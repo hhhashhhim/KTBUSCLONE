@@ -1,0 +1,56 @@
+<?php
+
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
+use App\Http\Middleware\CustomMiddleware;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::post("/login",[AuthController::class,'login']);
+Route::get("/logout",[AuthController::class,'logout'])->middleware([CustomMiddleware::class]);
+
+
+Route::group(['prefix'=>'admin'],function(){
+    Route::get('dashboard',[TestController::class,'index'])->name('dashboard');
+    Route::get('company/add',[TestController::class,'add_company'])->name('company.add');
+    Route::get('company/all',[TestController::class,'all_companies'])->name('company.all');
+});
+
+
+
+Route::group(['prefix'=>'role','middleware',[CustomMiddleware::class]],function(){
+    Route::post('/',[RoleController::class,'index']);
+    Route::post('store',[RoleController::class,'store']);
+    Route::post('update',[RoleController::class,'update']);
+    Route::post('delete',[RoleController::class,'delete']);
+    Route::post('/get',[RoleController::class,'role']);
+});
+Route::group(['prefix'=>'company','middleware',[CustomMiddleware::class]],function(){
+    Route::post('/',[CompanyController::class,'index']);
+    Route::post('store',[CompanyController::class,'store']);
+    Route::post('update',[CompanyController::class,'update']);
+    Route::post('delete',[CompanyController::class,'delete']);
+    Route::post('/get',[CompanyController::class,'role']);
+    Route::post('/roles',[CompanyController::class,'company_roles']);
+});
+Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
+    Route::post('/',[UserController::class,'index']);
+    Route::post('store',[UserController::class,'store']);
+    Route::post('update',[UserController::class,'update']);
+    Route::post('delete',[UserController::class,'delete']);
+    Route::post('permissions',[UserController::class,'permissions']);
+});
+Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');
