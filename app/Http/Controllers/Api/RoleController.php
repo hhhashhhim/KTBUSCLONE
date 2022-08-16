@@ -16,13 +16,24 @@ class RoleController extends Controller
     public function role(Request $request)
     {
         $role = Role::with('company:id,name')->find($request->id);
-        $permissions = collect($this->permissions());
         $company = Company::find($role->company_id);
         if ($company) {
+
+            $modules = [];
+            foreach ($company->modules as $i => $module) {
+
+                $module['allow'] = false;
+                foreach ($module['childs'] as $j => $childModule) {
+                    $module['childs'][$j]['allow'] = false;
+                }
+                $modules[] = $module;
+
+            }
             return response()->json([
                 'role' => $role,
-                'permissions' => $company->modules,
+                'permissions' => $modules,
             ], 200);
+
         }else{
             return response()->json([
                 'Message' => "Company Not Found !!!!",
