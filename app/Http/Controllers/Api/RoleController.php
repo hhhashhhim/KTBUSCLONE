@@ -15,28 +15,23 @@ class RoleController extends Controller
     }
     public function role(Request $request)
     {
-        $permissions = collect($this->permissions());
         $role = Role::with('company:id,name')->find($request->id);
-        $companyPermissions = Company::find($role->company_id)->modules;
-        $modules = [];
-
-        foreach ($companyPermissions??[] as $key => $module) {
-            foreach ($module as $name => $column) {
-                if ($column == true) {
-                    $modules[] = $name;
-                }
-            }
+        $permissions = collect($this->permissions());
+        $company = Company::find($role->company_id);
+        if ($company) {
+            return response()->json([
+                'role' => $role,
+                'permissions' => $company->modules,
+            ], 200);
+        }else{
+            return response()->json([
+                'Message' => "Company Not Found !!!!",
+            ], 400);
         }
         
-        $permissions = $permissions->whereIn('name', $modules);
-        return response()->json([
-            'role' => $role,
-            'permissions' => $permissions,
-        ], 200);
     }
     public function store(Request $request)
     {
-
         $this->validate($request, [
             'name' => 'required',
         ]);
@@ -49,7 +44,6 @@ class RoleController extends Controller
     }
     public function update(Request $request)
     {
-        return $request;
         Role::find($request->id)->update([
             'name' => $request->name,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
@@ -86,21 +80,9 @@ class RoleController extends Controller
                 'read' => false,
                 'update' => false,
                 'delete' => false,
-            ],
-            [
-                'name' => "hrm",
-                'create' => false,
-                'read' => false,
-                'update' => false,
-                'delete' => false,
-            ],
-            [
-                'name' => "accounts",
-                'create' => false,
-                'read' => false,
-                'update' => false,
-                'delete' => false,
             ]
         ];
     }
 }
+// :checked="mod"
+// :value="true"

@@ -137,28 +137,48 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(moduleName,i) in data.modules" :key="i">
+            <template v-for="(moduleName,i) in data.modules" :key="i">
+            <tr>
               <td>{{ i+1 }}</td>
               <td> 
-                <div class="text-capitalize" v-for="(mod,j) in moduleName" :key="j">
-                  {{ j }}
+                <div class="text-capitalize">
+                  {{ moduleName.name }}
                 </div>
               </td>
               <td>
-                <label class="colorinput mx-3" v-for="(mod,j) in moduleName" :key="j">
+                <label class="colorinput mx-3">
                   <span v-if="i!='name'">
                         <input
                           :checked="mod"
                           type="checkbox"
                           :value="true"
                           class="colorinput-input"
-                          v-model="moduleName[j]"
+                          v-model="moduleName.allow"
                     />
                     <span class="colorinput-color bg-success"></span>
                   </span>
                 </label>
               </td>
             </tr>
+            <tr v-if="moduleName.allow">
+              <td></td>
+                <td colspan="2" class="py-5">
+                  <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
+                  <span v-if="i!='name'">
+                        <input
+                          :checked="menus"
+                          type="checkbox"
+                          :value="true"
+                          class="colorinput-input"
+                          v-model="menus.allow"
+                    />
+                    <span class="colorinput-color bg-success"></span>
+                    <span style="position:relative;left:5px;top:-10px;" class="text-capitalize"> {{ menus.name }} </span>
+                  </span>
+                </label>
+                </td>
+            </tr>
+            </template>
           </tbody>
         </table>
         <div class="row">
@@ -230,28 +250,48 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(moduleName,i) in dataEdit.modules" :key="i">
+            <template v-for="(moduleName,i) in dataEdit.modules" :key="i">
+            <tr>
               <td>{{ i+1 }}</td>
               <td> 
-                <div class="text-capitalize" v-for="(mod,j) in moduleName" :key="j">
-                  {{ j }}
+                <div class="text-capitalize">
+                  {{ moduleName.name }}
                 </div>
               </td>
               <td>
-                <label class="colorinput mx-3" v-for="(mod,j) in moduleName" :key="j">
+                <label class="colorinput mx-3">
                   <span v-if="i!='name'">
                         <input
                           :checked="mod"
                           type="checkbox"
                           :value="true"
                           class="colorinput-input"
-                          v-model="moduleName[j]"
+                          v-model="moduleName.allow"
                     />
                     <span class="colorinput-color bg-success"></span>
                   </span>
                 </label>
               </td>
             </tr>
+            <tr v-if="moduleName.allow">
+              <td></td>
+                <td colspan="2" class="py-5">
+                  <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
+                  <span v-if="i!='name'">
+                        <input
+                          :checked="menus"
+                          type="checkbox"
+                          :value="true"
+                          class="colorinput-input"
+                          v-model="menus.allow"
+                    />
+                    <span class="colorinput-color bg-success"></span>
+                    <span style="position:relative;left:5px;top:-10px;" class="text-capitalize"> {{ menus.name }} </span>
+                  </span>
+                </label>
+                </td>
+            </tr>
+            </template>
           </tbody>
         </table>
         <div class="row">
@@ -294,7 +334,20 @@ export default {
         contact: "",
         logo: "",
         location: "",
-        modules:[{hrm:false},{accounts:false},{booking:false},{users:false}]
+        modules:[
+          {name:'hrm',allow:false,childs:[
+            {name:"employee",allow:false},
+            {name:"salary",allow:false},
+            {name:"loan",allow:false},
+            {name:"leave managment",allow:false},
+            {name:"attendance",allow:false},
+          ]},
+          {name:'users',allow:false,childs:[
+            {name:"user",allow:false},
+            {name:"roles",allow:false},
+          ]}
+        ],
+        defaultModules:[],
       },
       dataEdit:{
         i: "",
@@ -302,7 +355,19 @@ export default {
         contact: "",
         logo: "",
         location: "",
-        modules:[{hrm:false},{accounts:false},{booking:false},{users:false}]
+        modules:[
+          {name:'hrm',allow:false,childs:[
+            {name:"employee",allow:false},
+            {name:"salary",allow:false},
+            {name:"loan",allow:false},
+            {name:"leave managment",allow:false},
+            {name:"attendance",allow:false},
+          ]},
+          {name:'users',allow:false,childs:[
+            {name:"user",allow:false},
+            {name:"roles",allow:false},
+          ]}
+        ]
       },
       success: false,
       companies: [],
@@ -311,13 +376,15 @@ export default {
   async created() {
     const companyRes = await this.callApi("post", "/company");
     if (companyRes.status==200){
+      this.defaultModules = this.data.modules;
       this.companies = companyRes.data;
     }
     
   },
   methods: {
     async add() {
-
+      // console.log(this.data.modules);
+      // return ;
       this.validationErrors = [];
       if (this.data.name == "")
         return this.errorsArray("Company Name is Required", "Name");
@@ -329,11 +396,11 @@ export default {
         this.success = "Company Created Successfully";
         this.companies.unshift(res.data);
         this.data.name = this.data.contact = this.data.location = "";
-        this.modules=[{hrm:false},{accounts:false},{booking:false}]
+        this.data.modules = this.defaultModules;
         setTimeout(() => {
           this.success = "";
           $("#add-modal").modal("hide");
-        }, 3000);
+        }, 2000);
       } else {
         if (res.status == 422) {
           for (const key in res.data.errors) {

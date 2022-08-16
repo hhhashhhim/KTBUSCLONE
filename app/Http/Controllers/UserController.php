@@ -25,6 +25,7 @@ class UserController extends Controller
         $user = User::create([
             'name'=>$request->name,
             'email'=>$request->email,
+            'contact'=>$request->contact,
             'password'=>Hash::make($request->password),
             'role_id'=>$request->role,
             'company_id'=>auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id,

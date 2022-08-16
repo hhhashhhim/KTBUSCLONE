@@ -57,7 +57,7 @@ export default {
                     isDeleted:true,
                 }
                 this.$store.commit("setDeleteObj",deletingObj);
-                this.success="Role Deleted !!!";
+                this.success="Company Deleted !!!";
                 setTimeout(() => {
                     this.success=""
                     $("#delete-modal").modal("hide");            

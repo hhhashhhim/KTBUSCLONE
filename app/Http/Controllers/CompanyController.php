@@ -40,6 +40,9 @@ class CompanyController extends Controller
         ]);
         
     }
+    public function delete( Request $request ){
+        return Company::find($request->id)->delete();
+    }
     public function company_roles( Request $request ){
         return Role::where('company_id',$request->id)->get();
     }

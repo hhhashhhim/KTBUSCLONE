@@ -39,25 +39,67 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(permission, index) in permissions" :key="index">
-                              <td>{{ (index+1) }}</td>
+                            <template v-for="(moduleName,i) in permissions" :key="i">
+                            <tr>
+                              <td>{{ i+1 }}</td>
+                              <td> 
+                                <div class="text-capitalize">
+                                  {{ moduleName.name }}
+                                </div>
+                              </td>
+                              <td>
+                                <label class="colorinput mx-3">
+                                  <span v-if="i!='name'">
+                                        <input
+                                          :checked="mod"
+                                          type="checkbox"
+                                          :value="true"
+                                          class="colorinput-input"
+                                          v-model="moduleName.allow"
+                                    />
+                                    <span class="colorinput-color bg-success"></span>
+                                  </span>
+                                </label>
+                              </td>
+                            </tr>
+                            <tr v-if="moduleName.allow">
+                              <td colspan="2"></td>
+                                <td class="py-5">
+                                  <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
+                                  <span v-if="i!='name'">
+                                        <input
+                                          :checked="menus"
+                                          type="checkbox"
+                                          :value="true"
+                                          class="colorinput-input"
+                                          v-model="menus.allow"
+                                    />
+                                    <span class="colorinput-color bg-success"></span>
+                                    <span style="position:relative;left:5px;top:-10px;" class="text-capitalize"> {{ menus.name }} </span>
+                                  </span>
+                                </label>
+                                </td>
+                            </tr>
+                            </template>
+                            <!-- <tr v-for="(permission, index) in permissions" :key="index">
+                              <td>{{ parseInt(index)+1 }}</td>
                               <td>{{ permission.name }}</td>
                               <td>
                                 <label class="colorinput mx-3" v-for="(operation,i) in permission" :key="i">
                                   <span v-if="i!='name'">
                                         <input
-                                          :checked="permission[i]"
                                           type="checkbox"
-                                          :value="true"
                                           class="colorinput-input"
                                           v-model="permission[i]"
                                     />
+                                    :checked="permission[i]"
+                                          :value="true"
                                     <span class="colorinput-color bg-success"></span>
                                     <span style="position:relative;top:-10px;left:5px;"> {{ i }}</span>
                                   </span>
                                 </label>
                               </td>
-                            </tr>
+                            </tr> -->
                           </tbody>
                         </table>
                       </div>
@@ -80,38 +122,15 @@ export default {
   data() {
     return {
       role: "",
-
-      permissions: [
-        {
-          name: "roles",
-          create: false,
-          read: false,
-          update: false,
-          delete: false,
-        },
-        {
-          name: "users",
-          create: false,
-          read: false,
-          update: false,
-          delete: false,
-        },
-        {
-          name: "profile",
-          create: false,
-          read: false,
-          update: false,
-          delete: false,
-        },
-      ],
+      permissions: [],
       success: false,
     };
   },
   async created() {
     const res = await this.callApi("post", "/role/get", { id: this.$route.params.id });
     if (res.status == 200) {
-      console.log(res.data);
       this.role = res.data.role;
+      console.log(res.data.permissions);
       this.permissions = res.data.permissions; 
     } else {
       console.log(res);
@@ -123,7 +142,6 @@ export default {
         ...this.role,
         permissions:this.permissions,
       })
-      console.log(res);
       if (res.status == 201) {
         this.success = "Role and Permissions Updated Successfully";
         setTimeout(() => {
