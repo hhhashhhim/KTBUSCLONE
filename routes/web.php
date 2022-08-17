@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -23,11 +23,11 @@ Route::post("/login",[AuthController::class,'login']);
 Route::get("/logout",[AuthController::class,'logout'])->middleware([CustomMiddleware::class]);
 
 
-Route::group(['prefix'=>'admin'],function(){
-    Route::get('dashboard',[TestController::class,'index'])->name('dashboard');
-    Route::get('company/add',[TestController::class,'add_company'])->name('company.add');
-    Route::get('company/all',[TestController::class,'all_companies'])->name('company.all');
-});
+// Route::group(['prefix'=>'admin'],function(){
+//     Route::get('dashboard',[TestController::class,'index'])->name('dashboard');
+//     Route::get('company/add',[TestController::class,'add_company'])->name('company.add');
+//     Route::get('company/all',[TestController::class,'all_companies'])->name('company.all');
+// });
 
 
 
@@ -52,5 +52,12 @@ Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
     Route::post('update',[UserController::class,'update']);
     Route::post('delete',[UserController::class,'delete']);
     Route::post('permissions',[UserController::class,'permissions']);
+});
+Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
+    Route::post('/',[TerminalController::class,'index']);
+    Route::post('store',[TerminalController::class,'store']);
+    Route::post('update',[TerminalController::class,'update']);
+    Route::post('delete',[TerminalController::class,'delete']);
+    Route::post('permissions',[TerminalController::class,'permissions']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

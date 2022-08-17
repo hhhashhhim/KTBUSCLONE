@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateTerminalsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('terminals', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('contact');
+            $table->text('address');
+            $table->string('longitude');
+            $table->string('latitude');
+            $table->tinyInteger('active_sms');
+            $table->integer('city_id');
+            $table->integer('company_id');
+            $table->string('online_terminal_name');
+            $table->string('status');
+            $table->integer('added_by');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('terminals');
+    }
+}

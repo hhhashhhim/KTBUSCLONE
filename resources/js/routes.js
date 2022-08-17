@@ -8,7 +8,8 @@ import Roles from "./pages/roles/Roles.vue";
 import Company from "./pages/company/Company.vue";
 import Permissions from "./pages/roles/Permissions.vue";
 import Login from "./pages/auth/Login.vue";
-import AdminRoles from "./pages/admin/roles/Roles.vue";
+import Terminal from "./pages/terminal/Terminal.vue";
+import Dashboard from "./pages/auth/Dashboard.vue";
 
 const routes = [
     {
@@ -45,6 +46,16 @@ const routes = [
         path:"/company",
         component : Company,
         name:"company"
+    },
+    {
+        path:"/terminal",
+        component : Terminal,
+        name:"terminal"
+    },
+    {
+        path:"/admin/dashboard",
+        component : Dashboard,
+        name:"admin-dashboard"
     }
 ]
 const router = createRouter({

@@ -30,15 +30,14 @@ const store = createStore({
         async updateUser(state,user){
             state.user=user;
             if (user.is_super_admin != 1 && user.role && user.company) {
-                
-                let companyPermissions = user.company.modules;
-                let modules = [];
-                companyPermissions.forEach(permission => {
-                    for(const test in permission){
-                        modules.push(test);
-                    }
-                });
-                state.companyModules = modules;
+                // let companyPermissions = user.company.modules;
+                // let modules = [];
+                // companyPermissions.forEach(permission => {
+                //     for(const test in permission){
+                //         modules.push(test);
+                //     }
+                // });
+                // state.companyModules = modules;
                 state.permissions = user.role.permissions;            
             }else{
                 state.permissions = state.companyModules = []

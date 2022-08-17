@@ -335,6 +335,11 @@ export default {
         logo: "",
         location: "",
         modules:[
+          {name:'admin',allow:false,childs:[
+            {name:"dashboard",allow:false},
+            {name:"companies",allow:false},
+            {name:"terminal",allow:false},
+          ]},
           {name:'hrm',allow:false,childs:[
             {name:"employee",allow:false},
             {name:"salary",allow:false},

@@ -19,15 +19,20 @@ class RoleController extends Controller
         $company = Company::find($role->company_id);
         if ($company) {
 
-            $modules = [];
-            foreach ($company->modules as $i => $module) {
+            if ($role->permissions) {
+                $modules = $role->permissions;
+            }
+            else{
+                $modules = [];
+                foreach ($company->modules as $i => $module) {
 
-                $module['allow'] = false;
-                foreach ($module['childs'] as $j => $childModule) {
-                    $module['childs'][$j]['allow'] = false;
+                    $module['allow'] = false;
+                    foreach ($module['childs'] as $j => $childModule) {
+                        $module['childs'][$j]['allow'] = false;
+                    }
+                    $modules[] = $module;
+
                 }
-                $modules[] = $module;
-
             }
             return response()->json([
                 'role' => $role,

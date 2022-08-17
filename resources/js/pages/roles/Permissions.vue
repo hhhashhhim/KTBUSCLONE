@@ -81,25 +81,6 @@
                                 </td>
                             </tr>
                             </template>
-                            <!-- <tr v-for="(permission, index) in permissions" :key="index">
-                              <td>{{ parseInt(index)+1 }}</td>
-                              <td>{{ permission.name }}</td>
-                              <td>
-                                <label class="colorinput mx-3" v-for="(operation,i) in permission" :key="i">
-                                  <span v-if="i!='name'">
-                                        <input
-                                          type="checkbox"
-                                          class="colorinput-input"
-                                          v-model="permission[i]"
-                                    />
-                                    :checked="permission[i]"
-                                          :value="true"
-                                    <span class="colorinput-color bg-success"></span>
-                                    <span style="position:relative;top:-10px;left:5px;"> {{ i }}</span>
-                                  </span>
-                                </label>
-                              </td>
-                            </tr> -->
                           </tbody>
                         </table>
                       </div>
@@ -130,7 +111,6 @@ export default {
     const res = await this.callApi("post", "/role/get", { id: this.$route.params.id });
     if (res.status == 200) {
       this.role = res.data.role;
-      console.log(res.data.permissions);
       this.permissions = res.data.permissions; 
     } else {
       console.log(res);
@@ -147,7 +127,8 @@ export default {
         setTimeout(() => {
           this.success = "";
         }, 3000);
-      }else {
+      }
+      else {
         if (res.status == 422) {
           for (const key in res.data.errors) {
             res.data.errors[key].forEach((element) => {

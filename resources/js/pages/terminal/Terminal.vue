@@ -5,7 +5,7 @@
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card card-success">
             <div class="card-header">
-              <h4>Users</h4>
+              <h4>Terminals</h4>
               <div class="card-header-action">
                 <a
                   href="#add-modal"
@@ -34,26 +34,26 @@
                             <tr>
                               <th>Sr No.</th>
                               <th>Name</th>
-                              <th>Email</th>
                               <th>Contact</th>
-                              <th>Company</th>
-                              <th>Role</th>
+                              <th>Address</th>
+                              <th>Modified By</th>
+                              <th>Modified Date</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(user, i) in users" :key="i">
+                            <tr v-for="(terminal, i) in terminals" :key="i">
                               <td>{{ i + 1 }}</td>
-                              <td>{{ user.name }}</td>
-                              <td>{{ user.email }}</td>
-                              <td>{{ user.contact }}</td>
-                              <th>{{ user.company?user.company.name:"Not Found" }}</th>
-                              <th>{{ user.role?user.role.name:"Not Found" }}</th>
+                              <td>{{ terminal.name }}</td>
+                              <td>{{ terminal.contact }}</td>
+                              <td>{{ terminal.address }}</td>
+                              <th>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</th>
+                              <th>{{ terminal.updated_at }}</th>
                               <td>
                                 <a
                                   href="#edit-modal"
                                   data-toggle="modal"
-                                  @click="edit(user)"
+                                  @click="edit(terminal)"
                                   class="btn btn-warning mx-1"
                                 >
                                   <i class="far fa-edit"></i>
@@ -61,7 +61,7 @@
                                 <a
                                   href="#delete-modal"
                                   data-toggle="modal"
-                                  @click="deleteModal(user, i)"
+                                  @click="deleteModal(terminal, i)"
                                   class="btn btn-danger"
                                 >
                                   <i class="far fa-trash-alt"></i>
@@ -83,7 +83,7 @@
 
       <!-- Add Modal -->
       <Add
-        heading="New User"
+        heading="New terminal"
         :errors="this.validationErrors"
         :success="success"
       >
@@ -160,7 +160,7 @@
         </div>
         <div class="form-group col-md-12">
           <button type="button" class="btn btn-block btn-success" @click="add">
-            Add User
+            Add terminal
           </button>
         </div>
       </div>
@@ -168,7 +168,7 @@
 
       <!-- Add Modal -->
       <Edit
-        heading="Edit User"
+        heading="Edit terminal"
         :errors="this.validationErrors"
         :success="success"
       >
@@ -248,7 +248,7 @@
             class="btn btn-block btn-success"
             @click="update"
           >
-            Update User
+            Update terminal
           </button>
         </div>
       </div>
@@ -256,7 +256,7 @@
 
       <!-- Add Modal -->
       <Delete
-        confirmationMessage='Are You Sure You want To Delete This "USER" ???'
+        confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
       />
     </div>
   </section>
@@ -277,25 +277,29 @@ export default {
   },
   data() {
     return {
-      roles: [],
-      users: [],
+      terminals: [],
       companies: [],
       data: {
-        name: "",
-        email: "",
-        contact: "",
-        password: "",
-        role: "",
-        company_id: "",
+        name:"",
+        contact:"",
+        address:"",
+        longitude:"",
+        latitude:"",
+        active_sms:"",
+        city_id:"",
+        company_id:"",
+        online_terminal_name:"",
+        status:"",
+        added_by:"",
       },
       dataEdit:{},
       success: false,
     };
   },
   async created() {
-    const userRes = await this.callApi("post", "/user", {});
+    const terminalRes = await this.callApi("post", "/terminal", {});
     const compRes = await this.callApi("post", "/company", {});
-    this.users = userRes.data;
+    this.terminals = terminalRes.data;
     this.companies = compRes.data;
   },
   methods: {
@@ -303,18 +307,18 @@ export default {
       this.validationErrors = [];
 
       if (this.data.name == "")
-        return this.errorsArray("User Name is Required", "Name");
+        return this.errorsArray("terminal Name is Required", "Name");
       if (this.data.email == "")
-        return this.errorsArray("User Email is Required", "Email");
+        return this.errorsArray("terminal Email is Required", "Email");
       if (this.data.password == "")
-        return this.errorsArray("User Password is Required", "Password");
+        return this.errorsArray("terminal Password is Required", "Password");
       if (this.data.role == "")
-        return this.errorsArray("User Role is Required", "Role");
+        return this.errorsArray("terminal Role is Required", "Role");
       // return "Reaching";
-      const res = await this.callApi("post", "/user/store", this.data);
+      const res = await this.callApi("post", "/terminal/store", this.data);
       if (res.status == 200) {
-        this.success = "User Created Successfully";
-        this.users = res.data
+        this.success = "terminal Created Successfully";
+        this.terminals = res.data
         this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
         setTimeout(() => {
           this.success = "";
@@ -329,22 +333,22 @@ export default {
         }
       }
     },
-    async edit(user) {
-      this.dataEdit = user;
-      this.dataEdit.role=user.role_id;
-      const roleRes = await this.callApi("post", "/company/roles", {id:user.company_id});
+    async edit(terminal) {
+      this.dataEdit = terminal;
+      this.dataEdit.role=terminal.role_id;
+      const roleRes = await this.callApi("post", "/company/roles", {id:terminal.company_id});
       this.roles = roleRes.data;
     },
     async update() {
       this.validationErrors = [];
       if (this.dataEdit.name == "")
-      return this.errorsArray("User Name is Required", "Name");
-      const res = await this.callApi("post", "/user/update", this.dataEdit);
+      return this.errorsArray("terminal Name is Required", "Name");
+      const res = await this.callApi("post", "/terminal/update", this.dataEdit);
       if (res.status == 201) {
-        this.success = "User Updated Successfully";
+        this.success = "terminal Updated Successfully";
         this.dataEdit = "";
-        const userRes = await this.callApi("post", "/user", {});
-        this.users = userRes.data;
+        const terminalRes = await this.callApi("post", "/terminal", {});
+        this.terminals = terminalRes.data;
         setTimeout(() => {
           this.success = "";
           $("#edit-modal").modal("hide");
@@ -360,10 +364,10 @@ export default {
         }
       }
     },
-    async deleteModal(user, i) {
+    async deleteModal(terminal, i) {
       const deletingObj = {
-        url: "/user/delete",
-        data: user,
+        url: "/terminal/delete",
+        data: terminal,
         index: i,
       };
       this.$store.commit("setDeleteObj", deletingObj);
@@ -380,7 +384,7 @@ export default {
     getDeletingObj(obj) {
       console.log(obj);
       if (obj.isDeleted) {
-        this.users.splice(obj.index, 1);
+        this.terminals.splice(obj.index, 1);
       }
     },
   },

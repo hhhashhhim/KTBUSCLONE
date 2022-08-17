@@ -38,10 +38,6 @@ export default {
             this.$store.commit('updateUser',this.user);            
         }
         this.$store.commit('updateAppUrl',this.app_url);
-        
-
-        // .find("users")  
-
     }
 }
 </script>

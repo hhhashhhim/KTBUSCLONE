@@ -12,10 +12,30 @@
                     <a href="/" class="nav-link">
                     <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
-                <li class="dropdown">
-                    <router-link class="nav-link text-capitalize" :to="{ name:'company' }" v-if="$store.state.user.is_super_admin==1">
-                        <i class="fa fa-building"></i> Company
-                    </router-link>
+                <li class="dropdown" v-if="$store.state.user.is_super_admin==1 || checkPermission('users')">
+                    
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-user-shield"></i>
+                        <span>
+                            Admin
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'admin-dashboard' }">
+                                <i class="fa fa-desktop"></i> Dashboard
+                            </router-link>
+                        </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'company' }">
+                                <i class="fa fa-building"></i> Company
+                            </router-link>
+                        </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'terminal' }">
+                                <i class="fa fa-landmark"></i> terminal
+                            </router-link>
+                        </li>
+                    </ul>
                 </li>
                 <li class="dropdown" v-if="$store.state.user.is_super_admin==1 || checkPermission('users')">
                     
@@ -31,7 +51,7 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="$store.state.user.is_super_admin==1 || checkForSubmenu('users')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="$store.state.user.is_super_admin==1 || checkForSubmenu('user')">
                                 <i class="fa fa-user"></i> Users
                             </router-link>
                         </li>
@@ -59,27 +79,30 @@ export default {
           permissions:[],
         }
     },
-    created(){
-        this.permissions = this.$store.state.permissions;
-        console.log(this.$store.state.permissions);
-    },
     methods:{
         checkPermission(name){
-            let permissions =this.$store.state.companyModules;
-            for(var i=0; i<permissions.length; i++) {
-                if (permissions[i]==name) {
-                    return 1;
-                }
-            }
+
+            let permissions =this.$store.state.permissions;
+            let module = permissions.find(obj => obj.name === name);
+            return module.allow;
+
         },
         checkForSubmenu(moduleName){
-            // console.log(moduleName);
+
             let permissions = this.permissions;
-            for(const i in permissions) {
-                if (permissions[i].name==moduleName && permissions[i].read==true) {
-                    return 1;
-                }
+            let valid = false;
+            for(var i=0; i<permissions.length; i++) {
+
+                permissions[i].childs.forEach(subMenuItem => {
+                    if (subMenuItem.name==moduleName) {
+                        valid = subMenuItem.allow; 
+                        return;
+                    }
+                });
+                
             }
+            return valid;
+
         }
     }
 }
