@@ -350,7 +350,8 @@ export default {
           {name:'users',allow:false,childs:[
             {name:"user",allow:false},
             {name:"roles",allow:false},
-          ]}
+          ]},
+          {name:'fare-table',allow:false,childs:[]}
         ],
         defaultModules:[],
       },

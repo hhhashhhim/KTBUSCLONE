@@ -35,6 +35,7 @@ export default {
     },
     created(){
         if (this.user) {
+            // console.log("User Data",this.user);
             this.$store.commit('updateUser',this.user);            
         }
         this.$store.commit('updateAppUrl',this.app_url);

@@ -117,7 +117,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="advance_booking">Advance Booking Allowed(Days)</label>
-          <input type="number" value="0" class="form-control" v-model="data.advance_booking">
+          <input type="number" class="form-control" v-model="data.advance_booking">
         </div>
         <div class="form-group col-md-4">
           <label for="longitude">Longitude</label>
@@ -280,7 +280,7 @@ import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
 
 export default {
-  name: "Role",
+  name: "Terminal",
   components: {
     Add,
     Edit,
@@ -385,10 +385,6 @@ export default {
         index: i,
       };
       this.$store.commit("setDeleteObj", deletingObj);
-    },
-    async fetchCompanyRoles(){
-      const roleRes = await this.callApi("post", "/company/roles", {id:this.data.company_id});
-      this.roles = roleRes.data;
     }
   },
   computed: {

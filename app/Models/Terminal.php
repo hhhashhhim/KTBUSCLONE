@@ -9,6 +9,6 @@ class Terminal extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name','contact','address','longitude','latitude','active_sms','city_id','company_id','online_terminal_name','status','added_by',
+        'name','contact','address','longitude','latitude','time_difference','order','active_sms','city_id','company_id','online_terminal_name','status','added_by',
     ];
 }

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Terminal;
+use App\Models\TerminalAllowedSeatsAdvance;
+use App\Models\TerminalAvailableSeat;
+use App\Models\TerminalCommission;
 use Illuminate\Http\Request;
 
 class TerminalController extends Controller
@@ -19,13 +22,39 @@ class TerminalController extends Controller
             'city_id'=>'required',
         ]);
         
-        $user = Terminal::create([
+        $terminal = Terminal::create([
             'name'=>$request->name,
-            'email'=>$request->email,
             'contact'=>$request->contact,
-            'role_id'=>$request->role,
+            'address'=>$request->address,
+            'longitude'=>$request->longitude,
+            'latitude'=>$request->latitude,
+            'time_difference'=>$request->time_difference,
+            'order'=>$request->order,
+            'active_sms'=>$request->active_sms?1:0,
+            'city_id'=>$request->city_id,
+            'online_terminal_name'=>$request->online_terminal_name,
+            'status'=>$request->active?1:0,
+            'added_by'=>auth()->user()->id,
             'company_id'=>auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id,
         ]);
+
+        TerminalAllowedSeatsAdvance::create([
+            'terminal_id'=>$terminal->id,
+            'seats'=>$request->advance_booking,
+            'added_by'=>$terminal->id,
+        ]);
+        TerminalAvailableSeat::create([
+            'terminal_id'=>$terminal->id,
+            'seats'=>$request->advance_booking,
+            'added_by'=>$terminal->id,
+        ]);
+        TerminalCommission::create([
+            'terminal_id'=>$terminal->id,
+            'amount'=>$request->amount,
+            'added_by'=>$terminal->id,
+            'per_seat'=>$request->per_seat,
+        ]);
+        
         return $this->index();
         
     }

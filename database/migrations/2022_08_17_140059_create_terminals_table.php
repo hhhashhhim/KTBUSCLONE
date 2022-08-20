@@ -19,6 +19,8 @@ class CreateTerminalsTable extends Migration
             $table->string('contact');
             $table->text('address');
             $table->string('longitude')->nullable();
+            $table->string('time_difference')->nullable();
+            $table->string('order')->nullable();
             $table->string('latitude')->nullable();
             $table->tinyInteger('active_sms')->nullable();
             $table->integer('city_id');

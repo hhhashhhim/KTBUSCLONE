@@ -57,6 +57,11 @@
                         </li>
                     </ul>
                 </li>
+                <li v-if="$store.state.user.is_super_admin==1 || checkPermission('fare-table')">
+                    <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }" v-if="$store.state.user.is_super_admin==1 || checkForSubmenu('roles')">
+                        <i class="fas fa-table"></i> Fare Table
+                    </router-link>
+                </li>
                 <!-- <li class="dropdown" v-for="(permission,i) in $store.state.permissions" :key="i">
                     <router-link class="nav-link text-capitalize" :to="{ name:permission.name }" v-if="permission.read==true">
                         <i :class="'fa '+iconsClass[permission.name]"></i>{{ permission.name }}
@@ -83,6 +88,7 @@ export default {
         checkPermission(name){
 
             let permissions =this.$store.state.permissions;
+            return console.log(permissions);
             let module = permissions.find(obj => obj.name === name);
             return module.allow;
 

@@ -10,6 +10,7 @@ import Permissions from "./pages/roles/Permissions.vue";
 import Login from "./pages/auth/Login.vue";
 import Terminal from "./pages/terminal/Terminal.vue";
 import Dashboard from "./pages/auth/Dashboard.vue";
+import FareTable from "./pages/fareTable/FareTable.vue";
 
 const routes = [
     {
@@ -56,6 +57,11 @@ const routes = [
         path:"/admin/dashboard",
         component : Dashboard,
         name:"admin-dashboard"
+    },
+    {
+        path:"/fare-table",
+        component : FareTable,
+        name:"fare-table"
     }
 ]
 const router = createRouter({

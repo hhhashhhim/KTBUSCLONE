@@ -7,7 +7,7 @@
                 <div class="modal-body">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4 class="modal-title">{{ heading }}</h4>
+                            <h4 class="modal-title"><span v-html="heading"></span></h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>    

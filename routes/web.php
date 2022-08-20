@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
@@ -59,5 +60,12 @@ Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
     Route::post('update',[TerminalController::class,'update']);
     Route::post('delete',[TerminalController::class,'delete']);
     Route::post('permissions',[TerminalController::class,'permissions']);
+});
+Route::group(['prefix'=>'city',[CustomMiddleware::class]],function(){
+    Route::post('/',[CityController::class,'index']);
+});
+Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
+    Route::post('/',[CityController::class,'index']);
+    Route::post('/store',[CityController::class,'store']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');
