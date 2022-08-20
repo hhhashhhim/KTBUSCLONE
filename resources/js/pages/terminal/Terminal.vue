@@ -88,76 +88,87 @@
         :success="success"
       >
       <div class="row">
-        <div class="form-group col-md-6">
-          <label for="name">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Enter Name"
-            id="name"
-            v-model="data.name"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <label for="email">Email</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Enter Email"
-            id="email"
-            v-model="data.email"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <label for="contact">Contact</label>
-          <input
-            type="contact"
-            class="form-control"
-            placeholder="Enter Password"
-            id="contact"
-            v-model="data.contact"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            placeholder="Enter Password"
-            id="password"
-            v-model="data.password"
-          />
-        </div>
-        <div class="form-group col-md-12">
-          <label for="company">Company</label>
-          <select
-            type="text"
-            class="form-control"
-            id="company"
-            @change="fetchCompanyRoles"
-            v-model="data.company_id"
-          >
+        <div class="form-group col-md-4" v-if="$store.state.user.is_super_admin==1">
+          <label for="company">Company Name</label>
+          <select class="form-control" v-model="data.company_id">
             <option value="">Select Company</option>
-            <option v-for="(company, i) in companies" :value="company.id" :key="i">
-              {{ company.name }}
-            </option>
+            <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
           </select>
         </div>
-        <div class="form-group col-md-12" v-if="data.company_id">
-          <label for="role">Role</label>
-          <select
-            type="text"
-            class="form-control"
-            placeholder="Enter role"
-            id="role"
-            v-model="data.role"
-          >
-            <option value="" selected>Select Role</option>
-            <option v-for="(role, i) in roles" :value="role.id" :key="i">
-              {{ role.name }}
-            </option>
+        <div class="form-group col-md-4">
+          <label for="name">Terminal Name</label>
+          <input type="text" class="form-control" v-model="data.name">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="available_seats">Available Seats</label>
+          <input type="number" class="form-control" v-model="data.available_seats">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="contact">Terminal Contact</label>
+          <input type="text" class="form-control" v-model="data.contact">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="address">Address</label>
+          <input type="text" class="form-control" v-model="data.address">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="time_difference">Time Difference ( Hours )</label>
+          <input type="text" class="form-control" v-model="data.time_difference">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="advance_booking">Advance Booking Allowed(Days)</label>
+          <input type="number" value="0" class="form-control" v-model="data.advance_booking">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="longitude">Longitude</label>
+          <input type="text" class="form-control" v-model="data.longitude">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="Latitude">Latitude</label>
+          <input type="text" class="form-control" v-model="data.latitude">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="online_terminal_name">Online Terminal Name</label>
+          <input type="text" class="form-control" v-model="data.online_terminal_name">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="city_id">Terminal City</label>
+          <select class="form-control" v-model="data.city_id">
+            <option value="">Select City</option>
+            <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
           </select>
         </div>
+        <div class="form-group col-md-4">
+          <label for="order">Terminal Order</label>
+          <input type="text" class="form-control" v-model="data.order">
+        </div>
+        <div class="form-group col-md-4 d-flex align-items-center">
+          <label class="mt-4" for="active">Is Active</label>
+          <label class="colorinput mx-3 mt-3">
+            <span>
+                  <input
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="data.active"
+              />
+            <span class="colorinput-color bg-success"></span>
+            </span>
+          </label>
+        </div>
+        <div class="form-group col-md-4 d-flex align-items-center">
+          <label class="mt-4" for="sms">SMS</label>
+          <label class="colorinput mx-3 mt-3">
+            <span>
+                  <input
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="data.active_sms"
+              />
+            <span class="colorinput-color bg-success"></span>
+            </span>
+          </label>
+        </div>
+        
         <div class="form-group col-md-12">
           <button type="button" class="btn btn-block btn-success" @click="add">
             Add terminal
@@ -280,25 +291,29 @@ export default {
       terminals: [],
       companies: [],
       data: {
+        company_id:"",
         name:"",
+        available_seats:"",
         contact:"",
         address:"",
+        time_difference:"",
+        active_sms:"",
+        advance_booking:"",
         longitude:"",
         latitude:"",
-        active_sms:"",
         city_id:"",
         company_id:"",
         online_terminal_name:"",
-        status:"",
-        added_by:"",
+        active:"",
+        order:"",
       },
       dataEdit:{},
       success: false,
     };
   },
   async created() {
-    const terminalRes = await this.callApi("post", "/terminal", {});
-    const compRes = await this.callApi("post", "/company", {});
+    const terminalRes = await this.callApi("post", "/terminal");
+    const compRes = await this.callApi("post", "/company");
     this.terminals = terminalRes.data;
     this.companies = compRes.data;
   },
@@ -307,15 +322,14 @@ export default {
       this.validationErrors = [];
 
       if (this.data.name == "")
-        return this.errorsArray("terminal Name is Required", "Name");
-      if (this.data.email == "")
-        return this.errorsArray("terminal Email is Required", "Email");
-      if (this.data.password == "")
-        return this.errorsArray("terminal Password is Required", "Password");
-      if (this.data.role == "")
-        return this.errorsArray("terminal Role is Required", "Role");
-      // return "Reaching";
+        return this.errorsArray("Terminal Name is Required", "Name");
+      if (this.$store.state.user.is_super_admin == 1 && this.data.company_id == "")
+        return this.errorsArray("Company is Required", "Password");
+      if (this.data.city_id == "")
+        return this.errorsArray("Terminal City is Required", "City");
+       
       const res = await this.callApi("post", "/terminal/store", this.data);
+      return ;
       if (res.status == 200) {
         this.success = "terminal Created Successfully";
         this.terminals = res.data

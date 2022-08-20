@@ -18,13 +18,13 @@ class CreateTerminalsTable extends Migration
             $table->string('name');
             $table->string('contact');
             $table->text('address');
-            $table->string('longitude');
-            $table->string('latitude');
-            $table->tinyInteger('active_sms');
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
+            $table->tinyInteger('active_sms')->nullable();
             $table->integer('city_id');
             $table->integer('company_id');
             $table->string('online_terminal_name');
-            $table->string('status');
+            $table->string('status')->default('inactive');
             $table->integer('added_by');
             $table->timestamps();
         });

@@ -65,7 +65,7 @@
                             <tr v-if="moduleName.allow">
                               <td colspan="2"></td>
                                 <td class="py-5">
-                                  <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
+                                <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
                                   <span v-if="i!='name'">
                                         <input
                                           :checked="menus"

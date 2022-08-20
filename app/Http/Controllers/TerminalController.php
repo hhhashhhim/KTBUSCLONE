@@ -13,14 +13,12 @@ class TerminalController extends Controller
         
     }
     public function store( Request $request ){
-        
         $this->validate( $request,[
             'name'=>'required',
-            'email'=>'bail|required|email|unique:users',
-            'password'=>'required',
-            'role'=>'required',
-            'contact'=>'required',
+            'company_id'=>'required_if:'. auth()->user()->is_super_admin.",==,1",
+            'city_id'=>'required',
         ]);
+        
         $user = Terminal::create([
             'name'=>$request->name,
             'email'=>$request->email,
