@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FareTableController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CustomMiddleware;
@@ -65,7 +66,7 @@ Route::group(['prefix'=>'city',[CustomMiddleware::class]],function(){
     Route::post('/',[CityController::class,'index']);
 });
 Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
-    Route::post('/',[CityController::class,'index']);
-    Route::post('/store',[CityController::class,'store']);
+    Route::post('/',[FareTableController::class,'index']);
+    Route::post('/store',[FareTableController::class,'store']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

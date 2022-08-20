@@ -4,12 +4,31 @@
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card card-success">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                Please Enter All Required Fields !!!
+            </div>
             <div class="card-header">
               <h4>Fare Table</h4>
-              <div class="card-header-action w-25">
-                <select v-model="data.type" class="form-control">
-                    <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }} </option>
-                </select>
+              <div class="w-50 d-flex">
+                <div class="mx-2" v-if="$store.state.user.is_super_admin==1">
+                    <label for="company_id" class="font-weight-bold">Company</label>
+                    <select v-model="data.company_id" class="form-control">
+                        <option value="" selected>Select Company</option>
+                        <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
+                    </select>
+                </div>
+                <div class="mx-2">
+                    <label for="fare_class" class="font-weight-bold">Fare Class</label>
+                    <select v-model="data.fare_class" class="form-control">
+                        <option value="" selected>Select Fare Class</option>
+                        <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }} </option>
+                    </select>
+                </div>
+                <button class="btn btn-success btn-sm" type="button" @click="fetchRecord">Fetch Record</button>
               </div>
             </div>
             <div class="card-body">
@@ -218,19 +237,22 @@ export default {
   data() {
     return {
       cities: [],
+      companies: [],
       fareClasses: [{id:1,name:"economy"},{id:2,name:"exuctive"},{id:3,name:"business"}],
       data: {},
       from:{},
       to:{},
       dataEdit:{},
       success: false,
+      error: false,
       icon : ' <i class="fa fa-bus"></i> '
     };
   },
   async created() {
+    const compRes = await this.callApi("post", "/company");
     const cityRes = await this.callApi("post", "/city");
     this.cities = cityRes.data;
-    console.log(this.cities);
+    this.companies = compRes.data;
   },
   computed:{
     heading : function(){
@@ -241,11 +263,8 @@ export default {
     async add() {
       this.validationErrors = [];
       const res = await this.callApi("post", "/fare-table/store", this.data);
-      return ;
       if (res.status == 200) {
-        this.success = "terminal Created Successfully";
-        this.terminals = res.data
-        this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
+        this.success = "Fare Table Updated Created Successfully";
         setTimeout(() => {
           this.success = "";
         }, 3000);
@@ -265,7 +284,14 @@ export default {
         this.data.from = from.id
         this.data.to = to.id
     },
-    async deleteModal(terminal, i) {
+    fetchRecord(){
+        if (!data.company_id)
+            this.error=true;
+        if (!data.fare_class)
+            this.error=true;
+        
+    },
+    deleteModal(terminal, i) {
       const deletingObj = {
         url: "/terminal/delete",
         data: terminal,

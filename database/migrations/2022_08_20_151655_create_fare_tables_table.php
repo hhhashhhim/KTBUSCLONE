@@ -17,6 +17,9 @@ class CreateFareTablesTable extends Migration
             $table->id();
             $table->decimal('fare',12,2);
             $table->integer('fare_class');
+            $table->integer('from_city_id');
+            $table->integer('to_city_id');
+            $table->integer('company_id');
             $table->decimal('commission_flat',12,2)->nullable();
             $table->decimal('commission_percentage',12,2)->nullable();
             $table->decimal('terminal_commission',12,2)->nullable();
@@ -26,6 +29,7 @@ class CreateFareTablesTable extends Migration
             $table->string('surcharge_end_date')->nullable();
             $table->decimal('advance_availability',12,2)->nullable();
             $table->tinyInteger('is_active')->default('0');
+            $table->integer('added_by');
             $table->timestamps();
         });
     }

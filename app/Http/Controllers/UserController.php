@@ -62,11 +62,6 @@ class UserController extends Controller
         ],201);
     }
 
-    // public function permissions(){
-
-    //     Role::where('id',auth()->user()->role_id)->get
-        
-    // }
     
     
 }
