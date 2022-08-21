@@ -44,7 +44,7 @@
                       <h4></h4>
                     </div>
                     <div class="card-body">
-                      <div class="table-responsive">
+                      <div class="table-responsive" v-if="cities">
                         <table
                           class="table table-striped table-hover table-bordered"
                           id="edit_loc"
@@ -52,19 +52,21 @@
                           <thead>
                             <tr>
                                 <th></th>
-                                <th v-for="(city,i) in cities" :key="i"> {{ city.name }} </th>                              
+                                <th v-for="(city,i) in cities" :key="i"> {{ i }} </th>                              
                             </tr>
                           </thead>
                           <tbody>
-                                <tr v-for="(from_city,i) in cities" :key="i">
-                                    <template v-for="(to_city,j) in cities" :key="j">
-                                      <th v-if="j==0"> {{ from_city.name }} </th>
-                                      <td :class="+i==j?'bg-danger':'modal-cell'"> 
+                                <tr v-for="(to_city_array,i) in cities" :key="i">
+
+                                    <template v-for="(from_city,j) in to_city_array" :key="j">
+                                      <th v-if="j==0"> {{ from_city.from_name }} </th>
+                                      <td :class="i==j?'bg-danger':'modal-cell'"> 
                                           <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,to_city)" v-if="i!=j" class="btn btn-success btn-block modal-btn">
-                                            {{ checkFare(from_city,to_city) }}
+                                            {{  }}
                                           </a>
                                       </td>
                                     </template>
+
                                 </tr>
                           </tbody>
                         </table>
@@ -246,6 +248,8 @@ export default {
       companies: [],
       fetchedData: [],
       fareClasses: [{id:1,name:"economy"},{id:2,name:"exuctive"},{id:3,name:"business"}],
+      data:{},
+      dataEdit:{},
       from:{},
       to:{},
       success: false,
@@ -256,8 +260,6 @@ export default {
   },
   async created() {
     const compRes = await this.callApi("post", "/company");
-    const cityRes = await this.callApi("post", "/city");
-    this.cities = cityRes.data;
     this.companies = compRes.data;
   },
   computed:{
@@ -299,10 +301,8 @@ export default {
         company_id:this.data.company_id,fare_class:this.data.fare_class
       });
       if (res.status == 200) {
+        this.cities = res.data
         console.log(res.data);
-        this.fetchedData = res.data
-        this.success = "Fare Table Updated Successfully";
-        this.$forceUpdate()
         setTimeout(() => {
           this.success = "";
         }, 3000);

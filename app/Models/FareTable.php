@@ -25,4 +25,8 @@ class FareTable extends Model
         'is_active',
         'added_by',
     ];
+
+    public function city_name(){
+        return $this->belongsTo(City::class, 'to_city_id',  'id');
+    }
 }
