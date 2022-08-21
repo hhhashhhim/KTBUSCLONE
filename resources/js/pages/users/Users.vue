@@ -318,6 +318,7 @@ export default {
         this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
         setTimeout(() => {
           this.success = "";
+          
         }, 3000);
       } else {
         if (res.status == 422) {

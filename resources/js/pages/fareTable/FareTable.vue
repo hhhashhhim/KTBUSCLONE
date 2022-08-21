@@ -60,9 +60,9 @@
 
                                     <template v-for="(from_city,j) in to_city_array" :key="j">
                                       <th v-if="j==0"> {{ from_city.from_name }} </th>
-                                      <td :class="i==j?'bg-danger':'modal-cell'"> 
-                                          <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,to_city)" v-if="i!=j" class="btn btn-success btn-block modal-btn">
-                                            {{  }}
+                                      <td :class="from_city.from_id==from_city.to_id?'bg-danger':'modal-cell'"> 
+                                          <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,from_city)" v-if="from_city.from_id!=from_city.to_id" class="btn btn-success btn-block modal-btn">
+                                          {{ from_city.fare }}
                                           </a>
                                       </td>
                                     </template>
@@ -83,7 +83,7 @@
 
       <!-- Add Modal -->
       <Add
-        :heading="from.name + icon + to.name"
+        :heading="from + icon + to"
         :errors="this.validationErrors"
         :success="success"
       >
@@ -273,8 +273,12 @@ export default {
       const res = await this.callApi("post", "/fare-table/store", this.data);
       if (res.status == 200) {
         this.success = "Fare Table Updated Created Successfully";
+        // Object.keys(obj).forEach((i) => obj[i] = null);
+        this.data = {}
+        this.cities = res.data
         setTimeout(() => {
           this.success = "";
+          $("#add-modal").modal("hide")
         }, 3000);
       } else {
         if (res.status == 422) {
@@ -287,10 +291,10 @@ export default {
       }
     },
     changeInfo(from,to){
-        this.from = from;
-        this.to   = to;
-        this.data.from = from.id
-        this.data.to = to.id
+        this.from = from.from_name;
+        this.to   = to.to_name;
+        this.data.from = from.from_id
+        this.data.to = to.to_id
     },
     async fetchRecord(){
         if (!this.data.company_id || !this.data.fare_class){

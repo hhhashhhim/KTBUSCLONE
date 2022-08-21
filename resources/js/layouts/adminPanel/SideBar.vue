@@ -21,9 +21,15 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'admin-dashboard' }">
+                            
+                            <a href="/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>
+                                <span>
+                                    Dashboard
+                                </span>
+                            </a>
+                            <!-- <router-link class="nav-link text-capitalize" :to="{ name:'admin-dashboard' }">
                                 <i class="fa fa-desktop"></i> Dashboard
-                            </router-link>
+                            </router-link> -->
                         </li>
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name:'company' }">

@@ -15,12 +15,13 @@ class FareTableController extends Controller
             'fare'=>'required',
             'fare_class'=>'required',
         ]);
+        $company_id = auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id;
         FareTable::create([
             'fare'=>$request->fare,
             'from_city_id'=>$request->from,
             'to_city_id'=>$request->to,
             'fare_class'=>$request->fare_class,
-            'company_id'=>auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id,
+            'company_id'=>$company_id,
             'commission_flat'=>$request->commission_flat,
             'commission_percentage'=>$request->commission_percentage,
             'terminal_commission'=>$request->terminal_commission,
@@ -32,9 +33,7 @@ class FareTableController extends Controller
             'added_by'=>auth()->user()->id,
         ]);
         
-        return response()->json([
-            'message'=>'Stored Successfully',
-        ],200);
+        return $this->getFarePrices( $company_id,$request->fare_class );
         
     }
     
@@ -44,26 +43,29 @@ class FareTableController extends Controller
             'company_id'=>'required',
             'fare_class'=>'required',
         ]);
-       
-        $cities = City::leftjoin('cities as cities_to', 'cities.id', '!=', 'cities_to.id')
-            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name')->groupBy('from_name','from_id','from_name','to_id','to_name');
 
-        foreach($cities as $i => $city){
-            $cities[$i]->push([
-                "from_id"=> $city[0]->from_id,
-                "from_name"=> $i,
-                "to_id"=> $city[0]->to_id,
-                "to_name"=> $i
-            ]);
-        }
-        // return $cities->get();
+        return $this->getFarePrices( $request->company_id,$request->fare_class );
+    }
+
+    public function getFarePrices( $company_id,$fare_class ){
+        
+        $cities = City::leftjoin('cities as cities_to', 'cities.id', '!=', 'cities_to.id')
+            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
+        $cities2 = City::leftjoin('cities as cities_to', 'cities.id', 'cities_to.id')
+            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
+        $cities->union($cities2);
+
+        
+        
         $farePrices = FareTable::rightjoin(
-            DB::raw('(' . $cities . ') as cities'),
+            DB::raw('(' . $cities->toSql() . ') as cities'),
             function ($join) use ($cities) {
                 $join->on('fare_tables.from_city_id', '=', 'cities.from_id')
                     ->on('fare_tables.to_city_id', '=', 'cities.to_id');
-            }
-        )->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
+        })
+        ->orWhere('company_id',$company_id)->orWhere('company_id',null)
+        ->orWhere('fare_class',$fare_class)->orWhere('fare_class',null)
+        ->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
 
         return $farePrices;
     }

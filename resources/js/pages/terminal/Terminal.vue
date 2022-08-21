@@ -47,17 +47,17 @@
                               <td>{{ terminal.name }}</td>
                               <td>{{ terminal.contact }}</td>
                               <td>{{ terminal.address }}</td>
-                              <th>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</th>
-                              <th>{{ terminal.updated_at }}</th>
+                              <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
+                              <td>{{ terminal.updated_at }}</td>
                               <td>
-                                <a
+                                <!-- <a
                                   href="#edit-modal"
                                   data-toggle="modal"
                                   @click="edit(terminal)"
                                   class="btn btn-warning mx-1"
                                 >
                                   <i class="far fa-edit"></i>
-                                </a>
+                                </a> -->
                                 <a
                                   href="#delete-modal"
                                   data-toggle="modal"
@@ -135,7 +135,7 @@
           <label for="city_id">Terminal City</label>
           <select class="form-control" v-model="data.city_id">
             <option value="">Select City</option>
-            <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
+            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }} </option>
           </select>
         </div>
         <div class="form-group col-md-4">
@@ -290,6 +290,7 @@ export default {
     return {
       terminals: [],
       companies: [],
+      cities: [],
       data: {
         company_id:"",
         name:"",
@@ -314,8 +315,10 @@ export default {
   async created() {
     const terminalRes = await this.callApi("post", "/terminal");
     const compRes = await this.callApi("post", "/company");
+    const cities = await this.callApi("post", "/city");
     this.terminals = terminalRes.data;
     this.companies = compRes.data;
+    this.cities = cities.data;
   },
   methods: {
     async add() {
@@ -327,15 +330,17 @@ export default {
         return this.errorsArray("Company is Required", "Password");
       if (this.data.city_id == "")
         return this.errorsArray("Terminal City is Required", "City");
+      if (this.data.contact == "")
+        return this.errorsArray("Terminal Contact is Required", "Contact");
        
       const res = await this.callApi("post", "/terminal/store", this.data);
-      return ;
       if (res.status == 200) {
-        this.success = "terminal Created Successfully";
+        this.success = "Terminal Created Successfully";
         this.terminals = res.data
         this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
         setTimeout(() => {
           this.success = "";
+          $("#add-modal").modal("hide")
         }, 3000);
       } else {
         if (res.status == 422) {

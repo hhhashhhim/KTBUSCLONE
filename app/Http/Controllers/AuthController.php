@@ -12,49 +12,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     public function index(Request $request)
-    {
-
-        
-        $cities = City::leftjoin('cities as cities_to', 'cities.id', '!=', 'cities_to.id')
-            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
-        $cities2 = City::leftjoin('cities as cities_to', 'cities.id', 'cities_to.id')
-        ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
-        $cities->union($cities2);
-
-        
-        $farePrices = FareTable::rightjoin(
-        DB::raw('(' . $cities->toSql() . ') as cities'),
-        function ($join) use ($cities) {
-            $join->on('fare_tables.from_city_id', '=', 'cities.from_id')
-                ->on('fare_tables.to_city_id', '=', 'cities.to_id');
-        }
-        )->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
-
-        return $farePrices;
-        
-        // foreach($cities as $i => $city){
-        //     $cities[$i]->push([
-        //         "from_id"=> $city[0]->from_id,
-        //         "from_name"=> $i,
-        //         "to_id"=> $city[0]->to_id,
-        //         "to_name"=> $i
-        //     ]);
-        // }
-        // return $cities->get();
-
-         $cities = City::leftjoin('cities as cities_to', 'cities.id', '!=', 'cities_to.id')
-        ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name')->get()->groupBy('from_name');
-
-            
-        // $farePrices = FareTable::rightjoin(
-        //     DB::raw('(' . $cities->toSql() . ') as cities'),
-        //     function ($join) use ($cities) {
-        //         $join->on('fare_tables.from_city_id', '=', 'cities.from_id')
-        //             ->on('fare_tables.to_city_id', '=', 'cities.to_id');
-        //     }
-        // )->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
-
-        
+    {   
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
