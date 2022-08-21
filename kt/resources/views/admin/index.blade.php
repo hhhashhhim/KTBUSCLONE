@@ -41,7 +41,7 @@
 
     
     {{-- Vue App JS --}}
-    <script src="{{ mix('public/js/app.js') }}"></script>
+    <script src="{{ asset('/js/app.js') }}"></script>
     <script>
         $(document).ready(function(){
             $(document).on('show.bs.modal', '.modal', function () {

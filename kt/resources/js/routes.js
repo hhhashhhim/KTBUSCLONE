@@ -1,5 +1,4 @@
 import Vue from "vue";
-import Welcome from "./components/Welcome.vue";
 import Profile from "./components/Profile.vue";
 import { createWebHistory,createRouter } from "vue-router";
 
@@ -15,7 +14,7 @@ import FareTable from "./pages/fareTable/FareTable.vue";
 const routes = [
     {
         path:"/",
-        component : Welcome,
+        component : Users,
         name:"home",
     },
     {
