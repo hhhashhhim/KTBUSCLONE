@@ -66,7 +66,7 @@ Route::group(['prefix'=>'city',[CustomMiddleware::class]],function(){
     Route::post('/',[CityController::class,'index']);
 });
 Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
-    Route::post('/',[FareTableController::class,'index']);
+    Route::post('/',[FareTableController::class,'record']);
     Route::post('/store',[FareTableController::class,'store']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

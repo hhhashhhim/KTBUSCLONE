@@ -4,34 +4,38 @@
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
           <div class="card card-success">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    <span class="sr-only">Close</span>
-                </button>
-                Please Enter All Required Fields !!!
-            </div>
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between">
               <h4>Fare Table</h4>
-              <div class="w-50 d-flex">
-                <div class="mx-2" v-if="$store.state.user.is_super_admin==1">
-                    <label for="company_id" class="font-weight-bold">Company</label>
+              <div class="w-50 d-flex align-items-center">
+                <div class="header-select mx-2" v-if="$store.state.user.is_super_admin==1">
+                    <label for="company_id" class="font-weight-bold my-0">Company</label>
                     <select v-model="data.company_id" class="form-control">
                         <option value="" selected>Select Company</option>
                         <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
                     </select>
                 </div>
-                <div class="mx-2">
-                    <label for="fare_class" class="font-weight-bold">Fare Class</label>
+                <div class="header-select mx-2">
+                    <label for="fare_class" class="font-weight-bold my-0">Fare Class</label>
                     <select v-model="data.fare_class" class="form-control">
                         <option value="" selected>Select Fare Class</option>
                         <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }} </option>
                     </select>
                 </div>
-                <button class="btn btn-success btn-sm" type="button" @click="fetchRecord">Fetch Record</button>
+                <button class="btn btn-success btn-sm mt-4" type="button" @click="fetchRecord">Fetch Record</button>
               </div>
             </div>
             <div class="card-body">
+              <transition name="fade">
+                
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="error=!error">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    Please Enter All Required Fields !!!
+                </div>
+                
+              </transition>
               <!-- Table -->
               <div class="row">
                 <div class="col-12">
@@ -54,10 +58,12 @@
                           <tbody>
                                 <tr v-for="(from_city,i) in cities" :key="i">
                                     <template v-for="(to_city,j) in cities" :key="j">
-                                    <th v-if="j==0"> {{ from_city.name }} </th>
-                                    <td :class="+i==j?'bg-danger':'modal-cell'"> 
-                                        <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,to_city)" v-if="i!=j" class="btn btn-success btn-block modal-btn"></a>
-                                    </td>
+                                      <th v-if="j==0"> {{ from_city.name }} </th>
+                                      <td :class="+i==j?'bg-danger':'modal-cell'"> 
+                                          <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,to_city)" v-if="i!=j" class="btn btn-success btn-block modal-btn">
+                                            {{ checkFare(from_city,to_city) }}
+                                          </a>
+                                      </td>
                                     </template>
                                 </tr>
                           </tbody>
@@ -238,14 +244,14 @@ export default {
     return {
       cities: [],
       companies: [],
+      fetchedData: [],
       fareClasses: [{id:1,name:"economy"},{id:2,name:"exuctive"},{id:3,name:"business"}],
-      data: {},
       from:{},
       to:{},
-      dataEdit:{},
       success: false,
       error: false,
-      icon : ' <i class="fa fa-bus"></i> '
+      icon : ' <i class="fa fa-bus"></i> ',
+
     };
   },
   async created() {
@@ -284,13 +290,27 @@ export default {
         this.data.from = from.id
         this.data.to = to.id
     },
-    fetchRecord(){
-        if (!data.company_id)
-            this.error=true;
-        if (!data.fare_class)
-            this.error=true;
-        
+    async fetchRecord(){
+        if (!this.data.company_id || !this.data.fare_class){
+          this.error=true;
+          return
+        }
+      const res = await this.callApi("post", "/fare-table", {
+        company_id:this.data.company_id,fare_class:this.data.fare_class
+      });
+      if (res.status == 200) {
+        console.log(res.data);
+        this.fetchedData = res.data
+        this.success = "Fare Table Updated Successfully";
+        this.$forceUpdate()
+        setTimeout(() => {
+          this.success = "";
+        }, 3000);
+      } else {
+        alert("Something Went Wrong")
+      }
     },
+    
     deleteModal(terminal, i) {
       const deletingObj = {
         url: "/terminal/delete",
@@ -330,5 +350,16 @@ table,table *{
     z-index: 20;
     transform: scale(1.3) translateY(-20px);
     box-shadow: 0px 0px 10px black;
+}
+.header-select{
+  width: 35%;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

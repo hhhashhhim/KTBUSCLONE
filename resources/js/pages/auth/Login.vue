@@ -46,48 +46,53 @@
                   </button>
                   {{ success }}
                 </div>
-                <div class="form-group">
-                  <label for="email">Email</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    tabindex="1"
-                    required
-                    autofocus
-                    v-model="data.email"
-                  />
-                  <div class="invalid-feedback">Please fill in your email</div>
-                </div>
-                <div class="form-group">
-                  <div class="d-block">
-                    <label for="password" class="control-label">Password</label>
-                    <!-- <div class="float-right">
-                        <a href="auth-forgot-password.html" class="text-small">
-                          Forgot Password?
-                        </a>
-                      </div> -->
+
+                <form @submit="login">
+
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      tabindex="1"
+                      required
+                      autofocus
+                      v-model="data.email"
+                    />
+                    <div class="invalid-feedback">Please fill in your email</div>
                   </div>
-                  <input
-                    type="password"
-                    class="form-control"
-                    tabindex="2"
-                    required
-                    v-model="data.password"
-                  />
-                  <div class="invalid-feedback">
-                    please fill in your password
+                  <div class="form-group">
+                    <div class="d-block">
+                      <label for="password" class="control-label">Password</label>
+                      <!-- <div class="float-right">
+                          <a href="auth-forgot-password.html" class="text-small">
+                            Forgot Password?
+                          </a>
+                        </div> -->
+                    </div>
+                    <input
+                      type="password"
+                      class="form-control"
+                      tabindex="2"
+                      required
+                      v-model="data.password"
+                    />
+                    <div class="invalid-feedback">
+                      please fill in your password
+                    </div>
                   </div>
-                </div>
-                <div class="form-group">
-                  <button
-                    type="button"
-                    class="btn btn-success btn-lg btn-block"
-                    tabindex="4"
-                    @click="login"
-                  >
-                    Login
-                  </button>
-                </div>
+                  <div class="form-group">
+                    <button
+                      type="submit"
+                      class="btn btn-success btn-lg btn-block"
+                      tabindex="4"
+                    >
+                      Login
+                    </button>
+                  </div>
+                  
+                </form>
+                
               </div>
             </div>
             <div class="mt-5 text-muted text-center">
@@ -113,7 +118,8 @@ export default {
     };
   },
   methods: {
-    async login() {
+    async login(e) {
+      e.preventDefault()
       this.validationErrors = [];
       if (this.data.email == "")
         return this.errorsArray("Email is Required", "Email");
