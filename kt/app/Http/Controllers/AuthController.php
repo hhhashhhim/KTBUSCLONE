@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\CityToCity;
 use App\Models\FareTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {   
+        $cities = City::with('to')->get();
+        return $cities;
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
