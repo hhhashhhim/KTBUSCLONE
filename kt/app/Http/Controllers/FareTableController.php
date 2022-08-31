@@ -49,7 +49,9 @@ class FareTableController extends Controller
     public function getFarePrices( $company_id,$fare_class ){
         
         
-        $cities = City::with('city_to:id,name')->get();
+        $cities = City::with(['city_to'=>function($q){
+            $q->orderBy('name');
+        }])->orderBy('name')->get();
         $subRoutes = $cities->map(function ($city_from, $i){
 
             // Storing Destination Cities into new Array Index

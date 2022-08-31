@@ -52,10 +52,10 @@
                                 <tr v-for="(departureCity,i) in cities" :key="i">
 
                                     <template v-for="(destinationCity,j) in departureCity.destinationCities" :key="j">
-                                      <th v-if="j==0"> {{ destinationCity.name }} </th>
+                                      <th v-if="j==0"> {{ cities[i].name }} </th>
                                       <td :class="destinationCity.id==departureCity.id?'bg-danger':'modal-cell'"> 
                                           <a 
-                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,destinationCity)" v-if="destinationCity.id!=destinationCity.id" class="btn btn-success btn-block modal-btn">
+                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,destinationCity)" v-if="departureCity.id!=destinationCity.id" class="btn btn-success btn-block modal-btn">
                                           {{ destinationCity.fare }}
                                           </a>
                                       </td>
