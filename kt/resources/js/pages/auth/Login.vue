@@ -125,20 +125,15 @@ export default {
         return this.errorsArray("Email is Required", "Email");
       if (this.data.password == "")
         return this.errorsArray("Password is Required", "Password");
-      if (this.data.password.length < 8)
-        return this.errorsArray(
-          "Password Cannot Contain Less than 8 Characters Required",
-          "Password"
-        );
 
       const res = await this.callApi("post", "/login", this.data);
       if (res.status == 200) {
+        
         this.success = "Logged In Successfully";
         this.data.email = this.data.password = "";
-        setTimeout(() => {
-          window.location="/"
-          this.success = "";
-        }, 2000);
+        window.location="/admin/dashboard"
+        this.success = "";
+        
       } else {
         if (res.status == 422) {
           for (const key in res.data.errors) {

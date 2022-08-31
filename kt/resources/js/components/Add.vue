@@ -1,14 +1,14 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal fade" :id="formID" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
                             <h4 class="modal-title"><span v-html="heading"></span></h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
                                 <span aria-hidden="true">&times;</span>
                             </button>    
                         </div>
@@ -44,11 +44,31 @@
 
 </template>
 <script>
+import { watch } from '@vue/runtime-core'
 export default {
     props:{
         heading:String,
         errors:Array,
         success:String,
+        formID:String
+    },
+    methods:{
+        close(){
+            $(`#${this.formID}`).modal("hide")
+        }
+    },
+    watch:{
+        success(newSuccess,oldSuccess){
+            if (newSuccess!="") {
+                swal('Success', newSuccess, 'success');
+            }
+        },
+        errors(newError,oldError){
+            
+            if (newError!="") {
+                swal('Error', 'Oops Something Went Wrong', 'error');
+            }
+        }
     }
 }
 </script>

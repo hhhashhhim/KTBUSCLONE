@@ -12,10 +12,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
     public function index(Request $request)
-    {   
-        $cities = City::with('to')->get();
-        return $cities;
+    {
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
@@ -62,6 +61,15 @@ class AuthController extends Controller
                 'success' => false,
             ], 401);
         }
+    }
+
+    public function doubleCheck( Request $request ){
+
+        $request->validate([
+            'password'=>'required',
+        ]);
+        return $request;
+        
     }
 }
 

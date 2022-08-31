@@ -50,6 +50,25 @@ export default {
         errors:Array,
         success:String,
         dataEdit:Object,
+        formID:String
+    },
+    methods:{
+        close(){
+            alert('Reaching')
+            $(`#${this.formID}`).modal('hide')
+        }
+    },
+    watch:{
+        success(newSuccess,oldSuccess){
+            if (newSuccess!="") {
+                swal('Success', newSuccess, 'success');
+            }
+        },
+        errors(newError,oldError){
+            
+            swal('Error', 'Oops Something Went Wrong', 'error');
+
+        }
     }
 }
 </script>

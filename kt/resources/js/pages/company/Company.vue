@@ -8,8 +8,9 @@
               <h4>Companies</h4>
               <div class="card-header-action">
                 <a
-                  href="#add-modal"
+                  href="#"
                   data-toggle="modal"
+                  :data-target="'#'+formID"
                   class="btn btn-success"
                 >
                   Add New
@@ -17,6 +18,7 @@
               </div>
             </div>
             <div class="card-body">
+              
               <!-- Table -->
               <div class="row">
                 <div class="col-12">
@@ -51,7 +53,7 @@
                                 <a
                                   href="#edit-modal"
                                   data-toggle="modal"
-                                  @click="edit(company,i)"
+                                  @click="edit(company.id,i)"
                                   class="btn btn-warning mx-1"
                                 >
                                   <i class="far fa-edit"></i>
@@ -84,10 +86,11 @@
         heading="New Company"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
       >
         <div class="row">
           <div class="form-group col-md-4">
-            <label for="name">Name</label>
+            <label for="name">Company Name</label>
             <input
               type="text"
               class="form-control"
@@ -99,7 +102,7 @@
           <div class="form-group col-md-4">
             <label for="contact">Contact</label>
             <input
-              type="text"
+              type="number"
               class="form-control"
               placeholder="Enter contact"
               id="contact"
@@ -113,6 +116,36 @@
               class="form-control"
               id="Logo"
               @change="uploadLogo(e)"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="userName">User Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter User Name"
+              id="userName"
+              v-model="data.userName"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="email">Email</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Email"
+              id="email"
+              v-model="data.email"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Enter Password"
+              id="password"
+              v-model="data.password"
             />
           </div>
           <div class="form-group col-md-12">
@@ -185,7 +218,7 @@
           <div class="col-md-12">
             <div class="form-group">
               <button type="button" class="btn btn-block btn-success mt-4" @click="add">
-                Add Company
+                Add Company 
               </button>
             </div>
           </div>
@@ -197,6 +230,7 @@
         heading="Edit Company"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
       >
         <div class="row">
           <div class="form-group col-md-4">
@@ -214,7 +248,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Enter contact"
+              placeholder="Enter Contact"
               id="contact"
               v-model="dataEdit.contact"
             />
@@ -308,6 +342,7 @@
       <!-- Add Modal -->
       <Delete
         confirmationMessage='Are You Sure You want To Delete This "company" ???'
+        doubleCheckIncluded=""
       />
     </div>
   </section>
@@ -317,6 +352,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
+import Modal from "../../components/Modal.vue";
 import { mapGetters } from "vuex";
 
 export default {
@@ -325,43 +361,27 @@ export default {
     Add,
     Edit,
     Delete,
+    Modal,
   },
   data() {
     return {
       roles: [],
+      formID : "newCompany",
       data: {
         name: "",
         contact: "",
         logo: "",
+        isModalVisible:"",
         location: "",
-        modules:[
+        modules:[],
+      },
+      defaultModules:[
           {name:'admin',allow:false,childs:[
             {name:"dashboard",allow:false},
-            {name:"companies",allow:false},
             {name:"terminal",allow:false},
+            {name:'fare-table',allow:false},
+            {name:"route",allow:false},
           ]},
-          {name:'hrm',allow:false,childs:[
-            {name:"employee",allow:false},
-            {name:"salary",allow:false},
-            {name:"loan",allow:false},
-            {name:"leave managment",allow:false},
-            {name:"attendance",allow:false},
-          ]},
-          {name:'users',allow:false,childs:[
-            {name:"user",allow:false},
-            {name:"roles",allow:false},
-          ]},
-          {name:'fare-table',allow:false,childs:[]}
-        ],
-        defaultModules:[],
-      },
-      dataEdit:{
-        i: "",
-        name: "",
-        contact: "",
-        logo: "",
-        location: "",
-        modules:[
           {name:'hrm',allow:false,childs:[
             {name:"employee",allow:false},
             {name:"salary",allow:false},
@@ -373,21 +393,31 @@ export default {
             {name:"user",allow:false},
             {name:"roles",allow:false},
           ]}
-        ]
+      ],
+      dataEdit:{
+        i: "",
+        name: "",
+        contact: "",
+        logo: "",
+        location: "",
+        modules:[]
       },
       success: false,
       companies: [],
     };
   },
   async created() {
+    this.data.modules = this.dataEdit.modules = this.defaultModules;
     const companyRes = await this.callApi("post", "/company");
     if (companyRes.status==200){
-      this.defaultModules = this.data.modules;
       this.companies = companyRes.data;
-    }
-    
+    }    
   },
   methods: {
+    showModal(){
+      this.isModalVisible=true;
+      return;
+    },
     async add() {
       // console.log(this.data.modules);
       // return ;
@@ -417,12 +447,29 @@ export default {
         }
       }
     },
-    edit(company,i) {
-      let modules = {...this.dataEdit.modules,...company.modules};
-      console.log(modules);
+    async edit(id,i) {
+      
+      const res = await this.callApi("post", "/company/get", {id});
+      let company;
+        
+      if(res.status == 200) {
+        company = res.data;
+      }
+
+      else{
+        return alert("Something Went Wrong !!!");
+      }
+
+      const modules = company.modules.concat(this.dataEdit.modules).filter(function(obj) {  
+        return this.has(obj.name) ? false : this.add(obj.name);
+      }, new Set());
+
+      // console.log(modules);
+      
       this.dataEdit = {
         ...company,modules,i
       };
+      // console.log(this.dataEdit);
     },
     async update() {
       
@@ -435,8 +482,7 @@ export default {
       const res = await this.callApi("post", "/company/update", this.dataEdit);
 
       if (res.status == 200) {
-        
-        console.log("From Update Function",this.dataEdit);
+
         this.success = "Company Updated Successfully";
         const companyRes = await this.callApi("post", "/company");
         if(companyRes.status==200){

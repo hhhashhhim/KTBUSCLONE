@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\City;
+use App\Models\CityToCity;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,10 +17,23 @@ class CreateCityToCitiesTable extends Migration
     {
         Schema::create('city_to_city', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('from')->references('id')->on('cities')->cascadeOnDelete();
-            $table->foreignId('to')->references('id')->on('cities')->cascadeOnDelete();
+            $table->bigInteger('departure_city_id');
+            $table->bigInteger('destination_city_id');
             $table->timestamps();
         });
+        
+          $cities = City::get();
+          foreach ($cities as $i => $cityFrom) {
+            foreach ($cities as $i => $cityTo) {
+
+                CityToCity::create([
+                    'departure_city_id'=>$cityFrom->id,
+                    'destination_city_id'=>$cityTo->id,
+                ]);
+                
+            }
+             
+          }
     }
 
     /**

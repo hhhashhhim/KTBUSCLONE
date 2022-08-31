@@ -10,6 +10,7 @@
                 <a
                   href="#add-modal"
                   data-toggle="modal"
+                  :data-target="'#'+formID"
                   class="btn btn-success"
                 >
                   Add New
@@ -36,7 +37,6 @@
                               <th>Name</th>
                               <th>Email</th>
                               <th>Contact</th>
-                              <th>Company</th>
                               <th>Role</th>
                               <th>Action</th>
                             </tr>
@@ -47,7 +47,6 @@
                               <td>{{ user.name }}</td>
                               <td>{{ user.email }}</td>
                               <td>{{ user.contact }}</td>
-                              <th>{{ user.company?user.company.name:"Not Found" }}</th>
                               <th>{{ user.role?user.role.name:"Not Found" }}</th>
                               <td>
                                 <a
@@ -86,6 +85,8 @@
         heading="New User"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
+
       >
       <div class="row">
         <div class="form-group col-md-6">
@@ -111,9 +112,9 @@
         <div class="form-group col-md-6">
           <label for="contact">Contact</label>
           <input
-            type="contact"
+            type="number"
             class="form-control"
-            placeholder="Enter Password"
+            placeholder="Enter Contact"
             id="contact"
             v-model="data.contact"
           />
@@ -129,21 +130,6 @@
           />
         </div>
         <div class="form-group col-md-12">
-          <label for="company">Company</label>
-          <select
-            type="text"
-            class="form-control"
-            id="company"
-            @change="fetchCompanyRoles"
-            v-model="data.company_id"
-          >
-            <option value="">Select Company</option>
-            <option v-for="(company, i) in companies" :value="company.id" :key="i">
-              {{ company.name }}
-            </option>
-          </select>
-        </div>
-        <div class="form-group col-md-12" v-if="data.company_id">
           <label for="role">Role</label>
           <select
             type="text"
@@ -171,6 +157,8 @@
         heading="Edit User"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
+
       >
       <div class="row">
         <div class="form-group col-md-6">
@@ -212,21 +200,6 @@
             id="password"
             v-model="dataEdit.password"
           />
-        </div>
-        <div class="form-group col-md-12" v-if="dataEdit.company_id">
-          <label for="company">Company</label>
-          <select
-              type="text"
-              class="form-control"
-              id="company"
-              @change="fetchCompanyRoles"
-              v-model="dataEdit.company_id"
-            >
-              <option value="">Select Company</option>
-              <option v-for="(company, i) in companies" :value="company.id" :key="i">
-                {{ company.name }}
-              </option>
-            </select>
         </div>
         <div class="form-group col-md-12">
           <label for="role">Role</label>
@@ -279,7 +252,7 @@ export default {
     return {
       roles: [],
       users: [],
-      companies: [],
+      formID: 'newUser',
       data: {
         name: "",
         email: "",
@@ -294,9 +267,9 @@ export default {
   },
   async created() {
     const userRes = await this.callApi("post", "/user", {});
-    const compRes = await this.callApi("post", "/company", {});
     this.users = userRes.data;
-    this.companies = compRes.data;
+    const roleRes = await this.callApi("post", "/company/roles", {id:this.data.company_id});
+    this.roles = roleRes.data;
   },
   methods: {
     async add() {
@@ -310,12 +283,12 @@ export default {
         return this.errorsArray("User Password is Required", "Password");
       if (this.data.role == "")
         return this.errorsArray("User Role is Required", "Role");
-      // return "Reaching";
+
       const res = await this.callApi("post", "/user/store", this.data);
       if (res.status == 200) {
         this.success = "User Created Successfully";
         this.users = res.data
-        this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
+        this.data.name = this.data.email = this.data.contact = this.data.password = this.data.role = this.data.company_id = "";
         setTimeout(() => {
           this.success = "";
           
@@ -350,7 +323,8 @@ export default {
           this.success = "";
           $("#edit-modal").modal("hide");
         }, 3000);
-      } else {
+      }
+      else {
         if (res.status == 422) {
           console.log();
           for (const key in res.data.errors) {
@@ -370,8 +344,6 @@ export default {
       this.$store.commit("setDeleteObj", deletingObj);
     },
     async fetchCompanyRoles(){
-      const roleRes = await this.callApi("post", "/company/roles", {id:this.data.company_id});
-      this.roles = roleRes.data;
     }
   },
   computed: {

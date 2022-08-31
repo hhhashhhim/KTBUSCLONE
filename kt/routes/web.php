@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post("/login",[AuthController::class,'login']);
+Route::post("/double-check",[AuthController::class,'doubleCheck']);
 Route::get("/logout",[AuthController::class,'logout'])->middleware([CustomMiddleware::class]);
 
 
@@ -47,6 +48,7 @@ Route::group(['prefix'=>'company','middleware',[CustomMiddleware::class]],functi
     Route::post('delete',[CompanyController::class,'delete']);
     Route::post('/get',[CompanyController::class,'role']);
     Route::post('/roles',[CompanyController::class,'company_roles']);
+    Route::post('/get',[CompanyController::class,'company']);
 });
 Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
     Route::post('/',[UserController::class,'index']);

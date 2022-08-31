@@ -21,29 +21,6 @@ class CreateCitiesTable extends Migration
             $table->timestamps();
         });
 
-        $allCitiesOfPak = [
-          "Rawalpindi",
-          "Karachi",
-          "Lahore",
-          "Faisalabad",
-          "Multan",
-          "Dera Ismail Khan",
-          "Kot Adu",
-          "Layyah",
-          "Bhakkar",
-          "Bahawalpur",
-          "Larkana",
-          "Alipur",
-          "Arifwala",
-          "Sahiwal"
-        ];
-
-        foreach ($allCitiesOfPak as $i => $city) {
-            City::create([
-                'name'=>$city,
-                'added_by'=>0,
-            ]);
-        }
     }
 
     /**

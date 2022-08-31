@@ -10,6 +10,6 @@ class CityToCity extends Model
     use HasFactory;
     protected $table = 'city_to_city';
     protected $fillable = [
-        'from','to',
+        'departure_city_id','destination_city_id',
     ];
 }

@@ -40,11 +40,10 @@ class FareTableController extends Controller
     public function record( Request $request ){
 
         $request->validate([
-            'company_id'=>'required',
             'fare_class'=>'required',
         ]);
 
-        return $this->getFarePrices( $request->company_id,$request->fare_class );
+        return $this->getFarePrices( 1,$request->fare_class );
     }
 
     public function getFarePrices( $company_id,$fare_class ){
@@ -63,7 +62,7 @@ class FareTableController extends Controller
                 $join->on('fare_tables.from_city_id', '=', 'cities.from_id')
                     ->on('fare_tables.to_city_id', '=', 'cities.to_id');
         })
-        ->orWhere('company_id',$company_id)->orWhere('company_id',null)
+        ->orWhere('company_id',1)->orWhere('company_id',null)
         ->orWhere('fare_class',$fare_class)->orWhere('fare_class',null)
         ->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
 

@@ -8,9 +8,20 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public $company_id;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next){
+            $this->company_id = auth()->user()->company_id;
+            return $next( $request );
+        });
+    }   
     public function index(){
         
-        return User::with('role:id,name','company:id,name')->where('id','!=',auth()->user()->id)->latest('id')->get();
+        return User::with('role:id,name','company:id,name')
+        ->where('company_id',$this->company_id)
+        ->where('id','!=',auth()->user()->id)->latest('id')
+        ->get();
         
     }
     public function store( Request $request ){
@@ -28,7 +39,7 @@ class UserController extends Controller
             'contact'=>$request->contact,
             'password'=>Hash::make($request->password),
             'role_id'=>$request->role,
-            'company_id'=>auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id,
+            'company_id'=>$this->company_id,
         ]);
         return $this->index();
         
@@ -50,7 +61,7 @@ class UserController extends Controller
             'email'=>$request->email,
             'contact'=>$request->contact,
             'role_id'=>$request->role,
-            'company_id'=>auth()->user()->is_super_admin==0?auth()->user()->company_id:$request->company_id,
+            'company_id'=>$this->company_id,
         ]);
         if ($request->password!="") {
             User::find($request->id)->update([

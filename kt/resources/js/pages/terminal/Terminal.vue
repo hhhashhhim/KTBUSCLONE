@@ -10,6 +10,7 @@
                 <a
                   href="#add-modal"
                   data-toggle="modal"
+                  :data-target="'#'+formID"
                   class="btn btn-success"
                 >
                   Add New
@@ -83,11 +84,20 @@
 
       <!-- Add Modal -->
       <Add
-        heading="New terminal"
+        heading="New Terminal"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
+
       >
       <div class="row">
+        <div class="form-group col-md-4">
+          <label for="city_id">Terminal City</label>
+          <select class="form-control" v-model="data.city_id">
+            <option value="">Select City</option>
+            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }} </option>
+          </select>
+        </div>
         <div class="form-group col-md-4" v-if="$store.state.user.is_super_admin==1">
           <label for="company">Company Name</label>
           <select class="form-control" v-model="data.company_id">
@@ -105,7 +115,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="contact">Terminal Contact</label>
-          <input type="text" class="form-control" v-model="data.contact">
+          <input type="number" class="form-control" v-model="data.contact">
         </div>
         <div class="form-group col-md-4">
           <label for="address">Address</label>
@@ -113,7 +123,7 @@
         </div>
         <div class="form-group col-md-4">
           <label for="time_difference">Time Difference ( Hours )</label>
-          <input type="text" class="form-control" v-model="data.time_difference">
+          <input type="time" class="form-control" v-model="data.time_difference">
         </div>
         <div class="form-group col-md-4">
           <label for="advance_booking">Advance Booking Allowed(Days)</label>
@@ -130,13 +140,6 @@
         <div class="form-group col-md-4">
           <label for="online_terminal_name">Online Terminal Name</label>
           <input type="text" class="form-control" v-model="data.online_terminal_name">
-        </div>
-        <div class="form-group col-md-4">
-          <label for="city_id">Terminal City</label>
-          <select class="form-control" v-model="data.city_id">
-            <option value="">Select City</option>
-            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }} </option>
-          </select>
         </div>
         <div class="form-group col-md-4">
           <label for="order">Terminal Order</label>
@@ -182,6 +185,8 @@
         heading="Edit terminal"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
+
       >
       <div class="row">
         <div class="form-group col-md-6">
@@ -290,6 +295,7 @@ export default {
     return {
       terminals: [],
       companies: [],
+      formID: "newTerminal",
       cities: [],
       data: {
         company_id:"",

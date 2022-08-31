@@ -7,21 +7,14 @@
             <div class="card-header d-flex justify-content-between">
               <h4>Fare Table</h4>
               <div class="w-50 d-flex align-items-center">
-                <div class="header-select mx-2" v-if="$store.state.user.is_super_admin==1">
-                    <label for="company_id" class="font-weight-bold my-0">Company</label>
-                    <select v-model="data.company_id" class="form-control">
-                        <option value="" selected>Select Company</option>
-                        <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
-                    </select>
-                </div>
                 <div class="header-select mx-2">
                     <label for="fare_class" class="font-weight-bold my-0">Fare Class</label>
-                    <select v-model="data.fare_class" class="form-control">
-                        <option value="" selected>Select Fare Class</option>
-                        <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }} </option>
+                    <select v-model="data.fare_class" class="form-control rounded-0">
+                        <option value="0" selected>Select Fare Class</option>
+                        <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id" class="text-capitalize"> {{ fareClass.name }} </option>
                     </select>
                 </div>
-                <button class="btn btn-success btn-sm mt-4" type="button" @click="fetchRecord">Fetch Record</button>
+                <button class="btn btn-success mt-4" type="button" @click="fetchRecord">Fetch Record</button>
               </div>
             </div>
             <div class="card-body">
@@ -61,7 +54,8 @@
                                     <template v-for="(from_city,j) in to_city_array" :key="j">
                                       <th v-if="j==0"> {{ from_city.from_name }} </th>
                                       <td :class="from_city.from_id==from_city.to_id?'bg-danger':'modal-cell'"> 
-                                          <a href="#add-modal" data-toggle="modal" @click="changeInfo(from_city,from_city)" v-if="from_city.from_id!=from_city.to_id" class="btn btn-success btn-block modal-btn">
+                                          <a 
+                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(from_city,from_city)" v-if="from_city.from_id!=from_city.to_id" class="btn btn-success btn-block modal-btn">
                                           {{ from_city.fare }}
                                           </a>
                                       </td>
@@ -86,6 +80,7 @@
         :heading="from + icon + to"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
       >
       <div class="row">
         <div class="form-group col-md-4">
@@ -138,6 +133,7 @@
         heading="Edit terminal"
         :errors="this.validationErrors"
         :success="success"
+        :formID="formID"
       >
       <div class="row">
         <div class="form-group col-md-6">
@@ -247,8 +243,11 @@ export default {
       cities: [],
       companies: [],
       fetchedData: [],
+      formID : "fareTablePopup",
       fareClasses: [{id:1,name:"economy"},{id:2,name:"exuctive"},{id:3,name:"business"}],
-      data:{},
+      data:{
+        fare_class:'0',
+      },
       dataEdit:{},
       from:{},
       to:{},
@@ -257,10 +256,6 @@ export default {
       icon : ' <i class="fa fa-bus"></i> ',
 
     };
-  },
-  async created() {
-    const compRes = await this.callApi("post", "/company");
-    this.companies = compRes.data;
   },
   computed:{
     heading : function(){
@@ -297,7 +292,7 @@ export default {
         this.data.to = to.to_id
     },
     async fetchRecord(){
-        if (!this.data.company_id || !this.data.fare_class){
+        if ( !this.data.fare_class ){
           this.error=true;
           return
         }

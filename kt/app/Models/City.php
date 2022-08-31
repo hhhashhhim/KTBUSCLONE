@@ -13,10 +13,10 @@ class City extends Model
     public function fares(){
         return $this->hasMany(FareTable::class, 'from_city_id', 'id');
     }
-    public function from(){
-        return $this->belongsToMany( City::class,'city_to_city','from','to' );
+    public function city_from(){
+        return $this->belongsToMany( City::class,'city_to_city','departure_city_id','destination_city_id' );
     }
-    public function to(){
-        return $this->belongsToMany( City::class,'city_to_city','to','from' );
+    public function city_to(){
+        return $this->belongsToMany( City::class,'city_to_city','destination_city_id','departure_city_id' );
     }
 }

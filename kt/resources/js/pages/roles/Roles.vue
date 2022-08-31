@@ -9,7 +9,7 @@
                         <div class="card-header">
                             <h4>Roles</h4>
                             <div class="card-header-action">
-                                <a href="#add-modal" data-toggle="modal" class="btn btn-success">
+                                <a href="#add-modal" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success">
                                     Add New
                                 </a>
                             </div>
@@ -69,17 +69,11 @@
             heading="New Role"
             :errors="this.validationErrors"
             :success="success"
+            :formID="formID"
             >
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="data.name">
-                </div>
-                <div class="form-group" v-if="$store.state.user.is_super_admin==1">
-                    <label for="company">Company</label>
-                    <select name="comapany" id="company" class="form-control" v-model="data.company_id">
-                        <option value="">Select Company</option>
-                        <option v-for="(company,i) in companies" :key="i" :value="company.id">{{ company.name }}</option>
-                    </select>
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-block btn-success" @click="add">Add Role</button>
@@ -91,17 +85,11 @@
             heading="Edit Role"
             :errors="this.validationErrors"
             :success="success"
+            :formID="formID"
             >
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="dataEdit.name">
-                </div>
-                <div class="form-group" v-if="$store.state.user.is_super_admin==1">
-                    <label for="company">Company</label>
-                    <select name="comapany" id="company" class="form-control" v-model="dataEdit.company_id">
-                        <option value="">Select Company</option>
-                        <option v-for="(company,i) in companies" :key="i" :value="company.id">{{ company.name }}</option>
-                    </select>
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-block btn-success" @click="update">Update Role</button>
@@ -133,7 +121,7 @@ export default {
     data(){
         return {
             roles:[],
-            companies:[],
+            formID:'newRole',
             data:{
                 name:"",
                 company_id:""
@@ -148,10 +136,6 @@ export default {
         }
     },
     async created(){
-        const companyRes = await this.callApi("post", "/company");
-        if (companyRes.status==200){
-            this.companies = companyRes.data;
-        }
         const res = await this.callApi("post",'/role',{name:this.data.name});
         if (res.status==200) {
             this.roles=res.data
@@ -164,7 +148,6 @@ export default {
         async add(){
             this.validationErrors=[]
             if(this.data.name=="") return this.errorsArray("Role Name is Required","Name");
-            if(this.data.company_id=="" && $store.state.user.is_super_admin==1) return this.errorsArray("Company is Required","Company");
             const res = await this.callApi("post",'/role/store',this.data);
             if (res.status==200) {
                 this.success="Role Created Successfully";
@@ -191,7 +174,6 @@ export default {
             
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("Role Name is Required","Name");
-            if(this.dataEdit.company_id=="" && $store.state.user.is_super_admin==1) return this.errorsArray("Company is Required","Company");
             const res = await this.callApi("post",'/role/update',this.dataEdit);
             if (res.status==201) {
                 this.success="Role Updated Successfully";
@@ -206,7 +188,6 @@ export default {
             }
             else{
                 if (res.status==422) {
-                    console.log();
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach(element => {
                             this.errorsArray(element,key)

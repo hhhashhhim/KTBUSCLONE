@@ -40,7 +40,7 @@
                           </thead>
                           <tbody>
                             <tr v-for="(permission, index) in permissions" :key="index">
-                              <td>{{ (index+1) }}</td>
+                              <td>{{ (parseInt(index)+11) }}</td>
                               <td>{{ permission.name }}</td>
                               <td>
                                 <label class="colorinput mx-3" v-for="(operation,i) in permission" :key="i">
@@ -80,22 +80,7 @@ export default {
   data() {
     return {
       role: "",
-      permissions: [
-        {
-          name: "roles",
-          create: false,
-          read: false,
-          update: false,
-          delete: false,
-        },
-        {
-          name: "users",
-          create: false,
-          read: false,
-          update: false,
-          delete: false,
-        },
-      ],
+      permissions:[],
       success: false,
     };
   },
@@ -136,4 +121,20 @@ export default {
   },
 
 };
+// [
+//         {
+//           name: "roles",
+//           create: false,
+//           read: false,
+//           update: false,
+//           delete: false,
+//         },
+//         {
+//           name: "users",
+//           create: false,
+//           read: false,
+//           update: false,
+//           delete: false,
+//         },
+//       ]
 </script>
