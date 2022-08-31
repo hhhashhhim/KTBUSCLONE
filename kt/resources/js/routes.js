@@ -10,7 +10,7 @@ import Login from "./pages/auth/Login.vue";
 import Terminal from "./pages/terminal/Terminal.vue";
 import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
-// import FareTable from "./pages/fareTable/FareTable.vue";
+import RoutePage from "./pages/route/RoutePage.vue";
 
 const routes = [
     {
@@ -62,6 +62,11 @@ const routes = [
         path:"/fare-table",
         component : FareTable,
         name:"fare-table"
+    },
+    {
+        path:"/routes",
+        component : RoutePage,
+        name:"routes-page"
     }
 ]
 const router = createRouter({

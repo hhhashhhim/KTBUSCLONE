@@ -38,6 +38,11 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
+                           <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }">
+                                <i class="fas fa-table"></i> Routes
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('users')">
