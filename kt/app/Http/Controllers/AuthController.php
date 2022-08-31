@@ -14,17 +14,7 @@ class AuthController extends Controller
 {
 
     public function index(Request $request)
-    {
-        
-        $cities = City::with('city_to')->get();
-
-        $subRoutes = $cities->map(function ($city_from, $i){
-            $city_from['city_to_final'] = $city_from->city_to->whereIn('id',[8,3,1]);
-            unset($city_from['city_to']);
-            return $city_from;
-        });
-        
-        return $subRoutes[0]->city_to_final[0]->pivot;
+    {        
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
@@ -107,3 +97,12 @@ class AuthController extends Controller
 //         ->on('fare_tables.to_city_id', '=', 'cities.to_id');
 // }
 // )->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
+
+
+
+
+
+
+
+//  For Route City Mapping
+// $city_from['city_to_final'] = $city_from->city_to->whereIn('id',[8,3,1]);

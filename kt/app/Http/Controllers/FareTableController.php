@@ -48,22 +48,25 @@ class FareTableController extends Controller
 
     public function getFarePrices( $company_id,$fare_class ){
         
-        $cities = City::leftjoin('cities as cities_to', 'cities.id', '!=', 'cities_to.id')
-            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
-        $cities2 = City::leftjoin('cities as cities_to', 'cities.id', 'cities_to.id')
-            ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
-        $cities->union($cities2);
         
-        $farePrices = FareTable::rightjoin(
-            DB::raw('(' . $cities->toSql() . ') as cities'),
-            function ($join) use ($cities) {
-                $join->on('fare_tables.from_city_id', '=', 'cities.from_id')
-                    ->on('fare_tables.to_city_id', '=', 'cities.to_id');
-        })
-        ->orWhere('company_id',1)->orWhere('company_id',null)
-        ->orWhere('fare_class',$fare_class)->orWhere('fare_class',null)
-        ->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
+        $cities = City::with('city_to:id,name')->get();
+        $subRoutes = $cities->map(function ($city_from, $i){
 
-        return $farePrices;
+            // Storing Destination Cities into new Array Index
+            $city_from['destinationCities'] = $city_from->city_to;
+            
+            // Fetching and storing the fare of the Departure and the Destination city Fare.
+            foreach ($city_from['destinationCities'] as $j => $city_to) {
+                $routeCities = $city_to->pivot;
+                $city_from['destinationCities'][$j]['fare'] = FareTable::where('from_city_id',$routeCities->departure_city_id)
+                ->where('to_city_id',$routeCities->destination_city_id)
+                ->value('fare');
+            }
+            // 
+            unset($city_from['city_to']);
+            return $city_from;
+        });
+        
+        return $subRoutes;
     }
 }

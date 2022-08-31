@@ -49,14 +49,14 @@
                             </tr>
                           </thead>
                           <tbody>
-                                <tr v-for="(to_city_array,i) in cities" :key="i">
+                                <tr v-for="(destinationCity,i) in cities" :key="i">
 
-                                    <template v-for="(from_city,j) in to_city_array" :key="j">
-                                      <th v-if="j==0"> {{ from_city.from_name }} </th>
-                                      <td :class="from_city.from_id==from_city.to_id?'bg-danger':'modal-cell'"> 
+                                    <template v-for="(departureCity,j) in destinationCity" :key="j">
+                                      <th v-if="j==0"> {{ departureCity.from_name }} </th>
+                                      <td :class="departureCity.from_id==departureCity.to_id?'bg-danger':'modal-cell'"> 
                                           <a 
-                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(from_city,from_city)" v-if="from_city.from_id!=from_city.to_id" class="btn btn-success btn-block modal-btn">
-                                          {{ from_city.fare }}
+                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,departureCity)" v-if="departureCity.from_id!=departureCity.to_id" class="btn btn-success btn-block modal-btn">
+                                          {{ departureCity.fare }}
                                           </a>
                                       </td>
                                     </template>
