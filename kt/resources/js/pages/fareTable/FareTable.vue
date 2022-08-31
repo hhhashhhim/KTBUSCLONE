@@ -45,18 +45,18 @@
                           <thead>
                             <tr>
                                 <th></th>
-                                <th v-for="(city,i) in cities" :key="i"> {{ i }} </th>                              
+                                <th v-for="(city,i) in cities" :key="i"> {{ city.name }} </th>                              
                             </tr>
                           </thead>
                           <tbody>
-                                <tr v-for="(destinationCity,i) in cities" :key="i">
+                                <tr v-for="(departureCity,i) in cities" :key="i">
 
-                                    <template v-for="(departureCity,j) in destinationCity" :key="j">
-                                      <th v-if="j==0"> {{ departureCity.from_name }} </th>
-                                      <td :class="departureCity.from_id==departureCity.to_id?'bg-danger':'modal-cell'"> 
+                                    <template v-for="(destinationCity,j) in departureCity.destinationCities" :key="j">
+                                      <th v-if="j==0"> {{ destinationCity.name }} </th>
+                                      <td :class="destinationCity.id==departureCity.id?'bg-danger':'modal-cell'"> 
                                           <a 
-                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,departureCity)" v-if="departureCity.from_id!=departureCity.to_id" class="btn btn-success btn-block modal-btn">
-                                          {{ departureCity.fare }}
+                                          href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,destinationCity)" v-if="destinationCity.id!=destinationCity.id" class="btn btn-success btn-block modal-btn">
+                                          {{ destinationCity.fare }}
                                           </a>
                                       </td>
                                     </template>
@@ -286,16 +286,16 @@ export default {
       }
     },
     changeInfo(from,to){
-        this.from = from.from_name;
-        this.to   = to.to_name;
-        this.data.from = from.from_id
-        this.data.to = to.to_id
+        this.from = from.name;
+        this.to   = to.name;
+        this.data.from = from.id
+        this.data.to = to.id
     },
     async fetchRecord(){
-        if ( !this.data.fare_class ){
-          this.error=true;
-          return
-        }
+      if ( !this.data.fare_class ){
+        this.error=true;
+        return
+      }
       const res = await this.callApi("post", "/fare-table", {
         company_id:this.data.company_id,fare_class:this.data.fare_class
       });
