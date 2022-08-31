@@ -56,23 +56,29 @@
           <div
             v-if="doubleCheckIncluded"
           >
-          <ConfirmationModal :formID="doubleCheckIncluded" />
+          <ConfirmationModal 
+            :formID="doubleCheckIncluded"
+            v-on:deleteData="deleteData(event)"
+          />
             <button
               type="button"
               class="btn btn-danger btn-block"
               @click="deleteData"
             >
-              Yes
+              Yes, I want to Delete
             </button>
           </div>
+          <div
+            v-else
+          >  
           <button
             type="button"
             class="btn btn-danger btn-block"
-            v-else
             @click="passwordInput"
           >
             Yes
           </button>
+          </div>
           <button
             type="button"
             class="btn btn-secondary btn-block"
@@ -87,8 +93,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import ConfirmationModal from "../../components/ConfirmationModal.vue";
-import ConfirmationModal from './ConfirmationModal.vue';
+import ConfirmationModal from "./ConfirmationModal.vue";
 export default {
   components: { ConfirmationModal },
   props: {
@@ -131,55 +136,9 @@ export default {
         }
       }
     },
-    passwordInput() {
-      swal({
-        title: "Are You Sure You Want to Delete This Data. This can't Be Undone !!!",
-        content: {
-          element: "input",
-          attributes: {
-            placeholder: "Enter Your Password to Continue",
-            type: "text",
-            autocomplete:"new-password",
-            autofocus:true,
-          },
-        },
-      }).then(async (data) => {
-        const res = await this.callApi(
-          "post",
-          "/double-check",{
-            data:this.deletModalInfo.data,  
-            url:this.deletModalInfo.url,  
-            password:data,
-          }
-          
-        );
-        if (res.status == 200) {
-          const deletingObj = {
-            ...this.deletModalInfo,
-            url: "",
-            data: "",
-            isDeleted: true,
-          };
-          this.$store.commit("setDeleteObj", deletingObj);
-          this.success = "Company Deleted !!!";
-            swal(
-                "Record Deleted!", //Heading
-                this.success, // Message
-                "success" // Status
-            );
-          
-        } else {
-          if (res.status == 422) {
-            for (const key in res.data.errors) {
-              res.data.errors[key].forEach((element) => {
-                this.errors(element, key);
-              });
-            }
-          }
-        }
+    authorized(data){
 
-      });
-    },
+    }
   },
   computed: {
     ...mapGetters({

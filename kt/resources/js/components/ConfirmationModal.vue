@@ -82,23 +82,12 @@ export default {
         return this.errorsArray("Password Field Is Required");
 
       const res = await this.callApi("post", "/double-check", {password:this.password});
-      if (res.status == 201) {
-        this.success = "Company Created Successfully";
-        this.companies.unshift(res.data);
-        this.data.name = this.data.contact = this.data.location = "";
-        this.data.modules = this.defaultModules;
-        setTimeout(() => {
-          this.success = "";
-          $("#add-modal").modal("hide");
-        }, 2000);
+      if (res.status == 200) {
+        this.password=""
+        this.success = "Company Deleted";
+        this.$emit('deleteData',1)
       } else {
-        if (res.status == 422) {
-          for (const key in res.data.errors) {
-            res.data.errors[key].forEach((element) => {
-              this.errorsArray(element, key);
-            });
-          }
-        }
+        this.error = "Unauthorized !!!"
       }
     }
   }

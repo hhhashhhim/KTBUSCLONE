@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\CityToCity;
 use App\Models\FareTable;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -68,7 +69,12 @@ class AuthController extends Controller
         $request->validate([
             'password'=>'required',
         ]);
-        return $request;
+        if (Hash::check($request->password,auth()->user()->password)) {
+            return response()->json([],200);
+        }
+        else{
+            return response()->json([],403);
+        }
         
     }
 }
