@@ -53,8 +53,6 @@ class FareTableController extends Controller
         $cities2 = City::leftjoin('cities as cities_to', 'cities.id', 'cities_to.id')
             ->select('cities.id as from_id', 'cities.name as from_name', 'cities_to.id as to_id', 'cities_to.name as to_name');
         $cities->union($cities2);
-
-        
         
         $farePrices = FareTable::rightjoin(
             DB::raw('(' . $cities->toSql() . ') as cities'),

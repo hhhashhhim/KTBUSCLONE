@@ -19,4 +19,5 @@ class City extends Model
     public function city_to(){
         return $this->belongsToMany( City::class,'city_to_city','destination_city_id','departure_city_id' );
     }
+    
 }

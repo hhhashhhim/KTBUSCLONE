@@ -15,6 +15,16 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+        
+        $cities = City::with('city_to')->get();
+
+        $subRoutes = $cities->map(function ($city_from, $i){
+            $city_from['city_to_final'] = $city_from->city_to->whereIn('id',[8,3,1]);
+            unset($city_from['city_to']);
+            return $city_from;
+        });
+        
+        return $subRoutes[0]->city_to_final[0]->pivot;
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
