@@ -53,21 +53,25 @@
           </div>
         </div>
         <div class="modal-footer d-block pt-0">
-          <button
-            type="button"
-            class="btn btn-danger btn-block"
-            v-if="!doubleCheckIncluded"
-            @click="deleteData"
+          <div
+            v-if="doubleCheckIncluded"
           >
-            Yes
-          </button>
+          <ConfirmationModal :formID="doubleCheckIncluded" />
+            <button
+              type="button"
+              class="btn btn-danger btn-block"
+              @click="deleteData"
+            >
+              Yes
+            </button>
+          </div>
           <button
             type="button"
             class="btn btn-danger btn-block"
             v-else
             @click="passwordInput"
           >
-            Yes 1
+            Yes
           </button>
           <button
             type="button"
@@ -83,7 +87,10 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import ConfirmationModal from "../../components/ConfirmationModal.vue";
+import ConfirmationModal from './ConfirmationModal.vue';
 export default {
+  components: { ConfirmationModal },
   props: {
     confirmationMessage: String,
     doubleCheckIncluded: String,

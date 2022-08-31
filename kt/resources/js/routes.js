@@ -10,6 +10,7 @@ import Login from "./pages/auth/Login.vue";
 import Terminal from "./pages/terminal/Terminal.vue";
 import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
+import FareTable from "./pages/fareTable/FareTable.vue";
 
 const routes = [
     {

@@ -342,7 +342,7 @@
       <!-- Add Modal -->
       <Delete
         confirmationMessage='Are You Sure You want To Delete This "company" ???'
-        doubleCheckIncluded=""
+        doubleCheckIncluded="company"
       />
     </div>
   </section>

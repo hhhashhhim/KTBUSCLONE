@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class FareTableController extends Controller
 {
+    public $company_id;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next){
+            $this->company_id = auth()->user()->company_id;
+            return $next( $request );
+        });
+    }
     public function store( Request $request ){
 
         $request->validate([
@@ -43,15 +51,18 @@ class FareTableController extends Controller
             'fare_class'=>'required',
         ]);
 
-        return $this->getFarePrices( 1,$request->fare_class );
+        return $this->getFarePrices( $request->fare_class );
     }
 
-    public function getFarePrices( $company_id,$fare_class ){
+    public function getFarePrices( $fare_class ){
         
         
         $cities = City::with(['city_to'=>function($q){
             $q->orderBy('name');
-        }])->orderBy('name')->get();
+        }])
+        ->where('company_id',$this->company_id)
+        ->orderBy('name')->get();
+        
         $subRoutes = $cities->map(function ($city_from, $i){
 
             // Storing Destination Cities into new Array Index
