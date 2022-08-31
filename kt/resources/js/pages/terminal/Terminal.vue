@@ -37,6 +37,7 @@
                               <th>Name</th>
                               <th>Contact</th>
                               <th>Address</th>
+                              <th>City</th>
                               <th>Modified By</th>
                               <th>Modified Date</th>
                               <th>Action</th>
@@ -48,6 +49,7 @@
                               <td>{{ terminal.name }}</td>
                               <td>{{ terminal.contact }}</td>
                               <td>{{ terminal.address }}</td>
+                              <td>{{ terminal.city.name }}</td>
                               <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
                               <td>{{ terminal.updated_at }}</td>
                               <td>
@@ -88,7 +90,6 @@
         :errors="this.validationErrors"
         :success="success"
         :formID="formID"
-
       >
       <div class="row">
         <div class="form-group col-md-4">
@@ -171,10 +172,23 @@
             </span>
           </label>
         </div>
+        <div class="form-group col-md-4 d-flex align-items-center">
+          <label class="mt-4" for="sms">Main Terminal</label>
+          <label class="colorinput mx-3 mt-3">
+            <span>
+                  <input
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="data.is_main"
+              />
+            <span class="colorinput-color bg-success"></span>
+            </span>
+          </label>
+        </div>
         
         <div class="form-group col-md-12">
           <button type="button" class="btn btn-block btn-success" @click="add">
-            Add terminal
+            Add Terminal
           </button>
         </div>
       </div>
@@ -356,6 +370,9 @@ export default {
             });
           }
         }
+        if (res.status == 423) {
+          this.errorsArray(res.data.is_main, 'Main Terminal');
+        }
       }
     },
     async edit(terminal) {
@@ -378,7 +395,7 @@ export default {
           this.success = "";
           $("#edit-modal").modal("hide");
         }, 3000);
-      } else {
+      }else {
         if (res.status == 422) {
           console.log();
           for (const key in res.data.errors) {

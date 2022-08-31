@@ -534,7 +534,6 @@ export default {
   },
   watch: {
     getDeletingObj(obj) {
-      console.log(obj);
       if (obj.isDeleted) {
         this.companies.splice(obj.index, 1);
       }
