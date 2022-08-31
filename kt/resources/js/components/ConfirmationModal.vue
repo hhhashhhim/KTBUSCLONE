@@ -2,7 +2,7 @@
   <!-- Modal -->
   <div
     class="modal fade"
-    :id="`#${formID}`"
+    :id="`${formID}`"
     tabindex="-1"
     role="dialog"
     aria-labelledby="modelTitleId"
@@ -17,7 +17,7 @@
                 class="modal-title text-center text-danger"
                 style="width: 97%"
               >
-                <i class="fas fa-exclamation-circle fa-2x"></i> Warning Cruicial Data Deletion Found
+                <i class="fas fa-exclamation-circle fa-2x"></i> Warning Crucial Data Deletion Found
               </h4>
               <button
                 type="button"
@@ -30,7 +30,7 @@
             </div>
             <div class="card-body text-center">
               <div
-                class="alert alert-danger alert-dismissible fade show"
+                class="alert alert-success alert-dismissible fade show"
                 role="alert"
                 v-if="success"
               >
@@ -44,6 +44,22 @@
                   <span class="sr-only">Close</span>
                 </button>
                 {{ success }}
+              </div>
+              <div
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+                v-if="error"
+              >
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="alert"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                  <span class="sr-only">Close</span>
+                </button>
+                {{ error }}
               </div>
               <p class="font-weight-bold">
                 Are You Sure You want to Delete this Record? If Yes Please Enter Your Account Password to Further Proceed
@@ -66,13 +82,19 @@
   </div>
 </template>
 <script>
+import { mapGetters } from "vuex";
 export default {
+  name:'ConfirmationModal',
   props: {
     formID: String,
+  },
+  created(){
+    console.log("from confirm modal",this.formID);
   },
   data(){
     return{
       password:"",
+      error:"",
     }
   },
   methods:{
@@ -83,13 +105,19 @@ export default {
 
       const res = await this.callApi("post", "/double-check", {password:this.password});
       if (res.status == 200) {
+        this.$emit('confirmDeleteModal',{
+          details:this.getDeletingObj.data,
+          url:this.getDeletingObj.url,
+        })
         this.password=""
         this.success = "Company Deleted";
-        this.$emit('deleteData',1)
       } else {
         this.error = "Unauthorized !!!"
       }
     }
-  }
+  },
+  computed: {
+    ...mapGetters(["getDeletingObj"]),
+  },
 };
 </script>

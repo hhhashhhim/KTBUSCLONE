@@ -1,5 +1,6 @@
 <template>
-  <section class="section">
+  <div>
+    <section class="section">
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
@@ -339,19 +340,25 @@
         </div>
       </Edit>
 
-      <!-- Add Modal -->
-      <Delete
-        confirmationMessage='Are You Sure You want To Delete This "company" ???'
-        doubleCheckIncluded="company"
+      <!-- Delete Modals -->
+      <ConfirmationModal
+        :formID="confirmModalID"
+        v-on:confirmDeleteModal="confirmDeleteModal(event)"
       />
     </div>
+    <Delete
+      confirmationMessage='Are You Sure You want To Delete This "company" ???'
+      :confirmModalID="confirmModalID"
+    />
   </section>
+  </div>
 </template>
 
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
+import ConfirmationModal from "../../components/ConfirmationModal.vue";
 import Modal from "../../components/Modal.vue";
 import { mapGetters } from "vuex";
 
@@ -362,16 +369,17 @@ export default {
     Edit,
     Delete,
     Modal,
+    ConfirmationModal,
   },
   data() {
     return {
       roles: [],
       formID : "newCompany",
+      confirmModalID:"confirmModal",
       data: {
         name: "",
         contact: "",
         logo: "",
-        isModalVisible:"",
         location: "",
         modules:[],
       },
@@ -414,10 +422,6 @@ export default {
     }    
   },
   methods: {
-    showModal(){
-      this.isModalVisible=true;
-      return;
-    },
     async add() {
       // console.log(this.data.modules);
       // return ;
@@ -512,6 +516,14 @@ export default {
         index: i,
       };
       this.$store.commit("setDeleteObj", deletingObj);
+    },
+    async confirmDeleteModal(data){
+      const res = await this.callApi(
+        "post",
+        this.getDeletingObj.url,
+        this.getDeletingObj.data
+      );
+      location.reload()
     },
     uploadLogo(e){
       this.data.logo=e.target.files[0]

@@ -53,32 +53,16 @@
           </div>
         </div>
         <div class="modal-footer d-block pt-0">
-          <div
-            v-if="doubleCheckIncluded"
-          >
-          <ConfirmationModal 
-            :formID="doubleCheckIncluded"
-            v-on:deleteData="deleteData(event)"
-          />
-            <button
-              type="button"
-              class="btn btn-danger btn-block"
-              @click="deleteData"
-            >
-              Yes, I want to Delete
-            </button>
-          </div>
-          <div
-            v-else
-          >  
+          
           <button
             type="button"
+            data-toggle="modal"
+            :data-target="`#${confirmModalID}`"
+            @click="checkAlert"
             class="btn btn-danger btn-block"
-            @click="passwordInput"
           >
-            Yes
+            Yes, I want to Delete
           </button>
-          </div>
           <button
             type="button"
             class="btn btn-secondary btn-block"
@@ -93,12 +77,10 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-import ConfirmationModal from "./ConfirmationModal.vue";
 export default {
-  components: { ConfirmationModal },
   props: {
     confirmationMessage: String,
-    doubleCheckIncluded: String,
+    confirmModalID: String,
   },
   data() {
     return {
@@ -136,9 +118,6 @@ export default {
         }
       }
     },
-    authorized(data){
-
-    }
   },
   computed: {
     ...mapGetters({
@@ -147,11 +126,11 @@ export default {
   },
   watch: {
     success(newSuccess, oldSuccess) {
-        swal(
-            "Record Deleted!", //Heading
-            newSuccess, // Message
-            "success" // Status
-        );
+      swal(
+        "Record Deleted!", //Heading
+        newSuccess, // Message
+        "success" // Status
+      );
     },
   },
 };
