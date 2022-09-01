@@ -17,10 +17,10 @@ class UserFactory extends Factory
     {
         return [
             'name' => "Admin",
-            'contact' => "123",
-            'email' => "admin@gmail.com",
+            'contact' => "03035008889",
+            'email' => "admin@kt.com",
             'email_verified_at' => now(),
-            'password' => Hash::make("admin123"), // password
+            'password' => Hash::make("admin1234"), // password
             'role_id' => "1",
             'company_id' => "0",
             'is_super_admin' => "1",
