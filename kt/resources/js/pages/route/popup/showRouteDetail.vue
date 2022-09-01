@@ -19,12 +19,20 @@
                             <tr>
                                 <th>City From</th>
                                 <th>City To</th>
-                                <th>Terminals</th>
                                 <th>Business Fare</th>
                                 <th>Executive Fare</th>
                                 <th>Ecomony Fare</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            <tr v-for="item in routeDetails" :key="item.id">
+                                <td>{{ item.city_from.name.toUpperCase() }}</td>
+                                <td>{{ item.city_to.name.toUpperCase() }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.name }}</td>
+                            </tr>
+                        </tbody>
                        </table>
                        </div>
                     </div>
@@ -40,6 +48,9 @@
 </template>
 <script>
 export default {
-   name : 'showRouteDetails'
+   name : 'showRouteDetails',
+   props : {
+    routeDetails:Array
+   }
 }
 </script>

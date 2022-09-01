@@ -167,7 +167,7 @@
         confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
       />
 
-      <showRouteDetails />
+      <showRouteDetails :routeDetails="routeDetails"/>
     </div>
   </section>
 </template>
@@ -214,7 +214,8 @@ export default {
       error: false,
       icon: ' <i class="fa fa-bus"></i> ',
       loop : 1,
-      routeName : ''
+      routeName : '',
+      routeDetails : []
     };
   },
   created(){
@@ -314,7 +315,7 @@ export default {
         id : id
       });
         if (routeDetailRes.status == 200){
-          this.routeDetails = routeDetailRes.data.cities;
+          this.routeDetails = routeDetailRes.data;
         }   
     },
     async fetchRecord() {

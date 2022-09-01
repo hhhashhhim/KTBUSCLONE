@@ -39,7 +39,7 @@
                             </router-link>
                         </li>
                            <li class="dropdown">
-                            <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
                                 <i class="fas fa-table"></i> Routes
                             </router-link>
                         </li>

@@ -64,12 +64,17 @@ class CityController extends Controller
 
                 $fare = FareTable::where('from_city_id', $city)->where('to_city_id', $request['cities'][$index + 1])->get();
                 if($fare->count() > 0){
-                    RouteFare::create([
-                        'route_id'   => $route->id,
-                        'fare_id'    => $fare->id,
-                        'company_id' => $this->company_id,
-                        'added_by'   => auth()->user()->id  
-                    ]);
+                    foreach( $fare as $detail){
+
+                        RouteFare::create([
+                            'route_id'   => $route->id,
+                            'fare_id'    => $detail->id,
+                            'city_from_id' => $city,
+                            'city_to_id' => $request['cities'][$index + 1],
+                            'company_id' => $this->company_id,
+                            'added_by'   => auth()->user()->id  
+                        ]);
+                    }
                 }
             }
         }
@@ -78,6 +83,8 @@ class CityController extends Controller
     }
 
     public function city_routes_details( Request $request){
-        return Route::with('terminals.city:id,name', 'fares.fare_details')->get();
+        return RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details')
+        ->where('route_id', $request->id)
+        ->get();
     }
 }

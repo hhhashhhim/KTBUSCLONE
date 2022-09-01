@@ -10,7 +10,7 @@ class FareTable extends Model
     use HasFactory;
     protected $fillable = [
         'fare',
-        'fare_class',
+        'fare_class', //0 => 
         'from_city_id',
         'to_city_id',
         'company_id',
