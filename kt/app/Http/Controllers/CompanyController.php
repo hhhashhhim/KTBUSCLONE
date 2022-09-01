@@ -35,7 +35,7 @@ class CompanyController extends Controller
             'contact'=>$request->contact,
             'location'=>$request->location,
             'modules'=>$request->modules,
-            // 'logo'=>$request->logo,
+            'logo'=>$request->logo,
             'added_by'=>auth()->user()->id,
         ]);
         
@@ -58,7 +58,8 @@ class CompanyController extends Controller
 
     }
     public function logoUpload( Request $request ){
-        return $request->hasFile('logo');
+        $name = $this->image($request->logo);
+        return response(['name'=>$name],200);
     }
     public function update( Request $request ){
 
@@ -92,6 +93,25 @@ class CompanyController extends Controller
         ->join('users','companies.id','users.company_id')
         ->select('companies.*','users.name as userName','users.email')
         ->first();
+    }
+    public function image($image){
+
+        $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+        ."_".time().'.'.$image->extension();
+
+        $image->move(public_path('uploads/company/logo/'), $imageName);
+        return $imageName;
+
+        // $filenameWithExt = $image->getClientOriginalName();
+        // //get just filename
+        // $filename        = pathinfo($filenameWithExt);
+        // //get just extension
+        // $extension       = $image->extension();
+        // return $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        // //Move to folder
+        // $path            = $image->move('uploads/company/logo/', $nameToStore);
+        // // $path            = $image->storeAs('uploads/employee/profile/', $nameToStore);
+        // return $nameToStore;
     }
     
 }

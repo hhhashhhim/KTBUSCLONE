@@ -48,7 +48,9 @@
                                 <td>{{ company.name }}</td>
                                 <td>{{ company.contact }}</td>
                                 <td>{{ company.location }}</td>
-                                <td>{{ company.logo }}</td>
+                                <td>
+                                  <img :src="'uploads/company/logo/'+(company.logo)" style="width:200px;" alt="">
+                                </td>
                                 <td>
                                   <a
                                     href="#edit-modal"
@@ -232,9 +234,10 @@
                 <button
                   type="button"
                   class="btn btn-block btn-success mt-4"
+                  :class="loading?'disabled':''"
                   @click="add"
                 >
-                  Add Company
+                  {{ loading?"Loading....":"Add Company" }}
                 </button>
               </div>
             </div>
@@ -436,6 +439,7 @@ export default {
       roles: [],
       formID: "newCompany",
       confirmModalID: "confirmModal",
+      loading:false,
       data: {
         name: "",
         contact: "",
@@ -503,18 +507,18 @@ export default {
       }
       let formData = new FormData();
       formData.append('logo', this.data.logo);
-      alert("Reaching")
-      const logoRes = await this.callApi("post", "/company/logo-upload", formData,config);
-      return logoRes;
 
       this.validationErrors = [];
       if (this.data.name == "")
         return this.errorsArray("Company Name is Required", "Name");
       if (this.data.contact == "")
         return this.errorsArray("Company Contact is Required", "Contact");
+      this.loading = true;
 
-      const res = await this.callApi("post", "/company/store", this.data);
+      const logoRes = await this.callApi("post", "/company/logo-upload", formData,config);
+      const res = await this.callApi("post", "/company/store", {...this.data,logo:logoRes.data.name});
       if (res.status == 201) {
+        this.loading = false;
         this.success = "Company Created Successfully";
         this.companies.unshift(res.data);
         this.data.name = this.data.contact = this.data.location = "";
@@ -525,6 +529,7 @@ export default {
         }, 2000);
       } else {
         if (res.status == 422) {
+        this.loading = false;
           for (const key in res.data.errors) {
             res.data.errors[key].forEach((element) => {
               this.errorsArray(element, key);
