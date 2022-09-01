@@ -45,8 +45,30 @@
                       <h4></h4>
                     </div>
                     <div class="card-body">
-                      <div class="table-responsive" v-if="cities">
-                        
+                       <div class="table-responsive">
+                        <table
+                          class="table table-striped table-hover"
+                          id="edit_loc"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Sr No.</th>
+                              <th>Name</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(route, i) in routes" :key="i">
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ route.name }}</td>
+                              <td>
+                                <button class="btn btn-outline-primary" 
+                                  data-toggle="modal"
+                                  data-target="#showDetails" @click="fetchRouteDetails( route.id )">See Details</button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
@@ -60,28 +82,17 @@
 
       <!-- Add Modal -->
       <Add
-        :heading="from + icon + to"
+        :heading="'ADD NEW ROUTE'"
         :errors="this.validationErrors"
         :success="success"
         :formID="formID"
       >
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-12">
             <label for="name">Name</label>
-            <input type="text" class="form-control" v-model="data.fare" />
+            <input type="text" class="form-control" v-model="routeName" />
           </div>
-          <div class="form-group col-md-6">
-            <label for="commission_flat">Select City</label>
-            <label for="fare_class" class="font-weight-bold my-0"
-              >Fare Class</label
-            >
-            <select class="form-control rounded-0" @change="fetchTerminal()">
-              <option value="0" selected>Select Fare Class</option>
-               <option v-for="(city, i) in cities" :value="city.id" :key="i">
-                {{ city.name }}
-              </option>
-            </select>
-          </div>
+          
           <div class="col-md-12">
             <h5>Select Terminals</h5>
             <br />
@@ -95,85 +106,53 @@
               <thead>
                 <tr>
                   <th>City From</th>
-                  <th>City To</th>
+                  <th>Select Terminal</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr v-for="index in loop" :key="index">
                   <td>
-                  <select class="form-control rounded-0">
-                    <option value="0" selected>Select Fare Class</option>
+                  <select class="form-control rounded-0" @change="fetchTerminals($event , index)">
+                    <option value="0" selected>Select City</option>
                     <option v-for="(city, i) in cities" :value="city.id" :key="i">
                       {{ city.name }}
                     </option>
                   </select>
                   </td>
                   <td>
-                   <span class="mx-2">
-              <label class="mt-4" for="sms">Kainat Travel</label>
-              <label class="colorinput mx-3 mt-3">
-                <span>
-                  <input
-                    type="checkbox"
-                    class="colorinput-input"
-                    v-model="data.is_main"
-                  />
-                  <span class="colorinput-color bg-success"></span>
-                </span>
-              </label>
-            </span>
+                   <span class="mx-2" v-for="(item) in terminals[index]" :key="item.id">
+                    <label class="mt-4" for="sms">{{ item.name }}</label>
+                    <label class="colorinput mx-3 mt-3">
+                      <span>
+                        <input
+                          type="checkbox"
+                          class="colorinput-input"
+                          @click="addTerminal($event)"
+                          id="sms"
+                          :value="item.id"
+                        />
+                        <span class="colorinput-color bg-success"></span>
+                      </span>
+                    </label>
+                  </span>
                   </td>
                   <td>
-                    <button class="btn btn-outline-primary">Add</button>
-                    <button class="btn btn-outline-danger">Remove</button>
+                    <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
+                    <button class="btn btn-outline-danger" @click="removeRow">Remove</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="form-group col-md-12 d-flex align-items-center">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>City From</th>
-                  <th>City To</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                  <select class="form-control rounded-0">
-                    <option value="0" selected>Select Fare Class</option>
-                    <option v-for="(city, i) in cities" :value="city.id" :key="i">
-                      {{ city.name }}
-                    </option>
-                  </select>
-                  </td>
-                  <td>
-                    <select class="form-control rounded-0">
-                      <option value="0" selected>Select Fare Class</option>
-                       <option v-for="(city, i) in cities" :value="city.id" :key="i">
-                        {{ city.name }}
-                      </option>
-                    </select>
-                  </td>
-                  <td>
-                    <button class="btn btn-outline-primary">Add</button>
-                    <button class="btn btn-outline-danger">Remove</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+         
 
           <div class="form-group col-md-12">
             <button
               type="button"
               class="btn btn-block btn-primary"
-              @click="add"
+              @click="addRoute"
             >
               Save Route Details
             </button>
@@ -187,6 +166,8 @@
       <Delete
         confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
       />
+
+      <showRouteDetails />
     </div>
   </section>
 </template>
@@ -196,6 +177,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
+import showRouteDetails from "./popup/showRouteDetail.vue"
 
 export default {
   name: "RoutePage",
@@ -203,12 +185,19 @@ export default {
     Add,
     Edit,
     Delete,
+    showRouteDetails
   },
   data() {
     return {
       cities: [],
+      city : 0,
+      addCities : [],
       companies: [],
+      terminals : [],
       fetchedData: [],
+      addTerminalsOnClick : [],
+      termianl : '',
+      routes : [],
       formID: "addNewRoute",
       fareClasses: [
         { id: 1, name: "economy" },
@@ -224,6 +213,8 @@ export default {
       success: false,
       error: false,
       icon: ' <i class="fa fa-bus"></i> ',
+      loop : 1,
+      routeName : ''
     };
   },
   created(){
@@ -235,6 +226,20 @@ export default {
     },
   },
   methods: {
+    async addRoute(){
+
+      const data = {
+        route : this.routeName,
+        cities : this.addCities,
+        terminals : this.addTerminalsOnClick
+      }
+
+      const res = await this.callApi("post", "/cities/routes", data);
+
+      if (res.status == 200) {
+        this.success = "Route Created Successfully";
+      }
+    },
     async add() {
       this.validationErrors = [];
       const res = await this.callApi("post", "/fare-table/store", this.data);
@@ -257,15 +262,45 @@ export default {
         }
       }
     },
-    async fetchTerminal(){
-      alert('et')
+    addRow(){
+      this.loop ++;
+    },
+    removeRow(){
+      this.loop --;
+    },
+    addTerminal( event ){
+      const value = event.target.value
+      if( event.target.checked ){
+        const index = this.addTerminalsOnClick.indexOf( value );
+        if(index == -1){
+          this.addTerminalsOnClick.push(value);
+        }
+      }else{
+        const index = this.addTerminalsOnClick.indexOf( value );
+        this.addTerminalsOnClick.splice(index, 1);
+      }
+    },
+    async fetchTerminals( event , index ){
+      const value = event.target.value;
+      
+      const indexI = this.addCities.indexOf( value );
+        if(indexI == -1){
+          this.addCities.push(value);
+        }
+
+     const terminalRes = await this.callApi("post", "/cities/terminals",{
+        id : value
+     });
+        if (terminalRes.status == 200){
+            this.terminals[index] = terminalRes.data; 
+           
+        } 
     },
     async fetchCities(){
-    const cityRes = await this.callApi("post", "/city");
+    const cityRes = await this.callApi("post", "/cities/routes/list");
         if (cityRes.status == 200){
-          this.cities = cityRes.data;
-          console.log(cityRes.data);
-          console.log(this.cities);
+          this.cities = cityRes.data.cities;
+          this.routes = cityRes.data.routes;
         }   
     },
     changeInfo(from, to) {
@@ -273,6 +308,14 @@ export default {
       this.to = to.name;
       this.data.from = from.id;
       this.data.to = to.id;
+    },
+    async fetchRouteDetails( id ){
+      const routeDetailRes = await this.callApi("post", "/cities/routes/details", {
+        id : id
+      });
+        if (routeDetailRes.status == 200){
+          this.routeDetails = routeDetailRes.data.cities;
+        }   
     },
     async fetchRecord() {
       if (!this.data.fare_class) {
