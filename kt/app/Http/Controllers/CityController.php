@@ -85,6 +85,6 @@ class CityController extends Controller
     public function city_routes_details( Request $request){
         return RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details')
         ->where('route_id', $request->id)
-        ->get();
+        ->get()->groupBy('city_from_id', 'city_to_id');
     }
 }

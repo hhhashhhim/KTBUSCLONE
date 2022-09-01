@@ -26,11 +26,11 @@
                         </thead>
                         <tbody>
                             <tr v-for="item in routeDetails" :key="item.id">
-                                <td>{{ item.city_from.name.toUpperCase() }}</td>
-                                <td>{{ item.city_to.name.toUpperCase() }}</td>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.name }}</td>
+                                <td>{{ item[0].city_from.name.toUpperCase() }}</td>
+                                <td>{{ item[0].city_to.name.toUpperCase() }}</td>
+                                <td>{{ item[0].fare_details ? item[0].fare_details.fare : 'N/A'}} RS.</td>
+                                <td>{{ item[1].fare_details ? item[1].fare_details.fare : 'N/A' }} RS.</td>
+                                <td>{{ item[2].fare_details ? item[2].fare_details.fare : 'N/A' }} RS.</td>
                             </tr>
                         </tbody>
                        </table>
