@@ -57,6 +57,9 @@ class CompanyController extends Controller
         return $company;
 
     }
+    public function logoUpload( Request $request ){
+        return $request->hasFile('logo');
+    }
     public function update( Request $request ){
 
         $request->validate([
@@ -85,7 +88,10 @@ class CompanyController extends Controller
         return Role::where('company_id',$this->company_id)->get();
     }
     public function company( Request $request ){
-        return Company::find($request->id);
+        return Company::where('companies.id',$request->id)
+        ->join('users','companies.id','users.company_id')
+        ->select('companies.*','users.name as userName','users.email')
+        ->first();
     }
     
 }

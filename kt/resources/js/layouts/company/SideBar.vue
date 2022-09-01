@@ -38,7 +38,7 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
-                           <li class="dropdown">
+                           <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
                                 <i class="fas fa-table"></i> Routes
                             </router-link>
@@ -61,6 +61,42 @@
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('user')">
                                 <i class="fa fa-user"></i> Users
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown" v-if="checkPermission('hrm')">
+                    
+                    <a href="#" class="menu-toggle nav-link has-dropdown">                
+                        <i class="fas fa-sitemap"></i>
+                        <span>
+                            HRM
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }" v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i> Employees
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('salary')">
+                                <i class="fas fa-hand-holding-usd"></i> Salary
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('loan')">
+                                <i class="fas fa-money-check-alt"></i> Loan
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('leave managment')">
+                                <i class="fas fa-street-view"></i> leave managment
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('attendance')">
+                                <i class="fas fa-file-export"></i> attendance
                             </router-link>
                         </li>
                     </ul>
