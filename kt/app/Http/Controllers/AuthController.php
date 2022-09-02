@@ -30,18 +30,14 @@ class AuthController extends Controller
 
         // ->first();
 
-        $routes = RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details:id,fare,fare_class','fare_details.class:id,name')
+        return $routes = RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details:id,fare,fare_class','fare_details.class:id,name')
         ->where('company_id', $this->company_id)
         ->where('route_id', 1)
         ->get()->groupBy('city_from_id','city_to_id');
-        return $routes['40'];
         // return $routes[0]->fare_details->groupBy('fare_class');
         $newRoutes = $routes->map( function($route,$i){
             
-            $route['fare_info'] = $route->fare_details->groupBy('fare_class');
- 
-            unset($route->fare_details);
-            return $route;
+            $route->map( function() );
 
         });
 
