@@ -19,18 +19,21 @@
                             <tr>
                                 <th>City From</th>
                                 <th>City To</th>
+                                <th>Ecomony Fare</th>
                                 <th>Business Fare</th>
                                 <th>Executive Fare</th>
-                                <th>Ecomony Fare</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="item in routeDetails" :key="item.id">
-                                <td>{{ item.city_from.name.toUpperCase() }}</td>
-                                <td>{{ item.city_to.name.toUpperCase() }}</td>
-                                <td>{{ item.fare_details ? item.fare_details.fare : 'N/A'}} RS.</td>
-                                <td>{{ item.fare_details ? item.fare_details.fare : 'N/A' }} RS.</td>
-                                <td>{{ item.fare_details ? item.fare_details.fare : 'N/A' }} RS.</td>
+                                <td>{{ item[0].city_from.name.toUpperCase() }}</td>
+                                <td>
+                                  {{ item[0].city_to.name.toUpperCase() }}
+                                </td>
+                                <template v-for="(n,i) in 3" :key="i">
+                                  <td v-if="item[i]">{{ item[i].fare_details.fare }} RS.</td>
+                                  <td v-else>N/A</td>
+                                </template>
                             </tr>
                         </tbody>
                        </table>
@@ -51,6 +54,11 @@ export default {
    name : 'showRouteDetails',
    props : {
     routeDetails:Array
+   },
+   methods:{
+    testFunction(item){
+      console.log(item);
+    }
    }
 }
 </script>

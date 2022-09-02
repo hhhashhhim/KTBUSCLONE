@@ -316,6 +316,7 @@ export default {
       });
         if (routeDetailRes.status == 200){
           this.routeDetails = routeDetailRes.data;
+          console.log(this.routeDetails[0]);
         }   
     },
     async fetchRecord() {

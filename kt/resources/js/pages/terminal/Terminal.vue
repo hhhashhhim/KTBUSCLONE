@@ -116,8 +116,8 @@
           <input type="text" class="form-control" v-model="data.address">
         </div>
         <div class="form-group col-md-4">
-          <label for="time_difference">Time Difference ( Hours )</label>
-          <input type="time" class="form-control" v-model="data.time_difference">
+          <label for="time_difference">Time Difference ( eg 3:40 )</label>
+          <input type="text" class="form-control" v-model="data.time_difference">
         </div>
         <div class="form-group col-md-4">
           <label for="advance_booking">Advance Booking Allowed(Days)</label>
