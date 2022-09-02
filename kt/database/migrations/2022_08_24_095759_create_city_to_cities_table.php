@@ -21,19 +21,7 @@ class CreateCityToCitiesTable extends Migration
             $table->bigInteger('destination_city_id');
             $table->timestamps();
         });
-        
-          $cities = City::get();
-          foreach ($cities as $i => $cityFrom) {
-            foreach ($cities as $i => $cityTo) {
 
-                CityToCity::create([
-                    'departure_city_id'=>$cityFrom->id,
-                    'destination_city_id'=>$cityTo->id,
-                ]);
-                
-            }
-             
-          }
     }
 
     /**

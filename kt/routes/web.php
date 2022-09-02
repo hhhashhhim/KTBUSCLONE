@@ -67,6 +67,9 @@ Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
 });
 Route::group(['prefix'=>'city',[CustomMiddleware::class]],function(){
     Route::post('/',[CityController::class,'index']);
+    Route::post('store',[CityController::class,'store']);
+    Route::post('update',[CityController::class,'update']);
+    Route::post('delete',[CityController::class,'delete']);
 });
 
 Route::group(['prefix'=>'cities',[CustomMiddleware::class]],function(){

@@ -11,6 +11,7 @@ import Terminal from "./pages/terminal/Terminal.vue";
 import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
 import RoutePage from "./pages/route/RoutePage.vue";
+import CitiesPage from "./pages/city/CitiesPage.vue";
 
 const routes = [
     {
@@ -67,6 +68,11 @@ const routes = [
         path:"/routes",
         component : RoutePage,
         name:"routes-page"
+    },
+    {
+        path:"/cities",
+        component : CitiesPage,
+        name:"cities-page"
     }
 ]
 const router = createRouter({

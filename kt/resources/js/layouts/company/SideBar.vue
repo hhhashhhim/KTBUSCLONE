@@ -12,7 +12,7 @@
                     <a href="/" class="nav-link">
                     <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
-                <li class="dropdown" v-if="checkPermission('users')">
+                <li class="dropdown" v-if="checkPermission('admin')">
                     
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-user-shield"></i>
                         <span>
@@ -27,6 +27,11 @@
                                     Dashboard
                                 </span>
                             </a>
+                        </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'cities-page' }">
+                                <i class="fas fa-table"></i> Cities
+                            </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('terminal')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'terminal' }">
@@ -128,7 +133,6 @@ export default {
     },
     methods:{
         checkPermission(name){
-
             let permissions = this.permissions;
             let module = permissions.find(obj => obj.name === name);
             if (module) {

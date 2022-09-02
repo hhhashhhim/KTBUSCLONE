@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\CityToCity;
 use App\Models\FareTable;
+use App\Models\Route\Route;
+use App\Models\Route\RouteFare;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +16,36 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
 
+    public $company_id;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next){
+            $this->company_id = auth()->user()->company_id;
+            return $next( $request );
+        });
+    }
     public function index(Request $request)
     {
+        // return Route::with('fares','fares.city_from:id,name','fares.city_to:id,name','fares.fare_details')->where('id',1)
+
+        // ->first();
+
+        $routes = RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details:id,fare,fare_class','fare_details.class:id,name')
+        ->where('company_id', $this->company_id)
+        ->where('route_id', 1)
+        ->get()->groupBy('city_from_id','city_to_id');
+        return $routes['40'];
+        // return $routes[0]->fare_details->groupBy('fare_class');
+        $newRoutes = $routes->map( function($route,$i){
+            
+            $route['fare_info'] = $route->fare_details->groupBy('fare_class');
+ 
+            unset($route->fare_details);
+            return $route;
+
+        });
+
+
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }

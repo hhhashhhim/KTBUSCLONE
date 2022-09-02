@@ -9,7 +9,7 @@
               <div class="w-50 d-flex align-items-center">
                 <div class="header-select mx-2">
                     <label for="fare_class" class="font-weight-bold my-0">Fare Class</label>
-                    <select v-model="data.fare_class" class="form-control rounded-0">
+                    <select v-model="data.fare_class" class="form-control rounded-0 text-capitalize">
                         <option value="0" selected>Select Fare Class</option>
                         <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id" class="text-capitalize"> {{ fareClass.name }} </option>
                     </select>
@@ -56,7 +56,7 @@
                                       <td :class="destinationCity.id==departureCity.id?'bg-danger':'modal-cell'"> 
                                           <a 
                                           href="#" :data-target="'#'+formID" data-toggle="modal" @click="changeInfo(departureCity,destinationCity)" v-if="departureCity.id!=destinationCity.id" class="btn btn-success btn-block modal-btn">
-                                          {{ destinationCity.fare }}
+                                          {{ destinationCity.fare }} 
                                           </a>
                                       </td>
                                     </template>
@@ -267,9 +267,9 @@ export default {
       this.validationErrors = [];
       const res = await this.callApi("post", "/fare-table/store", this.data);
       if (res.status == 200) {
-        this.success = "Fare Table Updated Created Successfully";
+        this.success = "Fare Table Updated Successfully";
         // Object.keys(obj).forEach((i) => obj[i] = null);
-        this.data = {}
+        this.data.fare = {}
         this.cities = res.data
         setTimeout(() => {
           this.success = "";

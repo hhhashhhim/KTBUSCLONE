@@ -65,8 +65,9 @@ export default {
             }
         },
         errors(newError,oldError){
-            
-            swal('Error', 'Oops Something Went Wrong', 'error');
+            if (newError!="" && newError!=[]) {
+                swal('Error', 'Oops Something Went Wrong', 'error');
+            }
 
         }
     }

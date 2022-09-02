@@ -29,7 +29,7 @@ const store = createStore({
         },
         async updateUser(state,user){
             state.user=user;
-            if (user.is_super_admin != 1 && user.role && user.company) {
+            if (user.is_super_admin != 1 && user.role) {
                 // let companyPermissions = user.company.modules;
                 // let modules = [];
                 // companyPermissions.forEach(permission => {

@@ -59,6 +59,16 @@
             data-toggle="modal"
             :data-target="`#${confirmModalID}`"
             @click="checkAlert"
+            v-if="confirmModalID"
+            class="btn btn-danger btn-block"
+          >
+            Yes, I want to Delete
+          </button>
+
+          <button
+            type="button"
+            @click="deleteData"
+            v-else
             class="btn btn-danger btn-block"
           >
             Yes, I want to Delete
@@ -126,11 +136,13 @@ export default {
   },
   watch: {
     success(newSuccess, oldSuccess) {
-      swal(
-        "Record Deleted!", //Heading
-        newSuccess, // Message
-        "success" // Status
-      );
+      if (newSuccess!="") {
+        swal(
+          "Record Deleted!", //Heading
+          newSuccess, // Message
+          "success" // Status
+        );
+      }
     },
   },
 };

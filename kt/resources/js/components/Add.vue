@@ -64,11 +64,12 @@ export default {
             }
         },
         errors(newError,oldError){
-            
-            if (newError!="") {
+            if (newError!="" && newError!=[]) {
                 swal('Error', 'Oops Something Went Wrong', 'error');
             }
+
         }
     }
+
 }
 </script>

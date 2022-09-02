@@ -49,7 +49,7 @@
                               <td>{{ terminal.name }}</td>
                               <td>{{ terminal.contact }}</td>
                               <td>{{ terminal.address }}</td>
-                              <td>{{ terminal.city.name }}</td>
+                              <td>{{ terminal.city?terminal.city.name:"" }}</td>
                               <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
                               <td>{{ terminal.updated_at }}</td>
                               <td>
@@ -93,21 +93,14 @@
       >
       <div class="row">
         <div class="form-group col-md-4">
-          <label for="city_id">Terminal City</label>
+          <label for="city_id">Terminal City <span class="text-danger">*</span></label>
           <select class="form-control" v-model="data.city_id">
             <option value="">Select City</option>
             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }} </option>
           </select>
         </div>
-        <div class="form-group col-md-4" v-if="$store.state.user.is_super_admin==1">
-          <label for="company">Company Name</label>
-          <select class="form-control" v-model="data.company_id">
-            <option value="">Select Company</option>
-            <option v-for="(company,i) in companies" :key="i" :value="company.id"> {{ company.name }} </option>
-          </select>
-        </div>
         <div class="form-group col-md-4">
-          <label for="name">Terminal Name</label>
+          <label for="name">Terminal Name <span class="text-danger">*</span></label>
           <input type="text" class="form-control" v-model="data.name">
         </div>
         <div class="form-group col-md-4">
@@ -115,7 +108,7 @@
           <input type="number" class="form-control" v-model="data.available_seats">
         </div>
         <div class="form-group col-md-4">
-          <label for="contact">Terminal Contact</label>
+          <label for="contact">Terminal Contact <span class="text-danger">*</span>  </label>
           <input type="number" class="form-control" v-model="data.contact">
         </div>
         <div class="form-group col-md-4">

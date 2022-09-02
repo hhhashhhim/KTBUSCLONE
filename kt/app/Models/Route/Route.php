@@ -14,7 +14,6 @@ class Route extends Model
     public function fares(){
         return $this->hasMany(RouteFare::class, 'route_id', 'id');
     }
-
     public function terminals(){
         return $this->hasMany(RouteTerminal::class, 'route_id', 'id');
     }

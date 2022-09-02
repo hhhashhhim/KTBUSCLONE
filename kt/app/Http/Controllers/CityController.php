@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\CityToCity;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
@@ -24,10 +25,43 @@ class CityController extends Controller
 
     public function index(){
         
-        return City::orderBy('name')->select('name','id')->get();
+        return City::orderBy('name')->where( 'company_id',$this->company_id )->select('name','id')->get();
         
     }
 
+    public function store( Request $request ){
+
+        $request->validate(['name'=>'required']);
+        
+        $city = City::create([
+            'name'=>$request->name,
+            'company_id'=>$this->company_id,
+            'added_by'=>auth()->user()->id,   
+        ]);
+        
+        $this->cityCombinations( $city );
+        return $city;
+        
+    }
+
+    public function update( Request $request ){
+        
+        $request->validate([
+            'name'=>'required'
+        ]);
+        
+        return City::find( $request->id )->update([
+            'name'=>$request->name,
+            'added_by'=>auth()->user()->id,   
+        ]);
+
+    }
+    
+    public function delete(Request $request)
+    {
+        return City::find($request->id)->delete();
+    }
+    
     public function city_routes_list(){
         
         $data = [
@@ -84,7 +118,33 @@ class CityController extends Controller
 
     public function city_routes_details( Request $request){
         return RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details')
+        ->where('company_id', $this->company_id)
         ->where('route_id', $request->id)
-        ->get()->groupBy('city_from_id', 'city_to_id');
+        ->get();
+        // ->groupBy('city_from_id', 'city_to_id');
+    }
+
+    public function cityCombinations( $city ){
+
+
+        $cities = City::get();
+        foreach ($cities as $i => $cityTo) {
+
+            // Creating Relation of Newly added city with Other Cities
+            CityToCity::create([
+                'departure_city_id'=>$city->id,
+                'destination_city_id'=>$cityTo->id,
+            ]);
+
+            // Creating Other Cities Relation with Newly added City 
+            if ($cityTo->id != $city->id) {
+                CityToCity::create([
+                    'departure_city_id'=>$cityTo->id,
+                    'destination_city_id'=>$city->id,
+                ]);
+            }
+
+        }
+        
     }
 }

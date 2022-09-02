@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Route\RouteFare;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,4 +30,10 @@ class FareTable extends Model
     public function city_name(){
         return $this->belongsTo(City::class, 'to_city_id',  'id');
     }
+    public function class(){
+        return $this->hasOne( FareClass::class,'id','fare_class' );
+    }
+    // public function route_fare(){
+    //     return $this->belongsTo( RouteFare::class,'id','fare_id' );
+    // }
 }

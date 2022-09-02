@@ -6,7 +6,7 @@
           <div class="col-12 col-md-12 col-lg-12">
             <div class="card card-success">
               <div class="card-header">
-                <h4>Companies</h4>
+                <h4>cities</h4>
                 <div class="card-header-action">
                   <a
                     href="#"
@@ -43,19 +43,19 @@
                               </tr>
                             </thead>
                             <tbody>
-                              <tr v-for="(company, i) in companies" :key="i">
+                              <tr v-for="(city, i) in cities" :key="i">
                                 <td>{{ i + 1 }}</td>
-                                <td>{{ company.name }}</td>
-                                <td>{{ company.contact }}</td>
-                                <td>{{ company.location }}</td>
+                                <td>{{ city.name }}</td>
+                                <td>{{ city.contact }}</td>
+                                <td>{{ city.location }}</td>
                                 <td>
-                                  <img :src="'uploads/company/logo/'+(company.logo)" style="width:200px;" alt="">
+                                  <img :src="'uploads/city/logo/'+(city.logo)" style="width:200px;" alt="">
                                 </td>
                                 <td>
                                   <a
                                     href="#edit-modal"
                                     data-toggle="modal"
-                                    @click="edit(company.id, i)"
+                                    @click="edit(city.id, i)"
                                     class="btn btn-warning mx-1"
                                   >
                                     <i class="far fa-edit"></i>
@@ -63,7 +63,7 @@
                                   <a
                                     href="#delete-modal"
                                     data-toggle="modal"
-                                    @click="deleteModal(company, i)"
+                                    @click="deleteModal(city, i)"
                                     class="btn btn-danger"
                                   >
                                     <i class="far fa-trash-alt"></i>
@@ -85,14 +85,14 @@
 
         <!-- Add Modal -->
         <Add
-          heading="New Company"
+          heading="New city"
           :errors="this.validationErrors"
           :success="success"
           :formID="formID"
         >
           <div class="row">
             <div class="form-group col-md-4">
-              <label for="name">Company Name</label>
+              <label for="name">city Name</label>
               <input
                 type="text"
                 class="form-control"
@@ -237,7 +237,7 @@
                   :class="loading?'disabled':''"
                   @click="add"
                 >
-                  {{ loading?"Loading....":"Add Company" }}
+                  {{ loading?"Loading....":"Add city" }}
                 </button>
               </div>
             </div>
@@ -246,14 +246,14 @@
 
         <!-- Add Modal -->
         <Edit
-          heading="Edit Company"
+          heading="Edit city"
           :errors="this.validationErrors"
           :success="success"
           :formID="formID"
         >
           <div class="row">
             <div class="form-group col-md-4">
-              <label for="name">Company Name</label>
+              <label for="name">city Name</label>
               <input
                 type="text"
                 class="form-control"
@@ -396,7 +396,7 @@
                   class="btn btn-block btn-success mt-4"
                   @click="update"
                 >
-                  Update Company
+                  Update city
                 </button>
               </div>
             </div>
@@ -410,7 +410,7 @@
         />
       </div>
       <Delete
-        confirmationMessage='Are You Sure You want To Delete This "company" ???'
+        confirmationMessage='Are You Sure You want To Delete This "city" ???'
         :confirmModalID="confirmModalID"
       />
     </section>
@@ -437,7 +437,7 @@ export default {
   data() {
     return {
       roles: [],
-      formID: "newCompany",
+      formID: "newcity",
       confirmModalID: "confirmModal",
       loading:false,
       data: {
@@ -487,14 +487,14 @@ export default {
         modules: [],
       },
       success: false,
-      companies: [],
+      cities: [],
     };
   },
   async created() {
     this.data.modules = this.dataEdit.modules = this.defaultModules;
-    const companyRes = await this.callApi("post", "/company");
-    if (companyRes.status == 200) {
-      this.companies = companyRes.data;
+    const cityRes = await this.callApi("post", "/city");
+    if (cityRes.status == 200) {
+      this.cities = cityRes.data;
     }
   },
   methods: {
@@ -510,17 +510,24 @@ export default {
 
       this.validationErrors = [];
       if (this.data.name == "")
-        return this.errorsArray("Company Name is Required", "Name");
+        return this.errorsArray("city Name is Required", "Name");
       if (this.data.contact == "")
-        return this.errorsArray("Company Contact is Required", "Contact");
+        return this.errorsArray("city Contact is Required", "Contact");
       this.loading = true;
 
-      const logoRes = await this.callApi("post", "/company/logo-upload", formData,config);
-      const res = await this.callApi("post", "/company/store", {...this.data,logo:logoRes.data.name});
+      let logo = "";
+      if (this.data.logo) {
+        const logoRes = await this.callApi("post", "/city/logo-upload", formData,config);
+        logo:logoRes?logoRes.data.name:""
+      }
+      const res = await this.callApi("post", "/city/store", {
+        ...this.data,
+        logo
+      });
       if (res.status == 201) {
         this.loading = false;
-        this.success = "Company Created Successfully";
-        this.companies.unshift(res.data);
+        this.success = "city Created Successfully";
+        this.cities.unshift(res.data);
         this.data.name = this.data.contact = this.data.location = "";
         this.data.modules = this.defaultModules;
         setTimeout(() => {
@@ -539,16 +546,16 @@ export default {
       }
     },
     async edit(id, i) {
-      const res = await this.callApi("post", "/company/get", { id });
-      let company;
+      const res = await this.callApi("post", "/city/get", { id });
+      let city;
 
       if (res.status == 200) {
-        company = res.data;
+        city = res.data;
       } else {
         return alert("Something Went Wrong !!!");
       }
 
-      const modules = company.modules
+      const modules = city.modules
         .concat(this.dataEdit.modules)
         .filter(function (obj) {
           return this.has(obj.name) ? false : this.add(obj.name);
@@ -557,7 +564,7 @@ export default {
       // console.log(modules);
 
       this.dataEdit = {
-        ...company,
+        ...city,
         modules,
         i,
       };
@@ -566,22 +573,17 @@ export default {
     async update() {
       this.validationErrors = [];
       if (this.dataEdit.name == "")
-        return this.errorsArray("Company Name is Required", "Name");
-      if (this.dataEdit.contact == "")
-        return this.errorsArray("Company Contact is Required", "Contact");
+        return this.errorsArray("City Name is Required", "Name");
 
-      const res = await this.callApi("post", "/company/update", this.dataEdit);
+      const res = await this.callApi("post", "/city/update", this.dataEdit);
 
       if (res.status == 200) {
-        this.success = "Company Updated Successfully";
-        const companyRes = await this.callApi("post", "/company");
-        if (companyRes.status == 200) {
-          this.companies = companyRes.data;
+        this.success = "City Updated Successfully";
+        const cityRes = await this.callApi("post", "/city");
+        if (cityRes.status == 200) {
+          this.cities = cityRes.data;
         }
-        this.dataEdit.name =
-          this.dataEdit.contact =
-          this.dataEdit.location =
-            "";
+        this.dataEdit.name ="";
         this.modules = [
           { hrm: false },
           { accounts: false },
@@ -601,10 +603,10 @@ export default {
         }
       }
     },
-    async deleteModal(company, i) {
+    async deleteModal(city, i) {
       const deletingObj = {
-        url: "/company/delete",
-        data: company,
+        url: "/city/delete",
+        data: city,
         index: i,
       };
       this.$store.commit("setDeleteObj", deletingObj);
@@ -627,7 +629,7 @@ export default {
   watch: {
     getDeletingObj(obj) {
       if (obj.isDeleted) {
-        this.companies.splice(obj.index, 1);
+        this.cities.splice(obj.index, 1);
       }
     },
   },

@@ -22,9 +22,13 @@ class RouteFare extends Model
     ];
 
     public function fare_details(){
-        return $this->belongsTo(FareTable::class, 'fare_id',  'id');
+        return $this->hasMany( FareTable::class,'id','fare_id' );
     }
-
+    
+    public function route(){
+        return $this->hasOne( Route::class,'id','route_id');
+    }
+    
     public function city_from(){
         return $this->belongsTo(City::class, 'city_from_id',  'id');
     }

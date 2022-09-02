@@ -22,7 +22,9 @@ class TerminalController extends Controller
     public function index()
     {
 
-        return Terminal::with('added_by', 'city')->latest('id')->get();
+        return Terminal::with('added_by', 'city')
+        ->where('company_id',$this->company_id)
+        ->latest('id')->get();
     }
     public function store(Request $request)
     {
