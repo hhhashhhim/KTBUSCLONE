@@ -13,6 +13,7 @@ import FareTable from "./pages/fareTable/FareTable.vue";
 import RoutePage from "./pages/route/RoutePage.vue";
 import CitiesPage from "./pages/city/CitiesPage.vue";
 import DiscountPage from "./pages/discount/DiscountPage";
+import SurchargePage from "./pages/surcharge/SurchargePage";
 
 const routes = [
     {
@@ -74,6 +75,11 @@ const routes = [
         path:"/discounts",
         component : DiscountPage,
         name:"discount-page"
+    },
+    {
+        path:"/surcharge",
+        component : SurchargePage,
+        name:"surcharge-page"
     },
     {
         path:"/cities",

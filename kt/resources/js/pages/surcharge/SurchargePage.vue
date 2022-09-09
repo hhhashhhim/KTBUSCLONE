@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Discount Details</h4>
+                            <h4>Surcharge Details</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -13,7 +13,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary"
                                 >
-                                    Add Discount
+                                    Add Surcharge
                                 </a>
                             </div>
                         </div>
@@ -60,18 +60,18 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(discount, i) in discounts" :key="i">
-                                                        <td>{{ discount.id }}</td>
-                                                        <td>{{ discount.name }}</td>
-                                                        <td>{{ discount.percentage }}%</td>
-                                                        <td>{{ discount.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                    <tr v-for="(surcharge, i) in surcharges" :key="i">
+                                                        <td>{{ surcharge.id }}</td>
+                                                        <td>{{ surcharge.name }}</td>
+                                                        <td>{{ surcharge.percentage }}%</td>
+                                                        <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(discount)" class="btn btn-warning mx-1">
+                                                               @click="edit(surcharge)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
                                                             <a href="#delete-modal" data-toggle="modal"
-                                                               @click="deleteModal(discount,i)" class="btn btn-danger">
+                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
@@ -91,20 +91,20 @@
 
             <!-- Add Modal -->
             <Add
-                :heading="'ADD NEW DISCOUNT'"
+                :heading="'ADD SURCHARGE'"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="DiscountName">Name</label>
-                        <input type="text" class="form-control" v-model="DiscountName" @keypress="isAlphabet($event)"/>
+                        <label for="SurchargeName">Name</label>
+                        <input type="text" class="form-control" v-model="SurchargeName" @keypress="isAlphabet($event)"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="PercentageName">Percentage</label>
+                        <label for="SurchargePercentage">Percentage</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="PercentageName"
+                            <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
                                    @keypress="isNumber($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -119,8 +119,9 @@
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" value="1" checked class="colorinput-input"
-                                       @change="checkBox($event)"/>
+                                <input type="checkbox" checked  class="colorinput-input" v-model="toggle"
+                                       true-value="yes"
+                                       false-value="no"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -132,9 +133,9 @@
                         <button
                             type="button"
                             class="btn btn-block btn-primary"
-                            @click="addDiscount"
+                            @click="addSurcharge"
                         >
-                            Save Discount Details
+                            Save Surcharge Details
                         </button>
                     </div>
                 </div>
@@ -144,18 +145,18 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Discount"
+                heading="Edit Surcharge"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="DiscountName">Name</label>
+                        <label for="SurchargeName">Name</label>
                         <input type="text" class="form-control" v-model="dataEdit.name" @keypress="isAlphabet($event)"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="PercentageName">Percentage</label>
+                        <label for="SurchargePercentage">Percentage</label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
                                    @keypress="isNumber($event)">
@@ -173,8 +174,9 @@
                             <label class="colorinput mx-3 mt-3">
 
                             <span>
-                                <input type="checkbox"  class="colorinput-input" id="editCheckBox"
-                                       @change="checkBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                                <input type="checkbox"  class="colorinput-input" id="editCheckBox" v-model="toggle"
+                                       true-value="yes"
+                                       false-value="no"  v-bind:checked="dataEdit.is_active === 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -183,15 +185,15 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-block btn-success" @click="updateDiscount">Update
-                            Discount
+                        <button type="button" class="btn btn-block btn-success" @click="updateSurcharge">Update
+                            Surcharge
                         </button>
                     </div>
                 </div>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete
-                confirmationMessage='Are You Sure You want To Delete This Discount ???'
+                confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
             />
 
         </div>
@@ -206,7 +208,7 @@ import {mapGetters} from "vuex";
 import showRouteDetails from "../route/popup/showRouteDetail";
 
 export default {
-    name: "DiscountPage",
+    name: "SurchargePage",
     components: {
         Add,
         Edit,
@@ -214,15 +216,15 @@ export default {
     },
     data() {
         return {
-            discounts: [],
-            isActive: 1,
-            formID: "addNewDiscount",
+            surcharges: [],
+            toggle : 'yes',
+            formID: "addNewSurcharge",
             validationErrors: [],
             success: false,
             error: false,
-            DiscountName: '',
+            SurchargeName: '',
             delId:"",
-            PercentageName: '',
+            SurchargePercentage: '',
             dataEdit: {
                 id: "",
                 name: "",
@@ -232,9 +234,9 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", '/discount');
+        const res = await this.callApi("post", '/surcharge');
         if (res.status == 200) {
-            this.discounts = res.data
+            this.surcharges = res.data
         } else {
             console.log(res);
         }
@@ -257,28 +259,26 @@ export default {
         },
         checkBox: function (e) {
             if (e.target.checked) {
-                this.isActive = 1;
-            } else {
                 this.isActive = 0;
             }
         },
 
-        async addDiscount() {
+        async addSurcharge() {
             this.validationErrors = [];
-            if (this.DiscountName == "")
-                return this.errorsArray("Name is Required", "DiscountName");
-            if (this.PercentageName == "")
-                return this.errorsArray("Percentage is Required", "PercentageName");
+            if (this.SurchargeName == "")
+                return this.errorsArray("Name is Required", "SurchargeName");
+            if (this.SurchargePercentage == "")
+                return this.errorsArray("Percentage is Required", "SurchargePercentage");
 
             const data = {
-                name: this.DiscountName,
-                percentage: this.PercentageName,
-                active: this.isActive,
+                name: this.SurchargeName,
+                percentage: this.SurchargePercentage,
+                active: this.toggle,
             }
 
-            const res = await this.callApi("post", "/discount/store", data);
+            const res = await this.callApi("post", "/surcharge/store", data);
             if (res.status === 201 && res.statusText === "Created") {
-                this.success = "Discount Created Successfully";
+                this.success = "Surcharge Created Successfully";
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -293,16 +293,16 @@ export default {
             }
         },
 
-        async updateDiscount() {
+        async updateSurcharge() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                return this.errorsArray("Name is Required", "DiscountName");
+                return this.errorsArray("Name is Required", "SurchargeName");
             if (this.dataEdit.percentage === "")
-                return this.errorsArray("Percentage is Required", "PercentageName");
+                return this.errorsArray("Percentage is Required", "SurchargePercentage");
 
-            const res = await this.callApi("post", '/discount/update', this.dataEdit);
+            const res = await this.callApi("post", '/surcharge/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Discount Updated Successfully";
+                this.success = "Surcharge Updated Successfully";
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -320,15 +320,16 @@ export default {
 
         async deleteModal( city,i ){
             const deletingObj = {
-                url:"/discount/delete",
+                url:"/surcharge/delete",
                 data:city,
                 index:i,
             }
             this.$store.commit("setDeleteObj",deletingObj);
         },
 
-        edit(dis) {
-            this.dataEdit = dis;
+        edit(sur) {
+            console.log(sur)
+            this.dataEdit = sur;
 
 
         },
@@ -339,7 +340,7 @@ export default {
     watch:{
         getDeletingObj(obj){
             if (obj.isDeleted) {
-                this.discounts.splice(obj.index,1)
+                this.surcharges.splice(obj.index,1)
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);

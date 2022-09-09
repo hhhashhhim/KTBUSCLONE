@@ -37,7 +37,7 @@
                                                         <tr v-for="(city,i) in cities" :key="i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ city.name }}</td>
-                                                            <td>  
+                                                            <td>
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-warning mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
@@ -60,7 +60,7 @@
             </div>
 
             <!-- Add Modal -->
-            <Add 
+            <Add
             heading="New City"
             :errors="this.validationErrors"
             :success="success"
@@ -76,7 +76,7 @@
             </Add>
 
             <!-- Add Modal -->
-            <Edit 
+            <Edit
             heading="Edit City"
             :errors="this.validationErrors"
             :success="success"
@@ -93,7 +93,7 @@
 
             <!-- Add Modal -->
             <Delete confirmationMessage="Are You Sure You want To Delete This City ???" />
-            
+
         </div>
     </section>
 
@@ -165,7 +165,8 @@ export default {
             this.dataEdit = city;
         },
         async update(){
-            
+
+
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("City Name is Required","Name");
             const res = await this.callApi("post",'/city/update',this.dataEdit);

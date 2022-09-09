@@ -4,8 +4,9 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\Discount\DiscountController;
 use App\Http\Controllers\FareTableController;
+use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CustomMiddleware;
@@ -90,5 +91,14 @@ Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
 Route::group(['prefix'=>'discount',[CustomMiddleware::class]],function(){
     Route::post('/',[DiscountController::class,'index']);
     Route::post('/store',[DiscountController::class,'storeDiscount']);
+    Route::post('/update',[DiscountController::class,'updateDiscount']);
+    Route::post('/delete',[DiscountController::class,'deleteDiscount']);
+});
+
+Route::group(['prefix'=>'surcharge',[CustomMiddleware::class]],function(){
+    Route::post('/',[SurchargeController::class,'index']);
+    Route::post('/store',[SurchargeController::class,'storeSurcharge']);
+    Route::post('/update',[SurchargeController::class,'updateSurcharge']);
+    Route::post('/delete',[SurchargeController::class,'deleteSurcharge']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');
