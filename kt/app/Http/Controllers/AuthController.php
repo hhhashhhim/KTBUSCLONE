@@ -18,6 +18,34 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+
+          
+        // return $cities = City::with(['city_to'=>function($q){
+        //     $q->orderBy('name')->where('company_id',$this->company_id);
+        // }])
+        // ->where('company_id',$this->company_id)
+        // ->orderBy('name')->get();
+        
+        // $subRoutes = $cities->map(function ($city_from) use ($fare_class){
+
+        //     // Storing Destination Cities into new Array Index
+        //     $city_from['destinationCities'] = $city_from->city_to;
+            
+        //     // Fetching and storing the fare of the Departure and the Destination city Fare.
+        //     foreach ($city_from['destinationCities'] as $j => $city_to) {
+        //         $routeCities = $city_to->pivot;
+        //         $city_from['destinationCities'][$j]['fare'] = FareTable::where('from_city_id',$routeCities->departure_city_id)
+        //         ->where('to_city_id',$routeCities->destination_city_id)
+        //         ->where('fare_class',$fare_class)
+        //         ->value('fare');
+        //     }
+        //     // 
+        //     unset($city_from['city_to']);
+        //     return $city_from;
+        // });
+        
+        // return $subRoutes;
+        
         // return Route::with('fares','fares.city_from:id,name','fares.city_to:id,name','fares.fare_details')->where('id',1)
 
         // ->first();

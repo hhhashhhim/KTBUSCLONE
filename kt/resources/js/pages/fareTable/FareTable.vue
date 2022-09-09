@@ -43,6 +43,9 @@
                           id="edit_loc"
                         >
                           <thead>
+                            <tr v-if="cities.length==0">
+                              <th style="font-size:15px;">{{ msg==1?"Class Not Selected.......":"No Cities Found......." }}</th>
+                            </tr>
                             <tr>
                                 <th></th>
                                 <th v-for="(city,i) in cities" :key="i"> {{ city.name }} </th>                              
@@ -243,8 +246,9 @@ export default {
       cities: [],
       companies: [],
       fetchedData: [],
+      msg: 1,
       formID : "fareTablePopup",
-      fareClasses: [{id:1,name:"economy"},{id:2,name:"exuctive"},{id:3,name:"business"}],
+      fareClasses: [{id:1,name:"economy"},{id:2,name:"business"},{id:3,name:"exuctive"}],
       data:{
         fare_class:'0',
       },
@@ -268,7 +272,6 @@ export default {
       const res = await this.callApi("post", "/fare-table/store", this.data);
       if (res.status == 200) {
         this.success = "Fare Table Updated Successfully";
-        // Object.keys(obj).forEach((i) => obj[i] = null);
         this.data.fare = {}
         this.cities = res.data
         setTimeout(() => {
@@ -300,6 +303,7 @@ export default {
         company_id:this.data.company_id,fare_class:this.data.fare_class
       });
       if (res.status == 200) {
+        this.msg=2;
         this.cities = res.data
         console.log(res.data);
         setTimeout(() => {

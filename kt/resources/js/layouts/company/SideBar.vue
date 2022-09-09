@@ -2,7 +2,7 @@
     <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
             <div class="sidebar-brand text-center">
-                <a href="/"> 
+                <a href="/">
                     <img :src="$store.state.app_url+'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
                 </a>
             </div>
@@ -10,10 +10,10 @@
                 <li class="menu-header">Main</li>
                 <li class="dropdown active">
                     <a href="/" class="nav-link">
-                    <i class="fas fa-desktop"></i><span>Dashboard</span></a>
+                        <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
                 <li class="dropdown" v-if="checkPermission('admin')">
-                    
+
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-user-shield"></i>
                         <span>
                             Admin
@@ -21,7 +21,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            
+
                             <a href="/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>
                                 <span>
                                     Dashboard
@@ -43,15 +43,20 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
-                           <li class="dropdown" v-if="checkForSubmenu('route')">
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
                                 <i class="fas fa-table"></i> Routes
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'discount-page' }">
+                                <i class="fas fa-table"></i> Discount
                             </router-link>
                         </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('users')">
-                    
+
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-users"></i>
                         <span>
                             Users
@@ -59,20 +64,22 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }" v-if="checkForSubmenu('roles')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }"
+                                         v-if="checkForSubmenu('roles')">
                                 <i class="fas fa-project-diagram"></i> roles
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('user')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
+                                         v-if="checkForSubmenu('user')">
                                 <i class="fa fa-user"></i> Users
                             </router-link>
                         </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('hrm')">
-                    
-                    <a href="#" class="menu-toggle nav-link has-dropdown">                
+
+                    <a href="#" class="menu-toggle nav-link has-dropdown">
                         <i class="fas fa-sitemap"></i>
                         <span>
                             HRM
@@ -80,27 +87,32 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }" v-if="checkForSubmenu('employee')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }"
+                                         v-if="checkForSubmenu('employee')">
                                 <i class="fas fa-users"></i> Employees
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('salary')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
+                                         v-if="checkForSubmenu('salary')">
                                 <i class="fas fa-hand-holding-usd"></i> Salary
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('loan')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
+                                         v-if="checkForSubmenu('loan')">
                                 <i class="fas fa-money-check-alt"></i> Loan
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('leave managment')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
+                                         v-if="checkForSubmenu('leave managment')">
                                 <i class="fas fa-street-view"></i> leave managment
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }" v-if="checkForSubmenu('attendance')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
+                                         v-if="checkForSubmenu('attendance')">
                                 <i class="fas fa-file-export"></i> attendance
                             </router-link>
                         </li>
@@ -117,45 +129,44 @@
 </template>
 <script>
 export default {
-    data(){
-        return{
-          iconsClass:{
-            users:"fa-users",
-            profile:"fa-user-circle",
-            roles:"fa-map-signs",
-            company:"fa-building",
-          },
-          permissions:[],
+    data() {
+        return {
+            iconsClass: {
+                users: "fa-users",
+                profile: "fa-user-circle",
+                roles: "fa-map-signs",
+                company: "fa-building",
+            },
+            permissions: [],
         }
     },
-    created(){
+    created() {
         this.permissions = this.$store.state.permissions
     },
-    methods:{
-        checkPermission(name){
+    methods: {
+        checkPermission(name) {
             let permissions = this.permissions;
             let module = permissions.find(obj => obj.name === name);
             if (module) {
                 return module.allow;
-            }
-            else{
+            } else {
                 return false;
             }
 
         },
-        checkForSubmenu(moduleName){
+        checkForSubmenu(moduleName) {
 
             let permissions = this.permissions;
             let valid = false;
-            for(var i=0; i<permissions.length; i++) {
+            for (var i = 0; i < permissions.length; i++) {
 
                 permissions[i].childs.forEach(subMenuItem => {
-                    if (subMenuItem.name==moduleName) {
-                        valid = subMenuItem.allow; 
+                    if (subMenuItem.name == moduleName) {
+                        valid = subMenuItem.allow;
                         return;
                     }
                 });
-                
+
             }
             return valid;
 

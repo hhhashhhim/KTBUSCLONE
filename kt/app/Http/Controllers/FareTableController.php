@@ -94,7 +94,7 @@ class FareTableController extends Controller
         
         
         $cities = City::with(['city_to'=>function($q){
-            $q->orderBy('name');
+            $q->orderBy('name')->where('company_id',$this->company_id);;
         }])
         ->where('company_id',$this->company_id)
         ->orderBy('name')->get();

@@ -10,7 +10,7 @@
                             <h4 class="modal-title"><span v-html="heading"></span></h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>    
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">

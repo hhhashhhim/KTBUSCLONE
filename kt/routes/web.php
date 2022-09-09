@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\FareTableController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
@@ -81,8 +82,13 @@ Route::group(['prefix'=>'cities',[CustomMiddleware::class]],function(){
 });
 
 Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
-    
+
     Route::post('/',[FareTableController::class,'record']);
     Route::post('/store',[FareTableController::class,'store']);
+});
+
+Route::group(['prefix'=>'discount',[CustomMiddleware::class]],function(){
+    Route::post('/',[DiscountController::class,'index']);
+    Route::post('/store',[DiscountController::class,'storeDiscount']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

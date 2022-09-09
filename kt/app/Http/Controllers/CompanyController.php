@@ -38,7 +38,7 @@ class CompanyController extends Controller
             'logo'=>$request->logo,
             'added_by'=>auth()->user()->id,
         ]);
-        
+
         $role = Role::create([
             'name' => 'admin',
             'company_id' => $company->id,
@@ -53,7 +53,7 @@ class CompanyController extends Controller
             'role_id'=>$role->id,
             'company_id'=>$company->id,
         ]);
-        
+
         return $company;
 
     }
@@ -62,7 +62,6 @@ class CompanyController extends Controller
         return response(['name'=>$name],200);
     }
     public function update( Request $request ){
-
         $request->validate([
             'name'=>'required',
             'contact'=>'required',
@@ -74,13 +73,19 @@ class CompanyController extends Controller
             'modules'=>$request->modules,
             'added_by'=>auth()->user()->id,
         ]);
+        User::where('company_id', $request->id)->where('email', $request->email)->first()->update([
+            'name'=>$request->name,
+            'contact'=>$request->contact,
+            'email'=>$request->email,
+            'password'=>Hash::make($request->password),
+        ]);
         Role::where('company_id',$request->id)->where('name','admin')->update([
             'permissions' => $request->modules,
         ]);
         return response()->json([
             'message'=>"Updated Successfully",
         ],200);
-        
+
     }
     public function delete( Request $request ){
         return Company::find($request->id)->delete();
@@ -113,5 +118,5 @@ class CompanyController extends Controller
         // // $path            = $image->storeAs('uploads/employee/profile/', $nameToStore);
         // return $nameToStore;
     }
-    
+
 }

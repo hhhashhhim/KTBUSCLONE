@@ -122,7 +122,7 @@
                   </td>
                   <td>
                    <span class="mx-2" v-for="(item) in terminals[index]" :key="item.id">
-                    <label class="mt-4" for="sms">{{ item.name }}</label>
+                    <label class="mt-4 checkbox-inputs" for="sms">{{ item.name }}</label>
                     <label class="colorinput mx-3 mt-3">
                       <span>
                         <input
@@ -390,5 +390,12 @@ table * {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+table,tr,th,td,option,select,label,button,a,div,p{
+  font-size: 14px !important;
+}
+.checkbox-inputs{
+  position: relative;
+  bottom: 10px;
 }
 </style>

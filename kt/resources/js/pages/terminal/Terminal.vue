@@ -178,7 +178,7 @@
             </span>
           </label>
         </div>
-        
+
         <div class="form-group col-md-12">
           <button type="button" class="btn btn-block btn-success" @click="add">
             Add Terminal
@@ -316,9 +316,9 @@ export default {
         longitude:"",
         latitude:"",
         city_id:"",
-        company_id:"",
         online_terminal_name:"",
         active:"",
+        inactive:"",
         order:"",
       },
       dataEdit:{},
@@ -345,12 +345,12 @@ export default {
         return this.errorsArray("Terminal City is Required", "City");
       if (this.data.contact == "")
         return this.errorsArray("Terminal Contact is Required", "Contact");
-       
+
       const res = await this.callApi("post", "/terminal/store", this.data);
       if (res.status == 200) {
         this.success = "Terminal Created Successfully";
         this.terminals = res.data
-        this.data.name = this.data.email = this.data.password = this.data.role = this.data.company_id = "";
+        this.data = "";
         setTimeout(() => {
           this.success = "";
           $("#add-modal").modal("hide")

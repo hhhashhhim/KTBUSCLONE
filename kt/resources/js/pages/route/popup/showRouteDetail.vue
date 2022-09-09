@@ -12,7 +12,7 @@
       </div>
       <div class="modal-body">
          <div class="card">
-                    <div class="card-body">
+                    <div class="card-body" style="font-size:14px;">
                        <div class="table-responsive">
                        <table class="table table-striped">
                         <thead>

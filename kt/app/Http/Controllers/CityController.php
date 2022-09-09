@@ -10,7 +10,6 @@ use App\Models\Route\RouteFare;
 use App\Models\Route\RouteTerminal;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
-use Symfony\Component\VarDumper\Caster\RdKafkaCaster;
 
 class CityController extends Controller
 {
@@ -65,8 +64,8 @@ class CityController extends Controller
     public function city_routes_list(){
         
         $data = [
-            'cities' => City::orderBy('name')->select('name','id')->get(),
-            'routes' => Route::get() 
+            'cities' => City::orderBy('name')->where('company_id', $this->company_id)->select('name','id')->get(),
+            'routes' => Route::where('company_id', $this->company_id)->get() 
         ];
 
         return $data;
@@ -83,7 +82,6 @@ class CityController extends Controller
             'company_id' => $this->company_id,
             'added_by' => auth()->user()->id  
         ]);
-
         foreach($request['terminals'] as $terminal){
             RouteTerminal::create([
                 'route_id'     =>  $route->id,
@@ -117,10 +115,9 @@ class CityController extends Controller
     }
 
     public function city_routes_details( Request $request){
-        
         $routeFares = RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details:id,fare,fare_class','fare_details.class:id,name')
         ->where('company_id', $this->company_id)
-        ->where('route_id', 1)
+        ->where('route_id', $request->id)
         ->get()->groupBy('city_from_id','city_to_id');
         // return $routeFares[0]->fare_details->groupBy('fare_class');
 

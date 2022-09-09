@@ -10,7 +10,7 @@
                             <h4 class="modal-title">{{ heading }}</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>    
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">

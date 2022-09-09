@@ -12,6 +12,7 @@ import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
 import RoutePage from "./pages/route/RoutePage.vue";
 import CitiesPage from "./pages/city/CitiesPage.vue";
+import DiscountPage from "./pages/discount/DiscountPage";
 
 const routes = [
     {
@@ -32,7 +33,7 @@ const routes = [
     {
         path:"/roles",
         component : Roles,
-        name:"roles", 
+        name:"roles",
     },
     {
         path:"/permissions/:id",
@@ -70,10 +71,15 @@ const routes = [
         name:"routes-page"
     },
     {
+        path:"/discounts",
+        component : DiscountPage,
+        name:"discount-page"
+    },
+    {
         path:"/cities",
         component : CitiesPage,
         name:"cities-page"
-    }
+    },
 ]
 const router = createRouter({
     history:createWebHistory(),
