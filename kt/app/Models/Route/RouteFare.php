@@ -6,29 +6,23 @@ use App\Models\City;
 use App\Models\FareTable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RouteFare extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'routes_fares';
 
-    protected $fillable = [
-        'route_id', 
-        'fare_id',
-        'city_from_id',
-        'city_to_id',
-        'company_id',
-        'added_by'
-    ];
+    protected $guarded = [];
 
     public function fare_details(){
         return $this->hasOne( FareTable::class,'id','fare_id' );
     }
-    
+
     public function route(){
         return $this->hasOne( Route::class,'id','route_id');
     }
-    
+
     public function city_from(){
         return $this->belongsTo(City::class, 'city_from_id',  'id');
     }

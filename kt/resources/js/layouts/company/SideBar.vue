@@ -30,12 +30,17 @@
                         </li>
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name:'cities-page' }">
-                                <i class="fas fa-table"></i> Cities
+                                <i class="fas fa-city"></i> Cities
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('terminal')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'terminal' }">
-                                <i class="fa fa-landmark"></i> terminal
+                                <i class="fa fa-landmark"></i> Terminal
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                            <router-link class="nav-link text-capitalize" :to="{name:'terminal-commission-page'}">
+                                <i class="fa fa-landmark"></i> Terminal Commission
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('fare-table')">
@@ -45,7 +50,7 @@
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
-                                <i class="fas fa-table"></i> Routes
+                                <i class="fas fa-route"></i> Routes
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('route')">
@@ -56,6 +61,11 @@
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'surcharge-page' }">
                                 <i class="fas fa-table"></i> Surcharge
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'bus-commission-page' }">
+                                <i class="fas fa-table"></i> Bus Commission
                             </router-link>
                         </li>
                     </ul>

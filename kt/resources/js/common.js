@@ -9,17 +9,18 @@ export default {
     methods:{
 
         async callApi( method , url , data ){
-        
+            var format =/^\/[a-z]+$/i;
+
             try {
                 return await axios({
                     method:method,
+                    // url: format.test(url) ? '/api'+url : '/api/'+url,
                     url:url,
                     data:data
                 });
             } catch (error) {
                 return error.response
             }
-
         },
         errorsArray(desc,title="Ooops"){
             this.validationErrors.push({

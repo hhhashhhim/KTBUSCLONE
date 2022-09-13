@@ -57,14 +57,14 @@
                                 >
                                   <i class="far fa-edit"></i>
                                 </a>
-                                <a
-                                  href="#delete-modal"
-                                  data-toggle="modal"
-                                  @click="deleteModal(user, i)"
-                                  class="btn btn-danger"
-                                >
-                                  <i class="far fa-trash-alt"></i>
-                                </a>
+<!--                                <a-->
+<!--                                  href="#delete-modal"-->
+<!--                                  data-toggle="modal"-->
+<!--                                  @click="deleteModal(user, i)"-->
+<!--                                  class="btn btn-danger"-->
+<!--                                >-->
+<!--                                  <i class="far fa-trash-alt"></i>-->
+<!--                                </a>-->
                               </td>
                             </tr>
                           </tbody>
@@ -291,7 +291,7 @@ export default {
         this.data.name = this.data.email = this.data.contact = this.data.password = this.data.role = this.data.company_id = "";
         setTimeout(() => {
           this.success = "";
-          
+
         }, 3000);
       } else {
         if (res.status == 422) {

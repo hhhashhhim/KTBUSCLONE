@@ -19,6 +19,7 @@ class CreateCityToCitiesTable extends Migration
             $table->id();
             $table->bigInteger('departure_city_id');
             $table->bigInteger('destination_city_id');
+            $table->softDeletes();
             $table->timestamps();
         });
 

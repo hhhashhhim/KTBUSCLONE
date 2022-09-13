@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CityToCity extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'city_to_city';
-    protected $fillable = [
-        'departure_city_id','destination_city_id',
-    ];
+    protected $guarded = [];
 }

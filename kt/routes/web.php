@@ -79,13 +79,14 @@ Route::group(['prefix'=>'cities',[CustomMiddleware::class]],function(){
     Route::post('/routes',[CityController::class,'cityRoutes']);
     Route::post('/routes/list',[CityController::class,'city_routes_list']);
     Route::post('/routes/details',[CityController::class,'city_routes_details']);
-
 });
 
 Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
 
     Route::post('/',[FareTableController::class,'record']);
     Route::post('/store',[FareTableController::class,'store']);
+    Route::post('/fare_class/store',[FareTableController::class,'storeFareClass']);
+    Route::post('/fare_class/get',[FareTableController::class,'getFareClass']);
 });
 
 Route::group(['prefix'=>'discount',[CustomMiddleware::class]],function(){

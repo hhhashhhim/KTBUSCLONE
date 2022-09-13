@@ -42,13 +42,13 @@
                                                             <td>
                                                                 <router-link :to="{name: 'role.permission', params: { id:role.id }}" class="btn btn-primary">
                                                                     <i class="fas fa-user-shield"></i>
-                                                                </router-link>    
+                                                                </router-link>
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-warning mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
-                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">
-                                                                    <i class="far fa-trash-alt"></i>
-                                                                </a>
+<!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">-->
+<!--                                                                    <i class="far fa-trash-alt"></i>-->
+<!--                                                                </a>-->
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -65,7 +65,7 @@
             </div>
 
             <!-- Add Modal -->
-            <Add 
+            <Add
             heading="New Role"
             :errors="this.validationErrors"
             :success="success"
@@ -80,7 +80,7 @@
             </Add>
 
             <!-- Add Modal -->
-            <Edit 
+            <Edit
             heading="Edit Role"
             :errors="this.validationErrors"
             :success="success"
@@ -96,7 +96,7 @@
 
             <!-- Add Modal -->
             <Delete confirmationMessage="Are You Sure You want To Delete This Role ???" />
-            
+
         </div>
     </section>
 
@@ -167,7 +167,7 @@ export default {
             this.dataEdit.name = role.name;
         },
         async update(){
-            
+
             this.validationErrors=[]
             if(this.data.name=="") return this.errorsArray("Role Name is Required","Name");
             const res = await this.callApi("post",'/role/update',this.dataEdit);

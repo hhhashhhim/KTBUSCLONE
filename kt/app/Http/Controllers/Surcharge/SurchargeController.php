@@ -31,14 +31,13 @@ class SurchargeController extends Controller
         return Surcharge::create([
             'name' => $request->name,
             'percentage' => $request->percentage,
-            'is_active' => $request->active === "yes" ? 1 : 0,
+            'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
     }
 
     public function updateSurcharge(Request $request)
     {
-        dd($request->all());
         $rules = [
             'name' => 'required',
             'percentage' => 'required|numeric|min:0|max:100',
@@ -54,7 +53,7 @@ class SurchargeController extends Controller
         return Surcharge::where('id', $request->id)->update([
             'name' => $request->name,
             'percentage' => $request->percentage,
-            'is_active' => $request->active === "yes" ? 1 : 0,
+            'is_active'=> !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);
     }

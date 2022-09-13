@@ -60,14 +60,14 @@
                                   >
                                     <i class="far fa-edit"></i>
                                   </a>
-                                  <a
-                                    href="#delete-modal"
-                                    data-toggle="modal"
-                                    @click="deleteModal(company, i)"
-                                    class="btn btn-danger"
-                                  >
-                                    <i class="far fa-trash-alt"></i>
-                                  </a>
+<!--                                  <a-->
+<!--                                    href="#delete-modal"-->
+<!--                                    data-toggle="modal"-->
+<!--                                    @click="deleteModal(company, i)"-->
+<!--                                    class="btn btn-danger"-->
+<!--                                  >-->
+<!--                                    <i class="far fa-trash-alt"></i>-->
+<!--                                  </a>-->
                                 </td>
                               </tr>
                             </tbody>

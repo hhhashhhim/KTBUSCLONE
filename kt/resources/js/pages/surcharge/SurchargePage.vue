@@ -61,7 +61,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(surcharge, i) in surcharges" :key="i">
-                                                        <td>{{ surcharge.id }}</td>
+                                                        <td>{{ i+1 }}</td>
                                                         <td>{{ surcharge.name }}</td>
                                                         <td>{{ surcharge.percentage }}%</td>
                                                         <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
@@ -70,10 +70,10 @@
                                                                @click="edit(surcharge)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
-                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </a>
+<!--                                                            <a href="#delete-modal" data-toggle="modal"-->
+<!--                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </a>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -119,9 +119,8 @@
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" checked  class="colorinput-input" v-model="toggle"
-                                       true-value="yes"
-                                       false-value="no"/>
+                                <input type="checkbox" value="1" checked class="colorinput-input"
+                                       @change="checkBox($event)"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -172,11 +171,9 @@
                         <div class="form-group d-flex align-items-center ">
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
-
                             <span>
-                                <input type="checkbox"  class="colorinput-input" id="editCheckBox" v-model="toggle"
-                                       true-value="yes"
-                                       false-value="no"  v-bind:checked="dataEdit.is_active === 1"/>
+                                <input type="checkbox"  class="colorinput-input" id="editCheckBox"
+                                       @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -217,7 +214,7 @@ export default {
     data() {
         return {
             surcharges: [],
-            toggle : 'yes',
+            isActive: 1,
             formID: "addNewSurcharge",
             validationErrors: [],
             success: false,
@@ -229,7 +226,7 @@ export default {
                 id: "",
                 name: "",
                 percentage: "",
-                isActive: "",
+                is_Active: "",
             },
         };
     },
@@ -259,7 +256,16 @@ export default {
         },
         checkBox: function (e) {
             if (e.target.checked) {
+                this.isActive = 1;
+            } else {
                 this.isActive = 0;
+            }
+        },
+        editCheckBox: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.is_Active = 1;
+            } else {
+                this.dataEdit.is_Active = 0;
             }
         },
 
@@ -318,17 +324,16 @@ export default {
         },
 
 
-        async deleteModal( city,i ){
+        async deleteModal( surcharge,i ){
             const deletingObj = {
                 url:"/surcharge/delete",
-                data:city,
+                data:surcharge,
                 index:i,
             }
             this.$store.commit("setDeleteObj",deletingObj);
         },
 
         edit(sur) {
-            console.log(sur)
             this.dataEdit = sur;
 
 

@@ -15,96 +15,92 @@ class CityController extends Controller
 {
     public $company_id;
 
-    public function __construct(){
-        $this->middleware(function ($request, $next){
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
             $this->company_id = auth()->user()->company_id;
-            return $next( $request );
+            return $next($request);
         });
     }
 
-    public function index(){
-        
-        return City::orderBy('name')->where( 'company_id',$this->company_id )->select('name','id')->get();
-        
+    public function index()
+    {
+        return City::orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get();
     }
 
-    public function store( Request $request ){
-
-        $request->validate(['name'=>'required']);
-        
+    public function store(Request $request)
+    {
+        $request->validate(['name' => 'required']);
         $city = City::create([
-            'name'=>$request->name,
-            'company_id'=>$this->company_id,
-            'added_by'=>auth()->user()->id,   
+            'name' => $request->name,
+            'company_id' => $this->company_id,
+            'added_by' => auth()->user()->id,
         ]);
-        
-        $this->cityCombinations( $city );
+        $this->cityCombinations($city);
         return $city;
-        
     }
 
-    public function update( Request $request ){
-        
+    public function update(Request $request)
+    {
         $request->validate([
-            'name'=>'required'
+            'name' => 'required'
         ]);
-        
-        return City::find( $request->id )->update([
-            'name'=>$request->name,
-            'added_by'=>auth()->user()->id,   
+        return City::find($request->id)->update([
+            'name' => $request->name,
+            'added_by' => auth()->user()->id,
         ]);
-
     }
-    
+
     public function delete(Request $request)
     {
         return City::find($request->id)->delete();
     }
-    
-    public function city_routes_list(){
-        
+
+    public function city_routes_list()
+    {
         $data = [
-            'cities' => City::orderBy('name')->where('company_id', $this->company_id)->select('name','id')->get(),
-            'routes' => Route::where('company_id', $this->company_id)->get() 
+            'cities' => City::orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get(),
+            'routes' => Route::where('company_id', $this->company_id)->get()
         ];
 
         return $data;
-        
     }
 
-    public function cityTerminals( Request $request ){
-        return Terminal::where('company_id', $this->company_id)->where('city_id',$request->id)->get();
+    public function cityTerminals(Request $request)
+    {
+        return Terminal::where('company_id', $this->company_id)->where('city_id', $request->id)->get();
     }
 
-    public function cityRoutes( Request $request ){
+    public function cityRoutes(Request $request)
+    {
         $route = Route::create([
-            'name'       =>  $request['route'],
+            'name' => $request['route'],
             'company_id' => $this->company_id,
-            'added_by' => auth()->user()->id  
+            'added_by' => auth()->user()->id
         ]);
-        foreach($request['terminals'] as $terminal){
+        foreach ($request['terminals'] as $terminal) {
             RouteTerminal::create([
-                'route_id'     =>  $route->id,
-                'terminal_id'  => $terminal,
-                'company_id'   => $this->company_id,
-                'added_by'     => auth()->user()->id  
+                'route_id' => $route->id,
+                'terminal_id' => $terminal,
+                'company_id' => $this->company_id,
+                'added_by' => auth()->user()->id
             ]);
         }
 
-        foreach($request['cities'] as $index => $city){
-            if( isset($request['cities'][$index + 1] ) ){
+        foreach ($request['cities'] as $index => $city) {
+            if (isset($request['cities'][$index + 1])) {
 
                 $fare = FareTable::where('from_city_id', $city)->where('to_city_id', $request['cities'][$index + 1])->get();
-                if($fare->count() > 0){
-                    foreach( $fare as $detail){
+                if ($fare->count() > 0) {
+                    foreach ($fare as $detail) {
 
                         RouteFare::create([
-                            'route_id'   => $route->id,
-                            'fare_id'    => $detail->id,
+                            'route_id' => $route->id,
+                            'fare_id' => $detail->id,
                             'city_from_id' => $city,
                             'city_to_id' => $request['cities'][$index + 1],
                             'company_id' => $this->company_id,
-                            'added_by'   => auth()->user()->id  
+                            'added_by' => auth()->user()->id
                         ]);
                     }
                 }
@@ -114,51 +110,37 @@ class CityController extends Controller
         return ['message' => 'success'];
     }
 
-    public function city_routes_details( Request $request){
-        $routeFares = RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details:id,fare,fare_class','fare_details.class:id,name')
-        ->where('company_id', $this->company_id)
-        ->where('route_id', $request->id)
-        ->get()->groupBy('city_from_id','city_to_id');
-        // return $routeFares[0]->fare_details->groupBy('fare_class');
-
-        return $newRoutes = $routeFares->map( function($routes,$i){
-            
+    public function city_routes_details(Request $request)
+    {
+        $routeFares = RouteFare::with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')
+            ->where('company_id', $this->company_id)
+            ->where('route_id', $request->id)
+            ->get()->groupBy('city_from_id', 'city_to_id');
+        return $routeFares->map(function ($routes, $i) {
             $classes = [];
             foreach ($routes as $i => $route) {
-                array_push($classes,$route);
+                $classes[] = $route;
             }
             return $classes;
-            
         });
-
-        // RouteFare::with('city_from:id,name', 'city_to:id,name','fare_details')
-        // ->where('company_id', $this->company_id)
-        // ->where('route_id', $request->id)
-        // ->get();
-        // ->groupBy('city_from_id', 'city_to_id');
     }
 
-    public function cityCombinations( $city ){
-
-
+    public function cityCombinations($city)
+    {
         $cities = City::get();
         foreach ($cities as $i => $cityTo) {
-
             // Creating Relation of Newly added city with Other Cities
             CityToCity::create([
-                'departure_city_id'=>$city->id,
-                'destination_city_id'=>$cityTo->id,
+                'departure_city_id' => $city->id,
+                'destination_city_id' => $cityTo->id,
             ]);
-
-            // Creating Other Cities Relation with Newly added City 
+            // Creating Other Cities Relation with Newly added City
             if ($cityTo->id != $city->id) {
                 CityToCity::create([
-                    'departure_city_id'=>$cityTo->id,
-                    'destination_city_id'=>$city->id,
+                    'departure_city_id' => $cityTo->id,
+                    'destination_city_id' => $city->id,
                 ]);
             }
-
         }
-        
     }
 }

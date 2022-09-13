@@ -18,6 +18,7 @@ class CreateTerminalAllowedSeatsAdvanceTable extends Migration
             $table->integer('terminal_id');
             $table->integer('seats');
             $table->integer('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

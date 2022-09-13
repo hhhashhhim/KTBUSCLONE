@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class City extends Model
 {
-    use HasFactory;
-    protected $fillable = ['name','company_id','added_by'];
+    use HasFactory, SoftDeletes;
+    protected $guarded = [];
 
     public function fares(){
         return $this->hasMany(FareTable::class, 'from_city_id', 'id');

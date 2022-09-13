@@ -20,6 +20,7 @@ class CreateCompaniesTable extends Migration
             $table->string('logo')->nullable();
             $table->text('location')->nullable();
             $table->integer('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -61,7 +61,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(discount, i) in discounts" :key="i">
-                                                        <td>{{ discount.id }}</td>
+                                                        <td>{{ i+1 }}</td>
                                                         <td>{{ discount.name }}</td>
                                                         <td>{{ discount.percentage }}%</td>
                                                         <td>{{ discount.is_active === 1 ? 'Active' : 'InActive' }}</td>
@@ -70,10 +70,10 @@
                                                                @click="edit(discount)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
-                                                               @click="deleteModal(discount,i)" class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </a>
+<!--                                                            <a href="#delete-modal" data-toggle="modal"-->
+<!--                                                               @click="deleteModal(discount,i)" class="btn btn-danger">-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </a>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -171,10 +171,9 @@
                         <div class="form-group d-flex align-items-center ">
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
-
                             <span>
                                 <input type="checkbox"  class="colorinput-input" id="editCheckBox"
-                                       @change="checkBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                                       @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -227,7 +226,7 @@ export default {
                 id: "",
                 name: "",
                 percentage: "",
-                isActive: "",
+                is_Active: "",
             },
         };
     },
@@ -262,6 +261,13 @@ export default {
                 this.isActive = 0;
             }
         },
+        editCheckBox: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.is_Active = 1;
+            } else {
+                this.dataEdit.is_Active = 0;
+            }
+        },
 
         async addDiscount() {
             this.validationErrors = [];
@@ -283,9 +289,12 @@ export default {
                     window.location.reload();
                 }, 2000);
             } else {
-                if (res.status === 422 && res.statusText === "Unprocessable Content") {
+                if (res.status === 422) {
                     for (const key in res.data.errors) {
                         res.data.errors.percentage.forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                        res.data.errors.name.forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }

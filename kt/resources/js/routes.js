@@ -14,6 +14,8 @@ import RoutePage from "./pages/route/RoutePage.vue";
 import CitiesPage from "./pages/city/CitiesPage.vue";
 import DiscountPage from "./pages/discount/DiscountPage";
 import SurchargePage from "./pages/surcharge/SurchargePage";
+import BusCommissionPage from "./pages/busCommission/BusCommissionPage";
+import TerminalCommissionPage from "./pages/terminalCommission/TerminalCommissionPage";
 
 const routes = [
     {
@@ -80,6 +82,16 @@ const routes = [
         path:"/surcharge",
         component : SurchargePage,
         name:"surcharge-page"
+    },
+    {
+        path:"/bus-commission",
+        component : BusCommissionPage,
+        name:"bus-commission-page"
+    },
+    {
+        path:"/terminal-commission",
+        component : TerminalCommissionPage,
+        name:"terminal-commission-page"
     },
     {
         path:"/cities",

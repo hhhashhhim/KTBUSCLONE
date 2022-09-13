@@ -18,6 +18,7 @@ class CreateRoutesTable extends Migration
             $table->string('name');
             $table->bigInteger('company_id');
             $table->bigInteger('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

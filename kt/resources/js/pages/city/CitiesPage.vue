@@ -41,9 +41,9 @@
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-warning mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
-                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">
-                                                                    <i class="far fa-trash-alt"></i>
-                                                                </a>
+<!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">-->
+<!--                                                                    <i class="far fa-trash-alt"></i>-->
+<!--                                                                </a>-->
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -141,15 +141,15 @@ export default {
     methods:{
         async add(){
             this.validationErrors=[]
-            if(this.data.name=="") return this.errorsArray("City Name is Required","Name");
+            if(this.data.name === "") return this.errorsArray("City Name is Required","Name");
             const res = await this.callApi("post",'/city/store',this.data);
-            if (res.status==201) {
+            if (res.status === 201) {
                 this.success="City Created Successfully";
                 this.cities.unshift(res.data);
                 this.data.name = "";
                 setTimeout(() => {
-                    this.success=""
-                }, 3000);
+                    window.location.reload();
+                }, 2000);
             }
             else{
                 if (res.status==422) {

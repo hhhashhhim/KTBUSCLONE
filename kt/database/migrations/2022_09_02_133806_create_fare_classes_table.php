@@ -18,11 +18,12 @@ class CreateFareClassesTable extends Migration
             $table->id();
             $table->string('name');
             $table->integer('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
         $class = ['economy','business','executive'];
         foreach ($class as $i => $singleClass) {
-            FareClass::create(['name'=>$singleClass,'added_by'=>0]);   
+            FareClass::create(['name'=>$singleClass,'added_by'=>0]);
         }
     }
 

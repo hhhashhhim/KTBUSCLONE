@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class FareTableController extends Controller
@@ -49,7 +51,7 @@ class FareTableController extends Controller
             $routeFare->fare_id = $fare1Side->id;
             RouteFare::create($routeFare->toArray());
         }
-        
+
         $fare2Side = FareTable::create([
             'fare'=>$request->fare,
             'from_city_id'=>$request->to,
@@ -76,11 +78,11 @@ class FareTableController extends Controller
                 'fare_id'=>$fare2Side->id
             ]);
         }
-        
+
         return $this->getFarePrices( $request->fare_class );
-        
+
     }
-    
+
     public function record( Request $request ){
 
         $request->validate([
@@ -91,19 +93,19 @@ class FareTableController extends Controller
     }
 
     public function getFarePrices( $fare_class ){
-        
-        
+
+
         $cities = City::with(['city_to'=>function($q){
             $q->orderBy('name')->where('company_id',$this->company_id);;
         }])
         ->where('company_id',$this->company_id)
         ->orderBy('name')->get();
-        
+
         $subRoutes = $cities->map(function ($city_from) use ($fare_class){
 
             // Storing Destination Cities into new Array Index
             $city_from['destinationCities'] = $city_from->city_to;
-            
+
             // Fetching and storing the fare of the Departure and the Destination city Fare.
             foreach ($city_from['destinationCities'] as $j => $city_to) {
                 $routeCities = $city_to->pivot;
@@ -112,11 +114,33 @@ class FareTableController extends Controller
                 ->where('fare_class',$fare_class)
                 ->value('fare');
             }
-            // 
+            //
             unset($city_from['city_to']);
             return $city_from;
         });
-        
+
         return $subRoutes;
+    }
+
+    public function getFareClass()
+    {
+        return FareClass::orderBy('id')->select('id','name')->get(['name', 'id']);
+    }
+
+    public function storeFareClass(Request $request)
+    {
+        $rules = [
+            'name' => 'required|unique:fare_classes,name',
+        ];
+
+        $customMessages = [
+            'name.required' => 'Fare Class Name is Required!',
+            'name.unique' => 'Fare Class Name not be Repeated!',
+        ];
+        $this->validate($request, $rules, $customMessages);
+        return FareClass::create([
+            'name' => $request->name,
+            'added_by' => Auth::user()->company_id,
+        ]);
     }
 }

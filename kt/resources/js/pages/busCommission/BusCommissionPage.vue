@@ -49,29 +49,26 @@
                                                         <td>{{ terminal.name }}</td>
                                                         <td>{{ terminal.contact }}</td>
                                                         <td>{{ terminal.address }}</td>
-                                                        <td>{{ terminal.city ? terminal.city.name : "" }}</td>
-                                                        <td>{{
-                                                                terminal.added_by ? terminal.added_by.name : "Not Found"
-                                                            }}
-                                                        </td>
+                                                        <td>{{ terminal.city?terminal.city.name:"" }}</td>
+                                                        <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
                                                         <td>{{ terminal.updated_at }}</td>
                                                         <td>
-                                                            <a
-                                                                href="#edit-modal"
-                                                                data-toggle="modal"
-                                                                @click="edit(terminal)"
-                                                                class="btn btn-warning mx-1"
+                                                            <!-- <a
+                                                              href="#edit-modal"
+                                                              data-toggle="modal"
+                                                              @click="edit(terminal)"
+                                                              class="btn btn-warning mx-1"
                                                             >
-                                                                <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <!--                                <a-->
-                                                            <!--                                  href="#delete-modal"-->
-                                                            <!--                                  data-toggle="modal"-->
-                                                            <!--                                  @click="deleteModal(terminal, i)"-->
-                                                            <!--                                  class="btn btn-danger"-->
-                                                            <!--                                >-->
-                                                            <!--                                  <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                </a>-->
+                                                              <i class="far fa-edit"></i>
+                                                            </a> -->
+<!--                                                            <a-->
+<!--                                                                href="#delete-modal"-->
+<!--                                                                data-toggle="modal"-->
+<!--                                                                @click="deleteModal(terminal, i)"-->
+<!--                                                                class="btn btn-danger"-->
+<!--                                                            >-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </a>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -99,20 +96,20 @@
                         <label for="city_id">Terminal City <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="data.city_id">
                             <option value="">Select City</option>
-                            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
+                            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }} </option>
                         </select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="name">Terminal Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" v-model="data.name" @keypress="isAlphabet($event)">
+                        <input type="text" class="form-control" v-model="data.name">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="available_seats">Available Seats</label>
                         <input type="number" class="form-control" v-model="data.available_seats">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
-                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"  @keypress="isNumber($event)">
+                        <label for="contact">Terminal Contact <span class="text-danger">*</span>  </label>
+                        <input type="number" class="form-control" v-model="data.contact">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -292,8 +289,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     name: "Terminal",
@@ -309,27 +305,26 @@ export default {
             formID: "newTerminal",
             cities: [],
             data: {
-                company_id: "",
-                name: "",
-                available_seats: "",
-                contact: "",
-                address: "",
-                time_difference: "",
-                active_sms: "",
-                advance_booking: "",
-                longitude: "",
-                latitude: "",
-                city_id: "",
-                online_terminal_name: "",
-                active: "",
-                inactive: "",
-                order: "",
+                company_id:"",
+                name:"",
+                available_seats:"",
+                contact:"",
+                address:"",
+                time_difference:"",
+                active_sms:"",
+                advance_booking:"",
+                longitude:"",
+                latitude:"",
+                city_id:"",
+                online_terminal_name:"",
+                active:"",
+                inactive:"",
+                order:"",
             },
-            dataEdit: {},
+            dataEdit:{},
             success: false,
         };
     },
-
     async created() {
         const terminalRes = await this.callApi("post", "/terminal");
         const compRes = await this.callApi("post", "/company");
@@ -339,21 +334,6 @@ export default {
         this.cities = cities.data;
     },
     methods: {
-        isNumber: function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
-        },
-        isAlphabet: function (evet) {
-            if (!/[a-zA-Z\s]/.test(event.key)) {
-                this.ignoredValue = event.key ? event.key : "";
-                event.preventDefault();
-            }
-        },
         async add() {
             this.validationErrors = [];
 
@@ -373,9 +353,8 @@ export default {
                 this.data = "";
                 setTimeout(() => {
                     this.success = "";
-                    // $("#add-modal").modal("hide")
-                    window.location.reload();
-                }, 2000);
+                    $("#add-modal").modal("hide")
+                }, 3000);
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {
@@ -391,8 +370,8 @@ export default {
         },
         async edit(terminal) {
             this.dataEdit = terminal;
-            this.dataEdit.role = terminal.role_id;
-            const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
+            this.dataEdit.role=terminal.role_id;
+            const roleRes = await this.callApi("post", "/company/roles", {id:terminal.company_id});
             this.roles = roleRes.data;
         },
         async update() {
@@ -409,7 +388,7 @@ export default {
                     this.success = "";
                     $("#edit-modal").modal("hide");
                 }, 3000);
-            } else {
+            }else {
                 if (res.status == 422) {
                     console.log();
                     for (const key in res.data.errors) {

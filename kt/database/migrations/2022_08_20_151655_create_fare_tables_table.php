@@ -30,6 +30,7 @@ class CreateFareTablesTable extends Migration
             $table->decimal('advance_availability',12,2)->nullable();
             $table->tinyInteger('is_active')->default('0');
             $table->integer('added_by');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

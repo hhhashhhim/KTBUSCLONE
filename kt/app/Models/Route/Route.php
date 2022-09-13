@@ -4,12 +4,13 @@ namespace App\Models\Route;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Route extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'company_id','added_by'];
+    protected $guarded = [];
 
     public function fares(){
         return $this->hasMany(RouteFare::class, 'route_id', 'id');

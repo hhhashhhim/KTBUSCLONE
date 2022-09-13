@@ -15,6 +15,7 @@ class AddIsMainToTerminalsTable extends Migration
     {
         Schema::table('terminals', function (Blueprint $table) {
             $table->tinyInteger('is_main')->after('order');
+            $table->softDeletes();
         });
     }
 

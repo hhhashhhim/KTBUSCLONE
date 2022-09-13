@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRoutesFaresTable extends Migration
+class CreateActivityLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateRoutesFaresTable extends Migration
      */
     public function up()
     {
-        Schema::create('routes_fares', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('route_id');
-            $table->bigInteger('fare_id');
-            $table->bigInteger('city_from_id');
-            $table->bigInteger('city_to_id');
-            $table->bigInteger('company_id');
-            $table->bigInteger('added_by');
+            $table->string('message');
+            $table->integer('activity_by');
+            $table->ipAddress('requested_host');
+            $table->enum('status', ['Read', 'Unread']);
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -33,6 +32,6 @@ class CreateRoutesFaresTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('routes_fares');
+        Schema::dropIfExists('activity_logs');
     }
 }

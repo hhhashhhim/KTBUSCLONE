@@ -5,27 +5,13 @@ namespace App\Models;
 use App\Models\Route\RouteFare;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class FareTable extends Model
 {
-    use HasFactory;
-    protected $fillable = [
-        'fare',
-        'fare_class', //0 => 
-        'from_city_id',
-        'to_city_id',
-        'company_id',
-        'commission_flat',
-        'commission_percentage',
-        'terminal_commission',
-        'time_difference',
-        'surcharge',
-        'surcharge_start_date',
-        'surcharge_end_date',
-        'advance_availability',
-        'is_active',
-        'added_by',
-    ];
+    use HasFactory, SoftDeletes;
+    protected $guarded = [];
 
     public function city_name(){
         return $this->belongsTo(City::class, 'to_city_id',  'id');

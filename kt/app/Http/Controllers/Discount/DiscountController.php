@@ -53,7 +53,7 @@ class DiscountController extends Controller
        return Discount::where('id', $request->id)->update([
             'name'=> $request->name,
             'percentage'=> $request->percentage,
-            'is_active'=> $request->is_active,
+            'is_active'=> !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by'=> Auth::user()->id,
         ]);
     }

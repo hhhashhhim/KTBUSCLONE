@@ -15,6 +15,7 @@ class AddModulesToCompaniesTable extends Migration
     {
         Schema::table('companies', function (Blueprint $table) {
             $table->json('modules')->after('location')->nullable();
+            $table->softDeletes();
         });
     }
 
