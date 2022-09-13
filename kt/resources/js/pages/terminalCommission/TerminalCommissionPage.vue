@@ -223,7 +223,7 @@
                         <label for="timeDifference">Time Difference</label>
                         <input
                             type="text"
-                            class="form-control" value="0"
+                            class="form-control"
                             placeholder="Time difference in Minutes"
                             id="timeDifference"
                             v-model="dataEdit.timeDifference"
@@ -245,18 +245,48 @@
                         </select>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="role">Role</label>
-                        <select
-                            type="text"
-                            class="form-control"
-                            id="role"
-                            v-model="dataEdit.role"
-                        >
-                            <option value="">Select Role</option>
-                            <option v-for="(role, i) in roles" :value="role.id" :key="i">
-                                {{ role.name }}
-                            </option>
-                        </select>
+                        <div class="table-responsive">
+                            <table
+                                class="table table-striped table-hover"
+                                id="edit_commissoion"
+                            >
+                                <thead>
+                                <tr>
+                                    <th>Sr No.</th>
+                                    <th>Route Name</th>
+                                    <th>Fare</th>
+                                    <th>Commission in Flat</th>
+                                    <th>Commisionin Percentage</th>
+                                    <th>Terminal Commission</th>
+                                    <th>Time Differnece</th>
+                                    <th>Surcharge</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(terminal, i) in terminals" :key="i">
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ terminal.name }}</td>
+                                    <td>{{ terminal.contact }}</td>
+                                    <td>{{ terminal.address }}</td>
+                                    <td>{{ terminal.city?terminal.city.name:"" }}</td>
+                                    <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
+                                    <td>{{ terminal.updated_at }}</td>
+                                    <td><a href="#edit-modal" data-toggle="modal" @click="edit(terminal)" class="btn btn-warning mx-1">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                        <!--                                                            <a-->
+                                        <!--                                                                href="#delete-modal"-->
+                                        <!--                                                                data-toggle="modal"-->
+                                        <!--                                                                @click="deleteModal(terminal, i)"-->
+                                        <!--                                                                class="btn btn-danger"-->
+                                        <!--                                                            >-->
+                                        <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                        <!--                                                            </a>-->
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <button
