@@ -38,11 +38,6 @@
                                 <i class="fa fa-landmark"></i> Terminal
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
-                            <router-link class="nav-link text-capitalize" :to="{name:'terminal-commission-page'}">
-                                <i class="fa fa-landmark"></i> Terminal Commission
-                            </router-link>
-                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('fare-table')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }">
                                 <i class="fas fa-table"></i> Fare Table
@@ -64,8 +59,8 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('route')">
-                            <router-link class="nav-link text-capitalize" :to="{ name:'bus-commission-page' }">
-                                <i class="fas fa-table"></i> Bus Commission
+                            <router-link class="nav-link text-capitalize" :to="{ name:'schedule-page' }">
+                                <i class="fas fa-table"></i> Schedule
                             </router-link>
                         </li>
                     </ul>

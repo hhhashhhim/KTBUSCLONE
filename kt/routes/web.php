@@ -6,6 +6,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Discount\DiscountController;
 use App\Http\Controllers\FareTableController;
+use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
@@ -101,5 +102,11 @@ Route::group(['prefix'=>'surcharge',[CustomMiddleware::class]],function(){
     Route::post('/store',[SurchargeController::class,'storeSurcharge']);
     Route::post('/update',[SurchargeController::class,'updateSurcharge']);
     Route::post('/delete',[SurchargeController::class,'deleteSurcharge']);
+});
+Route::group(['prefix'=>'schedule',[CustomMiddleware::class]],function(){
+    Route::post('/',[ScheduleController::class,'index']);
+    Route::post('/store',[ScheduleController::class,'storeSchedule']);
+    Route::post('/update',[ScheduleController::class,'updateSchedule']);
+    Route::post('/delete',[ScheduleController::class,'deleteSchedule']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');
