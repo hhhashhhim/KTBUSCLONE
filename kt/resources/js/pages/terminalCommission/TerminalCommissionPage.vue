@@ -52,15 +52,9 @@
                                                         <td>{{ terminal.city?terminal.city.name:"" }}</td>
                                                         <td>{{ terminal.added_by?terminal.added_by.name:"Not Found" }}</td>
                                                         <td>{{ terminal.updated_at }}</td>
-                                                        <td>
-                                                            <!-- <a
-                                                              href="#edit-modal"
-                                                              data-toggle="modal"
-                                                              @click="edit(terminal)"
-                                                              class="btn btn-warning mx-1"
-                                                            >
+                                                        <td><a href="#edit-modal" data-toggle="modal" @click="edit(terminal)" class="btn btn-warning mx-1">
                                                               <i class="far fa-edit"></i>
-                                                            </a> -->
+                                                            </a>
 <!--                                                            <a-->
 <!--                                                                href="#delete-modal"-->
 <!--                                                                data-toggle="modal"-->
@@ -197,6 +191,15 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
+                        <label for="city_id" class="font-weight-bold">City</label>
+                        <select v-model="data.city_id" class="form-control rounded-0 text-capitalize">
+                            <option value="0" selected>--Select City--</option>
+                            <option v-for="(city,i) in cities" :key="i" :value="city.id"
+                                    class="text-capitalize"> {{ city.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="name">Name</label>
                         <input
                             type="text"
@@ -207,33 +210,23 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="email">Email</label>
-                        <input
+                        <label for="available_seats">Available Seats</label>
+                        <textarea
                             type="text"
                             class="form-control"
-                            placeholder="Enter Email"
-                            id="email"
-                            v-model="dataEdit.email"
+                            placeholder="Available Seats"
+                            id="available_seats"
+                            v-model="dataEdit.available_seats"
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="contact">Contact</label>
+                        <label for="timeDifference">Time Difference</label>
                         <input
                             type="text"
-                            class="form-control"
-                            placeholder="Enter Contact"
-                            id="contact"
-                            v-model="dataEdit.contact"
-                        />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="password">Password</label>
-                        <input
-                            type="password"
-                            class="form-control"
-                            placeholder="Enter Password"
-                            id="password"
-                            v-model="dataEdit.password"
+                            class="form-control" value="0"
+                            placeholder="Time difference in Minutes"
+                            id="timeDifference"
+                            v-model="dataEdit.timeDifference"
                         />
                     </div>
                     <div class="form-group col-md-12" v-if="dataEdit.company_id">
@@ -337,17 +330,17 @@ export default {
         async add() {
             this.validationErrors = [];
 
-            if (this.data.name == "")
+            if (this.data.name === "")
                 return this.errorsArray("Terminal Name is Required", "Name");
-            if (this.$store.state.user.is_super_admin == 1 && this.data.company_id == "")
+            if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 return this.errorsArray("Company is Required", "Password");
-            if (this.data.city_id == "")
+            if (this.data.city_id === "")
                 return this.errorsArray("Terminal City is Required", "City");
-            if (this.data.contact == "")
+            if (this.data.contact === "")
                 return this.errorsArray("Terminal Contact is Required", "Contact");
 
             const res = await this.callApi("post", "/terminal/store", this.data);
-            if (res.status == 200) {
+            if (res.status === 200) {
                 this.success = "Terminal Created Successfully";
                 this.terminals = res.data
                 this.data = "";
@@ -356,30 +349,30 @@ export default {
                     $("#add-modal").modal("hide")
                 }, 3000);
             } else {
-                if (res.status == 422) {
+                if (res.status === 422) {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
-                if (res.status == 423) {
+                if (res.status === 423) {
                     this.errorsArray(res.data.is_main, 'Main Terminal');
                 }
             }
         },
-        async edit(terminal) {
-            this.dataEdit = terminal;
-            this.dataEdit.role=terminal.role_id;
-            const roleRes = await this.callApi("post", "/company/roles", {id:terminal.company_id});
+        async edit(terminal_commission) {
+            this.dataEdit = terminal_commission;
+            this.dataEdit.role=terminal_commission.role_id;
+            const roleRes = await this.callApi("post", "/company/roles", {id:terminal_commission.company_id});
             this.roles = roleRes.data;
         },
         async update() {
             this.validationErrors = [];
-            if (this.dataEdit.name == "")
+            if (this.dataEdit.name === "")
                 return this.errorsArray("terminal Name is Required", "Name");
             const res = await this.callApi("post", "/terminal/update", this.dataEdit);
-            if (res.status == 201) {
+            if (res.status === 201) {
                 this.success = "terminal Updated Successfully";
                 this.dataEdit = "";
                 const terminalRes = await this.callApi("post", "/terminal", {});
@@ -389,7 +382,7 @@ export default {
                     $("#edit-modal").modal("hide");
                 }, 3000);
             }else {
-                if (res.status == 422) {
+                if (res.status === 422) {
                     console.log();
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {

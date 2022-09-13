@@ -193,7 +193,7 @@
                                                     {{ item[0].city_to.name }}
                                                 </td>
                                                 <template v-for="(n,i) in 3" :key="i">
-                                                        <td v-if="item[i]">RS.{{ item[i]}}</td>
+                                                        <td v-if="item[i]">RS.{{ item[i].fare_details.fare}}</td>
                                                     <td v-else>N/A</td>
                                                 </template>
                                             </tr>
