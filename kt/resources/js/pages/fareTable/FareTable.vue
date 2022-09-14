@@ -16,12 +16,12 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-success mt-4 mr-5" type="button" @click="fetchRecord">Fetch
+                                <button class="btn btn-success mt-4" type="button" @click="fetchRecord">Fetch
                                     Record
                                 </button>
-                                <a href="#edit-modal" data-toggle="modal" class="btn btn-warning mt-4 ml-5">
-                                    <span>Add Fare Class</span>
-                                </a>
+<!--                                <a href="#edit-modal" data-toggle="modal" class="btn btn-warning mt-4 ml-5">-->
+<!--                                    <span>Add Fare Class</span>-->
+<!--                                </a>-->
                             </div>
                         </div>
                         <div class="card-body">
@@ -155,27 +155,7 @@
                 :success="success"
                 :formID="formID"
             >
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <label for="name">Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Fare Class Name"
-                            id="name"
-                            v-model="FareClassName"
-                        />
-                    </div>
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="addFareClass"
-                        >
-                            Add Fare Class
-                        </button>
-                    </div>
-                </div>
+
             </Edit>
 
             <!-- Add Modal -->

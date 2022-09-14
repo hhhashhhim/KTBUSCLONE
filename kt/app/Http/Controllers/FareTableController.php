@@ -124,23 +124,8 @@ class FareTableController extends Controller
 
     public function getFareClass()
     {
-        return FareClass::orderBy('id')->select('id','name')->get(['name', 'id']);
+        return FareClass::where('is_active',1)->orderBy('id')->select('id','name')->get(['name', 'id']);
     }
 
-    public function storeFareClass(Request $request)
-    {
-        $rules = [
-            'name' => 'required|unique:fare_classes,name',
-        ];
 
-        $customMessages = [
-            'name.required' => 'Fare Class Name is Required!',
-            'name.unique' => 'Fare Class Name not be Repeated!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return FareClass::create([
-            'name' => $request->name,
-            'added_by' => Auth::user()->company_id,
-        ]);
-    }
 }

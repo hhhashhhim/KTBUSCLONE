@@ -61,7 +61,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(surcharge, i) in surcharges" :key="i">
-                                                        <td>{{ i+1 }}</td>
+                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ surcharge.name }}</td>
                                                         <td>{{ surcharge.percentage }}%</td>
                                                         <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
@@ -70,10 +70,10 @@
                                                                @click="edit(surcharge)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-<!--                                                            <a href="#delete-modal" data-toggle="modal"-->
-<!--                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </a>-->
+                                                            <a href="#delete-modal" data-toggle="modal"
+                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </a>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -172,8 +172,8 @@
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox"  class="colorinput-input" id="editCheckBox"
-                                       @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                               <input type="checkbox" class="colorinput-input" id="editCheckBox"
+                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -220,7 +220,7 @@ export default {
             success: false,
             error: false,
             SurchargeName: '',
-            delId:"",
+            delId: "",
             SurchargePercentage: '',
             dataEdit: {
                 id: "",
@@ -279,7 +279,7 @@ export default {
             const data = {
                 name: this.SurchargeName,
                 percentage: this.SurchargePercentage,
-                active: this.toggle,
+                active: this.isActive,
             }
 
             const res = await this.callApi("post", "/surcharge/store", data);
@@ -289,13 +289,16 @@ export default {
                     window.location.reload();
                 }, 2000);
             } else {
-                if (res.status === 422 && res.statusText === "Unprocessable Content") {
+                if (res.status === 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
+                        res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
             }
         },
 
@@ -315,22 +318,26 @@ export default {
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
+                        res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 2000);
+
                 }
             }
         },
 
 
-        async deleteModal( surcharge,i ){
+        async deleteModal(surcharge, i) {
             const deletingObj = {
-                url:"/surcharge/delete",
-                data:surcharge,
-                index:i,
+                url: "/surcharge/delete",
+                data: surcharge,
+                index: i,
             }
-            this.$store.commit("setDeleteObj",deletingObj);
+            this.$store.commit("setDeleteObj", deletingObj);
         },
 
         edit(sur) {
@@ -339,13 +346,13 @@ export default {
 
         },
     },
-    computed:{
+    computed: {
         ...mapGetters(['getDeletingObj'])
     },
-    watch:{
-        getDeletingObj(obj){
+    watch: {
+        getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.surcharges.splice(obj.index,1)
+                this.surcharges.splice(obj.index, 1)
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);

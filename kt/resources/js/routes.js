@@ -15,6 +15,7 @@ import CitiesPage from "./pages/city/CitiesPage.vue";
 import DiscountPage from "./pages/discount/DiscountPage";
 import SurchargePage from "./pages/surcharge/SurchargePage";
 import SchedulePage from "./pages/schedule/SchedulePage";
+import FareClass from "./pages/fareClass/FareClassPage";
 
 const routes = [
     {
@@ -66,6 +67,11 @@ const routes = [
         path:"/fare-table",
         component : FareTable,
         name:"fare-table"
+    },
+    {
+        path:"/fare-class",
+        component : FareClass,
+        name:"fare-class"
     },
     {
         path:"/routes",
