@@ -61,7 +61,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(discount, i) in discounts" :key="i">
-                                                        <td>{{ i+1 }}</td>
+                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ discount.name }}</td>
                                                         <td>{{ discount.percentage }}%</td>
                                                         <td>{{ discount.is_active === 1 ? 'Active' : 'InActive' }}</td>
@@ -70,10 +70,10 @@
                                                                @click="edit(discount)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-<!--                                                            <a href="#delete-modal" data-toggle="modal"-->
-<!--                                                               @click="deleteModal(discount,i)" class="btn btn-danger">-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </a>-->
+                                                            <a href="#delete-modal" data-toggle="modal"
+                                                               @click="deleteModal(discount,i)" class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </a>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -172,7 +172,7 @@
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox"  class="colorinput-input" id="editCheckBox"
+                                <input type="checkbox" class="colorinput-input" id="editCheckBox"
                                        @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
@@ -220,7 +220,7 @@ export default {
             success: false,
             error: false,
             DiscountName: '',
-            delId:"",
+            delId: "",
             PercentageName: '',
             dataEdit: {
                 id: "",
@@ -271,9 +271,9 @@ export default {
 
         async addDiscount() {
             this.validationErrors = [];
-            if (this.DiscountName == "")
+            if (this.DiscountName === "")
                 return this.errorsArray("Name is Required", "DiscountName");
-            if (this.PercentageName == "")
+            if (this.PercentageName === "")
                 return this.errorsArray("Percentage is Required", "PercentageName");
 
             const data = {
@@ -291,14 +291,14 @@ export default {
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                        res.data.errors.name.forEach((element) => {
+                        res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
             }
         },
 
@@ -318,22 +318,25 @@ export default {
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
+                        res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
             }
         },
 
 
-        async deleteModal( city,i ){
+        async deleteModal(discount, i) {
             const deletingObj = {
-                url:"/discount/delete",
-                data:city,
-                index:i,
+                url: "/discount/delete",
+                data: discount,
+                index: i,
             }
-            this.$store.commit("setDeleteObj",deletingObj);
+            this.$store.commit("setDeleteObj", deletingObj);
         },
 
         edit(dis) {
@@ -342,13 +345,13 @@ export default {
 
         },
     },
-    computed:{
+    computed: {
         ...mapGetters(['getDeletingObj'])
     },
-    watch:{
-        getDeletingObj(obj){
+    watch: {
+        getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.discounts.splice(obj.index,1)
+                this.discounts.splice(obj.index, 1)
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSurchargesTable extends Migration
+class CreateBusesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateSurchargesTable extends Migration
      */
     public function up()
     {
-        Schema::create('surcharges', function (Blueprint $table) {
+        Schema::create('buses', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->integer('percentage')->nullable();
-            $table->boolean('is_active')->default(1);
+
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
@@ -34,6 +32,6 @@ class CreateSurchargesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('surcharges');
+        Schema::dropIfExists('buses');
     }
 }

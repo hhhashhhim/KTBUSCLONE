@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Schedule Details</h4>
+                            <h4>Fare Class Details</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -13,7 +13,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary"
                                 >
-                                    Add Schedule
+                                    Add Fare Class
                                 </a>
                             </div>
                         </div>
@@ -48,37 +48,29 @@
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-                                                    id="edit_schedule"
+                                                    id="edit_dis"
                                                 >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Departure Date</th>
-                                                        <th>Departure Time</th>
-                                                        <th>Destination Date</th>
-                                                        <th>Destination Time</th>
-                                                        <th>Created By</th>
-                                                        <th>Modified By</th>
-                                                        <th>Created Date</th>
+                                                        <th>Name</th>
+                                                        <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(schedule, i) in schedules" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ schedule.departure_date }}</td>
-                                                        <td>{{ schedule.departure_time }}</td>
-                                                        <td>{{ schedule.destination_date }}</td>
-                                                        <td>{{ schedule.destination_time }}</td>
-                                                        <td v-if="schedule.added_by">{{ schedule.added_by }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td v-if="schedule.updated_by">{{ schedule.updated_by }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td>{{ schedule.created_at }}</td>
+                                                    <tr v-for="(fareClass, i) in fareClasses" :key="i">
+                                                        <td>{{ i+1 }}</td>
+                                                        <td>{{ fareClass.name }}</td>
+                                                        <td>{{ fareClass.is_active === 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(schedule)" class="btn btn-warning mx-1">
+                                                               @click="edit(fareClass)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
+                                                            </a>
+                                                            <a href="#delete-modal" data-toggle="modal"
+                                                               @click="deleteModal(fareClass,i)" class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -97,27 +89,42 @@
 
             <!-- Add Modal -->
             <Add
-                :heading="'ADD NEW SCHEDULE'"
+                :heading="'Add Fare Class'"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">Departure Date Time</label>
-                        <input type="datetime-local" class="form-control" v-model="DepartureDateTime"/>
+                    <div class="form-group col-md-12">
+                        <label for="name">Name</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Fare Class Name"
+                            id="name"
+                            v-model="FareClassName"
+                        />
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">Trip Duration</label>
-                        <input type="text" class="form-control" placeholder="Trip Duration must be in Hours(H:m)" v-model="TripDuration">
+                    <div class="col-md-12">
+                        <h5>Status</h5>
+                        <div class="form-group d-flex align-items-center ">
+                            <label class="mt-4" for="active">Is Active</label>
+                            <label class="colorinput mx-3 mt-3">
+                            <span>
+                                <input type="checkbox" value="1" checked class="colorinput-input"
+                                       @change="checkBox($event)"/>
+                                <span class="colorinput-color bg-success"></span>
+                            </span>
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <button
                             type="button"
                             class="btn btn-block btn-success"
-                            @click="addSchedule"
+                            @click="addFareClass"
                         >
-                            Save Schedule
+                            Add Fare Class
                         </button>
                     </div>
                 </div>
@@ -127,42 +134,41 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Schedule"
+                heading="Edit Surcharge"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">From Date</label>
-                            <input type="date" class="form-control" v-model="dataEdit.departure_date"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">To Date</label>
-                        <input type="date" class="form-control" v-model="dataEdit.DestinationDate">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">Dept Time</label>
-                        <input type="time" class="form-control" v-model="dataEdit.DepartureTime"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">Trip Duration</label>
-                        <input type="time" class="form-control" v-model="dataEdit.TripDuration">
-                    </div>
                     <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="updateSchedule"
-                        >
-                            Update Schedule
+                        <label for="SurchargeName">Name</label>
+                        <input type="text" class="form-control" v-model="dataEdit.name" @keypress="isAlphabet($event)"/>
+                    </div>
+                    <div class="col-md-12">
+                        <h5>Status</h5>
+                        <div class="form-group d-flex align-items-center ">
+                            <label class="mt-4" for="active">Is Active</label>
+                            <label class="colorinput mx-3 mt-3">
+                            <span>
+                               <input type="checkbox"  class="colorinput-input" id="editCheckBox"
+                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                                <span class="colorinput-color bg-success"></span>
+                            </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="form-group col-md-12">
+                        <button type="button" class="btn btn-block btn-success" @click="updateFareClass">Update
+                            Surcharge
                         </button>
                     </div>
                 </div>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete
-                confirmationMessage='Are You Sure You want To Delete This Discount ???'
+                confirmationMessage='Are You Sure You want To Delete This Fare Class ???'
             />
 
         </div>
@@ -173,70 +179,100 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import { VueMaskFilter } from 'v-mask'
-
 import {mapGetters} from "vuex";
+import showRouteDetails from "../route/popup/showRouteDetail";
 
 export default {
-    name: "SchedulePage",
+    name: "FareClassPage",
     components: {
         Add,
         Edit,
         Delete,
-        VueMaskFilter,
     },
     data() {
         return {
-            schedules: [],
-            formID: "addNewSchedule",
+            fareClasses: [],
+            isActive: 1,
+            formID: "addNewFareClass",
             validationErrors: [],
             success: false,
             error: false,
-            DepartureDateTime: '',
-            TripDuration: '',
+            FareClassName:'',
+            delId:"",
+            SurchargePercentage: '',
             dataEdit: {
-                DepartureDate: '',
-                DestinationDate: '',
-                DepartureTime: '',
-                TripDuration: '',
+                FareClassName: '',
+                is_Active: '',
             },
         };
     },
     async created() {
-        const res = await this.callApi("post", '/schedule');
+        const res = await this.callApi("post", '/fare-class');
         if (res.status === 200) {
-            console.log(res.data);
-            this.schedules = res.data
+            this.fareClasses = res.data
         } else {
             console.log(res);
         }
     },
     methods: {
-        async addSchedule() {
-            this.validationErrors = [];
-            if (this.DepartureDateTime === "")
-                return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
-            if (this.TripDuration === "")
-                return this.errorsArray("Trip Duration is Required", "TripDuration");
 
-            const data = {
-                dept_date_time: this.DepartureDateTime,
-                trip_duration: this.TripDuration,
+        isNumber: function (evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
             }
+        },
+        isAlphabet: function (evet) {
+            if (!/[a-zA-Z\s]/.test(event.key)) {
+                this.ignoredValue = event.key ? event.key : "";
+                event.preventDefault();
+            }
+        },
+        checkBox: function (e) {
+            if (e.target.checked) {
+                this.isActive = 1;
+            } else {
+                this.isActive = 0;
+            }
+        },
+        editCheckBox: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.is_Active = 1;
+            } else {
+                this.dataEdit.is_Active = 0;
+            }
+        },
+        async getClasses() {
+            const res = await this.callApi("post", '/fare-table/fare_class/get');
+            if (res.status === 200) {
+                this.fareClasses = res.data
+            } else {
+                console.log(res);
+            }
+        },
 
-            const res = await this.callApi("post", "/schedule/store", data);
-            if (res.status === 201 && res.statusText === "Created") {
-                this.success = "Schedule Created Successfully";
+        async addFareClass() {
+            this.validationErrors = [];
+            if (this.FareClassName === "")
+                return this.errorsArray("Fare Class Name is Required", "FareClassName");
+            const dataFare = {
+                name: this.FareClassName,
+                active: this.isActive,
+            }
+            const res = await this.callApi("post", "/fare-class/store", dataFare);
+            if (res.status === 201) {
+                this.success = "Fare Class Added Successfully";
+                await this.getClasses();
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                        res.data.errors.name.forEach((element) => {
+                        res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
@@ -244,20 +280,15 @@ export default {
             }
         },
 
-        async updateSchedule() {
-            this.validationErrors = [];
-            if (this.DepartureDate === "")
-                return this.errorsArray("From Date is Required", "DepartureDate");
-            if (this.DestinationDate === "")
-                return this.errorsArray("To Date is Required", "DestinationDate");
-            if (this.DepartureTime === "")
-                return this.errorsArray("Departure Time is Required", "DepartureTime");
-            if (this.TripDuration === "")
-                return this.errorsArray("Trip Duration is Required", "TripDuration");
 
-            const res = await this.callApi("post", '/schedule/update', this.dataEdit);
+        async updateFareClass() {
+            this.validationErrors = [];
+            if (this.dataEdit.FareClassName === "")
+                return this.errorsArray("Fare Class Name is Required", "FareClassName");
+
+            const res = await this.callApi("post", '/fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Discount Updated Successfully";
+                this.success = "Surcharge Updated Successfully";
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -271,18 +302,28 @@ export default {
                 }
             }
         },
-        edit(schema) {
-            console.log(schema);
-            this.dataEdit = schema;
+
+
+        async deleteModal( fare_class,i ){
+            const deletingObj = {
+                url:"/fare-class/delete",
+                data:fare_class,
+                index:i,
+            }
+            this.$store.commit("setDeleteObj",deletingObj);
+        },
+
+        edit(fare_class) {
+            this.dataEdit = fare_class;
         },
     },
-    computed: {
+    computed:{
         ...mapGetters(['getDeletingObj'])
     },
-    watch: {
-        getDeletingObj(obj) {
+    watch:{
+        getDeletingObj(obj){
             if (obj.isDeleted) {
-                this.discounts.splice(obj.index, 1)
+                this.fareClasses.splice(obj.index,1)
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);

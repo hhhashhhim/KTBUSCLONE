@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Schedule;
+namespace App\Http\Controllers\Bus;
 
 use App\Http\Controllers\Controller;
-use App\Models\Schedule\Schedule;
+use App\Models\Bus\Bus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ScheduleController extends Controller
+class BusController extends Controller
 {
     public function index()
     {
         return Schedule::orderBy('id')->select('departure_date', 'destination_date', 'destination_time', 'departure_time', 'trip_duration', 'added_by', 'updated_by', 'created_at')->get();
     }
 
-    public function storeSchedule(Request $request)
+    public function storeBus(Request $request)
     {
         dd($request->all());
         $rules = [
@@ -32,7 +32,7 @@ class ScheduleController extends Controller
         $trip_arr = explode(":", $request->trip_duration);
         $trp = isset($trip_arr[0]) ? Carbon::parse($request->dept_date_time)->addHour($trip_arr[0])->format('Y-m-d') : $date_arr[0];
         dd(isset($trip_arr[0]), isset($trip_arr[1]));
-        return Schedule::create([
+        return Bus::create([
             'departure_date' => $date_arr[0],
             'departure_time' => $date_arr[1],
             'destination_date' => $trp,
@@ -41,7 +41,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function updateSchedule(Request $request)
+    public function updateBus(Request $request)
     {
         $rules = [
             'dept_date' => 'required|date',
@@ -57,7 +57,7 @@ class ScheduleController extends Controller
             'trip_duration.required' => 'Trip Duration is Required',
         ];
         $this->validate($request, $rules, $customMessages);
-        return Schedule::where('id', $request->id)->update([
+        return Bus::where('id', $request->id)->update([
             'departure_date' => $request->dept_date,
             'departure_time' => $request->dept_time,
             'destination_date' => $request->dest_date,
@@ -67,8 +67,8 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function deleteSchedule(Request $request)
+    public function deleteBus(Request $request)
     {
-        return Schedule::find($request->id)->delete();
+        return Bus::find($request->id)->delete();
     }
 }

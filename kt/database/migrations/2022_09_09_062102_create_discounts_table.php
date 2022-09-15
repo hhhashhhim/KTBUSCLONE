@@ -17,6 +17,7 @@ class CreateDiscountsTable extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->integer('percentage')->nullable();
+            $table->integer('company_id')->nullable();
             $table->boolean('is_active')->default(1);
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();

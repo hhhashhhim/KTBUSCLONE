@@ -15,6 +15,8 @@ import CitiesPage from "./pages/city/CitiesPage.vue";
 import DiscountPage from "./pages/discount/DiscountPage";
 import SurchargePage from "./pages/surcharge/SurchargePage";
 import SchedulePage from "./pages/schedule/SchedulePage";
+import FareClass from "./pages/fareClass/FareClassPage";
+import BusesPage from "./pages/buses/BusesPage";
 
 const routes = [
     {
@@ -68,6 +70,11 @@ const routes = [
         name:"fare-table"
     },
     {
+        path:"/fare-class",
+        component : FareClass,
+        name:"fare-class"
+    },
+    {
         path:"/routes",
         component : RoutePage,
         name:"routes-page"
@@ -91,6 +98,11 @@ const routes = [
         path:"/schedule",
         component : SchedulePage,
         name:"schedule-page"
+    },
+    {
+        path:"/buses",
+        component : BusesPage,
+        name:"buses-page"
     },
 ]
 const router = createRouter({

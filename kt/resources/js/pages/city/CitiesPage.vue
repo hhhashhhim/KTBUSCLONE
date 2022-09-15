@@ -41,9 +41,9 @@
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-warning mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
-<!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">-->
-<!--                                                                    <i class="far fa-trash-alt"></i>-->
-<!--                                                                </a>-->
+                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">
+                                                                    <i class="far fa-trash-alt"></i>
+                                                                </a>
                                                             </td>
                                                         </tr>
                                                     </tbody>
