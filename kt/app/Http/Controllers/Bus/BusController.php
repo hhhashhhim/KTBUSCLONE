@@ -19,24 +19,36 @@ class BusController extends Controller
     {
         dd($request->all());
         $rules = [
-            'dept_date_time' => 'required',
-            'trip_duration' => 'required',
+            'busNumber' => 'required',
+            'fare_class' => 'required|integer',
+            'chassisNumber' => 'required',
+            'insuranceNumber' => 'required',
+            'noOfSeats' => 'required',
+            'routePermit' => 'required',
+            'noOfRows' => 'required|integer|min:0',
         ];
 
         $customMessages = [
-            'dept_date_time.required' => 'Departure Date and Time  is Required!',
-            'trip_duration.required' => 'Trip Duration is Required!',
+            'busNumber.required' => 'Bus Number is Required!',
+            'fare_class.required' => 'Fare Class is Required!',
+            'chassisNumber.required' => 'Chassis Number is Required!',
+            'insuranceNumber.required' => 'Insurance Number is Required!',
+            'noOfSeats.required' => 'Number Of Seats is Required!',
+            'routePermit.required' => 'Route Permit is Required!',
+            'noOfRows.required' => 'No of Rows of Bus  is Required!',
+            'noOfRows.min' => 'Default Value is 0 ',
         ];
         $this->validate($request, $rules, $customMessages);
-        $date_arr = explode("T", $request->dept_date_time);
-        $trip_arr = explode(":", $request->trip_duration);
-        $trp = isset($trip_arr[0]) ? Carbon::parse($request->dept_date_time)->addHour($trip_arr[0])->format('Y-m-d') : $date_arr[0];
-        dd(isset($trip_arr[0]), isset($trip_arr[1]));
         return Bus::create([
-            'departure_date' => $date_arr[0],
-            'departure_time' => $date_arr[1],
-            'destination_date' => $trp,
-            'destination_time' => isset($trip_arr[1]) ? Carbon::parse($request->dept_date_time)->addMinute($trip_arr[1])->format('H:i:s') : $date_arr[1],
+            'bus_number' => $request->busNumber,
+            'chassis_number' => $request->chassisNumber,
+            'insurance_number' => $request->insuranceNumber,
+            'no_of_seats' => $request->noOfSeats,
+            'route_permit_number' => $request->routePermit,
+            'fare_class_id' => $request->fare_class,
+            'seat_map' => null,
+            'no_of_rows' => $request->noOfRows,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }

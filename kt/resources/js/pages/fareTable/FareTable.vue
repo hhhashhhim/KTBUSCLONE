@@ -104,43 +104,15 @@
                         <label for="fare">Fare</label>
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="commission_flat">Commission Flat</label>-->
-<!--                        <input type="number" class="form-control" v-model="data.commission_flat">-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="commission_percentage">Commission Percentage</label>-->
-<!--                        <input type="number" class="form-control" v-model="data.commission_percentage">-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="terminal_commission">Terminal Commission</label>-->
-<!--                        <input type="number" class="form-control" v-model="data.terminal_commission">-->
-<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="time_difference">Time Difference ( e.g 1:30 )</label>
                         <input type="text" class="form-control" v-model="data.time_difference">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="distance_in_km">Distance in KiloMeter</label>
-                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4" v-model="data.distance_in_km">
+                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4"
+                               v-model="data.distance_in_km">
                     </div>
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="surcharge">Surcharge</label>-->
-<!--                        <input type="number" class="form-control" v-model="data.surcharge">-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="surcharge_start_date">Surcharge Start Date</label>-->
-<!--                        <input type="date" class="form-control" v-model="data.surcharge_start_date">-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="surcharge_end_date">Surcharge End Date</label>-->
-<!--                        <input type="date" class="form-control" v-model="data.surcharge_end_date">-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="advance_booking">Advance Booking Allowed(Days)</label>-->
-<!--                        <input type="number" class="form-control" v-model="data.advance_booking">-->
-<!--                    </div>-->
-
                     <div class="form-group col-md-12">
                         <button type="button" class="btn btn-block btn-success" @click="add">
                             Save Fare Details
@@ -227,37 +199,11 @@ export default {
             console.log(res.data)
             if (res.status === 200) {
                 this.success = "Fare Table Updated Successfully";
-                this.data.fare = {}
                 this.cities = res.data
                 setTimeout(() => {
                     this.success = "";
-                    window.location.reload();
                     // $("#add-modal").modal("hide")
-                }, 2000);
-            } else {
-                if (res.status === 422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-            }
-        },
-
-        async addFareClass() {
-            this.validationErrors = [];
-            if (this.FareClassName === "")
-                return this.errorsArray("Fare Class Name is Required", "DiscountName");
-            const dataFare = {
-                name: this.FareClassName,
-            }
-            const res = await this.callApi("post", "/fare-table/fare_class/store", dataFare);
-            if (res.status === 201) {
-                this.success = "Fare Class Added Successfully";
-                await this.getClasses();
-                setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -279,11 +225,23 @@ export default {
             }
         },
 
-        changeInfo(from, to) {
+        async changeInfo(from, to) {
+            const resGetTerminal = await this.callApi("post", '/fare-table/check', {
+                from: from.id,
+                to: to.id,
+                fare_class: this.data.fare_class,
+            });
+            console.log(resGetTerminal);
+            if (resGetTerminal.status === 200 && resGetTerminal.data !== '') {
+                this.data = resGetTerminal.data;
+                this.data.created = 1;
+            }else{
+                this.data.created = 0;
+            }
             this.from = from.name;
             this.to = to.name;
             this.data.from = from.id
-            this.data.to = to.id
+            this.data.to = to.id;
         },
         async fetchRecord() {
             if (!this.data.fare_class) {

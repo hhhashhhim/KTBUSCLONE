@@ -108,7 +108,7 @@
                             <thead>
                             <tr>
                                 <th>City From</th>
-                                <th>Select Terminal</th>
+<!--                                <th>Select Terminal</th>-->
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -122,23 +122,23 @@
                                         </option>
                                     </select>
                                 </td>
-                                <td>
-                   <span class="mx-2" v-for="(item) in terminals[index]" :key="item.id">
-                    <label class="mt-4 checkbox-inputs" for="sms">{{ item.name }}</label>
-                    <label class="colorinput mx-3 mt-3">
-                      <span>
-                        <input
-                            type="checkbox"
-                            class="colorinput-input"
-                            @click="addTerminal($event)"
-                            id="sms"
-                            :value="item.id"
-                        />
-                        <span class="colorinput-color bg-success"></span>
-                      </span>
-                    </label>
-                  </span>
-                                </td>
+<!--                                <td>-->
+<!--                   <span class="mx-2" v-for="(item) in terminals[index]" :key="item.id">-->
+<!--                    <label class="mt-4 checkbox-inputs" for="sms">{{ item.name }}</label>-->
+<!--                    <label class="colorinput mx-3 mt-3">-->
+<!--                      <span>-->
+<!--                        <input-->
+<!--                            type="checkbox"-->
+<!--                            class="colorinput-input"-->
+<!--                            @click="addTerminal($event)"-->
+<!--                            id="sms"-->
+<!--                            :value="item.id"-->
+<!--                        />-->
+<!--                        <span class="colorinput-color bg-success"></span>-->
+<!--                      </span>-->
+<!--                    </label>-->
+<!--                  </span>-->
+<!--                                </td>-->
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
                                     <button class="btn btn-outline-danger" @click="removeRow">Remove</button>
@@ -181,9 +181,10 @@
                                             <tr>
                                                 <th>City From</th>
                                                 <th>City To</th>
-                                                <th>Economy Fare</th>
+                                                <!-- <th>Economy Fare</th>
                                                 <th>Business Fare</th>
-                                                <th>Executive Fare</th>
+                                                <th>Executive Fare</th> -->
+                                                <th v-for="(item,i) in routeDetails" :key="i"> {{ item[0].class.name }} </th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -192,9 +193,9 @@
                                                 <td>
                                                     {{ item[0].city_to.name }}
                                                 </td>
-                                                <template v-for="(n,i) in 3" :key="i">
-                                                        <td v-if="item[i]">RS.{{ item[i].fare_details.fare}}</td>
-                                                    <td v-else>N/A</td>
+                                                <template v-for="(fare,i) in item" :key="i">
+                                                    <td v-if="fare.class">RS.{{ fare.fare }}</td>
+                                                    <td>N/A</td>
                                                 </template>
                                             </tr>
                                             </tbody>
@@ -351,6 +352,7 @@ export default {
             this.data.to = to.id;
         },
         async fetchRouteDetails(id) {
+
             const routeDetailRes = await this.callApi("post", "/cities/routes/details", {
                 id: id
             });
@@ -358,6 +360,7 @@ export default {
 
             if (routeDetailRes.status === 200) {
                 this.routeDetails = routeDetailRes.data;
+                console.log(this.routeDetails);
             }
         },
         async fetchRecord() {

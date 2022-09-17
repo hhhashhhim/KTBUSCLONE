@@ -190,7 +190,6 @@ export default {
                 insuranceNumber: "",
                 noOfSeats: "",
                 routePermit: "",
-                noOfColumns: "0",
                 noOfRows: "0",
             },
             dataEdit: {
@@ -347,15 +346,18 @@ export default {
             }
         },
 
-
         async addBuses() {
             this.validationErrors = []
-            if (this.data.name === "") return this.errorsArray("City Name is Required", "Name");
-            const res = await this.callApi("post", '/city/store', this.data);
+            if (this.data.busNumber === "") return this.errorsArray("Bus Number is Required", "busNumber");
+            if (this.data.chassisNumber === "") return this.errorsArray("Chassis Number is Required", "chassisNumber");
+            if (this.data.insuranceNumber === "") return this.errorsArray("Insurance Number is Required", "insuranceNumber");
+            if (this.data.noOfSeats === "") return this.errorsArray("No. Of Seats is Required", "noOfSeats");
+            if (this.data.routePermit === "") return this.errorsArray("Route Permit is Required", "routePermit");
+            if (this.data.noOfRows === "0") return this.errorsArray("Bus Seats Rows is Required", "noOfRows");
+            if (this.data.fare_class === "") return this.errorsArray("PLease Select Fare Class", "fare_class");
+            const res = await this.callApi("post", '/buses/store', this.data);
             if (res.status === 201) {
-                this.success = "City Created Successfully";
-                this.cities.unshift(res.data);
-                this.data.name = "";
+                this.success = "Bus Created Successfully";
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);

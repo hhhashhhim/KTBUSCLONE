@@ -89,7 +89,7 @@ Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
     Route::post('/',[FareTableController::class,'record']);
     Route::post('/store',[FareTableController::class,'store']);
     Route::post('/fare_class/get',[FareTableController::class,'getFareClass']);
-    Route::post('/fare_class/store',[FareTableController::class,'storeFareClass']);
+    Route::post('/check',[FareTableController::class,'check']);
 });
 
 Route::group(['prefix'=>'fare-class',[CustomMiddleware::class]],function(){

@@ -16,6 +16,12 @@ class FareTable extends Model
     public function city_name(){
         return $this->belongsTo(City::class, 'to_city_id',  'id');
     }
+    public function city_to(){
+        return $this->belongsTo(City::class, 'to_city_id',  'id');
+    }
+    public function city_from(){
+        return $this->belongsTo(City::class, 'from_city_id',  'id');
+    }
     public function class(){
         return $this->hasOne( FareClass::class,'id','fare_class' );
     }

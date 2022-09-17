@@ -23,9 +23,6 @@ class TerminalController extends Controller
     }
     public function index()
     {
-//        return Terminal::with('added_by', 'city')
-//        ->where('company_id',$this->company_id)
-//        ->latest('id')->get()/*->groupBy('city_id')*/;
         return City::with('terminal')->where('company_id', Auth::user()->company_id)->get();
     }
     public function store(Request $request)
@@ -63,24 +60,6 @@ class TerminalController extends Controller
             'added_by' => auth()->user()->id,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
         ]);
-
-
-        // TerminalAllowedSeatsAdvance::create([
-        //     'terminal_id'=>$terminal->id,
-        //     'seats'=>$request->advance_booking,
-        //     'added_by'=>$terminal->id,
-        // ]);
-        // TerminalAvailableSeat::create([
-        //     'terminal_id'=>$terminal->id,
-        //     'seats'=>$request->advance_booking,
-        //     'added_by'=>$terminal->id,
-        // ]);
-        // TerminalCommission::create([
-        //     'terminal_id'=>$terminal->id,
-        //     'amount'=>$request->amount,
-        //     'added_by'=>$terminal->id,
-        //     'per_seat'=>$request->per_seat,
-        // ]);
 
         return $this->index();
     }

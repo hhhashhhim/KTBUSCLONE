@@ -48,26 +48,10 @@
                                                             <a
                                                                 href="#detail-modal"
                                                                 data-toggle="modal"
-                                                                @click="terminalDetail(terminal.terminal)"
+                                                                @click="terminalDetail(terminal)"
                                                                 class=" btn btn-info mx-2"
                                                             >
                                                                 <i class="far fa-eye"></i>
-                                                            </a>
-                                                            <a
-                                                                href="#edit-modal"
-                                                                data-toggle="modal"
-                                                                @click="edit(terminal.terminal)"
-                                                                class="btn btn-warning mx-2"
-                                                            >
-                                                                <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a
-                                                                href="#delete-modal"
-                                                                data-toggle="modal"
-                                                                @click="deleteModal(terminal.terminal, i)"
-                                                                class="btn btn-danger"
-                                                            >
-                                                                <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -136,10 +120,6 @@
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
                     </div>
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="order">Terminal Order</label>-->
-                    <!--                        <input type="text" class="form-control" v-model="data.order">-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Is Active</label>
                         <label class="colorinput mx-3 mt-3">
@@ -306,6 +286,7 @@
                                                             <th>Terminal Name</th>
                                                             <th>Address</th>
                                                             <th>Contact Number</th>
+                                                            <th>Action</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -317,6 +298,22 @@
                                                             <td v-else>N/A</td>
                                                             <td v-if="single.contact">{{ single.contact }}</td>
                                                             <td v-else>N/A</td>
+                                                            <td><a
+                                                                href="#edit-modal"
+                                                                data-toggle="modal"
+                                                                @click="edit(single)"
+                                                                class="btn btn-warning mx-2"
+                                                            >
+                                                                <i class="far fa-edit"></i>
+                                                            </a>
+                                                                <a
+                                                                    href="#delete-modal"
+                                                                    data-toggle="modal"
+                                                                    @click="deleteModal(single, i)"
+                                                                    class="btn btn-danger"
+                                                                >
+                                                                    <i class="far fa-trash-alt"></i>
+                                                                </a></td>
                                                         </tr>
                                                         </tbody>
                                                     </table>
@@ -359,6 +356,7 @@ export default {
     },
     data() {
         return {
+            validationErrors:'',
             seen: true,
             terminals: [],
             terminalsDetails: [],
@@ -452,14 +450,15 @@ export default {
                 }
             }
         },
-        async edit(terminal) {
-            console.log(terminal);
-            this.dataEdit = terminal;
-            this.dataEdit.role = terminal.role_id;
+        async edit(single) {
+            this.dataEdit = single;
+            this.dataEdit.role = single.role_id;
+            console.log(this.dataEdit.role);
             const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
             this.roles = roleRes.data;
         },
-        async terminalDetail(terminal) {
+         terminalDetail(terminal) {
+             console.log()
             this.terminalsDetails = terminal;
             setTimeout(() => {
                 $("#show_terminal").DataTable();

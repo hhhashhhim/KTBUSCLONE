@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use stdClass;
 
 class AuthController extends Controller
 {
@@ -19,37 +20,67 @@ class AuthController extends Controller
     public function index(Request $request)
     {
 
-          
-        // return $cities = City::with(['city_to'=>function($q){
-        //     $q->orderBy('name')->where('company_id',$this->company_id);
-        // }])
-        // ->where('company_id',$this->company_id)
-        // ->orderBy('name')->get();
-        
-        // $subRoutes = $cities->map(function ($city_from) use ($fare_class){
+       $routeFareCities = RouteFare::where('route_id',1)->get();
+       $allCombinations = [];
+       foreach ($routeFareCities as $i => $routeFareCity) {
 
-        //     // Storing Destination Cities into new Array Index
-        //     $city_from['destinationCities'] = $city_from->city_to;
-            
-        //     // Fetching and storing the fare of the Departure and the Destination city Fare.
-        //     foreach ($city_from['destinationCities'] as $j => $city_to) {
-        //         $routeCities = $city_to->pivot;
-        //         $city_from['destinationCities'][$j]['fare'] = FareTable::where('from_city_id',$routeCities->departure_city_id)
-        //         ->where('to_city_id',$routeCities->destination_city_id)
-        //         ->where('fare_class',$fare_class)
-        //         ->value('fare');
-        //     }
-        //     // 
-        //     unset($city_from['city_to']);
-        //     return $city_from;
-        // });
-        
-        // return $subRoutes;
-        
-        // return Route::with('fares','fares.city_from:id,name','fares.city_to:id,name','fares.fare_details')->where('id',1)
+           $destinationCities = RouteFare::where('id','>',$routeFareCity->id)->pluck('city_to_id');
+           $combination = [
+               'departure_city_id'=>$routeFareCity->city_from_id,
+               'destinationCities'=>[
+                   $routeFareCity->city_to_id,
+                   ...$destinationCities
+               ],
+           ];
+           $combination;
+           $allCombinations[] = $combination;
+       }
 
-        // ->first();
+       $fares = [];
 
+       foreach ($allCombinations as $i => $combination) {
+
+           $singleCityFares = FareTable::where('from_city_id',$combination['departure_city_id'])
+           ->where('company_id',auth()->user()->company_id)
+           ->whereIn('to_city_id',$combination['destinationCities'])
+           ->select('fare','fare_class','from_city_id','to_city_id')
+           ->with('class:id,name','city_to:id,name','city_from:id,name')
+           ->get();
+
+           array_push($fares,...$singleCityFares);
+
+       }
+       return $fares = collect($fares);
+       return $fares->groupBy('fare_class')->unique();
+       
+       
+       
+       $routeFareList = collect([]);
+
+
+
+       return $routeFareList->where('from_city_id','=',7)
+       ->where('to_city_id',10)->where('fare_class',1);
+       
+       foreach ($fares as $i => $fare) {
+
+        $exists = $routeFareList->where('from_city_id',$fare->from_city_id)
+        ->where('to_city_id',$fare->to_city_id)
+        ->where('fare_class',$fare->fare_class)
+        ->first();
+        if ($exists) {
+            return "Reaching $i";
+        }
+        $routeFare = new stdClass;
+        $routeFare->from = $fare->city_from->name;
+        $routeFare->to = $fare->city_to->name;
+
+
+        
+       }
+
+//
+        // return $allCombinations->city_to->whereIn('id', [1]);
         if (!Auth::check()  && $request->path() != "login") {
             return redirect('/login');
         }
@@ -109,7 +140,7 @@ class AuthController extends Controller
         else{
             return response()->json([],403);
         }
-        
+
     }
 }
 
@@ -146,3 +177,19 @@ class AuthController extends Controller
 
 //  For Route City Mapping
 // $city_from['city_to_final'] = $city_from->city_to->whereIn('id',[8,3,1]);
+// ["fare"=> "150.00",
+//        "fare_class"=> 1,
+//        "from_city_id"=> 7,
+//        "to_city_id"=> 10,
+//        "class"=> [
+//        "id"=> 1,
+//        "name"=> "Economy"
+//        ],
+//        "city_to"=> [
+//        "id"=> 10,
+//        "name"=> "Kharachi"
+//        ],
+//        "city_from"=> [
+//        "id"=> 7,
+//        "name"=> "Fsd"
+//        ]]

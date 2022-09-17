@@ -28,61 +28,13 @@ class FareTableController extends Controller
             'fare' => 'required',
             'fare_class' => 'required',
         ]);
+
         $company_id = auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id;
-        $fare1Side = FareTable::create([
-            'fare' => $request->fare,
-            'from_city_id' => $request->from,
-            'to_city_id' => $request->to,
-            'fare_class' => $request->fare_class,
-            'company_id' => $company_id,
-//            'commission_flat'=>$request->commission_flat,
-//            'commission_percentage'=>$request->commission_percentage,
-//            'terminal_commission'=>$request->terminal_commission,
-            'time_difference' => $request->time_difference,
-            'distance_in_km' => $request->distance_in_km,
-//            'surcharge'=>$request->surcharge,
-//            'surcharge_start_date'=>$request->surcharge_start_date,
-//            'surcharge_end_date'=>$request->surcharge_end_date,
-//            'advance_availability'=>$request->advance_availability,
-            'added_by' => auth()->user()->id,
-        ]);
-
-        $routeFares1Side = RouteFare::where('city_from_id', $fare1Side->from_city_id)
-            ->where('city_to_id', $fare1Side->to_city_id)
-            ->get();
-        foreach ($routeFares1Side as $i => $routeFare) {
-            $routeFare->fare_id = $fare1Side->id;
-            RouteFare::create($routeFare->toArray());
+        if ($request->created == 1) {
+            updateFare($request, $company_id);
+        } else {
+           storeFare($request, $company_id);
         }
-
-        $fare2Side = FareTable::create([
-            'fare' => $request->fare,
-            'from_city_id' => $request->to,
-            'to_city_id' => $request->from,
-            'fare_class' => $request->fare_class,
-            'company_id' => $company_id,
-//            'commission_flat'=>$request->commission_flat,
-//            'commission_percentage'=>$request->commission_percentage,
-//            'terminal_commission'=>$request->terminal_commission,
-            'time_difference' => $request->time_difference,
-            'distance_in_km' => $request->distance_in_km,
-//            'surcharge'=>$request->surcharge,
-//            'surcharge_start_date'=>$request->surcharge_start_date,
-//            'surcharge_end_date'=>$request->surcharge_end_date,
-//            'advance_availability'=>$request->advance_availability,
-            'added_by' => auth()->user()->id,
-        ]);
-
-        $routeFares2Side = RouteFare::where('city_from_id', $fare2Side->from_city_id)
-            ->where('city_to_id', $fare2Side->to_city_id)
-            ->get();
-        foreach ($routeFares2Side as $i => $routeFare) {
-            RouteFare::create([
-                ...$routeFare,
-                'fare_id' => $fare2Side->id
-            ]);
-        }
-
         return $this->getFarePrices($request->fare_class);
 
     }
@@ -131,6 +83,12 @@ class FareTableController extends Controller
     public function getFareClass()
     {
         return FareClass::where('is_active', 1)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
+    }
+
+    public function check(Request $request)
+    {
+        $checkFare = FareTable::where('fare_class', $request->fare_class)->where('from_city_id', $request->from)->where('to_city_id', $request->to)->where('company_id', $this->company_id)->select('id', 'fare', 'distance_in_km', 'time_difference', 'fare_class')->first();
+        return response($checkFare, 200);
     }
 
 

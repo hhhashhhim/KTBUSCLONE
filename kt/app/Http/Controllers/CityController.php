@@ -112,17 +112,50 @@ class CityController extends Controller
 
     public function city_routes_details(Request $request)
     {
-        $routeFares = RouteFare::with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')
-            ->where('company_id', $this->company_id)
-            ->where('route_id', $request->id)
-            ->get()->groupBy('city_from_id', 'city_to_id');
-        return $routeFares->map(function ($routes, $i) {
-            $classes = [];
-            foreach ($routes as $i => $route) {
-                $classes[] = $route;
-            }
-            return $classes;
-        });
+        
+       $routeFareCities = RouteFare::where('route_id',1)->get();
+       $allCombinations = [];
+       foreach ($routeFareCities as $i => $routeFareCity) {
+
+           $destinationCities = RouteFare::where('id','>',$routeFareCity->id)->pluck('city_to_id');
+           $combination = [
+               'departure_city_id'=>$routeFareCity->city_from_id,
+               'destinationCities'=>[
+                   $routeFareCity->city_to_id,
+                   ...$destinationCities
+               ],
+           ];
+           $combination;
+           $allCombinations[] = $combination;
+       }
+
+       $fares = [];
+
+       foreach ($allCombinations as $i => $combination) {
+
+           $singleCityFares = FareTable::where('from_city_id',$combination['departure_city_id'])
+           ->where('company_id',auth()->user()->company_id)
+           ->whereIn('to_city_id',$combination['destinationCities'])
+           ->select('fare','fare_class','from_city_id','to_city_id')
+           ->with('class:id,name','city_to:id,name','city_from:id,name')
+           ->get();
+
+           array_push($fares,...$singleCityFares);
+
+       }
+       return collect($fares)->groupBy('fare_class');
+
+//        $routeFares = RouteFare::with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')
+//            ->where('company_id', $this->company_id)
+//            ->where('route_id', $request->id)
+//            ->get()->groupBy('city_from_id', 'city_to_id');
+//        return $routeFares->map(function ($routes, $i) {
+//            $classes = [];
+//            foreach ($routes as $i => $route) {
+//                $classes[] = $route;
+//            }
+//            return $classes;
+//        });
     }
 
     public function cityCombinations($city)

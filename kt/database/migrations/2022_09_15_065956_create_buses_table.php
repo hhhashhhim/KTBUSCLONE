@@ -20,7 +20,9 @@ class CreateBusesTable extends Migration
             $table->string('insurance_number')->nullable();
             $table->integer('no_of_seats')->nullable();
             $table->string('route_permit_number')->nullable();
+            $table->integer('fare_class_id')->nullable();
             $table->longText('seat_map')->nullable();
+            $table->integer('no_of_rows')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
