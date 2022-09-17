@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class City extends Model
 {
@@ -19,6 +20,10 @@ class City extends Model
     }
     public function city_to(){
         return $this->belongsToMany( City::class,'city_to_city','departure_city_id','destination_city_id' );
+    }
+
+    public function terminal(){
+        return $this->hasMany(Terminal::class, 'city_id', 'id');
     }
 
 }

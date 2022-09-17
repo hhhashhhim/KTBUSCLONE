@@ -19,9 +19,6 @@
                                 <button class="btn btn-success mt-4" type="button" @click="fetchRecord">Fetch
                                     Record
                                 </button>
-<!--                                <a href="#edit-modal" data-toggle="modal" class="btn btn-warning mt-4 ml-5">-->
-<!--                                    <span>Add Fare Class</span>-->
-<!--                                </a>-->
                             </div>
                         </div>
                         <div class="card-body">
@@ -51,7 +48,7 @@
                                                     id="edit_loc"
                                                 >
                                                     <thead>
-                                                    <tr v-if="cities.length==0">
+                                                    <tr v-if="cities.length === 0">
                                                         <th style="font-size:15px;">{{
                                                                 msg == 1 ? "Class Not Selected......." : "No Cities Found......."
                                                             }}
@@ -107,38 +104,42 @@
                         <label for="fare">Fare</label>
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="commission_flat">Commission Flat</label>
-                        <input type="number" class="form-control" v-model="data.commission_flat">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="commission_percentage">Commission Percentage</label>
-                        <input type="number" class="form-control" v-model="data.commission_percentage">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal_commission">Terminal Commission</label>
-                        <input type="number" class="form-control" v-model="data.terminal_commission">
-                    </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="commission_flat">Commission Flat</label>-->
+<!--                        <input type="number" class="form-control" v-model="data.commission_flat">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="commission_percentage">Commission Percentage</label>-->
+<!--                        <input type="number" class="form-control" v-model="data.commission_percentage">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal_commission">Terminal Commission</label>-->
+<!--                        <input type="number" class="form-control" v-model="data.terminal_commission">-->
+<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="time_difference">Time Difference ( e.g 1:30 )</label>
                         <input type="text" class="form-control" v-model="data.time_difference">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="surcharge">Surcharge</label>
-                        <input type="number" class="form-control" v-model="data.surcharge">
+                        <label for="distance_in_km">Distance in KiloMeter</label>
+                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4" v-model="data.distance_in_km">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="surcharge_start_date">Surcharge Start Date</label>
-                        <input type="date" class="form-control" v-model="data.surcharge_start_date">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="surcharge_end_date">Surcharge End Date</label>
-                        <input type="date" class="form-control" v-model="data.surcharge_end_date">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="advance_booking">Advance Booking Allowed(Days)</label>
-                        <input type="number" class="form-control" v-model="data.advance_booking">
-                    </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="surcharge">Surcharge</label>-->
+<!--                        <input type="number" class="form-control" v-model="data.surcharge">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="surcharge_start_date">Surcharge Start Date</label>-->
+<!--                        <input type="date" class="form-control" v-model="data.surcharge_start_date">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="surcharge_end_date">Surcharge End Date</label>-->
+<!--                        <input type="date" class="form-control" v-model="data.surcharge_end_date">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="advance_booking">Advance Booking Allowed(Days)</label>-->
+<!--                        <input type="number" class="form-control" v-model="data.advance_booking">-->
+<!--                    </div>-->
 
                     <div class="form-group col-md-12">
                         <button type="button" class="btn btn-block btn-success" @click="add">
@@ -174,7 +175,7 @@ import {mapGetters} from "vuex";
 
 export default {
     name: "FareTable",
-    created(){
+    created() {
         this.getClasses();
     },
     components: {
@@ -223,6 +224,7 @@ export default {
         async add() {
             this.validationErrors = [];
             const res = await this.callApi("post", "/fare-table/store", this.data);
+            console.log(res.data)
             if (res.status === 200) {
                 this.success = "Fare Table Updated Successfully";
                 this.data.fare = {}
@@ -291,7 +293,7 @@ export default {
             const res = await this.callApi("post", "/fare-table", {
                 company_id: this.data.company_id, fare_class: this.data.fare_class
             });
-            if (res.status == 200) {
+            if (res.status === 200) {
                 this.msg = 2;
                 this.cities = res.data
                 setTimeout(() => {

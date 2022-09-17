@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success">
+                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success"  @click="getFareClass()">
                                     Add New Bus
                                 </a>
                             </div>
@@ -27,21 +27,35 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Name</th>
+                                                        <th>Bus Number</th>
+                                                        <th>Chassis Number</th>
+                                                        <th>Insurance Number</th>
+                                                        <th>No. of Seats</th>
+                                                        <th>Route Permit</th>
+                                                        <th>Added By</th>
+                                                        <th>Updated By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(city,i) in cities" :key="i">
+                                                    <tr v-for="(bus,i) in buses" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ city.name }}</td>
+                                                        <td>{{ bus.bus_number }}</td>
+                                                        <td>{{ bus.chassis_number }}</td>
+                                                        <td>{{ bus.insurance_number }}</td>
+                                                        <td>{{ bus.no_of_seats }}</td>
+                                                        <td>{{ bus.route_permit_number }}</td>
+                                                        <td v-if="bus.added_by">{{ bus.added_by }}</td>
+                                                        <td v-else>N/A</td>
+                                                        <td v-if="bus.updated_by">{{ bus.updated_by }}</td>
+                                                        <td v-else>N/A</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(city)" class="btn btn-warning mx-1">
+                                                               @click="edit(bus)" class="btn btn-warning mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
                                                             <a href="#delete-modal" data-toggle="modal"
-                                                               @click="deleteModal(city,i)" class="btn btn-danger">
+                                                               @click="deleteModal(bus,i)" class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
@@ -72,9 +86,9 @@
                         <input type="text" class="form-control" placeholder="Enter Bus Name" v-model="data.busNumber">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Chasis Number</label>
+                        <label for="name">Chassis Number</label>
                         <input type="text" class="form-control" placeholder="Enter Chasis Number"
-                               v-model="data.chasisNumber" @keypress="isNumber($event)">
+                               v-model="data.chassisNumber" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Insurance Number</label>
@@ -91,6 +105,13 @@
                         <input type="text" class="form-control" placeholder="Enter Route Permit Number"
                                v-model="data.routePermit" @keypress="isNumber($event)">
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="city_id">Fare Classes</label>
+                        <select class="form-control" v-model="data.fare_class">
+                            <option value="">Select Fare Class</option>
+                            <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }}</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -98,40 +119,19 @@
                         <input type="text" class="form-control" placeholder="Enter No. of Rows"
                                v-model="data.noOfRows" @keypress="isNumber($event)">
                     </div>
-                    <!--                    <div class="form-group col-md-3">-->
-                    <!--                        <label for="name">No. of Columns</label>-->
-                    <!--                        <input type="text" class="form-control" placeholder="Enter No. of Columns"-->
-                    <!--                               v-model="data.noOfColumns" @keypress="isNumber($event)">-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-4 my-4">
                         <button type="button" class="btn btn-block btn-warning" @click="generateMap">Generate Seat Map
                         </button>
 
                     </div>
                     <div v-if="isShowDiv" class="col-md-6 border py-5 mb-5">
-                        <label class="text-dark " for="">Create Here</label>
                         <div id="seat-map">
-                            <div class="front-indicator">Front</div>
+                            <label class="text-dark " for="">Create Here</label>
                         </div>
-<!--                        <tr class="my-5 py-5" v-for="(record, indexRecord) in parseInt(data.noOfRows)" :key="record">-->
-<!--                            <td v-for="(col, index) in parseInt(5)" :key="col">-->
-<!--                                <p>{{ index + 1 }}</p>-->
-<!--                                <img alt="image" src="/assets/img/buses/available_seat_img.gif"-->
-<!--                                     class="mr-3 user-img-radious-style user-list-img">-->
-<!--                            </td>-->
-<!--                        </tr>-->
-                        <!--                    </div>-->
-                        <!--                    <div v-if="isShowDiv" class="col-md-6 border py-5 mb-5">-->
-                        <!--                        <label class="text-dark " for="">Generated Map</label>-->
-                        <!--                        <tr class="my-5 py-5" v-for="(record, indexRecord) in parseInt(data.noOfColumns)" :key="record">-->
-                        <!--                            <td v-for="(col, index) in parseInt(data.noOfRows)" :key="col">-->
-                        <!--                                <p>{{ indexRecord+1 }}</p>-->
-                        <!--                                <img alt="image" src="http://127.0.0.1:8000/assets/img/buses/available_seat_img.gif" class="mr-3 user-img-radious-style user-list-img">-->
-                        <!--                            </td>-->
-                        <!--                        </tr>-->
                     </div>
                     <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-block btn-success" @click="addBuses">Add Bus</button>
+                        <button type="button" class="btn btn-block btn-success" @click="addBuses">Add Bus
+                        </button>
                     </div>
                 </div>
             </Add>
@@ -175,7 +175,8 @@ export default {
     },
     data() {
         return {
-            cities: [],
+            buses: [],
+            fareClasses: [],
             validationErrors: '',
             records: '',
             columns: '',
@@ -184,7 +185,8 @@ export default {
             isShowDiv: false,
             data: {
                 busNumber: "",
-                chasisNumber: "",
+                fare_class: "",
+                chassisNumber: "",
                 insuranceNumber: "",
                 noOfSeats: "",
                 routePermit: "",
@@ -201,14 +203,28 @@ export default {
         }
     },
     async created() {
+
         const res = await this.callApi("post", '/buses');
+
         if (res.status === 200) {
-            this.cities = res.data
+            this.buses = res.data
         } else {
             console.log(res);
         }
+
     },
     methods: {
+
+        getFareClass: async function () {
+            const resFareClass = await this.callApi("post", '/fare-class');
+            console.log(resFareClass);
+            if (resFareClass.status === 200) {
+                this.fareClasses = resFareClass.data
+            } else {
+                console.log(res);
+            }
+        },
+
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -225,100 +241,96 @@ export default {
                 return this.errorsArray("Please Enter No. of Rows", "No.of Rows");
             } else {
                 this.isShowDiv = true;
-
+                let customMap=[];
+                for(let r = 0;r < parseInt(this.data.noOfRows);r++){
+                    customMap[r] = 'eeeee';
+                }
                 var firstSeatLabel = 1;
 
-                    var $cart = $('#selected-seats'),
-                        $counter = $('#counter'),
-                        $total = $('#total'),
-                        sc = $('#seat-map').seatCharts({
-                            map: [
-                                'fefff',
-                                'ff_ff',
-                                'ee_ee',
-                                'ee_ee',
-                                'ee_ee',
-                                'ee_ee',
-                                'ee_ee',
-                                'ee_ee',
-                                'eeeee',
-                                'eeeee',
-                                'eeeee',
-                                'eeeee',
-                            ],
-                            seats: {
-                                f: {
-                                    price   : 100,
-                                    classes : 'first-class', //your custom CSS class
-                                    category: 'First Class'
-                                },
-                                e: {
-                                    price   : 40,
-                                    classes : 'economy-class', //your custom CSS class
-                                    category: 'Economy Class'
-                                }
-
+                var $cart = $('#selected-seats'),
+                    $counter = $('#counter'),
+                    $total = $('#total'),
+                    sc = $('#seat-map').seatCharts({
+                        map: customMap/*[
+                            'fefff',
+                            'ff_ff',
+                            'ee_ee',
+                            'ee_ee',
+                            'ee_ee',
+                            'ee_ee',
+                            'ee_ee',
+                            'ee_ee',
+                            'eeeee',
+                            'eeeee',
+                            'eeeee',
+                            'eeeee',
+                        ]*/,
+                        seats: {
+                            f: {
+                                price: 100,
+                                classes: 'first-class', //your custom CSS class
+                                category: 'First Class'
                             },
-                            naming : {
-                                top : false,
-                                getLabel : function (character, row, column) {
-                                    return firstSeatLabel++;
-                                },
-                            },
-                            legend : {
-                                node : $('#legend'),
-                                items : [
-                                    [ 'f', 'available',   'First Class' ],
-                                    [ 'e', 'available',   'Economy Class'],
-                                    [ 'f', 'unavailable', 'Already Booked']
-                                ]
-                            },
-                            click: function () {
-                                if (this.status() == 'available') {
-                                    //let's create a new <li> which we'll add to the cart items
-                                    $('<li>'+this.data().category+' Seat # '+this.settings.label+': <b>$'+this.data().price+'</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
-                                        .attr('id', 'cart-item-'+this.settings.id)
-                                        .data('seatId', this.settings.id)
-                                        .appendTo($cart);
-
-                                    /*
-                                     * Lets update the counter and total
-                                     *
-                                     * .find function will not find the current seat, because it will change its stauts only after return
-                                     * 'selected'. This is why we have to add 1 to the length and the current seat price to the total.
-                                     */
-                                    $counter.text(sc.find('selected').length+1);
-                                    $total.text(recalculateTotal(sc)+this.data().price);
-
-                                    return 'selected';
-                                } else if (this.status() == 'selected') {
-                                    //update the counter
-                                    $counter.text(sc.find('selected').length-1);
-                                    //and total
-                                    $total.text(recalculateTotal(sc)-this.data().price);
-
-                                    //remove the item from our cart
-                                    $('#cart-item-'+this.settings.id).remove();
-
-                                    //seat has been vacated
-                                    return 'available';
-                                } else if (this.status() == 'unavailable') {
-                                    //seat has been already booked
-                                    return 'unavailable';
-                                } else {
-                                    return this.style();
-                                }
+                            e: {
+                                price: 40,
+                                classes: 'economy-class', //your custom CSS class
+                                category: 'Economy Class'
                             }
-                        });
 
-                    //this will handle "[cancel]" link clicks
-                    $('#selected-seats').on('click', '.cancel-cart-item', function () {
-                        //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
-                        sc.get($(this).parents('li:first').data('seatId')).click();
+                        },
+                        naming: {
+                            top: false,
+                            getLabel: function (character, row, column) {
+                                return firstSeatLabel++;
+                            },
+                        },
+                        legend: {
+                            node: $('#legend'),
+                            items: [
+                                // ['f', 'available', 'First Class'],
+                                // ['e', 'available', 'Economy Class'],
+                                // ['f', 'unavailable', 'Already Booked']
+                            ]
+                        },
+                        click: function () {
+                            if (this.status() === 'available') {
+                                //let's create a new <li> which we'll add to the cart items
+                                $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>$' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
+                                    .attr('id', 'cart-item-' + this.settings.id)
+                                    .data('seatId', this.settings.id)
+                                    .appendTo($cart);
+                                $counter.text(sc.find('selected').length + 1);
+                                $total.text(recalculateTotal(sc) + this.data().price);
+
+                                return 'selected';
+                            } else if (this.status() === 'selected') {
+                                //update the counter
+                                $counter.text(sc.find('selected').length - 1);
+                                //and total
+                                $total.text(recalculateTotal(sc) - this.data().price);
+
+                                //remove the item from our cart
+                                $('#cart-item-' + this.settings.id).remove();
+
+                                //seat has been vacated
+                                return 'available';
+                            } else if (this.status() == 'unavailable') {
+                                //seat has been already booked
+                                return 'unavailable';
+                            } else {
+                                return this.style();
+                            }
+                        }
                     });
 
-                    //let's pretend some seats have already been booked
-                    sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
+                //this will handle "[cancel]" link clicks
+                $('#selected-seats').on('click', '.cancel-cart-item', function () {
+                    //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
+                    sc.get($(this).parents('li:first').data('seatId')).click();
+                });
+
+                //let's pretend some seats have already been booked
+                sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
 
 
                 function recalculateTotal(sc) {
@@ -361,8 +373,6 @@ export default {
             this.dataEdit = city;
         },
         async update() {
-
-
             this.validationErrors = []
             if (this.dataEdit.name === "") return this.errorsArray("City Name is Required", "Name");
             const res = await this.callApi("post", '/city/update', this.dataEdit);
@@ -410,6 +420,7 @@ export default {
 <style scoped>
 @import 'http://www.jqueryscript.net/css/jquerysctipttop.css';
 @import '/assets/css/buses/jquery.seat-charts.css';
+
 .front-indicator {
     width: 145px;
     margin: 5px 32px 15px 32px;
@@ -419,16 +430,19 @@ export default {
     padding: 3px;
     border-radius: 5px;
 }
+
 .wrapper {
     width: 100%;
     text-align: center;
-    margin-top:150px;
+    margin-top: 150px;
 }
+
 .container {
     margin: 0 auto;
     width: 500px;
     text-align: left;
 }
+
 .booking-details {
     float: left;
     text-align: left;
@@ -437,14 +451,17 @@ export default {
     position: relative;
     height: 401px;
 }
+
 .booking-details h2 {
     margin: 25px 0 20px 0;
     font-size: 17px;
 }
+
 .booking-details h3 {
     margin: 5px 5px 0 0;
     font-size: 14px;
 }
+
 div.seatCharts-cell {
     color: #182C4E;
     height: 25px;
@@ -452,53 +469,66 @@ div.seatCharts-cell {
     line-height: 25px;
 
 }
+
 div.seatCharts-seat {
     color: #FFFFFF;
     cursor: pointer;
 }
+
 div.seatCharts-row {
     height: 35px;
 }
+
 div.seatCharts-seat.available {
     background-color: #B9DEA0;
 
 }
+
 div.seatCharts-seat.available.first-class {
     /* 	background: url(vip.png); */
     background-color: #3a78c3;
 }
+
 div.seatCharts-seat.focused {
     background-color: #76B474;
 }
+
 div.seatCharts-seat.selected {
     background-color: #E6CAC4;
 }
+
 div.seatCharts-seat.unavailable {
     background-color: #472B34;
 }
+
 div.seatCharts-container {
     border-right: 1px dotted #adadad;
     width: 200px;
     padding: 20px;
     float: left;
 }
+
 div.seatCharts-legend {
     padding-left: 0px;
     position: absolute;
     bottom: 16px;
 }
+
 ul.seatCharts-legendList {
     padding-left: 0px;
 }
+
 span.seatCharts-legendDescription {
     margin-left: 5px;
     line-height: 30px;
 }
+
 .checkout-button {
     display: block;
     margin: 10px 0;
     font-size: 14px;
 }
+
 #selected-seats {
     max-height: 90px;
     overflow-y: scroll;

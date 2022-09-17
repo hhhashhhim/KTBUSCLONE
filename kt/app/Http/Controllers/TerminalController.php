@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\Terminal;
 use App\Models\TerminalAllowedSeatsAdvance;
 use App\Models\TerminalAvailableSeat;
 use App\Models\TerminalCommission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TerminalController extends Controller
 {
@@ -21,10 +23,10 @@ class TerminalController extends Controller
     }
     public function index()
     {
-
-        return Terminal::with('added_by', 'city')
-        ->where('company_id',$this->company_id)
-        ->latest('id')->get();
+//        return Terminal::with('added_by', 'city')
+//        ->where('company_id',$this->company_id)
+//        ->latest('id')->get()/*->groupBy('city_id')*/;
+        return City::with('terminal')->where('company_id', Auth::user()->company_id)->get();
     }
     public function store(Request $request)
     {
@@ -53,7 +55,6 @@ class TerminalController extends Controller
             'longitude' => $request->longitude,
             'latitude' => $request->latitude,
             'time_difference' => $request->time_difference,
-            'order' => $request->order,
             'active_sms' => $request->active_sms ? 1 : 0,
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name ?? " ",

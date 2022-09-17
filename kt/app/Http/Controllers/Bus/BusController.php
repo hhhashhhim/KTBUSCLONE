@@ -12,7 +12,7 @@ class BusController extends Controller
 {
     public function index()
     {
-        return Schedule::orderBy('id')->select('departure_date', 'destination_date', 'destination_time', 'departure_time', 'trip_duration', 'added_by', 'updated_by', 'created_at')->get();
+        return Bus::orderBy('id')->select('bus_number', 'chassis_number', 'insurance_number', 'no_of_seats', 'route_permit_number', 'added_by', 'updated_by', 'created_at')->get();
     }
 
     public function storeBus(Request $request)

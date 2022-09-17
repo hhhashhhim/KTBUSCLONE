@@ -21,7 +21,6 @@ class CreateTerminalsTable extends Migration
             $table->string('longitude')->nullable();
             $table->string('latitude')->nullable();
             $table->string('time_difference')->nullable();
-            $table->string('order')->nullable();
             $table->tinyInteger('active_sms')->nullable();
             $table->integer('city_id');
             $table->integer('company_id');

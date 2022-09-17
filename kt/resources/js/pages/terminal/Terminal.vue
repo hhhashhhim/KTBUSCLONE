@@ -28,18 +28,14 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table
-                                                    class="table table-striped table-hover"
+                                                    class="table table-striped table-hover dataTable no-footer"
                                                     id="edit_loc"
                                                 >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Contact</th>
-                                                        <th>Address</th>
-                                                        <th>City</th>
-                                                        <th>Modified By</th>
-                                                        <th>Modified Date</th>
+                                                        <th>City Name</th>
+                                                        <th>No.of Terminals</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -47,27 +43,28 @@
                                                     <tr v-for="(terminal, i) in terminals" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ terminal.name }}</td>
-                                                        <td>{{ terminal.contact }}</td>
-                                                        <td>{{ terminal.address }}</td>
-                                                        <td>{{ terminal.city ? terminal.city.name : "" }}</td>
-                                                        <td>{{
-                                                                terminal.added_by ? terminal.added_by.name : "Not Found"
-                                                            }}
-                                                        </td>
-                                                        <td>{{ terminal.updated_at }}</td>
+                                                        <td>{{ terminal.terminal.length }}</td>
                                                         <td>
+                                                            <a
+                                                                href="#detail-modal"
+                                                                data-toggle="modal"
+                                                                @click="terminalDetail(terminal.terminal)"
+                                                                class=" btn btn-info mx-2"
+                                                            >
+                                                                <i class="far fa-eye"></i>
+                                                            </a>
                                                             <a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
-                                                                @click="edit(terminal)"
-                                                                class="btn btn-warning mx-1"
+                                                                @click="edit(terminal.terminal)"
+                                                                class="btn btn-warning mx-2"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
                                                             <a
                                                                 href="#delete-modal"
                                                                 data-toggle="modal"
-                                                                @click="deleteModal(terminal, i)"
+                                                                @click="deleteModal(terminal.terminal, i)"
                                                                 class="btn btn-danger"
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
@@ -112,7 +109,8 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
-                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"  @keypress="isNumber($event)">
+                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"
+                               @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -138,24 +136,23 @@
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="order">Terminal Order</label>
-                        <input type="text" class="form-control" v-model="data.order">
-                    </div>
-                    <div class="form-group col-md-4 d-flex align-items-center">
+                    <!--                    <div class="form-group col-md-4">-->
+                    <!--                        <label for="order">Terminal Order</label>-->
+                    <!--                        <input type="text" class="form-control" v-model="data.order">-->
+                    <!--                    </div>-->
+                    <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Is Active</label>
                         <label class="colorinput mx-3 mt-3">
-            <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      v-model="data.active"
-                  />
-            <span class="colorinput-color bg-success"></span>
+            <span><input
+                type="checkbox"
+                class="colorinput-input"
+                v-model="data.active"
+            />
+                <span class="colorinput-color bg-success"></span>
             </span>
                         </label>
                     </div>
-                    <div class="form-group col-md-4 d-flex align-items-center">
+                    <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="sms">SMS</label>
                         <label class="colorinput mx-3 mt-3">
             <span>
@@ -168,7 +165,7 @@
             </span>
                         </label>
                     </div>
-                    <div class="form-group col-md-4 d-flex align-items-center">
+                    <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="sms">Main Terminal</label>
                         <label class="colorinput mx-3 mt-3">
             <span>
@@ -190,7 +187,7 @@
                 </div>
             </Add>
 
-            <!-- Add Modal -->
+            <!-- Edit Modal -->
             <Edit
                 heading="Edit terminal"
                 :errors="this.validationErrors"
@@ -280,7 +277,65 @@
                 </div>
             </Edit>
 
-            <!-- Add Modal -->
+            <!--View Details Model-->
+            <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Terminal Details</h5>
+                        </div>
+                        <div class="modal-body m-1 p-1">
+                            <div class="card-body my-0 py-0">
+                                <!-- Table -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4></h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table
+                                                        class="table table-striped table-hover dataTable no-footer"
+                                                        id="show_terminal"
+                                                    >
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Terminal Name</th>
+                                                            <th>Address</th>
+                                                            <th>Contact Number</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr v-for="(single, i) in terminalsDetails" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td v-if="single.name">{{ single.name }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="single.address">{{ single.address }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="single.contact">{{ single.contact }}</td>
+                                                            <td v-else>N/A</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END TABLE -->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" v-on:click="seen = !seen">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
             <Delete
                 confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
             />
@@ -304,7 +359,9 @@ export default {
     },
     data() {
         return {
+            seen: true,
             terminals: [],
+            terminalsDetails: [],
             companies: [],
             formID: "newTerminal",
             cities: [],
@@ -332,11 +389,17 @@ export default {
 
     async created() {
         const terminalRes = await this.callApi("post", "/terminal");
+        console.log(terminalRes);
         const compRes = await this.callApi("post", "/company");
         const cities = await this.callApi("post", "/city");
         this.terminals = terminalRes.data;
         this.companies = compRes.data;
         this.cities = cities.data;
+        setTimeout(() => {
+            $("#edit_loc").DataTable();
+            $("#show_terminal").DataTable();
+        }, 500);
+
     },
     methods: {
         isNumber: function (evt) {
@@ -356,51 +419,58 @@ export default {
         },
         async add() {
             this.validationErrors = [];
-
-            if (this.data.name == "")
+            if (this.data.name === "")
                 return this.errorsArray("Terminal Name is Required", "Name");
-            if (this.$store.state.user.is_super_admin == 1 && this.data.company_id == "")
+            if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 return this.errorsArray("Company is Required", "Password");
-            if (this.data.city_id == "")
+            if (this.data.city_id === "")
                 return this.errorsArray("Terminal City is Required", "City");
-            if (this.data.contact == "")
+            if (this.data.contact === "")
                 return this.errorsArray("Terminal Contact is Required", "Contact");
 
             const res = await this.callApi("post", "/terminal/store", this.data);
-            if (res.status == 200) {
+            if (res.status === 200) {
                 this.success = "Terminal Created Successfully";
                 this.terminals = res.data
                 this.data = "";
                 setTimeout(() => {
                     this.success = "";
+
                     // $("#add-modal").modal("hide")
                     window.location.reload();
                 }, 2000);
             } else {
-                if (res.status == 422) {
+                if (res.status === 422) {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
-                if (res.status == 423) {
+                if (res.status === 423) {
                     this.errorsArray(res.data.is_main, 'Main Terminal');
                 }
             }
         },
         async edit(terminal) {
+            console.log(terminal);
             this.dataEdit = terminal;
             this.dataEdit.role = terminal.role_id;
             const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
             this.roles = roleRes.data;
         },
+        async terminalDetail(terminal) {
+            this.terminalsDetails = terminal;
+            setTimeout(() => {
+                $("#show_terminal").DataTable();
+            }, 500);
+        },
         async update() {
             this.validationErrors = [];
-            if (this.dataEdit.name == "")
+            if (this.dataEdit.name === "")
                 return this.errorsArray("terminal Name is Required", "Name");
             const res = await this.callApi("post", "/terminal/update", this.dataEdit);
-            if (res.status == 201) {
+            if (res.status === 201) {
                 this.success = "terminal Updated Successfully";
                 this.dataEdit = "";
                 const terminalRes = await this.callApi("post", "/terminal", {});
@@ -410,7 +480,7 @@ export default {
                     $("#edit-modal").modal("hide");
                 }, 3000);
             } else {
-                if (res.status == 422) {
+                if (res.status === 422) {
                     console.log();
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
