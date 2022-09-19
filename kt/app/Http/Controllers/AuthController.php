@@ -19,11 +19,10 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-        $routeFareCities = RouteFare::/*with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class')->*/where('route_id', 15)->get()->groupBy('city_from_id');
-
+        $routeFareCities = RouteFare::/*with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class')->*/where('route_id', 15)->get()->groupBy(['city_from_id', 'city_to_id']);
 //        $data = [];
         foreach ($routeFareCities as $i => $singlesItem) {
-            return $singlesItem;
+            return $singlesItem->unique('fare_id');
 
 //                $data[] = $single->unique('city_to_id');
 
