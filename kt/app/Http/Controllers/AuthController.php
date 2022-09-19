@@ -19,72 +19,23 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+        $routeFareCities = RouteFare::/*with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class')->*/where('route_id', 15)->get()->groupBy('city_from_id');
 
-       $routeFareCities = RouteFare::where('route_id',1)->get();
-       $allCombinations = [];
-       foreach ($routeFareCities as $i => $routeFareCity) {
+//        $data = [];
+        foreach ($routeFareCities as $i => $singlesItem) {
+            return $singlesItem;
 
-           $destinationCities = RouteFare::where('id','>',$routeFareCity->id)->pluck('city_to_id');
-           $combination = [
-               'departure_city_id'=>$routeFareCity->city_from_id,
-               'destinationCities'=>[
-                   $routeFareCity->city_to_id,
-                   ...$destinationCities
-               ],
-           ];
-           $combination;
-           $allCombinations[] = $combination;
-       }
-
-       $fares = [];
-
-       foreach ($allCombinations as $i => $combination) {
-
-           $singleCityFares = FareTable::where('from_city_id',$combination['departure_city_id'])
-           ->where('company_id',auth()->user()->company_id)
-           ->whereIn('to_city_id',$combination['destinationCities'])
-           ->select('fare','fare_class','from_city_id','to_city_id')
-           ->with('class:id,name','city_to:id,name','city_from:id,name')
-           ->get();
-
-           array_push($fares,...$singleCityFares);
-
-       }
-       return $fares = collect($fares);
-       return $fares->groupBy('fare_class')->unique();
-       
-       
-       
-       $routeFareList = collect([]);
+//                $data[] = $single->unique('city_to_id');
 
 
-
-       return $routeFareList->where('from_city_id','=',7)
-       ->where('to_city_id',10)->where('fare_class',1);
-       
-       foreach ($fares as $i => $fare) {
-
-        $exists = $routeFareList->where('from_city_id',$fare->from_city_id)
-        ->where('to_city_id',$fare->to_city_id)
-        ->where('fare_class',$fare->fare_class)
-        ->first();
-        if ($exists) {
-            return "Reaching $i";
         }
-        $routeFare = new stdClass;
-        $routeFare->from = $fare->city_from->name;
-        $routeFare->to = $fare->city_to->name;
+        return $data;
 
 
-        
-       }
-
-//
-        // return $allCombinations->city_to->whereIn('id', [1]);
-        if (!Auth::check()  && $request->path() != "login") {
+        if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }
-        if (Auth::check()  && $request->path() == "login") {
+        if (Auth::check() && $request->path() == "login") {
             return redirect('/');
         }
         // $user = Auth::user();
@@ -93,6 +44,7 @@ class AuthController extends Controller
         // }
         return view('admin.index');
     }
+
     public function checkForPermission($user, $request)
     {
         $permission = collect($user->role
@@ -101,11 +53,13 @@ class AuthController extends Controller
             ->where('read', true)
             ->first();
     }
+
     public function logout()
     {
         Auth::logout();
         return redirect("/");
     }
+
     public function login(Request $request)
     {
 
@@ -129,18 +83,17 @@ class AuthController extends Controller
         }
     }
 
-    public function doubleCheck( Request $request ){
+    public function doubleCheck(Request $request)
+    {
 
         $request->validate([
-            'password'=>'required',
+            'password' => 'required',
         ]);
-        if (Hash::check($request->password,auth()->user()->password)) {
-            return response()->json([],200);
+        if (Hash::check($request->password, auth()->user()->password)) {
+            return response()->json([], 200);
+        } else {
+            return response()->json([], 403);
         }
-        else{
-            return response()->json([],403);
-        }
-
     }
 }
 
@@ -168,11 +121,6 @@ class AuthController extends Controller
 //         ->on('fare_tables.to_city_id', '=', 'cities.to_id');
 // }
 // )->select('cities.*', 'fare_tables.fare')->orderBy('from_name')->orderBy('to_name')->get()->groupBy('from_name');
-
-
-
-
-
 
 
 //  For Route City Mapping

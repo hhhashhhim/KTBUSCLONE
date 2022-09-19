@@ -7,7 +7,8 @@
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success"  @click="getFareClass()">
+                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success"
+                                   @click="getFareClass()">
                                     Add New Bus
                                 </a>
                             </div>
@@ -109,7 +110,9 @@
                         <label for="city_id">Fare Classes</label>
                         <select class="form-control" v-model="data.fare_class">
                             <option value="">Select Fare Class</option>
-                            <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"> {{ fareClass.name }}</option>
+                            <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id">
+                                {{ fareClass.name }}
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -124,10 +127,12 @@
                         </button>
 
                     </div>
-                    <div v-if="isShowDiv" class="col-md-6 border py-5 mb-5">
-                        <div id="seat-map">
-                            <label class="text-dark " for="">Create Here</label>
-                        </div>
+                    <div v-if="isShowDiv" class="col-md-6 border my-5">
+                        <tr v-for="(record, rowIndex) in parseInt(data.noOfRows)" :key="rowIndex">
+                            <td v-for="(col, colIndex) in parseInt(5)" :key="colIndex">
+
+                            </td>
+                        </tr>
                     </div>
                     <div class="form-group col-md-12">
                         <button type="button" class="btn btn-block btn-success" @click="addBuses">Add Bus
@@ -240,108 +245,108 @@ export default {
                 return this.errorsArray("Please Enter No. of Rows", "No.of Rows");
             } else {
                 this.isShowDiv = true;
-                let customMap=[];
-                for(let r = 0;r < parseInt(this.data.noOfRows);r++){
-                    customMap[r] = 'eeeee';
-                }
-                var firstSeatLabel = 1;
-
-                var $cart = $('#selected-seats'),
-                    $counter = $('#counter'),
-                    $total = $('#total'),
-                    sc = $('#seat-map').seatCharts({
-                        map: customMap/*[
-                            'fefff',
-                            'ff_ff',
-                            'ee_ee',
-                            'ee_ee',
-                            'ee_ee',
-                            'ee_ee',
-                            'ee_ee',
-                            'ee_ee',
-                            'eeeee',
-                            'eeeee',
-                            'eeeee',
-                            'eeeee',
-                        ]*/,
-                        seats: {
-                            f: {
-                                price: 100,
-                                classes: 'first-class', //your custom CSS class
-                                category: 'First Class'
-                            },
-                            e: {
-                                price: 40,
-                                classes: 'economy-class', //your custom CSS class
-                                category: 'Economy Class'
-                            }
-
-                        },
-                        naming: {
-                            top: false,
-                            getLabel: function (character, row, column) {
-                                return firstSeatLabel++;
-                            },
-                        },
-                        legend: {
-                            node: $('#legend'),
-                            items: [
-                                // ['f', 'available', 'First Class'],
-                                // ['e', 'available', 'Economy Class'],
-                                // ['f', 'unavailable', 'Already Booked']
-                            ]
-                        },
-                        click: function () {
-                            if (this.status() === 'available') {
-                                //let's create a new <li> which we'll add to the cart items
-                                $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>$' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
-                                    .attr('id', 'cart-item-' + this.settings.id)
-                                    .data('seatId', this.settings.id)
-                                    .appendTo($cart);
-                                $counter.text(sc.find('selected').length + 1);
-                                $total.text(recalculateTotal(sc) + this.data().price);
-
-                                return 'selected';
-                            } else if (this.status() === 'selected') {
-                                //update the counter
-                                $counter.text(sc.find('selected').length - 1);
-                                //and total
-                                $total.text(recalculateTotal(sc) - this.data().price);
-
-                                //remove the item from our cart
-                                $('#cart-item-' + this.settings.id).remove();
-
-                                //seat has been vacated
-                                return 'available';
-                            } else if (this.status() == 'unavailable') {
-                                //seat has been already booked
-                                return 'unavailable';
-                            } else {
-                                return this.style();
-                            }
-                        }
-                    });
-
-                //this will handle "[cancel]" link clicks
-                $('#selected-seats').on('click', '.cancel-cart-item', function () {
-                    //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
-                    sc.get($(this).parents('li:first').data('seatId')).click();
-                });
-
-                //let's pretend some seats have already been booked
-                sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
-
-
-                function recalculateTotal(sc) {
-                    var total = 0;
-
-                    //basically find every selected seat and sum its price
-                    sc.find('selected').each(function () {
-                        total += this.data().price;
-                    });
-
-                    return total;
-                }
+                // let customMap=[];
+                // for(let r = 0;r < parseInt(this.data.noOfRows);r++){
+                //     customMap[r] = 'eeeee';
+                // }
+                // var firstSeatLabel = 1;
+                //
+                // var $cart = $('#selected-seats'),
+                //     $counter = $('#counter'),
+                //     $total = $('#total'),
+                //     sc = $('#seat-map').seatCharts({
+                //         map: customMap/*[
+                //             'fefff',
+                //             'ff_ff',
+                //             'ee_ee',
+                //             'ee_ee',
+                //             'ee_ee',
+                //             'ee_ee',
+                //             'ee_ee',
+                //             'ee_ee',
+                //             'eeeee',
+                //             'eeeee',
+                //             'eeeee',
+                //             'eeeee',
+                //         ]*/,
+                //         seats: {
+                //             f: {
+                //                 price: 100,
+                //                 classes: 'first-class', //your custom CSS class
+                //                 category: 'First Class'
+                //             },
+                //             e: {
+                //                 price: 40,
+                //                 classes: 'economy-class', //your custom CSS class
+                //                 category: 'Economy Class'
+                //             }
+                //
+                //         },
+                //         naming: {
+                //             top: false,
+                //             getLabel: function (character, row, column) {
+                //                 return firstSeatLabel++;
+                //             },
+                //         },
+                //         legend: {
+                //             node: $('#legend'),
+                //             items: [
+                //                 // ['f', 'available', 'First Class'],
+                //                 // ['e', 'available', 'Economy Class'],
+                //                 // ['f', 'unavailable', 'Already Booked']
+                //             ]
+                //         },
+                //         click: function () {
+                //             if (this.status() === 'available') {
+                //                 //let's create a new <li> which we'll add to the cart items
+                //                 $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>$' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
+                //                     .attr('id', 'cart-item-' + this.settings.id)
+                //                     .data('seatId', this.settings.id)
+                //                     .appendTo($cart);
+                //                 $counter.text(sc.find('selected').length + 1);
+                //                 $total.text(recalculateTotal(sc) + this.data().price);
+                //
+                //                 return 'selected';
+                //             } else if (this.status() === 'selected') {
+                //                 //update the counter
+                //                 $counter.text(sc.find('selected').length - 1);
+                //                 //and total
+                //                 $total.text(recalculateTotal(sc) - this.data().price);
+                //
+                //                 //remove the item from our cart
+                //                 $('#cart-item-' + this.settings.id).remove();
+                //
+                //                 //seat has been vacated
+                //                 return 'available';
+                //             } else if (this.status() == 'unavailable') {
+                //                 //seat has been already booked
+                //                 return 'unavailable';
+                //             } else {
+                //                 return this.style();
+                //             }
+                //         }
+                //     });
+                //
+                // //this will handle "[cancel]" link clicks
+                // $('#selected-seats').on('click', '.cancel-cart-item', function () {
+                //     //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
+                //     sc.get($(this).parents('li:first').data('seatId')).click();
+                // });
+                //
+                // //let's pretend some seats have already been booked
+                // sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
+                //
+                //
+                // function recalculateTotal(sc) {
+                //     var total = 0;
+                //
+                //     //basically find every selected seat and sum its price
+                //     sc.find('selected').each(function () {
+                //         total += this.data().price;
+                //     });
+                //
+                //     return total;
+                // }
 
             }
         },
