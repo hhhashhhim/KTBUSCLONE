@@ -17,8 +17,8 @@ class CreateRoutesFaresTable extends Migration
             $table->id();
             $table->bigInteger('route_id');
             $table->bigInteger('fare_id');
-            $table->bigInteger('city_from_id');
-            $table->bigInteger('city_to_id');
+            $table->bigInteger('departure_city_id');
+            $table->bigInteger('destination_city_id');
             $table->bigInteger('company_id');
             $table->bigInteger('added_by');
             $table->softDeletes();

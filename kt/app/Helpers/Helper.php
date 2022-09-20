@@ -17,8 +17,8 @@ if (!function_exists('storeFare')) {
             'added_by' => auth()->user()->id,
         ]);
         /*Creating Route Fares those fare added after creating the route of one side*/
-        $routeFares1Side = RouteFare::where('city_from_id', $request->from_city_id)
-            ->where('city_to_id', $request->to_city_id)
+        $routeFares1Side = RouteFare::where('departure_city_id', $request->from_city_id)
+            ->where('destination_city_id', $request->to_city_id)
             ->get();
         foreach ($routeFares1Side as $i => $routeFare) {
             $routeFare->fare_id = $fare1Side->id;
@@ -36,8 +36,8 @@ if (!function_exists('storeFare')) {
             'added_by' => auth()->user()->id,
         ]);
 
-        $routeFares2Side = RouteFare::where('city_from_id', $fare2Side->from_city_id)
-            ->where('city_to_id', $fare2Side->to_city_id)
+        $routeFares2Side = RouteFare::where('departure_city_id', $fare2Side->from_city_id)
+            ->where('destination_city_id', $fare2Side->to_city_id)
             ->get();
         foreach ($routeFares2Side as $i => $routeFare) {
             RouteFare::create([
@@ -72,16 +72,16 @@ if (!function_exists('updateFare')) {
             'distance_in_km' => $request->distance_in_km,
             'added_by' => auth()->user()->id,
         ]);
-//        $routeFares1Side = RouteFare::where('city_from_id', $request->from_city_id)
-//            ->where('city_to_id', $request->to_city_id)
+//        $routeFares1Side = RouteFare::where('departure_city_id', $request->from_city_id)
+//            ->where('destination_city_id', $request->to_city_id)
 //            ->get();
 //        foreach ($routeFares1Side as $i => $routeFare) {
 //            $routeFare->fare_id = $fare1Side->id;
 //            RouteFare::create($routeFare->toArray());
 //        }
 //
-//        $routeFares2Side = RouteFare::where('city_from_id', $request->to_city_id)
-//            ->where('city_to_id', $request->to_city_id)
+//        $routeFares2Side = RouteFare::where('departure_city_id', $request->to_city_id)
+//            ->where('destination_city_id', $request->to_city_id)
 //            ->get();
 //        foreach ($routeFares2Side as $i => $routeFare) {
 //            RouteFare::create([
