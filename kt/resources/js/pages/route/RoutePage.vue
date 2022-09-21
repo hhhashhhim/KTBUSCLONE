@@ -278,7 +278,6 @@ export default {
     },
     methods: {
         fareClassValue( data , className){
-
             const header = className;
             const dataTwo = data;
             const converted = Object.keys(dataTwo)
