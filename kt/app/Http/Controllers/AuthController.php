@@ -19,6 +19,26 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+//        $routeFareCities = RouteFare::with('city_to:id,name','city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_class.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
+//        $data =[];
+//        foreach ($routeFareCities as  $cities){
+//            foreach ($cities as $city){
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['departure_city'] = $city[0]->city_from->name;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['destination_city'] = $city[0]->city_to->name;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_one'] = $city[0]->fare_details->fare;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_one_class'] = $city[0]->fare_class->class->name;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_one_id'] = $city[0]->fare_details->fare_class;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_two'] = $city[1]->fare_details->fare;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_two_class'] = $city[1]->fare_class->class->name;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_two_id'] = $city[1]->fare_details->fare_class;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_three'] = $city[2]->fare_details->fare;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_three_class'] = $city[2]->fare_class->class->name;
+//                $data[$city[0]->city_from->name][$city[0]->city_to->name]['fare_three_id'] = $city[2]->fare_details->fare_class;
+//            }
+//        }
+//        return $data;
+
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

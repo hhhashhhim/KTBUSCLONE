@@ -181,21 +181,34 @@
                                             <tr>
                                                 <th>City From</th>
                                                 <th>City To</th>
-                                                <th>Economy Fare</th>
-                                                <th>Business Fare</th>
-                                                <th>Executive Fare</th>
+                                                <th v-for="(heading,i) in th" :key="i">
+                                                    {{ heading.name }}
+                                                </th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr v-for="(item, i) in routeDetails" :key="i">
-                                                <template v-for="(single,j) in item" :key="j">
-                                                    <td v-if="j - 1 == i">{{ single[0].city_from.name}}</td>
-                                                    <td v-if="j - 1 == i">{{ single[0].city_to.name}}</td>
-                                                    <td v-if="j - 1 == i && single[0].fare_details.fare_class == 1"> RS. {{ parseInt(single[0].fare_details.fare)}} </td>
-                                                    <td v-if="j - 1 == i && single[1].fare_details.fare_class == 2"> RS. {{ parseInt(single[1].fare_details.fare)}} </td>
-                                                    <td v-if="j - 1 == i && single[2].fare_details.fare_class == 3"> RS. {{ parseInt(single[2].fare_details.fare) }} </td>
-                                                </template>
-                                            </tr>
+                                            <template v-for="(item,j) in routeDetails" :key="j">
+                                                <tr v-for="(single, i) in item" :key="i">
+                                                    <td> {{ single.departure_city }}</td>
+                                                    <td> {{ single.destination_city }}</td>
+                                                    <td v-for="(row, k) in th" :key="k">
+                                                        {{
+                                                            fareClassValue(single, th)
+                                                        }}
+
+<!--                                                        <span v-if="single.includes(row.name +'_fare')">N/A</span>-->
+<!--                                                        {{single.includes(row.name +'_fare')}}-->
+                                                    </td>
+<!--                                                    <td v-if="single.include(this,th[0]+'_fare')">{{single.Economy_fare}}</td>-->
+<!--                                                    <td v-if="single.fare_one"> {{ single.fare_one }}</td>-->
+<!--                                                    <td v-else>N/A</td>-->
+<!--                                                    <td v-if="single.fare_two"> {{ single.fare_two }}</td>-->
+<!--                                                    <td v-else>N/A</td>-->
+<!--                                                    <td v-if="single.fare_three"> {{ single.fare_three }}</td>-->
+<!--                                                    <td v-else>N/A</td>-->
+
+                                                </tr>
+                                            </template>
                                             </tbody>
                                         </table>
                                     </div>
@@ -234,6 +247,7 @@ export default {
     data() {
         return {
             cities: [],
+            validationErrors: [],
             city: 0,
             addCities: [],
             companies: [],
@@ -243,11 +257,6 @@ export default {
             termianl: '',
             routes: [],
             formID: "addNewRoute",
-            fareClasses: [
-                {id: 1, name: "economy"},
-                {id: 2, name: "exuctive"},
-                {id: 3, name: "business"},
-            ],
             data: {
                 fare_class: "0",
             },
@@ -259,13 +268,33 @@ export default {
             icon: ' <i class="fa fa-bus"></i> ',
             loop: 1,
             routeName: '',
-            routeDetails: []
+            routeDetails: [],
+            th : [],
+            classFareName : ''
         };
     },
     created() {
         this.fetchCities();
     },
     methods: {
+        fareClassValue( data , className){
+
+            const header = className;
+            const dataTwo = data;
+            const converted = Object.keys(dataTwo)
+            let new_name = '';
+            converted.forEach((element , i) => {
+                header.forEach( el => {
+                    console.log( el.name + '_fare' == element)
+
+                    if( el.name + '_fare' == element){
+
+                        new_name = dataTwo[element];
+                    }
+                })
+            });
+            console.log(new_name);
+        },
         async addRoute() {
             const data = {
                 route: this.routeName,
@@ -354,9 +383,9 @@ export default {
             const routeDetailRes = await this.callApi("post", "/cities/routes/details", {
                 id: id
             });
-            console.log(routeDetailRes.data)
             if (routeDetailRes.status === 200) {
-                this.routeDetails = routeDetailRes.data;
+                this.routeDetails = routeDetailRes.data.data;
+                this.th = routeDetailRes.data.th;
             }
         },
         async fetchRecord() {

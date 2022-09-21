@@ -561,8 +561,8 @@ CREATE TABLE `routes_fares` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `route_id` bigint(20) NOT NULL,
   `fare_id` bigint(20) NOT NULL,
-  `city_from_id` bigint(20) NOT NULL,
-  `city_to_id` bigint(20) NOT NULL,
+  `departure_city_id` bigint(20) NOT NULL,
+  `destination_city_id` bigint(20) NOT NULL,
   `company_id` bigint(20) NOT NULL,
   `added_by` bigint(20) NOT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -574,7 +574,7 @@ CREATE TABLE `routes_fares` (
 -- Dumping data for table `routes_fares`
 --
 
-INSERT INTO `routes_fares` (`id`, `route_id`, `fare_id`, `city_from_id`, `city_to_id`, `company_id`, `added_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `routes_fares` (`id`, `route_id`, `fare_id`, `departure_city_id`, `destination_city_id`, `company_id`, `added_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
 (1, 1, 8, 4, 1, 1, 42, NULL, '2022-09-03 07:27:20', '2022-09-03 07:27:20'),
 (2, 1, 5, 1, 3, 1, 42, NULL, '2022-09-03 07:27:20', '2022-09-03 07:27:20'),
 (3, 1, 12, 3, 5, 1, 42, NULL, '2022-09-03 07:27:20', '2022-09-03 07:27:20'),

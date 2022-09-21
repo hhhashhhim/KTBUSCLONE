@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\CityToCity;
+use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
@@ -92,8 +93,8 @@ class CityController extends Controller
                             RouteFare::create([
                                 'route_id' => $route->id,
                                 'fare_id' => $detail->id,
-                                'city_from_id' => $used_cities[$index],
-                                'city_to_id' => $innerCity,
+                                'departure_city_id' => $used_cities[$index],
+                                'destination_city_id' => $innerCity,
                                 'company_id' => $this->company_id,
                                 'added_by' => auth()->user()->id
                             ]);
@@ -107,15 +108,23 @@ class CityController extends Controller
 
     public function city_routes_details(Request $request)
     {
-        $routeFareCities = RouteFare::with('city_from:id,name', 'city_to:id,name', 'fare_details:id,fare,fare_class')->where('route_id', $request->id)->get()->groupBy('city_from_id');
+        $routeFareCities = RouteFare::with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
         $data = [];
-        foreach ($routeFareCities as $i => $single) {
-
-            $data[] = $single->unique('city_to_id');
-
-
+        foreach ($routeFareCities as $cities) {
+            foreach ($cities as $city) {
+                $data[$city[0]->city_from->name][$city[0]->city_to->name]['departure_city'] = $city[0]->city_from->name;
+                $data[$city[0]->city_from->name][$city[0]->city_to->name]['destination_city'] = $city[0]->city_to->name;
+                foreach ($city as $fare) {
+                    $data[$city[0]->city_from->name][$city[0]->city_to->name][$fare->fare_details->class->name] = $fare->fare_details->class->name . '---';
+                    $data[$city[0]->city_from->name][$city[0]->city_to->name][$fare->fare_details->class->name . '_fare'] = $fare->fare_details->fare;
+                }
+            }
         }
-        return $data;
+        return $final_array = [
+            'data' => $data,
+            'th' => FareClass::where('company_id', $this->company_id)->orderBY('name', 'ASC')->get(),
+        ];
+
     }
 
     public function cityCombinations($city)

@@ -18,16 +18,19 @@ class RouteFare extends Model
     public function fare_details(){
         return $this->hasOne( FareTable::class,'id','fare_id' );
     }
+    public function fare_class(){
+        return $this->hasOne( FareTable::class,'id','fare_id' );
+    }
 
     public function route(){
         return $this->hasOne( Route::class,'id','route_id');
     }
 
     public function city_from(){
-        return $this->belongsTo(City::class, 'city_from_id',  'id');
+        return $this->belongsTo(City::class, 'departure_city_id',  'id');
     }
 
     public function city_to(){
-        return $this->belongsTo(City::class, 'city_to_id',  'id');
+        return $this->belongsTo(City::class, 'destination_city_id',  'id');
     }
 }

@@ -25,7 +25,4 @@ class FareTable extends Model
     public function class(){
         return $this->hasOne( FareClass::class,'id','fare_class' );
     }
-    // public function route_fare(){
-    //     return $this->belongsTo( RouteFare::class,'id','fare_id' );
-    // }
 }
