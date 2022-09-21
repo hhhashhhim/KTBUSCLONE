@@ -23571,11 +23571,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/Add.vue */ "./resources/js/components/Add.vue");
 /* harmony import */ var _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Edit.vue */ "./resources/js/components/Edit.vue");
 /* harmony import */ var _components_Delete_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Delete.vue */ "./resources/js/components/Delete.vue");
-/* harmony import */ var _assets_js_buses_jquery_seat_charts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../assets/js/buses/jquery.seat-charts */ "./public/assets/js/buses/jquery.seat-charts.js");
-/* harmony import */ var _assets_js_buses_jquery_seat_charts__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_assets_js_buses_jquery_seat_charts__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _assets_js_buses_jquery_seat_charts_min__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../assets/js/buses/jquery.seat-charts.min */ "./public/assets/js/buses/jquery.seat-charts.min.js");
-/* harmony import */ var _assets_js_buses_jquery_seat_charts_min__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_assets_js_buses_jquery_seat_charts_min__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -23594,8 +23590,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "buses",
   components: {
@@ -23607,12 +23601,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       buses: [],
       fareClasses: [],
-      validationErrors: '',
-      records: '',
-      columns: '',
-      details: '',
-      formID: 'newBuses',
+      validationErrors: "",
+      records: "",
+      columns: "",
+      details: "",
+      formID: "newBuses",
       isShowDiv: false,
+      someArray: "",
       data: {
         busNumber: "",
         fare_class: "",
@@ -23641,7 +23636,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _this.callApi("post", '/buses');
+              return _this.callApi("post", "/buses");
 
             case 2:
               res = _context.sent;
@@ -23661,6 +23656,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
+    getBoxIndex: function getBoxIndex(rIndex) {
+      alert(rIndex);
+    },
     getFareClass: function () {
       var _getFareClass = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resFareClass;
@@ -23669,11 +23667,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return this.callApi("post", '/fare-class');
+                return this.callApi("post", "/fare-class");
 
               case 2:
                 resFareClass = _context2.sent;
-                console.log(resFareClass);
 
                 if (resFareClass.status === 200) {
                   this.fareClasses = resFareClass.data;
@@ -23681,7 +23678,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(res);
                 }
 
-              case 5:
+              case 4:
               case "end":
                 return _context2.stop();
             }
@@ -23711,104 +23708,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       if (vm.data.noOfRows === "0") {
         return this.errorsArray("Please Enter No. of Rows", "No.of Rows");
-      } else if (vm.data.noOfRows > "20") {
-        return this.errorsArray("Number of Rows is less then 20 ", "No.of Rows");
       } else {
-        var recalculateTotal = function recalculateTotal(sc) {
-          var total = 0; //basically find every selected seat and sum its price
+        var count = this.data.noOfRows * 5;
+        var someArray = ""; //   <a @click="getBoxIndex(rowIndex, colIndex)"><span id="counterBox" v-html="someArray"></span><img
+        //                             class="p-1"
+        //                             :src="$store.state.app_url+'assets/img/buses/available_seat_img.gif'" alt=""></a>
 
-          sc.find('selected').each(function () {
-            total += this.data().price;
-          });
-          return total;
-        };
-
-        this.isShowDiv = true;
-        var customMap = [];
-
-        for (var r = 0; r < parseInt(this.data.noOfRows); r++) {
-          customMap[r] = 'eeeee';
+        for (var i = 1; i <= count; i++) {
+          if (i % 5 === 0) {
+            someArray += "<li class=\" innerLi p-0 m-0\">\n                                                    <a onclick=\"getBoxIndex(".concat(i, ")\" class=\"innerAnchor\" >\n                                                        <span class=\"counterBox\"> ").concat(i, " </span>\n                                                        <img class=\"p-1 m-0\" src=\"http://127.0.0.1:8000/assets/img/buses/available_seat_img.gif\"  alt=\"\"/>\n                                                    </a>\n                                                </li>");
+          } else {
+            someArray += "<li class=\" innerLi p-0 m-0\">\n                                                    <a  onclick=\"getBoxIndex(".concat(i, ")\" class=\"innerAnchor\">\n                                                        <span class=\"counterBox\"> ").concat(i, " </span>\n                                                        <img class=\"p-1 m-0\" src=\"http://127.0.0.1:8000/assets/img/buses/available_seat_img.gif\"  alt=\"\"/>\n                                                    </a>\n                                                </li>");
+          }
         }
 
-        var firstSeatLabel = 1;
-        var $cart = $('#selected-seats'),
-            $counter = $('#counter'),
-            $total = $('#total'),
-            sc = $('#seat-map').seatCharts({
-          map: customMap
-          /*[
-          'fefff',
-          'ff_ff',
-          'ee_ee',
-          'ee_ee',
-          'ee_ee',
-          'ee_ee',
-          'ee_ee',
-          'ee_ee',
-          'eeeee',
-          'eeeee',
-          'eeeee',
-          'eeeee',
-          ]*/
-          ,
-          seats: {
-            f: {
-              price: 100,
-              classes: 'first-class',
-              //your custom CSS class
-              category: 'First Class'
-            },
-            e: {
-              price: 40,
-              classes: 'economy-class',
-              //your custom CSS class
-              category: 'Economy Class'
-            }
-          },
-          naming: {
-            top: false,
-            getLabel: function getLabel(character, row, column) {
-              return firstSeatLabel++;
-            }
-          },
-          legend: {
-            node: $('#legend'),
-            items: [// ['f', 'available', 'First Class'],
-              // ['e', 'available', 'Economy Class'],
-              // ['f', 'unavailable', 'Already Booked']
-            ]
-          },
-          click: function click() {
-            if (this.status() === 'available') {
-              //let's create a new <li> which we'll add to the cart items
-              $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>$' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>').attr('id', 'cart-item-' + this.settings.id).data('seatId', this.settings.id).appendTo($cart);
-              $counter.text(sc.find('selected').length + 1);
-              $total.text(recalculateTotal(sc) + this.data().price);
-              return 'selected';
-            } else if (this.status() === 'selected') {
-              //update the counter
-              $counter.text(sc.find('selected').length - 1); //and total
-
-              $total.text(recalculateTotal(sc) - this.data().price); //remove the item from our cart
-
-              $('#cart-item-' + this.settings.id).remove(); //seat has been vacated
-
-              return 'available';
-            } else if (this.status() == 'unavailable') {
-              //seat has been already booked
-              return 'unavailable';
-            } else {
-              return this.style();
-            }
-          }
-        }); //this will handle "[cancel]" link clicks
-
-        $('#selected-seats').on('click', '.cancel-cart-item', function () {
-          //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
-          sc.get($(this).parents('li:first').data('seatId')).click();
-        }); //let's pretend some seats have already been booked
-
-        sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
+        this.someArray = someArray;
+        this.isShowDiv = true;
       }
     },
     addBuses: function addBuses() {
@@ -23880,7 +23795,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 15:
                 _context3.next = 17;
-                return _this2.callApi("post", '/buses/store', _this2.data);
+                return _this2.callApi("post", "/buses/store", _this2.data);
 
               case 17:
                 res = _context3.sent;
@@ -23889,6 +23804,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this2.success = "Bus Created Successfully";
                   setTimeout(function () {
                     window.location.reload();
+                    _this2.isShowDiv = false;
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -23936,7 +23852,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 3:
                 _context4.next = 5;
-                return _this3.callApi("post", '/city/update', _this3.dataEdit);
+                return _this3.callApi("post", "/city/update", _this3.dataEdit);
 
               case 5:
                 res = _context4.sent;
@@ -23948,7 +23864,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this3.success = "City Updated Successfully";
                 _context4.next = 10;
-                return _this3.callApi("post", '/city');
+                return _this3.callApi("post", "/city");
 
               case 10:
                 _res = _context4.sent;
@@ -24011,7 +23927,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     }
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(['getDeletingObj'])),
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["getDeletingObj"])),
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
@@ -25986,6 +25902,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
+var _name$components$data;
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -26002,7 +25920,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_name$components$data = {
   name: "RoutePage",
   components: {
     Add: _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -26041,22 +25959,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   created: function created() {
     this.fetchCities();
   },
+  computed: {},
   methods: {
     fareClassValue: function fareClassValue(data, className) {
-      var header = className;
       var dataTwo = data;
       var converted = Object.keys(dataTwo);
       var new_name = '';
       converted.forEach(function (element, i) {
-        header.forEach(function (el) {
-          console.log(el.name + '_fare' == element);
-
-          if (el.name + '_fare' == element) {
-            new_name = dataTwo[element];
-          }
-        });
+        if (className + '_fare' == element) {
+          new_name = dataTwo[element];
+        }
       });
-      console.log(new_name);
+      return new_name ? new_name + ' PKR' : 'N/A';
     },
     addRoute: function addRoute() {
       var _this = this;
@@ -26313,20 +26227,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
       this.$store.commit("setDeleteObj", deletingObj);
     }
-  },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["getDeletingObj"])), {}, {
-    heading: function heading() {
-      return from.name + "<i class='fa fa-user'></i>" + to.name;
-    }
-  }),
-  watch: {
-    getDeletingObj: function getDeletingObj(obj) {
-      if (obj.isDeleted) {
-        this.terminals.splice(obj.index, 1);
-      }
+  }
+}, _defineProperty(_name$components$data, "computed", _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["getDeletingObj"])), {}, {
+  heading: function heading() {
+    return from.name + "<i class='fa fa-user'></i>" + to.name;
+  }
+})), _defineProperty(_name$components$data, "watch", {
+  getDeletingObj: function getDeletingObj(obj) {
+    if (obj.isDeleted) {
+      this.terminals.splice(obj.index, 1);
     }
   }
-});
+}), _name$components$data);
 
 /***/ }),
 
@@ -29521,20 +29433,31 @@ var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_47 = {
-  "class": "form-group col-md-4 my-4"
+  "class": "form-group col-md-4 my-4 pt-2"
 };
 var _hoisted_48 = {
   key: 0,
-  "class": "row mx-3"
+  "class": "row mx-3 mainRow"
 };
 var _hoisted_49 = {
-  "class": "form-group col-md-5 border mx-1 py-3"
+  "class": "form-group col-md-5 border colLeft mx-1 py-3"
 };
-var _hoisted_50 = ["src"];
-var _hoisted_51 = {
-  "class": "form-group col-md-5 border mx-1 py-3"
+var _hoisted_50 = {
+  "class": "multiple_columns",
+  style: {
+    "list-style": "none"
+  }
 };
-var _hoisted_52 = ["src"];
+var _hoisted_51 = ["innerHTML"];
+
+var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "form-group col-md-5 border mx-1 py-3"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <tr v-for=\"(record, rowIndex) in parseInt(data.noOfRows)\" :key=\"rowIndex\">\n                                        <td class=\"m-5\" v-for=\"(col, colIndex) in parseInt(5)\" :key=\"colIndex\">\n\n                                        </td>\n                                    </tr> ")], -1
+  /* HOISTED */
+  );
+});
+
 var _hoisted_53 = {
   "class": "row"
 };
@@ -29711,49 +29634,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[13] || (_cache[13] = function () {
           return $options.generateMap && $options.generateMap.apply($options, arguments);
         })
-      }, "Generate Seat Map ")])]), $data.isShowDiv ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(parseInt($data.data.noOfRows), function (record, rowIndex) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-          key: rowIndex
-        }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(parseInt(5), function (col, colIndex) {
-          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
-            "class": "m-5",
-            key: colIndex
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-            src: _ctx.$store.state.app_url + 'assets/img/buses/available_seat_img.gif',
-            alt: ""
-          }, null, 8
-          /* PROPS */
-          , _hoisted_50)]);
-        }), 128
-        /* KEYED_FRAGMENT */
-        ))]);
-      }), 128
-      /* KEYED_FRAGMENT */
-      ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(parseInt($data.data.noOfRows), function (record, rowIndex) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-          key: rowIndex
-        }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(parseInt(5), function (col, colIndex) {
-          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
-            "class": "m-5",
-            key: colIndex
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-            src: _ctx.$store.state.app_url + 'assets/img/buses/available_seat_img.gif',
-            alt: ""
-          }, null, 8
-          /* PROPS */
-          , _hoisted_52)]);
-        }), 128
-        /* KEYED_FRAGMENT */
-        ))]);
-      }), 128
-      /* KEYED_FRAGMENT */
-      ))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      }, " Generate Seat Map ")])]), $data.isShowDiv ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        id: "innerSpan",
+        innerHTML: $data.someArray
+      }, null, 8
+      /* PROPS */
+      , _hoisted_51)])]), _hoisted_52])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-block btn-success",
         onClick: _cache[14] || (_cache[14] = function () {
           return $options.addBuses && $options.addBuses.apply($options, arguments);
         })
-      }, "Add Bus ")])])];
+      }, " Add Bus ")])])];
     }),
     _: 1
     /* STABLE */
@@ -29782,7 +29674,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[16] || (_cache[16] = function () {
           return $options.update && $options.update.apply($options, arguments);
         })
-      }, "Update City")])];
+      }, " Update City ")])];
     }),
     _: 1
     /* STABLE */
@@ -32743,7 +32635,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.th, function (row, k) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
           key: k
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.fareClassValue(single, $data.th)), 1
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.fareClassValue(single, row.name)), 1
         /* TEXT */
         ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        <span v-if=\"single.includes(row.name +'_fare')\">N/A</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        {{single.includes(row.name +'_fare')}}")]);
       }), 128
@@ -34894,777 +34786,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     confirmationMessage: "Are You Sure You want To Delete This \"USER\" ???"
   })])]);
 }
-
-/***/ }),
-
-/***/ "./public/assets/js/buses/jquery.seat-charts.js":
-/*!******************************************************!*\
-  !*** ./public/assets/js/buses/jquery.seat-charts.js ***!
-  \******************************************************/
-/***/ (() => {
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-/*!
- * jQuery-Seat-Charts v1.1.5
- * https://github.com/mateuszmarkowski/jQuery-Seat-Charts
- *
- * Copyright 2013, 2016 Mateusz Markowski
- * Released under the MIT license
- */
-(function ($) {
-  //'use strict';	
-  $.fn.seatCharts = function (setup) {
-    //if there's seatCharts object associated with the current element, return it
-    if (this.data('seatCharts')) {
-      return this.data('seatCharts');
-    }
-
-    var fn = this,
-        seats = {},
-        seatIds = [],
-        legend,
-        settings = {
-      animate: false,
-      //requires jQuery UI
-      naming: {
-        top: true,
-        left: true,
-        getId: function getId(character, row, column) {
-          return row + '_' + column;
-        },
-        getLabel: function getLabel(character, row, column) {
-          return column;
-        }
-      },
-      legend: {
-        node: null,
-        items: []
-      },
-      click: function click() {
-        if (this.status() == 'available') {
-          return 'selected';
-        } else if (this.status() == 'selected') {
-          return 'available';
-        } else {
-          return this.style();
-        }
-      },
-      focus: function focus() {
-        if (this.status() == 'available') {
-          return 'focused';
-        } else {
-          return this.style();
-        }
-      },
-      blur: function blur() {
-        return this.status();
-      },
-      seats: {}
-    },
-        //seat will be basically a seat object which we'll when generating the map
-    seat = function (seatCharts, seatChartsSettings) {
-      return function (setup) {
-        var fn = this;
-        fn.settings = $.extend({
-          status: 'available',
-          //available, unavailable, selected
-          style: 'available',
-          //make sure there's an empty hash if user doesn't pass anything
-          data: seatChartsSettings.seats[setup.character] || {} //anything goes here?
-
-        }, setup);
-        fn.settings.$node = $('<div></div>');
-        fn.settings.$node.attr({
-          id: fn.settings.id,
-          role: 'checkbox',
-          'aria-checked': false,
-          focusable: true,
-          tabIndex: -1 //manual focus
-
-        }).text(fn.settings.label).addClass(['seatCharts-seat', 'seatCharts-cell', 'available'].concat( //let's merge custom user defined classes with standard JSC ones
-        fn.settings.classes, typeof seatChartsSettings.seats[fn.settings.character] == "undefined" ? [] : seatChartsSettings.seats[fn.settings.character].classes).join(' ')); //basically a wrapper function
-
-        fn.data = function () {
-          return fn.settings.data;
-        };
-
-        fn["char"] = function () {
-          return fn.settings.character;
-        };
-
-        fn.node = function () {
-          return fn.settings.$node;
-        };
-        /*
-         * Can either set or return status depending on arguments.
-         *
-         * If there's no argument, it will return the current style.
-         *
-         * If you pass an argument, it will update seat's style
-         */
-
-
-        fn.style = function () {
-          return arguments.length == 1 ? function (newStyle) {
-            var oldStyle = fn.settings.style; //if nothing changes, do nothing
-
-            if (newStyle == oldStyle) {
-              return oldStyle;
-            } //focused is a special style which is not associated with status
-
-
-            fn.settings.status = newStyle != 'focused' ? newStyle : fn.settings.status;
-            fn.settings.$node.attr('aria-checked', newStyle == 'selected'); //if user wants to animate status changes, let him do this
-
-            seatChartsSettings.animate ? fn.settings.$node.switchClass(oldStyle, newStyle, 200) : fn.settings.$node.removeClass(oldStyle).addClass(newStyle);
-            return fn.settings.style = newStyle;
-          }(arguments[0]) : fn.settings.style;
-        }; //either set or retrieve
-
-
-        fn.status = function () {
-          return fn.settings.status = arguments.length == 1 ? fn.style(arguments[0]) : fn.settings.status;
-        }; //using immediate function to convienietly get shortcut variables
-
-
-        (function (seatSettings, character, seat) {
-          //attach event handlers
-          $.each(['click', 'focus', 'blur'], function (index, callback) {
-            //we want to be able to call the functions for each seat object
-            fn[callback] = function () {
-              if (callback == 'focus') {
-                //if there's already a focused element, we have to remove focus from it first
-                if (seatCharts.attr('aria-activedescendant') !== undefined) {
-                  seats[seatCharts.attr('aria-activedescendant')].blur();
-                }
-
-                seatCharts.attr('aria-activedescendant', seat.settings.id);
-                seat.node().focus();
-              }
-              /*
-               * User can pass his own callback function, so we have to first check if it exists
-               * and if not, use our default callback.
-               *
-               * Each callback function is executed in the current seat context.
-               */
-
-
-              return fn.style(typeof seatSettings[character][callback] === 'function' ? seatSettings[character][callback].apply(seat) : seatChartsSettings[callback].apply(seat));
-            };
-          }); //the below will become seatSettings, character, seat thanks to the immediate function		
-        })(seatChartsSettings.seats, fn.settings.character, fn);
-
-        fn.node() //the first three mouse events are simple
-        .on('click', fn.click).on('mouseenter', fn.focus).on('mouseleave', fn.blur) //keydown requires quite a lot of logic, because we have to know where to move the focus
-        .on('keydown', function (seat, $seat) {
-          return function (e) {
-            var $newSeat; //everything depends on the pressed key
-
-            switch (e.which) {
-              //spacebar will just trigger the same event mouse click does
-              case 32:
-                e.preventDefault();
-                seat.click();
-                break;
-              //UP & DOWN
-
-              case 40:
-              case 38:
-                e.preventDefault();
-                /*
-                 * This is a recursive, immediate function which searches for the first "focusable" row.
-                 * 
-                 * We're using immediate function because we want a convenient access to some DOM elements
-                 * We're using recursion because sometimes we may hit an empty space rather than a seat.
-                 *
-                 */
-
-                $newSeat = function findAvailable($rows, $seats, $currentRow) {
-                  var $newRow; //let's determine which row should we move to
-
-                  if (!$rows.index($currentRow) && e.which == 38) {
-                    //if this is the first row and user has pressed up arrow, move to the last row
-                    $newRow = $rows.last();
-                  } else if ($rows.index($currentRow) == $rows.length - 1 && e.which == 40) {
-                    //if this is the last row and user has pressed down arrow, move to the first row
-                    $newRow = $rows.first();
-                  } else {
-                    //using eq to get an element at the desired index position
-                    $newRow = $rows.eq( //if up arrow, then decrement the index, if down increment it
-                    $rows.index($currentRow) + (e.which == 38 ? -1 : +1));
-                  } //now that we know the row, let's get the seat using the current column position
-
-
-                  $newSeat = $newRow.find('.seatCharts-seat,.seatCharts-space').eq($seats.index($seat)); //if the seat we found is a space, keep looking further
-
-                  return $newSeat.hasClass('seatCharts-space') ? findAvailable($rows, $seats, $newRow) : $newSeat;
-                }($seat //get a reference to the parent container and then select all rows but the header
-                .parents('.seatCharts-container').find('.seatCharts-row:not(.seatCharts-header)'), $seat //get a reference to the parent row and then find all seat cells (both seats & spaces)
-                .parents('.seatCharts-row:first').find('.seatCharts-seat,.seatCharts-space'), //get a reference to the current row
-                $seat.parents('.seatCharts-row:not(.seatCharts-header)')); //we couldn't determine the new seat, so we better give up
-
-
-                if (!$newSeat.length) {
-                  return;
-                } //remove focus from the old seat and put it on the new one
-
-
-                seat.blur();
-                seats[$newSeat.attr('id')].focus();
-                $newSeat.focus(); //update our "aria" reference with the new seat id
-
-                seatCharts.attr('aria-activedescendant', $newSeat.attr('id'));
-                break;
-              //LEFT & RIGHT
-
-              case 37:
-              case 39:
-                e.preventDefault();
-                /*
-                 * The logic here is slightly different from the one for up/down arrows.
-                 * User will be able to browse the whole map using just left/right arrow, because
-                 * it will move to the next row when we reach the right/left-most seat.
-                 */
-
-                $newSeat = function ($seats) {
-                  if (!$seats.index($seat) && e.which == 37) {
-                    //user has pressed left arrow and we're currently on the left-most seat
-                    return $seats.last();
-                  } else if ($seats.index($seat) == $seats.length - 1 && e.which == 39) {
-                    //user has pressed right arrow and we're currently on the right-most seat
-                    return $seats.first();
-                  } else {
-                    //simply move one seat left or right depending on the key
-                    return $seats.eq($seats.index($seat) + (e.which == 37 ? -1 : +1));
-                  }
-                }($seat.parents('.seatCharts-container:first').find('.seatCharts-seat:not(.seatCharts-space)'));
-
-                if (!$newSeat.length) {
-                  return;
-                } //handle focus
-
-
-                seat.blur();
-                seats[$newSeat.attr('id')].focus();
-                $newSeat.focus(); //update our "aria" reference with the new seat id
-
-                seatCharts.attr('aria-activedescendant', $newSeat.attr('id'));
-                break;
-
-              default:
-                break;
-            }
-          };
-        }(fn, fn.node())); //.appendTo(seatCharts.find('.' + row));
-      };
-    }(fn, settings);
-
-    fn.addClass('seatCharts-container'); //true -> deep copy!
-
-    $.extend(true, settings, setup); //Generate default row ids unless user passed his own
-
-    settings.naming.rows = settings.naming.rows || function (length) {
-      var rows = [];
-
-      for (var i = 1; i <= length; i++) {
-        rows.push(i);
-      }
-
-      return rows;
-    }(settings.map.length); //Generate default column ids unless user passed his own
-
-
-    settings.naming.columns = settings.naming.columns || function (length) {
-      var columns = [];
-
-      for (var i = 1; i <= length; i++) {
-        columns.push(i);
-      }
-
-      return columns;
-    }(settings.map[0].split('').length);
-
-    if (settings.naming.top) {
-      var $headerRow = $('<div></div>').addClass('seatCharts-row seatCharts-header');
-
-      if (settings.naming.left) {
-        $headerRow.append($('<div></div>').addClass('seatCharts-cell'));
-      }
-
-      $.each(settings.naming.columns, function (index, value) {
-        $headerRow.append($('<div></div>').addClass('seatCharts-cell').text(value));
-      });
-    }
-
-    fn.append($headerRow); //do this for each map row
-
-    $.each(settings.map, function (row, characters) {
-      var $row = $('<div></div>').addClass('seatCharts-row');
-
-      if (settings.naming.left) {
-        $row.append($('<div></div>').addClass('seatCharts-cell seatCharts-space').text(settings.naming.rows[row]));
-      }
-      /*
-       * Do this for each seat (letter)
-       *
-       * Now users will be able to pass custom ID and label which overwrite the one that seat would be assigned by getId and
-       * getLabel
-       *
-       * New format is like this:
-       * a[ID,label]a[ID]aaaaa
-       *
-       * So you can overwrite the ID or label (or both) even for just one seat.
-       * Basically ID should be first, so if you want to overwrite just label write it as follows:
-       * a[,LABEL]
-       *
-       * Allowed characters in IDs areL 0-9, a-z, A-Z, _
-       * Allowed characters in labels are: 0-9, a-z, A-Z, _, ' ' (space)
-       *
-       */
-
-
-      $.each(characters.match(/[a-z_]{1}(\[[0-9a-z_]{0,}(,[0-9a-z_ ]+)?\])?/gi), function (column, characterParams) {
-        var matches = characterParams.match(/([a-z_]{1})(\[([0-9a-z_ ,]+)\])?/i),
-            //no matter if user specifies [] params, the character should be in the second element
-        character = matches[1],
-            //check if user has passed some additional params to override id or label
-        params = typeof matches[3] !== 'undefined' ? matches[3].split(',') : [],
-            //id param should be first
-        overrideId = params.length ? params[0] : null,
-            //label param should be second
-        overrideLabel = params.length === 2 ? params[1] : null;
-        $row.append(character != '_' ? //if the character is not an underscore (empty space)
-        function (naming) {
-          //so users don't have to specify empty objects
-          settings.seats[character] = character in settings.seats ? settings.seats[character] : {};
-          var id = overrideId ? overrideId : naming.getId(character, naming.rows[row], naming.columns[column]);
-          seats[id] = new seat({
-            id: id,
-            label: overrideLabel ? overrideLabel : naming.getLabel(character, naming.rows[row], naming.columns[column]),
-            row: row,
-            column: column,
-            character: character
-          });
-          seatIds.push(id);
-          return seats[id].node();
-        }(settings.naming) : //this is just an empty space (_)
-        $('<div></div>').addClass('seatCharts-cell seatCharts-space'));
-      });
-      fn.append($row);
-    }); //if there're any legend items to be rendered
-
-    settings.legend.items.length ? function (legend) {
-      //either use user-defined container or create our own and insert it right after the seat chart div
-      var $container = (legend.node || $('<div></div>').insertAfter(fn)).addClass('seatCharts-legend');
-      var $ul = $('<ul></ul>').addClass('seatCharts-legendList').appendTo($container);
-      $.each(legend.items, function (index, item) {
-        $ul.append($('<li></li>').addClass('seatCharts-legendItem').append($('<div></div>') //merge user defined classes with our standard ones
-        .addClass(['seatCharts-seat', 'seatCharts-cell', item[1]].concat(settings.classes, typeof settings.seats[item[0]] == "undefined" ? [] : settings.seats[item[0]].classes).join(' '))).append($('<span></span>').addClass('seatCharts-legendDescription').text(item[2])));
-      });
-      return $container;
-    }(settings.legend) : null;
-    fn.attr({
-      tabIndex: 0
-    }); //when container's focused, move focus to the first seat
-
-    fn.focus(function () {
-      if (fn.attr('aria-activedescendant')) {
-        seats[fn.attr('aria-activedescendant')].blur();
-      }
-
-      fn.find('.seatCharts-seat:not(.seatCharts-space):first').focus();
-      seats[seatIds[0]].focus();
-    }); //public methods of seatCharts
-
-    fn.data('seatCharts', {
-      seats: seats,
-      seatIds: seatIds,
-      //set for one, set for many, get for one
-      status: function status() {
-        var fn = this;
-        return arguments.length == 1 ? fn.seats[arguments[0]].status() : function (seatsIds, newStatus) {
-          return typeof seatsIds == 'string' ? fn.seats[seatsIds].status(newStatus) : function () {
-            $.each(seatsIds, function (index, seatId) {
-              fn.seats[seatId].status(newStatus);
-            });
-          }();
-        }(arguments[0], arguments[1]);
-      },
-      each: function each(callback) {
-        var fn = this;
-
-        for (var seatId in fn.seats) {
-          if (false === callback.call(fn.seats[seatId], seatId)) {
-            return seatId; //return last checked
-          }
-        }
-
-        return true;
-      },
-      node: function node() {
-        var fn = this; //basically create a CSS query to get all seats by their DOM ids
-
-        return $('#' + fn.seatIds.join(',#'));
-      },
-      find: function find(query) {
-        //D, a.available, unavailable
-        var fn = this;
-        var seatSet = fn.set(); //is RegExp
-
-        return query instanceof RegExp ? function () {
-          fn.each(function (id) {
-            if (id.match(query)) {
-              seatSet.push(id, this);
-            }
-          });
-          return seatSet;
-        }() : query.length == 1 ? function (character) {
-          //user searches just for a particual character
-          fn.each(function () {
-            if (this["char"]() == character) {
-              seatSet.push(this.settings.id, this);
-            }
-          });
-          return seatSet;
-        }(query) : function () {
-          //user runs a more sophisticated query, so let's see if there's a dot
-          return query.indexOf('.') > -1 ? function () {
-            //there's a dot which separates character and the status
-            var parts = query.split('.');
-            fn.each(function (seatId) {
-              if (this["char"]() == parts[0] && this.status() == parts[1]) {
-                seatSet.push(this.settings.id, this);
-              }
-            });
-            return seatSet;
-          }() : function () {
-            fn.each(function () {
-              if (this.status() == query) {
-                seatSet.push(this.settings.id, this);
-              }
-            });
-            return seatSet;
-          }();
-        }();
-      },
-      set: function _set() {
-        //inherits some methods
-        var fn = this;
-        return {
-          seats: [],
-          seatIds: [],
-          length: 0,
-          status: function status() {
-            var args = arguments,
-                that = this; //if there's just one seat in the set and user didn't pass any params, return current status
-
-            return this.length == 1 && args.length == 0 ? this.seats[0].status() : function () {
-              //otherwise call status function for each of the seats in the set
-              $.each(that.seats, function () {
-                this.status.apply(this, args);
-              });
-            }();
-          },
-          node: function node() {
-            return fn.node.call(this);
-          },
-          each: function each() {
-            return fn.each.call(this, arguments[0]);
-          },
-          get: function get() {
-            return fn.get.call(this, arguments[0]);
-          },
-          find: function find() {
-            return fn.find.call(this, arguments[0]);
-          },
-          set: function set() {
-            return _set.call(fn);
-          },
-          push: function push(id, seat) {
-            this.seats.push(seat);
-            this.seatIds.push(id);
-            ++this.length;
-          }
-        };
-      },
-      //get one object or a set of objects
-      get: function get(seatsIds) {
-        var fn = this;
-        return typeof seatsIds == 'string' ? fn.seats[seatsIds] : function () {
-          var seatSet = fn.set();
-          $.each(seatsIds, function (index, seatId) {
-            if (_typeof(fn.seats[seatId]) === 'object') {
-              seatSet.push(seatId, fn.seats[seatId]);
-            }
-          });
-          return seatSet;
-        }();
-      }
-    });
-    return fn.data('seatCharts');
-  };
-})(jQuery);
-
-/***/ }),
-
-/***/ "./public/assets/js/buses/jquery.seat-charts.min.js":
-/*!**********************************************************!*\
-  !*** ./public/assets/js/buses/jquery.seat-charts.min.js ***!
-  \**********************************************************/
-/***/ (() => {
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-/*!
- * jQuery-Seat-Charts v1.1.5
- * https://github.com/mateuszmarkowski/jQuery-Seat-Charts
- *
- * Copyright 2013, 2016 Mateusz Markowski
- * Released under the MIT license
- */
-!function (t) {
-  t.fn.seatCharts = function (s) {
-    if (this.data("seatCharts")) return this.data("seatCharts");
-
-    var e = this,
-        a = {},
-        n = [],
-        i = {
-      animate: !1,
-      naming: {
-        top: !0,
-        left: !0,
-        getId: function getId(t, s, e) {
-          return s + "_" + e;
-        },
-        getLabel: function getLabel(t, s, e) {
-          return e;
-        }
-      },
-      legend: {
-        node: null,
-        items: []
-      },
-      click: function click() {
-        return "available" == this.status() ? "selected" : "selected" == this.status() ? "available" : this.style();
-      },
-      focus: function focus() {
-        return "available" == this.status() ? "focused" : this.style();
-      },
-      blur: function blur() {
-        return this.status();
-      },
-      seats: {}
-    },
-        r = function (s, e) {
-      return function (n) {
-        var i = this;
-        i.settings = t.extend({
-          status: "available",
-          style: "available",
-          data: e.seats[n.character] || {}
-        }, n), i.settings.$node = t("<div></div>"), i.settings.$node.attr({
-          id: i.settings.id,
-          role: "checkbox",
-          "aria-checked": !1,
-          focusable: !0,
-          tabIndex: -1
-        }).text(i.settings.label).addClass(["seatCharts-seat", "seatCharts-cell", "available"].concat(i.settings.classes, "undefined" == typeof e.seats[i.settings.character] ? [] : e.seats[i.settings.character].classes).join(" ")), i.data = function () {
-          return i.settings.data;
-        }, i["char"] = function () {
-          return i.settings.character;
-        }, i.node = function () {
-          return i.settings.$node;
-        }, i.style = function () {
-          return 1 == arguments.length ? function (t) {
-            var s = i.settings.style;
-            return t == s ? s : (i.settings.status = "focused" != t ? t : i.settings.status, i.settings.$node.attr("aria-checked", "selected" == t), e.animate ? i.settings.$node.switchClass(s, t, 200) : i.settings.$node.removeClass(s).addClass(t), i.settings.style = t);
-          }(arguments[0]) : i.settings.style;
-        }, i.status = function () {
-          return i.settings.status = 1 == arguments.length ? i.style(arguments[0]) : i.settings.status;
-        }, function (n, r, c) {
-          t.each(["click", "focus", "blur"], function (t, u) {
-            i[u] = function () {
-              return "focus" == u && (void 0 !== s.attr("aria-activedescendant") && a[s.attr("aria-activedescendant")].blur(), s.attr("aria-activedescendant", c.settings.id), c.node().focus()), i.style("function" == typeof n[r][u] ? n[r][u].apply(c) : e[u].apply(c));
-            };
-          });
-        }(e.seats, i.settings.character, i), i.node().on("click", i.click).on("mouseenter", i.focus).on("mouseleave", i.blur).on("keydown", function (t, e) {
-          return function (n) {
-            var i;
-
-            switch (n.which) {
-              case 32:
-                n.preventDefault(), t.click();
-                break;
-
-              case 40:
-              case 38:
-                if (n.preventDefault(), i = function r(t, s, a) {
-                  var c;
-                  return c = t.index(a) || 38 != n.which ? t.index(a) == t.length - 1 && 40 == n.which ? t.first() : t.eq(t.index(a) + (38 == n.which ? -1 : 1)) : t.last(), i = c.find(".seatCharts-seat,.seatCharts-space").eq(s.index(e)), i.hasClass("seatCharts-space") ? r(t, s, c) : i;
-                }(e.parents(".seatCharts-container").find(".seatCharts-row:not(.seatCharts-header)"), e.parents(".seatCharts-row:first").find(".seatCharts-seat,.seatCharts-space"), e.parents(".seatCharts-row:not(.seatCharts-header)")), !i.length) return;
-                t.blur(), a[i.attr("id")].focus(), i.focus(), s.attr("aria-activedescendant", i.attr("id"));
-                break;
-
-              case 37:
-              case 39:
-                if (n.preventDefault(), i = function (t) {
-                  return t.index(e) || 37 != n.which ? t.index(e) == t.length - 1 && 39 == n.which ? t.first() : t.eq(t.index(e) + (37 == n.which ? -1 : 1)) : t.last();
-                }(e.parents(".seatCharts-container:first").find(".seatCharts-seat:not(.seatCharts-space)")), !i.length) return;
-                t.blur(), a[i.attr("id")].focus(), i.focus(), s.attr("aria-activedescendant", i.attr("id"));
-            }
-          };
-        }(i, i.node()));
-      };
-    }(e, i);
-
-    if (e.addClass("seatCharts-container"), t.extend(!0, i, s), i.naming.rows = i.naming.rows || function (t) {
-      for (var s = [], e = 1; t >= e; e++) {
-        s.push(e);
-      }
-
-      return s;
-    }(i.map.length), i.naming.columns = i.naming.columns || function (t) {
-      for (var s = [], e = 1; t >= e; e++) {
-        s.push(e);
-      }
-
-      return s;
-    }(i.map[0].split("").length), i.naming.top) {
-      var c = t("<div></div>").addClass("seatCharts-row seatCharts-header");
-      i.naming.left && c.append(t("<div></div>").addClass("seatCharts-cell")), t.each(i.naming.columns, function (s, e) {
-        c.append(t("<div></div>").addClass("seatCharts-cell").text(e));
-      });
-    }
-
-    return e.append(c), t.each(i.map, function (s, c) {
-      var u = t("<div></div>").addClass("seatCharts-row");
-      i.naming.left && u.append(t("<div></div>").addClass("seatCharts-cell seatCharts-space").text(i.naming.rows[s])), t.each(c.match(/[a-z_]{1}(\[[0-9a-z_]{0,}(,[0-9a-z_ ]+)?\])?/gi), function (e, c) {
-        var h = c.match(/([a-z_]{1})(\[([0-9a-z_ ,]+)\])?/i),
-            d = h[1],
-            o = "undefined" != typeof h[3] ? h[3].split(",") : [],
-            l = o.length ? o[0] : null,
-            f = 2 === o.length ? o[1] : null;
-        u.append("_" != d ? function (t) {
-          i.seats[d] = d in i.seats ? i.seats[d] : {};
-          var c = l ? l : t.getId(d, t.rows[s], t.columns[e]);
-          return a[c] = new r({
-            id: c,
-            label: f ? f : t.getLabel(d, t.rows[s], t.columns[e]),
-            row: s,
-            column: e,
-            character: d
-          }), n.push(c), a[c].node();
-        }(i.naming) : t("<div></div>").addClass("seatCharts-cell seatCharts-space"));
-      }), e.append(u);
-    }), i.legend.items.length ? function (s) {
-      var a = (s.node || t("<div></div>").insertAfter(e)).addClass("seatCharts-legend"),
-          n = t("<ul></ul>").addClass("seatCharts-legendList").appendTo(a);
-      return t.each(s.items, function (s, e) {
-        n.append(t("<li></li>").addClass("seatCharts-legendItem").append(t("<div></div>").addClass(["seatCharts-seat", "seatCharts-cell", e[1]].concat(i.classes, "undefined" == typeof i.seats[e[0]] ? [] : i.seats[e[0]].classes).join(" "))).append(t("<span></span>").addClass("seatCharts-legendDescription").text(e[2])));
-      }), a;
-    }(i.legend) : null, e.attr({
-      tabIndex: 0
-    }), e.focus(function () {
-      e.attr("aria-activedescendant") && a[e.attr("aria-activedescendant")].blur(), e.find(".seatCharts-seat:not(.seatCharts-space):first").focus(), a[n[0]].focus();
-    }), e.data("seatCharts", {
-      seats: a,
-      seatIds: n,
-      status: function status() {
-        var s = this;
-        return 1 == arguments.length ? s.seats[arguments[0]].status() : function (e, a) {
-          return "string" == typeof e ? s.seats[e].status(a) : function () {
-            t.each(e, function (t, e) {
-              s.seats[e].status(a);
-            });
-          }();
-        }(arguments[0], arguments[1]);
-      },
-      each: function each(t) {
-        var s = this;
-
-        for (var e in s.seats) {
-          if (!1 === t.call(s.seats[e], e)) return e;
-        }
-
-        return !0;
-      },
-      node: function node() {
-        var s = this;
-        return t("#" + s.seatIds.join(",#"));
-      },
-      find: function find(t) {
-        var s = this,
-            e = s.set();
-        return t instanceof RegExp ? function () {
-          return s.each(function (s) {
-            s.match(t) && e.push(s, this);
-          }), e;
-        }() : 1 == t.length ? function (t) {
-          return s.each(function () {
-            this["char"]() == t && e.push(this.settings.id, this);
-          }), e;
-        }(t) : function () {
-          return t.indexOf(".") > -1 ? function () {
-            var a = t.split(".");
-            return s.each(function (t) {
-              this["char"]() == a[0] && this.status() == a[1] && e.push(this.settings.id, this);
-            }), e;
-          }() : function () {
-            return s.each(function () {
-              this.status() == t && e.push(this.settings.id, this);
-            }), e;
-          }();
-        }();
-      },
-      set: function u() {
-        var s = this;
-        return {
-          seats: [],
-          seatIds: [],
-          length: 0,
-          status: function status() {
-            var s = arguments,
-                e = this;
-            return 1 == this.length && 0 == s.length ? this.seats[0].status() : function () {
-              t.each(e.seats, function () {
-                this.status.apply(this, s);
-              });
-            }();
-          },
-          node: function node() {
-            return s.node.call(this);
-          },
-          each: function each() {
-            return s.each.call(this, arguments[0]);
-          },
-          get: function get() {
-            return s.get.call(this, arguments[0]);
-          },
-          find: function find() {
-            return s.find.call(this, arguments[0]);
-          },
-          set: function set() {
-            return u.call(s);
-          },
-          push: function push(t, s) {
-            this.seats.push(s), this.seatIds.push(t), ++this.length;
-          }
-        };
-      },
-      get: function get(s) {
-        var e = this;
-        return "string" == typeof s ? e.seats[s] : function () {
-          var a = e.set();
-          return t.each(s, function (t, s) {
-            "object" == _typeof(e.seats[s]) && a.push(s, e.seats[s]);
-          }), a;
-        }();
-      }
-    }), e.data("seatCharts");
-  };
-}(jQuery);
 
 /***/ }),
 
@@ -41293,15 +40414,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_public_assets_css_buses_jquery_seat_charts_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! -!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../public/assets/css/buses/jquery.seat-charts.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./public/assets/css/buses/jquery.seat-charts.css");
 // Imports
 
-
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-___CSS_LOADER_EXPORT___.push([module.id, "@import url(http://www.jqueryscript.net/css/jquerysctipttop.css);"]);
-___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_public_assets_css_buses_jquery_seat_charts_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.front-indicator[data-v-203bacc3] {\r\n    width: 145px;\r\n    margin: 5px 32px 15px 32px;\r\n    background-color: #f6f6f6;\r\n    color: #adadad;\r\n    text-align: center;\r\n    padding: 3px;\r\n    border-radius: 5px;\n}\n.wrapper[data-v-203bacc3] {\r\n    width: 100%;\r\n    text-align: center;\r\n    margin-top: 150px;\n}\n.container[data-v-203bacc3] {\r\n    margin: 0 auto;\r\n    width: 500px;\r\n    text-align: left;\n}\n.booking-details[data-v-203bacc3] {\r\n    float: left;\r\n    text-align: left;\r\n    margin-left: 35px;\r\n    font-size: 12px;\r\n    position: relative;\r\n    height: 401px;\n}\n.booking-details h2[data-v-203bacc3] {\r\n    margin: 25px 0 20px 0;\r\n    font-size: 17px;\n}\n.booking-details h3[data-v-203bacc3] {\r\n    margin: 5px 5px 0 0;\r\n    font-size: 14px;\n}\ndiv.seatCharts-cell[data-v-203bacc3] {\r\n    color: #182C4E;\r\n    height: 25px;\r\n    width: 25px;\r\n    line-height: 25px;\n}\ndiv.seatCharts-seat[data-v-203bacc3] {\r\n    color: #FFFFFF;\r\n    cursor: pointer;\n}\ndiv.seatCharts-row[data-v-203bacc3] {\r\n    height: 35px;\n}\ndiv.seatCharts-seat.available[data-v-203bacc3] {\r\n    background-color: #B9DEA0;\n}\ndiv.seatCharts-seat.available.first-class[data-v-203bacc3] {\r\n    /* \tbackground: url(vip.png); */\r\n    background-color: #3a78c3;\n}\ndiv.seatCharts-seat.focused[data-v-203bacc3] {\r\n    background-color: #76B474;\n}\ndiv.seatCharts-seat.selected[data-v-203bacc3] {\r\n    background-color: #E6CAC4;\n}\ndiv.seatCharts-seat.unavailable[data-v-203bacc3] {\r\n    background-color: #472B34;\n}\ndiv.seatCharts-container[data-v-203bacc3] {\r\n    border-right: 1px dotted #adadad;\r\n    width: 200px;\r\n    padding: 20px;\r\n    float: left;\n}\ndiv.seatCharts-legend[data-v-203bacc3] {\r\n    padding-left: 0px;\r\n    position: absolute;\r\n    bottom: 16px;\n}\nul.seatCharts-legendList[data-v-203bacc3] {\r\n    padding-left: 0px;\n}\nspan.seatCharts-legendDescription[data-v-203bacc3] {\r\n    margin-left: 5px;\r\n    line-height: 30px;\n}\n.checkout-button[data-v-203bacc3] {\r\n    display: block;\r\n    margin: 10px 0;\r\n    font-size: 14px;\n}\n#selected-seats[data-v-203bacc3] {\r\n    max-height: 90px;\r\n    overflow-y: scroll;\r\n    overflow-x: none;\r\n    width: 170px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/*.mainRow .colLeft .multiple_columns #innerSpan .innerLi:hover {*/\n/*    cursor: pointer;*/\n/*    background-color: yellow;*/\n/*}*/\nul.multiple_columns[data-v-203bacc3], span#innerSpan li.innerLi  a.innerAnchor img[data-v-203bacc3]:hover {\n    cursor: pointer;\n    background-color: yellow;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -41446,30 +40563,6 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-57b22b22],\ntable *[data-v-57b22b22] {\n    font-size: 10px;\n}\n.modal-cell[data-v-57b22b22] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-57b22b22] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-57b22b22] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-57b22b22] {\n    width: 35%;\n}\n.fade-enter-active[data-v-57b22b22],\n.fade-leave-active[data-v-57b22b22] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-57b22b22], .fade-leave-to[data-v-57b22b22] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-57b22b22], tr[data-v-57b22b22], th[data-v-57b22b22], td[data-v-57b22b22], option[data-v-57b22b22], select[data-v-57b22b22], label[data-v-57b22b22], button[data-v-57b22b22], a[data-v-57b22b22], div[data-v-57b22b22], p[data-v-57b22b22] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-57b22b22] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./public/assets/css/buses/jquery.seat-charts.css":
-/*!**********************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./public/assets/css/buses/jquery.seat-charts.css ***!
-  \**********************************************************************************************************************/
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-// Imports
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, "div.seatCharts-container {\n\t/*min-width: 700px;*/\n}\ndiv.seatCharts-cell {\n\n\theight: 16px;\n\twidth: 16px;\n\tmargin: 3px;\n\tfloat: left;\n\ttext-align: center;\n\toutline: none;\n\tfont-size: 13px;\n\tline-height:16px;\n\tcolor: blue;\n\n}\ndiv.seatCharts-seat {\n\tbackground-color: green;\n\tcolor: white;\n\t-webkit-border-radius: 5px;\n\t-moz-border-radius: 5px;\n\tborder-radius: 5px;\n\tcursor: default;\n}\ndiv.seatCharts-seat:focus {\n\tborder: none;\n}\n/*\n.seatCharts-seat:focus {\n\toutline: none;\n}\n*/\n\ndiv.seatCharts-space {\n\tbackground-color: white;\n}\ndiv.seatCharts-row {\n\theight: 50px;\n}\n\ndiv.seatCharts-row:after {\n\tclear: both;\n}\n\ndiv.seatCharts-seat.selected {\n\tbackground-color: aqua;\n}\n\ndiv.seatCharts-seat.focused {\n\tbackground-color: #6db131;\n}\n\ndiv.seatCharts-seat.available {\n\tbackground-color: green;\n}\n\ndiv.seatCharts-seat.unavailable {\n\tbackground-color: red;\n\tcursor: not-allowed;\n}\n\nul.seatCharts-legendList {\n\tlist-style: none;\n}\nli.seatCharts-legendItem {\n\tmargin-top: 10px;\n\tline-height: 2;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

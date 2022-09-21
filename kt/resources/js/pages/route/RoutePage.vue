@@ -179,6 +179,7 @@
                                         <table class="table table-striped">
                                             <thead>
                                             <tr>
+                                              
                                                 <th>City From</th>
                                                 <th>City To</th>
                                                 <th v-for="(heading,i) in th" :key="i">
@@ -189,12 +190,13 @@
                                             <tbody>
                                             <template v-for="(item,j) in routeDetails" :key="j">
                                                 <tr v-for="(single, i) in item" :key="i">
+                                                    
                                                     <td> {{ single.departure_city }}</td>
                                                     <td> {{ single.destination_city }}</td>
                                                     <td v-for="(row, k) in th" :key="k">
                                                         {{
-                                                            fareClassValue(single, th)
-                                                        }}
+                                                            fareClassValue(single, row.name)
+                                                        }} 
 
 <!--                                                        <span v-if="single.includes(row.name +'_fare')">N/A</span>-->
 <!--                                                        {{single.includes(row.name +'_fare')}}-->
@@ -276,23 +278,20 @@ export default {
     created() {
         this.fetchCities();
     },
+    computed : {
+
+    },
     methods: {
         fareClassValue( data , className){
-            const header = className;
             const dataTwo = data;
             const converted = Object.keys(dataTwo)
             let new_name = '';
             converted.forEach((element , i) => {
-                header.forEach( el => {
-                    console.log( el.name + '_fare' == element)
-
-                    if( el.name + '_fare' == element){
-
-                        new_name = dataTwo[element];
-                    }
-                })
+                if( className + '_fare' == element ){
+                    new_name = dataTwo[element];
+                }
             });
-            console.log(new_name);
+            return new_name ? new_name + ' PKR' : 'N/A';
         },
         async addRoute() {
             const data = {
