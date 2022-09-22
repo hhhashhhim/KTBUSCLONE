@@ -43,12 +43,12 @@
                                                     <tr v-for="(terminal, i) in terminals" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ terminal.name }}</td>
-                                                        <td>{{ terminal.terminal.length }}</td>
+                                                        <td>{{ terminal.terminal_count }}</td>
                                                         <td>
                                                             <a
                                                                 href="#detail-modal"
                                                                 data-toggle="modal"
-                                                                @click="terminalDetail(terminal)"
+                                                                @click="terminalDetail(terminal.id)"
                                                                 class=" btn btn-info mx-2"
                                                             >
                                                                 <i class="far fa-eye"></i>
@@ -395,7 +395,6 @@ export default {
         this.cities = cities.data;
         setTimeout(() => {
             $("#edit_loc").DataTable();
-            $("#show_terminal").DataTable();
         }, 500);
 
     },
@@ -433,7 +432,6 @@ export default {
                 this.data = "";
                 setTimeout(() => {
                     this.success = "";
-
                     // $("#add-modal").modal("hide")
                     window.location.reload();
                 }, 2000);
@@ -457,13 +455,13 @@ export default {
             const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
             this.roles = roleRes.data;
         },
-         terminalDetail(terminal) {
-             console.log()
-            this.terminalsDetails = terminal;
-            setTimeout(() => {
-                $("#show_terminal").DataTable();
-            }, 500);
-        },
+         async terminalDetail(id) {
+             const getTerminalRes = await this.callApi("post", "/terminal/getTerminal", {id: id});
+             this.terminalsDetails = getTerminalRes.data;
+             setTimeout(() => {
+                 $("#show_terminal").DataTable();
+             }, 500);
+         },
         async update() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")

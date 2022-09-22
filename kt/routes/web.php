@@ -65,6 +65,7 @@ Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
 });
 Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
     Route::post('/',[TerminalController::class,'index']);
+    Route::post('/getTerminal',[TerminalController::class,'getTerminal']);
     Route::post('store',[TerminalController::class,'store']);
     Route::post('update',[TerminalController::class,'update']);
     Route::post('delete',[TerminalController::class,'delete']);

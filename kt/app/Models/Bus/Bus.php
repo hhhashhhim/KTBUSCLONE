@@ -10,6 +10,11 @@ class Bus extends Model
 {
     use HasFactory, softDeletes;
 
+    protected $casts = [
+        'seat_map' => 'array'
+    ];
+
     protected $guarded = [];
+
 
 }

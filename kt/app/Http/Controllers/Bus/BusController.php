@@ -12,12 +12,11 @@ class BusController extends Controller
 {
     public function index()
     {
-        return Bus::orderBy('id')->select('bus_number', 'chassis_number', 'insurance_number', 'no_of_seats', 'route_permit_number', 'added_by', 'updated_by', 'created_at')->get();
+        return Bus::orderBy('id')->get();
     }
 
     public function storeBus(Request $request)
     {
-        dd($request->all());
         $rules = [
             'busNumber' => 'required',
             'fare_class' => 'required|integer',
@@ -25,7 +24,7 @@ class BusController extends Controller
             'insuranceNumber' => 'required',
             'noOfSeats' => 'required',
             'routePermit' => 'required',
-            'noOfRows' => 'required|integer|min:0',
+            'noOfRows' => 'required|integer',
         ];
 
         $customMessages = [
@@ -36,7 +35,6 @@ class BusController extends Controller
             'noOfSeats.required' => 'Number Of Seats is Required!',
             'routePermit.required' => 'Route Permit is Required!',
             'noOfRows.required' => 'No of Rows of Bus  is Required!',
-            'noOfRows.min' => 'Default Value is 0 ',
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::create([
@@ -46,7 +44,7 @@ class BusController extends Controller
             'no_of_seats' => $request->noOfSeats,
             'route_permit_number' => $request->routePermit,
             'fare_class_id' => $request->fare_class,
-            'seat_map' => null,
+            'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
             'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
@@ -56,25 +54,35 @@ class BusController extends Controller
     public function updateBus(Request $request)
     {
         $rules = [
-            'dept_date' => 'required|date',
-            'dest_date' => 'required|date',
-            'trip_duration' => 'required|date_format:H:i',
-            'dept_time' => 'required|date_format:H:i',
+            'bus_number' => 'required',
+            'fare_class_id' => 'required|integer',
+            'chassis_number' => 'required',
+            'insurance_number' => 'required',
+            'no_of_seats' => 'required',
+            'route_permit_number' => 'required',
+            'no_of_rows' => 'required|integer',
         ];
 
         $customMessages = [
-            'dept_date.required' => 'From Date is Required!',
-            'dest_date.required' => 'To Date is Required!',
-            'dept_time.required' => 'Departure Time is Required',
-            'trip_duration.required' => 'Trip Duration is Required',
+            'bus_number.required' => 'Bus Number is Required!',
+            'fare_class_id.required' => 'Fare Class is Required!',
+            'chassis_number.required' => 'Chassis Number is Required!',
+            'insurance_number.required' => 'Insurance Number is Required!',
+            'no_of_seats.required' => 'Number Of Seats is Required!',
+            'route_permit_number.required' => 'Route Permit is Required!',
+            'no_of_rows.required' => 'No of Rows of Bus  is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::where('id', $request->id)->update([
-            'departure_date' => $request->dept_date,
-            'departure_time' => $request->dept_time,
-            'destination_date' => $request->dest_date,
-            'destination_time' => $request->trip_duration,
-            'trip_duration' => $request->trip_duration,
+            'bus_number' => $request->bus_number,
+            'chassis_number' => $request->chassis_number,
+            'insurance_number' => $request->insurance_number,
+            'no_of_seats' => $request->no_of_seats,
+            'route_permit_number' => $request->route_permit_number,
+            'fare_class_id' => $request->fare_class_id,
+            'seat_map' => $request->seat_map,
+            'no_of_rows' => $request->no_of_rows,
+            'company_id' => Auth::user()->company_id,
             'updated_by' => Auth::user()->id,
         ]);
     }

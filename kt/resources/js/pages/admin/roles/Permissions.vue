@@ -25,7 +25,7 @@
                           </button>
                           {{ success }}
                       </div>
-                      
+
                       <div class="table-responsive">
                         <table
                           class="table table-striped table-hover"
@@ -90,7 +90,8 @@ export default {
     if (res.status == 200) {
       this.role = res.data;
       this.permissions = {
-        ...this.permissions,...this.role.permissions
+        ...this.permissions,
+          ...this.role.permissions
       };
     } else {
       console.log(res);
@@ -119,22 +120,5 @@ export default {
       }
     }
   },
-
 };
-// [
-//         {
-//           name: "roles",
-//           create: false,
-//           read: false,
-//           update: false,
-//           delete: false,
-//         },
-//         {
-//           name: "users",
-//           create: false,
-//           read: false,
-//           update: false,
-//           delete: false,
-//         },
-//       ]
 </script>

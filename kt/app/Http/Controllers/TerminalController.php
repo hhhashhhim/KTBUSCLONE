@@ -23,7 +23,11 @@ class TerminalController extends Controller
     }
     public function index()
     {
-        return City::with('terminal')->where('company_id', Auth::user()->company_id)->get();
+        return City::withCount('terminal')->where('company_id', Auth::user()->company_id)->get();
+    }
+    public function getTerminal(Request $request)
+    {
+        return Terminal::where('city_id', $request->id)->get();
     }
     public function store(Request $request)
     {
