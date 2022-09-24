@@ -301,7 +301,7 @@
                                                             <td><a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
-                                                                @click="edit(single)"
+                                                                @click="editTerminal(single)"
                                                                 class="btn btn-warning mx-2"
                                                             >
                                                                 <i class="far fa-edit"></i>
@@ -448,7 +448,8 @@ export default {
                 }
             }
         },
-        async edit(single) {
+        async editTerminal(single) {
+            console.log(single);
             this.dataEdit = single;
             this.dataEdit.role = single.role_id;
             console.log(this.dataEdit.role);
