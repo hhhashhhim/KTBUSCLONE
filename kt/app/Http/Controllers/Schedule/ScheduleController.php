@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Schedule;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
+use App\Models\Route\Route;
+use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
+use App\Models\Terminal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +35,6 @@ class ScheduleController extends Controller
         $date_arr = explode("T", $request->dept_date_time);
         $trip_arr = explode(":", $request->trip_duration);
         $trp = isset($trip_arr[0]) ? Carbon::parse($request->dept_date_time)->addHour($trip_arr[0])->format('Y-m-d') : $date_arr[0];
-        dd(isset($trip_arr[0]), isset($trip_arr[1]));
         return Schedule::create([
             'departure_date' => $date_arr[0],
             'departure_time' => $date_arr[1],
@@ -70,5 +73,29 @@ class ScheduleController extends Controller
     public function deleteSchedule(Request $request)
     {
         return Schedule::find($request->id)->delete();
+    }
+
+    public function getRoutes()
+    {
+        return Route::get();
+    }
+
+    public function getCity(Request $request)
+    {
+        $routeFares = RouteFare::where('route_id', $request->id)->select('departure_city_id', 'destination_city_id')->get();
+        $data = [];
+        foreach ($routeFares as $i => $routeFare) {
+            if ($i == 0) {
+                $data[] = $routeFare->departure_city_id;
+            }
+            $data[] = $routeFare->destination_city_id;
+        }
+        $data = collect($data)->unique();
+        return City::whereIn('id', $data)->get();
+    }
+
+    public function getTerminal(Request $request)
+    {
+        return Terminal::where('city_id', $request->id)->select('id', 'name')->get();
     }
 }

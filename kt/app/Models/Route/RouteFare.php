@@ -26,6 +26,7 @@ class RouteFare extends Model
         return $this->hasOne( Route::class,'id','route_id');
     }
 
+
     public function city_from(){
         return $this->belongsTo(City::class, 'departure_city_id',  'id');
     }

@@ -12,6 +12,7 @@
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
                                     class="btn btn-primary"
+                                    @click="getData()"
                                 >
                                     Add Schedule
                                 </a>
@@ -100,29 +101,149 @@
                 :heading="'ADD NEW SCHEDULE'"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
-            >
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">Departure Date Time</label>
-                        <input type="datetime-local" class="form-control" v-model="DepartureDateTime"/>
+                :formID="formID">
+
+                <div class="row mb-3">
+                    <div class="col-md-3 text-center" :class="activeSection!=0?'':'border p-3  text-light bg-primary'">
+                        Step 1
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">Trip Duration</label>
-                        <input type="text" class="form-control" placeholder="Trip Duration must be in Hours(H:m)" v-model="TripDuration">
+                    <div class="col-md-3 text-center"
+                         :class="activeSection!='step1'?'':'border p-3  text-light bg-info'">Step 2
                     </div>
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="addSchedule"
-                        >
-                            Save Schedule
-                        </button>
+                    <div class="col-md-3 text-center"
+                         :class="activeSection!='step2'?'':'border p-3  text-light bg-success'">Step 3
+                    </div>
+                    <div class="col-md-3 text-center"
+                         :class="activeSection!='step3'?'':'border p-3  text-light bg-warning'">Step 4
                     </div>
                 </div>
-            </Add>
+                <section class="section1" :class="activeSection!=0?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-4 class form-group">
+                            <label for="DiscountName">Departure Date Time</label>
+                            <input type="datetime-local" class="form-control" v-model="data.DepartureDateTime"/>
+                        </div>
+                        <div class="col-md-4 class form-group">
+                            <label for="DiscountName">Destination Date Time</label>
+                            <input type="datetime-local" class="form-control" v-model="data.DestinationDateTime"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="DiscountName">Bus Type</label>
+                            <select  class="form-control" id="class" v-model="data.class"
+                            >
+                                <option value="" selected>Select Type</option>
+                                <option v-for="(type, i) in classes" :value="type.id" :key="i">
+                                    {{ type.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success step1 float-right" @click="nextSection('step1')">Next<i
+                                class="fas fa-arrow-right pr-1"></i></button>
+                        </div>
+                    </div>
+                </section>
 
+                <section class="section2" :class="activeSection!='step1'?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-4 class form-group">
+                            <label for="DiscountName">Routes</label>
+                            <select  class="form-control" id="route"
+                                    @change="getSelectiveData($event , 'route')" v-model="data.route"
+                            >
+                                <option value="" selected>Select Route</option>
+                                <option v-for="(route, i) in routes" :value="route.id" :key="i">
+                                    {{ route.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 class form-group">
+                            <label for="DiscountName">City</label>
+                            <select  class="form-control" @change="getSelectiveData($event , 'city')"
+                                    id="city" v-model="data.city"
+                            >
+                                <option value="" selected>Select City</option>
+                                <option v-for="(city, i) in cities" :value="city.id" :key="i">
+                                    {{ city.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 class form-group">
+                            <label for="DiscountName">Terminal</label>
+                            <select  class="form-control" id="terminal" v-model="data.terminal">
+                                <option value="" selected>Select Terminal</option>
+                                <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">
+                                    {{ terminal.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-info back1 float-left" @click="previousSection(0)"><i
+                                class="fas fa-arrow-left mr-1"></i>Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success step2 float-right" @click="nextSection('step2')">Next<i
+                                class="fas fa-arrow-right mr-1"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section3" :class="activeSection!='step2'?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="DiscountName">Bus</label>
+                            <select  class="form-control" id="terminal" v-model="data.bus">
+                                <option value="" selected>Select bus</option>
+                                <option v-for="(terminal, i) in buses" :value="terminal.id" :key="i">
+                                    {{ terminal.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-info back2 float-left" @click="previousSection('step1')"><i
+                                class="fas fa-arrow-left mr-1"></i> Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success step2 float-right" @click="nextSection('step3')">Next<i
+                                class="fas fa-arrow-right mr-1"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section4" :class="activeSection!='step3'?'d-none':''">
+                    <div class="row my-3 py-2">
+                        <div class="col-md-12 text-center">
+                            <span class="h3 font-weight-bold text-muted"> Review </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-info back2 float-left" @click="previousSection('step2')"><i
+                                class="fas fa-arrow-left mr-1"></i> Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="submitFormButton" class=" btn btn-success float-right" @click="addSchedule">Save
+                                Schedule
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </Add>
 
             <!-- Add Modal End -->
             <!--            Edit Model-->
@@ -135,7 +256,7 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="DiscountName">From Date</label>
-                            <input type="date" class="form-control" v-model="dataEdit.departure_date"/>
+                        <input type="date" class="form-control" v-model="dataEdit.departure_date"/>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="PercentageName">To Date</label>
@@ -162,7 +283,7 @@
             </Edit>
             <!--            Edit MOdel End-->
             <Delete
-                confirmationMessage='Are You Sure You want To Delete This Discount ???'
+                confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
             />
 
         </div>
@@ -173,8 +294,6 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import { VueMaskFilter } from 'v-mask'
-
 import {mapGetters} from "vuex";
 
 export default {
@@ -183,17 +302,30 @@ export default {
         Add,
         Edit,
         Delete,
-        VueMaskFilter,
     },
     data() {
         return {
             schedules: [],
             formID: "addNewSchedule",
             validationErrors: [],
+            value:[],
             success: false,
             error: false,
-            DepartureDateTime: '',
+            routes: '',
+            cities: '',
+            terminals: '',
+            classes: '',
             TripDuration: '',
+            activeSection: 0,
+            data: {
+                DepartureDateTime: '',
+                DestinationDateTime: '',
+                route: '',
+                city: '',
+                terminal: '',
+                class: '',
+
+            },
             dataEdit: {
                 DepartureDate: '',
                 DestinationDate: '',
@@ -203,15 +335,44 @@ export default {
         };
     },
     async created() {
+
+
         const res = await this.callApi("post", '/schedule');
         if (res.status === 200) {
-            console.log(res.data);
             this.schedules = res.data
         } else {
             console.log(res);
         }
     },
+
+
     methods: {
+        async getSelectiveData(event, name) {
+            this.value = event.target.value;
+            if (name == 'route') {
+                const resRoute = await this.callApi("post", '/schedule/getCity', {id: this.data.route});
+                this.cities = resRoute.data;
+            }
+            if (name == 'city') {
+                const resCity = await this.callApi("post", '/schedule/getTerminal', {id: this.data.city});
+                // this.terminals = resCity.data;
+                console.log(resCity.data);
+            }
+        },
+        async getData() {
+            const resGetAllRoutes = await this.callApi("post", "/schedule/getRoute");
+            this.routes = resGetAllRoutes.data;
+
+            const resGetAllClasses = await this.callApi("post", "/fare-class");
+            this.classes = resGetAllClasses.data;
+        },
+        nextSection(nextBtn) {
+            this.activeSection = nextBtn
+        },
+        previousSection(prvBtn) {
+            this.activeSection = prvBtn;
+        },
+
         async addSchedule() {
             this.validationErrors = [];
             if (this.DepartureDateTime === "")
@@ -224,7 +385,7 @@ export default {
                 trip_duration: this.TripDuration,
             }
 
-            const res = await this.callApi("post", "/schedule/store", data);
+            const res = await this.callApi("post", "/schedule/store", this.data);
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Schedule Created Successfully";
                 setTimeout(function () {
@@ -272,7 +433,6 @@ export default {
             }
         },
         edit(schema) {
-            console.log(schema);
             this.dataEdit = schema;
         },
     },
@@ -290,50 +450,8 @@ export default {
         }
     }
 };
+
 </script>
 <style scoped>
-table,
-table * {
-    font-size: 10px;
-}
 
-.modal-cell {
-    padding: 0 !important;
-    position: relative;
-}
-
-.modal-cell .modal-btn {
-    height: 100%;
-    transition: 0.5s transform;
-}
-
-.modal-cell:hover .modal-btn {
-    position: absolute;
-    z-index: 20;
-    transform: scale(1.3) translateY(-20px);
-    box-shadow: 0px 0px 10px black;
-}
-
-.header-select {
-    width: 35%;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 1s;
-}
-
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
-    opacity: 0;
-}
-
-table, tr, th, td, option, select, label, button, a, div, p {
-    font-size: 14px !important;
-}
-
-.checkbox-inputs {
-    position: relative;
-    bottom: 10px;
-}
 </style>

@@ -419,7 +419,7 @@
                     </div>
                   </div>
                   <div class="row mx-3 mainRow" v-if="isShowDiv">
-                    <div class="form-group col-md-5 border mx-1 py-3">
+                    <div class="form-group col-md-5 border py-3">
                       <tr
                         class="seat-img p-0 m-0 s"
                         v-for="(record, rowIndex) in data.seatMap"
@@ -441,7 +441,7 @@
                         </td>
                       </tr>
                     </div>
-                    <div class="form-group col-md-5 border mx-1 py-3">
+                    <div class="form-group col-md-5 border py-3">
                       <tr
                         class="seat-img p-0 m-0"
                         v-for="(record, rowIndex) in data.seatMap"
@@ -463,6 +463,11 @@
                         </td>
                       </tr>
                     </div>
+                      <div class="class-md-2 form-group  ">
+                            <div class="btn selected-row border-dark border-2">
+                                    <span class="text-dark p-1">Selected</span>
+                            </div>
+                      </div>
                   </div>
                   <div class="row">
                     <div class="form-group col-md-12">

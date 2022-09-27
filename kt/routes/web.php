@@ -119,6 +119,9 @@ Route::group(['prefix'=>'schedule',[CustomMiddleware::class]],function(){
     Route::post('/store',[ScheduleController::class,'storeSchedule']);
     Route::post('/update',[ScheduleController::class,'updateSchedule']);
     Route::post('/delete',[ScheduleController::class,'deleteSchedule']);
+    Route::post('/getRoute',[ScheduleController::class,'getRoutes']);
+    Route::post('/getCity',[ScheduleController::class,'getCity']);
+    Route::post('/getTerminal',[ScheduleController::class,'getTerminal']);
 });
 Route::group(['prefix'=>'buses',[CustomMiddleware::class]],function(){
     Route::post('/',[BusController::class,'index']);

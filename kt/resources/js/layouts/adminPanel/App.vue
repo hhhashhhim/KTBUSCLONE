@@ -4,15 +4,15 @@
         <div class="main-wrapper main-wrapper-1" v-if="$store.state.user">
             <div class="navbar-bg"></div>
             <NavBar  v-if="$store.state.user.is_super_admin" />
-            <SideBar v-if="$store.state.user.is_super_admin" />          
+            <SideBar v-if="$store.state.user.is_super_admin" />
             <CompanyNavBar v-if="!$store.state.user.is_super_admin" />
             <CompanySideBar v-if="!$store.state.user.is_super_admin" />
             <!-- Main Content -->
             <div class="main-content">
-                
+
                 <router-view></router-view>
-                <SettingSideBar />            
-                
+                <SettingSideBar />
+
             </div>
         </div>
         <div v-else>
@@ -41,8 +41,7 @@ export default {
     },
     created(){
         if (this.user) {
-            // console.log("User Data",this.user);
-            this.$store.commit('updateUser',this.user);            
+            this.$store.commit('updateUser',this.user);
         }
         this.$store.commit('updateAppUrl',this.app_url);
     }
