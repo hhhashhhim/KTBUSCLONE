@@ -83,11 +83,12 @@ class ScheduleController extends Controller
       $dataArr =[];
 
 //      dd($schedu->route_city_terminal);
-      foreach ($schedu->route_city_terminal as $item){
-          $city = City::where('id', $item->city_id)->get();
-          $terminal = Terminal::where('id', $item->terminal_id)->get();
-          dd($city, $terminal);
+      foreach ($schedu->route_city_terminal as $key => $item){
+
+          $dataArr['city'][$key] = City::where('id', $item['city_id'])->get()->groupBy('id');
+          $dataArr['terminal'][$key] = Terminal::where('id', $item['terminal_id'])->get()->groupBy('id');
       }
+      return $dataArr;
     }
 
     public function updateSchedule(Request $request)
