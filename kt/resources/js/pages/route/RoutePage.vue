@@ -115,7 +115,7 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="fetchTerminals($event , index)">
+                                    <select class="form-control rounded-0" @change="fetchTerminals($event , index)" >
                                         <option value="0" selected>Select City</option>
                                         <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                             {{ city.name }}
@@ -179,7 +179,7 @@
                                         <table class="table table-striped">
                                             <thead>
                                             <tr>
-                                              
+
                                                 <th>City From</th>
                                                 <th>City To</th>
                                                 <th v-for="(heading,i) in th" :key="i">
@@ -190,13 +190,13 @@
                                             <tbody>
                                             <template v-for="(item,j) in routeDetails" :key="j">
                                                 <tr v-for="(single, i) in item" :key="i">
-                                                    
+
                                                     <td> {{ single.departure_city }}</td>
                                                     <td> {{ single.destination_city }}</td>
                                                     <td v-for="(row, k) in th" :key="k">
                                                         {{
                                                             fareClassValue(single, row.name)
-                                                        }} 
+                                                        }}
 
 <!--                                                        <span v-if="single.includes(row.name +'_fare')">N/A</span>-->
 <!--                                                        {{single.includes(row.name +'_fare')}}-->
@@ -226,8 +226,7 @@
 
 
             <!-- Add Modal -->
-            <Delete
-                confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
+            <Delete confirmationMessage='Are You Sure You want To Delete This "Route" ???'
             />
         </div>
     </section>
@@ -256,7 +255,6 @@ export default {
             terminals: [],
             fetchedData: [],
             addTerminalsOnClick: [],
-            termianl: '',
             routes: [],
             formID: "addNewRoute",
             data: {
@@ -277,9 +275,6 @@ export default {
     },
     created() {
         this.fetchCities();
-    },
-    computed : {
-
     },
     methods: {
         fareClassValue( data , className){
@@ -303,7 +298,7 @@ export default {
             if (res.status === 200) {
                 this.success = "Route Created Successfully";
                 setTimeout(() => {
-                    // window.location.reload();
+                    window.location.reload();
                 }, 3000);
             }
         },

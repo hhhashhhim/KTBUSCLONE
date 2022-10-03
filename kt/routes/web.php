@@ -106,6 +106,7 @@ Route::group(['prefix'=>'discount',[CustomMiddleware::class]],function(){
     Route::post('/store',[DiscountController::class,'storeDiscount']);
     Route::post('/update',[DiscountController::class,'updateDiscount']);
     Route::post('/delete',[DiscountController::class,'deleteDiscount']);
+    Route::post('/getSelective',[DiscountController::class,'selectiveDiscount']);
 });
 
 Route::group(['prefix'=>'surcharge',[CustomMiddleware::class]],function(){
@@ -113,20 +114,25 @@ Route::group(['prefix'=>'surcharge',[CustomMiddleware::class]],function(){
     Route::post('/store',[SurchargeController::class,'storeSurcharge']);
     Route::post('/update',[SurchargeController::class,'updateSurcharge']);
     Route::post('/delete',[SurchargeController::class,'deleteSurcharge']);
+    Route::post('/getSelective',[SurchargeController::class,'selectiveSurcharge']);
 });
 Route::group(['prefix'=>'schedule',[CustomMiddleware::class]],function(){
     Route::post('/',[ScheduleController::class,'index']);
     Route::post('/store',[ScheduleController::class,'storeSchedule']);
+    Route::post('/edit',[ScheduleController::class,'editSchedule']);
     Route::post('/update',[ScheduleController::class,'updateSchedule']);
     Route::post('/delete',[ScheduleController::class,'deleteSchedule']);
     Route::post('/getRoute',[ScheduleController::class,'getRoutes']);
     Route::post('/getCity',[ScheduleController::class,'getCity']);
-    Route::post('/getTerminal',[ScheduleController::class,'getTerminal']);
+    Route::post('/getEntire',[ScheduleController::class,'getEntire']);
+    Route::post('/getRouteFare',[ScheduleController::class,'getRouteFareClass']);
+    Route::post('/genericCommon',[ScheduleController::class,'genericCommon']);
 });
 Route::group(['prefix'=>'buses',[CustomMiddleware::class]],function(){
     Route::post('/',[BusController::class,'index']);
     Route::post('/store',[BusController::class,'storeBus']);
     Route::post('/update',[BusController::class,'updateBus']);
     Route::post('/delete',[BusController::class,'deleteBus']);
+    Route::post('/getBusData',[BusController::class,'getBusData']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

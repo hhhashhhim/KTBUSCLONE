@@ -100,126 +100,6 @@
         :success="success"
         :formID="formID"
       >
-        <!--                <div class="row">-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">Bus Number</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter Bus Name"-->
-        <!--                            v-model="data.busNumber"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">Chassis Number</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter Chasis Number"-->
-        <!--                            v-model="data.chassisNumber"-->
-        <!--                            @keypress="isNumber($event)"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">Insurance Number</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter Insurance Number"-->
-        <!--                            v-model="data.insuranceNumber"-->
-        <!--                            @keypress="isNumber($event)"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">No. of Seats</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter No. of Seats"-->
-        <!--                            v-model="data.noOfSeats"-->
-        <!--                            @keypress="isNumber($event)"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">Route Permit Number</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter Route Permit Number"-->
-        <!--                            v-model="data.routePermit"-->
-        <!--                            @keypress="isNumber($event)"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="city_id">Fare Classes</label>-->
-        <!--                        <select class="form-control" v-model="data.fare_class">-->
-        <!--                            <option value="">Select Fare Class</option>-->
-        <!--                            <option-->
-        <!--                                v-for="(fareClass, i) in fareClasses"-->
-        <!--                                :key="i"-->
-        <!--                                :value="fareClass.id"-->
-        <!--                            >-->
-        <!--                                {{ fareClass.name }}-->
-        <!--                            </option>-->
-        <!--                        </select>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--                <div class="row">-->
-        <!--                    <div class="form-group col-md-6">-->
-        <!--                        <label for="name">No. of Rows</label>-->
-        <!--                        <input-->
-        <!--                            type="text"-->
-        <!--                            class="form-control"-->
-        <!--                            placeholder="Enter No. of Rows"-->
-        <!--                            v-model="data.noOfRows"-->
-        <!--                            @keypress="isNumber($event)"-->
-        <!--                        />-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-4 my-4 pt-2">-->
-        <!--                        <button-->
-        <!--                            type="button"-->
-        <!--                            class="btn btn-block btn-warning"-->
-        <!--                            @click="generateMap"-->
-        <!--                        >-->
-        <!--                            Generate Seat Map-->
-        <!--                        </button>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--                <div class="row mx-3 mainRow" v-if="isShowDiv">-->
-        <!--                    <div class="form-group col-md-5 border mx-1 py-3">-->
-        <!--                        <tr class="seat-img p-0 m-0 s" v-for="(record, rowIndex) in data.seatMap"-->
-        <!--                            :key="rowIndex">-->
-        <!--                            <td v-for="(col, colIndex) in record" :key="colIndex"-->
-        <!--                                :class="col.reserved?'selected-row border':''">-->
-        <!--                                <img @click="changeStatus(rowIndex,colIndex)"-->
-        <!--                                     :src="$store.state.app_url+'assets/img/buses/available_seat_img.gif'" alt=""/>-->
-        <!--                            </td>-->
-        <!--                        </tr>-->
-        <!--                    </div>-->
-        <!--                    <div class="form-group col-md-5 border mx-1 py-3">-->
-        <!--                        <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap"-->
-        <!--                            :key="rowIndex">-->
-        <!--                            <td v-for="(col, colIndex) in record" :key="colIndex">-->
-        <!--                                <span @click="getSeatFareClass()">-->
-        <!--                                    <img v-if="col.reserved"-->
-        <!--                                         :src="$store.state.app_url+'assets/img/buses/booked_seat_img.gif'" alt=""/>-->
-        <!--                                    <span v-else></span>-->
-        <!--                                </span>-->
-        <!--                            </td>-->
-        <!--                        </tr>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--                <div class="row">-->
-        <!--                    <div class="form-group col-md-12">-->
-        <!--                        <button-->
-        <!--                            type="button"-->
-        <!--                            class="btn btn-block btn-success"-->
-        <!--                            @click="addBuses"-->
-        <!--                        >-->
-        <!--                            Add Bus-->
-        <!--                        </button>-->
-        <!--                    </div>-->
-        <!--                </div>-->
       </Add>
       <!--view modal-->
       <div
@@ -655,7 +535,7 @@
                         <option
                           v-for="(fareClass, i) in fareClasses"
                           :key="i"
-                          :value="fareClass.id"
+                          :value="fareClass.name"
                         >
                           {{ fareClass.name }}
                         </option>
@@ -794,7 +674,6 @@ export default {
       $("#setSeatClass").appendTo("body");
     },
     changeStatus: function (row, col) {
-      console.log(row, col);
       if (this.data.seatMap[row][col].reserved) {
         this.seatNo--;
         this.data.seatMap[row][col] = {
@@ -901,7 +780,6 @@ export default {
       }
     },
     editBus(val) {
-      console.log(val);
       this.dataEdit = val;
     },
     viewBus(view) {

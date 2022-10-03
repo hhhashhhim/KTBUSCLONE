@@ -3,6 +3,7 @@
 namespace App\Models\Route;
 
 use App\Models\City;
+use App\Models\FareClass;
 use App\Models\FareTable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,7 @@ class RouteFare extends Model
         return $this->hasOne( FareTable::class,'id','fare_id' );
     }
     public function fare_class(){
-        return $this->hasOne( FareTable::class,'id','fare_id' );
+        return $this->hasOne( FareClass::class,'id','fare_class_id' );
     }
 
     public function route(){

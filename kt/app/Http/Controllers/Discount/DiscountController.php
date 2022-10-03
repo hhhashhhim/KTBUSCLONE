@@ -76,4 +76,8 @@ class DiscountController extends Controller
     {
         return Discount::find($request->id)->delete();
     }
+    public function selectiveDiscount()
+    {
+        return Discount::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
+    }
 }

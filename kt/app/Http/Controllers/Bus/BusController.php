@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Auth;
 
 class BusController extends Controller
 {
+    public $company_id;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->company_id = auth()->user()->company_id;
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         return Bus::orderBy('id')->get();
@@ -90,5 +100,9 @@ class BusController extends Controller
     public function deleteBus(Request $request)
     {
         return Bus::find($request->id)->delete();
+    }
+    public function getBusData(Request $request)
+    {
+        return Bus::where('id',$request->id)->get();
     }
 }

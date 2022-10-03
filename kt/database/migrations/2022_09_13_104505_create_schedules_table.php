@@ -15,11 +15,21 @@ class CreateSchedulesTable extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->date('departure_date')->nullable();
-            $table->time('departure_time')->nullable();
-            $table->date('destination_date')->nullable();
-            $table->time('destination_time')->nullable();
-            $table->time('trip_duration')->nullable();
+            $table->string('name')->nullable();
+            $table->dateTime('departure_datetime')->nullable();
+            $table->dateTime('destination_datetime')->nullable();
+            $table->integer('bus_class_id')->nullable();
+            $table->integer('route_id')->nullable();
+//            $table->integer('city_id')->nullable();
+//            $table->integer('terminal_id')->nullable();
+            $table->integer('bus_id')->nullable();
+            $table->json('seat_map')->nullable();
+            $table->json('route_city_terminal')->nullable();
+            $table->integer('selected_bus_class_id')->nullable();
+            $table->integer('no_of_rows')->nullable();
+            $table->integer('surcharge_id')->nullable();
+            $table->integer('discount_id')->nullable();
+            $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamp('time')->useCurrent();

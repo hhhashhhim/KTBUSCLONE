@@ -54,32 +54,50 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Departure Date</th>
-                                                        <th>Departure Time</th>
-                                                        <th>Destination Date</th>
-                                                        <th>Destination Time</th>
+                                                        <th>Name</th>
+                                                        <th>Departure Date & Time</th>
+                                                        <th>Destination Date & Time</th>
+                                                        <th>Bus Type</th>
+                                                        <th>Route</th>
+                                                        <th>Bus Name</th>
+                                                        <th>Bus Class</th>
+                                                        <th>No of Rows</th>
                                                         <th>Created By</th>
                                                         <th>Modified By</th>
-                                                        <th>Created Date</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(schedule, i) in schedules" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ schedule.departure_date }}</td>
-                                                        <td>{{ schedule.departure_time }}</td>
-                                                        <td>{{ schedule.destination_date }}</td>
-                                                        <td>{{ schedule.destination_time }}</td>
-                                                        <td v-if="schedule.added_by">{{ schedule.added_by }}</td>
+                                                        <td>{{ schedule.name }}</td>
+                                                        <td>{{ schedule.departure_datetime }}</td>
+                                                        <td>{{ schedule.destination_datetime }}</td>
+                                                        <td>{{ schedule.single_bus_class.name }}</td>
+                                                        <td>{{ schedule.single_route.name }}</td>
+                                                        <td>{{ schedule.single_bus.bus_number }}</td>
+                                                        <td>{{ schedule.selective_bus.name }}</td>
+                                                        <td>{{ schedule.no_of_rows }}</td>
+                                                        <td v-if="schedule.added_by">{{ schedule.added_by.name }}</td>
                                                         <td v-else>N/A</td>
-                                                        <td v-if="schedule.updated_by">{{ schedule.updated_by }}</td>
+                                                        <td v-if="schedule.updated_by">{{
+                                                                schedule.updated_by.name
+                                                            }}
+                                                        </td>
                                                         <td v-else>N/A</td>
-                                                        <td>{{ schedule.created_at }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(schedule)" class="btn btn-warning mx-1">
+                                                               @click="edit(schedule); genericData()"
+                                                               class="btn btn-warning mr-1">
                                                                 <i class="far fa-edit"></i>
+                                                            </a>
+                                                            <a
+                                                                href="#delete-modal"
+                                                                data-toggle="modal"
+                                                                @click="deleteSchedule(schedule, i)"
+                                                                class="btn btn-danger"
+                                                            >
+                                                                <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -102,7 +120,6 @@
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID">
-
                 <div class="row mb-3">
                     <div class="col-md-3 text-center" :class="activeSection!=0?'':'border p-3  text-light bg-primary'">
                         Step 1
@@ -119,17 +136,26 @@
                 </div>
                 <section class="section1" :class="activeSection!=0?'d-none':''">
                     <div class="row">
-                        <div class="col-md-4 class form-group">
-                            <label for="DiscountName">Departure Date Time</label>
-                            <input type="datetime-local" class="form-control" v-model="data.DepartureDateTime"/>
+                        <div class="col-md-6">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" class="form-control"
+                                   v-model="data.name"/>
                         </div>
-                        <div class="col-md-4 class form-group">
-                            <label for="DiscountName">Destination Date Time</label>
-                            <input type="datetime-local" class="form-control" v-model="data.DestinationDateTime"/>
+                        <div class="col-md-6 class form-group">
+                            <label for="departure">Departure Date Time</label>
+                            <input type="datetime-local" id="departure" class="form-control"
+                                   v-model="data.DepartureDateTime"/>
                         </div>
-                        <div class="col-md-4">
-                            <label for="DiscountName">Bus Type</label>
-                            <select  class="form-control" id="class" v-model="data.class"
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="destination">Destination Date Time</label>
+                            <input type="datetime-local" id="destination" class="form-control"
+                                   v-model="data.DestinationDateTime"/>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="busType">Bus Type</label>
+                            <select class="form-control" id="busType" v-model="data.class"
                             >
                                 <option value="" selected>Select Type</option>
                                 <option v-for="(type, i) in classes" :value="type.id" :key="i">
@@ -149,10 +175,11 @@
 
                 <section class="section2" :class="activeSection!='step1'?'d-none':''">
                     <div class="row">
-                        <div class="col-md-4 class form-group">
+                        <div class="col-md-12 class form-group">
                             <label for="DiscountName">Routes</label>
-                            <select  class="form-control" id="route"
-                                    @change="getSelectiveData($event , 'route')" v-model="data.route"
+                            <select class="form-control" id="route"
+                                    @change="getSelectiveData( 'route'); this.stepTwoAddSchedule = true"
+                                    v-model="data.route"
                             >
                                 <option value="" selected>Select Route</option>
                                 <option v-for="(route, i) in routes" :value="route.id" :key="i">
@@ -160,25 +187,37 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-4 class form-group">
-                            <label for="DiscountName">City</label>
-                            <select  class="form-control" @change="getSelectiveData($event , 'city')"
-                                    id="city" v-model="data.city"
-                            >
-                                <option value="" selected>Select City</option>
-                                <option v-for="(city, i) in cities" :value="city.id" :key="i">
-                                    {{ city.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 class form-group">
-                            <label for="DiscountName">Terminal</label>
-                            <select  class="form-control" id="terminal" v-model="data.terminal">
-                                <option value="" selected>Select Terminal</option>
-                                <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                    </div>
+                    <div class="row d-flex justify-content-center" v-if="stepTwoAddSchedule">
+                        <div class="col-md-12 class form-group mx-2">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="addScheduleStep2">
+                                    <thead>
+                                    <tr>
+                                        <th>Sr No.</th>
+                                        <th>City Name</th>
+                                        <th>Terminals</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(city, i) in  cities " :key="i">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ city.name }}</td>
+                                        <td>
+                                            <span v-for="(item) in terminals[i]" :key="item.id">
+                                                <label class="colorinput mx-3">
+                                                    <span>
+                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id"/>
+                                                        <span class="colorinput-color bg-success"></span>
+                                                    </span>
+                                                </label>
+                                                <label class="checkbox-inputs" for="terminal">{{ item.name }}</label>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -196,25 +235,160 @@
 
                 <section class="section3" :class="activeSection!='step2'?'d-none':''">
                     <div class="row">
-                        <div class="col-md-6">
-                            <label for="DiscountName">Bus</label>
-                            <select  class="form-control" id="terminal" v-model="data.bus">
-                                <option value="" selected>Select bus</option>
-                                <option v-for="(terminal, i) in buses" :value="terminal.id" :key="i">
-                                    {{ terminal.name }}
+                        <div class="col-md-6 class form-group">
+                            <label for="">Bus</label>
+                            <select class="form-control" id="terminal" @change="getSelectiveData( 'bus')"
+                                    v-model="data.bus">
+                                <option value="0" selected>Select bus</option>
+                                <option v-for="(bus, i) in buses" :value="bus.id" :key="i">
+                                    {{ bus.bus_number }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="busCLass">Bus Class</label>
+                            <select class="form-control" id="busCLass" v-model="data.busClass">
+                                <option value="0" selected>Select Route Bus CLass</option>
+                                <option v-for="(type, i) in classes" :value="type.id" :key="i">
+                                    {{ type.name }}
                                 </option>
                             </select>
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="surcharge">Surcharge</label>
+                            <select class="form-control" id="surcharge"
+                                    v-model="data.surcharge">
+                                <option value="0" selected>Select Surcharge</option>
+                                <option v-for="(surcharge, i) in surcharges" :value="surcharge.id" :key="i">
+                                    {{ surcharge.name }} - {{ surcharge.percentage }}%
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="discount">Discount</label>
+                            <select class="form-control" id="discount" v-model="data.discount">
+                                <option value="0" selected>Select Discount</option>
+                                <option v-for="(discount, i) in discounts" :value="discount.id" :key="i">
+                                    {{ discount.name }} - {{ discount.percentage }}%
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="">No of Rows</label>
+                            <input type="text" class="form-control" v-model="data.noRows"
+                                   @keypress="isNumber($event)">
+                        </div>
+                        <div class="form-group col-md-4 my-4 pt-2">
+                            <button
+                                type="button"
+                                class="btn btn-block btn-warning"
+                                @click="editGenerateMap(data.bus)"
+                            >
+                                Generate Seat Map
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mx-1 mainRow" v-if="isShowEditDiv">
+                        <div class="form-group col-md-6 border py-3">
+                            <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap" :key="rowIndex">
+                                <td v-for="(col, colIndex) in record" :key="colIndex">
+                                    <img :class="getStyleClass(col)" data-toggle="modal" data-target="#setSeatClass"
+                                         :src="$store.state.app_url +'assets/img/buses/available_seat_img.gif'" alt=""/>
+                                </td>
+                            </tr>
+                        </div>
+                        <div class="col-md-4 mr-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul style="list-style: none;">
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="selected-row mr-1 border">
+                                            </div>
+                                            <span>Reserved</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="booked_Seat mr-1 border">
+                                            </div>
+                                            <span>Booked</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="notForSale mr-1 border">
+                                            </div>
+                                            <span>Not For Sale</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="reservedForFemale mr-1 border">
+                                            </div>
+                                            <span>Reserved For Female</span>
+                                        </li>
+                                        <br>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul style="list-style: none;">
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="economy mr-1 border">
+                                            </div>
+                                            <span>Economy</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="exective mr-1 border">
+                                            </div>
+                                            <span>Executive</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="business mr-1 border">
+                                            </div>
+                                            <span>Business</span>
+                                        </li>
+                                        <br>
+                                        <li style="display:inline; ">
+                                            <div
+                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                class="anyElseClass pr-1 border">
+                                            </div>
+                                            <span>Other Class</span>
+                                        </li>
+                                        <br>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <button class="btn btn-info back2 float-left" @click="previousSection('step1')"><i
-                                class="fas fa-arrow-left mr-1"></i> Previous
+                                class="fas fa-arrow-left mr-1 border-dark"></i> Previous
                             </button>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-success step2 float-right" @click="nextSection('step3')">Next<i
-                                class="fas fa-arrow-right mr-1"></i></button>
+                            <button class="btn btn-success step2 float-right"
+                                    @click="nextSection('step3'); getEntireForm()">Next<i
+                                class="fas fa-arrow-right mr-1 border-dark"></i></button>
                         </div>
                     </div>
                 </section>
@@ -225,9 +399,176 @@
                             <span class="h3 font-weight-bold text-muted"> Review </span>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <table
+                                class="table table-striped table-borderless table-responsive text-dark  font-weight-bold my-3 ml-4">
+                                <tbody>
+                                <tr>
+                                    <td class="mr-3">Name</td>
+                                    <td v-if="this.dataPreview.Name">{{ this.dataPreview.Name }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Departure Date</td>
+                                    <td v-if="this.dataPreview.departureDate">{{ this.dataPreview.departureDate }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Departure Time</td>
+                                    <td v-if="this.dataPreview.departureTime">{{ this.dataPreview.departureTime }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Bus Type</td>
+                                    <td v-if="this.dataPreview.busClass">{{ this.dataPreview.class }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Bus Name</td>
+                                    <td v-if="this.dataPreview.busName">{{ this.dataPreview.busName }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Selected Bus Class</td>
+                                    <td v-if="this.dataPreview.class">{{ this.dataPreview.busClass }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Destination Date</td>
+                                    <td v-if="this.dataPreview.destinationDate">{{
+                                            this.dataPreview.destinationDate
+                                        }}
+                                    </td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Destination Time</td>
+                                    <td v-if="this.dataPreview.destinationTime">{{
+                                            this.dataPreview.destinationTime
+                                        }}
+                                    </td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Route</td>
+                                    <td v-if="this.dataPreview.route">{{ this.dataPreview.route }}</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+<!--                                <tr>-->
+<!--                                    <td class="mr-3">City</td>-->
+<!--                                    <td v-if="this.dataPreview.city">{{ this.dataPreview.city }}</td>-->
+<!--                                    <td v-else>N/A</td>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td class="mr-3">Terminal</td>-->
+<!--                                    <td v-if="this.dataPreview.terminal">{{ this.dataPreview.terminal }}</td>-->
+<!--                                    <td v-else>N/A</td>-->
+<!--                                </tr>-->
+                                <tr>
+                                    <td class="mr-3">Discount</td>
+                                    <td v-if="this.dataPreview.discount">{{ this.dataPreview.discount }}%</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td class="mr-3">Surcharge</td>
+                                    <td v-if="this.dataPreview.surcharge">{{ this.dataPreview.surcharge }}%</td>
+                                    <td v-else>N/A</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap"
+                                        :key="rowIndex">
+                                        <td v-for="(col, colIndex) in record" :key="colIndex">
+                                            <img :class="getStyleClass(col)" data-toggle="modal"
+                                                 data-target="#setSeatClass"
+                                                 :src="$store.state.app_url +'assets/img/buses/available_seat_img.gif'"
+                                                 alt=""/>
+                                        </td>
+                                    </tr>
+                                </div>
 
+                                <div class="col-md-12 mt-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul style="list-style: none;" class="p-0 m-0">
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="selected-row mr-1 border">
+                                                    </div>
+                                                    <span>Reserved</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="booked_Seat mr-1 border">
+                                                    </div>
+                                                    <span>Booked</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="notForSale mr-1 border">
+                                                    </div>
+                                                    <span>Not For Sale</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="reservedForFemale mr-1 border">
+                                                    </div>
+                                                    <span>Reserved For Female</span>
+                                                </li>
+                                                <br>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul style="list-style: none;">
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="economy mr-1 border">
+                                                    </div>
+                                                    <span>Economy</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="exective mr-1 border">
+                                                    </div>
+                                                    <span>Executive</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="business mr-1 border">
+                                                    </div>
+                                                    <span>Business</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="anyElseClass pr-1 border">
+                                                    </div>
+                                                    <span>Other Class</span>
+                                                </li>
+                                                <br>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -237,7 +578,8 @@
                             </button>
                         </div>
                         <div class="col-md-6">
-                            <button id="submitFormButton" class=" btn btn-success float-right" @click="addSchedule">Save
+                            <button id="submitFormButton" class=" btn btn-success float-right" @click="addSchedule()">
+                                Save
                                 Schedule
                             </button>
                         </div>
@@ -253,37 +595,199 @@
                 :success="success"
                 :formID="formID"
             >
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">From Date</label>
-                        <input type="date" class="form-control" v-model="dataEdit.departure_date"/>
+                <div class="row mb-3">
+                    <div class="col-md-4 text-center"
+                         :class="editActiveSection!=0?'':'border p-3  text-light bg-primary'">
+                        Step 1
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">To Date</label>
-                        <input type="date" class="form-control" v-model="dataEdit.DestinationDate">
+                    <div class="col-md-4 text-center"
+                         :class="editActiveSection!='step1'?'':'border p-3  text-light bg-info'">Step 2
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="DiscountName">Dept Time</label>
-                        <input type="time" class="form-control" v-model="dataEdit.DepartureTime"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="PercentageName">Trip Duration</label>
-                        <input type="time" class="form-control" v-model="dataEdit.TripDuration">
-                    </div>
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="updateSchedule"
-                        >
-                            Update Schedule
-                        </button>
+                    <div class="col-md-4 text-center"
+                         :class="editActiveSection!='step2'?'':'border p-3  text-light bg-success'">Step 3
                     </div>
                 </div>
+                <section class="section1" :class="editActiveSection!=0?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" class="form-control"
+                                   v-model="dataEdit.name"/>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="departure">Departure Date Time</label>
+                            <input type="datetime-local" id="departure" class="form-control"
+                                   v-model="dataEdit.departure_datetime"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="destination">Destination Date Time</label>
+                            <input type="datetime-local" id="destination" class="form-control"
+                                   v-model="dataEdit.destination_datetime"/>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="busType">Bus Type</label>
+                            <select class="form-control" id="busType" v-model="dataEdit.bus_class_id"
+                            >
+                                <option value="" selected>Select Type</option>
+                                <option v-for="(type, i) in editClasses" :value="type.id" :key="i">
+                                    {{ type.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success step1 float-right" @click="editNextSection('step1'); this.stepTwoAddSchedule = true">Next<i
+                                class="fas fa-arrow-right pr-1"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section2" :class="editActiveSection!='step1'?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-12 class form-group">
+                            <label for="DiscountName">Routes</label>
+                            <select class="form-control" id="route"
+                                    @change="getSelectiveData( 'routeEdit')" v-model="dataEdit.route_id"
+                            >
+                                <option value="" selected>Select Route</option>
+                                <option v-for="(route, i) in editRoutes" :value="route.id" :key="i">
+                                    {{ route.name }}
+                                </option>
+                            </select>
+                        </div>
+<!--                        <div class="col-md-6 class form-group">-->
+<!--                            <label for="DiscountName">City</label>-->
+<!--                            <select class="form-control" @change="getSelectiveData( 'cityEdit')"-->
+<!--                                    id="city" v-model="dataEdit.city_id"-->
+<!--                            >-->
+<!--                                <option value="" selected>Select City</option>-->
+<!--                                <option v-for="(city, i) in editCities" :value="city.id" :key="i">-->
+<!--                                    {{ city.name }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+                    </div>
+                    <div class="row d-flex justify-content-center" v-if="stepTwoAddSchedule">
+                        <div class="col-md-12 class form-group mx-2">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="addScheduleStep2">
+                                    <thead>
+                                    <tr>
+                                        <th>Sr No.</th>
+                                        <th>City Name</th>
+                                        <th>Terminals</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(city, i) in  dataEdit.route_city_terminal " :key="i">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ city.city_id}}</td>
+                                        <td>
+                                            <span v-for="(item) in terminals[i]" :key="item.id">
+                                                <label class="colorinput mx-3">
+                                                    <span>
+                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id"/>
+                                                        <span class="colorinput-color bg-success"></span>
+                                                    </span>
+                                                </label>
+                                                <label class="checkbox-inputs" for="terminal">{{ item.name }}</label>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+<!--                    <div class="row">-->
+<!--                        <div class="col-md-6 class form-group">-->
+<!--                            <label for="DiscountName">Terminal</label>-->
+<!--                            <select class="form-control" id="terminal" v-model="dataEdit.terminal_id">-->
+<!--                                <option value="" selected>Select Terminal</option>-->
+<!--                                <option v-for="(terminal, i) in editTerminals" :value="terminal.id" :key="i">-->
+<!--                                    {{ terminal.name }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-info back1 float-left" @click="editPreviousSection(0)"><i
+                                class="fas fa-arrow-left mr-1"></i>Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-success step2 float-right" @click="editNextSection('step2')">Next<i
+                                class="fas fa-arrow-right mr-1"></i></button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section3" :class="editActiveSection!='step2'?'d-none':''">
+                    <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="">Bus</label>
+                            <select class="form-control" id="terminal" @change="getSelectiveData( 'bus')"
+                                    v-model="dataEdit.bus_id">
+                                <option value="0" selected>Select bus</option>
+                                <option v-for="(bus, i) in editBuses" :value="bus.id" :key="i">
+                                    {{ bus.bus_number }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="busCLass">Bus Class</label>
+                            <select class="form-control" id="busCLass" v-model="dataEdit.selected_bus_class_id">
+                                <option value="0" selected>Select Route Bus CLass</option>
+                                <option v-for="(fareClass, i) in editRouteClasses" :value="fareClass.id"
+                                        :key="i">
+                                    {{ fareClass.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 class form-group">
+                            <label for="surcharge">Surcharge</label>
+                            <select class="form-control" id="surcharge"
+                                    v-model="dataEdit.surcharge_id">
+                                <option value="0" selected>Select Surcharge</option>
+                                <option v-for="(surcharge, i) in editSurcharges" :value="surcharge.id" :key="i">
+                                    {{ surcharge.name }} - {{ surcharge.percentage }}%
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 class form-group">
+                            <label for="discount">Discount</label>
+                            <select class="form-control" id="discount" v-model="dataEdit.discount_id">
+                                <option value="0" selected>Select Discount</option>
+                                <option v-for="(discount, i) in editDiscounts" :value="discount.id" :key="i">
+                                    {{ discount.name }} - {{ discount.percentage }}%
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button class="btn btn-info back2 float-left" @click="editPreviousSection('step1')"><i
+                                class="fas fa-arrow-left mr-1 border-dark"></i> Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="submitFormButton" class=" btn btn-success float-right" @click="updateSchedule">
+                                Update Schedule
+                            </button>
+                        </div>
+                    </div>
+                </section>
             </Edit>
-            <!--            Edit MOdel End-->
+            <!--            Edit Model End-->
             <Delete
-                confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
+                confirmationMessage='Are You Sure You want To Delete This Schedule ???'
             />
 
         </div>
@@ -306,32 +810,64 @@ export default {
     data() {
         return {
             schedules: [],
+            discounts: [],
+            surcharges: [],
             formID: "addNewSchedule",
             validationErrors: [],
-            value:[],
+            value: [],
+            editClasses: [],
+            editDiscounts: [],
+            editSurcharges: [],
+            editRouteClasses: [],
+            editBuses: [],
+            editTerminals: [],
+            editCities: [],
+            editRoutes: [],
             success: false,
             error: false,
             routes: '',
             cities: '',
             terminals: '',
             classes: '',
+            routeClasses: '',
+            isShowEditDiv: false,
+            stepTwoAddSchedule: false,
+            buses: '',
             TripDuration: '',
             activeSection: 0,
+            editActiveSection: 0,
             data: {
+                name: '',
                 DepartureDateTime: '',
                 DestinationDateTime: '',
+                class: '',
                 route: '',
                 city: '',
                 terminal: '',
-                class: '',
-
+                noRows: '',
+                surcharge: 0,
+                discount: 0,
+                busClass: 0,
+                bus: 0,
+                seatMap: 0,
+                addTerminalsOnClick: [],
             },
             dataEdit: {
-                DepartureDate: '',
-                DestinationDate: '',
-                DepartureTime: '',
-                TripDuration: '',
+                name: '',
+                DepartureDateTime: '',
+                DestinationDateTime: '',
+                class: '',
+                route: '',
+                city: '',
+                terminal: '',
+                noRows: '',
+                surcharge: 0,
+                discount: 0,
+                busClass: 0,
+                bus: 0,
+                seatMap: 0,
             },
+            dataPreview: {},
         };
     },
     async created() {
@@ -347,43 +883,185 @@ export default {
 
 
     methods: {
-        async getSelectiveData(event, name) {
-            this.value = event.target.value;
-            if (name == 'route') {
-                const resRoute = await this.callApi("post", '/schedule/getCity', {id: this.data.route});
-                this.cities = resRoute.data;
-            }
-            if (name == 'city') {
-                const resCity = await this.callApi("post", '/schedule/getTerminal', {id: this.data.city});
-                // this.terminals = resCity.data;
-                console.log(resCity.data);
+        async fetchTerminals(event, index) {
+            console.log(index);
+            //
+            // const indexI = this.addCities.indexOf(value);
+            // if (indexI === -1) {
+            //     this.addCities.push(value);
+            // }
+
+            const terminalRes = await this.callApi("post", "/cities/terminals", {id: value});
+            if (terminalRes.status === 200) {
+                this.terminals[index] = terminalRes.data;
             }
         },
+        async getEntireForm() {
+            const resEntire = await this.callApi("post", '/schedule/getEntire', this.data);
+            this.dataPreview = resEntire.data;
+            var departureDate = this.data.DepartureDateTime;
+            var destinationDate = this.data.DestinationDateTime;
+            const departure = departureDate.split('T');
+            const destination = destinationDate.split('T');
+            this.dataPreview.departureDate = departure[0];
+            this.dataPreview.departureTime = this.tConvert(departure[1]);
+            this.dataPreview.destinationDate = destination[0];
+            this.dataPreview.destinationTime = this.tConvert(destination[1]);
+            this.dataPreview.Name = this.data.name;
+        },
+
+        tConvert: function (time) {
+            // Check correct time format and split into components
+            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+            if (time.length > 1) { // If time format correct
+                time = time.slice(1);  // Remove full string match value
+                time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
+                time[0] = +time[0] % 12 || 12; // Adjust hours
+            }
+            return time.join(''); // return adjusted time or original string
+        },
+
+        getStyleClass: function (col) {
+            if (col.reserved && col.type == 'reserved_for_female') {
+                return "reservedForFemale border";
+            }
+            if (col.reserved && col.type == 'not_for_sale') {
+                return "notForSale border";
+            }
+            if (col.reserved) {
+                return "booked_Seat border";
+            }
+            if (col.class == 'Economy') {
+                return "economy border";
+            }
+            if (col.class == 'Business') {
+                return "business border";
+            }
+            if (col.class == 'Exective') {
+                return "exective border";
+            }
+            if (col.reserved && col.class == 'Economy' && col.class !== 'Business' && col.class !== 'Exective') {
+                return "anyElseClass border";
+            }
+            return '';
+
+        },
+
+        isNumber: function (evt) {
+            evt = evt ? evt : window.event;
+            var charCode = evt.which ? evt.which : evt.keyCode;
+            if (
+                charCode > 31 &&
+                (charCode < 48 || charCode > 57) &&
+                charCode !== 46
+            ) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
+
+        editGenerateMap: function (val) {
+            if (val === "0") {
+                this.isShowEditDiv = false;
+            }
+            this.isShowEditDiv = true;
+        },
+
+        addTerminal(event, id) {
+            const value = event.target.value
+            if (event.target.checked) {
+                const index = this.data.addTerminalsOnClick.indexOf(value);
+                if (index === -1) {
+                    this.data.addTerminalsOnClick.push({
+                        'city_id': id,
+                        'terminal_id': parseInt(value),
+                        'allow': true,
+                    });
+                }
+            } else {
+                const index = this.data.addTerminalsOnClick.indexOf(value);
+                this.data.addTerminalsOnClick.splice(index, 1);
+            }
+        },
+
+        async getSelectiveData(name) {
+            if (name == 'route') {
+                const resRoute = await this.callApi("post", '/schedule/getCity', {id: this.data.route});
+                this.cities = resRoute.data.cities;
+                this.terminals = resRoute.data.terminal;
+
+            }
+            if (name == 'routeEdit') {
+                const resRouteEdit = await this.callApi("post", '/schedule/getCity', {id: this.dataEdit.route_id});
+                this.cities = resRouteEdit.dataEdit;
+                this.terminals = resRouteEdit.dataEdit;
+
+                const resRouteFareClass = await this.callApi("post", '/schedule/getRouteFare', {id: this.data.route});
+                this.routeClasses = resRouteFareClass.data;
+
+            }
+            if (name == 'bus') {
+                const resBus = await this.callApi("post", '/buses/getBusData', {id: this.data.bus});
+                console.log(resBus);
+                this.data.busClass = resBus.data[0].fare_class_id;
+                this.data.noRows = resBus.data[0].no_of_rows;
+                this.data.seatMap = resBus.data[0].seat_map;
+                this.isShowEditDiv = false;
+            }
+        },
+
         async getData() {
             const resGetAllRoutes = await this.callApi("post", "/schedule/getRoute");
             this.routes = resGetAllRoutes.data;
 
             const resGetAllClasses = await this.callApi("post", "/fare-class");
             this.classes = resGetAllClasses.data;
+
+            const resGetAllBus = await this.callApi("post", "/buses");
+            this.buses = resGetAllBus.data;
+
+            const resSurcharge = await this.callApi("post", '/surcharge/getSelective');
+            this.surcharges = resSurcharge.data;
+
+            const resDiscount = await this.callApi("post", '/discount/getSelective');
+            this.discounts = resDiscount.data;
         },
+
         nextSection(nextBtn) {
             this.activeSection = nextBtn
         },
+
+        editNextSection(nextBtn) {
+            this.editActiveSection = nextBtn
+        },
+
         previousSection(prvBtn) {
             this.activeSection = prvBtn;
         },
 
+        editPreviousSection(prvBtn) {
+            this.editActiveSection = prvBtn;
+        },
+
         async addSchedule() {
             this.validationErrors = [];
-            if (this.DepartureDateTime === "")
+            if (this.data.name === "")
+                return this.errorsArray("Schedule Name is Required", "Name");
+            if (this.data.DepartureDateTime === "")
                 return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
-            if (this.TripDuration === "")
-                return this.errorsArray("Trip Duration is Required", "TripDuration");
-
-            const data = {
-                dept_date_time: this.DepartureDateTime,
-                trip_duration: this.TripDuration,
-            }
+            if (this.data.DestinationDateTime === "")
+                return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
+            if (this.data.bus === "")
+                return this.errorsArray("Bus is Required", "Bus");
+            if (this.data.busClass === "")
+                return this.errorsArray("Bus Class is Required", "BusClass");
+            if (this.data.class === "")
+                return this.errorsArray("Selected Bus Class is Required", "Class");
+            if (this.data.noRows === "")
+                return this.errorsArray("No of Rows is Required", "NoOfRows");
+            if (this.data.route === "")
+                return this.errorsArray("Route is Required", "Route");
 
             const res = await this.callApi("post", "/schedule/store", this.data);
             if (res.status === 201 && res.statusText === "Created") {
@@ -407,18 +1085,25 @@ export default {
 
         async updateSchedule() {
             this.validationErrors = [];
-            if (this.DepartureDate === "")
-                return this.errorsArray("From Date is Required", "DepartureDate");
-            if (this.DestinationDate === "")
-                return this.errorsArray("To Date is Required", "DestinationDate");
-            if (this.DepartureTime === "")
-                return this.errorsArray("Departure Time is Required", "DepartureTime");
-            if (this.TripDuration === "")
-                return this.errorsArray("Trip Duration is Required", "TripDuration");
-
+            if (this.dataEdit.name === "")
+                return this.errorsArray("Schedule Name is Required", "Name");
+            if (this.dataEdit.DepartureDateTime === "")
+                return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
+            if (this.dataEdit.DestinationDateTime === "")
+                return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
+            if (this.dataEdit.bus === "")
+                return this.errorsArray("Bus is Required", "Bus");
+            if (this.dataEdit.busClass === "")
+                return this.errorsArray("Bus Class is Required", "BusClass");
+            if (this.dataEdit.class === "")
+                return this.errorsArray("Selected Bus Class is Required", "Class");
+            if (this.dataEdit.noRows === "")
+                return this.errorsArray("No of Rows is Required", "NoOfRows");
+            if (this.dataEdit.route === "")
+                return this.errorsArray("Route is Required", "Route");
             const res = await this.callApi("post", '/schedule/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Discount Updated Successfully";
+                this.success = "Schedule Updated Successfully";
                 setTimeout(function () {
                     window.location.reload();
                 }, 2000);
@@ -432,13 +1117,43 @@ export default {
                 }
             }
         },
-        edit(schema) {
-            this.dataEdit = schema;
+
+        async edit(schema) {
+            const resEditSchedule = await this.callApi("post", '/schedule/edit', schema);
+            console.log(resEditSchedule.data);
+            // this.dataEdit = schema;
+        },
+
+        async genericData() {
+            const resCommon = await this.callApi("post", '/schedule/genericCommon');
+            console.log(resCommon);
+            this.editClasses = resCommon.data.class;
+            this.editDiscounts = resCommon.data.discount;
+            this.editSurcharges = resCommon.data.surcharge;
+            this.editRouteClasses = resCommon.data.routeClass;
+            this.editBuses = resCommon.data.bus;
+            this.editTerminals = resCommon.data.terminal;
+            this.editCities = resCommon.data.city;
+            this.editRoutes = resCommon.data.route;
+        },
+
+        async deleteSchedule(schVal, i) {
+            const deletingObj = {
+                url: "/schedule/delete",
+                data: schVal,
+                index: i,
+            };
+            this.$store.commit("setDeleteObj", deletingObj);
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         },
     },
     computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
+        ...
+            mapGetters(['getDeletingObj'])
+    }
+    ,
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
@@ -449,9 +1164,49 @@ export default {
             }
         }
     }
-};
+}
+;
 
 </script>
 <style scoped>
+.selected-row {
+    background-color: yellow !important;
+}
 
+.booked_Seat {
+    background-color: rgb(255, 0, 0) !important;
+}
+
+.notForSale {
+    background-color: rgb(140, 109, 109) !important;
+}
+
+.reservedForFemale {
+    background-color: rgb(250, 185, 250) !important;
+}
+
+
+.economy {
+    background-color: rgb(250, 97, 64) !important;
+}
+
+.exective {
+    background-color: rgb(64, 250, 81) !important;
+}
+
+.business {
+    background-color: rgb(31, 126, 91) !important;
+}
+
+
+.anyElseClass {
+    background-color: rgb(131, 163, 199) !important;
+}
+
+.seat-img img,
+.seat-img span {
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+}
 </style>

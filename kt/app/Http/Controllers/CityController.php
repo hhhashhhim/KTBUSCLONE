@@ -93,6 +93,7 @@ class CityController extends Controller
                             RouteFare::create([
                                 'route_id' => $route->id,
                                 'fare_id' => $detail->id,
+                                'fare_class_id' => $detail->fare_class,
                                 'departure_city_id' => $used_cities[$index],
                                 'destination_city_id' => $innerCity,
                                 'company_id' => $this->company_id,
