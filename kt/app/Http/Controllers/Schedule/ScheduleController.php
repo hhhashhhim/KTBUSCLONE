@@ -30,7 +30,7 @@ class ScheduleController extends Controller
 
     public function index()
     {
-        return Schedule::with('single_bus_class','single_bus.busClass', 'selective_bus','singleRoute','singleCity','singleTerminal', 'updated_by', 'added_by')->orderBy('id')->get();
+        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'updated_by', 'added_by')->orderBy('id')->get();
     }
 
     public function storeSchedule(Request $request)
@@ -60,35 +60,43 @@ class ScheduleController extends Controller
         ];
         $this->validate($request, $rules, $customMessages);
         return Schedule::create([
-            'name' =>$request->name,
-            'departure_datetime' =>$request->DepartureDateTime,
-            'destination_datetime' =>$request->DestinationDateTime,
-            'bus_class_id' =>$request->class,
-            'route_id' =>$request->route,
-            'surcharge_id' =>$request->surcharge,
-            'discount_id' =>$request->discount,
-            'route_city_terminal' =>$request->addTerminalsOnClick,
-            'bus_id' =>$request->bus,
-            'selected_bus_class_id' =>$request->busClass,
-            'no_of_rows' =>$request->noRows,
-            'company_id' =>$this->company_id,
-            'seat_map' =>$request->seatMap,
-            'added_by' =>Auth::user()->id,
+            'name' => $request->name,
+            'departure_datetime' => $request->DepartureDateTime,
+            'destination_datetime' => $request->DestinationDateTime,
+            'bus_class_id' => $request->class,
+            'route_id' => $request->route,
+            'surcharge_id' => $request->surcharge,
+            'discount_id' => $request->discount,
+            'route_city_terminal' => $request->addTerminalsOnClick,
+            'bus_id' => $request->bus,
+            'selected_bus_class_id' => $request->busClass,
+            'no_of_rows' => $request->noRows,
+            'company_id' => $this->company_id,
+            'seat_map' => $request->seatMap,
+            'added_by' => Auth::user()->id,
         ]);
     }
 
-    public function editSchedule(Request  $request)
+    public function editSchedule(Request $request)
     {
-      $schedu = Schedule::where('id', $request->id)->where('company_id' , $this->company_id)->first();
-      $dataArr =[];
+        $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->get();
+        $dataArr = [];
+        foreach ($schedule[0]->route_city_terminal as $key => $item) {
+            $dataArr['city'][$key] = $item['city_id'];
+            $dataArr['terminal'][$key] = $item['terminal_id'];
+        }
+        $cities_id = array_unique($dataArr['city']);
+        $terminals_id = array_unique($dataArr['terminal']);
+        $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', $this->company_id)->get();
+    return[
+            'cities' => $city,
+            'schedules' => $schedule[0],
+            'compare_array' => $schedule[0]->route_city_terminal,
+        ];
+    
+    
 
-//      dd($schedu->route_city_terminal);
-      foreach ($schedu->route_city_terminal as $key => $item){
 
-          $dataArr['city'][$key] = City::where('id', $item['city_id'])->get()->groupBy('id');
-          $dataArr['terminal'][$key] = Terminal::where('id', $item['terminal_id'])->get()->groupBy('id');
-      }
-      return $dataArr;
     }
 
     public function updateSchedule(Request $request)
@@ -119,18 +127,18 @@ class ScheduleController extends Controller
         $this->validate($request, $rules, $customMessages);
 
         return Schedule::where('id', $request->id)->update([
-            'name' =>$request->name,
-            'departure_datetime' =>$request->departure_datetime,
-            'destination_datetime' =>$request->destination_datetime,
-            'bus_class_id' =>$request->bus_class_id,
-            'route_id' =>$request->route_id,
-            'city_id' =>$request->city_id,
-            'surcharge_id' =>$request->surcharge_id,
-            'discount_id' =>$request->discount_id,
-            'terminal_id' =>$request->terminal_id,
-            'bus_id' =>$request->bus_id,
-            'selected_bus_class_id' =>$request->selected_bus_class_id,
-            'updated_by' =>Auth::user()->id,
+            'name' => $request->name,
+            'departure_datetime' => $request->departure_datetime,
+            'destination_datetime' => $request->destination_datetime,
+            'bus_class_id' => $request->bus_class_id,
+            'route_id' => $request->route_id,
+            'city_id' => $request->city_id,
+            'surcharge_id' => $request->surcharge_id,
+            'discount_id' => $request->discount_id,
+            'terminal_id' => $request->terminal_id,
+            'bus_id' => $request->bus_id,
+            'selected_bus_class_id' => $request->selected_bus_class_id,
+            'updated_by' => Auth::user()->id,
         ]);
     }
 
@@ -154,15 +162,15 @@ class ScheduleController extends Controller
             }
             $data[] = $routeFare->destination_city_id;
         }
-       $data = collect($data)->unique();
-       $cities =  City::whereIn('id', $data)->get();
+        $data = collect($data)->unique();
+        $cities = City::whereIn('id', $data)->get();
 
-       $finalData = [];
-       foreach ($cities as $key => $city){
+        $finalData = [];
+        foreach ($cities as $key => $city) {
             $finalData['cities'] = $cities;
             $finalData['terminal'][$key] = Terminal::with('city')->where('city_id', $city->id)->where('company_id', $this->company_id)->get();
-       }
-       return $finalData;
+        }
+        return $finalData;
     }
 
     public function getRouteFareClass(Request $request)
@@ -185,6 +193,7 @@ class ScheduleController extends Controller
 
         ];
     }
+
     public function genericCommon()
     {
         return [

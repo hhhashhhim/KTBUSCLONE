@@ -612,23 +612,23 @@
                         <div class="col-md-6">
                             <label for="name">Name</label>
                             <input type="text" id="name" class="form-control"
-                                   v-model="dataEdit.name"/>
+                                   v-model="dataEdit.schedules.name"/>
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="departure">Departure Date Time</label>
                             <input type="datetime-local" id="departure" class="form-control"
-                                   v-model="dataEdit.departure_datetime"/>
+                                   v-model="dataEdit.schedules.departure_datetime"/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 class form-group">
                             <label for="destination">Destination Date Time</label>
                             <input type="datetime-local" id="destination" class="form-control"
-                                   v-model="dataEdit.destination_datetime"/>
+                                   v-model="dataEdit.schedules.destination_datetime"/>
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="busType">Bus Type</label>
-                            <select class="form-control" id="busType" v-model="dataEdit.bus_class_id"
+                            <select class="form-control" id="busType" v-model="dataEdit.schedules.bus_class_id"
                             >
                                 <option value="" selected>Select Type</option>
                                 <option v-for="(type, i) in editClasses" :value="type.id" :key="i">
@@ -651,7 +651,7 @@
                         <div class="col-md-12 class form-group">
                             <label for="DiscountName">Routes</label>
                             <select class="form-control" id="route"
-                                    @change="getSelectiveData( 'routeEdit')" v-model="dataEdit.route_id"
+                                    @change="getSelectiveData( 'routeEdit')" v-model="dataEdit.schedules.route_id"
                             >
                                 <option value="" selected>Select Route</option>
                                 <option v-for="(route, i) in editRoutes" :value="route.id" :key="i">
@@ -659,17 +659,6 @@
                                 </option>
                             </select>
                         </div>
-<!--                        <div class="col-md-6 class form-group">-->
-<!--                            <label for="DiscountName">City</label>-->
-<!--                            <select class="form-control" @change="getSelectiveData( 'cityEdit')"-->
-<!--                                    id="city" v-model="dataEdit.city_id"-->
-<!--                            >-->
-<!--                                <option value="" selected>Select City</option>-->
-<!--                                <option v-for="(city, i) in editCities" :value="city.id" :key="i">-->
-<!--                                    {{ city.name }}-->
-<!--                                </option>-->
-<!--                            </select>-->
-<!--                        </div>-->
                     </div>
                     <div class="row d-flex justify-content-center" v-if="stepTwoAddSchedule">
                         <div class="col-md-12 class form-group mx-2">
@@ -683,14 +672,14 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr v-for="(city, i) in  dataEdit.route_city_terminal " :key="i">
+                                    <tr v-for="(city, i) in  dataEdit.cities" :key="i">
                                         <td>{{ i + 1 }}</td>
-                                        <td>{{ city.city_id}}</td>
+                                        <td>{{ city.name}}</td>
                                         <td>
-                                            <span v-for="(item) in terminals[i]" :key="item.id">
+                                            <span v-for="(item) in  city.terminal" :key="item.id">
                                                 <label class="colorinput mx-3">
                                                     <span>
-                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id"/>
+                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" v-bind:checked="checkedSelectedTerminals(item.id)" id="terminal" :value="item.id"/>
                                                         <span class="colorinput-color bg-success"></span>
                                                     </span>
                                                 </label>
@@ -703,17 +692,6 @@
                             </div>
                         </div>
                     </div>
-<!--                    <div class="row">-->
-<!--                        <div class="col-md-6 class form-group">-->
-<!--                            <label for="DiscountName">Terminal</label>-->
-<!--                            <select class="form-control" id="terminal" v-model="dataEdit.terminal_id">-->
-<!--                                <option value="" selected>Select Terminal</option>-->
-<!--                                <option v-for="(terminal, i) in editTerminals" :value="terminal.id" :key="i">-->
-<!--                                    {{ terminal.name }}-->
-<!--                                </option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="row">
                         <div class="col-md-6">
                             <button class="btn btn-info back1 float-left" @click="editPreviousSection(0)"><i
@@ -732,7 +710,7 @@
                         <div class="col-md-6 class form-group">
                             <label for="">Bus</label>
                             <select class="form-control" id="terminal" @change="getSelectiveData( 'bus')"
-                                    v-model="dataEdit.bus_id">
+                                    v-model="dataEdit.schedules.bus_id">
                                 <option value="0" selected>Select bus</option>
                                 <option v-for="(bus, i) in editBuses" :value="bus.id" :key="i">
                                     {{ bus.bus_number }}
@@ -741,7 +719,7 @@
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="busCLass">Bus Class</label>
-                            <select class="form-control" id="busCLass" v-model="dataEdit.selected_bus_class_id">
+                            <select class="form-control" id="busCLass" v-model="dataEdit.schedules.selected_bus_class_id">
                                 <option value="0" selected>Select Route Bus CLass</option>
                                 <option v-for="(fareClass, i) in editRouteClasses" :value="fareClass.id"
                                         :key="i">
@@ -754,7 +732,7 @@
                         <div class="col-md-6 class form-group">
                             <label for="surcharge">Surcharge</label>
                             <select class="form-control" id="surcharge"
-                                    v-model="dataEdit.surcharge_id">
+                                    v-model="dataEdit.schedules.surcharge_id">
                                 <option value="0" selected>Select Surcharge</option>
                                 <option v-for="(surcharge, i) in editSurcharges" :value="surcharge.id" :key="i">
                                     {{ surcharge.name }} - {{ surcharge.percentage }}%
@@ -763,7 +741,7 @@
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="discount">Discount</label>
-                            <select class="form-control" id="discount" v-model="dataEdit.discount_id">
+                            <select class="form-control" id="discount" v-model="dataEdit.schedules.discount_id">
                                 <option value="0" selected>Select Discount</option>
                                 <option v-for="(discount, i) in editDiscounts" :value="discount.id" :key="i">
                                     {{ discount.name }} - {{ discount.percentage }}%
@@ -853,26 +831,15 @@ export default {
                 addTerminalsOnClick: [],
             },
             dataEdit: {
-                name: '',
-                DepartureDateTime: '',
-                DestinationDateTime: '',
-                class: '',
-                route: '',
-                city: '',
-                terminal: '',
-                noRows: '',
-                surcharge: 0,
-                discount: 0,
-                busClass: 0,
-                bus: 0,
-                seatMap: 0,
+                schedules: [],
+                cities: [],
+                terminals: [],
+                compare_array: [],
             },
             dataPreview: {},
         };
     },
     async created() {
-
-
         const res = await this.callApi("post", '/schedule');
         if (res.status === 200) {
             this.schedules = res.data
@@ -884,18 +851,12 @@ export default {
 
     methods: {
         async fetchTerminals(event, index) {
-            console.log(index);
-            //
-            // const indexI = this.addCities.indexOf(value);
-            // if (indexI === -1) {
-            //     this.addCities.push(value);
-            // }
-
             const terminalRes = await this.callApi("post", "/cities/terminals", {id: value});
             if (terminalRes.status === 200) {
                 this.terminals[index] = terminalRes.data;
             }
         },
+
         async getEntireForm() {
             const resEntire = await this.callApi("post", '/schedule/getEntire', this.data);
             this.dataPreview = resEntire.data;
@@ -903,9 +864,9 @@ export default {
             var destinationDate = this.data.DestinationDateTime;
             const departure = departureDate.split('T');
             const destination = destinationDate.split('T');
-            this.dataPreview.departureDate = departure[0];
+            this.dataPreview.departureDate = departure;
             this.dataPreview.departureTime = this.tConvert(departure[1]);
-            this.dataPreview.destinationDate = destination[0];
+            this.dataPreview.destinationDate = destination;
             this.dataPreview.destinationTime = this.tConvert(destination[1]);
             this.dataPreview.Name = this.data.name;
         },
@@ -915,8 +876,8 @@ export default {
             time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
             if (time.length > 1) { // If time format correct
                 time = time.slice(1);  // Remove full string match value
-                time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
-                time[0] = +time[0] % 12 || 12; // Adjust hours
+                time[5] = +time < 12 ? ' AM' : ' PM'; // Set AM/PM
+                time = +time % 12 || 12; // Adjust hours
             }
             return time.join(''); // return adjusted time or original string
         },
@@ -985,11 +946,24 @@ export default {
             }
         },
 
+        checkedSelectedTerminals(id){
+            let status = '';
+            status = this.dataEdit.compare_array.filter((arr) => {
+                if( arr.terminal_id == id ){
+                    return arr.allow;
+                }
+            })
+            console.log(status[0].allow);
+            return status[0].allow;
+        },
+
         async getSelectiveData(name) {
             if (name == 'route') {
                 const resRoute = await this.callApi("post", '/schedule/getCity', {id: this.data.route});
                 this.cities = resRoute.data.cities;
+                this.dataEdit.cities = resRoute.data.cities;
                 this.terminals = resRoute.data.terminal;
+                this.dataEdit.terminals = resRoute.data.terminal;
 
             }
             if (name == 'routeEdit') {
@@ -1004,9 +978,9 @@ export default {
             if (name == 'bus') {
                 const resBus = await this.callApi("post", '/buses/getBusData', {id: this.data.bus});
                 console.log(resBus);
-                this.data.busClass = resBus.data[0].fare_class_id;
-                this.data.noRows = resBus.data[0].no_of_rows;
-                this.data.seatMap = resBus.data[0].seat_map;
+                this.data.busClass = resBus.data.fare_class_id;
+                this.data.noRows = resBus.data.no_of_rows;
+                this.data.seatMap = resBus.data.seat_map;
                 this.isShowEditDiv = false;
             }
         },
@@ -1121,12 +1095,14 @@ export default {
         async edit(schema) {
             const resEditSchedule = await this.callApi("post", '/schedule/edit', schema);
             console.log(resEditSchedule.data);
-            // this.dataEdit = schema;
+            this.dataEdit.schedules = resEditSchedule.data.schedules;
+            this.dataEdit.compare_array = resEditSchedule.data.compare_array;
+            this.dataEdit.cities = resEditSchedule.data.cities;
+
         },
 
         async genericData() {
             const resCommon = await this.callApi("post", '/schedule/genericCommon');
-            console.log(resCommon);
             this.editClasses = resCommon.data.class;
             this.editDiscounts = resCommon.data.discount;
             this.editSurcharges = resCommon.data.surcharge;
@@ -1152,8 +1128,8 @@ export default {
     computed: {
         ...
             mapGetters(['getDeletingObj'])
-    }
-    ,
+    },
+
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {

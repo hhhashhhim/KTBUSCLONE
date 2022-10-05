@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Bus\BusController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
@@ -134,5 +135,13 @@ Route::group(['prefix'=>'buses',[CustomMiddleware::class]],function(){
     Route::post('/update',[BusController::class,'updateBus']);
     Route::post('/delete',[BusController::class,'deleteBus']);
     Route::post('/getBusData',[BusController::class,'getBusData']);
+});
+
+Route::group(['prefix'=>'booking',[CustomMiddleware::class]],function(){
+    Route::post('/',[BookingController::class,'index']);
+    Route::post('/store',[BookingController::class,'storeBooking']);
+    Route::post('/update',[BookingController::class,'updateBooking']);
+    Route::post('/delete',[BookingController::class,'deleteBooking']);
+    Route::post('/getBusData',[BookingController::class,'getBookingData']);
 });
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');

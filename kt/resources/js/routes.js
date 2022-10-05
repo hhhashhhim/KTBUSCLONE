@@ -17,6 +17,8 @@ import SurchargePage from "./pages/surcharge/SurchargePage";
 import SchedulePage from "./pages/schedule/SchedulePage";
 import FareClass from "./pages/fareClass/FareClassPage";
 import BusesPage from "./pages/buses/BusesPage";
+import BookingPage from "./pages/booking/BookingPage";
+
 
 const routes = [
     {
@@ -103,6 +105,11 @@ const routes = [
         path:"/buses",
         component : BusesPage,
         name:"buses-page"
+    },
+    {
+        path:"/booking",
+        component : BookingPage,
+        name:"booking-page"
     },
 ]
 const router = createRouter({

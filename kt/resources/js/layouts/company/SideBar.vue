@@ -73,6 +73,11 @@
                                 <i class="fas fa-table"></i> Schedule
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'booking-page' }">
+                                <i class="fas fa-bookmark"></i> Booking
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('users')">
