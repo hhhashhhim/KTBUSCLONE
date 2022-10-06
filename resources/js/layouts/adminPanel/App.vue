@@ -9,14 +9,14 @@
             <CompanySideBar v-if="!$store.state.user.is_super_admin" />
             <!-- Main Content -->
             <div class="main-content">
-
-                <router-view></router-view>
-                <SettingSideBar />
+            <router-view></router-view>
 
             </div>
         </div>
         <div v-else>
-            <router-view></router-view>
+            <router-view>
+                <Login />
+            </router-view>
         </div>
     </div>
 </template>

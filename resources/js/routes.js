@@ -18,11 +18,12 @@ import SchedulePage from "./pages/schedule/SchedulePage";
 import FareClass from "./pages/fareClass/FareClassPage";
 import BusesPage from "./pages/buses/BusesPage";
 import BookingPage from "./pages/booking/BookingPage";
+import store from './store.js';
 
 
 const routes = [
     {
-        path:"/",
+        path: "/",
         component : Users,
         name:"home",
     },
@@ -47,17 +48,17 @@ const routes = [
         name:"role.permission"
     },
     {
-        path:"/profile",
+        path:"/profiles",
         component : Profile,
         name:"profile"
     },
     {
-        path:"/company",
+        path:"/companies",
         component : Company,
         name:"company"
     },
     {
-        path:"/terminal",
+        path:"/terminals",
         component : Terminal,
         name:"terminal"
     },
@@ -117,5 +118,9 @@ const router = createRouter({
     mode:history,
     routes,
 })
+
+// router.beforeEach(()=>{
+//     console.log(this.$store);
+// })
 
 export default router

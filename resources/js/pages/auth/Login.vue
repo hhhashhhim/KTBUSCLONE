@@ -107,6 +107,7 @@
 </template>
 <script>
 export default {
+  name : 'Dashboard',
   data() {
     return {
       data: {
@@ -117,6 +118,7 @@ export default {
       errors:[]
     };
   },
+
   methods: {
     async login(e) {
       e.preventDefault()
@@ -126,12 +128,12 @@ export default {
       if (this.data.password == "")
         return this.errorsArray("Password is Required", "Password");
 
-      const res = await this.callApi("post", "/login", this.data);
+      const res = await this.callApi("post", "/kt/public/login", this.data);
       if (res.status == 200) {
         
         this.success = "Logged In Successfully";
         this.data.email = this.data.password = "";
-        window.location="/admin/dashboard"
+        window.location="/kt/public/admin/dashboard"
         this.success = "";
         
       } else {

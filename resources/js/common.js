@@ -10,12 +10,12 @@ export default {
 
         async callApi( method , url , data ){
             var format =/^\/[a-z]+$/i;
-
+            console.log();
             try {
                 return await axios({
                     method:method,
                     // url: format.test(url) ? '/api'+url : '/api/'+url,
-                    url:url,
+                    url: url,
                     data:data
                 });
             } catch (error) {

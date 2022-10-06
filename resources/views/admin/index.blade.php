@@ -20,12 +20,14 @@
 
 <body>
 <div class="loader"></div>
-<div id="app">
+<div id="app">    
     @if (Auth::check())
-        <mainapp :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}"
-                 app_url="{{ config('app.url') }}"></mainapp>
+
+        <main-app :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}" app_url="{{ config('app.url') }}">
+        </main-app>
     @else
-        <mainapp :user="false" app_url="{{ config('app.url') }}"></mainapp>
+        {{-- <test-app :user="false" app_url="{{ config('app.url') }}"></test-app> --}}
+        <main-app :user="false" app_url="{{ config('app.url') }}"></main-app>
     @endif
 </div>
 <!-- General JS Scripts -->
@@ -44,7 +46,7 @@
 
 
 {{-- Vue App JS --}}
-<script src="{{ mix('/js/app.js') }}"></script>
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
     $(document).ready(function () {
         $(document).on('show.bs.modal', '.modal', function () {

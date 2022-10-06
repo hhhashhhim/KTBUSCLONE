@@ -2,15 +2,19 @@
 
     <!-- Modal -->
     <div class="modal fade" :id="formID" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span v-html="heading"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                                <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4 class="modal-title"><span v-html="heading"></span></h4>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+        
+                            
                         </div>
                         <div class="card-body">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">
@@ -34,10 +38,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="modal-footer">
+                <div class="modal-footer bg-whitesmoke br">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="this.$parent.add()">Save</button>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
