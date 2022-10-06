@@ -88,43 +88,39 @@ class ScheduleController extends Controller
         $cities_id = array_unique($dataArr['city']);
         $terminals_id = array_unique($dataArr['terminal']);
         $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', $this->company_id)->get();
-    return[
+        return [
             'cities' => $city,
             'schedules' => $schedule[0],
             'compare_array' => $schedule[0]->route_city_terminal,
         ];
-    
-    
 
 
     }
 
     public function updateSchedule(Request $request)
     {
-        $rules = [
-            'name' => 'required',
-            'departure_datetime' => 'required',
-            'destination_datetime' => 'required',
-            'bus_class_id' => 'required',
-            'route_id' => 'required',
-            'city_id' => 'required',
-            'terminal_id' => 'required',
-            'selected_bus_class_id' => 'required',
-            'bus_id' => 'required',
-        ];
+        // dd($request->addTerminalsOnClick);
+        // $rules = [
+        //     'name' => 'required',
+        //     'departure_datetime' => 'required',
+        //     'destination_datetime' => 'required',
+        //     'bus_class_id' => 'required',
+        //     'route_id' => 'required',
+        //     'selected_bus_class_id' => 'required',
+        //     'bus_id' => 'required',
+        // ];
 
-        $customMessages = [
-            'name.required' => 'Schedule Name is Required',
-            'departure_datetime.required' => 'Departure Date & Time is Required',
-            'destination_datetime.required' => 'Destination Date & Time is Required',
-            'bus_class_id.required' => 'Class is Required',
-            'route_id.required' => 'Route is Required',
-            'city_id.required' => 'City is Required',
-            'terminal_id.required' => 'Terminal is Required',
-            'selected_bus_class_id.required' => 'Bus Class is Required',
-            'bus_id.required' => 'Bus is Required',
-        ];
-        $this->validate($request, $rules, $customMessages);
+        // $customMessages = [
+        //     'name.required' => 'Schedule Name is Required',
+        //     'departure_datetime.required' => 'Departure Date & Time is Required',
+        //     'destination_datetime.required' => 'Destination Date & Time is Required',
+        //     'bus_class_id.required' => 'Class is Required',
+        //     'route_id.required' => 'Route is Required',
+        //     'selected_bus_class_id.required' => 'Bus Class is Required',
+        //     'bus_id.required' => 'Bus is Required',
+        // ];
+        // $this->validate($request, $rules, $customMessages);
+        self::getUpdateValue($request);
 
         return Schedule::where('id', $request->id)->update([
             'name' => $request->name,
@@ -132,14 +128,20 @@ class ScheduleController extends Controller
             'destination_datetime' => $request->destination_datetime,
             'bus_class_id' => $request->bus_class_id,
             'route_id' => $request->route_id,
-            'city_id' => $request->city_id,
             'surcharge_id' => $request->surcharge_id,
             'discount_id' => $request->discount_id,
-            'terminal_id' => $request->terminal_id,
+            'route_city_terminal' => self::getUpdateValue($request),
             'bus_id' => $request->bus_id,
             'selected_bus_class_id' => $request->selected_bus_class_id,
             'updated_by' => Auth::user()->id,
         ]);
+    }
+
+    public function getUpdateValue($req)
+    {
+        $scheduleEditArray = Schedule::where('id', $req->schedules['id'])->pluck('route_city_terminal')->first();
+//        $result = array_intersect($scheduleEditArray, $req->addTerminalsOnClick);
+        dd($scheduleEditArray == $req->addTerminalsOnClick);
     }
 
     public function deleteSchedule(Request $request)

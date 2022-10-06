@@ -679,7 +679,7 @@
                                             <span v-for="(item) in  city.terminal" :key="item.id">
                                                 <label class="colorinput mx-3">
                                                     <span>
-                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" v-bind:checked="checkedSelectedTerminals(item.id)" id="terminal" :value="item.id"/>
+                                                        <input type="checkbox" class="colorinput-input" @click="editTerminal($event, city.id)"  v-bind:checked="checkedSelectedTerminals(item.id)"  id="terminal" :value="item.id"/>
                                                         <span class="colorinput-color bg-success"></span>
                                                     </span>
                                                 </label>
@@ -835,6 +835,7 @@ export default {
                 cities: [],
                 terminals: [],
                 compare_array: [],
+                addTerminalsOnClick: [],
             },
             dataPreview: {},
         };
@@ -946,14 +947,31 @@ export default {
             }
         },
 
+        editTerminal(event, id) {
+            const value = event.target.value
+            console.log(value,id);
+            // if (event.target.checked) {
+            //     const index = this.dataEdit.addTerminalsOnClick.indexOf(value);
+            //     if (index === -1) {
+            //         this.dataEdit.addTerminalsOnClick.push({
+            //             'city_id': id,
+            //             'terminal_id': parseInt(value),
+            //             'allow': true,
+            //         });
+            //     }
+            // } else {
+            //     const index = this.dataEdit.addTerminalsOnClick.indexOf(value);
+            //     this.dataEdit.addTerminalsOnClick.splice(index, 1);
+            // }
+        },
+
         checkedSelectedTerminals(id){
             let status = '';
             status = this.dataEdit.compare_array.filter((arr) => {
                 if( arr.terminal_id == id ){
-                    return arr.allow;
+                    return arr
                 }
             })
-            console.log(status[0].allow);
             return status[0].allow;
         },
 
@@ -1061,40 +1079,42 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 return this.errorsArray("Schedule Name is Required", "Name");
-            if (this.dataEdit.DepartureDateTime === "")
+            if (this.dataEdit.departure_datetime === "")
                 return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
-            if (this.dataEdit.DestinationDateTime === "")
+            if (this.dataEdit.destination_datetime === "")
                 return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
-            if (this.dataEdit.bus === "")
+            if (this.dataEdit.bus_id === "")
                 return this.errorsArray("Bus is Required", "Bus");
-            if (this.dataEdit.busClass === "")
+            if (this.dataEdit.bus_class_id === "")
                 return this.errorsArray("Bus Class is Required", "BusClass");
-            if (this.dataEdit.class === "")
-                return this.errorsArray("Selected Bus Class is Required", "Class");
-            if (this.dataEdit.noRows === "")
-                return this.errorsArray("No of Rows is Required", "NoOfRows");
-            if (this.dataEdit.route === "")
+            if (this.dataEdit.selected_bus_class_id === "")
+                return this.errorsArray("Selected Bus Class is Required", "Selected Bus Class");
+            if (this.dataEdit.route_id === "")
                 return this.errorsArray("Route is Required", "Route");
-            const res = await this.callApi("post", '/schedule/update', this.dataEdit);
-            if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Schedule Updated Successfully";
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            } else {
-                if (res.status === 422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-            }
+            if (this.dataEdit.surcharge_id === "")
+                return this.errorsArray("Surcharge is Required", "Surcharge");
+            if (this.dataEdit.discount_id === "")
+                return this.errorsArray("Discount is Required", "Discount");
+            const resEdit = await this.callApi("post", '/schedule/update', this.dataEdit);
+            console.log(resEdit)
+            // if (res.status === 200 && res.statusText === "OK") {
+            //     this.success = "Schedule Updated Successfully";
+            //     setTimeout(function () {
+            //         window.location.reload();
+            //     }, 2000);
+            // } else {
+            //     if (res.status === 422) {
+            //         for (const key in res.data.errors) {
+            //             res.data.errors.percentage.forEach((element) => {
+            //                 this.errorsArray(element, key);
+            //             });
+            //         }
+            //     }
+            // }
         },
 
         async edit(schema) {
             const resEditSchedule = await this.callApi("post", '/schedule/edit', schema);
-            console.log(resEditSchedule.data);
             this.dataEdit.schedules = resEditSchedule.data.schedules;
             this.dataEdit.compare_array = resEditSchedule.data.compare_array;
             this.dataEdit.cities = resEditSchedule.data.cities;
