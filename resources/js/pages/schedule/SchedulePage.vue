@@ -835,7 +835,6 @@ export default {
                 cities: [],
                 terminals: [],
                 compare_array: [],
-                addTerminalsOnClick: [],
             },
             dataPreview: {},
         };
@@ -948,21 +947,18 @@ export default {
         },
 
         editTerminal(event, id) {
-            const value = event.target.value
-            console.log(value,id);
-            // if (event.target.checked) {
-            //     const index = this.dataEdit.addTerminalsOnClick.indexOf(value);
-            //     if (index === -1) {
-            //         this.dataEdit.addTerminalsOnClick.push({
-            //             'city_id': id,
-            //             'terminal_id': parseInt(value),
-            //             'allow': true,
-            //         });
-            //     }
-            // } else {
-            //     const index = this.dataEdit.addTerminalsOnClick.indexOf(value);
-            //     this.dataEdit.addTerminalsOnClick.splice(index, 1);
-            // }
+            if (event.target.checked) {
+                const value = event.target.value
+                this.dataEdit.compare_array = this.dataEdit.compare_array.map((arr) => {
+                    if (arr.terminal_id == value) {
+                        return {...arr, allow: !arr.allow}
+                    }
+                    return arr;
+                })
+
+                this.dataEdit.updated_route_city_terminal = this.dataEdit.compare_array;
+                console.log(this.dataEdit.updated_route_city_terminal);
+            }
         },
 
         checkedSelectedTerminals(id){
@@ -1077,40 +1073,36 @@ export default {
 
         async updateSchedule() {
             this.validationErrors = [];
-            if (this.dataEdit.name === "")
+            if (this.dataEdit.schedules.name === "")
                 return this.errorsArray("Schedule Name is Required", "Name");
-            if (this.dataEdit.departure_datetime === "")
+            if (this.dataEdit.schedules.departure_datetime === "")
                 return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
-            if (this.dataEdit.destination_datetime === "")
+            if (this.dataEdit.schedules.destination_datetime === "")
                 return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
-            if (this.dataEdit.bus_id === "")
+            if (this.dataEdit.schedules.bus_id === "")
                 return this.errorsArray("Bus is Required", "Bus");
-            if (this.dataEdit.bus_class_id === "")
+            if (this.dataEdit.schedules.bus_class_id === "")
                 return this.errorsArray("Bus Class is Required", "BusClass");
-            if (this.dataEdit.selected_bus_class_id === "")
+            if (this.dataEdit.schedules.selected_bus_class_id === "")
                 return this.errorsArray("Selected Bus Class is Required", "Selected Bus Class");
-            if (this.dataEdit.route_id === "")
+            if (this.dataEdit.schedules.route_id === "")
                 return this.errorsArray("Route is Required", "Route");
-            if (this.dataEdit.surcharge_id === "")
-                return this.errorsArray("Surcharge is Required", "Surcharge");
-            if (this.dataEdit.discount_id === "")
-                return this.errorsArray("Discount is Required", "Discount");
             const resEdit = await this.callApi("post", '/schedule/update', this.dataEdit);
             console.log(resEdit)
-            // if (res.status === 200 && res.statusText === "OK") {
-            //     this.success = "Schedule Updated Successfully";
-            //     setTimeout(function () {
-            //         window.location.reload();
-            //     }, 2000);
-            // } else {
-            //     if (res.status === 422) {
-            //         for (const key in res.data.errors) {
-            //             res.data.errors.percentage.forEach((element) => {
-            //                 this.errorsArray(element, key);
-            //             });
-            //         }
-            //     }
-            // }
+            if (resEdit.status === 200 && resEdit.statusText === "OK") {
+                this.success = "Schedule Updated Successfully";
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                if (resEdit.status === 422) {
+                    for (const key in res.data.errors) {
+                        res.data.errors.percentage.forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
         },
 
         async edit(schema) {

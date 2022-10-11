@@ -10,7 +10,6 @@ export default {
 
         async callApi( method , url , data ){
             var format =/^\/[a-z]+$/i;
-            console.log();
             try {
                 return await axios({
                     method:method,

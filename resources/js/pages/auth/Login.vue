@@ -90,9 +90,9 @@
                       Login
                     </button>
                   </div>
-                  
+
                 </form>
-                
+
               </div>
             </div>
             <div class="mt-5 text-muted text-center">
@@ -128,14 +128,14 @@ export default {
       if (this.data.password == "")
         return this.errorsArray("Password is Required", "Password");
 
-      const res = await this.callApi("post", "/kt/public/login", this.data);
+      const res = await this.callApi("post", this.$store.state.app_url + "login", this.data);
       if (res.status == 200) {
-        
+
         this.success = "Logged In Successfully";
         this.data.email = this.data.password = "";
-        window.location="/kt/public/admin/dashboard"
+        window.location= this.$store.state.app_url + "admin/dashboard"
         this.success = "";
-        
+
       } else {
         if (res.status == 422) {
           for (const key in res.data.errors) {

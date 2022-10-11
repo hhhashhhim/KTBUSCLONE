@@ -47,6 +47,7 @@ Route::group(['prefix'=>'role','middleware',[CustomMiddleware::class]],function(
     Route::post('delete',[RoleController::class,'delete']);
     Route::post('/get',[RoleController::class,'role']);
 });
+
 Route::group(['prefix'=>'company','middleware',[CustomMiddleware::class]],function(){
     Route::post('/',[CompanyController::class,'index']);
     Route::post('store',[CompanyController::class,'store']);
@@ -57,6 +58,7 @@ Route::group(['prefix'=>'company','middleware',[CustomMiddleware::class]],functi
     Route::post('/roles',[CompanyController::class,'company_roles']);
     Route::post('/get',[CompanyController::class,'company']);
 });
+
 Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
     Route::post('/',[UserController::class,'index']);
     Route::post('store',[UserController::class,'store']);
@@ -64,6 +66,7 @@ Route::group(['prefix'=>'user',[CustomMiddleware::class]],function(){
     Route::post('delete',[UserController::class,'delete']);
     Route::post('permissions',[UserController::class,'permissions']);
 });
+
 Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
     Route::post('/',[TerminalController::class,'index']);
     Route::post('/getTerminal',[TerminalController::class,'getTerminal']);
@@ -72,6 +75,7 @@ Route::group(['prefix'=>'terminal',[CustomMiddleware::class]],function(){
     Route::post('delete',[TerminalController::class,'delete']);
     Route::post('permissions',[TerminalController::class,'permissions']);
 });
+
 Route::group(['prefix'=>'city',[CustomMiddleware::class]],function(){
     Route::post('/',[CityController::class,'index']);
     Route::post('store',[CityController::class,'store']);
@@ -87,7 +91,6 @@ Route::group(['prefix'=>'cities',[CustomMiddleware::class]],function(){
 });
 
 Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
-
     Route::post('/',[FareTableController::class,'record']);
     Route::post('/store',[FareTableController::class,'store']);
     Route::post('/fare_class/get',[FareTableController::class,'getFareClass']);
@@ -95,7 +98,6 @@ Route::group(['prefix'=>'fare-table',[CustomMiddleware::class]],function(){
 });
 
 Route::group(['prefix'=>'fare-class',[CustomMiddleware::class]],function(){
-
     Route::post('/',[FareClassController::class,'index']);
     Route::post('/store',[FareClassController::class,'storeFareClass']);
     Route::post('/update',[FareClassController::class,'updateFareClass']);
@@ -117,6 +119,7 @@ Route::group(['prefix'=>'surcharge',[CustomMiddleware::class]],function(){
     Route::post('/delete',[SurchargeController::class,'deleteSurcharge']);
     Route::post('/getSelective',[SurchargeController::class,'selectiveSurcharge']);
 });
+
 Route::group(['prefix'=>'schedule',[CustomMiddleware::class]],function(){
     Route::post('/',[ScheduleController::class,'index']);
     Route::post('/store',[ScheduleController::class,'storeSchedule']);
@@ -129,6 +132,7 @@ Route::group(['prefix'=>'schedule',[CustomMiddleware::class]],function(){
     Route::post('/getRouteFare',[ScheduleController::class,'getRouteFareClass']);
     Route::post('/genericCommon',[ScheduleController::class,'genericCommon']);
 });
+
 Route::group(['prefix'=>'buses',[CustomMiddleware::class]],function(){
     Route::post('/',[BusController::class,'index']);
     Route::post('/store',[BusController::class,'storeBus']);
@@ -144,4 +148,5 @@ Route::group(['prefix'=>'booking',[CustomMiddleware::class]],function(){
     Route::post('/delete',[BookingController::class,'deleteBooking']);
     Route::post('/getBusData',[BookingController::class,'getBookingData']);
 });
+
 Route::get('/{any}', [AuthController::class,'index'])->where('any', '.*');
