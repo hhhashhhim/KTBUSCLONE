@@ -14,14 +14,14 @@ class BookingController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
 
     public function index()
     {
-        return Booking::orderBy('id')->get();
+        return Booking::orderBy('id')->where('company_id', $this->company_id)->get();
     }
 
     public function storeBooking(Request $request)
@@ -55,7 +55,7 @@ class BookingController extends Controller
             'fare_class_id' => $request->fare_class,
             'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }
@@ -91,7 +91,7 @@ class BookingController extends Controller
             'fare_class_id' => $request->fare_class_id,
             'seat_map' => $request->seat_map,
             'no_of_rows' => $request->no_of_rows,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -102,6 +102,6 @@ class BookingController extends Controller
     }
     public function getBookingData(Request $request)
     {
-        return Booking::where('id',$request->id)->get();
+        return Booking::where('id',$request->id)->where('company_id', $this->company_id)->get();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models\Schedule;
 
 use App\Models\Bus\Bus;
 use App\Models\City;
+use App\Models\Company;
 use App\Models\FareClass;
 use App\Models\Route\Route;
 use App\Models\Terminal;
@@ -31,6 +32,10 @@ class Schedule extends Model
     public function updated_by()
     {
         return $this->hasOne(User::class, 'id', 'updated_by');
+    }
+
+    public function company(){
+        return $this->hasOne( Company::class,'id','company_id' );
     }
 
     public function single_bus()

@@ -7,7 +7,7 @@ import common from './common.js';
 import store from './store.js';
 import  router  from './routes.js';
 
-// Admin Panel Customization 
+// Admin Panel Customization
 // Vue.mixin(common); // Adding Common Functions
 
 

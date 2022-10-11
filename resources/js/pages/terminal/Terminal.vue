@@ -85,11 +85,11 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="name">Terminal Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" v-model="data.name" @keypress="isAlphabet($event)">
+                        <input type="text" class="form-control" v-model="data.name">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="available_seats">Available Seats</label>
-                        <input type="number" class="form-control" v-model="data.available_seats">
+                        <label for="available_seats">Allowed Seats</label>
+                        <input type="text" class="form-control" v-model="data.available_seats">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
@@ -101,8 +101,16 @@
                         <input type="text" class="form-control" v-model="data.address">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="time_difference">Time Difference ( eg 3:40 )</label>
-                        <input type="text" class="form-control" v-model="data.time_difference">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <!--                        <input type="text" class="form-control" id="time_diff" v-model="data.time_difference">-->
+<!--                        <input type="text" id="timePicker" class="form-control" v-model="data.time_difference">-->
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.time_difference"
+                            mask="00:00"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
@@ -121,7 +129,7 @@
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
                     </div>
                     <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="active">Is Active</label>
+                        <label class="mt-4" for="active">Online Availability</label>
                         <label class="colorinput mx-3 mt-3">
             <span><input
                 type="checkbox"
@@ -176,85 +184,185 @@
 
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="name">Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Name"
-                            id="name"
-                            v-model="dataEdit.name"
-                        />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="email">Email</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Email"
-                            id="email"
-                            v-model="dataEdit.email"
-                        />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="contact">Contact</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Contact"
-                            id="contact"
-                            v-model="dataEdit.contact"
-                        />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="password">Password</label>
-                        <input
-                            type="password"
-                            class="form-control"
-                            placeholder="Enter Password"
-                            id="password"
-                            v-model="dataEdit.password"
-                        />
-                    </div>
-                    <div class="form-group col-md-12" v-if="dataEdit.company_id">
-                        <label for="company">Company</label>
-                        <select
-                            type="text"
-                            class="form-control"
-                            id="company"
-                            @change="fetchCompanyRoles"
-                            v-model="dataEdit.company_id"
-                        >
-                            <option value="">Select Company</option>
-                            <option v-for="(company, i) in companies" :value="company.id" :key="i">
-                                {{ company.name }}
-                            </option>
+                    <div class="form-group col-md-4">
+                        <label for="city_id">Terminal City <span class="text-danger">*</span></label>
+                        <select class="form-control" v-model="dataEdit.city_id">
+                            <option value="">Select City</option>
+                            <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-12">
-                        <label for="role">Role</label>
-                        <select
-                            type="text"
-                            class="form-control"
-                            id="role"
-                            v-model="dataEdit.role"
-                        >
-                            <option value="">Select Role</option>
-                            <option v-for="(role, i) in roles" :value="role.id" :key="i">
-                                {{ role.name }}
-                            </option>
-                        </select>
+                    <div class="form-group col-md-4">
+                        <label for="name">Terminal Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.name">
                     </div>
+                    <div class="form-group col-md-4">
+                        <label for="available_seats">Allowed Seats</label>
+                        <input type="text" class="form-control" v-model="dataEdit.available_seats">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
+                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"
+                               @keypress="isNumber($event)">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" v-model="dataEdit.address">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.time_difference"
+                            mask="00:00"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="advance_booking">Advance Booking Allowed(Days)</label>
+                        <input type="number" class="form-control" v-model="dataEdit.advance_booking">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="longitude">Longitude</label>
+                        <input type="text" class="form-control" v-model="dataEdit.longitude">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="Latitude">Latitude</label>
+                        <input type="text" class="form-control" v-model="dataEdit.latitude">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="online_terminal_name">Online Terminal Name</label>
+                        <input type="text" class="form-control" v-model="dataEdit.online_terminal_name">
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="active">Online Availability </label>
+                        <label class="colorinput mx-3 mt-3">
+            <span><input
+                type="checkbox"
+                class="colorinput-input"
+                v-model="dataEdit.active"
+                v-bind:checked="parseInt(dataEdit.status) === 1 "
+            />
+                <span class="colorinput-color bg-success"></span>
+            </span>
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">SMS</label>
+                        <label class="colorinput mx-3 mt-3">
+            <span>
+                  <input
+                      type="checkbox"
+                      class="colorinput-input"
+                      v-model="dataEdit.active_sms"
+                      v-bind:checked="dataEdit.active_sms === 1"
+                  />
+            <span class="colorinput-color bg-success"></span>
+            </span>
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">Main Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
+            <span>
+                  <input
+                      type="checkbox"
+                      class="colorinput-input"
+                      v-model="dataEdit.is_main"
+                      v-bind:checked="dataEdit.is_main === 1"
+
+                  />
+            <span class="colorinput-color bg-success"></span>
+            </span>
+                        </label>
+                    </div>
+
                     <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="update"
-                        >
-                            Update terminal
+                        <button type="button" class="btn btn-block btn-success" @click="update">
+                            Update Terminal
                         </button>
                     </div>
                 </div>
+                <!--                <div class="row">-->
+                <!--                    <div class="form-group col-md-12">-->
+                <!--                        <label for="name">Name</label>-->
+                <!--                        <input-->
+                <!--                            type="text"-->
+                <!--                            class="form-control"-->
+                <!--                            placeholder="Enter Name"-->
+                <!--                            id="name"-->
+                <!--                            v-model="dataEdit.name"-->
+                <!--                        />-->
+                <!--                    </div>-->
+                <!--&lt;!&ndash;                    <div class="form-group col-md-6">&ndash;&gt;-->
+                <!--&lt;!&ndash;                        <label for="email">Email</label>&ndash;&gt;-->
+                <!--&lt;!&ndash;                        <input&ndash;&gt;-->
+                <!--&lt;!&ndash;                            type="text"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            class="form-control"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            placeholder="Enter Email"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            id="email"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            v-model="dataEdit.email"&ndash;&gt;-->
+                <!--&lt;!&ndash;                        />&ndash;&gt;-->
+                <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+                <!--                    <div class="form-group col-md-12">-->
+                <!--                        <label for="contact">Contact</label>-->
+                <!--                        <input-->
+                <!--                            type="text"-->
+                <!--                            class="form-control"-->
+                <!--                            placeholder="Enter Contact"-->
+                <!--                            id="contact"-->
+                <!--                            v-model="dataEdit.contact"-->
+                <!--                        />-->
+                <!--                    </div>-->
+                <!--&lt;!&ndash;                    <div class="form-group col-md-6">&ndash;&gt;-->
+                <!--&lt;!&ndash;                        <label for="password">Password</label>&ndash;&gt;-->
+                <!--&lt;!&ndash;                        <input&ndash;&gt;-->
+                <!--&lt;!&ndash;                            type="password"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            class="form-control"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            placeholder="Enter Password"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            id="password"&ndash;&gt;-->
+                <!--&lt;!&ndash;                            v-model="dataEdit.password"&ndash;&gt;-->
+                <!--&lt;!&ndash;                        />&ndash;&gt;-->
+                <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+                <!--                    <div class="form-group col-md-12" v-if="dataEdit.company_id">-->
+                <!--                        <label for="company">Company</label>-->
+                <!--                        <select-->
+                <!--                            type="text"-->
+                <!--                            class="form-control"-->
+                <!--                            id="company"-->
+                <!--                            @change="fetchCompanyRoles"-->
+                <!--                            v-model="dataEdit.company_id"-->
+                <!--                        >-->
+                <!--                            <option value="">Select Company</option>-->
+                <!--                            <option v-for="(company, i) in companies" :value="company.id" :key="i">-->
+                <!--                                {{ company.name }}-->
+                <!--                            </option>-->
+                <!--                        </select>-->
+                <!--                    </div>-->
+                <!--                    <div class="form-group col-md-12">-->
+                <!--                        <label for="role">Role</label>-->
+                <!--                        <select-->
+                <!--                            type="text"-->
+                <!--                            class="form-control"-->
+                <!--                            id="role"-->
+                <!--                            v-model="dataEdit.role"-->
+                <!--                        >-->
+                <!--                            <option value="">Select Role</option>-->
+                <!--                            <option v-for="(role, i) in roles" :value="role.id" :key="i">-->
+                <!--                                {{ role.name }}-->
+                <!--                            </option>-->
+                <!--                        </select>-->
+                <!--                    </div>-->
+                <!--                    <div class="form-group col-md-12">-->
+                <!--                        <button-->
+                <!--                            type="button"-->
+                <!--                            class="btn btn-block btn-success"-->
+                <!--                            @click="update"-->
+                <!--                        >-->
+                <!--                            Update terminal-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
             </Edit>
 
             <!--View Details Model-->
@@ -344,7 +452,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-
+import vueMask from 'vue-jquery-mask';
 import {mapGetters} from "vuex";
 
 export default {
@@ -353,10 +461,16 @@ export default {
         Add,
         Edit,
         Delete,
+        vueMask,
     },
     data() {
         return {
-            validationErrors:'',
+            date: null,
+            options: {
+                placeholder: 'HH:MM',
+                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
+            validationErrors: '',
             seen: true,
             terminals: [],
             terminalsDetails: [],
@@ -369,7 +483,7 @@ export default {
                 available_seats: "",
                 contact: "",
                 address: "",
-                time_difference: "",
+                time_difference: '',
                 active_sms: "",
                 advance_booking: "",
                 longitude: "",
@@ -387,7 +501,6 @@ export default {
 
     async created() {
         const terminalRes = await this.callApi("post", "/terminal");
-        console.log(terminalRes);
         const compRes = await this.callApi("post", "/company");
         const cities = await this.callApi("post", "/city");
         this.terminals = terminalRes.data;
@@ -395,10 +508,16 @@ export default {
         this.cities = cities.data;
         setTimeout(() => {
             $("#edit_loc").DataTable();
+            // $("#timePicker, #timeDiff").inputmask("99:99");
+            // $("#timePicker, #timeDiff").datetimepicker({
+            //     // options here
+            // });
         }, 500);
 
     },
     methods: {
+
+
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -433,6 +552,7 @@ export default {
                 setTimeout(() => {
                     this.success = "";
                     // $("#add-modal").modal("hide")
+
                     window.location.reload();
                 }, 2000);
             } else {
@@ -451,18 +571,17 @@ export default {
         async editTerminal(single) {
             console.log(single);
             this.dataEdit = single;
-            this.dataEdit.role = single.role_id;
-            console.log(this.dataEdit.role);
-            const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
-            this.roles = roleRes.data;
+            // this.dataEdit.role = single.role_id;
+            // const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
+            // this.roles = roleRes.data;
         },
-         async terminalDetail(id) {
-             const getTerminalRes = await this.callApi("post", "/terminal/getTerminal", {id: id});
-             this.terminalsDetails = getTerminalRes.data;
-             setTimeout(() => {
-                 $("#show_terminal").DataTable();
-             }, 500);
-         },
+        async terminalDetail(id) {
+            const getTerminalRes = await this.callApi("post", "/terminal/getTerminal", {id: id});
+            this.terminalsDetails = getTerminalRes.data;
+            setTimeout(() => {
+                $("#show_terminal").DataTable();
+            }, 500);
+        },
         async update() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
@@ -476,6 +595,7 @@ export default {
                 setTimeout(() => {
                     this.success = "";
                     $("#edit-modal").modal("hide");
+                    window.location.reload();
                 }, 3000);
             } else {
                 if (res.status === 422) {
@@ -495,6 +615,8 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
+            setTimeout(() => {
+            }, 3000);
         }
     },
     computed: {

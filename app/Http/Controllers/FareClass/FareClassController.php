@@ -16,20 +16,20 @@ class FareClassController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
 
     protected function index()
     {
-        return FareClass::orderBy('id')->select('id', 'name', 'is_active')->get(['id', 'name', 'is_active']);
+        return FareClass::orderBy('id')->where('company_id', $this->company_id)->select('id', 'name', 'is_active')->get(['id', 'name', 'is_active']);
     }
 
     public function storeFareClass(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('fare_classes', 'name')->whereNull('deleted_at')]
+            'name' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')]
         ];
 
         $customMessages = [
@@ -40,7 +40,7 @@ class FareClassController extends Controller
         return FareClass::create([
             'name' => $request->name,
             'is_active' => $request->active,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }
@@ -57,7 +57,7 @@ class FareClassController extends Controller
         $this->validate($request, $rules, $customMessages);
         return FareClass::where('id', $request->id)->update([
             'name' => $request->name,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);

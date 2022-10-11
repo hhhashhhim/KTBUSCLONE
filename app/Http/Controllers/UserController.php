@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -12,20 +13,20 @@ class UserController extends Controller
 
     public function __construct(){
         $this->middleware(function ($request, $next){
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next( $request );
         });
-    }   
+    }
     public function index(){
-        
+
         return User::with('role:id,name','company:id,name')
         ->where('company_id',$this->company_id)
         ->where('id','!=',auth()->user()->id)->latest('id')
         ->get();
-        
+
     }
     public function store( Request $request ){
-        
+
         $this->validate( $request,[
             'name'=>'required',
             'email'=>'bail|required|email|unique:users',
@@ -42,13 +43,13 @@ class UserController extends Controller
             'company_id'=>$this->company_id,
         ]);
         return $this->index();
-        
+
     }
     public function delete( Request $request ){
         return User::find($request->id)->delete();
     }
     public function update( Request $request ){
-        
+
         $this->validate( $request,[
             'name'=>'required',
             'email'=>'bail|required|email|unique:users,email,'.$request->id,
@@ -73,6 +74,6 @@ class UserController extends Controller
         ],201);
     }
 
-    
-    
+
+
 }

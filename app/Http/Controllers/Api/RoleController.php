@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\admin\Role;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
@@ -13,7 +14,7 @@ class RoleController extends Controller
 
     public function __construct(){
         $this->middleware(function ($request, $next){
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next( $request );
         });
     }
@@ -26,7 +27,7 @@ class RoleController extends Controller
         $role = Role::with('company:id,name')->find($request->id);
         $company = Company::find($role->company_id);
         if ($company) {
-            
+
             if ($role->permissions) {
                 $modules = $role->permissions;
             }
@@ -35,13 +36,13 @@ class RoleController extends Controller
                 foreach ($company->modules as $i => $module) {
 
                     if ($module['allow'] == false) {
-                        continue; 
+                        continue;
                         // If Main Module is not in permission then don't check its sub modules and return back to next module.
                     }
                     $module['allow'] = false;
                     // Setting default false value of main module so that the role does't inherit true as per from company permissions
                     foreach ($module['childs'] as $j => $childModule) {
-                        
+
                         if ($module['childs'][$j]['allow'] == false) {
                             unset($module['childs'][$j]);
                             continue;
@@ -56,7 +57,7 @@ class RoleController extends Controller
                 }
 
             }
-            
+
             return response()->json([
                 'role' => $role,
                 'permissions' => $modules,
@@ -67,7 +68,7 @@ class RoleController extends Controller
                 'Message' => "Company Not Found !!!!",
             ], 400);
         }
-        
+
     }
     public function store(Request $request)
     {

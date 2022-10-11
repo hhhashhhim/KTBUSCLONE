@@ -15,6 +15,7 @@
     <!-- Custom style CSS -->
     <link rel='shortcut icon' type='image/x-icon' href='{{ asset('assets/img/fav-logo.png') }}'/>
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-timepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
 </head>
@@ -42,6 +43,8 @@
 <!-- Custom JS File -->
 <script src="{{ asset('assets/js/custom.js') }}"></script>
 <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('assets/js/bootstrap-timepicker.min.js') }}"></script>
+<script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
 

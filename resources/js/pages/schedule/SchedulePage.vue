@@ -55,8 +55,8 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
-                                                        <th>Departure Date & Time</th>
-                                                        <th>Destination Date & Time</th>
+                                                        <th>Start Date</th>
+                                                        <th>End Date </th>
                                                         <th>Bus Type</th>
                                                         <th>Route</th>
                                                         <th>Bus Name</th>
@@ -71,8 +71,8 @@
                                                     <tr v-for="(schedule, i) in schedules" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ schedule.name }}</td>
-                                                        <td>{{ schedule.departure_datetime }}</td>
-                                                        <td>{{ schedule.destination_datetime }}</td>
+                                                        <td>{{ schedule.start_date }}</td>
+                                                        <td>{{ schedule.end_date }}</td>
                                                         <td>{{ schedule.single_bus_class.name }}</td>
                                                         <td>{{ schedule.single_route.name }}</td>
                                                         <td>{{ schedule.single_bus.bus_number }}</td>
@@ -142,16 +142,16 @@
                                    v-model="data.name"/>
                         </div>
                         <div class="col-md-6 class form-group">
-                            <label for="departure">Departure Date Time</label>
-                            <input type="datetime-local" id="departure" class="form-control"
-                                   v-model="data.DepartureDateTime"/>
+                            <label for="start">Start Date</label>
+                            <input type="date" id="start" class="form-control"
+                                   v-model="data.StartDate"/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 class form-group">
-                            <label for="destination">Destination Date Time</label>
-                            <input type="datetime-local" id="destination" class="form-control"
-                                   v-model="data.DestinationDateTime"/>
+                            <label for="end">End Date</label>
+                            <input type="date" id="end" class="form-control"
+                                   v-model="data.EndDate"/>
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="busType">Bus Type</label>
@@ -277,9 +277,14 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 class form-group">
+                        <div class="col-md-3 class form-group">
                             <label for="">No of Rows</label>
                             <input type="text" class="form-control" v-model="data.noRows"
+                                   @keypress="isNumber($event)">
+                        </div>
+                        <div class="col-md-3 class form-group">
+                            <label for="">No of Cols</label>
+                            <input type="text" class="form-control" v-model="data.noCols"
                                    @keypress="isNumber($event)">
                         </div>
                         <div class="form-group col-md-4 my-4 pt-2">
@@ -298,7 +303,7 @@
                             <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap" :key="rowIndex">
                                 <td v-for="(col, colIndex) in record" :key="colIndex">
                                     <img :class="getStyleClass(col)" data-toggle="modal" data-target="#setSeatClass"
-                                         :src="$store.state.app_url +'assets/img/buses/available_seat_img.gif'" alt=""/>
+                                         :src= "$store.state.app_url +'assets/img/buses/available_seat_img.gif'" alt=""/>
                                 </td>
                             </tr>
                         </div>
@@ -314,7 +319,7 @@
                                             <span>Reserved</span>
                                         </li>
                                         <br>
-                                        <li style="display:inline; ">
+                                        <li style="display:inline;">
                                             <div
                                                 style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
                                                 class="booked_Seat mr-1 border">
@@ -410,13 +415,13 @@
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
-                                    <td class="mr-3">Departure Date</td>
-                                    <td v-if="this.dataPreview.departureDate">{{ this.dataPreview.departureDate }}</td>
+                                    <td class="mr-3">Start Date</td>
+                                    <td v-if="this.dataPreview.start_date">{{ this.dataPreview.start_date }}</td>
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
-                                    <td class="mr-3">Departure Time</td>
-                                    <td v-if="this.dataPreview.departureTime">{{ this.dataPreview.departureTime }}</td>
+                                    <td class="mr-3">End Date</td>
+                                    <td v-if="this.dataPreview.end_date">{{ this.dataPreview.end_date }}</td>
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
@@ -435,36 +440,10 @@
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
-                                    <td class="mr-3">Destination Date</td>
-                                    <td v-if="this.dataPreview.destinationDate">{{
-                                            this.dataPreview.destinationDate
-                                        }}
-                                    </td>
-                                    <td v-else>N/A</td>
-                                </tr>
-                                <tr>
-                                    <td class="mr-3">Destination Time</td>
-                                    <td v-if="this.dataPreview.destinationTime">{{
-                                            this.dataPreview.destinationTime
-                                        }}
-                                    </td>
-                                    <td v-else>N/A</td>
-                                </tr>
-                                <tr>
                                     <td class="mr-3">Route</td>
                                     <td v-if="this.dataPreview.route">{{ this.dataPreview.route }}</td>
                                     <td v-else>N/A</td>
                                 </tr>
-<!--                                <tr>-->
-<!--                                    <td class="mr-3">City</td>-->
-<!--                                    <td v-if="this.dataPreview.city">{{ this.dataPreview.city }}</td>-->
-<!--                                    <td v-else>N/A</td>-->
-<!--                                </tr>-->
-<!--                                <tr>-->
-<!--                                    <td class="mr-3">Terminal</td>-->
-<!--                                    <td v-if="this.dataPreview.terminal">{{ this.dataPreview.terminal }}</td>-->
-<!--                                    <td v-else>N/A</td>-->
-<!--                                </tr>-->
                                 <tr>
                                     <td class="mr-3">Discount</td>
                                     <td v-if="this.dataPreview.discount">{{ this.dataPreview.discount }}%</td>
@@ -615,16 +594,16 @@
                                    v-model="dataEdit.schedules.name"/>
                         </div>
                         <div class="col-md-6 class form-group">
-                            <label for="departure">Departure Date Time</label>
-                            <input type="datetime-local" id="departure" class="form-control"
-                                   v-model="dataEdit.schedules.departure_datetime"/>
+                            <label for="start">Start Date </label>
+                            <input type="date" id="start" class="form-control"
+                                   v-model="dataEdit.schedules.start_date"/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 class form-group">
-                            <label for="destination">Destination Date Time</label>
-                            <input type="datetime-local" id="destination" class="form-control"
-                                   v-model="dataEdit.schedules.destination_datetime"/>
+                            <label for="end">End Date </label>
+                            <input type="date" id="end" class="form-control"
+                                   v-model="dataEdit.schedules.end_date"/>
                         </div>
                         <div class="col-md-6 class form-group">
                             <label for="busType">Bus Type</label>
@@ -816,13 +795,12 @@ export default {
             editActiveSection: 0,
             data: {
                 name: '',
-                DepartureDateTime: '',
-                DestinationDateTime: '',
+                StartDate: '',
+                EndDate: '',
                 class: '',
                 route: '',
-                city: '',
-                terminal: '',
                 noRows: '',
+                noCols: '',
                 surcharge: 0,
                 discount: 0,
                 busClass: 0,
@@ -860,14 +838,8 @@ export default {
         async getEntireForm() {
             const resEntire = await this.callApi("post", '/schedule/getEntire', this.data);
             this.dataPreview = resEntire.data;
-            var departureDate = this.data.DepartureDateTime;
-            var destinationDate = this.data.DestinationDateTime;
-            const departure = departureDate.split('T');
-            const destination = destinationDate.split('T');
-            this.dataPreview.departureDate = departure;
-            this.dataPreview.departureTime = this.tConvert(departure[1]);
-            this.dataPreview.destinationDate = destination;
-            this.dataPreview.destinationTime = this.tConvert(destination[1]);
+            this.dataPreview.start_date = this.data.StartDate;
+            this.dataPreview.end_date = this.data.EndDate;
             this.dataPreview.Name = this.data.name;
         },
 
@@ -991,9 +963,10 @@ export default {
             }
             if (name == 'bus') {
                 const resBus = await this.callApi("post", '/buses/getBusData', {id: this.data.bus});
-                console.log(resBus);
+                console.log(resBus.data);
                 this.data.busClass = resBus.data.fare_class_id;
                 this.data.noRows = resBus.data.no_of_rows;
+                this.data.noCols = resBus.data.no_of_cols;
                 this.data.seatMap = resBus.data.seat_map;
                 this.isShowEditDiv = false;
             }
@@ -1036,10 +1009,10 @@ export default {
             this.validationErrors = [];
             if (this.data.name === "")
                 return this.errorsArray("Schedule Name is Required", "Name");
-            if (this.data.DepartureDateTime === "")
-                return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
+            if (this.data.StartDate === "")
+                return this.errorsArray("Departure Date and Time is Required", "StartDate");
             if (this.data.DestinationDateTime === "")
-                return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
+                return this.errorsArray("End Date and Time is Required", "DestinationDateTime");
             if (this.data.bus === "")
                 return this.errorsArray("Bus is Required", "Bus");
             if (this.data.busClass === "")
@@ -1075,10 +1048,10 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.schedules.name === "")
                 return this.errorsArray("Schedule Name is Required", "Name");
-            if (this.dataEdit.schedules.departure_datetime === "")
-                return this.errorsArray("Departure Date and Time is Required", "DepartureDateTime");
-            if (this.dataEdit.schedules.destination_datetime === "")
-                return this.errorsArray("Destination Date and Time is Required", "DestinationDateTime");
+            if (this.dataEdit.schedules.startDate === "")
+                return this.errorsArray("Departure Date and Time is Required", "StartDate");
+            if (this.dataEdit.schedules.endDate === "")
+                return this.errorsArray("End Date and Time is Required", "DestinationDateTime");
             if (this.dataEdit.schedules.bus_id === "")
                 return this.errorsArray("Bus is Required", "Bus");
             if (this.dataEdit.schedules.bus_class_id === "")

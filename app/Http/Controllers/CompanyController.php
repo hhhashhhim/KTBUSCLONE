@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
@@ -14,7 +15,7 @@ class CompanyController extends Controller
 
     public function __construct(){
         $this->middleware(function ($request, $next){
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next( $request );
         });
     }

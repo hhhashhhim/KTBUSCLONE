@@ -15,14 +15,14 @@ class SurchargeController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
 
     public function index()
     {
-        return Surcharge::orderBy('id')->select('name', 'id', 'percentage', 'is_active')->get();
+        return Surcharge::orderBy('id')->where('company_id', $this->company_id)->select('name', 'id', 'percentage', 'is_active')->get();
     }
 
     public function storeSurcharge(Request $request)
@@ -43,7 +43,7 @@ class SurchargeController extends Controller
         return Surcharge::create([
             'name' => $request->name,
             'percentage' => $request->percentage,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
@@ -66,7 +66,7 @@ class SurchargeController extends Controller
         return Surcharge::where('id', $request->id)->update([
             'name' => $request->name,
             'percentage' => $request->percentage,
-            'company_id' => Auth::user()->company_id,
+            'company_id' => $this->company_id,
             'is_active'=> !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);
@@ -79,6 +79,6 @@ class SurchargeController extends Controller
 
     public function selectiveSurcharge()
     {
-        return Surcharge::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
+        return Surcharge::where('company_id', $this->company_id)->where('is_active', 1)->get();
     }
 }

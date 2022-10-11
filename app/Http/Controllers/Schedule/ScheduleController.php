@@ -23,25 +23,26 @@ class ScheduleController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
 
     public function index()
     {
-        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'updated_by', 'added_by')->orderBy('id')->get();
+        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'updated_by', 'added_by')->where('company_id', $this->company_id)->orderBy('id')->get();
     }
 
     public function storeSchedule(Request $request)
     {
         $rules = [
             'name' => 'required',
-            'DepartureDateTime' => 'required',
-            'DestinationDateTime' => 'required',
+            'StartDate' => 'required',
+            'EndDate' => 'required',
             'class' => 'required',
             'route' => 'required',
             'noRows' => 'required',
+            'noCols' => 'required',
             'busClass' => 'required',
             'bus' => 'required',
             'seatMap' => 'required',
@@ -49,11 +50,12 @@ class ScheduleController extends Controller
 
         $customMessages = [
             'name.required' => 'Schedule Name is Required',
-            'DepartureDateTime.required' => 'Departure Date & Time is Required',
-            'DestinationDateTime.required' => 'Destination Date & Time is Required',
+            'StartDate.required' => 'Start Date is Required',
+            'EndDate.required' => 'End Date is Required',
             'class.required' => 'Class is Required',
             'route.required' => 'Route is Required',
             'noRows.required' => 'No of Rows is Required',
+            'noCols.required' => 'No of Cols is Required',
             'busClass.required' => 'Bus Class is Required',
             'bus.required' => 'Bus is Required',
             'seatMap.required' => 'Seat Map is Required',
@@ -61,8 +63,8 @@ class ScheduleController extends Controller
         $this->validate($request, $rules, $customMessages);
         return Schedule::create([
             'name' => $request->name,
-            'departure_datetime' => $request->DepartureDateTime,
-            'destination_datetime' => $request->DestinationDateTime,
+            'start_date' => $request->StartDate,
+            'end_date' => $request->EndDate,
             'bus_class_id' => $request->class,
             'route_id' => $request->route,
             'surcharge_id' => $request->surcharge,
@@ -71,6 +73,7 @@ class ScheduleController extends Controller
             'bus_id' => $request->bus,
             'selected_bus_class_id' => $request->busClass,
             'no_of_rows' => $request->noRows,
+            'no_of_cols' => $request->noCols,
             'company_id' => $this->company_id,
             'seat_map' => $request->seatMap,
             'added_by' => Auth::user()->id,
@@ -98,33 +101,12 @@ class ScheduleController extends Controller
 
     public function updateSchedule(Request $request)
     {
-//        dd($request->schedules);
+//        dd($request->all());
         $req = $request->schedules;
-//         $rules = [
-//             'name' => 'required',
-//             'departure_datetime' => 'required',
-//             'destination_datetime' => 'required',
-//             'bus_class_id' => 'required',
-//             'route_id' => 'required',
-//             'selected_bus_class_id' => 'required',
-//             'bus_id' => 'required',
-//         ];
-//
-//         $customMessages = [
-//             'name.required' => 'Schedule Name is Required',
-//             'departure_datetime.required' => 'Departure Date & Time is Required',
-//             'destination_datetime.required' => 'Destination Date & Time is Required',
-//             'bus_class_id.required' => 'Class is Required',
-//             'route_id.required' => 'Route is Required',
-//             'selected_bus_class_id.required' => 'Bus Class is Required',
-//             'bus_id.required' => 'Bus is Required',
-//         ];
-//         $this->validate($req, $rules, $customMessages);
-//         dd('validate');
         return Schedule::where('id', $req['id'])->update([
             'name' => $req['name'],
-            'departure_datetime' => $req['departure_datetime'],
-            'destination_datetime' => $req['destination_datetime'],
+            'start_date' => $req['start_date'],
+            'end_date' => $req['end_date'],
             'bus_class_id' => $req['bus_class_id'],
             'route_id' => $req['route_id'],
             'surcharge_id' => $req['surcharge_id'],
@@ -143,7 +125,7 @@ class ScheduleController extends Controller
 
     public function getRoutes()
     {
-        return Route::get();
+        return Route::where('company_id', $this->company_id)->get();
     }
 
     public function getCity(Request $request)
@@ -169,21 +151,21 @@ class ScheduleController extends Controller
 
     public function getRouteFareClass(Request $request)
     {
-        return RouteFare::with('fare_class')->where('route_id', $request->id)->select('fare_class_id')->distinct()->get();
+        return RouteFare::with('fare_class')->where('company_id', $this->company_id)->where('route_id', $request->id)->select('fare_class_id')->distinct()->get();
     }
 
 
     public function getEntire(Request $request)
     {
         return [
-            'busName' => Bus::where('id', $request->bus)->pluck('bus_number')->first(),
-            'busClass' => FareClass::where('id', $request->busClass)->pluck('name')->first(),
-            'city' => City::where('id', $request->city)->pluck('name')->first(),
-            'class' => FareClass::where('id', $request->class)->pluck('name')->first(),
-            'route' => Route::where('id', $request->route)->pluck('name')->first(),
-            'terminal' => Terminal::where('id', $request->terminal)->pluck('name')->first(),
-            'discount' => Discount::where('id', $request->discount)->pluck('percentage')->first(),
-            'surcharge' => Surcharge::where('id', $request->surcharge)->pluck('percentage')->first(),
+            'busName' => Bus::where('company_id', $this->company_id)->where('id', $request->bus)->pluck('bus_number')->first(),
+            'busClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
+            'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
+            'class' => FareClass::where('company_id', $this->company_id)->where('id', $request->class)->pluck('name')->first(),
+            'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
+            'terminal' => Terminal::where('company_id', $this->company_id)->where('id', $request->terminal)->pluck('name')->first(),
+            'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->pluck('percentage')->first(),
+            'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->pluck('percentage')->first(),
 
         ];
     }
@@ -191,14 +173,14 @@ class ScheduleController extends Controller
     public function genericCommon()
     {
         return [
-            'bus' => Bus::where('company_id', Auth::user()->company_id)->get(),
-            'class' => FareClass::where('company_id', Auth::user()->company_id)->get(),
-            'routeClass' => FareClass::where('company_id', Auth::user()->company_id)->get(),
-            'city' => City::where('company_id', Auth::user()->company_id)->get(),
-            'route' => Route::where('company_id', Auth::user()->company_id)->get(),
-            'terminal' => Terminal::where('company_id', Auth::user()->company_id)->get(),
-            'discount' => Discount::where('company_id', Auth::user()->company_id)->get(),
-            'surcharge' => Surcharge::where('company_id', Auth::user()->company_id)->get(),
+            'bus' => Bus::where('company_id', $this->company_id)->get(),
+            'class' => FareClass::where('company_id', $this->company_id)->get(),
+            'routeClass' => FareClass::where('company_id', $this->company_id)->get(),
+            'city' => City::where('company_id', $this->company_id)->get(),
+            'route' => Route::where('company_id', $this->company_id)->get(),
+            'terminal' => Terminal::where('company_id', $this->company_id)->get(),
+            'discount' => Discount::where('company_id', $this->company_id)->get(),
+            'surcharge' => Surcharge::where('company_id', $this->company_id)->get(),
 
         ];
     }

@@ -11,6 +11,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Route\RouteTerminal;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CityController extends Controller
 {
@@ -19,7 +20,7 @@ class CityController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
@@ -109,7 +110,7 @@ class CityController extends Controller
 
     public function city_routes_details(Request $request)
     {
-        $routeFareCities = RouteFare::with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
+        $routeFareCities = RouteFare::where('route_id', $request->id)->where('company_id', $this->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
         $data = [];
         foreach ($routeFareCities as $cities) {
             foreach ($cities as $city) {
@@ -121,7 +122,7 @@ class CityController extends Controller
                 }
             }
         }
-        return $final_array = [
+        return [
             'data' => $data,
             'th' => FareClass::where('company_id', $this->company_id)->orderBY('name', 'ASC')->get(),
         ];

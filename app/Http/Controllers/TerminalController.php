@@ -17,17 +17,17 @@ class TerminalController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->company_id = auth()->user()->company_id;
+            $this->company_id = Auth::user()->company_id;
             return $next($request);
         });
     }
     public function index()
     {
-        return City::withCount('terminal')->where('company_id', Auth::user()->company_id)->get();
+        return City::withCount('terminal')->where('company_id', $this->company_id)->get();
     }
     public function getTerminal(Request $request)
     {
-        return Terminal::where('city_id', $request->id)->get();
+        return Terminal::where('city_id', $request->id)->where('company_id', $this->company_id)->get();
     }
     public function store(Request $request)
     {
@@ -49,20 +49,22 @@ class TerminalController extends Controller
             }
         }
 
-        $terminal = Terminal::create([
+        Terminal::create([
             'name' => $request->name,
             'contact' => $request->contact,
             'address' => $request->address ?? " ",
             'longitude' => $request->longitude,
             'latitude' => $request->latitude,
             'time_difference' => $request->time_difference,
+            'available_seats' => $request->available_seats,
+            'advance_booking' => $request->advance_booking,
             'active_sms' => $request->active_sms ? 1 : 0,
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name ?? " ",
             'status' => $request->active ? 1 : 0,
             'is_main' => $request->is_main ? 1 : 0,
-            'added_by' => auth()->user()->id,
-            'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
+            'added_by' => Auth::user()->id,
+            'company_id' => Auth::user()->is_super_admin == 0 ? $this->company_id : $request->company_id,
         ]);
 
         return $this->index();
@@ -73,19 +75,14 @@ class TerminalController extends Controller
     }
     public function update(Request $request)
     {
-
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'bail|required|email|unique:users,email,' . $request->id,
-            'password' => 'min:8',
-            'role' => 'required',
             'contact' => 'required',
         ]);
+
         $user = Terminal::find($request->id)->update([
             'name' => $request->name,
-            'email' => $request->email,
             'contact' => $request->contact,
-            'role_id' => $request->role,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
         ]);
         return response()->json([

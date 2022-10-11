@@ -53,7 +53,7 @@
           </div>
         </div>
         <div class="modal-footer d-block pt-0">
-          
+
           <button
             type="button"
             data-toggle="modal"

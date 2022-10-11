@@ -10,4 +10,18 @@ class FareClass extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = [];
+    public function added_by()
+    {
+        return $this->hasOne(User::class, 'id', 'added_by');
+    }
+
+    public function updated_by()
+    {
+        return $this->hasOne(User::class, 'id', 'updated_by');
+    }
+
+    public function company(){
+        return $this->hasOne( Company::class,'id','company_id' );
+    }
+
 }

@@ -105,13 +105,23 @@
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="time_difference">Time Difference ( e.g 1:30 )</label>
-                        <input type="text" class="form-control" v-model="data.time_difference">
+                        <label for="time_difference">Travel Time ( e.g HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.time_difference"
+                            mask="00:00"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="distance_in_km">Distance in KiloMeter</label>
-                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4"
-                               v-model="data.distance_in_km">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4" v-model="data.distance_in_km">
+                            <div class="input-group-append">
+                                <span class="input-group-text">km</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <button type="button" class="btn btn-block btn-success" @click="add">
@@ -144,6 +154,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import {mapGetters} from "vuex";
+import vueMask from "vue-jquery-mask";
 
 export default {
     name: "FareTable",
@@ -154,9 +165,15 @@ export default {
         Add,
         Edit,
         Delete,
+        vueMask,
     },
     data() {
         return {
+            date: null,
+            options: {
+                placeholder: 'HH:MM',
+                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
             cities: [],
             companies: [],
             fetchedData: [],
@@ -226,12 +243,14 @@ export default {
         },
 
         async changeInfo(from, to) {
+            this.data.fare = '';
+            this.data.distance_in_km = '';
+            this.data.time_difference = '';
             const resGetTerminal = await this.callApi("post", '/fare-table/check', {
                 from: from.id,
                 to: to.id,
                 fare_class: this.data.fare_class,
             });
-            console.log(resGetTerminal);
             if (resGetTerminal.status === 200 && resGetTerminal.data !== '') {
                 this.data = resGetTerminal.data;
                 this.data.created = 1;
