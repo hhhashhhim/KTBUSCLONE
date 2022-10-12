@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Routes Details</h4>
+                            <h4>Routes</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"

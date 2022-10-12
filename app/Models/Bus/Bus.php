@@ -22,7 +22,7 @@ class Bus extends Model
     {
         return $this->hasOne(FareClass::class, 'id', 'fare_class_id');
     }
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

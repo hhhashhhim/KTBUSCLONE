@@ -503,7 +503,7 @@ export default {
     async created() {
         const terminalRes = await this.callApi("post", "terminal");
         const compRes = await this.callApi("post", "company");
-        const cities = await this.callApi("post", "cities");
+        const cities = await this.callApi("post", "citities");
         this.terminals = terminalRes.data;
         this.companies = compRes.data;
         this.cities = cities.data;

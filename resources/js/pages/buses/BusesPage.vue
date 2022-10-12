@@ -3,11 +3,11 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card">
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#addBus" data-toggle="modal" class="btn btn-success">
+                                <a href="#addBus" data-toggle="modal" class="btn btn-primary">
                                     Add New Bus
                                 </a>
                             </div>
@@ -35,7 +35,6 @@
                                                         <th>No. of Seats</th>
                                                         <th>Route Permit</th>
                                                         <th>Added By</th>
-                                                        <th>Updated By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -48,10 +47,6 @@
                                                         <td>{{ bus.no_of_seats }}</td>
                                                         <td>{{ bus.route_permit_number }}</td>
                                                         <td v-if="bus.added_by">{{ bus.added_by }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td v-if="bus.updated_by">
-                                                            {{ bus.updated_by }}
-                                                        </td>
                                                         <td v-else>N/A</td>
                                                         <td>
                                                             <a
@@ -66,7 +61,7 @@
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
                                                                 @click="editBus(bus)"
-                                                                class="btn btn-warning mx-1"
+                                                                class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
@@ -111,7 +106,7 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="card card-success">
+                            <div class="card">
                                 <div class="card-header d-flex justify-content-between">
                                     <h4 class="modal-title">View Bus Details</h4>
                                     <button
@@ -161,9 +156,9 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="card card-success">
+                            <div class="card">
                                 <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Add New Bus</h4>
+                                    <h4 class="modal-title">Add Bus</h4>
                                     <button
                                         type="button"
                                         class="close"
@@ -609,7 +604,7 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="card card-success">
+                            <div class="card">
                                 <div class="card-header d-flex justify-content-between">
                                     <h4 class="modal-title">Add Class To Seat</h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

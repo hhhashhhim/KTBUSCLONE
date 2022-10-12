@@ -40,7 +40,7 @@ class RouteFare extends Model
     public function city_to(){
         return $this->belongsTo(City::class, 'destination_city_id',  'id');
     }
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

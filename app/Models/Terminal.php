@@ -13,7 +13,7 @@ class Terminal extends Model
 
     protected $guarded = [];
 
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

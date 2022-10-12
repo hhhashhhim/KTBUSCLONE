@@ -24,7 +24,7 @@ class Schedule extends Model
         'route_city_terminal' => 'array',
     ];
 
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

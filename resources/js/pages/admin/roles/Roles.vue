@@ -43,7 +43,7 @@
                                                                 <router-link :to="{name: 'role.permission', params: { id:role.id }}" class="btn btn-primary">
                                                                     <i class="fas fa-user-shield"></i>
                                                                 </router-link>
-                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-warning mx-1">
+                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
 <!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">-->

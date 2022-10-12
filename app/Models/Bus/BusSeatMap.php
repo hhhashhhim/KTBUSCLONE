@@ -11,16 +11,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class BusSeatMap extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $casts = [
-        'seat_map' => 'array'
-    ];
+    // protected $casts = [
+    //     'seat_map' => 'array'
+    // ];
 
     protected $guarded = [];
 
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
     }
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

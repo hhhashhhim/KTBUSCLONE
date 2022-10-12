@@ -12,7 +12,7 @@ class Company extends Model
     protected $guarded = [];
     protected $casts = ['modules'=>'array'];
 
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Fare Class Details</h4>
+                            <h4>Fare Class</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -65,7 +65,7 @@
                                                         <td>{{ fareClass.is_active === 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(fareClass)" class="btn btn-warning mx-1">
+                                                               @click="edit(fareClass)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
                                                             <a href="#delete-modal" data-toggle="modal"

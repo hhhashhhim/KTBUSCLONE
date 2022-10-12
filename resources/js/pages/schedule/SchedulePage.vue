@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-success">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Schedule Details</h4>
+                            <h4>Schedule</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -88,7 +88,7 @@
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
                                                                @click="edit(schedule); genericData()"
-                                                               class="btn btn-warning mr-1">
+                                                               class="btn btn-primary mr-1">
                                                                 <i class="far fa-edit"></i>
                                                             </a>
                                                             <a

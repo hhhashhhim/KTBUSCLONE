@@ -53,7 +53,7 @@
                                   href="#edit-modal"
                                   data-toggle="modal"
                                   @click="edit(user)"
-                                  class="btn btn-warning mx-1"
+                                  class="btn btn-primary mx-1"
                                 >
                                   <i class="far fa-edit"></i>
                                 </a>

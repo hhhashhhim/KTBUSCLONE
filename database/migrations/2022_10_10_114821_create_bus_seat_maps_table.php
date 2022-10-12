@@ -20,8 +20,8 @@ class CreateBusSeatMapsTable extends Migration
             $table->integer('row_index')->nullable();
             $table->integer('no_of_cols')->nullable();
             $table->integer('col_index')->nullable();
-            $table->enum('status',['B', 'R'])->nullable();
-            $table->json('seat_map')->nullable();
+            $table->string('status')->nullable();
+            // $table->json('seat_map')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();

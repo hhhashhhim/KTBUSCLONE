@@ -24,7 +24,7 @@ class Route extends Model
         return $this->hasOne( Company::class,'id','company_id' );
     }
 
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }

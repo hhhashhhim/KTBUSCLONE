@@ -12,7 +12,7 @@ class CityToCity extends Model
     protected $table = 'city_to_city';
     protected $guarded = [];
 
-    public function added_by()
+    public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
