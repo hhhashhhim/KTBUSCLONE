@@ -82,9 +82,10 @@ class ScheduleController extends Controller
 
     public function editSchedule(Request $request)
     {
-        $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->get();
+        $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->first();
+
         $dataArr = [];
-        foreach ($schedule[0]->route_city_terminal as $key => $item) {
+        foreach ($schedule->route_city_terminal as $key => $item) {
             $dataArr['city'][$key] = $item['city_id'];
             $dataArr['terminal'][$key] = $item['terminal_id'];
         }
@@ -92,8 +93,8 @@ class ScheduleController extends Controller
         $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', $this->company_id)->get();
         return [
             'cities' => $city,
-            'schedules' => $schedule[0],
-            'compare_array' => $schedule[0]->route_city_terminal,
+            'schedules' => $schedule,
+            'compare_array' => $schedule->route_city_terminal,
         ];
 
 

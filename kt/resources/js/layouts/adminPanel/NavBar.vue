@@ -30,7 +30,7 @@
                 <div class="dropdown-menu dropdown-menu-right pullDown">
                     <div class="dropdown-title">Hello {{ $store.state.user.name }}</div>
                     <div class="dropdown-divider"></div>
-                    <a href="/kt/public/logout" class="dropdown-item has-icon text-danger"> <i
+                    <a href="/logout" class="dropdown-item has-icon text-danger"> <i
                             class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>

@@ -207,7 +207,7 @@
                                             <span v-for="(item) in terminals[i]" :key="item.id">
                                                 <label class="colorinput mx-3">
                                                     <span>
-                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id"/>
+                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id" v-model="addTerminalId"/>
                                                         <span class="colorinput-color bg-success"></span>
                                                     </span>
                                                 </label>
@@ -790,6 +790,7 @@ export default {
             isShowEditDiv: false,
             stepTwoAddSchedule: false,
             buses: '',
+            addTerminalId: '',
             TripDuration: '',
             activeSection: 0,
             editActiveSection: 0,
@@ -1011,8 +1012,8 @@ export default {
                 return this.errorsArray("Schedule Name is Required", "Name");
             if (this.data.StartDate === "")
                 return this.errorsArray("Departure Date and Time is Required", "StartDate");
-            if (this.data.DestinationDateTime === "")
-                return this.errorsArray("End Date and Time is Required", "DestinationDateTime");
+            if (this.data.EndDate === "")
+                return this.errorsArray("End Date and Time is Required", "EndDate");
             if (this.data.bus === "")
                 return this.errorsArray("Bus is Required", "Bus");
             if (this.data.busClass === "")
@@ -1022,6 +1023,8 @@ export default {
             if (this.data.noRows === "")
                 return this.errorsArray("No of Rows is Required", "NoOfRows");
             if (this.data.route === "")
+                return this.errorsArray("Route is Required", "Route");
+            if (this.addTerminalId === "")
                 return this.errorsArray("Route is Required", "Route");
 
             const res = await this.callApi("post", "/schedule/store", this.data);
