@@ -25569,7 +25569,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 14;
+                  _context3.next = 13;
                   break;
                 }
 
@@ -25578,13 +25578,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this3.getClasses();
 
               case 11:
-                setTimeout(function () {
-                  window.location.reload();
-                }, 2000);
-                _context3.next = 15;
+                _context3.next = 14;
                 break;
 
-              case 14:
+              case 13:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -25597,7 +25594,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 15:
+              case 14:
               case "end":
                 return _context3.stop();
             }
@@ -25633,9 +25630,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200 && res.statusText === "OK") {
                   _this4.success = "Surcharge Updated Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
-                  }, 2000);
                 } else {
                   if (res.status === 422) {
                     _loop2 = function _loop2(key) {
@@ -25668,7 +25662,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context5.prev = _context5.next) {
               case 0:
                 deletingObj = {
-                  url: "/fare-class/delete",
+                  url: "fare-class/delete",
                   data: fare_class,
                   index: i
                 };
@@ -25692,9 +25686,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.fareClasses.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
-        }, 2000);
       }
     }
   }

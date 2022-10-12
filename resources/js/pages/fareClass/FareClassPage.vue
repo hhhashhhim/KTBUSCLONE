@@ -266,9 +266,7 @@ export default {
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
                 await this.getClasses();
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
+              
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
@@ -289,9 +287,7 @@ export default {
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Surcharge Updated Successfully";
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
+           
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
@@ -306,7 +302,7 @@ export default {
 
         async deleteModal( fare_class,i ){
             const deletingObj = {
-                url:"/fare-class/delete",
+                url:"fare-class/delete",
                 data:fare_class,
                 index:i,
             }
@@ -324,9 +320,7 @@ export default {
         getDeletingObj(obj){
             if (obj.isDeleted) {
                 this.fareClasses.splice(obj.index,1)
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
+          
             }
         }
     }
