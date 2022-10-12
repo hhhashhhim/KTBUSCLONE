@@ -27,7 +27,7 @@ class CityController extends Controller
 
     public function index()
     {
-        return City::with('added_by')->orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get();
+        return City::with('addedBy')->where('company_id', $this->company_id)->get();
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class CityController extends Controller
         $city = City::create([
             'name' => $request->name,
             'company_id' => $this->company_id,
-            'added_by' => auth()->user()->id,
+            'added_by' => Auth::user()->id,
         ]);
         $this->cityCombinations($city);
         return $city;

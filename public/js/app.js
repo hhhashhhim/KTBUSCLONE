@@ -24463,7 +24463,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var res;
+      var resCity;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -24472,11 +24472,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _this.callApi("post", 'cities');
 
             case 2:
-              res = _context.sent;
-              console.log(res.data);
+              resCity = _context.sent;
+              console.log(resCity.data);
 
-              if (res.status == 200) {
-                _this.cities = res.data;
+              if (resCity.status == 200) {
+                _this.cities = resCity.data;
               } else {
                 console.log(res);
               }
@@ -27879,7 +27879,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 5:
               compRes = _context.sent;
               _context.next = 8;
-              return _this.callApi("post", "city");
+              return _this.callApi("post", "cities");
 
             case 8:
               cities = _context.sent;
@@ -31783,7 +31783,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.added_by.name), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
       href: "#edit-modal",

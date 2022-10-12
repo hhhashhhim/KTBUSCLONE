@@ -36,7 +36,7 @@
                                                         <tr v-for="(city,i) in cities" :key="i">
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ city.name }}</td>
-                                                            <td>{{ city.name }}</td>
+                                                            <td>{{ city.added_by.name }}</td>
                                                             <td>
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
@@ -133,10 +133,10 @@ export default {
         }
     },
     async created(){
-        const res = await this.callApi("post",'cities');
-        console.log(res.data);
-        if (res.status==200) {
-            this.cities=res.data
+        const resCity = await this.callApi("post",'cities');
+        console.log(resCity.data);
+        if (resCity.status==200) {
+            this.cities=resCity.data
         }
         else{
             console.log(res);
