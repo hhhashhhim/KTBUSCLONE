@@ -14,7 +14,7 @@ export default {
                 return await axios({
                     method:method,
                     // url: format.test(url) ? '/api'+url : '/api/'+url,
-                    url: url,
+                    url: this.$store.state.app_url + url,
                     data:data
                 });
             } catch (error) {

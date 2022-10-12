@@ -11,12 +11,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="card card-success">
-                        <div class="card-header d-flex justify-content-between">
-        
-                            
-                        </div>
-                        <div class="card-body">
+                  
                             <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
@@ -27,18 +22,11 @@
                                     <li v-for="(error,i) in errors" :key="i">{{ error.desc }}</li>
                                 </ul>
                             </div>
-                            <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="success">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                    <span class="sr-only">Close</span>
-                                </button>
-                                {{ success }}
-                            </div>
                             <slot></slot>
-                        </div>
-                    </div>
                 </div>
+                
                 <div class="modal-footer bg-whitesmoke br">
+                    <slot name="button"></slot>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>

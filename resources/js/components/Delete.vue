@@ -8,7 +8,7 @@
     aria-labelledby="modelTitleId"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-body pt-5">
           <div class="card card-danger">

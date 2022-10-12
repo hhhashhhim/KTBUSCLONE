@@ -5,11 +5,11 @@
 
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card ">
                         <div class="card-header">
                             <h4>Cities</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success">
+                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-primary">
                                     Add New
                                 </a>
                             </div>
@@ -20,9 +20,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
+            
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table table-striped table-hover" id="edit_loc">
@@ -38,7 +36,7 @@
                                                             <td>{{ i+1 }}</td>
                                                             <td>{{ city.name }}</td>
                                                             <td>
-                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-warning mx-1">
+                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
                                                                 <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">
@@ -61,7 +59,7 @@
 
             <!-- Add Modal -->
             <Add
-            heading="New City"
+            heading="Add New City"
             :errors="this.validationErrors"
             :success="success"
             :formID="formID"
@@ -70,25 +68,26 @@
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-block btn-success" @click="add">Add City</button>
-                </div>
+                <template v-slot:button> 
+                    <button type="button" class="btn btn-primary" @click="add">Add New City</button>
+                </template>
             </Add>
 
             <!-- Add Modal -->
             <Edit
-            heading="Edit City"
+            heading="Edit City Name"
             :errors="this.validationErrors"
             :success="success"
-            :formID="formID"
+            :formID="editFormID"
             >
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="dataEdit.name">
                 </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-block btn-success" @click="update">Update City</button>
-                </div>
+         
+                <template v-slot:button> 
+                    <button type="button" class="btn btn-primary" @click="update">Update City</button>
+                </template>
             </Edit>
 
             <!-- Add Modal -->
@@ -117,6 +116,8 @@ export default {
         return {
             cities:[],
             formID:'newCity',
+            editFormID:'editCity',
+            deleteFormID:'deleteCity',
             data:{
                 name:"",
             },
@@ -130,7 +131,7 @@ export default {
         }
     },
     async created(){
-        const res = await this.callApi("post",'/city');
+        const res = await this.callApi("post",'city');
         if (res.status==200) {
             this.cities=res.data
         }
@@ -142,14 +143,11 @@ export default {
         async add(){
             this.validationErrors=[]
             if(this.data.name === "") return this.errorsArray("City Name is Required","Name");
-            const res = await this.callApi("post",'/city/store',this.data);
+            const res = await this.callApi("post",'city/store',this.data);
             if (res.status === 201) {
                 this.success="City Created Successfully";
                 this.cities.unshift(res.data);
                 this.data.name = "";
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
             }
             else{
                 if (res.status==422) {
@@ -169,10 +167,10 @@ export default {
 
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("City Name is Required","Name");
-            const res = await this.callApi("post",'/city/update',this.dataEdit);
+            const res = await this.callApi("post",'city/update',this.dataEdit);
             if (res.status==200) {
                 this.success="City Updated Successfully";
-                const res = await this.callApi("post",'/city');
+                const res = await this.callApi("post",'city');
                 if (res.status==200) {
                     this.cities=res.data
                 }
@@ -193,7 +191,7 @@ export default {
         },
         async deleteModal( city,i ){
             const deletingObj = {
-                url:"/city/delete",
+                url:"city/delete",
                 data:city,
                 index:i,
             }

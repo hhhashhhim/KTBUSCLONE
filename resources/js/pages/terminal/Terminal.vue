@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card ">
                         <div class="card-header">
                             <h4>Terminals</h4>
                             <div class="card-header-action">
@@ -11,7 +11,7 @@
                                     href="#add-modal"
                                     data-toggle="modal"
                                     :data-target="'#'+formID"
-                                    class="btn btn-success"
+                                    class="btn btn-primary"
                                 >
                                     Add New
                                 </a>
@@ -119,6 +119,7 @@
                     <div class="form-group col-md-4">
                         <label for="longitude">Longitude</label>
                         <input type="text" class="form-control" v-model="data.longitude">
+                        <small><a href="https://www.google.com/maps" target="_blank">Click Here to get</a></small>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="Latitude">Latitude</label>
@@ -167,12 +168,12 @@
                         </label>
                     </div>
 
-                    <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-block btn-success" @click="add">
-                            Add Terminal
-                        </button>
-                    </div>
                 </div>
+                    <template v-slot:button>
+                        <button type="button" class="btn btn-primary" @click="add">
+                            Add New Terminal
+                        </button>
+                    </template>
             </Add>
 
             <!-- Edit Modal -->
@@ -500,9 +501,9 @@ export default {
     },
 
     async created() {
-        const terminalRes = await this.callApi("post", "/terminal");
-        const compRes = await this.callApi("post", "/company");
-        const cities = await this.callApi("post", "/city");
+        const terminalRes = await this.callApi("post", "terminal");
+        const compRes = await this.callApi("post", "company");
+        const cities = await this.callApi("post", "city");
         this.terminals = terminalRes.data;
         this.companies = compRes.data;
         this.cities = cities.data;
@@ -576,7 +577,7 @@ export default {
             // this.roles = roleRes.data;
         },
         async terminalDetail(id) {
-            const getTerminalRes = await this.callApi("post", "/terminal/getTerminal", {id: id});
+            const getTerminalRes = await this.callApi("post", "terminal/getTerminal", {id: id});
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
@@ -586,11 +587,11 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 return this.errorsArray("terminal Name is Required", "Name");
-            const res = await this.callApi("post", "/terminal/update", this.dataEdit);
+            const res = await this.callApi("post", "terminal/update", this.dataEdit);
             if (res.status === 201) {
                 this.success = "terminal Updated Successfully";
                 this.dataEdit = "";
-                const terminalRes = await this.callApi("post", "/terminal", {});
+                const terminalRes = await this.callApi("post", "terminal", {});
                 this.terminals = terminalRes.data;
                 setTimeout(() => {
                     this.success = "";
@@ -610,7 +611,7 @@ export default {
         },
         async deleteModal(terminal, i) {
             const deletingObj = {
-                url: "/terminal/delete",
+                url: "terminal/delete",
                 data: terminal,
                 index: i,
             };
