@@ -266,9 +266,9 @@ export default {
     };
   },
   async created() {
-    const userRes = await this.callApi("post", "/user", {});
+    const userRes = await this.callApi("post", "user", {});
     this.users = userRes.data;
-    const roleRes = await this.callApi("post", "/company/roles", {id:this.data.company_id});
+    const roleRes = await this.callApi("post", "company/roles", {id:this.data.company_id});
     this.roles = roleRes.data;
   },
   methods: {
@@ -284,7 +284,7 @@ export default {
       if (this.data.role == "")
         return this.errorsArray("User Role is Required", "Role");
 
-      const res = await this.callApi("post", "/user/store", this.data);
+      const res = await this.callApi("post", "user/store", this.data);
       if (res.status == 200) {
         this.success = "User Created Successfully";
         this.users = res.data
@@ -306,18 +306,18 @@ export default {
     async edit(user) {
       this.dataEdit = user;
       this.dataEdit.role=user.role_id;
-      const roleRes = await this.callApi("post", "/company/roles", {id:user.company_id});
+      const roleRes = await this.callApi("post", "company/roles", {id:user.company_id});
       this.roles = roleRes.data;
     },
     async update() {
       this.validationErrors = [];
       if (this.dataEdit.name == "")
       return this.errorsArray("User Name is Required", "Name");
-      const res = await this.callApi("post", "/user/update", this.dataEdit);
+      const res = await this.callApi("post", "user/update", this.dataEdit);
       if (res.status == 201) {
         this.success = "User Updated Successfully";
         this.dataEdit = "";
-        const userRes = await this.callApi("post", "/user", {});
+        const userRes = await this.callApi("post", "user", {});
         this.users = userRes.data;
         setTimeout(() => {
           this.success = "";

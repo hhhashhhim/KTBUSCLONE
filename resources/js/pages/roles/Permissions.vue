@@ -108,7 +108,7 @@ export default {
     };
   },
   async created() {
-    const res = await this.callApi("post", "/role/get", { id: this.$route.params.id });
+    const res = await this.callApi("post", "role/get", { id: this.$route.params.id });
     if (res.status == 200) {
       this.role = res.data.role;
       console.log(res.data.permissions);
@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     async save() {
-      const res = await this.callApi("post", "/role/update",{
+      const res = await this.callApi("post", "role/update",{
         ...this.role,
         permissions:this.permissions,
       })

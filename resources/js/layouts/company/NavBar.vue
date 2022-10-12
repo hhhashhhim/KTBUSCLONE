@@ -31,7 +31,7 @@
                     <div class="dropdown-title">Hello {{ $store.state.user.name }}</div>
           
                     <div class="dropdown-divider"></div>
-                    <a href="/kt-new/logout" class="dropdown-item has-icon text-danger"> <i
+                    <a :href="$store.state.app_url + 'logout'" class="dropdown-item has-icon text-danger"> <i
                             class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>

@@ -294,7 +294,7 @@ export default {
                 cities: this.addCities,
                 terminals: this.addTerminalsOnClick
             }
-            const res = await this.callApi("post", "/cities/routes", data);
+            const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
                 this.success = "Route Created Successfully";
                 setTimeout(() => {
@@ -304,7 +304,7 @@ export default {
         },
         async add() {
             this.validationErrors = [];
-            const res = await this.callApi("post", "/fare-table/store", this.data);
+            const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {
                 this.success = "Fare Table Updated Created Successfully";
                 // Object.keys(obj).forEach((i) => obj[i] = null);
@@ -350,7 +350,7 @@ export default {
                 this.addCities.push(value);
             }
 
-            const terminalRes = await this.callApi("post", "/cities/terminals", {
+            const terminalRes = await this.callApi("post", "cities/terminals", {
                 id: value
             });
             if (terminalRes.status === 200) {
@@ -359,7 +359,7 @@ export default {
             }
         },
         async fetchCities() {
-            const cityRes = await this.callApi("post", "/cities/routes/list");
+            const cityRes = await this.callApi("post", "cities/routes/list");
             if (cityRes.status === 200) {
                 this.cities = cityRes.data.cities;
                 this.routes = cityRes.data.routes;
@@ -373,7 +373,7 @@ export default {
         },
         async fetchRouteDetails(id) {
 
-            const routeDetailRes = await this.callApi("post", "/cities/routes/details", {
+            const routeDetailRes = await this.callApi("post", "cities/routes/details", {
                 id: id
             });
             if (routeDetailRes.status === 200) {
@@ -386,7 +386,7 @@ export default {
                 this.error = true;
                 return;
             }
-            const res = await this.callApi("post", "/fare-table", {
+            const res = await this.callApi("post", "fare-table", {
                 company_id: this.data.company_id,
                 fare_class: this.data.fare_class,
             });

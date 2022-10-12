@@ -545,7 +545,7 @@ export default {
             if (this.data.contact === "")
                 return this.errorsArray("Terminal Contact is Required", "Contact");
 
-            const res = await this.callApi("post", "/terminal/store", this.data);
+            const res = await this.callApi("post", "terminal/store", this.data);
             if (res.status === 200) {
                 this.success = "Terminal Created Successfully";
                 this.terminals = res.data
@@ -572,9 +572,6 @@ export default {
         async editTerminal(single) {
             console.log(single);
             this.dataEdit = single;
-            // this.dataEdit.role = single.role_id;
-            // const roleRes = await this.callApi("post", "/company/roles", {id: terminal.company_id});
-            // this.roles = roleRes.data;
         },
         async terminalDetail(id) {
             const getTerminalRes = await this.callApi("post", "terminal/getTerminal", {id: id});

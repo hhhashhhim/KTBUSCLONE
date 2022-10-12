@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Bus\BusController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
@@ -71,14 +70,12 @@ Route::group(['prefix' => 'terminal', [CustomMiddleware::class]], function () {
     Route::post('delete', [TerminalController::class, 'delete']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
 });
-Route::group(['prefix' => 'city', [CustomMiddleware::class]], function () {
+
+Route::group(['prefix' => 'cities', [CustomMiddleware::class]], function () {
     Route::post('/', [CityController::class, 'index']);
     Route::post('store', [CityController::class, 'store']);
     Route::post('update', [CityController::class, 'update']);
     Route::post('delete', [CityController::class, 'delete']);
-});
-
-Route::group(['prefix' => 'cities', [CustomMiddleware::class]], function () {
     Route::post('/terminals', [CityController::class, 'cityTerminals']);
     Route::post('/routes', [CityController::class, 'cityRoutes']);
     Route::post('/routes/list', [CityController::class, 'city_routes_list']);
@@ -135,12 +132,4 @@ Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/delete', [BusController::class, 'deleteBus']);
     Route::post('/getBusData', [BusController::class, 'getBusData']);
 });
-//
-//Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
-//    Route::post('/', [BookingController::class, 'index']);
-//    Route::post('/store', [BookingController::class, 'storeBooking']);
-//    Route::post('/update', [BookingController::class, 'updateBooking']);
-//    Route::post('/delete', [BookingController::class, 'deleteBooking']);
-//    Route::post('/getBusData', [BookingController::class, 'getBookingData']);
-//});
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

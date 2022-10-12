@@ -131,7 +131,7 @@ export default {
         }
     },
     async created(){
-        const res = await this.callApi("post",'/role',{name:this.data.name});
+        const res = await this.callApi("post",'role',{name:this.data.name});
         if (res.status==200) {
             this.roles=res.data
         }
@@ -143,7 +143,7 @@ export default {
         async add(){
             this.validationErrors=[]
             if(this.data.name=="") return this.errorsArray("Role Name is Required","Name");
-            const res = await this.callApi("post",'/role/store',{name:this.data.name});
+            const res = await this.callApi("post",'role/store',{name:this.data.name});
             if (res.status==201) {
                 this.success="Role Created Successfully";
                 this.roles.unshift(res.data);
@@ -170,7 +170,7 @@ export default {
 
             this.validationErrors=[]
             if(this.data.name=="") return this.errorsArray("Role Name is Required","Name");
-            const res = await this.callApi("post",'/role/update',this.dataEdit);
+            const res = await this.callApi("post",'role/update',this.dataEdit);
             if (res.status==201) {
                 this.success="Role Created Successfully";
                 this.roles.unshift(res.data);

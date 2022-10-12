@@ -492,7 +492,7 @@ export default {
   },
   async created() {
     this.data.modules = this.dataEdit.modules = this.defaultModules;
-    const companyRes = await this.callApi("post", "/company");
+    const companyRes = await this.callApi("post", "company");
     if (companyRes.status == 200) {
       this.cities = companyRes.data;
     }
@@ -517,10 +517,10 @@ export default {
 
       let logo = "";
       if (this.data.logo) {
-        const logoRes = await this.callApi("post", "/company/logo-upload", formData,config);
+        const logoRes = await this.callApi("post", "company/logo-upload", formData,config);
         logo:logoRes?logoRes.data.name:""
       }
-      const res = await this.callApi("post", "/company/store", {
+      const res = await this.callApi("post", "company/store", {
         ...this.data,
         logo
       });
@@ -546,7 +546,7 @@ export default {
       }
     },
     async edit(id, i) {
-      const res = await this.callApi("post", "/company/get", { id });
+      const res = await this.callApi("post", "company/get", { id });
       let company;
 
       if (res.status == 200) {
@@ -575,11 +575,11 @@ export default {
       if (this.dataEdit.name == "")
         return this.errorsArray("Company Name is Required", "Name");
 
-      const res = await this.callApi("post", "/company/update", this.dataEdit);
+      const res = await this.callApi("post", "company/update", this.dataEdit);
 
       if (res.status == 200) {
         this.success = "Company Updated Successfully";
-        const companyRes = await this.callApi("post", "/company");
+        const companyRes = await this.callApi("post", "company");
         if (companyRes.status == 200) {
           this.cities = companyRes.data;
         }

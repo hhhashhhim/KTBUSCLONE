@@ -27,7 +27,7 @@ class CityController extends Controller
 
     public function index()
     {
-        return City::orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get();
+        return City::with('added_by')->orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get();
     }
 
     public function store(Request $request)

@@ -103,7 +103,7 @@ export default {
       if (this.password == "")
         return this.errorsArray("Password Field Is Required");
 
-      const res = await this.callApi("post", "/double-check", {password:this.password});
+      const res = await this.callApi("post", "double-check", {password:this.password});
       if (res.status == 200) {
         this.$emit('confirmDeleteModal',{
           details:this.getDeletingObj.data,

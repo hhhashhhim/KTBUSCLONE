@@ -207,7 +207,7 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", '/fare-class');
+        const res = await this.callApi("post", 'fare-class');
         if (res.status === 200) {
             this.fareClasses = res.data
         } else {
@@ -246,7 +246,7 @@ export default {
             }
         },
         async getClasses() {
-            const res = await this.callApi("post", '/fare-table/fare_class/get');
+            const res = await this.callApi("post", 'fare-table/fare_class/get');
             if (res.status === 200) {
                 this.fareClasses = res.data
             } else {
@@ -262,7 +262,7 @@ export default {
                 name: this.FareClassName,
                 active: this.isActive,
             }
-            const res = await this.callApi("post", "/fare-class/store", dataFare);
+            const res = await this.callApi("post", "fare-class/store", dataFare);
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
                 await this.getClasses();
@@ -286,7 +286,7 @@ export default {
             if (this.dataEdit.FareClassName === "")
                 return this.errorsArray("Fare Class Name is Required", "FareClassName");
 
-            const res = await this.callApi("post", '/fare-class/update', this.dataEdit);
+            const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Surcharge Updated Successfully";
                 setTimeout(function () {

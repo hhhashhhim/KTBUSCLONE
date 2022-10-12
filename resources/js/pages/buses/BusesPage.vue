@@ -722,14 +722,14 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", "/buses");
+        const res = await this.callApi("post", "buses");
         if (res.status === 200) {
             this.buses = res.data;
         } else {
             console.log(res);
         }
 
-        const resFareClass = await this.callApi("post", "/fare-class");
+        const resFareClass = await this.callApi("post", "fare-class");
         if (resFareClass.status === 200) {
             this.fareClasses = resFareClass.data;
         } else {
@@ -863,7 +863,7 @@ export default {
                 return this.errorsArray("Bus Seats Rows is Required", "noOfRows");
             if (this.data.fare_class === "")
                 return this.errorsArray("PLease Select Fare Class", "fare_class");
-            const res = await this.callApi("post", "/buses/store", this.data);
+            const res = await this.callApi("post", "buses/store", this.data);
             console.log(res);
             if (res.status === 201) {
                 this.success = "Bus Created Successfully";
@@ -892,10 +892,10 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 return this.errorsArray("City Name is Required", "Name");
-            const res = await this.callApi("post", "/buses/update", this.dataEdit);
+            const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
                 this.success = "Bus Record Updated Successfully";
-                const res = await this.callApi("post", "/buses");
+                const res = await this.callApi("post", "buses");
                 if (res.status === 200) {
                     this.buses = res.data;
                 }

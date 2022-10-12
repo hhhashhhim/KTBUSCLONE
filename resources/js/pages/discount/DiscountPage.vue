@@ -231,7 +231,7 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", '/discount');
+        const res = await this.callApi("post", 'discount');
         if (res.status == 200) {
             this.discounts = res.data
         } else {
@@ -282,7 +282,7 @@ export default {
                 active: this.isActive,
             }
 
-            const res = await this.callApi("post", "/discount/store", data);
+            const res = await this.callApi("post", "discount/store", data);
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Discount Created Successfully";
                 setTimeout(function () {
@@ -309,7 +309,7 @@ export default {
             if (this.dataEdit.percentage === "")
                 return this.errorsArray("Percentage is Required", "PercentageName");
 
-            const res = await this.callApi("post", '/discount/update', this.dataEdit);
+            const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Discount Updated Successfully";
                 setTimeout(function () {

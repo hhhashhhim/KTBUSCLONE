@@ -819,7 +819,7 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", '/schedule');
+        const res = await this.callApi("post", 'schedule');
         if (res.status === 200) {
             this.schedules = res.data
         } else {
@@ -830,14 +830,14 @@ export default {
 
     methods: {
         async fetchTerminals(event, index) {
-            const terminalRes = await this.callApi("post", "/cities/terminals", {id: value});
+            const terminalRes = await this.callApi("post", "cities/terminals", {id: value});
             if (terminalRes.status === 200) {
                 this.terminals[index] = terminalRes.data;
             }
         },
 
         async getEntireForm() {
-            const resEntire = await this.callApi("post", '/schedule/getEntire', this.data);
+            const resEntire = await this.callApi("post", 'schedule/getEntire', this.data);
             this.dataPreview = resEntire.data;
             this.dataPreview.start_date = this.data.StartDate;
             this.dataPreview.end_date = this.data.EndDate;
@@ -946,7 +946,7 @@ export default {
 
         async getSelectiveData(name) {
             if (name == 'route') {
-                const resRoute = await this.callApi("post", '/schedule/getCity', {id: this.data.route});
+                const resRoute = await this.callApi("post", 'schedule/getCity', {id: this.data.route});
                 this.cities = resRoute.data.cities;
                 this.dataEdit.cities = resRoute.data.cities;
                 this.terminals = resRoute.data.terminal;
@@ -954,16 +954,16 @@ export default {
 
             }
             if (name == 'routeEdit') {
-                const resRouteEdit = await this.callApi("post", '/schedule/getCity', {id: this.dataEdit.route_id});
+                const resRouteEdit = await this.callApi("post", 'schedule/getCity', {id: this.dataEdit.route_id});
                 this.cities = resRouteEdit.dataEdit;
                 this.terminals = resRouteEdit.dataEdit;
 
-                const resRouteFareClass = await this.callApi("post", '/schedule/getRouteFare', {id: this.data.route});
+                const resRouteFareClass = await this.callApi("post", 'schedule/getRouteFare', {id: this.data.route});
                 this.routeClasses = resRouteFareClass.data;
 
             }
             if (name == 'bus') {
-                const resBus = await this.callApi("post", '/buses/getBusData', {id: this.data.bus});
+                const resBus = await this.callApi("post", 'buses/getBusData', {id: this.data.bus});
                 console.log(resBus.data);
                 this.data.busClass = resBus.data.fare_class_id;
                 this.data.noRows = resBus.data.no_of_rows;
@@ -974,19 +974,19 @@ export default {
         },
 
         async getData() {
-            const resGetAllRoutes = await this.callApi("post", "/schedule/getRoute");
+            const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
 
-            const resGetAllClasses = await this.callApi("post", "/fare-class");
+            const resGetAllClasses = await this.callApi("post", "fare-class");
             this.classes = resGetAllClasses.data;
 
-            const resGetAllBus = await this.callApi("post", "/buses");
+            const resGetAllBus = await this.callApi("post", "buses");
             this.buses = resGetAllBus.data;
 
-            const resSurcharge = await this.callApi("post", '/surcharge/getSelective');
+            const resSurcharge = await this.callApi("post", 'surcharge/getSelective');
             this.surcharges = resSurcharge.data;
 
-            const resDiscount = await this.callApi("post", '/discount/getSelective');
+            const resDiscount = await this.callApi("post", 'discount/getSelective');
             this.discounts = resDiscount.data;
         },
 
@@ -1027,7 +1027,7 @@ export default {
             if (this.addTerminalId === "")
                 return this.errorsArray("Route is Required", "Route");
 
-            const res = await this.callApi("post", "/schedule/store", this.data);
+            const res = await this.callApi("post", "schedule/store", this.data);
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Schedule Created Successfully";
                 setTimeout(function () {
@@ -1063,7 +1063,7 @@ export default {
                 return this.errorsArray("Selected Bus Class is Required", "Selected Bus Class");
             if (this.dataEdit.schedules.route_id === "")
                 return this.errorsArray("Route is Required", "Route");
-            const resEdit = await this.callApi("post", '/schedule/update', this.dataEdit);
+            const resEdit = await this.callApi("post", 'schedule/update', this.dataEdit);
             console.log(resEdit)
             if (resEdit.status === 200 && resEdit.statusText === "OK") {
                 this.success = "Schedule Updated Successfully";
@@ -1082,7 +1082,7 @@ export default {
         },
 
         async edit(schema) {
-            const resEditSchedule = await this.callApi("post", '/schedule/edit', schema);
+            const resEditSchedule = await this.callApi("post", 'schedule/edit', schema);
             this.dataEdit.schedules = resEditSchedule.data.schedules;
             this.dataEdit.compare_array = resEditSchedule.data.compare_array;
             this.dataEdit.cities = resEditSchedule.data.cities;
@@ -1090,7 +1090,7 @@ export default {
         },
 
         async genericData() {
-            const resCommon = await this.callApi("post", '/schedule/genericCommon');
+            const resCommon = await this.callApi("post", 'schedule/genericCommon');
             this.editClasses = resCommon.data.class;
             this.editDiscounts = resCommon.data.discount;
             this.editSurcharges = resCommon.data.surcharge;

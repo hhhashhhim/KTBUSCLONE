@@ -231,7 +231,7 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", '/surcharge');
+        const res = await this.callApi("post", 'surcharge');
         if (res.status == 200) {
             this.surcharges = res.data
         } else {
@@ -282,7 +282,7 @@ export default {
                 active: this.isActive,
             }
 
-            const res = await this.callApi("post", "/surcharge/store", data);
+            const res = await this.callApi("post", "surcharge/store", data);
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Surcharge Created Successfully";
                 setTimeout(function () {
@@ -309,7 +309,7 @@ export default {
             if (this.dataEdit.percentage === "")
                 return this.errorsArray("Percentage is Required", "SurchargePercentage");
 
-            const res = await this.callApi("post", '/surcharge/update', this.dataEdit);
+            const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Surcharge Updated Successfully";
                 setTimeout(function () {

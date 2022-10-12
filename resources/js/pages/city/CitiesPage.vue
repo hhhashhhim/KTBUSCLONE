@@ -10,7 +10,7 @@
                             <h4>Cities</h4>
                             <div class="card-header-action">
                                 <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-primary">
-                                    Add New
+                                    Add New City
                                 </a>
                             </div>
                         </div>
@@ -28,12 +28,14 @@
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
+                                                            <th>Added By </th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(city,i) in cities" :key="i">
                                                             <td>{{ i+1 }}</td>
+                                                            <td>{{ city.name }}</td>
                                                             <td>{{ city.name }}</td>
                                                             <td>
                                                                 <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-primary mx-1">
@@ -131,7 +133,8 @@ export default {
         }
     },
     async created(){
-        const res = await this.callApi("post",'city');
+        const res = await this.callApi("post",'cities');
+        console.log(res.data);
         if (res.status==200) {
             this.cities=res.data
         }
@@ -143,7 +146,7 @@ export default {
         async add(){
             this.validationErrors=[]
             if(this.data.name === "") return this.errorsArray("City Name is Required","Name");
-            const res = await this.callApi("post",'city/store',this.data);
+            const res = await this.callApi("post",'cities/store',this.data);
             if (res.status === 201) {
                 this.success="City Created Successfully";
                 this.cities.unshift(res.data);
@@ -167,16 +170,17 @@ export default {
 
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("City Name is Required","Name");
-            const res = await this.callApi("post",'city/update',this.dataEdit);
+            const res = await this.callApi("post",'cities/update',this.dataEdit);
             if (res.status==200) {
                 this.success="City Updated Successfully";
-                const res = await this.callApi("post",'city');
+                const res = await this.callApi("post",'cities');
                 if (res.status==200) {
                     this.cities=res.data
                 }
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
                     this.success=""
+                    $('#edit-modal').modal('hide')
                 }, 3000);
             }
             else{
@@ -191,7 +195,7 @@ export default {
         },
         async deleteModal( city,i ){
             const deletingObj = {
-                url:"city/delete",
+                url:"cities/delete",
                 data:city,
                 index:i,
             }

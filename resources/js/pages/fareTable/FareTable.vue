@@ -212,7 +212,7 @@ export default {
         },
         async add() {
             this.validationErrors = [];
-            const res = await this.callApi("post", "/fare-table/store", this.data);
+            const res = await this.callApi("post", "fare-table/store", this.data);
             console.log(res.data)
             if (res.status === 200) {
                 this.success = "Fare Table Updated Successfully";
@@ -234,7 +234,7 @@ export default {
         },
 
         async getClasses() {
-            const res = await this.callApi("post", '/fare-table/fare_class/get');
+            const res = await this.callApi("post", 'fare-table/fare_class/get');
             if (res.status === 200) {
                 this.fareClasses = res.data
             } else {
@@ -246,7 +246,7 @@ export default {
             this.data.fare = '';
             this.data.distance_in_km = '';
             this.data.time_difference = '';
-            const resGetTerminal = await this.callApi("post", '/fare-table/check', {
+            const resGetTerminal = await this.callApi("post", 'fare-table/check', {
                 from: from.id,
                 to: to.id,
                 fare_class: this.data.fare_class,
@@ -267,7 +267,7 @@ export default {
                 this.error = true;
                 return
             }
-            const res = await this.callApi("post", "/fare-table", {
+            const res = await this.callApi("post", "fare-table", {
                 company_id: this.data.company_id, fare_class: this.data.fare_class
             });
             if (res.status === 200) {

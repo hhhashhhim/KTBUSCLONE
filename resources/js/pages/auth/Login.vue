@@ -128,12 +128,12 @@ export default {
       if (this.data.password == "")
         return this.errorsArray("Password is Required", "Password");
 
-      const res = await this.callApi("post", this.$store.state.app_url + "login", this.data);
+      const res = await this.callApi("post", "login", this.data);
       if (res.status == 200) {
 
         this.success = "Logged In Successfully";
         this.data.email = this.data.password = "";
-        window.location= this.$store.state.app_url + "admin/dashboard"
+        window.location= "admin/dashboard"
         this.success = "";
 
       } else {
