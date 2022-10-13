@@ -1023,7 +1023,7 @@ export default {
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Schedule Created Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -1060,7 +1060,7 @@ export default {
             if (resEdit.status === 200 && resEdit.statusText === "OK") {
                 this.success = "Schedule Updated Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (resEdit.status === 422) {
@@ -1101,7 +1101,7 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
             setTimeout(() => {
-                window.location.reload();
+                // window.location.reload();
             }, 3000);
         },
     },
@@ -1115,7 +1115,7 @@ export default {
             if (obj.isDeleted) {
                 this.discounts.splice(obj.index, 1)
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         }

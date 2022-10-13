@@ -512,7 +512,7 @@ export default {
                 setTimeout(() => {
                     this.success = "";
                     $("#edit-modal").modal("hide");
-                    window.location.reload();
+                    // window.location.reload();
                 }, 3000);
             } else {
                 if (res.status === 422) {

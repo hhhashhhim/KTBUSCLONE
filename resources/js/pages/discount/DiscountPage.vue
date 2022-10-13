@@ -288,7 +288,7 @@ export default {
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Discount Created Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -299,7 +299,7 @@ export default {
                     }
                 }
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         },
@@ -315,7 +315,7 @@ export default {
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Discount Updated Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -326,7 +326,7 @@ export default {
                     }
                 }
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         },
@@ -355,7 +355,7 @@ export default {
             if (obj.isDeleted) {
                 this.discounts.splice(obj.index, 1)
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         }

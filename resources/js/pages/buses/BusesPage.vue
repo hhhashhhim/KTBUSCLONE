@@ -863,7 +863,7 @@ export default {
             if (res.status === 201) {
                 this.success = "Bus Created Successfully";
                 setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                     this.isShowDiv = false;
                 }, 2000);
             } else {
@@ -895,7 +895,7 @@ export default {
                     this.buses = res.data;
                 }
                 setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -915,7 +915,7 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
             setTimeout(() => {
-                window.location.reload();
+                // window.location.reload();
             }, 3000);
         },
     },

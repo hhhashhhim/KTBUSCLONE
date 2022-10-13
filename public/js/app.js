@@ -23813,8 +23813,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 201 && res.statusText === "Created") {
                   _this2.success = "Surcharge Created Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -23829,8 +23828,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
 
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 }
 
@@ -23878,8 +23876,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200 && res.statusText === "OK") {
                   _this3.success = "Surcharge Updated Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -23893,8 +23890,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       _loop2(key);
                     }
 
-                    setTimeout(function () {
-                      window.location.reload();
+                    setTimeout(function () {// window.location.reload();
                     }, 2000);
                   }
                 }
@@ -23941,8 +23937,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.surcharges.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
+        setTimeout(function () {// window.location.reload();
         }, 2000);
       }
     }
@@ -24258,7 +24253,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (res.status === 201) {
                   _this2.success = "Bus Created Successfully";
                   setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                     _this2.isShowDiv = false;
                   }, 2000);
                 } else {
@@ -24332,8 +24327,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this3.buses = _res.data;
                 }
 
-                setTimeout(function () {
-                  window.location.reload();
+                setTimeout(function () {// window.location.reload();
                 }, 2000);
                 _context3.next = 16;
                 break;
@@ -24376,8 +24370,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this4.$store.commit("setDeleteObj", deletingObj);
 
-                setTimeout(function () {
-                  window.location.reload();
+                setTimeout(function () {// window.location.reload();
                 }, 3000);
 
               case 3:
@@ -25252,8 +25245,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 201 && res.statusText === "Created") {
                   _this2.success = "Discount Created Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -25268,8 +25260,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
 
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 }
 
@@ -25317,8 +25308,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200 && res.statusText === "OK") {
                   _this3.success = "Discount Updated Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -25333,8 +25323,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
 
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 }
 
@@ -25380,8 +25369,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.discounts.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
+        setTimeout(function () {// window.location.reload();
         }, 2000);
       }
     }
@@ -26455,8 +26443,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200) {
                   _this.success = "Route Created Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 3000);
                 }
 
@@ -27240,8 +27227,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 201 && res.statusText === "Created") {
                   _this6.success = "Schedule Created Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -27345,8 +27331,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resEdit.status === 200 && resEdit.statusText === "OK") {
                   _this7.success = "Schedule Updated Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (resEdit.status === 422) {
@@ -27444,8 +27429,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this10.$store.commit("setDeleteObj", deletingObj);
 
-                setTimeout(function () {
-                  window.location.reload();
+                setTimeout(function () {// window.location.reload();
                 }, 3000);
 
               case 3:
@@ -27462,8 +27446,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.discounts.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
+        setTimeout(function () {// window.location.reload();
         }, 2000);
       }
     }
@@ -27634,8 +27617,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 201 && res.statusText === "Created") {
                   _this2.success = "Surcharge Created Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -27650,8 +27632,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
 
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 }
 
@@ -27699,8 +27680,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200 && res.statusText === "OK") {
                   _this3.success = "Surcharge Updated Successfully";
-                  setTimeout(function () {
-                    window.location.reload();
+                  setTimeout(function () {// window.location.reload();
                   }, 2000);
                 } else {
                   if (res.status === 422) {
@@ -27714,8 +27694,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       _loop2(key);
                     }
 
-                    setTimeout(function () {
-                      window.location.reload();
+                    setTimeout(function () {// window.location.reload();
                     }, 2000);
                   }
                 }
@@ -27762,8 +27741,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.surcharges.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
+        setTimeout(function () {// window.location.reload();
         }, 2000);
       }
     }
@@ -28081,8 +28059,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.terminals = terminalRes.data;
                 setTimeout(function () {
                   _this5.success = "";
-                  $("#edit-modal").modal("hide");
-                  window.location.reload();
+                  $("#edit-modal").modal("hide"); // window.location.reload();
                 }, 3000);
                 _context5.next = 17;
                 break;

@@ -300,7 +300,7 @@ export default {
             if (res.status === 200) {
                 this.success = "Route Created Successfully";
                 setTimeout(() => {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 3000);
             }
         },

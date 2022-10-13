@@ -288,7 +288,7 @@ export default {
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Surcharge Created Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -299,7 +299,7 @@ export default {
                     }
                 }
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         },
@@ -315,7 +315,7 @@ export default {
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Surcharge Updated Successfully";
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -325,7 +325,7 @@ export default {
                         });
                     }
                     setTimeout(function () {
-                        window.location.reload();
+                        // window.location.reload();
                     }, 2000);
 
                 }
@@ -356,7 +356,7 @@ export default {
             if (obj.isDeleted) {
                 this.surcharges.splice(obj.index, 1)
                 setTimeout(function () {
-                    window.location.reload();
+                    // window.location.reload();
                 }, 2000);
             }
         }
