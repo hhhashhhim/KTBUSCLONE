@@ -76,7 +76,7 @@
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="data.name">
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-block btn-success" @click="add">Add Role</button>
+                    <button type="button" class="btn btn-success" @click="add">Add Role</button>
                 </div>
             </Add>
 
@@ -92,7 +92,7 @@
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="dataEdit.name">
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-block btn-success" @click="update">Update Role</button>
+                    <button type="button" class="btn btn-success" @click="update">Update Role</button>
                 </div>
             </Edit>
 

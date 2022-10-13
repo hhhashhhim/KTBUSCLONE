@@ -13,7 +13,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary"
                                 >
-                                Add Booking     
+                                    Add Booking
                                 </a>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                 :success="success"
                 :formID="formID"
             >
-                <div class="row">
+                <template class="row">
                     <div class="form-group col-md-6">
                         <label for="SurchargeName">Name</label>
                         <input type="text" class="form-control" v-model="SurchargeName" @keypress="isAlphabet($event)"/>
@@ -126,18 +126,16 @@
                             </label>
                         </div>
                     </div>
-
-
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-primary"
-                            @click="addSurcharge"
-                        >
-                            Save Surcharge Details
-                        </button>
-                    </div>
-                </div>
+                </template>
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-block btn-primary"
+                        @click="addSurcharge"
+                    >
+                        Save Surcharge Details
+                    </button>
+                </template>
             </Add>
 
 
@@ -182,7 +180,7 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-block btn-success" @click="updateSurcharge">Update
+                        <button type="button" class="btn btn-success" @click="updateSurcharge">Update
                             Surcharge
                         </button>
                     </div>

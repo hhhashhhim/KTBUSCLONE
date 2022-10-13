@@ -201,7 +201,7 @@
                                             <span v-for="(item) in terminals[i]" :key="item.id">
                                                 <label class="colorinput mx-3">
                                                     <span>
-                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id" v-model="addTerminalId"/>
+                                                        <input type="checkbox" class="colorinput-input" @click="addTerminal($event, city.id)" id="terminal" :value="item.id"/>
                                                         <span class="colorinput-color bg-success"></span>
                                                     </span>
                                                 </label>
@@ -420,7 +420,7 @@
                                 </tr>
                                 <tr>
                                     <td class="mr-3">Bus Type</td>
-                                    <td v-if="this.dataPreview.busClass">{{ this.dataPreview.class }}</td>
+                                    <td v-if="this.dataPreview.busClass">{{ this.dataPreview.busClass }}</td>
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
@@ -430,7 +430,7 @@
                                 </tr>
                                 <tr>
                                     <td class="mr-3">Selected Bus Class</td>
-                                    <td v-if="this.dataPreview.class">{{ this.dataPreview.busClass }}</td>
+                                    <td v-if="this.dataPreview.class">{{ this.dataPreview.class }}</td>
                                     <td v-else>N/A</td>
                                 </tr>
                                 <tr>
@@ -1017,8 +1017,6 @@ export default {
             if (this.data.noRows === "")
                 return this.errorsArray("No of Rows is Required", "NoOfRows");
             if (this.data.route === "")
-                return this.errorsArray("Route is Required", "Route");
-            if (this.addTerminalId === "")
                 return this.errorsArray("Route is Required", "Route");
 
             const res = await this.callApi("post", "schedule/store", this.data);

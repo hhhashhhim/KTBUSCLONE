@@ -162,7 +162,7 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-block btn-success" @click="updateFareClass">Update
+                        <button type="button" class="btn btn-success" @click="updateFareClass">Update
                             Surcharge
                         </button>
                     </div>

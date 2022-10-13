@@ -1,7 +1,7 @@
 <template>
 
     <section class="section">
-        <div class="section-body">
+        <template class="section-body">
 
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
@@ -74,9 +74,9 @@
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="data.name">
                 </div>
-                <div class="form-group">
-                    <button type="button" class="btn btn-block btn-primary" @click="add">Add Role</button>
-                </div>
+                <template v-slot:button>
+                <button type="button" class="btn btn-primary" @click="add">Add Role</button>
+                </template>
             </Add>
 
             <!-- Add Modal -->
@@ -90,7 +90,7 @@
                     <input type="text" class="form-control" placeholder="Enter Name" id="name" v-model="dataEdit.name">
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-block btn-primary" @click="update">Update Role</button>
+                    <button type="button" class="btn btn-primary" @click="update">Update Role</button>
                 </div>
             </Edit>
 

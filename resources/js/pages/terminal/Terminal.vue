@@ -105,7 +105,7 @@
                     <div class="form-group col-md-4">
                         <label for="time_difference">Time Difference ( eg HH:MM )</label>
                         <!--                        <input type="text" class="form-control" id="time_diff" v-model="data.time_difference">-->
-<!--                        <input type="text" id="timePicker" class="form-control" v-model="data.time_difference">-->
+                        <!--                        <input type="text" id="timePicker" class="form-control" v-model="data.time_difference">-->
                         <vue-mask
                             class="form-control"
                             v-model="data.time_difference"
@@ -171,11 +171,11 @@
                     </div>
 
                 </div>
-                    <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="add">
-                            Add New Terminal
-                        </button>
-                    </template>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="add">
+                        Add New Terminal
+                    </button>
+                </template>
             </Add>
 
             <!-- Edit Modal -->
@@ -253,7 +253,7 @@
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="sms">SMS</label>
                         <label class="colorinput mx-3 mt-3">
-            <span>
+                         <span>
                   <input
                       type="checkbox"
                       class="colorinput-input"
@@ -279,13 +279,12 @@
             </span>
                         </label>
                     </div>
-
-                    <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-block btn-success" @click="update">
-                            Update Terminal
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                <button type="button" class="btn btn-primary" @click="update">
+                        Update Terminal
+                    </button>
+                </template>
             </Edit>
 
             <!--View Details Model-->
@@ -331,7 +330,7 @@
                                                             <td v-if="single.contact">{{ single.contact }}</td>
                                                             <td v-else>N/A</td>
                                                             <td v-if="single.added_by">{{ single.added_by.name }}</td>
-<!--                                                            <td v-else>N/A</td>-->
+                                                            <td v-else>N/A</td>
                                                             <td><a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
@@ -435,7 +434,7 @@ export default {
         this.cities = cities.data;
         setTimeout(() => {
             $("#edit_loc").DataTable();
-                }, 500);
+        }, 500);
 
     },
     methods: {

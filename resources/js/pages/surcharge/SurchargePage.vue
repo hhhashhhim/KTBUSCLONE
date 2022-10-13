@@ -184,7 +184,7 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-block btn-success" @click="updateSurcharge">Update
+                        <button type="button" class="btn btn-success" @click="updateSurcharge">Update
                             Surcharge
                         </button>
                     </div>

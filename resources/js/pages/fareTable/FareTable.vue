@@ -124,7 +124,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-block btn-success" @click="add">
+                        <button type="button" class="btn btn-success" @click="add">
                             Save Fare Details
                         </button>
                     </div>
