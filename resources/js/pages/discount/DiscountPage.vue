@@ -56,6 +56,7 @@
                                                         <th>Name</th>
                                                         <th>Percentage</th>
                                                         <th>Status</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -65,6 +66,7 @@
                                                         <td>{{ discount.name }}</td>
                                                         <td>{{ discount.percentage }}%</td>
                                                         <td>{{ discount.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                        <td>{{ discount.added_by.name }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
                                                                @click="edit(discount)" class="btn btn-primary mx-1">

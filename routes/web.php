@@ -62,7 +62,7 @@ Route::group(['prefix' => 'user', [CustomMiddleware::class]], function () {
     Route::post('delete', [UserController::class, 'delete']);
     Route::post('permissions', [UserController::class, 'permissions']);
 });
-Route::group(['prefix' => 'terminal', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('/', [TerminalController::class, 'index']);
     Route::post('/getTerminal', [TerminalController::class, 'getTerminal']);
     Route::post('store', [TerminalController::class, 'store']);

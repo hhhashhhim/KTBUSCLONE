@@ -22,7 +22,7 @@ class DiscountController extends Controller
 
     public function index()
     {
-        return Discount::orderBy('id')->where('company_id', $this->company_id)->select('name', 'id', 'percentage', 'is_active')->get();
+        return Discount::with('addedBy')->orderBy('id')->where('company_id', $this->company_id)->get();
     }
 
     public function storeDiscount(Request $request)

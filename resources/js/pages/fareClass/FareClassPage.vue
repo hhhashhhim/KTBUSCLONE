@@ -55,6 +55,7 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Status</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -63,6 +64,7 @@
                                                         <td>{{ i+1 }}</td>
                                                         <td>{{ fareClass.name }}</td>
                                                         <td>{{ fareClass.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                        <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
                                                                @click="edit(fareClass)" class="btn btn-primary mx-1">
@@ -266,7 +268,7 @@ export default {
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
                 await this.getClasses();
-              
+
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
@@ -287,7 +289,7 @@ export default {
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 this.success = "Surcharge Updated Successfully";
-           
+
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
@@ -320,7 +322,7 @@ export default {
         getDeletingObj(obj){
             if (obj.isDeleted) {
                 this.fareClasses.splice(obj.index,1)
-          
+
             }
         }
     }

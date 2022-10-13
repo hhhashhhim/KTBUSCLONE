@@ -62,7 +62,7 @@ class CityController extends Controller
     {
         $data = [
             'cities' => City::orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get(),
-            'routes' => Route::where('company_id', $this->company_id)->get()
+            'routes' => Route::with('addedBy')->where('company_id', $this->company_id)->get()
         ];
 
         return $data;

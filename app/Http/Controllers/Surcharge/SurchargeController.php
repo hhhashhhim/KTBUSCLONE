@@ -22,7 +22,7 @@ class SurchargeController extends Controller
 
     public function index()
     {
-        return Surcharge::orderBy('id')->where('company_id', $this->company_id)->select('name', 'id', 'percentage', 'is_active')->get();
+        return Surcharge::with('addedBy')->orderBy('id')->where('company_id', $this->company_id)->get();
     }
 
     public function storeSurcharge(Request $request)

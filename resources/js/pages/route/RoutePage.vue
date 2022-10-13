@@ -54,6 +54,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -61,6 +62,7 @@
                                                     <tr v-for="(route, i) in routes" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ route.name }}</td>
+                                                        <td>{{ route.added_by.name }}</td>
                                                         <td>
                                                             <button class="btn btn-outline-primary"
                                                                     data-toggle="modal"

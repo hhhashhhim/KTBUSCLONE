@@ -30,7 +30,7 @@ class ScheduleController extends Controller
 
     public function index()
     {
-        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'updated_by', 'added_by')->where('company_id', $this->company_id)->orderBy('id')->get();
+        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'addedBy')->where('company_id', $this->company_id)->orderBy('id')->get();
     }
 
     public function storeSchedule(Request $request)

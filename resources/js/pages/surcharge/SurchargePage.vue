@@ -56,6 +56,7 @@
                                                         <th>Name</th>
                                                         <th>Percentage</th>
                                                         <th>Status</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -65,6 +66,7 @@
                                                         <td>{{ surcharge.name }}</td>
                                                         <td>{{ surcharge.percentage }}%</td>
                                                         <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                        <td>{{ surcharge.added_by.name }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
                                                                @click="edit(surcharge)" class="btn btn-primary mx-1">

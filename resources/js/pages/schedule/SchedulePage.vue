@@ -62,8 +62,7 @@
                                                         <th>Bus Name</th>
                                                         <th>Bus Class</th>
                                                         <th>No of Rows</th>
-                                                        <th>Created By</th>
-                                                        <th>Modified By</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -79,11 +78,6 @@
                                                         <td>{{ schedule.selective_bus.name }}</td>
                                                         <td>{{ schedule.no_of_rows }}</td>
                                                         <td v-if="schedule.added_by">{{ schedule.added_by.name }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td v-if="schedule.updated_by">{{
-                                                                schedule.updated_by.name
-                                                            }}
-                                                        </td>
                                                         <td v-else>N/A</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"

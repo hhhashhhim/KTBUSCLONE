@@ -13,7 +13,7 @@
                                     :data-target="'#'+formID"
                                     class="btn btn-primary"
                                 >
-                                    Add New
+                                    Add New Terminal
                                 </a>
                             </div>
                         </div>
@@ -36,6 +36,7 @@
                                                         <th>Sr No.</th>
                                                         <th>City Name</th>
                                                         <th>No.of Terminals</th>
+                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
@@ -44,6 +45,7 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ terminal.name }}</td>
                                                         <td>{{ terminal.terminal_count }}</td>
+                                                        <td>{{ terminal.added_by.name }}</td>
                                                         <td>
                                                             <a
                                                                 href="#detail-modal"
@@ -284,86 +286,6 @@
                         </button>
                     </div>
                 </div>
-                <!--                <div class="row">-->
-                <!--                    <div class="form-group col-md-12">-->
-                <!--                        <label for="name">Name</label>-->
-                <!--                        <input-->
-                <!--                            type="text"-->
-                <!--                            class="form-control"-->
-                <!--                            placeholder="Enter Name"-->
-                <!--                            id="name"-->
-                <!--                            v-model="dataEdit.name"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--&lt;!&ndash;                    <div class="form-group col-md-6">&ndash;&gt;-->
-                <!--&lt;!&ndash;                        <label for="email">Email</label>&ndash;&gt;-->
-                <!--&lt;!&ndash;                        <input&ndash;&gt;-->
-                <!--&lt;!&ndash;                            type="text"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            class="form-control"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            placeholder="Enter Email"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            id="email"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            v-model="dataEdit.email"&ndash;&gt;-->
-                <!--&lt;!&ndash;                        />&ndash;&gt;-->
-                <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-                <!--                    <div class="form-group col-md-12">-->
-                <!--                        <label for="contact">Contact</label>-->
-                <!--                        <input-->
-                <!--                            type="text"-->
-                <!--                            class="form-control"-->
-                <!--                            placeholder="Enter Contact"-->
-                <!--                            id="contact"-->
-                <!--                            v-model="dataEdit.contact"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--&lt;!&ndash;                    <div class="form-group col-md-6">&ndash;&gt;-->
-                <!--&lt;!&ndash;                        <label for="password">Password</label>&ndash;&gt;-->
-                <!--&lt;!&ndash;                        <input&ndash;&gt;-->
-                <!--&lt;!&ndash;                            type="password"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            class="form-control"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            placeholder="Enter Password"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            id="password"&ndash;&gt;-->
-                <!--&lt;!&ndash;                            v-model="dataEdit.password"&ndash;&gt;-->
-                <!--&lt;!&ndash;                        />&ndash;&gt;-->
-                <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-                <!--                    <div class="form-group col-md-12" v-if="dataEdit.company_id">-->
-                <!--                        <label for="company">Company</label>-->
-                <!--                        <select-->
-                <!--                            type="text"-->
-                <!--                            class="form-control"-->
-                <!--                            id="company"-->
-                <!--                            @change="fetchCompanyRoles"-->
-                <!--                            v-model="dataEdit.company_id"-->
-                <!--                        >-->
-                <!--                            <option value="">Select Company</option>-->
-                <!--                            <option v-for="(company, i) in companies" :value="company.id" :key="i">-->
-                <!--                                {{ company.name }}-->
-                <!--                            </option>-->
-                <!--                        </select>-->
-                <!--                    </div>-->
-                <!--                    <div class="form-group col-md-12">-->
-                <!--                        <label for="role">Role</label>-->
-                <!--                        <select-->
-                <!--                            type="text"-->
-                <!--                            class="form-control"-->
-                <!--                            id="role"-->
-                <!--                            v-model="dataEdit.role"-->
-                <!--                        >-->
-                <!--                            <option value="">Select Role</option>-->
-                <!--                            <option v-for="(role, i) in roles" :value="role.id" :key="i">-->
-                <!--                                {{ role.name }}-->
-                <!--                            </option>-->
-                <!--                        </select>-->
-                <!--                    </div>-->
-                <!--                    <div class="form-group col-md-12">-->
-                <!--                        <button-->
-                <!--                            type="button"-->
-                <!--                            class="btn btn-block btn-success"-->
-                <!--                            @click="update"-->
-                <!--                        >-->
-                <!--                            Update terminal-->
-                <!--                        </button>-->
-                <!--                    </div>-->
-                <!--                </div>-->
             </Edit>
 
             <!--View Details Model-->
@@ -395,6 +317,7 @@
                                                             <th>Terminal Name</th>
                                                             <th>Address</th>
                                                             <th>Contact Number</th>
+                                                            <th>Added By</th>
                                                             <th>Action</th>
                                                         </tr>
                                                         </thead>
@@ -407,6 +330,8 @@
                                                             <td v-else>N/A</td>
                                                             <td v-if="single.contact">{{ single.contact }}</td>
                                                             <td v-else>N/A</td>
+                                                            <td v-if="single.added_by">{{ single.added_by.name }}</td>
+<!--                                                            <td v-else>N/A</td>-->
                                                             <td><a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
@@ -501,19 +426,16 @@ export default {
     },
 
     async created() {
-        const terminalRes = await this.callApi("post", "terminal");
+        const terminalRes = await this.callApi("post", "terminals");
+        console.log(terminalRes.data);
         const compRes = await this.callApi("post", "company");
-        const cities = await this.callApi("post", "citities");
+        const cities = await this.callApi("post", "cities");
         this.terminals = terminalRes.data;
         this.companies = compRes.data;
         this.cities = cities.data;
         setTimeout(() => {
             $("#edit_loc").DataTable();
-            // $("#timePicker, #timeDiff").inputmask("99:99");
-            // $("#timePicker, #timeDiff").datetimepicker({
-            //     // options here
-            // });
-        }, 500);
+                }, 500);
 
     },
     methods: {
@@ -544,17 +466,15 @@ export default {
                 return this.errorsArray("Terminal City is Required", "City");
             if (this.data.contact === "")
                 return this.errorsArray("Terminal Contact is Required", "Contact");
-
-            const res = await this.callApi("post", "terminal/store", this.data);
+            const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
                 this.success = "Terminal Created Successfully";
                 this.terminals = res.data
                 this.data = "";
                 setTimeout(() => {
                     this.success = "";
-                    // $("#add-modal").modal("hide")
-
-                    window.location.reload();
+                    $("#add-modal").modal("hide")
+                    // window.location.reload();
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -574,7 +494,7 @@ export default {
             this.dataEdit = single;
         },
         async terminalDetail(id) {
-            const getTerminalRes = await this.callApi("post", "terminal/getTerminal", {id: id});
+            const getTerminalRes = await this.callApi("post", "terminals/getTerminal", {id: id});
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
@@ -584,11 +504,11 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 return this.errorsArray("terminal Name is Required", "Name");
-            const res = await this.callApi("post", "terminal/update", this.dataEdit);
+            const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
                 this.success = "terminal Updated Successfully";
                 this.dataEdit = "";
-                const terminalRes = await this.callApi("post", "terminal", {});
+                const terminalRes = await this.callApi("post", "terminals", {});
                 this.terminals = terminalRes.data;
                 setTimeout(() => {
                     this.success = "";
@@ -608,7 +528,7 @@ export default {
         },
         async deleteModal(terminal, i) {
             const deletingObj = {
-                url: "terminal/delete",
+                url: "terminals/delete",
                 data: terminal,
                 index: i,
             };
