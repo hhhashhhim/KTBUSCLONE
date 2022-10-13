@@ -1311,3 +1311,35 @@ Did you mean this?
 #47 D:\\xampp\\htdocs\\kt\\server.php(21): require_once('D:\\\\xampp\\\\htdocs...')
 #48 {main}
 "} 
+[2022-10-13 12:59:36] local.ERROR: There are no commands defined in the "oiptmize" namespace.
+
+Did you mean this?
+    optimize {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"oiptmize\" namespace.
+
+Did you mean this?
+    optimize at D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php:648)
+[stacktrace]
+#0 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(699): Symfony\\Component\\Console\\Application->findNamespace('oiptmize')
+#1 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(259): Symfony\\Component\\Console\\Application->find('oiptmize:clear')
+#2 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 D:\\xampp\\htdocs\\kt\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 
+[2022-10-13 12:59:44] local.ERROR: There are no commands defined in the "optoimize" namespace.
+
+Did you mean this?
+    optimize {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"optoimize\" namespace.
+
+Did you mean this?
+    optimize at D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php:648)
+[stacktrace]
+#0 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(699): Symfony\\Component\\Console\\Application->findNamespace('optoimize')
+#1 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(259): Symfony\\Component\\Console\\Application->find('optoimize:clear')
+#2 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 D:\\xampp\\htdocs\\kt\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 

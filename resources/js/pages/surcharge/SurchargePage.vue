@@ -128,18 +128,12 @@
                             </label>
                         </div>
                     </div>
-
-
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-primary"
-                            @click="addSurcharge"
-                        >
-                            Save Surcharge Details
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="addSurcharge">
+                        Save Surcharge Details
+                    </button>
+                </template>
             </Add>
 
 
@@ -166,8 +160,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -182,13 +174,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-success" @click="updateSurcharge">Update
+                    <template v-slot:button>
+                        <button type="button" class="btn btn-primary" @click="updateSurcharge">Update
                             Surcharge
                         </button>
-                    </div>
-                </div>
+                    </template>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete

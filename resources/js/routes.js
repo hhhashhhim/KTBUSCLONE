@@ -20,95 +20,96 @@ import BusesPage from "./pages/buses/BusesPage";
 import BookingPage from "./pages/booking/BookingPage";
 import store from './store.js';
 
+const url = '/kt/'
 
 const routes = [
     {
-        path: "/",
+        path: url + "",
         component : Users,
         name:"home",
     },
     {
-        path:"/login",
+        path: url + "login",
         component : Login,
         name:"login",
     },
     {
-        path:"/users",
+        path: url + "users",
         component : Users,
         name:"users",
     },
     {
-        path:"/roles",
+        path: url + "roles",
         component : Roles,
         name:"roles",
     },
     {
-        path:"/permissions/:id",
+        path: url + "permissions/:id",
         component :Permissions,
         name:"role.permission"
     },
     {
-        path:"/profiles",
+        path: url + "profiles",
         component : Profile,
         name:"profile"
     },
     {
-        path:"/companies",
+        path: url + "companies",
         component : Company,
         name:"company"
     },
     {
-        path:"/terminals",
+        path: url + "terminals",
         component : Terminal,
         name:"terminal"
     },
     {
-        path:"/admin/dashboard",
+        path: url + "admin/dashboard",
         component : Dashboard,
         name:"admin-dashboard"
     },
     {
-        path:"/fare-table",
+        path: url + "fare-table",
         component : FareTable,
         name:"fare-table"
     },
     {
-        path:"/fare-class",
+        path: url + "fare-class",
         component : FareClass,
         name:"fare-class"
     },
     {
-        path:"/routes",
+        path: url + "routes",
         component : RoutePage,
         name:"routes-page"
     },
     {
-        path:"/discounts",
+        path: url + "discounts",
         component : DiscountPage,
         name:"discount-page"
     },
     {
-        path:"/surcharge",
+        path: url + "surcharge",
         component : SurchargePage,
         name:"surcharge-page"
     },
     {
-        path:"/cities",
+        path: url + "cities",
         component : CitiesPage,
         name:"cities-page"
     },
     {
-        path:"/schedule",
+        path: url + "schedule",
         component : SchedulePage,
         name:"schedule-page"
     },
     {
-        path:"/buses",
+        path: url + "buses",
         component : BusesPage,
         name:"buses-page"
     },
     {
-        path:"/booking",
+        path: url + "booking",
         component : BookingPage,
         name:"booking-page"
     },

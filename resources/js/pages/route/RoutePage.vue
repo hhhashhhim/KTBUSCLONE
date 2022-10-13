@@ -117,30 +117,13 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="fetchTerminals($event , index)" >
+                                    <select class="form-control rounded-0" @change="fetchTerminals($event , index)">
                                         <option value="0" selected>Select City</option>
                                         <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                             {{ city.name }}
                                         </option>
                                     </select>
                                 </td>
-                                <!--                                <td>-->
-                                <!--                   <span class="mx-2" v-for="(item) in terminals[index]" :key="item.id">-->
-                                <!--                    <label class="mt-4 checkbox-inputs" for="sms">{{ item.name }}</label>-->
-                                <!--                    <label class="colorinput mx-3 mt-3">-->
-                                <!--                      <span>-->
-                                <!--                        <input-->
-                                <!--                            type="checkbox"-->
-                                <!--                            class="colorinput-input"-->
-                                <!--                            @click="addTerminal($event)"-->
-                                <!--                            id="sms"-->
-                                <!--                            :value="item.id"-->
-                                <!--                        />-->
-                                <!--                        <span class="colorinput-color bg-success"></span>-->
-                                <!--                      </span>-->
-                                <!--                    </label>-->
-                                <!--                  </span>-->
-                                <!--                                </td>-->
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
                                     <button class="btn btn-outline-danger" @click="removeRow">Remove</button>
@@ -149,18 +132,12 @@
                             </tbody>
                         </table>
                     </div>
-
-
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-primary"
-                            @click="addRoute"
-                        >
-                            Save Route Details
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="addRoute">
+                        Save Route Details
+                    </button>
+                </template>
             </Add>
 
             <!--            Details Model-->
@@ -175,10 +152,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="card">
-                                <div class="card-body" style="font-size:14px;">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped">
+                            <table class="table table-striped">
                                             <thead>
                                             <tr>
 
@@ -199,28 +173,14 @@
                                                         {{
                                                             fareClassValue(single, row.name)
                                                         }}
-
-<!--                                                        <span v-if="single.includes(row.name +'_fare')">N/A</span>-->
-<!--                                                        {{single.includes(row.name +'_fare')}}-->
                                                     </td>
-<!--                                                    <td v-if="single.include(this,th[0]+'_fare')">{{single.Economy_fare}}</td>-->
-<!--                                                    <td v-if="single.fare_one"> {{ single.fare_one }}</td>-->
-<!--                                                    <td v-else>N/A</td>-->
-<!--                                                    <td v-if="single.fare_two"> {{ single.fare_two }}</td>-->
-<!--                                                    <td v-else>N/A</td>-->
-<!--                                                    <td v-if="single.fare_three"> {{ single.fare_three }}</td>-->
-<!--                                                    <td v-else>N/A</td>-->
-
                                                 </tr>
                                             </template>
                                             </tbody>
                                         </table>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -271,20 +231,20 @@ export default {
             loop: 1,
             routeName: '',
             routeDetails: [],
-            th : [],
-            classFareName : ''
+            th: [],
+            classFareName: ''
         };
     },
     created() {
         this.fetchCities();
     },
     methods: {
-        fareClassValue( data , className){
+        fareClassValue(data, className) {
             const dataTwo = data;
             const converted = Object.keys(dataTwo)
             let new_name = '';
-            converted.forEach((element , i) => {
-                if( className + '_fare' == element ){
+            converted.forEach((element, i) => {
+                if (className + '_fare' == element) {
                     new_name = dataTwo[element];
                 }
             });

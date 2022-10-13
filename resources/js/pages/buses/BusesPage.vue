@@ -155,293 +155,282 @@
             <div class="modal fade" id="addBus" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Add Bus</h4>
+                            <button
+                                type="button"
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"
+                                @click="close"
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
                         <div class="modal-body">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Add Bus</h4>
+                            <div
+                                class="alert alert-danger alert-dismissible fade show"
+                                role="alert"
+                                v-if="this.validationErrors.length"
+                            >
+                                <button
+                                    type="button"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                <!-- {{ this.validationErrors.length }} -->
+                                <ul>
+                                    <li v-for="(error, i) in this.validationErrors" :key="i">
+                                        {{ error.desc }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div
+                                class="alert alert-success alert-dismissible fade show"
+                                role="alert"
+                                v-if="success"
+                            >
+                                <button
+                                    type="button"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                {{ success }}
+                            </div>
+                            <slot></slot>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="name">Bus Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Bus Name"
+                                        v-model="data.busNumber"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Chassis Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Chasis Number"
+                                        v-model="data.chassisNumber"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Insurance Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Insurance Number"
+                                        v-model="data.insuranceNumber"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">No. of Seats</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter No. of Seats"
+                                        v-model="data.noOfSeats"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Route Permit Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Route Permit Number"
+                                        v-model="data.routePermit"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="city_id">Fare Classes</label>
+                                    <select class="form-control" v-model="data.fare_class">
+                                        <option value="">Select Fare Class</option>
+                                        <option
+                                            v-for="(fareClass, i) in fareClasses"
+                                            :key="i"
+                                            :value="fareClass.id"
+                                        >
+                                            {{ fareClass.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label for="name">No. of Rows</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter No. of Rows"
+                                        v-model="data.noOfRows"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="name">No. of Cols</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter No. of Cols"
+                                        v-model="data.noOfCols"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-4 my-4 pt-2">
                                     <button
                                         type="button"
-                                        class="close"
-                                        data-dismiss="modal"
-                                        aria-label="Close"
-                                        @click="close"
+                                        class="btn btn-block btn-warning"
+                                        @click="generateMap"
                                     >
-                                        <span aria-hidden="true">&times;</span>
+                                        Generate Seat Map
                                     </button>
                                 </div>
-                                <div class="card-body">
-                                    <div
-                                        class="alert alert-danger alert-dismissible fade show"
-                                        role="alert"
-                                        v-if="this.validationErrors.length"
+                            </div>
+                            <div class="row mx-3 mainRow" v-if="isShowDiv">
+                                <div class="form-group col-md-5 border py-3">
+                                    <tr
+                                        class="seat-img p-0 m-0 s"
+                                        v-for="(record, rowIndex) in data.seatMap"
+                                        :key="rowIndex"
                                     >
-                                        <button
-                                            type="button"
-                                            class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"
+                                        <td
+                                            v-for="(col, colIndex) in record"
+                                            :key="colIndex"
+                                            :class="col.reserved ? 'selected-row border' : ''"
                                         >
-                                            <span aria-hidden="true">&times;</span>
-                                            <span class="sr-only">Close</span>
-                                        </button>
-                                        <!-- {{ this.validationErrors.length }} -->
-                                        <ul>
-                                            <li v-for="(error, i) in this.validationErrors" :key="i">
-                                                {{ error.desc }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div
-                                        class="alert alert-success alert-dismissible fade show"
-                                        role="alert"
-                                        v-if="success"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"
-                                        >
-                                            <span aria-hidden="true">&times;</span>
-                                            <span class="sr-only">Close</span>
-                                        </button>
-                                        {{ success }}
-                                    </div>
-                                    <slot></slot>
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Bus Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Bus Name"
-                                                v-model="data.busNumber"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Chassis Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Chasis Number"
-                                                v-model="data.chassisNumber"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Insurance Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Insurance Number"
-                                                v-model="data.insuranceNumber"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">No. of Seats</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter No. of Seats"
-                                                v-model="data.noOfSeats"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Route Permit Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Route Permit Number"
-                                                v-model="data.routePermit"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="city_id">Fare Classes</label>
-                                            <select class="form-control" v-model="data.fare_class">
-                                                <option value="">Select Fare Class</option>
-                                                <option
-                                                    v-for="(fareClass, i) in fareClasses"
-                                                    :key="i"
-                                                    :value="fareClass.id"
-                                                >
-                                                    {{ fareClass.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-md-3">
-                                            <label for="name">No. of Rows</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter No. of Rows"
-                                                v-model="data.noOfRows"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                            <label for="name">No. of Cols</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter No. of Cols"
-                                                v-model="data.noOfCols"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-4 my-4 pt-2">
-                                            <button
-                                                type="button"
-                                                class="btn btn-block btn-warning"
-                                                @click="generateMap"
-                                            >
-                                                Generate Seat Map
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="row mx-3 mainRow" v-if="isShowDiv">
-                                        <div class="form-group col-md-5 border py-3">
-                                            <tr
-                                                class="seat-img p-0 m-0 s"
-                                                v-for="(record, rowIndex) in data.seatMap"
-                                                :key="rowIndex"
-                                            >
-                                                <td
-                                                    v-for="(col, colIndex) in record"
-                                                    :key="colIndex"
-                                                    :class="col.reserved ? 'selected-row border' : ''"
-                                                >
-                                                    <img
-                                                        @click="changeStatus(rowIndex, colIndex)"
-                                                        :src="
+                                            <img
+                                                @click="changeStatus(rowIndex, colIndex)"
+                                                :src="
                               $store.state.app_url +
                               'assets/img/buses/available_seat_img.gif'
                             "
-                                                        alt=""
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </div>
-                                        <div class="form-group col-md-5 border py-3">
-                                            <tr
-                                                class="seat-img p-0 m-0"
-                                                v-for="(record, rowIndex) in data.seatMap"
-                                                :key="rowIndex"
-                                            >
-                                                <td v-for="(col, colIndex) in record" :key="colIndex">
-                                                    <img
-                                                        v-if="col.reserved"
-                                                        data-toggle="modal"
-                                                        data-target="#setSeatClass"
-                                                        @click="updateSeatData(rowIndex, colIndex)"
-                                                        :src="
+                                                alt=""
+                                            />
+                                        </td>
+                                    </tr>
+                                </div>
+                                <div class="form-group col-md-5 border py-3">
+                                    <tr
+                                        class="seat-img p-0 m-0"
+                                        v-for="(record, rowIndex) in data.seatMap"
+                                        :key="rowIndex"
+                                    >
+                                        <td v-for="(col, colIndex) in record" :key="colIndex">
+                                            <img
+                                                v-if="col.reserved"
+                                                data-toggle="modal"
+                                                data-target="#setSeatClass"
+                                                @click="updateSeatData(rowIndex, colIndex)"
+                                                :src="
                               $store.state.app_url +
                               'assets/img/buses/booked_seat_img.gif'
                             "
-                                                        alt=""
-                                                    />
-                                                    <span v-else></span>
-                                                </td>
-                                            </tr>
-                                        </div>
-                                        <div class="col-md-2 form-group  ">
-                                            <!--                            <div class="btn selected-row border-dark border-2">-->
-                                            <!--                                    <span class="text-dark p-1">Selected</span>-->
-                                            <!--                            </div>-->
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <ul style="list-style: none;" class="m-0 p-0 ">
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="selected-row mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Selected</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline;">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="booked_Seat mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Booked</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="notForSale mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Not For Sale</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="anyElseClass pr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Other Class</span>
-
-                                                        </li>
-                                                        <br>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <ul style="list-style: none;" class="m-0 p-0">
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="economy mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Economy</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="exective mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Executive</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="business mr-1 border">
-                                                            </div>
-                                                            <span class="text-nowrap">Business</span>
-                                                        </li>
-                                                        <br>
-                                                        <li style="display:inline; ">
-                                                            <div
-                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                                class="reservedForFemale mr-1 border">
-                                                            </div>
-                                                            <span class="text-wrap">Reserved For Female</span>
-                                                        </li>
-                                                        <br>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                alt=""
+                                            />
+                                            <span v-else></span>
+                                        </td>
+                                    </tr>
+                                </div>
+                                <div class="col-md-2 form-group  ">
+                                    <!--                            <div class="btn selected-row border-dark border-2">-->
+                                    <!--                                    <span class="text-dark p-1">Selected</span>-->
+                                    <!--                            </div>-->
                                     <div class="row">
-                                        <div class="form-group col-md-12">
-                                            <button
-                                                type="button"
-                                                class="btn btn-block btn-success"
-                                                @click="addBuses"
-                                            >
-                                                Add Bus
-                                            </button>
+                                        <div class="col-md-6">
+                                            <ul style="list-style: none;" class="m-0 p-0 ">
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="selected-row mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Selected</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline;">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="booked_Seat mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Booked</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="notForSale mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Not For Sale</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="anyElseClass pr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Other Class</span>
+
+                                                </li>
+                                                <br>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul style="list-style: none;" class="m-0 p-0">
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="economy mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Economy</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="exective mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Executive</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="business mr-1 border">
+                                                    </div>
+                                                    <span class="text-nowrap">Business</span>
+                                                </li>
+                                                <br>
+                                                <li style="display:inline; ">
+                                                    <div
+                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                        class="reservedForFemale mr-1 border">
+                                                    </div>
+                                                    <span class="text-wrap">Reserved For Female</span>
+                                                </li>
+                                                <br>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -536,11 +525,11 @@
                     <div class="form-group col-md-3">
                         <label for="name">No. of Cols</label>
                         <input readonly
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter No. of Cols"
-                            v-model="dataEdit.no_of_cols"
-                            @keypress="isNumber($event)"
+                               type="text"
+                               class="form-control"
+                               placeholder="Enter No. of Cols"
+                               v-model="dataEdit.no_of_cols"
+                               @keypress="isNumber($event)"
                         />
                     </div>
                     <div class="form-group col-md-4 my-4 pt-2">
@@ -577,15 +566,15 @@
                         </tr>
                     </div>
                 </div>
-                <div class="form-group">
-                    <button
+                <template v-slot:button>
+                <button
                         type="button"
-                        class="btn btn-block btn-success"
+                        class="btn btn-primary"
                         @click="updateBus"
                     >
                         Update Bus
                     </button>
-                </div>
+                </template>
             </Edit>
             <!-- Add Modal -->
             <Delete
@@ -734,10 +723,10 @@ export default {
 
     methods: {
         addSeatData: function (col, row) {
-            if(this.seatType === 0 ){
+            if (this.seatType === 0) {
                 return this.errorsArray("Please Select Seat Type", "Seat Type");
             }
-            if( this.seatClass === 0){
+            if (this.seatClass === 0) {
                 return this.errorsArray("Please Select Seat Class", "Seat Class");
             }
 

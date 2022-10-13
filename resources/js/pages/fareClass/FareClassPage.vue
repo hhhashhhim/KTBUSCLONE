@@ -120,16 +120,16 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="addFareClass"
-                        >
-                            Add Fare Class
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="addFareClass"
+                    >
+                        Add Fare Class
+                    </button>
+                </template>
             </Add>
 
 
@@ -160,13 +160,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-success" @click="updateFareClass">Update
+                <template v-slot:button>
+                        <button type="button" class="btn btn-primary" @click="updateFareClass">Update
                             Surcharge
                         </button>
-                    </div>
-                </div>
+                </template>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete

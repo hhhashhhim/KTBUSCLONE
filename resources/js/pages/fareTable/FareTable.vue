@@ -16,7 +16,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-success mt-4" type="button" @click="fetchRecord">Fetch
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord">Fetch
                                     Record
                                 </button>
                             </div>
@@ -123,12 +123,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-12">
-                        <button type="button" class="btn btn-success" @click="add">
-                            Save Fare Details
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="add">
+                        Save Fare Details
+                    </button>
+                </template>
             </Add>
 
             <!-- Add Modal -->

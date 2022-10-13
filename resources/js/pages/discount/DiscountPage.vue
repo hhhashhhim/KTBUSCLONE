@@ -113,8 +113,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -128,18 +126,12 @@
                             </label>
                         </div>
                     </div>
-
-
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-primary"
-                            @click="addDiscount"
-                        >
-                            Save Discount Details
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="addDiscount">
+                        Save Discount Details
+                    </button>
+                </template>
             </Add>
 
 
@@ -182,15 +174,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-success" @click="updateDiscount">Update
-                            Discount
-                        </button>
-                    </div>
-                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateDiscount">Update
+                        Discount
+                    </button>
+                </template>
             </Edit>
-            <!--            Edit MOdel End-->
+            <!--            Edit modal End-->
             <Delete
                 confirmationMessage='Are You Sure You want To Delete This Discount ???'
             />
