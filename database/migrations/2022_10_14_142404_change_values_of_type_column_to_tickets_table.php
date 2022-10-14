@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class BookingNoToTicketsTable extends Migration
+class ChangeValuesOfTypeColumnToTicketsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,9 +14,7 @@ class BookingNoToTicketsTable extends Migration
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->integer('booking_no')->after('bus_id');
-            $table->renameColumn('for_female', 'gender');
-            $table->string('date')->after('booking_no');
+            //
         });
     }
 
@@ -28,9 +26,7 @@ class BookingNoToTicketsTable extends Migration
     public function down()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->dropColumn('booking_no');
-            $table->dropColumn('date');
-            $table->renameColumn('gender','for_female');
+            //
         });
     }
 }

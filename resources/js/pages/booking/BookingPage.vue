@@ -37,6 +37,25 @@
                   Please Enter All Required Fields !!!
                 </div>
               </transition>
+              <transition name="fade">
+                <div
+                  class="alert alert-success alert-dismissible fade show"
+                  role="alert"
+                  v-if="success"
+                >
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                    @click="error = !error"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  {{ success }}
+                </div>
+              </transition>
               <!-- Table -->
               <div class="row">
                 <div class="col-12">
@@ -275,39 +294,33 @@
 
             <div class="col-md-6">
               <div class="card p-4">
-                <div class="col-md-12 mb-5">
-                  <span>
-                    <div class="selected-row circles mr-1 border"></div>
-                    <span class="text-nowrap">Selected</span>
-                  </span>
-                  <span>
-                    <div class="booked_Seat circles mr-1 border"></div>
-                    <span class="text-nowrap">Booked</span>
-                  </span>
-                  <span>
-                    <div class="notForSale circles mr-1 border"></div>
-                    <span class="text-nowrap">Not For Sale</span>
-                  </span>
-                  <span>
-                    <div class="anyElseClass circles pr-1 border"></div>
-                    <span class="text-nowrap">Other Class</span>
-                  </span>
-                  <span>
-                    <div class="economy circles mr-1 border"></div>
-                    <span class="text-nowrap">Economy</span>
-                  </span>
-                  <span>
-                    <div class="exective circles mr-1 border"></div>
-                    <span class="text-nowrap">Executive</span>
-                  </span>
-                  <span>
-                    <div class="business circles mr-1 border"></div>
-                    <span class="text-nowrap">Business</span>
-                  </span>
-                  <span>
-                    <div class="reservedForFemale circles mr-1 border"></div>
-                    <span class="text-wrap">Reserved For Female</span>
-                  </span>
+                <div class="col-md-12 mb-2 d-flex flex-wrap">
+                  <div class="my-2">
+                    <div class="selected circles mr-1 border"></div>
+                    <span class="text-wrap">Selected</span>
+                  </div>
+                  <div class="my-2">
+                    <div class="for-female circles mr-1 border"></div>
+                    <span class="text-wrap">For Female</span>
+                  </div>
+                  <div class="my-2">
+                    <div class="for-male circles mr-1 border"></div>
+                    <span class="text-wrap">For Male</span>
+                  </div>
+                  <div class="my-2">
+                    <div class="not-for-sale circles mr-1 border"></div>
+                    <span class="text-wrap">Not For Sale</span>
+                  </div>
+                  <div class="my-3">
+                      <div class="circles icons-legend mr-1 border">
+                        <i class="fas fa-check"></i>
+                      </div>
+                      <span class="text-wrap">Booked</span>
+                  </div>
+                  <div class="my-3">
+                    <div class="fas fa-check-double circles icons-legend mr-1 border"></div>
+                    <span class="text-wrap">Issued</span>                      
+                  </div>
                 </div>
                 <div
                   class="d-flex justify-content-center seat-img p-0 m-0"
@@ -315,14 +328,21 @@
                   :key="rowIndex"
                 >
                   <div v-for="(col, colIndex) in record" :key="colIndex">
-                    <span
+                    <!-- <div v-if="colIndex==0">
+                      {{ col }}
+                    </div> -->
+                    <div
                       v-if="col.reserved"
                       class="image-span d-block text-center text-white"
                       @click="selectSeat(rowIndex, colIndex, col.seatNo)"
-                      :class="col.selected ? 'selected-row' : ''"
+                      :class="getClasses(col)"
                     >
-                      {{ col.seatNo }}
-                    </span>
+                      <small>{{ col.seatNo }}</small>
+                      <br>
+                      <small v-if="col.type">
+                        <i class="fas" :class="col.type=='booked'?'fa-check-double':'fa-check'"></i>
+                      </small>
+                    </div>
                     <span v-else></span>
                   </div>
                 </div>
@@ -403,6 +423,7 @@ export default {
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
+        date: this.addForm.date,
       });
       if (res.status == 200) {
         this.loading = false;
@@ -424,8 +445,15 @@ export default {
 
       this.addForm.selectedSeats = this.selectedSeats;
     },
-
+    getClasses(col){
+      let gender = col.gender != undefined && col.gender==0? 'for-female' : col.gender && col.gender==1?'for-male':''
+      let selected = col.selected?"selected":"";
+      return gender+" "+selected;
+    },
     async add() {
+      this.success="dsfd"
+      window.scrollTo(0,0);
+
       this.validationErrors = [];
       if (this.schedule == "")
         return this.errorsArray("Schedule is Required", "Schedule");
@@ -433,9 +461,10 @@ export default {
       const res = await this.callApi("post", "booking/store", this.addForm);
       if (res.status === 201 && res.statusText === "Created") {
         this.success = "Booking Created Successfully";
-        // setTimeout(function () {
-        //   window.location.reload();
-        // }, 2000);
+        window.scrollTo(0,0);
+        setTimeout(function () {
+          this.success=""
+        }, 2000);
       } else {
         if (res.status === 422) {
           for (const key in res.addForm.errors) {
@@ -472,51 +501,6 @@ export default {
 };
 </script>
 <style scoped>
-.selected-row {
-  background-color: #6db131 !important;
-}
-
-.booked_Seat {
-  background-color: rgb(255, 0, 0) !important;
-}
-
-.notForSale {
-  background-color: rgb(140, 109, 109) !important;
-}
-
-.reservedForFemale {
-  background-color: rgb(250, 185, 250) !important;
-}
-
-.economy {
-  background-color: rgb(250, 97, 64) !important;
-}
-
-.exective {
-  background-color: rgb(64, 250, 81) !important;
-}
-
-.business {
-  background-color: rgb(31, 126, 91) !important;
-}
-
-.anyElseClass {
-  background-color: rgb(131, 163, 199) !important;
-}
-
-.seat-img {
-  height: 45px;
-  margin: 10px 0px;
-}
-
-.seat-img .image-span,
-.seat-img span {
-  height: 40px;
-  width: 40px;
-  display: inline-block;
-  cursor: pointer !important;
-  margin: 5px;
-}
 .image-span {
   background-color: #b9dea0;
   border-radius: 10px;
@@ -524,6 +508,42 @@ export default {
 }
 .image-span:hover {
   background-color: #6db131;
+}
+.selected{
+  background-color: #6db131 !important;
+}
+.economy{
+  border: 3px solid #6D6E69 !important;
+}
+.business{
+  border: 3px solid orangered !important;
+}
+.executive{
+  border: 3px solid gold !important;
+}
+.for-female{
+  background-color: hotpink !important;
+}
+.for-male{
+  background-color: #3D8FF2 !important;
+}
+
+.not-for-sale {
+  background-color: rgb(140, 109, 109) !important;
+}
+
+.seat-img {
+  height: 55px;
+  margin: 10px 0px;
+}
+
+.seat-img .image-span,
+.seat-img span {
+  height: 50px;
+  width: 50px;
+  display: inline-block;
+  cursor: pointer !important;
+  margin: 5px;
 }
 img {
   cursor: pointer !important;
@@ -535,10 +555,20 @@ img {
   -webkit-border-radius: 25px;
   border-radius: 50px;
   display: inline-block;
+  box-sizing: content-box;
+}
+.icons-legend{
+  position: relative;
+  bottom: 12px;
+  color: rgb(62, 61, 61);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .circles + span {
   position: relative;
   top: -10px;
   padding: 5px;
+  color: black;
 }
 </style>
