@@ -15,7 +15,6 @@ class AddCompanyIdToRolesTable extends Migration
     {
         Schema::table('roles', function (Blueprint $table) {
             $table->integer('company_id')->after('name');
-            $table->softDeletes();
         });
     }
 

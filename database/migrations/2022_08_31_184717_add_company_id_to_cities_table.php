@@ -15,7 +15,6 @@ class AddCompanyIdToCitiesTable extends Migration
     {
         Schema::table('cities', function (Blueprint $table) {
             $table->bigInteger('company_id')->after('name');
-            $table->softDeletes();
         });
     }
 

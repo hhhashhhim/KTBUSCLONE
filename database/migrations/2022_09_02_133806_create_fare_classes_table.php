@@ -24,10 +24,6 @@ class CreateFareClassesTable extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
-        $class = ['Economy','Business','Executive'];
-        foreach ($class as $i => $singleClass) {
-            FareClass::create(['name'=>$singleClass,'added_by'=>\Illuminate\Support\Facades\Auth::user()->id,'company_id'=>\Illuminate\Support\Facades\Auth::user()->company_id]);
-        }
     }
 
     /**

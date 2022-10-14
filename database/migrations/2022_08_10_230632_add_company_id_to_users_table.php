@@ -15,7 +15,6 @@ class AddCompanyIdToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->integer('company_id')->after('email');
-            $table->softDeletes();
         });
     }
 
