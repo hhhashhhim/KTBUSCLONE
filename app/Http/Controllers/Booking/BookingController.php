@@ -41,7 +41,7 @@ class BookingController extends Controller
                 'contact'=>$request->contact,
             ]);
         }
-        $bookingNo = Ticket::latest()->first()->booking_no??0;
+        $bookingNo = Ticket::latest()->first()->booking_no ?? 0;
         ++$bookingNo;
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([

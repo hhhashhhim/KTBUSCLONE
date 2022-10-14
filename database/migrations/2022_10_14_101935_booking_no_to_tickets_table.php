@@ -14,8 +14,11 @@ class BookingNoToTicketsTable extends Migration
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->integer('booking_no')->after('bus_id');
-            $table->string('date')->after('booking_no');
+            $table->integer('booking_no')->after('bus_id')->nullable();
+            $table->string('date')->after('booking_no')->nullable();
+            $table->dateTime('time')->after('discount')->nullable();
+            $table->softDeletes()->after('discount')->nullable();
+            $table->integer('added_by')->after('company_id')->nullable();
         });
     }
 
@@ -29,6 +32,9 @@ class BookingNoToTicketsTable extends Migration
         Schema::table('tickets', function (Blueprint $table) {
             $table->dropColumn('booking_no');
             $table->dropColumn('date');
+            $table->dropColumn('time');
+            $table->dropColumn('deleted_at');
+            $table->dropColumn('added_by');
         });
     }
 }

@@ -153,7 +153,7 @@
             </div>
 
             <div class="modal fade" id="addBus" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="card">
@@ -386,53 +386,55 @@
                                                             </div>
                                                             <span class="text-nowrap">Other Class</span>
 
-                                                </li>
-                                                <br>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <ul style="list-style: none;" class="m-0 p-0">
-                                                <li style="display:inline; ">
-                                                    <div
-                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                        class="economy mr-1 border">
-                                                    </div>
-                                                    <span class="text-nowrap">Economy</span>
-                                                </li>
-                                                <br>
-                                                <li style="display:inline; ">
-                                                    <div
-                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                        class="exective mr-1 border">
-                                                    </div>
-                                                    <span class="text-nowrap">Executive</span>
-                                                </li>
-                                                <br>
-                                                <li style="display:inline; ">
-                                                    <div
-                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                        class="business mr-1 border">
-                                                    </div>
-                                                    <span class="text-nowrap">Business</span>
-                                                </li>
-                                                <br>
-                                                <li style="display:inline; ">
-                                                    <div
-                                                        style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                        class="reservedForFemale mr-1 border">
-                                                    </div>
-                                                    <span class="text-wrap">Reserved For Female</span>
-                                                </li>
-                                                <br>
-                                            </ul>
+                                                        </li>
+                                                        <br>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <ul style="list-style: none;" class="m-0 p-0">
+                                                        <li style="display:inline; ">
+                                                            <div
+                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                                class="economy mr-1 border">
+                                                            </div>
+                                                            <span class="text-nowrap">Economy</span>
+                                                        </li>
+                                                        <br>
+                                                        <li style="display:inline; ">
+                                                            <div
+                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                                class="exective mr-1 border">
+                                                            </div>
+                                                            <span class="text-nowrap">Executive</span>
+                                                        </li>
+                                                        <br>
+                                                        <li style="display:inline; ">
+                                                            <div
+                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                                class="business mr-1 border">
+                                                            </div>
+                                                            <span class="text-nowrap">Business</span>
+                                                        </li>
+                                                        <br>
+                                                        <li style="display:inline; ">
+                                                            <div
+                                                                style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
+                                                                class="reservedForFemale mr-1 border">
+                                                            </div>
+                                                            <span class="text-wrap">Reserved For Female</span>
+                                                        </li>
+                                                        <br>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -558,19 +560,13 @@
                             >
                                 <img
                                     @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif'"
-                                    :src="
-                    $store.state.app_url +
-                    'assets/img/buses/available_seat_img.gif'
-                  "
-                                    alt=""
-                                />
+                                    :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif'" alt=""/>
                             </td>
                         </tr>
                     </div>
                 </div>
                 <template v-slot:button>
-                <button
+                    <button
                         type="button"
                         class="btn btn-primary"
                         @click="updateBus"
