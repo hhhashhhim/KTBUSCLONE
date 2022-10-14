@@ -1,406 +1,544 @@
 <template>
-    <section class="section">
-        <div class="section-body">
-            <div class="row">
-                <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
-                        <div class="card-header d-flex justify-content-between">
-                            <h4>Booking</h4>
-                            <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary"
-                                >
-                                    Add Booking
-                                </a>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <transition name="fade">
-                                <div
-                                    class="alert alert-danger alert-dismissible fade show"
-                                    role="alert"
-                                    v-if="error"
-                                >
-                                    <button
-                                        type="button"
-                                        class="close"
-                                        data-dismiss="alert"
-                                        aria-label="Close"
-                                        @click="error = !error"
-                                    >
-                                        <span aria-hidden="true">&times;</span>
-                                        <span class="sr-only">Close</span>
-                                    </button>
-                                    Please Enter All Required Fields !!!
-                                </div>
-                            </transition>
-                            <!-- Table -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
-                                                >
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Percentage</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr v-for="(surcharge, i) in surcharges" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ surcharge.name }}</td>
-                                                        <td>{{ surcharge.percentage }}%</td>
-                                                        <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
-                                                        <td>
-                                                            <a href="#edit-modal" data-toggle="modal"
-                                                               @click="edit(surcharge)" class="btn btn-primary mx-1">
-                                                                <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
-                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- END TABLE -->
-                        </div>
-                    </div>
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+          <div class="card card-success">
+            <div class="card-header d-flex justify-content-between">
+              <h4>Booking</h4>
+              <div class="card-header-action">
+                <a
+                  href="#"
+                  data-toggle="modal"
+                  :data-target="'#' + formID"
+                  class="btn btn-primary"
+                >
+                  Add Booking
+                </a>
+              </div>
+            </div>
+            <div class="card-body">
+              <transition name="fade">
+                <div
+                  class="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                  v-if="error"
+                >
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                    @click="error = !error"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                  </button>
+                  Please Enter All Required Fields !!!
                 </div>
+              </transition>
+              <!-- Table -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h4></h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table
+                          class="table table-striped table-hover"
+                          id="edit_dis"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Sr No.</th>
+                              <th>Name</th>
+                              <th>Percentage</th>
+                              <th>Status</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(surcharge, i) in surcharges" :key="i">
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ surcharge.name }}</td>
+                              <td>{{ surcharge.percentage }}%</td>
+                              <td>
+                                {{
+                                  surcharge.is_active === 1
+                                    ? "Active"
+                                    : "InActive"
+                                }}
+                              </td>
+                              <td>
+                                <a
+                                  href="#edit-modal"
+                                  data-toggle="modal"
+                                  @click="edit(surcharge)"
+                                  class="btn btn-primary mx-1"
+                                >
+                                  <i class="far fa-edit"></i>
+                                </a>
+                                <a
+                                  href="#delete-modal"
+                                  data-toggle="modal"
+                                  @click="deleteModal(surcharge, i)"
+                                  class="btn btn-danger"
+                                >
+                                  <i class="far fa-trash-alt"></i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- END TABLE -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Modal -->
+      <Add
+        :heading="'Create Booking'"
+        :errors="this.validationErrors"
+        :success="success"
+        :formID="formID"
+      >
+        <div class="row">
+          <div class="col-md-5 class form-group">
+            <label for="DiscountName">Schedule Name <span class="text-danger">*</span></label>
+            <select
+              class="form-control"
+              id="route"
+              v-model="addForm.schedule"
+            >
+              <option value="" selected>Select Schedule</option>
+              <option
+                v-for="(schedule, i) in allSchedules"
+                :value="schedule.id"
+                :key="i"
+              >
+                {{ schedule.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-5 class form-group">
+            <label for="date">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" v-model="addForm.date">
+          </div>
+          <div class="col-md-2">
+            <label>Action</label>
+            <button @click="fetchScheduleData" class="btn btn-block btn-primary">Get Record</button>
+          </div>
+
+          <h1 v-if="loading">Loading.........</h1>
+
+          <div class="col-md-12 row" v-if="showBookingDiv">
+            <div class="col-md-6">
+              <div class="card p-4">
+                <div class="form-group row">
+                  <label
+                    class="col-md-3 pt-3 font-weight-bold"
+                    for="customer-cnic"
+                    >CNIC</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control col-md-9"
+                    id="customer-cnic"
+                    v-model="addForm.customerCNIC"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="fullName"
+                    >Full Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control col-md-9"
+                    id="fullName"
+                    v-model="addForm.customerName"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Contact</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control col-md-9"
+                    id="contact"
+                    v-model="addForm.contact"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
+                    >Remarks</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control col-md-9"
+                    id="remarks"
+                    v-model="addForm.remarks"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Gender</label
+                  >
+                  <div class="col-md-9 pt-3">
+                    <input type="radio" v-model="addForm.gender" value="0" />
+                    <label class="mx-3">Female</label>
+                    <input type="radio" v-model="addForm.gender" value="1" />
+                    <label class="mx-3">Male</label>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Issue Or Book</label
+                  >
+                  <div class="col-md-9 pt-3">
+                    <input type="radio" v-model="addForm.type" value="booked" />
+                    <label class="mx-3">Issue</label>
+                    <input
+                      type="radio"
+                      v-model="addForm.type"
+                      value="advance booking"
+                    />
+                    <label class="mx-3">Book</label>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="seatNo"
+                    >Seat No.</label
+                  >
+                  <input
+                    type="text"
+                    readonly
+                    class="form-control col-md-9"
+                    id="seatNo"
+                    v-model="addForm.selectedSeats"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                    >Total Seats</label
+                  >
+                  <input
+                    type="text"
+                    readonly
+                    class="form-control col-md-9"
+                    id="totalNoSeats"
+                    v-model="selectedSeats.length"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                    >Total Fare</label
+                  >
+                  <input
+                    type="text"
+                    readonly
+                    class="form-control col-md-9"
+                    id="totalFare"
+                    v-model="addForm.totalFare"
+                  />
+                </div>
+                <div class="form-group row">
+                  <label class="col-md-3 pt-3 font-weight-bold" for="discount"
+                    >Discount ( % )</label
+                  >
+                  <input
+                    type="text"
+                    readonly
+                    class="form-control col-md-9"
+                    id="discount"
+                    v-model="addForm.discount"
+                  />
+                </div>
+
+                <div class="form-group text-right">
+                  <button class="btn btn-primary mx-1" @click="add">
+                    Save
+                  </button>
+                  <button class="btn btn-secondary mx-1">Reset</button>
+                </div>
+              </div>
             </div>
 
-            <!-- Add Modal -->
-            <Add
-                :heading="'ADD SURCHARGE'"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
-                <template class="row">
-                    <div class="form-group col-md-6">
-                        <label for="SurchargeName">Name</label>
-                        <input type="text" class="form-control" v-model="SurchargeName" @keypress="isAlphabet($event)"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="SurchargePercentage">Percentage</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
-                                   @keypress="isNumber($event)">
-                            <div class="input-group-append">
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-12">
-                        <h5>Status</h5>
-                        <div class="form-group d-flex align-items-center ">
-                            <label class="mt-4" for="active">Is Active</label>
-                            <label class="colorinput mx-3 mt-3">
-                            <span>
-                                <input type="checkbox" value="1" checked class="colorinput-input"
-                                       @change="checkBox($event)"/>
-                                <span class="colorinput-color bg-success"></span>
-                            </span>
-                            </label>
-                        </div>
-                    </div>
-                </template>
-                <template v-slot:button>
-                    <button
-                        type="button"
-                        class="btn btn-block btn-primary"
-                        @click="addSurcharge"
+            <div class="col-md-6">
+              <div class="card p-4">
+                <div class="col-md-12 mb-5">
+                  <span>
+                    <div class="selected-row circles mr-1 border"></div>
+                    <span class="text-nowrap">Selected</span>
+                  </span>
+                  <span>
+                    <div class="booked_Seat circles mr-1 border"></div>
+                    <span class="text-nowrap">Booked</span>
+                  </span>
+                  <span>
+                    <div class="notForSale circles mr-1 border"></div>
+                    <span class="text-nowrap">Not For Sale</span>
+                  </span>
+                  <span>
+                    <div class="anyElseClass circles pr-1 border"></div>
+                    <span class="text-nowrap">Other Class</span>
+                  </span>
+                  <span>
+                    <div class="economy circles mr-1 border"></div>
+                    <span class="text-nowrap">Economy</span>
+                  </span>
+                  <span>
+                    <div class="exective circles mr-1 border"></div>
+                    <span class="text-nowrap">Executive</span>
+                  </span>
+                  <span>
+                    <div class="business circles mr-1 border"></div>
+                    <span class="text-nowrap">Business</span>
+                  </span>
+                  <span>
+                    <div class="reservedForFemale circles mr-1 border"></div>
+                    <span class="text-wrap">Reserved For Female</span>
+                  </span>
+                </div>
+                <div
+                  class="d-flex justify-content-center seat-img p-0 m-0"
+                  v-for="(record, rowIndex) in schedule.single_bus.seat_map"
+                  :key="rowIndex"
+                >
+                  <div v-for="(col, colIndex) in record" :key="colIndex">
+                    <span
+                      v-if="col.reserved"
+                      class="image-span d-block text-center text-white"
+                      @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                      :class="col.selected ? 'selected-row' : ''"
                     >
-                        Save Surcharge Details
-                    </button>
-                </template>
-            </Add>
-
-
-            <!-- Add Modal End -->
-            <!--            Edit Model-->
-            <Edit
-                heading="Edit Surcharge"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="SurchargeName">Name</label>
-                        <input type="text" class="form-control" v-model="dataEdit.name" @keypress="isAlphabet($event)"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="SurchargePercentage">Percentage</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
-                                   @keypress="isNumber($event)">
-                            <div class="input-group-append">
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-12">
-                        <h5>Status</h5>
-                        <div class="form-group d-flex align-items-center ">
-                            <label class="mt-4" for="active">Is Active</label>
-                            <label class="colorinput mx-3 mt-3">
-                            <span>
-                               <input type="checkbox" class="colorinput-input" id="editCheckBox"
-                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
-                                <span class="colorinput-color bg-success"></span>
-                            </span>
-                            </label>
-                        </div>
-                    </div>
+                      {{ col.seatNo }}
+                    </span>
+                    <span v-else></span>
+                  </div>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="form-group col-md-5">
-                        <button type="button" class="btn btn-success" @click="updateSurcharge">Update
-                            Surcharge
-                        </button>
-                    </div>
-                </div>
-            </Edit>
-            <!--            Edit MOdel End-->
-            <Delete
-                confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
-            />
-
+                <tr></tr>
+                <!-- schedule -->
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
+      </Add>
+
+      <!--            Edit MOdel End-->
+      <Delete
+        confirmationMessage="Are You Sure You want To Delete This Surcharge ???"
+      />
+    </div>
+  </section>
 </template>
 
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
-    name: "SurchargePage",
-    components: {
-        Add,
-        Edit,
-        Delete,
-    },
-    data() {
-        return {
-            surcharges: [],
-            isActive: 1,
-            formID: "addBooking",
-            validationErrors: [],
-            success: false,
-            error: false,
-            SurchargeName: '',
-            delId: "",
-            SurchargePercentage: '',
-            dataEdit: {
-                id: "",
-                name: "",
-                percentage: "",
-                is_Active: "",
-            },
-        };
-    },
-    async created() {
-        const res = await this.callApi("post", 'surcharge');
-        if (res.status == 200) {
-            this.surcharges = res.data
-        } else {
-            console.log(res);
-        }
-    },
-    methods: {
-        isNumber: function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
-        },
-        isAlphabet: function (evet) {
-            if (!/[a-zA-Z\s]/.test(event.key)) {
-                this.ignoredValue = event.key ? event.key : "";
-                event.preventDefault();
-            }
-        },
-        checkBox: function (e) {
-            if (e.target.checked) {
-                this.isActive = 1;
-            } else {
-                this.isActive = 0;
-            }
-        },
-        editCheckBox: function (e) {
-            if (e.target.checked) {
-                this.dataEdit.is_Active = 1;
-            } else {
-                this.dataEdit.is_Active = 0;
-            }
-        },
-
-        async addSurcharge() {
-            this.validationErrors = [];
-            if (this.SurchargeName == "")
-                return this.errorsArray("Name is Required", "SurchargeName");
-            if (this.SurchargePercentage == "")
-                return this.errorsArray("Percentage is Required", "SurchargePercentage");
-
-            const data = {
-                name: this.SurchargeName,
-                percentage: this.SurchargePercentage,
-                active: this.isActive,
-            }
-
-            const res = await this.callApi("post", "surcharge/store", data);
-            if (res.status === 201 && res.statusText === "Created") {
-                this.success = "Surcharge Created Successfully";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
-            } else {
-                if (res.status === 422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
-            }
-        },
-
-        async updateSurcharge() {
-            this.validationErrors = [];
-            if (this.dataEdit.name === "")
-                return this.errorsArray("Name is Required", "SurchargeName");
-            if (this.dataEdit.percentage === "")
-                return this.errorsArray("Percentage is Required", "SurchargePercentage");
-
-            const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
-            if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Surcharge Updated Successfully";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
-            } else {
-                if (res.status === 422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                    setTimeout(function () {
-                        // window.location.reload();
-                    }, 2000);
-
-                }
-            }
-        },
-
-
-        async deleteModal(surcharge, i) {
-            const deletingObj = {
-                url: "/surcharge/delete",
-                data: surcharge,
-                index: i,
-            }
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-
-        edit(sur) {
-            this.dataEdit = sur;
-
-
-        },
-    },
-    computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.surcharges.splice(obj.index, 1)
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
-            }
-        }
+  name: "SurchargePage",
+  components: {
+    Add,
+    Edit,
+    Delete,
+  },
+  data() {
+    return {
+      surcharges: [],
+      isActive: 1,
+      formID: "addBooking",
+      validationErrors: [],
+      success: false,
+      error: false,
+      SurchargeName: "",
+      delId: "",
+      SurchargePercentage: "",
+      allSchedules: [],
+      schedule: "",
+      loading: false,
+      showBookingDiv: false,
+      selectedSeats: [],
+      // seatMap:[],
+      addForm: {
+        type: "booked",
+        gender: "1",
+      },
+      dataEdit: {
+        id: "",
+        name: "",
+        percentage: "",
+        is_Active: "",
+      },
+    };
+  },
+  async created() {
+    const res = await this.callApi("post", "schedule");
+    if (res.status == 200) {
+      this.allSchedules = res.data;
+    } else {
+      console.log(res);
     }
+  },
+
+  methods: {
+    async fetchScheduleData() {
+      if (this.addForm.date == "")
+        return this.errorsArray("Date is Required", "Date");
+      if (this.addForm.schedule == "")
+        return this.errorsArray("Schedule is Required", "Schedule");
+
+      this.loading = true;
+      const res = await this.callApi("post", "schedule/selected", {
+        id: this.addForm.schedule,
+      });
+      if (res.status == 200) {
+        this.loading = false;
+        this.showBookingDiv = true;
+        this.schedule = res.data;
+      } else {
+        console.log(res);
+      }
+    },
+    selectSeat(row, col, seatNo) {
+      let index = this.selectedSeats.indexOf(seatNo);
+      if (index != -1) {
+        this.schedule.single_bus.seat_map[row][col].selected = false;
+        this.selectedSeats.splice(index, 1);
+      } else {
+        this.schedule.single_bus.seat_map[row][col].selected = true;
+        this.selectedSeats.push(seatNo);
+      }
+
+      this.addForm.selectedSeats = this.selectedSeats;
+    },
+
+    async add() {
+      this.validationErrors = [];
+      if (this.schedule == "")
+        return this.errorsArray("Schedule is Required", "Schedule");
+
+      const res = await this.callApi("post", "booking/store", this.addForm);
+      if (res.status === 201 && res.statusText === "Created") {
+        this.success = "Booking Created Successfully";
+        // setTimeout(function () {
+        //   window.location.reload();
+        // }, 2000);
+      } else {
+        if (res.status === 422) {
+          for (const key in res.addForm.errors) {
+            res.addForm.errors[key].forEach((element) => {
+              this.errorsArray(element, key);
+            });
+          }
+        }
+      }
+    },
+
+    async deleteModal(surcharge, i) {
+      const deletingObj = {
+        url: "/surcharge/delete",
+        data: surcharge,
+        index: i,
+      };
+      this.$store.commit("setDeleteObj", deletingObj);
+    },
+  },
+  computed: {
+    ...mapGetters(["getDeletingObj"]),
+  },
+  watch: {
+    getDeletingObj(obj) {
+      if (obj.isDeleted) {
+        this.surcharges.splice(obj.index, 1);
+        setTimeout(function () {
+          window.location.reload();
+        }, 2000);
+      }
+    },
+  },
 };
 </script>
 <style scoped>
-table,
-table * {
-    font-size: 10px;
+.selected-row {
+  background-color: #6db131 !important;
 }
 
-.modal-cell {
-    padding: 0 !important;
-    position: relative;
+.booked_Seat {
+  background-color: rgb(255, 0, 0) !important;
 }
 
-.modal-cell .modal-btn {
-    height: 100%;
-    transition: 0.5s transform;
+.notForSale {
+  background-color: rgb(140, 109, 109) !important;
 }
 
-.modal-cell:hover .modal-btn {
-    position: absolute;
-    z-index: 20;
-    transform: scale(1.3) translateY(-20px);
-    box-shadow: 0px 0px 10px black;
+.reservedForFemale {
+  background-color: rgb(250, 185, 250) !important;
 }
 
-.header-select {
-    width: 35%;
+.economy {
+  background-color: rgb(250, 97, 64) !important;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 1s;
+.exective {
+  background-color: rgb(64, 250, 81) !important;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
-    opacity: 0;
+.business {
+  background-color: rgb(31, 126, 91) !important;
 }
 
-table, tr, th, td, option, select, label, button, a, div, p {
-    font-size: 14px !important;
+.anyElseClass {
+  background-color: rgb(131, 163, 199) !important;
 }
 
-.checkbox-inputs {
-    position: relative;
-    bottom: 10px;
+.seat-img {
+  height: 45px;
+  margin: 10px 0px;
+}
+
+.seat-img .image-span,
+.seat-img span {
+  height: 40px;
+  width: 40px;
+  display: inline-block;
+  cursor: pointer !important;
+  margin: 5px;
+}
+.image-span {
+  background-color: #b9dea0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.image-span:hover {
+  background-color: #6db131;
+}
+img {
+  cursor: pointer !important;
+}
+.circles {
+  width: 30px;
+  height: 30px;
+  -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
+  border-radius: 50px;
+  display: inline-block;
+}
+.circles + span {
+  position: relative;
+  top: -10px;
+  padding: 5px;
 }
 </style>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
     <title>Kainat Travels</title>
+    <meta name="csrf-token" id="token" content="{{ csrf_token() }}">
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
@@ -22,7 +23,7 @@
 
 <body>
 <div class="loader"></div>
-<div id="app">    
+<div id="app">
     @if (Auth::check())
 
         <main-app :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}" app_url="{{ config('app.url') }}">
@@ -50,6 +51,9 @@
 
 
 {{-- Vue App JS --}}
+<script>
+    window.Laravel = {csrfToken: '{{ csrf_token() }}'}
+</script>
 <script src="{{ asset('js/app.js') }}"></script>
 <script>
     $(document).ready(function () {

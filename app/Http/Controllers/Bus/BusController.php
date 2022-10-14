@@ -63,14 +63,18 @@ class BusController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        return BusSeatMap::create([
-            'bus_id' => $bus->id,
-            'seat_map' => $request->seatMap,
-            'no_of_rows' => $request->noOfRows,
-            'no_of_cols' => $request->noOfCols,
-            'company_id' => $this->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
+        // foreach ($request->seatMap as $i => $row) {
+        //     foreach ($row as $j => $column) {
+        //         BusSeatMap::create([
+        //             'bus_id' => $bus->id,
+        //             'seat_map' => $request->seatMap,
+        //             'no_of_rows' => $request->noOfRows,
+        //             'no_of_cols' => $request->noOfCols,
+        //             'company_id' => $this->company_id,
+        //             'added_by' => Auth::user()->id,
+        //         ]);
+        //     }
+        // }
     }
 
     public function updateBus(Request $request)

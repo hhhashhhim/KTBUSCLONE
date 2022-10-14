@@ -12,6 +12,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
+use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -185,4 +186,12 @@ class ScheduleController extends Controller
 
         ];
     }
+
+    public function selected( Request $request ){
+        $tickets = Ticket::where('schedule_id',$request->id)->whereDate('date',$request->date)->get();
+        return Schedule::where('id',$request->id)
+        ->with('single_bus')->first();
+
+    }
+
 }
