@@ -229,17 +229,17 @@
 
                 <section class="section3" :class="activeSection!='step2'?'d-none':''">
                     <div class="row">
-                        <div class="col-md-6 class form-group">
-                            <label for="">Bus</label>
-                            <select class="form-control" id="terminal" @change="getSelectiveData( 'bus')"
-                                    v-model="data.bus">
-                                <option value="0" selected>Select bus</option>
-                                <option v-for="(bus, i) in buses" :value="bus.id" :key="i">
-                                    {{ bus.bus_number }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 class form-group">
+<!--                        <div class="col-md-6 class form-group">-->
+<!--                            <label for="">Bus</label>-->
+<!--                            <select class="form-control" id="terminal" @change="getSelectiveData( 'bus')"-->
+<!--                                    v-model="data.bus">-->
+<!--                                <option value="0" selected>Select bus</option>-->
+<!--                                <option v-for="(bus, i) in buses" :value="bus.id" :key="i">-->
+<!--                                    {{ bus.bus_number }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+                        <div class="col-md-12 class form-group">
                             <label for="busCLass">Bus Class</label>
                             <select class="form-control" id="busCLass" v-model="data.busClass">
                                 <option value="0" selected>Select Route Bus CLass</option>
@@ -270,114 +270,114 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-3 class form-group">
-                            <label for="">No of Rows</label>
-                            <input type="text" class="form-control" v-model="data.noRows"
-                                   @keypress="isNumber($event)">
-                        </div>
-                        <div class="col-md-3 class form-group">
-                            <label for="">No of Cols</label>
-                            <input type="text" class="form-control" v-model="data.noCols"
-                                   @keypress="isNumber($event)">
-                        </div>
-                        <div class="form-group col-md-4 my-4 pt-2">
-                            <button
-                                type="button"
-                                class="btn btn-block btn-warning"
-                                @click="editGenerateMap(data.bus)"
-                            >
-                                Generate Seat Map
-                            </button>
-                        </div>
-                    </div>
+<!--                    <div class="row">-->
+<!--                        <div class="col-md-3 class form-group">-->
+<!--                            <label for="">No of Rows</label>-->
+<!--                            <input type="text" class="form-control" v-model="data.noRows"-->
+<!--                                   @keypress="isNumber($event)">-->
+<!--                        </div>-->
+<!--                        <div class="col-md-3 class form-group">-->
+<!--                            <label for="">No of Cols</label>-->
+<!--                            <input type="text" class="form-control" v-model="data.noCols"-->
+<!--                                   @keypress="isNumber($event)">-->
+<!--                        </div>-->
+<!--                        <div class="form-group col-md-4 my-4 pt-2">-->
+<!--                            <button-->
+<!--                                type="button"-->
+<!--                                class="btn btn-block btn-warning"-->
+<!--                                @click="editGenerateMap(data.bus)"-->
+<!--                            >-->
+<!--                                Generate Seat Map-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="row mx-1 mainRow" v-if="isShowEditDiv">
-                        <div class="form-group col-md-6 border py-3">
-                            <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap" :key="rowIndex">
-                                <td v-for="(col, colIndex) in record" :key="colIndex">
-                                    <img :class="getStyleClass(col)" data-toggle="modal" data-target="#setSeatClass"
-                                         :src= "$store.state.app_url +'assets/img/buses/available_seat_img.gif'" alt=""/>
-                                </td>
-                            </tr>
-                        </div>
-                        <div class="col-md-4 mr-3">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <ul style="list-style: none;">
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="selected-row mr-1 border">
-                                            </div>
-                                            <span>Reserved</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline;">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="booked_Seat mr-1 border">
-                                            </div>
-                                            <span>Booked</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="notForSale mr-1 border">
-                                            </div>
-                                            <span>Not For Sale</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="reservedForFemale mr-1 border">
-                                            </div>
-                                            <span>Reserved For Female</span>
-                                        </li>
-                                        <br>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <ul style="list-style: none;">
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="economy mr-1 border">
-                                            </div>
-                                            <span>Economy</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="exective mr-1 border">
-                                            </div>
-                                            <span>Executive</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="business mr-1 border">
-                                            </div>
-                                            <span>Business</span>
-                                        </li>
-                                        <br>
-                                        <li style="display:inline; ">
-                                            <div
-                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"
-                                                class="anyElseClass pr-1 border">
-                                            </div>
-                                            <span>Other Class</span>
-                                        </li>
-                                        <br>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!--                    <div class="row mx-1 mainRow" v-if="isShowEditDiv">-->
+<!--                        <div class="form-group col-md-6 border py-3">-->
+<!--                            <tr class="seat-img p-0 m-0" v-for="(record, rowIndex) in data.seatMap" :key="rowIndex">-->
+<!--                                <td v-for="(col, colIndex) in record" :key="colIndex">-->
+<!--                                    <img :class="getStyleClass(col)" data-toggle="modal" data-target="#setSeatClass"-->
+<!--                                         :src= "$store.state.app_url +'assets/img/buses/available_seat_img.gif'" alt=""/>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-4 mr-3">-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-md-6">-->
+<!--                                    <ul style="list-style: none;">-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="selected-row mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Reserved</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline;">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="booked_Seat mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Booked</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="notForSale mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Not For Sale</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="reservedForFemale mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Reserved For Female</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                    </ul>-->
+<!--                                </div>-->
+<!--                                <div class="col-md-6">-->
+<!--                                    <ul style="list-style: none;">-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="economy mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Economy</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="exective mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Executive</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="business mr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Business</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                        <li style="display:inline; ">-->
+<!--                                            <div-->
+<!--                                                style="width: 50px; height: 50px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
+<!--                                                class="anyElseClass pr-1 border">-->
+<!--                                            </div>-->
+<!--                                            <span>Other Class</span>-->
+<!--                                        </li>-->
+<!--                                        <br>-->
+<!--                                    </ul>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
                     <div class="row">
                         <div class="col-md-6">
                             <button class="btn btn-info back2 float-left" @click="previousSection('step1')"><i
