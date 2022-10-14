@@ -29,29 +29,8 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'busNumber' => 'required',
-            'fare_class' => 'required|integer',
-            'chassisNumber' => 'required',
-            'insuranceNumber' => 'required',
-            'noOfSeats' => 'required',
-            'routePermit' => 'required',
-            'noOfRows' => 'required|integer',
-        ];
-
-        $customMessages = [
-            'busNumber.required' => 'Bus Number is Required!',
-            'fare_class.required' => 'Fare Class is Required!',
-            'chassisNumber.required' => 'Chassis Number is Required!',
-            'insuranceNumber.required' => 'Insurance Number is Required!',
-            'noOfSeats.required' => 'Number Of Seats is Required!',
-            'routePermit.required' => 'Route Permit is Required!',
-            'noOfRows.required' => 'No of Rows of Bus  is Required!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-
         $schedule = Schedule::where('id',$request->schedule)
-        ->select('id','bus_id')->with('single_bus')   
+        ->select('id','bus_id','company_id')->with('single_bus')   
         ->first();
 
         $customer = Customer::where('cnic',$request->customerCNIC)->first();
@@ -62,17 +41,19 @@ class BookingController extends Controller
                 'contact'=>$request->contact,
             ]);
         }
-        
+        $bookingNo = Ticket::latest()->first()->booking_no??0;
+        ++$bookingNo;
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([
                 'company_id'=>$schedule->company_id,
                 'bus_id'=>$schedule->bus_id,
-                'seatNo'=>$seat,
+                'seat_no'=>$seat,
+                'booking_no'=>$bookingNo,
                 'customer_id'=>$customer->id,
                 'schedule_id'=>$schedule->id,
                 'remarks'=>$request->remarks,
-                'for_female'=>$request->forFemale,
-                'type'=>$request->status,
+                'for_female'=>$request->gender,
+                'type'=>$request->type,
                 'discount'=>$request->discount,
             ]);
         }

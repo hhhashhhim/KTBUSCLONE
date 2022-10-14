@@ -111,12 +111,11 @@
         :formID="formID"
       >
         <div class="row">
-          <div class="col-md-12 class form-group">
-            <label for="DiscountName">Schedule Name</label>
+          <div class="col-md-5 class form-group">
+            <label for="DiscountName">Schedule Name <span class="text-danger">*</span></label>
             <select
               class="form-control"
               id="route"
-              @change="fetchScheduleData"
               v-model="addForm.schedule"
             >
               <option value="" selected>Select Schedule</option>
@@ -130,48 +129,26 @@
             </select>
           </div>
 
+          <div class="col-md-5 class form-group">
+            <label for="date">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" v-model="addForm.date">
+          </div>
+          <div class="col-md-2">
+            <label>Action</label>
+            <button @click="fetchScheduleData" class="btn btn-block btn-primary">Get Record</button>
+          </div>
+          
           <h1 v-if="loading">Loading.........</h1>
 
           <div class="col-md-12 row" v-if="showBookingDiv">
-            <div class="col-md-12 mb-5">
-              <span>
-                <div class="selected-row circles mr-1 border"></div>
-                <span class="text-nowrap">Selected</span>
-              </span>
-              <span>
-                <div class="booked_Seat circles mr-1 border"></div>
-                <span class="text-nowrap">Booked</span>
-              </span>
-              <span>
-                <div class="notForSale circles mr-1 border"></div>
-                <span class="text-nowrap">Not For Sale</span>
-              </span>
-              <span>
-                <div class="anyElseClass circles pr-1 border"></div>
-                <span class="text-nowrap">Other Class</span>
-              </span>
-              <span>
-                <div class="economy circles mr-1 border"></div>
-                <span class="text-nowrap">Economy</span>
-              </span>
-              <span>
-                <div class="exective circles mr-1 border"></div>
-                <span class="text-nowrap">Executive</span>
-              </span>
-              <span>
-                <div class="business circles mr-1 border"></div>
-                <span class="text-nowrap">Business</span>
-              </span>
-              <span>
-                <div class="reservedForFemale circles mr-1 border"></div>
-                <span class="text-wrap">Reserved For Female</span>
-              </span>
-            </div>
-
             <div class="col-md-6">
               <div class="card p-4">
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="customer-cnic">CNIC</label>
+                  <label
+                    class="col-md-3 pt-3 font-weight-bold"
+                    for="customer-cnic"
+                    >CNIC</label
+                  >
                   <input
                     type="text"
                     class="form-control col-md-9"
@@ -180,7 +157,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="fullName">Full Name</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="fullName"
+                    >Full Name</label
+                  >
                   <input
                     type="text"
                     class="form-control col-md-9"
@@ -189,7 +168,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact">Contact</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Contact</label
+                  >
                   <input
                     type="text"
                     class="form-control col-md-9"
@@ -198,7 +179,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="remarks">Remarks</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
+                    >Remarks</label
+                  >
                   <input
                     type="text"
                     class="form-control col-md-9"
@@ -207,25 +190,35 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact">Gender</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Gender</label
+                  >
                   <div class="col-md-9 pt-3">
-                    <input type="radio" v-model="addForm.forFemale" value="0" />
-                    <label class="mx-3">Yes</label>
-                    <input type="radio" v-model="addForm.forFemale" value="1" />
-                    <label class="mx-3">No</label>
+                    <input type="radio" v-model="addForm.gender" value="0" />
+                    <label class="mx-3">Female</label>
+                    <input type="radio" v-model="addForm.gender" value="1" />
+                    <label class="mx-3">Male</label>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact">Issue Or Book</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                    >Issue Or Book</label
+                  >
                   <div class="col-md-9 pt-3">
-                    <input type="radio" v-model="addForm.type" value="0" />
+                    <input type="radio" v-model="addForm.type" value="booked" />
                     <label class="mx-3">Issue</label>
-                    <input type="radio" v-model="addForm.type" value="1" />
+                    <input
+                      type="radio"
+                      v-model="addForm.type"
+                      value="advance booking"
+                    />
                     <label class="mx-3">Book</label>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="seatNo">Seat No.</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="seatNo"
+                    >Seat No.</label
+                  >
                   <input
                     type="text"
                     readonly
@@ -235,7 +228,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare">Total Seats</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                    >Total Seats</label
+                  >
                   <input
                     type="text"
                     readonly
@@ -245,7 +240,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare">Total Fare</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                    >Total Fare</label
+                  >
                   <input
                     type="text"
                     readonly
@@ -255,7 +252,9 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="discount">Discount ( % )</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="discount"
+                    >Discount ( % )</label
+                  >
                   <input
                     type="text"
                     readonly
@@ -266,7 +265,9 @@
                 </div>
 
                 <div class="form-group text-right">
-                  <button class="btn btn-primary mx-1" @click="add">Save</button>
+                  <button class="btn btn-primary mx-1" @click="add">
+                    Save
+                  </button>
                   <button class="btn btn-secondary mx-1">Reset</button>
                 </div>
               </div>
@@ -274,29 +275,58 @@
 
             <div class="col-md-6">
               <div class="card p-4">
-                <div class="d-flex justify-content-center seat-img p-0 m-0"
-                    v-for="(record, rowIndex) in schedule.single_bus.seat_map"
-                    :key="rowIndex"
-                >
-
-                    <div v-for="(col, colIndex) in record" :key="colIndex">
-                        <span
-                        v-if="col.reserved"
-                        class="image-span d-block text-center text-white"
-                        @click="selectSeat(rowIndex,colIndex,col.seatNo)"
-                        :class="col.selected?'selected-row':''"
-                        >
-                        {{ col.seatNo }}
-                        </span>
-                        <span v-else></span>
-                    </div>
-                
+                <div class="col-md-12 mb-5">
+                  <span>
+                    <div class="selected-row circles mr-1 border"></div>
+                    <span class="text-nowrap">Selected</span>
+                  </span>
+                  <span>
+                    <div class="booked_Seat circles mr-1 border"></div>
+                    <span class="text-nowrap">Booked</span>
+                  </span>
+                  <span>
+                    <div class="notForSale circles mr-1 border"></div>
+                    <span class="text-nowrap">Not For Sale</span>
+                  </span>
+                  <span>
+                    <div class="anyElseClass circles pr-1 border"></div>
+                    <span class="text-nowrap">Other Class</span>
+                  </span>
+                  <span>
+                    <div class="economy circles mr-1 border"></div>
+                    <span class="text-nowrap">Economy</span>
+                  </span>
+                  <span>
+                    <div class="exective circles mr-1 border"></div>
+                    <span class="text-nowrap">Executive</span>
+                  </span>
+                  <span>
+                    <div class="business circles mr-1 border"></div>
+                    <span class="text-nowrap">Business</span>
+                  </span>
+                  <span>
+                    <div class="reservedForFemale circles mr-1 border"></div>
+                    <span class="text-wrap">Reserved For Female</span>
+                  </span>
                 </div>
-                    <tr
-                    
+                <div
+                  class="d-flex justify-content-center seat-img p-0 m-0"
+                  v-for="(record, rowIndex) in schedule.single_bus.seat_map"
+                  :key="rowIndex"
+                >
+                  <div v-for="(col, colIndex) in record" :key="colIndex">
+                    <span
+                      v-if="col.reserved"
+                      class="image-span d-block text-center text-white"
+                      @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                      :class="col.selected ? 'selected-row' : ''"
                     >
-                        
-                    </tr>
+                      {{ col.seatNo }}
+                    </span>
+                    <span v-else></span>
+                  </div>
+                </div>
+                <tr></tr>
                 <!-- schedule -->
               </div>
             </div>
@@ -342,7 +372,10 @@ export default {
       showBookingDiv: false,
       selectedSeats: [],
       // seatMap:[],
-      addForm: {},
+      addForm: {
+        type: "booked",
+        gender: "1",
+      },
       dataEdit: {
         id: "",
         name: "",
@@ -359,9 +392,14 @@ export default {
       console.log(res);
     }
   },
-  
+
   methods: {
     async fetchScheduleData() {
+      if (this.addForm.date == "")
+        return this.errorsArray("Date is Required", "Date");
+      if (this.addForm.schedule == "")
+        return this.errorsArray("Schedule is Required", "Schedule");
+
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
@@ -370,30 +408,27 @@ export default {
         this.loading = false;
         this.showBookingDiv = true;
         this.schedule = res.data;
-        
       } else {
         console.log(res);
       }
     },
-    selectSeat(row,col,seatNo){
-        
-        let index = this.selectedSeats.indexOf(seatNo);
-        if (index != -1) {
-            this.schedule.single_bus.seat_map[row][col].selected=false;
-            this.selectedSeats.splice(index,1);
-        }
-        else{
-            this.schedule.single_bus.seat_map[row][col].selected=true;
-            this.selectedSeats.push(seatNo);
-        }
+    selectSeat(row, col, seatNo) {
+      let index = this.selectedSeats.indexOf(seatNo);
+      if (index != -1) {
+        this.schedule.single_bus.seat_map[row][col].selected = false;
+        this.selectedSeats.splice(index, 1);
+      } else {
+        this.schedule.single_bus.seat_map[row][col].selected = true;
+        this.selectedSeats.push(seatNo);
+      }
 
-        this.addForm.selectedSeats = this.selectedSeats;
-
+      this.addForm.selectedSeats = this.selectedSeats;
     },
-    
+
     async add() {
       this.validationErrors = [];
-      if (this.schedule == "") return this.errorsArray("Schedule is Required", "Schedule");
+      if (this.schedule == "")
+        return this.errorsArray("Schedule is Required", "Schedule");
 
       const res = await this.callApi("post", "booking/store", this.addForm);
       if (res.status === 201 && res.statusText === "Created") {
@@ -420,7 +455,6 @@ export default {
       };
       this.$store.commit("setDeleteObj", deletingObj);
     },
-
   },
   computed: {
     ...mapGetters(["getDeletingObj"]),
@@ -439,7 +473,7 @@ export default {
 </script>
 <style scoped>
 .selected-row {
-  background-color: #6DB131 !important;
+  background-color: #6db131 !important;
 }
 
 .booked_Seat {
@@ -472,6 +506,7 @@ export default {
 
 .seat-img {
   height: 45px;
+  margin: 10px 0px;
 }
 
 .seat-img .image-span,
@@ -482,15 +517,15 @@ export default {
   cursor: pointer !important;
   margin: 5px;
 }
-.image-span{
-    background-color: #B9DEA0;
-    border-radius: 10px;
-    cursor: pointer;
+.image-span {
+  background-color: #b9dea0;
+  border-radius: 10px;
+  cursor: pointer;
 }
-.image-span:hover{
-    background-color: #6DB131;
+.image-span:hover {
+  background-color: #6db131;
 }
-img{
+img {
   cursor: pointer !important;
 }
 .circles {
