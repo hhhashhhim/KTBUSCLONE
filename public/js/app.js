@@ -29873,11 +29873,890 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
+var _hoisted_1 = {
+  "class": "section"
+};
+var _hoisted_2 = {
+  "class": "row"
+};
+var _hoisted_3 = {
+  "class": "col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12"
+};
+var _hoisted_4 = {
+  "class": "card"
+};
+var _hoisted_5 = {
+  "class": "card-statistic-4"
+};
+var _hoisted_6 = {
+  "class": "align-items-center justify-content-between"
+};
+var _hoisted_7 = {
+  "class": "row"
+};
 
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<section class=\"section\"><div class=\"row\"><div class=\"col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12\"><div class=\"card\"><div class=\"card-statistic-4\"><div class=\"align-items-center justify-content-between\"><div class=\"row\"><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">New Booking</h5><h2 class=\"mb-3 font-18\">258</h2><p class=\"mb-0\"><span class=\"col-green\">10%</span> Increase</p></div></div><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0\"><div class=\"banner-img\"><img src=\"assets/img/banner/1.png\" alt=\"\"></div></div></div></div></div></div></div><div class=\"col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12\"><div class=\"card\"><div class=\"card-statistic-4\"><div class=\"align-items-center justify-content-between\"><div class=\"row\"><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\"> Customers</h5><h2 class=\"mb-3 font-18\">1,287</h2><p class=\"mb-0\"><span class=\"col-orange\">09%</span> Decrease</p></div></div><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0\"><div class=\"banner-img\"><img src=\"assets/img/banner/2.png\" alt=\"\"></div></div></div></div></div></div></div><div class=\"col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12\"><div class=\"card\"><div class=\"card-statistic-4\"><div class=\"align-items-center justify-content-between\"><div class=\"row\"><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">New Project</h5><h2 class=\"mb-3 font-18\">128</h2><p class=\"mb-0\"><span class=\"col-green\">18%</span> Increase</p></div></div><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0\"><div class=\"banner-img\"><img src=\"assets/img/banner/3.png\" alt=\"\"></div></div></div></div></div></div></div><div class=\"col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12\"><div class=\"card\"><div class=\"card-statistic-4\"><div class=\"align-items-center justify-content-between\"><div class=\"row\"><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">Revenue</h5><h2 class=\"mb-3 font-18\">$48,697</h2><p class=\"mb-0\"><span class=\"col-green\">42%</span> Increase</p></div></div><div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0\"><div class=\"banner-img\"><img src=\"assets/img/banner/4.png\" alt=\"\"></div></div></div></div></div></div></div></div><div class=\"row\"><div class=\"col-12 col-sm-12 col-lg-12\"><div class=\"card\"><div class=\"card-header\"><h4>Revenue chart</h4><div class=\"card-header-action\"><div class=\"dropdown\"><a href=\"#\" data-toggle=\"dropdown\" class=\"btn btn-warning dropdown-toggle\">Options</a><div class=\"dropdown-menu\"><a href=\"#\" class=\"dropdown-item has-icon\"><i class=\"fas fa-eye\"></i> View</a><a href=\"#\" class=\"dropdown-item has-icon\"><i class=\"far fa-edit\"></i> Edit</a><div class=\"dropdown-divider\"></div><a href=\"#\" class=\"dropdown-item has-icon text-danger\"><i class=\"far fa-trash-alt\"></i> Delete</a></div></div><a href=\"#\" class=\"btn btn-primary\">View All</a></div></div><div class=\"card-body\"><div class=\"row\"><div class=\"col-lg-9\"><div id=\"chart1\"></div><div class=\"row mb-0\"><div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\"><div class=\"list-inline text-center\"><div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-up-circle\" class=\"col-green\"></i><h5 class=\"m-b-0\">$675</h5><p class=\"text-muted font-14 m-b-0\">Weekly Earnings</p></div></div></div><div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\"><div class=\"list-inline text-center\"><div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-down-circle\" class=\"col-orange\"></i><h5 class=\"m-b-0\">$1,587</h5><p class=\"text-muted font-14 m-b-0\">Monthly Earnings</p></div></div></div><div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\"><div class=\"list-inline text-center\"><div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-up-circle\" class=\"col-green\"></i><h5 class=\"mb-0 m-b-0\">$45,965</h5><p class=\"text-muted font-14 m-b-0\">Yearly Earnings</p></div></div></div></div></div><div class=\"col-lg-3\"><div class=\"row mt-5\"><div class=\"col-7 col-xl-7 mb-3\">Total customers</div><div class=\"col-5 col-xl-5 mb-3\"><span class=\"text-big\">8,257</span><sup class=\"col-green\">+09%</sup></div><div class=\"col-7 col-xl-7 mb-3\">Total Income</div><div class=\"col-5 col-xl-5 mb-3\"><span class=\"text-big\">$9,857</span><sup class=\"text-danger\">-18%</sup></div><div class=\"col-7 col-xl-7 mb-3\">Project completed</div><div class=\"col-5 col-xl-5 mb-3\"><span class=\"text-big\">28</span><sup class=\"col-green\">+16%</sup></div><div class=\"col-7 col-xl-7 mb-3\">Total expense</div><div class=\"col-5 col-xl-5 mb-3\"><span class=\"text-big\">$6,287</span><sup class=\"col-green\">+09%</sup></div><div class=\"col-7 col-xl-7 mb-3\">New Customers</div><div class=\"col-5 col-xl-5 mb-3\"><span class=\"text-big\">684</span><sup class=\"col-green\">+22%</sup></div></div></div></div></div></div></div></div><div class=\"row\"><div class=\"col-12 col-sm-12 col-lg-4\"><div class=\"card\"><div class=\"card-header\"><h4>Chart</h4></div><div class=\"card-body\"><div id=\"chart4\" class=\"chartsh\"></div></div></div></div><div class=\"col-12 col-sm-12 col-lg-4\"><div class=\"card\"><div class=\"card-header\"><h4>Chart</h4></div><div class=\"card-body\"><div class=\"summary\"><div class=\"summary-chart active\" data-tab-group=\"summary-tab\" id=\"summary-chart\"><div id=\"chart3\" class=\"chartsh\"></div></div><div data-tab-group=\"summary-tab\" id=\"summary-text\"></div></div></div></div></div><div class=\"col-12 col-sm-12 col-lg-4\"><div class=\"card\"><div class=\"card-header\"><h4>Chart</h4></div><div class=\"card-body\"><div id=\"chart2\" class=\"chartsh\"></div></div></div></div></div><div class=\"row\"><div class=\"col-12\"><div class=\"card\"><div class=\"card-header\"><h4>Assign Task Table</h4><div class=\"card-header-form\"><form><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Search\"><div class=\"input-group-btn\"><button class=\"btn btn-primary\"><i class=\"fas fa-search\"></i></button></div></div></form></div></div><div class=\"card-body p-0\"><div class=\"table-responsive\"><table class=\"table table-striped\"><tr><th class=\"text-center\"><div class=\"custom-checkbox custom-checkbox-table custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" data-checkbox-role=\"dad\" class=\"custom-control-input\" id=\"checkbox-all\"><label for=\"checkbox-all\" class=\"custom-control-label\"> </label></div></th><th>Task Name</th><th>Members</th><th>Task Status</th><th>Assigh Date</th><th>Due Date</th><th>Priority</th><th>Action</th></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-1\"><label for=\"checkbox-1\" class=\"custom-control-label\"> </label></div></td><td>Create a mobile app</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-8.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Wildan Ahdian\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-9.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-10.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Sarah Smith\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+4</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">50%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar bg-success\" data-width=\"50%\"></div></div></td><td>2018-01-20</td><td>2019-05-28</td><td><div class=\"badge badge-success\">Low</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-2\"><label for=\"checkbox-2\" class=\"custom-control-label\"> </label></div></td><td>Redesign homepage</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-1.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Wildan Ahdian\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-2.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+2</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">40%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar bg-danger\" data-width=\"40%\"></div></div></td><td>2017-07-14</td><td>2018-07-21</td><td><div class=\"badge badge-danger\">High</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-3\"><label for=\"checkbox-3\" class=\"custom-control-label\"> </label></div></td><td>Backup database</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-3.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Wildan Ahdian\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-4.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-5.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Sarah Smith\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+3</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">55%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar bg-purple\" data-width=\"55%\"></div></div></td><td>2019-07-25</td><td>2019-08-17</td><td><div class=\"badge badge-info\">Average</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-4\"><label for=\"checkbox-4\" class=\"custom-control-label\"> </label></div></td><td>Android App</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-7.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-8.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Sarah Smith\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+4</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">70%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar\" data-width=\"70%\"></div></div></td><td>2018-04-15</td><td>2019-07-19</td><td><div class=\"badge badge-success\">Low</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-5\"><label for=\"checkbox-5\" class=\"custom-control-label\"> </label></div></td><td>Logo Design</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-9.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Wildan Ahdian\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-10.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-2.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Sarah Smith\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+2</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">45%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar bg-cyan\" data-width=\"45%\"></div></div></td><td>2017-02-24</td><td>2018-09-06</td><td><div class=\"badge badge-danger\">High</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr><tr><td class=\"p-0 text-center\"><div class=\"custom-checkbox custom-control\"><input type=\"checkbox\" data-checkboxes=\"mygroup\" class=\"custom-control-input\" id=\"checkbox-6\"><label for=\"checkbox-6\" class=\"custom-control-label\"> </label></div></td><td>Ecommerce website</td><td class=\"text-truncate\"><ul class=\"list-unstyled order-list m-b-0 m-b-0\"><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-8.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Wildan Ahdian\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-9.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"John Deo\"></li><li class=\"team-member team-member-sm\"><img class=\"rounded-circle\" src=\"assets/img/users/user-10.png\" alt=\"user\" data-toggle=\"tooltip\" title=\"\" data-original-title=\"Sarah Smith\"></li><li class=\"avatar avatar-sm\"><span class=\"badge badge-primary\">+4</span></li></ul></td><td class=\"align-middle\"><div class=\"progress-text\">30%</div><div class=\"progress\" data-height=\"6\"><div class=\"progress-bar bg-orange\" data-width=\"30%\"></div></div></td><td>2018-01-20</td><td>2019-05-28</td><td><div class=\"badge badge-info\">Average</div></td><td><a href=\"#\" class=\"btn btn-outline-primary\">Detail</a></td></tr></table></div></div></div></div></div><div class=\"row\"><div class=\"col-md-6 col-lg-12 col-xl-6\"><!-- Support tickets --><div class=\"card\"><div class=\"card-header\"><h4>Support Ticket</h4><form class=\"card-header-form\"><input type=\"text\" name=\"search\" class=\"form-control\" placeholder=\"Search\"></form></div><div class=\"card-body\"><div class=\"support-ticket media pb-1 mb-3\"><img src=\"assets/img/users/user-1.png\" class=\"user-img mr-2\" alt=\"\"><div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-success mb-1 float-right\">Feature</div><span class=\"font-weight-bold\">#89754</span><a href=\"javascript:void(0)\">Please add advance table</a><p class=\"my-1\">Hi, can you please add new table for advan...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">John Deo</span>    - 1 day ago</small></div></div><div class=\"support-ticket media pb-1 mb-3\"><img src=\"assets/img/users/user-2.png\" class=\"user-img mr-2\" alt=\"\"><div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-warning mb-1 float-right\">Bug</div><span class=\"font-weight-bold\">#57854</span><a href=\"javascript:void(0)\">Select item not working</a><p class=\"my-1\">please check select item in advance form not work...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Sarah Smith</span>    - 2 day ago</small></div></div><div class=\"support-ticket media pb-1 mb-3\"><img src=\"assets/img/users/user-3.png\" class=\"user-img mr-2\" alt=\"\"><div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-primary mb-1 float-right\">Query</div><span class=\"font-weight-bold\">#85784</span><a href=\"javascript:void(0)\">Are you provide template in Angular?</a><p class=\"my-1\">can you provide template in latest angular 8.</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Ashton Cox</span>    -2 day ago</small></div></div><div class=\"support-ticket media pb-1 mb-3\"><img src=\"assets/img/users/user-6.png\" class=\"user-img mr-2\" alt=\"\"><div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-info mb-1 float-right\">Enhancement</div><span class=\"font-weight-bold\">#25874</span><a href=\"javascript:void(0)\">About template page load speed</a><p class=\"my-1\">Hi, John, can you work on increase page speed of template...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Hasan Basri</span>    -3 day ago</small></div></div></div><a href=\"javascript:void(0)\" class=\"card-footer card-link text-center small\">View All</a></div><!-- Support tickets --></div><div class=\"col-md-6 col-lg-12 col-xl-6\"><div class=\"card\"><div class=\"card-header\"><h4>Projects Payments</h4></div><div class=\"card-body\"><div class=\"table-responsive\"><table class=\"table table-hover mb-0\"><thead><tr><th>#</th><th>Client Name</th><th>Date</th><th>Payment Method</th><th>Amount</th></tr></thead><tbody><tr><td>1</td><td>John Doe </td><td>11-08-2018</td><td>NEFT</td><td>$258</td></tr><tr><td>2</td><td>Cara Stevens </td><td>15-07-2018</td><td>PayPal</td><td>$125</td></tr><tr><td>3</td><td> Airi Satou </td><td>25-08-2018</td><td>RTGS</td><td>$287</td></tr><tr><td>4</td><td> Angelica Ramos </td><td>01-05-2018</td><td>CASH</td><td>$170</td></tr><tr><td>5</td><td> Ashton Cox </td><td>18-04-2018</td><td>NEFT</td><td>$970</td></tr><tr><td>6</td><td> John Deo </td><td>22-11-2018</td><td>PayPal</td><td>$854</td></tr><tr><td>7</td><td> Hasan Basri </td><td>07-09-2018</td><td>Cash</td><td>$128</td></tr></tbody></table></div></div></div></div></div></section>", 1);
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">New Booking</h5><h2 class=\"mb-3 font-18\">258</h2><p class=\"mb-0\"><span class=\"col-green\">10%</span> Increase</p></div></div>", 1);
+
+var _hoisted_9 = {
+  "class": "col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0"
+};
+var _hoisted_10 = {
+  "class": "banner-img"
+};
+var _hoisted_11 = ["src"];
+var _hoisted_12 = {
+  "class": "col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12"
+};
+var _hoisted_13 = {
+  "class": "card"
+};
+var _hoisted_14 = {
+  "class": "card-statistic-4"
+};
+var _hoisted_15 = {
+  "class": "align-items-center justify-content-between"
+};
+var _hoisted_16 = {
+  "class": "row"
+};
+
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\"> Customers</h5><h2 class=\"mb-3 font-18\">1,287</h2><p class=\"mb-0\"><span class=\"col-orange\">09%</span> Decrease</p></div></div>", 1);
+
+var _hoisted_18 = {
+  "class": "col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0"
+};
+var _hoisted_19 = {
+  "class": "banner-img"
+};
+var _hoisted_20 = ["src"];
+var _hoisted_21 = {
+  "class": "col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12"
+};
+var _hoisted_22 = {
+  "class": "card"
+};
+var _hoisted_23 = {
+  "class": "card-statistic-4"
+};
+var _hoisted_24 = {
+  "class": "align-items-center justify-content-between"
+};
+var _hoisted_25 = {
+  "class": "row"
+};
+
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">New Project</h5><h2 class=\"mb-3 font-18\">128</h2><p class=\"mb-0\"><span class=\"col-green\">18%</span> Increase</p></div></div>", 1);
+
+var _hoisted_27 = {
+  "class": "col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0"
+};
+var _hoisted_28 = {
+  "class": "banner-img"
+};
+var _hoisted_29 = ["src"];
+var _hoisted_30 = {
+  "class": "col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12"
+};
+var _hoisted_31 = {
+  "class": "card"
+};
+var _hoisted_32 = {
+  "class": "card-statistic-4"
+};
+var _hoisted_33 = {
+  "class": "align-items-center justify-content-between"
+};
+var _hoisted_34 = {
+  "class": "row"
+};
+
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\"><div class=\"card-content\"><h5 class=\"font-15\">Revenue</h5><h2 class=\"mb-3 font-18\">$48,697</h2><p class=\"mb-0\"><span class=\"col-green\">42%</span> Increase</p></div></div>", 1);
+
+var _hoisted_36 = {
+  "class": "col-lg-6 col-md-6 col-sm-6 col-xs-6 pl-0"
+};
+var _hoisted_37 = {
+  "class": "banner-img"
+};
+var _hoisted_38 = ["src"];
+var _hoisted_39 = {
+  "class": "row"
+};
+var _hoisted_40 = {
+  "class": "col-12"
+};
+var _hoisted_41 = {
+  "class": "card"
+};
+
+var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"card-header\"><h4>Schedule Table</h4><div class=\"card-header-form\"><form><div class=\"input-group\"><input type=\"text\" class=\"form-control\" placeholder=\"Search\"><div class=\"input-group-btn\"><button class=\"btn btn-primary\"><i class=\"fas fa-search\"></i></button></div></div></form></div></div>", 1);
+
+var _hoisted_43 = {
+  "class": "card-body p-0"
+};
+var _hoisted_44 = {
+  "class": "table-responsive"
+};
+var _hoisted_45 = {
+  "class": "table table-striped"
+};
+
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-checkbox-table custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "data-checkbox-role": "dad",
+  "class": "custom-control-input",
+  id: "checkbox-all"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-all",
+  "class": "custom-control-label"
+}, " ")])]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Task Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Members"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Task Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Assign Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Due Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Priority"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")], -1
+/* HOISTED */
+);
+
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-1"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-1",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Create a mobile app", -1
+/* HOISTED */
+);
+
+var _hoisted_49 = {
+  "class": "text-truncate"
+};
+var _hoisted_50 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_51 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_52 = ["src"];
+var _hoisted_53 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_54 = ["src"];
+var _hoisted_55 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_56 = ["src"];
+
+var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+4")], -1
+/* HOISTED */
+);
+
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "50%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar bg-success",
+  "data-width": "50%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2018-01-20", -1
+/* HOISTED */
+);
+
+var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2019-05-28", -1
+/* HOISTED */
+);
+
+var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-success"
+}, "Low")], -1
+/* HOISTED */
+);
+
+var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-2"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-2",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_64 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Redesign homepage", -1
+/* HOISTED */
+);
+
+var _hoisted_65 = {
+  "class": "text-truncate"
+};
+var _hoisted_66 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_67 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_68 = ["src"];
+var _hoisted_69 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_70 = ["src"];
+
+var _hoisted_71 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+2")], -1
+/* HOISTED */
+);
+
+var _hoisted_72 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "40%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar bg-danger",
+  "data-width": "40%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_73 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2017-07-14", -1
+/* HOISTED */
+);
+
+var _hoisted_74 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2018-07-21", -1
+/* HOISTED */
+);
+
+var _hoisted_75 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-danger"
+}, "High")], -1
+/* HOISTED */
+);
+
+var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_77 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-3",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_78 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Backup database", -1
+/* HOISTED */
+);
+
+var _hoisted_79 = {
+  "class": "text-truncate"
+};
+var _hoisted_80 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_81 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_82 = ["src"];
+var _hoisted_83 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_84 = ["src"];
+var _hoisted_85 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_86 = ["src"];
+
+var _hoisted_87 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+3")], -1
+/* HOISTED */
+);
+
+var _hoisted_88 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "55%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar bg-purple",
+  "data-width": "55%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_89 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2019-07-25", -1
+/* HOISTED */
+);
+
+var _hoisted_90 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2019-08-17", -1
+/* HOISTED */
+);
+
+var _hoisted_91 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-info"
+}, "Average")], -1
+/* HOISTED */
+);
+
+var _hoisted_92 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_93 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-4"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-4",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_94 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Android App", -1
+/* HOISTED */
+);
+
+var _hoisted_95 = {
+  "class": "text-truncate"
+};
+var _hoisted_96 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_97 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_98 = ["src"];
+var _hoisted_99 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_100 = ["src"];
+
+var _hoisted_101 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+4")], -1
+/* HOISTED */
+);
+
+var _hoisted_102 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "70%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar",
+  "data-width": "70%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_103 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2018-04-15", -1
+/* HOISTED */
+);
+
+var _hoisted_104 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2019-07-19", -1
+/* HOISTED */
+);
+
+var _hoisted_105 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-success"
+}, "Low")], -1
+/* HOISTED */
+);
+
+var _hoisted_106 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_107 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-5"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-5",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_108 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Logo Design", -1
+/* HOISTED */
+);
+
+var _hoisted_109 = {
+  "class": "text-truncate"
+};
+var _hoisted_110 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_111 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_112 = ["src"];
+var _hoisted_113 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_114 = ["src"];
+var _hoisted_115 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_116 = ["src"];
+
+var _hoisted_117 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+2")], -1
+/* HOISTED */
+);
+
+var _hoisted_118 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "45%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar bg-cyan",
+  "data-width": "45%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_119 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2017-02-24", -1
+/* HOISTED */
+);
+
+var _hoisted_120 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2018-09-06", -1
+/* HOISTED */
+);
+
+var _hoisted_121 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-danger"
+}, "High")], -1
+/* HOISTED */
+);
+
+var _hoisted_122 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_123 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "p-0 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "custom-checkbox custom-control"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "checkbox",
+  "data-checkboxes": "mygroup",
+  "class": "custom-control-input",
+  id: "checkbox-6"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "checkbox-6",
+  "class": "custom-control-label"
+}, " ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_124 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "Ecommerce website", -1
+/* HOISTED */
+);
+
+var _hoisted_125 = {
+  "class": "text-truncate"
+};
+var _hoisted_126 = {
+  "class": "list-unstyled order-list m-b-0 m-b-0"
+};
+var _hoisted_127 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_128 = ["src"];
+var _hoisted_129 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_130 = ["src"];
+var _hoisted_131 = {
+  "class": "team-member team-member-sm"
+};
+var _hoisted_132 = ["src"];
+
+var _hoisted_133 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  "class": "avatar avatar-sm"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "badge badge-primary"
+}, "+4")], -1
+/* HOISTED */
+);
+
+var _hoisted_134 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "align-middle"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-text"
+}, "30%"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress",
+  "data-height": "6"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "progress-bar bg-orange",
+  "data-width": "30%"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_135 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2018-01-20", -1
+/* HOISTED */
+);
+
+var _hoisted_136 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "2019-05-28", -1
+/* HOISTED */
+);
+
+var _hoisted_137 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "badge badge-info"
+}, "Average")], -1
+/* HOISTED */
+);
+
+var _hoisted_138 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "#",
+  "class": "btn btn-outline-primary"
+}, "Detail")], -1
+/* HOISTED */
+);
+
+var _hoisted_139 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row\"><!--              &lt;div class=&quot;col-12 col-sm-12 col-lg-4&quot;&gt;--><!--                  &lt;div class=&quot;card&quot;&gt;--><!--                      &lt;div class=&quot;card-header&quot;&gt;--><!--                          &lt;h4&gt;Chart&lt;/h4&gt;--><!--                      &lt;/div&gt;--><!--                      &lt;div class=&quot;card-body&quot;&gt;--><!--                          &lt;div id=&quot;chart4&quot; class=&quot;chartsh&quot;&gt;&lt;/div&gt;--><!--                      &lt;/div&gt;--><!--                  &lt;/div&gt;--><!--              &lt;/div&gt;--><!--              &lt;div class=&quot;col-12 col-sm-12 col-lg-4&quot;&gt;--><!--                  &lt;div class=&quot;card&quot;&gt;--><!--                      &lt;div class=&quot;card-header&quot;&gt;--><!--                          &lt;h4&gt;Chart&lt;/h4&gt;--><!--                      &lt;/div&gt;--><!--                      &lt;div class=&quot;card-body&quot;&gt;--><!--                          &lt;div class=&quot;summary&quot;&gt;--><!--                              &lt;div class=&quot;summary-chart active&quot; data-tab-group=&quot;summary-tab&quot; id=&quot;summary-chart&quot;&gt;--><!--                                  &lt;div id=&quot;chart3&quot; class=&quot;chartsh&quot;&gt;&lt;/div&gt;--><!--                              &lt;/div&gt;--><!--                              &lt;div data-tab-group=&quot;summary-tab&quot; id=&quot;summary-text&quot;&gt;--><!--                              &lt;/div&gt;--><!--                          &lt;/div&gt;--><!--                      &lt;/div&gt;--><!--                  &lt;/div&gt;--><!--              &lt;/div&gt;--><div class=\"col-12 col-sm-12 col-lg-4\"><div class=\"card\"><div class=\"card-header\"><h4>Fare Chart</h4></div><div class=\"card-body\"><div id=\"chart2\" class=\"chartsh\"></div></div></div></div></div>", 1);
+
+var _hoisted_140 = {
+  "class": "row"
+};
+var _hoisted_141 = {
+  "class": "col-md-6 col-lg-12 col-xl-6"
+};
+var _hoisted_142 = {
+  "class": "card"
+};
+
+var _hoisted_143 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "card-header"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Support Ticket"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  "class": "card-header-form"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  type: "text",
+  name: "search",
+  "class": "form-control",
+  placeholder: "Search"
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_144 = {
+  "class": "card-body"
+};
+var _hoisted_145 = {
+  "class": "support-ticket media pb-1 mb-3"
+};
+var _hoisted_146 = ["src"];
+
+var _hoisted_147 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-success mb-1 float-right\">Feature</div><span class=\"font-weight-bold\">#89754</span><a href=\"javascript:void(0)\">Please add advance table</a><p class=\"my-1\">Hi, can you please add new table for advan...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">John Deo</span>    - 1 day ago</small></div>", 1);
+
+var _hoisted_148 = {
+  "class": "support-ticket media pb-1 mb-3"
+};
+var _hoisted_149 = ["src"];
+
+var _hoisted_150 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-warning mb-1 float-right\">Bug</div><span class=\"font-weight-bold\">#57854</span><a href=\"javascript:void(0)\">Select item not working</a><p class=\"my-1\">please check select item in advance form not work...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Sarah Smith</span>    - 2 day ago</small></div>", 1);
+
+var _hoisted_151 = {
+  "class": "support-ticket media pb-1 mb-3"
+};
+var _hoisted_152 = ["src"];
+
+var _hoisted_153 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-primary mb-1 float-right\">Query</div><span class=\"font-weight-bold\">#85784</span><a href=\"javascript:void(0)\">Are you provide template in Angular?</a><p class=\"my-1\">can you provide template in latest angular 8.</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Ashton Cox</span>    -2 day ago</small></div>", 1);
+
+var _hoisted_154 = {
+  "class": "support-ticket media pb-1 mb-3"
+};
+var _hoisted_155 = ["src"];
+
+var _hoisted_156 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"media-body ml-3\"><div class=\"badge badge-pill badge-info mb-1 float-right\">Enhancement</div><span class=\"font-weight-bold\">#25874</span><a href=\"javascript:void(0)\">About template page load speed</a><p class=\"my-1\">Hi, John, can you work on increase page speed of template...</p><small class=\"text-muted\">Created by <span class=\"font-weight-bold font-13\">Hasan Basri</span>    -3 day ago</small></div>", 1);
+
+var _hoisted_157 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: "javascript:void(0)",
+  "class": "card-footer card-link text-center small"
+}, "View All", -1
+/* HOISTED */
+);
+
+var _hoisted_158 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"col-md-6 col-lg-12 col-xl-6\"><div class=\"card\"><div class=\"card-header\"><h4>Projects Payments</h4></div><div class=\"card-body\"><div class=\"table-responsive\"><table class=\"table table-hover mb-0\"><thead><tr><th>#</th><th>Client Name</th><th>Date</th><th>Payment Method</th><th>Amount</th></tr></thead><tbody><tr><td>1</td><td>John Doe </td><td>11-08-2018</td><td>NEFT</td><td>$258</td></tr><tr><td>2</td><td>Cara Stevens </td><td>15-07-2018</td><td>PayPal</td><td>$125</td></tr><tr><td>3</td><td> Airi Satou </td><td>25-08-2018</td><td>RTGS</td><td>$287</td></tr><tr><td>4</td><td> Angelica Ramos </td><td>01-05-2018</td><td>CASH</td><td>$170</td></tr><tr><td>5</td><td> Ashton Cox </td><td>18-04-2018</td><td>NEFT</td><td>$970</td></tr><tr><td>6</td><td> John Deo </td><td>22-11-2018</td><td>PayPal</td><td>$854</td></tr><tr><td>7</td><td> Hasan Basri </td><td>07-09-2018</td><td>Cash</td><td>$128</td></tr></tbody></table></div></div></div></div>", 1);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("    <section class=\"section\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("      <div class=\"container\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        <div class=\"row\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("          <div class=\"col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            <div class=\"card\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("              <div class=\"card-statistic-4\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                <div class=\"align-items-center justify-content-between\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                  <div class=\"row\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6 pr-0 pt-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      <div class=\"card-content\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <h5 class=\"font-15\">New Booking</h5>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <h2 class=\"mb-3 font-18\">258</h2>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <p class=\"mb-0\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          <span class=\"col-green\">10%</span> Increase"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </p>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                  </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("         "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("    </section>")]);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/banner/1.png',
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_11)])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/banner/2.png',
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_20)])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/banner/3.png',
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_29)])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/banner/4.png',
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_38)])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Comment for use later"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("          <div class=\"row\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("              <div class=\"col-12 col-sm-12 col-lg-12\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                  <div class=\"card \">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      <div class=\"card-header\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          <h4>Revenue chart</h4>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          <div class=\"card-header-action\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              <div class=\"dropdown\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <a href=\"#\" data-toggle=\"dropdown\" class=\"btn btn-warning dropdown-toggle\">Options</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <div class=\"dropdown-menu\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <a href=\"#\" class=\"dropdown-item has-icon\"><i class=\"fas fa-eye\"></i> View</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <a href=\"#\" class=\"dropdown-item has-icon\"><i class=\"far fa-edit\"></i> Edit</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"dropdown-divider\"></div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <a href=\"#\" class=\"dropdown-item has-icon text-danger\"><i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          Delete</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              <a href=\"#\" class=\"btn btn-primary\">View All</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      <div class=\"card-body\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          <div class=\"row\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              <div class=\"col-lg-9\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <div id=\"chart1\"></div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <div class=\"row mb-0\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <div class=\"list-inline text-center\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              <div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-up-circle\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                      class=\"col-green\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <h5 class=\"m-b-0\">$675</h5>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <p class=\"text-muted font-14 m-b-0\">Weekly Earnings</p>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <div class=\"list-inline text-center\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              <div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-down-circle\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                      class=\"col-orange\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <h5 class=\"m-b-0\">$1,587</h5>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <p class=\"text-muted font-14 m-b-0\">Monthly Earnings</p>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-lg-4 col-md-4 col-sm-4 col-xs-4\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <div class=\"list-inline text-center\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              <div class=\"list-inline-item p-r-30\"><i data-feather=\"arrow-up-circle\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                      class=\"col-green\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <h5 class=\"mb-0 m-b-0\">$45,965</h5>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                  <p class=\"text-muted font-14 m-b-0\">Yearly Earnings</p>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              <div class=\"col-lg-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <div class=\"row mt-5\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-7 col-xl-7 mb-3\">Total customers</div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-5 col-xl-5 mb-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <span class=\"text-big\">8,257</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <sup class=\"col-green\">+09%</sup>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-7 col-xl-7 mb-3\">Total Income</div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-5 col-xl-5 mb-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <span class=\"text-big\">$9,857</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <sup class=\"text-danger\">-18%</sup>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-7 col-xl-7 mb-3\">Project completed</div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-5 col-xl-5 mb-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <span class=\"text-big\">28</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <sup class=\"col-green\">+16%</sup>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-7 col-xl-7 mb-3\">Total expense</div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-5 col-xl-5 mb-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <span class=\"text-big\">$6,287</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <sup class=\"col-green\">+09%</sup>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-7 col-xl-7 mb-3\">New Customers</div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      <div class=\"col-5 col-xl-5 mb-3\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <span class=\"text-big\">684</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                          <sup class=\"col-green\">+22%</sup>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                      </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                  </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("              </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("          </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_47, _hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-8.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Wildan Ahdian"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_52)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-9.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_54)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-10.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Sarah Smith"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_56)]), _hoisted_57])]), _hoisted_58, _hoisted_59, _hoisted_60, _hoisted_61, _hoisted_62]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_63, _hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-1.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Wildan Ahdian"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_68)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-2.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_70)]), _hoisted_71])]), _hoisted_72, _hoisted_73, _hoisted_74, _hoisted_75, _hoisted_76]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_77, _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_79, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-3.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Wildan Ahdian"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_82)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-4.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_84)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-5.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Sarah Smith"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_86)]), _hoisted_87])]), _hoisted_88, _hoisted_89, _hoisted_90, _hoisted_91, _hoisted_92]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_93, _hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_95, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_96, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-7.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_98)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_99, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-8.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Sarah Smith"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_100)]), _hoisted_101])]), _hoisted_102, _hoisted_103, _hoisted_104, _hoisted_105, _hoisted_106]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_107, _hoisted_108, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_109, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-9.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Wildan Ahdian"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_112)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-10.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_114)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_115, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-2.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Sarah Smith"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_116)]), _hoisted_117])]), _hoisted_118, _hoisted_119, _hoisted_120, _hoisted_121, _hoisted_122]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_123, _hoisted_124, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_126, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_127, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-8.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Wildan Ahdian"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_128)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-9.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "John Deo"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_130)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_131, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "rounded-circle",
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-10.png',
+    alt: "user",
+    "data-toggle": "tooltip",
+    title: "",
+    "data-original-title": "Sarah Smith"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_132)]), _hoisted_133])]), _hoisted_134, _hoisted_135, _hoisted_136, _hoisted_137, _hoisted_138])])])])])])]), _hoisted_139, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_140, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_141, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Support tickets "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_142, [_hoisted_143, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_144, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_145, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-1.png',
+    "class": "user-img mr-2",
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_146), _hoisted_147]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_148, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-2.png',
+    "class": "user-img mr-2",
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_149), _hoisted_150]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_151, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-3.png',
+    "class": "user-img mr-2",
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_152), _hoisted_153]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_154, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: _ctx.$store.state.app_url + 'assets/img/users/user-6.png',
+    "class": "user-img mr-2",
+    alt: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_155), _hoisted_156])]), _hoisted_157]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Support tickets ")]), _hoisted_158])])]);
 }
 
 /***/ }),

@@ -556,10 +556,7 @@
                             >
                                 <img
                                     @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src="
-                    $store.state.app_url +
-                    'assets/img/buses/available_seat_img.gif'
-                  "
+                                    :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif'"
                                     alt=""
                                 />
                             </td>
