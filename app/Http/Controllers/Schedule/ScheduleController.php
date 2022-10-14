@@ -188,9 +188,30 @@ class ScheduleController extends Controller
     }
 
     public function selected( Request $request ){
-        $tickets = Ticket::where('schedule_id',$request->id)->where('company_id', $this->company_id)->whereDate('date',$request->date)->get();
-        return Schedule::where('id',$request->id)->where('company_id', $this->company_id)
+
+        
+        $tickets = Ticket::where('schedule_id',$request->id)->whereDate('date',$request->date)->get();
+        $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+        $schedule = Schedule::where('id',$request->id)->select('id','bus_id')
         ->with('single_bus')->first();
+        $seatMap = collect($schedule->single_bus->seat_map);
+        
+        for($i=0;$i<count($seatMap);$i++) {
+
+            $seatMap[$i] = collect($seatMap[$i]);
+
+            foreach ($seatMap[$i] as $j => $column) {
+                $seatMap[$i][$j] = collect($seatMap[$i][$j]);
+                $result = array_search($column['seatNo'], $ticketSeatNumbers);
+                if ($result!==false) {
+                    $seatMap[$i][$j]['gender']=$tickets[$result]->gender;
+                    $seatMap[$i][$j]['type']=$tickets[$result]->type;
+                }
+            }
+
+        }
+        $schedule->single_bus->seat_map = $seatMap;
+        return $schedule;
 
     }
 

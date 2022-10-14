@@ -2743,3 +2743,23 @@ Did you mean this?
 #31 D:\\xampp\\htdocs\\kt\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
 #32 {main}
 "} 
+[2022-10-14 14:56:09] local.ERROR: There are no commands defined in the "ide-helper" namespace. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"ide-helper\" namespace. at D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php:648)
+[stacktrace]
+#0 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(699): Symfony\\Component\\Console\\Application->findNamespace('ide-helper')
+#1 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(259): Symfony\\Component\\Console\\Application->find('ide-helper:gene...')
+#2 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 D:\\xampp\\htdocs\\kt\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 
+[2022-10-14 14:56:35] local.ERROR: There are no commands defined in the "ide-helper" namespace. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"ide-helper\" namespace. at D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php:648)
+[stacktrace]
+#0 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(699): Symfony\\Component\\Console\\Application->findNamespace('ide-helper')
+#1 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(259): Symfony\\Component\\Console\\Application->find('ide-helper:gene...')
+#2 D:\\xampp\\htdocs\\kt\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 D:\\xampp\\htdocs\\kt\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 D:\\xampp\\htdocs\\kt\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 

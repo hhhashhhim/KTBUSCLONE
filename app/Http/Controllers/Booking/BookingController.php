@@ -49,10 +49,11 @@ class BookingController extends Controller
                 'bus_id'=>$schedule->bus_id,
                 'seat_no'=>$seat,
                 'booking_no'=>$bookingNo,
+                'date'=>$request->date,
                 'customer_id'=>$customer->id,
                 'schedule_id'=>$schedule->id,
                 'remarks'=>$request->remarks,
-                'for_female'=>$request->gender,
+                'gender'=>$request->gender,
                 'type'=>$request->type,
                 'discount'=>$request->discount,
             ]);
