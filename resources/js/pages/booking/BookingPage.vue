@@ -531,12 +531,10 @@ export default {
 .not-for-sale {
   background-color: rgb(140, 109, 109) !important;
 }
-
 .seat-img {
   height: 55px;
   margin: 10px 0px;
 }
-
 .seat-img .image-span,
 .seat-img span {
   height: 50px;
