@@ -74,8 +74,9 @@ class BookingController extends Controller
                 'for_female'=>$request->forFemale,
                 'type'=>$request->status,
                 'discount'=>$request->discount,
-            ])   
+            ]);
         }
+        return "Successfully Boooking Created";
 
     }
 

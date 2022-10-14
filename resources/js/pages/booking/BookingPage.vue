@@ -207,7 +207,7 @@
                   />
                 </div>
                 <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact">Is Female</label>
+                  <label class="col-md-3 pt-3 font-weight-bold" for="contact">Gender</label>
                   <div class="col-md-9 pt-3">
                     <input type="radio" v-model="addForm.forFemale" value="0" />
                     <label class="mx-3">Yes</label>
