@@ -6,11 +6,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><span v-html="heading"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                                <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                  
                     <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -23,7 +24,7 @@
                     </div>
                     <slot></slot>
                 </div>
-
+                
                 <div class="modal-footer bg-whitesmoke br">
                     <slot name="button"></slot>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
