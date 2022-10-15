@@ -37,25 +37,6 @@
                   Please Enter All Required Fields !!!
                 </div>
               </transition>
-              <transition name="fade">
-                <div
-                  class="alert alert-success alert-dismissible fade show"
-                  role="alert"
-                  v-if="success"
-                >
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="alert"
-                    aria-label="Close"
-                    @click="error = !error"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                    <span class="sr-only">Close</span>
-                  </button>
-                  {{ success }}
-                </div>
-              </transition>
               <!-- Table -->
               <div class="row">
                 <div class="col-12">
@@ -126,7 +107,6 @@
       <Add
         :heading="'Create Booking'"
         :errors="this.validationErrors"
-        :success="success"
         :formID="formID"
       >
         <div class="row">
@@ -451,18 +431,14 @@ export default {
       return gender+" "+selected;
     },
     async add() {
-      
+
       this.validationErrors = [];
       if (this.schedule == "")
         return this.errorsArray("Schedule is Required", "Schedule");
 
       const res = await this.callApi("post", "booking/store", this.addForm);
       if (res.status === 201 && res.statusText === "Created") {
-        this.success = "Booking Created Successfully";
         window.scrollTo(0,0);
-        setTimeout(function () {
-          this.success=""
-        }, 2000);
       } else {
         if (res.status === 422) {
           for (const key in res.addForm.errors) {
