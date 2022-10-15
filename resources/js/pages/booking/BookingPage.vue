@@ -18,25 +18,6 @@
               </div>
             </div>
             <div class="card-body">
-              <transition name="fade">
-                <div
-                  class="alert alert-danger alert-dismissible fade show"
-                  role="alert"
-                  v-if="error"
-                >
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="alert"
-                    aria-label="Close"
-                    @click="error = !error"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                    <span class="sr-only">Close</span>
-                  </button>
-                  Please Enter All Required Fields !!!
-                </div>
-              </transition>
               <!-- Table -->
               <div class="row">
                 <div class="col-12">
@@ -110,6 +91,7 @@
         :formID="formID"
       >
         <div class="row">
+          
           <div class="col-md-5 class form-group">
             <label for="DiscountName">Schedule Name <span class="text-danger">*</span></label>
             <select
@@ -146,7 +128,7 @@
                   <label
                     class="col-md-3 pt-3 font-weight-bold"
                     for="customer-cnic"
-                    >CNIC</label
+                    >CNIC <span class="text-danger">*</span> </label
                   >
                   <input
                     type="text"
@@ -315,6 +297,8 @@
                       v-if="col.reserved"
                       class="image-span d-block text-center text-white"
                       @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                      data-toggle="modal"
+                      :data-target="col.type?'#booking-options-popup':''"
                       :class="getClasses(col)"
                     >
                       <small>{{ col.seatNo }}</small>
@@ -338,6 +322,11 @@
       <Delete
         confirmationMessage="Are You Sure You want To Delete This Surcharge ???"
       />
+
+      <BookingOptionsPopup
+        formID="booking-options-popup"
+      />
+      
     </div>
   </section>
 </template>
@@ -345,6 +334,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
+import BookingOptionsPopup from "./popup/BookingOptionsPopup.vue";
 import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
 
@@ -354,6 +344,7 @@ export default {
     Add,
     Edit,
     Delete,
+    BookingOptionsPopup,
   },
   data() {
     return {
@@ -375,6 +366,7 @@ export default {
       addForm: {
         type: "booked",
         gender: "1",
+        customerCNIC:"",
       },
       dataEdit: {
         id: "",
@@ -395,10 +387,12 @@ export default {
 
   methods: {
     async fetchScheduleData() {
-      if (this.addForm.date == "")
+      this.validationErrors = [];
+      if (!this.addForm.schedule)
+        return this.errorsArray("Schedule Name is Required", "Schedule");
+      if (!this.addForm.date)
         return this.errorsArray("Date is Required", "Date");
-      if (this.addForm.schedule == "")
-        return this.errorsArray("Schedule is Required", "Schedule");
+      this.validationErrors = [];
 
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
@@ -433,8 +427,23 @@ export default {
     async add() {
 
       this.validationErrors = [];
-      if (this.schedule == "")
-        return this.errorsArray("Schedule is Required", "Schedule");
+      if (!this.addForm.schedule){
+        this.doScroll()
+        return this.errorsArray("Schedule Name is Required", "Schedule");
+      }
+      if (!this.addForm.date){
+        this.doScroll()
+        return this.errorsArray("Date is Required", "Date");
+      }   
+      if (!this.addForm.customerCNIC ||  this.addForm.customerCNIC.length!=13){
+        this.doScroll()
+        return this.errorsArray("CNIC is Required and Should Contain 13 Digits", "CNIC");
+      }
+      if (this.selectedSeats.length > 0)
+        return this.errorsArray("Please Select At Least One Seat", "Seat");
+      
+      
+      this.validationErrors = [];
 
       const res = await this.callApi("post", "booking/store", this.addForm);
       if (res.status === 201 && res.statusText === "Created") {
@@ -449,7 +458,9 @@ export default {
         }
       }
     },
-
+    doScroll: function(){
+      $('#addBooking').scrollTop(10);
+    },
     async deleteModal(surcharge, i) {
       const deletingObj = {
         url: "/surcharge/delete",

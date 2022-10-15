@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal fade" :id="formID" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -11,7 +11,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                 
+                  
                     <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="errors.length">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -23,12 +23,11 @@
                         </ul>
                     </div>
                     <slot></slot>
-                       
                 </div>
-                <div class="modal-footer">
+                
+                <div class="modal-footer bg-whitesmoke br">
                     <slot name="button"></slot>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                   
                 </div>
             </div>
         </div>
@@ -36,18 +35,17 @@
 
 </template>
 <script>
+import { watch } from '@vue/runtime-core'
 export default {
     props:{
         heading:String,
         errors:Array,
         success:String,
-        dataEdit:Object,
         formID:String
     },
     methods:{
         close(){
-            alert('Reaching')
-            $(`#${this.formID}`).modal('hide')
+            $(`#${this.formID}`).modal("hide")
         }
     },
     watch:{
@@ -63,5 +61,6 @@ export default {
 
         }
     }
+
 }
 </script>
