@@ -23,58 +23,41 @@ class BusController extends Controller
 
     public function index()
     {
-        return Bus::orderBy('id')->where('company_id', $this->company_id)->get();
+        return Bus::with('addedBy', 'busClass')->orderBy('id')->where('company_id', $this->company_id)->get();
     }
 
     public function storeBus(Request $request)
     {
         $rules = [
+            'noOfSeats' => 'required',
             'busNumber' => 'required',
             'fare_class' => 'required|integer',
             'chassisNumber' => 'required',
             'insuranceNumber' => 'required',
-            'noOfSeats' => 'required',
             'routePermit' => 'required',
-            'noOfRows' => 'required|integer',
-            'noOfCols' => 'required|integer',
+
         ];
 
         $customMessages = [
+            'noOfSeats.required' => 'Number Of Seats is Required!',
             'busNumber.required' => 'Bus Number is Required!',
             'fare_class.required' => 'Fare Class is Required!',
             'chassisNumber.required' => 'Chassis Number is Required!',
             'insuranceNumber.required' => 'Insurance Number is Required!',
-            'noOfSeats.required' => 'Number Of Seats is Required!',
             'routePermit.required' => 'Route Permit is Required!',
-            'noOfRows.required' => 'No of Rows of Bus  is Required!',
-            'noOfCols.required' => 'No of Cols of Bus  is Required!',
+
         ];
         $this->validate($request, $rules, $customMessages);
-        $bus =  Bus::create([
+        return Bus::create([
+            'no_of_seats' => $request->noOfSeats,
             'bus_number' => $request->busNumber,
+            'fare_class_id' => $request->fare_class,
             'chassis_number' => $request->chassisNumber,
             'insurance_number' => $request->insuranceNumber,
-            'no_of_seats' => $request->noOfSeats,
             'route_permit_number' => $request->routePermit,
-            'fare_class_id' => $request->fare_class,
-            'seat_map' => $request->seatMap,
-            'no_of_rows' => $request->noOfRows,
-            'no_of_cols' => $request->noOfCols,
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        // foreach ($request->seatMap as $i => $row) {
-        //     foreach ($row as $j => $column) {
-        //         BusSeatMap::create([
-        //             'bus_id' => $bus->id,
-        //             'seat_map' => $request->seatMap,
-        //             'no_of_rows' => $request->noOfRows,
-        //             'no_of_cols' => $request->noOfCols,
-        //             'company_id' => $this->company_id,
-        //             'added_by' => Auth::user()->id,
-        //         ]);
-        //     }
-        // }
     }
 
     public function updateBus(Request $request)
@@ -117,8 +100,9 @@ class BusController extends Controller
     {
         return Bus::find($request->id)->delete();
     }
+
     public function getBusData(Request $request)
     {
-        return Bus::where('id',$request->id)->where('company_id', $this->company_id)->first();
+        return Bus::where('id', $request->id)->where('company_id', $this->company_id)->first();
     }
 }

@@ -17,6 +17,7 @@ import SurchargePage from "./pages/surcharge/SurchargePage";
 import SchedulePage from "./pages/schedule/SchedulePage";
 import FareClass from "./pages/fareClass/FareClassPage";
 import BusesPage from "./pages/buses/BusesPage";
+import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
 import store from './store.js';
 
@@ -107,6 +108,11 @@ const routes = [
         path: url + "buses",
         component : BusesPage,
         name:"buses-page"
+    },
+    {
+        path: url + "bus-class",
+        component : BusClassPage,
+        name:"bus-class-page"
     },
     {
         path: url + "booking",

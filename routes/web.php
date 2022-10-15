@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Booking\BookingController;
+use App\Http\Controllers\Bus\BusClassController;
 use App\Http\Controllers\Bus\BusController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\CompanyController;
@@ -133,6 +134,13 @@ Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/update', [BusController::class, 'updateBus']);
     Route::post('/delete', [BusController::class, 'deleteBus']);
     Route::post('/getBusData', [BusController::class, 'getBusData']);
+});
+
+Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function () {
+    Route::post('/', [BusClassController::class, 'index']);
+    Route::post('/store', [BusClassController::class, 'storeBusClass']);
+    Route::post('/update', [BusClassController::class, 'updateBusClass']);
+    Route::post('/delete', [BusClassController::class, 'deleteBusClass']);
 });
 
 Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {

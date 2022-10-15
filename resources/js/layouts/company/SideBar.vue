@@ -22,7 +22,7 @@
                     <ul class="dropdown-menu">
                         <li>
 
-                            <a href="/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>
+                            <a href="/kt/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>
                                 <span>
                                     Dashboard
                                 </span>
@@ -36,6 +36,11 @@
                         <li class="dropdown" v-if="checkForSubmenu('terminal')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'terminal' }">
                                 <i class="fa fa-landmark"></i> Terminal
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'bus-class-page' }">
+                                <i class="fa fa-bus"></i> Bus Class
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('terminal')">

@@ -367,7 +367,7 @@
 
             <!-- Delete Modal -->
             <Delete
-                confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
+                confirmationMessage='Are You Sure You want To Delete This terminal ???'
             />
         </div>
     </section>

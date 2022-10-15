@@ -21,7 +21,6 @@ class BookingNoToTicketsTable extends Migration
             $table->integer('added_by')->after('time')->nullable();
             $table->softDeletes()->after('time')->nullable();
             $table->renameColumn('for_female', 'gender');
-            
         });
     }
 
@@ -35,13 +34,10 @@ class BookingNoToTicketsTable extends Migration
         Schema::table('tickets', function (Blueprint $table) {
             $table->dropColumn('booking_no');
             $table->dropColumn('date');
-<<<<<<< HEAD
             $table->dropColumn('time');
             $table->dropColumn('deleted_at');
             $table->dropColumn('added_by');
-=======
             $table->renameColumn('gender','for_female');
->>>>>>> Booking
         });
     }
 }

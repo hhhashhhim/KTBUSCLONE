@@ -418,7 +418,7 @@ export default {
       if (this.addForm.date == "")
         return this.errorsArray("Date is Required", "Date");
       if (this.addForm.schedule == "")
-        return this.errorsArray("Schedule is Required", "Schedule");
+        return this.errorsArray("Schedule Field is Required", "Schedule");
 
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
