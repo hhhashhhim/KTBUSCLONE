@@ -23831,22 +23831,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this3.success = "dsfd";
-                window.scrollTo(0, 0);
                 _this3.validationErrors = [];
 
                 if (!(_this3.schedule == "")) {
-                  _context3.next = 5;
+                  _context3.next = 3;
                   break;
                 }
 
                 return _context3.abrupt("return", _this3.errorsArray("Schedule is Required", "Schedule"));
 
-              case 5:
-                _context3.next = 7;
+              case 3:
+                _context3.next = 5;
                 return _this3.callApi("post", "booking/store", _this3.addForm);
 
-              case 7:
+              case 5:
                 res = _context3.sent;
 
                 if (res.status === 201 && res.statusText === "Created") {
@@ -23869,7 +23867,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 9:
+              case 7:
               case "end":
                 return _context3.stop();
             }

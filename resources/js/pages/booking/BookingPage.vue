@@ -451,9 +451,7 @@ export default {
       return gender+" "+selected;
     },
     async add() {
-      this.success="dsfd"
-      window.scrollTo(0,0);
-
+      
       this.validationErrors = [];
       if (this.schedule == "")
         return this.errorsArray("Schedule is Required", "Schedule");
