@@ -197,7 +197,8 @@ class ScheduleController extends Controller
         
         for($i=0;$i<count($seatMap);$i++) {
 
-            $seatMap[$i] = collect($seatMap[$i]);
+            // $seatMap[$i] = collect($seatMap[$i]);
+            return $seatMap[$i];
 
             foreach ($seatMap[$i] as $j => $column) {
                 $seatMap[$i][$j] = collect($seatMap[$i][$j]);
