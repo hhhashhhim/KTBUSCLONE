@@ -69,7 +69,7 @@ class BusClassController extends Controller
         // $this->validate($request, $rules, $customMessages);
         return BusClass::where('id', $request->id)->update([
             'name' => $request->name,
-            'color' => $request->color,
+            'color' => $request->busClassColor,
             'seat_map' => $request->seat_map,
             'no_of_rows' => $request->no_of_rows,
             'no_of_cols' => $request->no_of_cols,

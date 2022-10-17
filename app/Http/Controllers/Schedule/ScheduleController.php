@@ -189,7 +189,6 @@ class ScheduleController extends Controller
 
     public function selected( Request $request ){
 
-        
         $tickets = Ticket::where('schedule_id',$request->id)->whereDate('date',$request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id',$request->id)->select('id','bus_id')
@@ -198,7 +197,8 @@ class ScheduleController extends Controller
         
         for($i=0;$i<count($seatMap);$i++) {
 
-            $seatMap[$i] = collect($seatMap[$i]);
+            // $seatMap[$i] = collect($seatMap[$i]);
+            return $seatMap[$i];
 
             foreach ($seatMap[$i] as $j => $column) {
                 $seatMap[$i][$j] = collect($seatMap[$i][$j]);
