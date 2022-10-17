@@ -11,4 +11,12 @@ class Customer extends Model
     use HasFactory, softDeletes;
     protected $guarded = [];
 
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'customer_id', 'id');
+    }
+    public function addedBy()
+    {
+        return $this->hasOne(User::class, 'id', 'added_by');
+    }
 }

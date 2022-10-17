@@ -34,37 +34,35 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Percentage</th>
-                                                        <th>Status</th>
+                                                        <th>Customer Name</th>
+                                                        <th>CNIC Number</th>
+                                                        <th>Cell Number</th>
+                                                        <th>Ticket Booked By</th>
+                                                        <th>No. of Tickets</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(surcharge, i) in surcharges" :key="i">
+                                                    <tr v-for="(customer, i) in customers" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ surcharge.name }}</td>
-                                                        <td>{{ surcharge.percentage }}%</td>
-                                                        <td>
-                                                            {{
-                                                                surcharge.is_active === 1
-                                                                    ? "Active"
-                                                                    : "InActive"
-                                                            }}
-                                                        </td>
+                                                        <td>{{ customer.name}}</td>
+                                                        <td>{{ cnicFormat(customer.cnic) }}</td>
+                                                        <td>{{ customer.contact }}</td>
+                                                        <td>{{ customer.added_by.name }}</td>
+                                                        <td>{{ customer.tickets_count }}</td>
                                                         <td>
                                                             <a
-                                                                href="#edit-modal"
+                                                                href="#detail-modal"
                                                                 data-toggle="modal"
-                                                                @click="edit(surcharge)"
+                                                                @click="viewDetail(customer)"
                                                                 class="btn btn-primary mx-1"
                                                             >
-                                                                <i class="far fa-edit"></i>
+                                                                <i class="far fa-eye"></i>
                                                             </a>
                                                             <a
                                                                 href="#delete-modal"
                                                                 data-toggle="modal"
-                                                                @click="deleteModal(surcharge, i)"
+                                                                @click="deleteModal(customer, i)"
                                                                 class="btn btn-danger"
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
@@ -326,10 +324,84 @@
                     </div>
                 </div>
             </Add>
+            <!--View Details Model-->
+            <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ticket Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body m-1 p-1">
+                            <div class="card-body my-0 py-0">
+                                <!-- Table -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-hover dataTable no-footer">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Terminal Name</th>
+                                                            <th>Address</th>
+                                                            <th>Contact Number</th>
+                                                            <th>Added By</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr v-for="(single, i) in ticketDetails" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td v-if="single.name">{{ single.name }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="single.address">{{ single.address }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="single.contact">{{ single.contact }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="single.added_by">{{ single.added_by.name }}</td>
+                                                            <td v-else>N/A</td>
+                                                            <td><a
+                                                                href="#edit-modal"
+                                                                data-toggle="modal"
+                                                                @click="editTerminal(single)"
+                                                                class="btn btn-warning mx-2"
+                                                            >
+                                                                <i class="far fa-edit"></i>
+                                                            </a>
+                                                                <a
+                                                                    href="#delete-modal"
+                                                                    data-toggle="modal"
+                                                                    @click="deleteModal(single, i)"
+                                                                    class="btn btn-danger"
+                                                                >
+                                                                    <i class="far fa-trash-alt"></i>
+                                                                </a></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END TABLE -->
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!--            Edit MOdel End-->
+<!--            DELETE MODAL-->
             <Delete
-                confirmationMessage="Are You Sure You want To Delete This Surcharge ???"
+                confirmationMessage="Are You Sure You want To Delete This Booking ???"
             />
 
             <BookingOptionsPopup
@@ -363,7 +435,8 @@ export default {
                 placeholder: 'xxxxx-xxxxxxx-x',
                 // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
-            surcharges: [],
+            customers: [],
+            ticketDetails: [],
             isActive: 1,
             formID: "addBooking",
             validationErrors: [],
@@ -394,16 +467,20 @@ export default {
     },
     async created() {
 
-        const res = await this.callApi("post", "schedule");
+        const res = await this.callApi("post", "booking");
+        console.log(res.data);
         if (res.status == 200) {
-
-            this.allSchedules = res.data;
+            this.customers = res.data;
         } else {
             console.log(res);
         }
     },
 
     methods: {
+        cnicFormat:function(string){
+            return (string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3"));
+        },
+
         async getCustomer() {
             const resCnic = await this.callApi("post", "booking/getCNIC", {cnicNumber: this.addForm.customerCNIC});
             this.addForm.contact = resCnic.data.contact;
@@ -493,10 +570,17 @@ export default {
         doScroll: function () {
             $('#addBooking').scrollTop(10);
         },
-        async deleteModal(surcharge, i) {
+        async viewDetail(customer){
+            const resDetailTicket = await this.callApi("post", "booking/detail", {id: customer.id});
+            this.ticketDetails = resDetailTicket.data;
+
+
+
+        },
+        async deleteModal(ticket, i) {
             const deletingObj = {
-                url: "/surcharge/delete",
-                data: surcharge,
+                url: "/booking/delete",
+                data: ticket,
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
@@ -517,86 +601,3 @@ export default {
     },
 };
 </script>
-<style scoped>
-.image-span {
-    background-color: #b9dea0;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.image-span:hover {
-    background-color: #6db131;
-}
-
-.selected {
-    background-color: #6db131 !important;
-}
-
-.economy {
-    border: 3px solid #6D6E69 !important;
-}
-
-.business {
-    border: 3px solid orangered !important;
-}
-
-.executive {
-    border: 3px solid gold !important;
-}
-
-.for-female {
-    background-color: hotpink !important;
-}
-
-.for-male {
-    background-color: #3D8FF2 !important;
-}
-
-.not-for-sale {
-    background-color: rgb(140, 109, 109) !important;
-}
-
-.seat-img {
-    height: 55px;
-    margin: 10px 0px;
-}
-
-.seat-img .image-span,
-.seat-img span {
-    height: 50px;
-    width: 50px;
-    display: inline-block;
-    cursor: pointer !important;
-    margin: 5px;
-}
-
-img {
-    cursor: pointer !important;
-}
-
-.circles {
-    width: 30px;
-    height: 30px;
-    -moz-border-radius: 25px;
-    -webkit-border-radius: 25px;
-    border-radius: 50px;
-    display: inline-block;
-    box-sizing: content-box;
-}
-
-.icons-legend {
-    position: relative;
-    bottom: 12px;
-    color: rgb(62, 61, 61);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circles + span {
-    position: relative;
-    top: -10px;
-    padding: 5px;
-    color: black;
-}
-</style>
