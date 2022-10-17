@@ -304,7 +304,7 @@
                                         <div
                                             v-if="col.reserved"
                                             class="image-span d-block text-center text-white"
-                                            @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                                            @click="col.type?seatId=col.seat_id:selectSeat(rowIndex, colIndex, col.seatNo)"
                                             data-toggle="modal"
                                             :data-target="col.type?'#booking-options-popup':''"
                                             :class="getClasses(col)"
@@ -334,6 +334,7 @@
 
             <BookingOptionsPopup
                 formID="booking-options-popup"
+                :seatId="seatId"
             />
 
         </div>
@@ -377,7 +378,7 @@ export default {
             loading: false,
             showBookingDiv: false,
             selectedSeats: [],
-            // seatMap:[],
+            seatId:0,
             addForm: {
                 type: "booked",
                 gender: "1",

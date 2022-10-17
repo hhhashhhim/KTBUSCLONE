@@ -27,12 +27,12 @@ class Schedule extends Model
 
     public function addedBy()
     {
-        return $this->hasOne(User::class, 'id', 'added_by');
+        return $this->hasOne( User::class, 'id', 'added_by' );
     }
 
     public function updated_by()
     {
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->hasOne( User::class, 'id', 'updated_by' );
     }
 
     public function company(){
@@ -41,7 +41,7 @@ class Schedule extends Model
 
     public function single_bus()
     {
-        return $this->hasOne(Bus::class, 'id', 'bus_id');
+        return $this->hasOne( Bus::class, 'id', 'bus_id' );
     }
 
     public function selective_bus()

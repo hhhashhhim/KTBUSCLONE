@@ -173,6 +173,17 @@ class ScheduleController extends Controller
         ];
     }
 
+    public function bookingOptions( Request $request ){
+
+        $ticket = Ticket::with('schedule:id,route_id')->find($request->id);
+        $scheduleCitiesList = RouteFare::where('company_id', $this->company_id)
+        ->where('route_id', $ticket->schedule->route_id)
+        ->select('departure_city_id','destination_city_id')->get();
+        $routesWithMainSchedule = RouteFare::whereIn('departure_city_id',$scheduleCitiesList->pluck('departure_city_id'))
+        ->whereIn('destination_city_id',$scheduleCitiesList->pluck('destination_city_id'))
+        ->get();
+        
+    }
     public function selected(Request $request)
     {
         $tickets = Ticket::where('schedule_id', $request->id)->whereDate('date', $request->date)->get();
@@ -184,6 +195,7 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 $result = array_search($column['seatNo'], $ticketSeatNumbers);
                 if ($result !== false) {
+                    $seatMap[$i][$j]['seat_id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                 }
