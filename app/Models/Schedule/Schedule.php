@@ -3,6 +3,7 @@
 namespace App\Models\Schedule;
 
 use App\Models\Bus\Bus;
+use App\Models\Bus\BusClass;
 use App\Models\City;
 use App\Models\Company;
 use App\Models\FareClass;
@@ -45,7 +46,7 @@ class Schedule extends Model
 
     public function selective_bus()
     {
-        return $this->hasOne(FareClass::class, 'id', 'selected_bus_class_id');
+        return $this->hasOne(BusClass::class, 'id', 'selected_bus_class_id');
     }
     public function single_bus_class()
     {

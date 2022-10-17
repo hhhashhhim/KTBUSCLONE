@@ -146,5 +146,6 @@ Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function ()
 Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/store', [BookingController::class, 'store']);
+    Route::post('/getCNIC', [BookingController::class, 'getCnic']);
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

@@ -30,14 +30,16 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $schedule = Schedule::where('id',$request->schedule)
-        ->select('id','bus_id','company_id')->with('single_bus')
+        ->select('id','selected_bus_class_id','company_id')->with('selective_bus')
         ->first();
-
-        $customer = Customer::where('cnic',$request->customerCNIC)->first();
+        $cnic = str_replace('-', '', $request->customerCNIC);
+        $customer = Customer::where('cnic',$cnic)->first();
         if (!$customer) {
             $customer = Customer::create([
+                'company_id'=>$this->company_id,
+                'added_by'=>Auth::user()->id,
                 'name'=>$request->customerName,
-                'cnic'=>$request->customerCNIC,
+                'cnic'=>$cnic,
                 'contact'=>$request->contact,
             ]);
         }
@@ -46,7 +48,7 @@ class BookingController extends Controller
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([
                 'company_id'=>$schedule->company_id,
-                'bus_id'=>$schedule->bus_id,
+                'bus_id'=>$schedule->selected_bus_class_id,
                 'seat_no'=>$seat,
                 'booking_no'=>$bookingNo,
                 'date'=>$request->date,
@@ -106,19 +108,10 @@ class BookingController extends Controller
     {
         return Booking::where('id',$request->id)->where('company_id', $this->company_id)->get();
     }
+
+    public function getCnic(Request  $request)
+    {
+        $cnic = str_replace('-', '', $request['cnicNumber']);
+        return Customer::where('company_id', $this->company_id)->where('cnic',  $cnic)->first();
+    }
 }
-
-
-// $schedule = Schedule::where('id',$request->schedule)
-// ->select('id','bus_id')->with('single_bus')
-// ->first();
-// $seatMap = collect($schedule->single_bus->seat_map);
-// $subCat=[];
-// for($i=0;$i<count($seatMap);$i++) {
-//     $seatMap[$i] = collect($seatMap[$i]);
-//     $results = $seatMap[$i]->whereIn('seatNo',$request->selectedSeats)->pluck('seatNo');
-//     if ($results->count()>0) {
-//         $subCat = array_merge( $subCat,$results->toArray() );
-//     }
-// }
-// return $subCat;

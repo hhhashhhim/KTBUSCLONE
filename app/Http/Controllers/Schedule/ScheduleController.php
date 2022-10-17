@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Schedule;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
+use App\Models\Bus\BusClass;
 use App\Models\City;
 use App\Models\Discount\Discount;
 use App\Models\FareClass;
@@ -40,43 +41,31 @@ class ScheduleController extends Controller
             'name' => 'required',
             'StartDate' => 'required',
             'EndDate' => 'required',
-            'class' => 'required',
+            'fareClass' => 'required',
             'route' => 'required',
-            'noRows' => 'required',
-            'noCols' => 'required',
             'busClass' => 'required',
-            'bus' => 'required',
-            'seatMap' => 'required',
         ];
 
         $customMessages = [
             'name.required' => 'Schedule Name is Required',
             'StartDate.required' => 'Start Date is Required',
             'EndDate.required' => 'End Date is Required',
-            'class.required' => 'Class is Required',
+            'fareClass.required' => 'Class is Required',
             'route.required' => 'Route is Required',
-            'noRows.required' => 'No of Rows is Required',
-            'noCols.required' => 'No of Cols is Required',
             'busClass.required' => 'Bus Class is Required',
-            'bus.required' => 'Bus is Required',
-            'seatMap.required' => 'Seat Map is Required',
         ];
         $this->validate($request, $rules, $customMessages);
         return Schedule::create([
             'name' => $request->name,
             'start_date' => $request->StartDate,
             'end_date' => $request->EndDate,
-            'bus_class_id' => $request->class,
+            'bus_class_id' => $request->fareClass,
             'route_id' => $request->route,
             'surcharge_id' => $request->surcharge,
             'discount_id' => $request->discount,
             'route_city_terminal' => $request->addTerminalsOnClick,
-            'bus_id' => $request->bus,
             'selected_bus_class_id' => $request->busClass,
-            'no_of_rows' => $request->noRows,
-            'no_of_cols' => $request->noCols,
             'company_id' => $this->company_id,
-            'seat_map' => $request->seatMap,
             'added_by' => Auth::user()->id,
         ]);
     }
@@ -160,15 +149,12 @@ class ScheduleController extends Controller
     public function getEntire(Request $request)
     {
         return [
-            'busName' => Bus::where('company_id', $this->company_id)->where('id', $request->bus)->pluck('bus_number')->first(),
-            'busClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
-            'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
-            'class' => FareClass::where('company_id', $this->company_id)->where('id', $request->class)->pluck('name')->first(),
+            'fareClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
             'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
-            'terminal' => Terminal::where('company_id', $this->company_id)->where('id', $request->terminal)->pluck('name')->first(),
+            'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
+            'busClass' => BusClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
             'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->pluck('percentage')->first(),
             'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->pluck('percentage')->first(),
-
         ];
     }
 
@@ -187,32 +173,24 @@ class ScheduleController extends Controller
         ];
     }
 
-    public function selected( Request $request ){
-
-        $tickets = Ticket::where('schedule_id',$request->id)->whereDate('date',$request->date)->get();
+    public function selected(Request $request)
+    {
+        $tickets = Ticket::where('schedule_id', $request->id)->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-        $schedule = Schedule::where('id',$request->id)->select('id','bus_id')
-        ->with('single_bus')->first();
-        $seatMap = collect($schedule->single_bus->seat_map);
-        
-        for($i=0;$i<count($seatMap);$i++) {
-
-            // $seatMap[$i] = collect($seatMap[$i]);
-            return $seatMap[$i];
-
+        $schedule = Schedule::where('id', $request->id)->select('id', 'selected_bus_class_id')
+            ->with('selective_bus')->first();
+        $seatMap = $schedule->selective_bus->seat_map;
+        for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
-                $seatMap[$i][$j] = collect($seatMap[$i][$j]);
                 $result = array_search($column['seatNo'], $ticketSeatNumbers);
-                if ($result!==false) {
-                    $seatMap[$i][$j]['gender']=$tickets[$result]->gender;
-                    $seatMap[$i][$j]['type']=$tickets[$result]->type;
+                if ($result !== false) {
+                    $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
+                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                 }
             }
-
         }
-        $schedule->single_bus->seat_map = $seatMap;
+        $schedule->selective_bus->seat_map = $seatMap;
         return $schedule;
-
     }
 
 }
