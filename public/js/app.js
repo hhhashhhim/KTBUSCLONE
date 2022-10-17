@@ -34062,7 +34062,7 @@ var _hoisted_30 = {
 
 var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "userName"
-}, "User Name", -1
+}, "Name", -1
 /* HOISTED */
 );
 
@@ -34400,7 +34400,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        placeholder: "Enter User Name",
+        placeholder: "Enter Name",
         id: "userName",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.data.userName = $event;

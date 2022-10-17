@@ -29,7 +29,7 @@ class CreateTerminalsTable extends Migration
             $table->string('online_terminal_name');
             $table->string('status')->default('inactive');
             $table->integer('added_by');
-            $table->dateTime('time');
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });
