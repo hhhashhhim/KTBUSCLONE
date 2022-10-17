@@ -15,7 +15,7 @@ class Bus extends Model
 
     public function busClass()
     {
-        return $this->hasOne(FareClass::class, 'id', 'fare_class_id');
+        return $this->hasOne(BusClass::class, 'id', 'fare_class_id');
     }
     public function addedBy()
     {
