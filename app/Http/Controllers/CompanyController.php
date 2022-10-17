@@ -23,7 +23,6 @@ class CompanyController extends Controller
         return Company::orderBy('id','desc')->get();
     }
     public function store( Request $request ){
-
         $request->validate([
             'name'=>'required | unique:companies',
             'contact'=>'required | unique:companies',
@@ -70,6 +69,7 @@ class CompanyController extends Controller
         Company::find( $request->id )->update([
             'name'=>$request->name,
             'contact'=>$request->contact,
+            'logo'=>$request->logo,
             'location'=>$request->location,
             'modules'=>$request->modules,
             'added_by'=>auth()->user()->id,
