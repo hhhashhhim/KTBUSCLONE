@@ -29,7 +29,10 @@ class AddColumnsToCustomersTable extends Migration
     public function down()
     {
         Schema::table('customers', function (Blueprint $table) {
-            //
+            $table->dropColumn('company_id');
+            $table->dropColumn('added_by');
+            $table->dropColumn('time');
+            $table->dropColumn('deleted_at');
         });
     }
 }
