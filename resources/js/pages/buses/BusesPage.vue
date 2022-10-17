@@ -503,7 +503,7 @@ export default {
             console.log(res);
         }
 
-        const resFareClass = await this.callApi("post", "fare-class");
+        const resFareClass = await this.callApi("post", "bus_classes");
         if (resFareClass.status === 200) {
             this.fareClasses = resFareClass.data;
         } else {

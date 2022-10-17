@@ -24564,7 +24564,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               _context.next = 6;
-              return _this.callApi("post", "fare-class");
+              return _this.callApi("post", "bus_classes");
 
             case 6:
               resFareClass = _context.sent;
@@ -40240,7 +40240,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var url = '/';
+var url = '/projects/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
