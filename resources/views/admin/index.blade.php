@@ -19,6 +19,11 @@
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-timepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
+    <style>
+        html{
+            scroll-behavior: smooth !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -48,7 +53,6 @@
 <script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-
 
 {{-- Vue App JS --}}
 <script>
