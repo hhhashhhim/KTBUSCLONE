@@ -127,6 +127,7 @@ Route::group(['prefix' => 'schedule', [CustomMiddleware::class]], function () {
     Route::post('/getRouteFare', [ScheduleController::class, 'getRouteFareClass']);
     Route::post('/genericCommon', [ScheduleController::class, 'genericCommon']);
     Route::post('/selected', [ScheduleController::class, 'selected']);
+
 });
 Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/', [BusController::class, 'index']);

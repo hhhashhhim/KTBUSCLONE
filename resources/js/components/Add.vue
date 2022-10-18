@@ -17,7 +17,7 @@
                             <span class="sr-only">Close</span>
                         </button>
                         <!-- {{ errors.length }} -->
-                        <ul>
+                        <ul class="my-0">
                             <li v-for="(error,i) in errors" :key="i">{{ error.desc }}</li>
                         </ul>
                     </div>
@@ -54,8 +54,12 @@ export default {
             }
         },
         errors(newError,oldError){
+            let content = "";
+            newError.forEach(error => {
+                content = error.desc+"\n";
+            });
             if (newError!="" && newError!=[]) {
-                swal('Error', 'Oops Something Went Wrong', 'error');
+                swal('Error', content , 'error');
             }
 
         }

@@ -1,74 +1,78 @@
 <template>
-    <section class="section">
-        <div class="section-body">
-            <div class="row">
-                <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card ">
-                        <div class="card-header">
-                            <h4>Terminals</h4>
-                            <div class="card-header-action">
-                                <a
-                                    href="#add-modal"
-                                    data-toggle="modal"
-                                    :data-target="'#'+formID"
-                                    class="btn btn-primary"
-                                >
-                                    Add New Terminal
-                                </a>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Table -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover dataTable no-footer"
-                                                    id="edit_loc"
-                                                >
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>City Name</th>
-                                                        <th>No.of Terminals</th>
-                                                        <th>Added By</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr v-for="(terminal, i) in terminals" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ terminal.name }}</td>
-                                                        <td>{{ terminal.terminal_count }}</td>
-                                                        <td>{{ terminal.added_by.name }}</td>
-                                                        <td>
-                                                            <a
-                                                                href="#detail-modal"
-                                                                data-toggle="modal"
-                                                                @click="terminalDetail(terminal.id)"
-                                                                class=" btn btn-info mx-2"
-                                                            >
-                                                                <i class="far fa-eye"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- END TABLE -->
-                        </div>
-                    </div>
-                </div>
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Terminals</h4>
+              <div class="card-header-action">
+                <a
+                  href="#add-modal"
+                  data-toggle="modal"
+                  :data-target="'#' + formID"
+                  class="btn btn-primary"
+                >
+                  Add New Terminal
+                </a>
+              </div>
             </div>
+            <div class="card-body">
+              <!-- Table -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h4></h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table
+                          class="
+                            table table-striped table-hover
+                            dataTable
+                            no-footer
+                          "
+                          id="edit_loc"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Sr No.</th>
+                              <th>City Name</th>
+                              <th>No.of Terminals</th>
+                              <th>Added By</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(terminal, i) in terminals" :key="i">
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ terminal.name }}</td>
+                              <td>{{ terminal.terminal_count }}</td>
+                              <td>{{ terminal.added_by.name }}</td>
+                              <td>
+                                <a
+                                  href="#detail-modal"
+                                  data-toggle="modal"
+                                  @click="terminalDetail(terminal.id)"
+                                  class="btn btn-info mx-2"
+                                >
+                                  <i class="far fa-eye"></i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- END TABLE -->
+            </div>
+          </div>
+        </div>
+      </div>
 
             <!-- Add Modal -->
             <Add
@@ -147,43 +151,42 @@
                 v-model="data.active"
             />
                 <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">SMS</label>
-                        <label class="colorinput mx-3 mt-3">
-            <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      v-model="data.active_sms"
-                  />
-            <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">Main Terminal</label>
-                        <label class="colorinput mx-3 mt-3">
-            <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      v-model="data.is_main"
-                  />
-            <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-
-                </div>
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add">
-                        Add New Terminal
-                    </button>
-                </template>
-            </Add>
+              </span>
+            </label>
+          </div>
+          <div class="form-group col-md-2 d-flex align-items-center">
+            <label class="mt-4" for="sms">SMS</label>
+            <label class="colorinput mx-3 mt-3">
+              <span>
+                <input
+                  type="checkbox"
+                  class="colorinput-input"
+                  v-model="data.active_sms"
+                />
+                <span class="colorinput-color bg-success"></span>
+              </span>
+            </label>
+          </div>
+          <div class="form-group col-md-2 d-flex align-items-center">
+            <label class="mt-4" for="sms">Main Terminal</label>
+            <label class="colorinput mx-3 mt-3">
+              <span>
+                <input
+                  type="checkbox"
+                  class="colorinput-input"
+                  v-model="data.is_main"
+                />
+                <span class="colorinput-color bg-success"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+        <template v-slot:button>
+          <button type="button" class="btn btn-primary" @click="add">
+            Add New Terminal
+          </button>
+        </template>
+      </Add>
 
             <!-- Edit Modal -->
             <Edit
@@ -261,45 +264,44 @@
                 v-bind:checked="parseInt(dataEdit.status) === 1 "
             />
                 <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">SMS</label>
-                        <label class="colorinput mx-3 mt-3">
-                         <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      v-model="dataEdit.active_sms"
-                      v-bind:checked="dataEdit.active_sms === 1"
-                  />
-            <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">Main Terminal</label>
-                        <label class="colorinput mx-3 mt-3">
-            <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      v-model="dataEdit.is_main"
-                      v-bind:checked="dataEdit.is_main === 1"
-
-                  />
-            <span class="colorinput-color bg-success"></span>
-            </span>
-                        </label>
-                    </div>
-                </div>
-                <template v-slot:button>
-                <button type="button" class="btn btn-primary" @click="update">
-                        Update Terminal
-                    </button>
-                </template>
-            </Edit>
+              </span>
+            </label>
+          </div>
+          <div class="form-group col-md-2 d-flex align-items-center">
+            <label class="mt-4" for="sms">SMS</label>
+            <label class="colorinput mx-3 mt-3">
+              <span>
+                <input
+                  type="checkbox"
+                  class="colorinput-input"
+                  v-model="dataEdit.active_sms"
+                  v-bind:checked="dataEdit.active_sms === 1"
+                />
+                <span class="colorinput-color bg-success"></span>
+              </span>
+            </label>
+          </div>
+          <div class="form-group col-md-2 d-flex align-items-center">
+            <label class="mt-4" for="sms">Main Terminal</label>
+            <label class="colorinput mx-3 mt-3">
+              <span>
+                <input
+                  type="checkbox"
+                  class="colorinput-input"
+                  v-model="dataEdit.is_main"
+                  v-bind:checked="dataEdit.is_main === 1"
+                />
+                <span class="colorinput-color bg-success"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+        <template v-slot:button>
+          <button type="button" class="btn btn-primary" @click="update">
+            Update Terminal
+          </button>
+        </template>
+      </Edit>
 
             <!--View Details Model-->
             <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
@@ -391,8 +393,8 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import vueMask from 'vue-jquery-mask';
-import {mapGetters} from "vuex";
+import vueMask from "vue-jquery-mask";
+import { mapGetters } from "vuex";
 
 export default {
     name: "Terminal",
