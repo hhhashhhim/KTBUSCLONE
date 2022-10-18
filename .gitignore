@@ -18,4 +18,4 @@ phpunit.dusk.xml
 /public/js/app.js
 docker-compose.override.yml
 /.idea
-/.vscode
+/.vscodex
