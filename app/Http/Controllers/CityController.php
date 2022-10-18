@@ -39,7 +39,7 @@ class CityController extends Controller
             'added_by' => Auth::user()->id,
         ]);
         $this->cityCombinations($city);
-        return $city;
+        return City::with('addedBy')->find($city->id);
     }
 
     public function update(Request $request)
@@ -49,7 +49,6 @@ class CityController extends Controller
         ]);
         return City::find($request->id)->update([
             'name' => $request->name,
-            'added_by' => auth()->user()->id,
         ]);
     }
 

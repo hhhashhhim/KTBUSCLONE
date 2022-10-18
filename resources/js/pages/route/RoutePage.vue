@@ -272,6 +272,8 @@ export default {
                 // Object.keys(obj).forEach((i) => obj[i] = null);
                 this.data = {};
                 this.cities = res.data;
+                window.scrollTo(0, 0);
+                this.
                 setTimeout(() => {
                     this.success = "";
                     $("#add-modal").modal("hide");

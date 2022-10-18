@@ -557,6 +557,8 @@ export default {
                 this.cities.unshift(res.data);
                 this.data.name = this.data.contact = this.data.location = "";
                 this.data.modules = this.defaultModules;
+                this.data = "";
+                window.scrollTo(0, 0);
                 setTimeout(() => {
                     this.success = "";
                     $("#add-modal").modal("hide");

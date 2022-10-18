@@ -442,7 +442,6 @@ export default {
 
     async created() {
         const terminalRes = await this.callApi("post", "terminals");
-        console.log(terminalRes.data);
         const compRes = await this.callApi("post", "company");
         const cities = await this.callApi("post", "cities");
         this.terminals = terminalRes.data;

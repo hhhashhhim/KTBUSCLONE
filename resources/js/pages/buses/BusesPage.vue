@@ -547,6 +547,8 @@ export default {
             console.log(res);
             if (res.status === 201) {
                 this.success = "Bus Created Successfully";
+                window.scrollTo(0, 0);
+                this.data = "";
                 setTimeout(() => {
                     // window.location.reload();
                     this.isShowDiv = false;

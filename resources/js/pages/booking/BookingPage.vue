@@ -556,6 +556,7 @@ export default {
             const res = await this.callApi("post", "booking/store", this.addForm);
             if (res.status === 201 && res.statusText === "Created") {
                 this.success = "Booking Created Successfully";
+                this.addForm = "";
                 window.scrollTo(0, 0);
             } else {
                 if (res.status === 422) {

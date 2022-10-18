@@ -116,7 +116,7 @@ export default {
         setTimeout(() => {
           this.success = "";
           $("#delete-modal").modal("hide");
-        }, 3000);
+        }, 1000);
       } else {
         if (res.status == 422) {
           console.log();

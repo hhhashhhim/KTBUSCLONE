@@ -20,7 +20,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-            
+
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table table-striped table-hover" id="edit_loc">
@@ -70,7 +70,7 @@
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
-                <template v-slot:button> 
+                <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="add">Add New City</button>
                 </template>
             </Add>
@@ -86,8 +86,8 @@
                     <label for="name">Name</label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="dataEdit.name">
                 </div>
-         
-                <template v-slot:button> 
+
+                <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="update">Update City</button>
                 </template>
             </Edit>
@@ -134,7 +134,6 @@ export default {
     },
     async created(){
         const resCity = await this.callApi("post",'cities');
-        console.log(resCity.data);
         if (resCity.status==200) {
             this.cities=resCity.data
         }
@@ -147,10 +146,17 @@ export default {
             this.validationErrors=[]
             if(this.data.name === "") return this.errorsArray("City Name is Required","Name");
             const res = await this.callApi("post",'cities/store',this.data);
-            if (res.status === 201) {
-                this.success="City Created Successfully";
+            console.log(res.data)
+            if (res.status === 200) {
+                this.success="City Created Successfully Named as " + res.data.name;
                 this.cities.unshift(res.data);
                 this.data.name = "";
+                setTimeout(function(){
+                    this.success = "";
+                },300)
+                setTimeout(function(){
+                    $('#'+ this.formID).modal('hide');
+                }, 2000);
             }
             else{
                 if (res.status==422) {
@@ -163,20 +169,20 @@ export default {
             }
         },
         edit( city ){
-            this.dataEdit = city;
+            let newCity = city
+            this.dataEdit = newCity;
         },
         async update(){
-
-
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("City Name is Required","Name");
-            const res = await this.callApi("post",'cities/update',this.dataEdit);
-            if (res.status==200) {
-                this.success="City Updated Successfully";
-                const res = await this.callApi("post",'cities');
-                if (res.status==200) {
-                    this.cities=res.data
-                }
+            const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
+            console.log(resEdit.data);
+            if (resEdit.status==200) {
+                this.success="City Updated Successfully Named as" ;
+                // const res = await this.callApi("post",'cities');
+                // if (res.status==200) {
+                //     this.cities = res.data;
+                // }
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
                     this.success=""
