@@ -952,15 +952,7 @@ export default {
                 this.routeClasses = resRouteFareClass.data;
 
             }
-            // if (name == 'bus') {
-            //     const resBus = await this.callApi("post", 'buses/getBusData', {id: this.data.bus});
-            //     console.log(resBus.data);
-            //     this.data.busClass = resBus.data.fare_class_id;
-            //     this.data.noRows = resBus.data.no_of_rows;
-            //     this.data.noCols = resBus.data.no_of_cols;
-            //     this.data.seatMap = resBus.data.seat_map;
-            //     this.isShowEditDiv = false;
-            // }
+
         },
 
         async getData() {
@@ -1015,7 +1007,7 @@ export default {
                 return this.errorsArray("Route is Required", "Route");
 
             const res = await this.callApi("post", "schedule/store", this.data);
-            if (res.status === 201 && res.statusText === "Created") {
+            if (res.status === 201) {
                 this.success = "Schedule Created Successfully";
                 setTimeout(function () {
                     // window.location.reload();

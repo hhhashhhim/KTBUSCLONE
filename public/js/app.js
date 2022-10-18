@@ -27682,7 +27682,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 15:
                 res = _context6.sent;
 
-                if (res.status === 201 && res.statusText === "Created") {
+                if (res.status === 201) {
                   _this6.success = "Schedule Created Successfully";
                   setTimeout(function () {// window.location.reload();
                   }, 2000);
@@ -40239,9 +40239,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/projects/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
