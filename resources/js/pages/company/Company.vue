@@ -46,7 +46,7 @@
                                                         <tr v-for="(company, i) in cities" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td>{{ company.name }}</td>
-                                                            <td>{{ company.contact }}</td>
+                                                            <td>{{ phoneFormat(company.contact) }}</td>
                                                             <td>{{ company.location }}</td>
                                                             <td>
                                                                 <img
@@ -105,13 +105,20 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="contact">Contact</label>
-                            <input
-                                type="text" @keypress="isNumber($event)"
+                            <vue-mask
                                 class="form-control"
-                                placeholder="Enter contact"
-                                id="contact"
                                 v-model="data.contact"
-                            />
+                                mask="0000-0000000"
+                                :raw="false"
+                                :options="options">
+                            </vue-mask>
+<!--                            <input-->
+<!--                                type="text" @keypress="isNumber($event)"-->
+<!--                                class="form-control"-->
+<!--                                placeholder="Enter contact"-->
+<!--                                id="contact"-->
+<!--                                v-model="data.contact"-->
+<!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
@@ -266,13 +273,20 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="contact">Contact</label>
-                            <input
-                                type="text" @keypress="isNumber($event)"
+                            <vue-mask
                                 class="form-control"
-                                placeholder="Enter contact"
-                                id="contact"
                                 v-model="dataEdit.contact"
-                            />
+                                mask="0000-0000000"
+                                :raw="false"
+                                :options="options">
+                            </vue-mask>
+<!--                            <input-->
+<!--                                type="text" @keypress="isNumber($event)"-->
+<!--                                class="form-control"-->
+<!--                                placeholder="Enter contact"-->
+<!--                                id="contact"-->
+<!--                                v-model="dataEdit.contact"-->
+<!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
@@ -425,6 +439,8 @@ import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import ConfirmationModal from "../../components/ConfirmationModal.vue";
 import Modal from "../../components/Modal.vue";
+import vueMask from 'vue-jquery-mask';
+
 import {mapGetters} from "vuex";
 
 export default {
@@ -435,9 +451,15 @@ export default {
         Delete,
         Modal,
         ConfirmationModal,
+        vueMask,
     },
     data() {
         return {
+            date: null,
+            options: {
+                placeholder: '0300-0000000',
+                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
             roles: [],
             formID: "newCompany",
             confirmModalID: "confirmModal",
@@ -500,14 +522,8 @@ export default {
         }
     },
     methods: {
-        isNumber: function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
+        phoneFormat:function(string){
+            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
         async add(e) {
             // console.log(this.data.modules);

@@ -48,10 +48,10 @@ class TerminalController extends Controller
                 ], 423);
             }
         }
-
+        $contact_format = str_replace('-', '', $request->contact);
         Terminal::create([
             'name' => $request->name,
-            'contact' => $request->contact,
+            'contact' => $contact_format,
             'address' => $request->address ?? " ",
             'longitude' => $request->longitude,
             'latitude' => $request->latitude,
@@ -80,9 +80,11 @@ class TerminalController extends Controller
             'contact' => 'required',
         ]);
 
+        $contact_format = str_replace('-', '', $request->contact);
+
         $user = Terminal::find($request->id)->update([
             'name' => $request->name,
-            'contact' => $request->contact,
+            'contact' => $contact_format,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
         ]);
         return response()->json([

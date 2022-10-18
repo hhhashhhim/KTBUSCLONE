@@ -95,8 +95,15 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
-                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"
-                               @keypress="isNumber($event)">
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.contact"
+                            mask="0000-0000000"
+                            :raw="false"
+                            :options="optionsContact">
+                        </vue-mask>
+<!--                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"-->
+<!--                               @keypress="isNumber($event)">-->
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -204,8 +211,15 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
-                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"
-                               @keypress="isNumber($event)">
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.contact"
+                            mask="0000-0000000"
+                            :raw="false"
+                            :options="optionsContact">
+                        </vue-mask>
+<!--                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"-->
+<!--                               @keypress="isNumber($event)">-->
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -327,7 +341,7 @@
                                                             <td v-else>N/A</td>
                                                             <td v-if="single.address">{{ single.address }}</td>
                                                             <td v-else>N/A</td>
-                                                            <td v-if="single.contact">{{ single.contact }}</td>
+                                                            <td v-if="single.contact">{{phoneFormat(single.contact) }}</td>
                                                             <td v-else>N/A</td>
                                                             <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                             <td v-else>N/A</td>
@@ -393,7 +407,9 @@ export default {
             date: null,
             options: {
                 placeholder: 'HH:MM',
-                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
+            optionsContact: {
+                placeholder: '0300-0000000',
             },
             validationErrors: '',
             seen: true,
@@ -439,7 +455,9 @@ export default {
     },
     methods: {
 
-
+        phoneFormat: function phoneFormat(string) {
+            return string.replace(/(\d{4})(\d{7})/, "$1-$2");
+        },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;

@@ -23,16 +23,19 @@ class CompanyController extends Controller
         return Company::orderBy('id','desc')->get();
     }
     public function store( Request $request ){
+
         $request->validate([
             'name'=>'required | unique:companies',
-            'contact'=>'required | unique:companies',
+            'contact'=>'required',
             'userName'=>'required',
             'email'=>'required | unique:users',
             'password'=>'required',
         ]);
+        $contact_format = str_replace('-', '', $request->contact);
+
         $company = Company::create([
             'name'=>$request->name,
-            'contact'=>$request->contact,
+            'contact'=>$contact_format,
             'location'=>$request->location,
             'modules'=>$request->modules,
             'logo'=>$request->logo,
@@ -48,7 +51,7 @@ class CompanyController extends Controller
         $user = User::create([
             'name'=>$request->userName,
             'email'=>$request->email,
-            'contact'=>$request->contact,
+            'contact'=>$contact_format,
             'password'=>Hash::make($request->password),
             'role_id'=>$role->id,
             'company_id'=>$company->id,
@@ -66,9 +69,10 @@ class CompanyController extends Controller
             'name'=>'required',
             'contact'=>'required',
         ]);
+        $contact_format = str_replace('-', '', $request->contact);
         Company::find( $request->id )->update([
             'name'=>$request->name,
-            'contact'=>$request->contact,
+            'contact'=>$contact_format,
             'logo'=>$request->logo,
             'location'=>$request->location,
             'modules'=>$request->modules,
@@ -76,7 +80,7 @@ class CompanyController extends Controller
         ]);
         User::where('company_id', $request->id)->where('email', $request->email)->first()->update([
             'name'=>$request->name,
-            'contact'=>$request->contact,
+            'contact'=>$contact_format,
             'email'=>$request->email,
             'password'=>Hash::make($request->password),
         ]);

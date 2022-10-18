@@ -19,7 +19,8 @@ class CreateCompaniesTable extends Migration
             $table->string('contact');
             $table->string('logo')->nullable();
             $table->text('location')->nullable();
-            $table->integer('added_by');
+            $table->integer('added_by')->nullable();
+            $table->dateTime('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });
