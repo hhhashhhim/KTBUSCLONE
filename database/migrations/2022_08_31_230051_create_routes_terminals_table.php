@@ -19,7 +19,7 @@ class CreateRoutesTerminalsTable extends Migration
             $table->bigInteger('terminal_id');
             $table->bigInteger('company_id');
             $table->bigInteger('added_by');
-            $table->dateTime('time')->useCurrent();
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -18,7 +18,7 @@ class CreateTerminalAvailableSeatsTable extends Migration
             $table->integer('terminal_id');
             $table->integer('seats');
             $table->integer('added_by');
-            $table->dateTime('time')->useCurrent();
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

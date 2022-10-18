@@ -22,7 +22,7 @@ class CreateRoutesFaresTable extends Migration
             $table->bigInteger('destination_city_id');
             $table->bigInteger('company_id');
             $table->bigInteger('added_by');
-            $table->dateTime('time')->useCurrent();
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

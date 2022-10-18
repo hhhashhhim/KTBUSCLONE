@@ -21,7 +21,7 @@ class CreateFareClassesTable extends Migration
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
-            $table->dateTime('time')->useCurrent();
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

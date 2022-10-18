@@ -130,11 +130,11 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="userName">User Name</label>
+                            <label for="userName">Name</label>
                             <input
                                 type="text"
                                 class="form-control"
-                                placeholder="Enter User Name"
+                                placeholder="Enter Name"
                                 id="userName"
                                 v-model="data.userName"
                             />
