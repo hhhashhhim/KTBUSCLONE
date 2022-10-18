@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Schedule\Schedule;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,4 +21,7 @@ class Ticket extends Model
     //     'type',
     //     'discount',
     // ];
+    public function schedule(){
+        return $this->hasOne( Schedule::class );
+    }
 }

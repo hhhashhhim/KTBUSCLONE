@@ -23759,7 +23759,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       showBookingDiv: false,
       selectedSeats: [],
-      // seatMap:[],
+      seatId: 0,
       addForm: {
         type: "booked",
         gender: "1",
@@ -24054,12 +24054,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "BookingOptionsPopup",
-  props: ["formID"],
+  props: ["formID", "seatId"],
   components: {
     BasicPopup: _components_BasicPopup_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
-    return {};
+    return {
+      partialSchedule: 0
+    };
+  },
+  watch: {
+    seatId: function seatId(newValue) {
+      // const resCnic = await this.callApi("post", "schedule/booking-options", {cnicNumber: this.addForm.customerCNIC});
+      this.addForm.contact = resCnic.data.contact;
+      this.addForm.customerName = resCnic.data.name;
+    }
   }
 });
 
@@ -32166,7 +32175,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             key: 0,
             "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white", $options.getClasses(col)]),
             onClick: function onClick($event) {
-              return $options.selectSeat(rowIndex, colIndex, col.seatNo);
+              return col.type ? $data.seatId = col.seat_id : $options.selectSeat(rowIndex, colIndex, col.seatNo);
             },
             "data-toggle": "modal",
             "data-target": col.type ? '#booking-options-popup' : ''
@@ -32194,8 +32203,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , ["errors", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
     confirmationMessage: "Are You Sure You want To Delete This Surcharge ???"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_BookingOptionsPopup, {
-    formID: "booking-options-popup"
-  })])]);
+    formID: "booking-options-popup",
+    seatId: $data.seatId
+  }, null, 8
+  /* PROPS */
+  , ["seatId"])])]);
 }
 
 /***/ }),
@@ -32216,23 +32228,40 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "section"
 };
-
-var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_2 = {
   id: "accordion"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+};
+var _hoisted_3 = {
   "class": "accordion"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+};
+
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "accordion-header py-4 collapsed",
   role: "button",
   "data-toggle": "collapse",
   "data-target": "#panel-body-1",
   "aria-expanded": "false"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Make Partial Seat")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Make Partial Seat")], -1
+/* HOISTED */
+);
+
+var _hoisted_5 = {
   "class": "accordion-body collapse",
   id: "panel-body-1",
   "data-parent": "#accordion",
   style: {}
-}, " Partial Seat Section ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+};
+
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "0",
+  selected: ""
+}, "Select City", -1
+/* HOISTED */
+);
+
+var _hoisted_7 = ["value"];
+
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "accordion"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "accordion-header py-4 collapsed",
@@ -32245,7 +32274,11 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   id: "panel-body-2",
   "data-parent": "#accordion",
   style: {}
-}, " Over Issue Section ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+}, " Over Issue Section ")], -1
+/* HOISTED */
+);
+
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "accordion"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "accordion-header py-4 collapsed",
@@ -32258,7 +32291,7 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   id: "panel-body-3",
   "data-parent": "#accordion",
   style: {}
-}, " Shift Seat Booking Section ")])], -1
+}, " Shift Seat Booking Section ")], -1
 /* HOISTED */
 );
 
@@ -32271,7 +32304,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     formID: $props.formID
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_2];
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control rounded-0",
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+          return $data.partialSchedule = $event;
+        })
+      }, [_hoisted_6, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.cities, function (city, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          value: city.id,
+          key: i
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_7);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.partialSchedule]])])]), _hoisted_8, _hoisted_9])];
     }),
     _: 1
     /* STABLE */

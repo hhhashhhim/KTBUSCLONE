@@ -22,7 +22,15 @@
             data-parent="#accordion"
             style=""
           >
-            Partial Seat Section
+          
+          
+            <select class="form-control rounded-0" v-model="partialSchedule">
+                <option value="0" selected>Select City</option>
+                <option v-for="(city, i) in cities" :value="city.id" :key="i">
+                    {{ city.name }}
+                </option>
+            </select>
+          
           </div>
         </div>
         <div class="accordion">
@@ -72,12 +80,21 @@ import BasicPopup from "../../../components/BasicPopup.vue";
 
 export default {
   name: "BookingOptionsPopup",
-  props: ["formID"],
+  props: ["formID","seatId"],
   components: {
     BasicPopup,
   },
   data() {
-    return {};
+    return {
+      partialSchedule:0,
+    };
   },
+  watch:{
+    seatId(newValue){
+      // const resCnic = await this.callApi("post", "schedule/booking-options", {cnicNumber: this.addForm.customerCNIC});
+      this.addForm.contact = resCnic.data.contact;
+      this.addForm.customerName = resCnic.data.name;
+    }
+  }
 };
 </script>
