@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Bus\BusClass;
 use App\Models\Schedule\Schedule;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

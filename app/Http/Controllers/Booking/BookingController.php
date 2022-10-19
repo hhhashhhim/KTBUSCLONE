@@ -24,7 +24,12 @@ class BookingController extends Controller
 
     public function index()
     {
-        return Customer::withCount('tickets')->with('addedBy')->where('company_id', $this->company_id)->get();
+            $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)->get()->groupBy('booking_no');
+            $allBooking = $bookings->map(function($booking){
+                $booking[0]->count=$booking->count();
+                return $booking[0];
+            });
+            return $allBooking;
     }
 
     public function store(Request $request)

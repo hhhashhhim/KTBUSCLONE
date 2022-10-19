@@ -35,6 +35,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Customer Name</th>
+                                                        <th>Date</th>
                                                         <th>CNIC Number</th>
                                                         <th>Cell Number</th>
                                                         <th>Ticket Booked By</th>
@@ -46,26 +47,19 @@
                                                     <tr v-for="(customer, i) in customers" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ customer.name}}</td>
+                                                        <td>{{ customer.name}}</td>
                                                         <td>{{ cnicFormat(customer.cnic) }}</td>
-                                                        <td>{{ customer.contact }}</td>
+                                                        <td>{{ phoneFormat(customer.contact) }}</td>
                                                         <td>{{ customer.added_by.name }}</td>
                                                         <td>{{ customer.tickets_count }}</td>
                                                         <td>
                                                             <a
-                                                                href="#detail-modal"
+                                                                href="#detailTicketModal"
                                                                 data-toggle="modal"
                                                                 @click="viewDetail(customer)"
                                                                 class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-eye"></i>
-                                                            </a>
-                                                            <a
-                                                                href="#delete-modal"
-                                                                data-toggle="modal"
-                                                                @click="deleteModal(customer, i)"
-                                                                class="btn btn-danger"
-                                                            >
-                                                                <i class="far fa-trash-alt"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -356,6 +350,72 @@
         </div>
       </Add>
 
+            <!--                    Modal for modify bus class-->
+            <div
+                class="modal fade"
+                id="detailTicketModal"
+                tabindex="-1"
+                aria-labelledby="staticBackdropLabel"
+                aria-hidden="true"
+
+            >
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="card card-success">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4 class="modal-title">Edit Seat Detail</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+<!--                                        <div class="form-group col-md-6">-->
+<!--                                            <label for="seat_class">Seat Class</label>-->
+<!--                                            <select class="form-control" v-model="editSeatModify.class">-->
+<!--                                                <option value="0" selected>Select Class</option>-->
+<!--                                                <option-->
+<!--                                                    v-for="(fareClass, i) in fareClasses"-->
+<!--                                                    :key="i"-->
+<!--                                                    :value="fareClass.id"-->
+<!--                                                >-->
+<!--                                                    {{ fareClass.name }}-->
+<!--                                                </option>-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                        <div class="form-group col-md-6">-->
+<!--                                            <label for="seat_type">Seat Type</label>-->
+<!--                                            <select class="form-control" v-model="editSeatModify.type">-->
+<!--                                                <option value="0" selected>Select Type</option>-->
+<!--                                                <option value="reserved_for_female">-->
+<!--                                                    Reserved for Female-->
+<!--                                                </option>-->
+<!--                                                <option value="not_for_sale">Not for Sale</option>-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+                                    </div>
+                                    <div class="row">
+<!--                                        <div class="col-md-12">-->
+<!--                                            <button-->
+<!--                                                type="button"-->
+<!--                                                class="btn btn-block btn-success"-->
+<!--                                                @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"-->
+<!--                                                data-dismiss="modal"-->
+<!--                                            >-->
+
+<!--                                                Update Seat Data-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End Modal-->
+
 <!--            DELETE MODAL-->
             <Delete
                 confirmationMessage="Are You Sure You want To Delete This Booking ???"
@@ -421,15 +481,22 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", "schedule");
-        if (res.status == 200) {
-            this.allSchedules = res.data;
+        const resTicket = await this.callApi("post", "booking");
+        console.log(resTicket.data);
+        if (resTicket.status == 200) {
+            this.customers = resTicket.data;
         } else {
-            console.log(res);
+            console.log(resTicket);
         }
     },
 
     methods: {
+        cnicFormat:function(string){
+            return (string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3"));
+        },
+        phoneFormat:function(string){
+            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+        },
         async getCustomer() {
             const resCnic = await this.callApi("post", "booking/getCNIC", {cnicNumber: this.addForm.customerCNIC});
             this.addForm.contact = resCnic.data.contact;
