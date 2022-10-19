@@ -371,7 +371,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import BookingOptionsPopup from "./popup/BookingOptionsPopup.vue";
+import BookingOptionsPopup from "./popup/ReschedulePopup.vue";
 import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
