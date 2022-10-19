@@ -186,7 +186,8 @@ class ScheduleController extends Controller
     }
     public function selected(Request $request)
     {
-        $tickets = Ticket::where('schedule_id', $request->id)->whereDate('date', $request->date)->get();
+        $tickets = Ticket::where('company_id',$this->company_id)->where('schedule_id', $request->id)
+        ->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id', $request->id)->select('id', 'selected_bus_class_id')
             ->with('selective_bus')->first();
@@ -195,7 +196,7 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 $result = array_search($column['seatNo'], $ticketSeatNumbers);
                 if ($result !== false) {
-                    $seatMap[$i][$j]['seat_id'] = $tickets[$result]['id'];
+                    $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                 }

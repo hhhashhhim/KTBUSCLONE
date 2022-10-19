@@ -150,5 +150,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/detail', [BookingController::class, 'detailTicket']);
+    Route::post('/reschedule', [BookingController::class, 'reschedule']);
+    
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

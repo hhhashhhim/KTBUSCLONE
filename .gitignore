@@ -1,6 +1,8 @@
 /node_modules
 /vendor
-.env
+/.env
+.env.backup
+.env.dusk.local
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json
