@@ -10,7 +10,6 @@
             <!-- Main Content -->
             <div class="main-content">
             <router-view></router-view>
-
             </div>
         </div>
         <div v-else>

@@ -286,7 +286,7 @@
                             <input
                                 type="file"
                                 class="form-control"
-                                id="Logo"
+                                id="Logo" accept=".jpg,.jpeg,.png"
                                 @change="uploadLogo($event, 'edit')"
                             />
                         </div>
@@ -514,7 +514,7 @@ export default {
                 this.cities = companyRes.data;
                 setTimeout(() => {
                     $("#company_table").DataTable();
-                }, 500);
+                }, 50);
             }
         },
         phoneFormat: function (string) {
@@ -550,6 +550,7 @@ export default {
                 this.loading = false;
                 this.success = "Company Created Successfully";
                 this.cities.unshift(res.data);
+                this.fetchCompany();
                 this.data.name = this.data.contact = this.data.location = "";
                 this.data.modules = this.defaultModules;
                 this.data = "";
@@ -590,14 +591,24 @@ export default {
                 modules,
                 i,
             };
-            // console.log(this.dataEdit);
         },
         async update() {
+            const config = {
+                headers: {'content-type': 'multipart/form-data'}
+            }
+            let formData = new FormData();
+            formData.append('logo', this.dataEdit.logo);
             this.validationErrors = [];
             if (this.dataEdit.name == "")
                 return this.errorsArray("Company Name is Required", "Name");
 
-            const res = await this.callApi("post", "company/update", this.dataEdit);
+            let logo = "";
+            if (this.dataEdit.logo) {
+                const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
+                logo = logoRes ? logoRes.data.name : ""
+            }
+
+            const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
 
             if (res.status == 200) {
                 this.success = "Company Updated Successfully";
@@ -645,13 +656,13 @@ export default {
             const imageFile = e.target.files[0];
             if (imageFile.name.match(/\.(jpg|jpeg|png)$/i)) {
                 if (name == "add") {
-                    this.data.logo = imageFile;
+                  this.data.logo = imageFile;
                 }
                 if (name == "edit") {
                     this.dataEdit.logo = imageFile;
                 }
             } else {
-                swal('Image Extension', 'Uploded Image must be .jpg, .jpeg, .png', 'error');
+                swal('Image Extension', 'Uploaded Image must be .jpg, .jpeg, .png', 'error');
                 e.target.value = '';
             }
 
@@ -670,3 +681,10 @@ export default {
     },
 };
 </script>
+<style scoped>
+
+div.dataTables_length select{
+    width: 90px !important;
+    display:inline-block;
+}
+</style>

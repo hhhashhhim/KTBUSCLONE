@@ -26,9 +26,6 @@ class CompanyController extends Controller
         return Company::orderBy('id', 'desc')->get();
     }
 
-
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -67,42 +64,6 @@ class CompanyController extends Controller
         return $company;
 
     }
-
-    public function attachment_data($image, $type)
-    {
-        $file = $type == 'installment' ? 'installment/' : 'late_payment/';
-        $filenameWithExt = $image->getClientOriginalName();
-        //get just filename
-        $filename = pathinfo($filenameWithExt);
-        //get just extension
-        $extension = $image->extension();
-        $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
-        //Move to folder
-        $path = $image->storeAs('public/uploads/dispute/' . $file, $nameToStore);
-        return $nameToStore;
-
-    }
-
-
-////singleImageUpload($request, 'image','upload/fittingImages'),
-//if (!function_exists('singleImageUpload')) {
-//    function singleImageUpload($request, $input_name, $path): ?string
-//    {
-//        if ($request->hasFile($input_name)) {
-//            $image = $request->file($input_name);
-//            $name = time() . '.' . $image->getClientOriginalExtension();
-//            $destinationPath = storage_path('app/public/' . $path);
-//            if ($image->move($destinationPath, $name)) {
-//                return $path . '/' . $name;
-//            } else {
-//                return null;
-//            }
-//        } else {
-//            return null;
-//        }
-//    }
-//}
-//
 
 
     public function logoUpload(Request $request)
@@ -161,23 +122,10 @@ class CompanyController extends Controller
 
     public function image($image)
     {
-
         $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
             . "_" . time() . '.' . $image->extension();
-
         $image->move(public_path('uploads/company/logo/'), $imageName);
         return $imageName;
-
-        // $filenameWithExt = $image->getClientOriginalName();
-        // //get just filename
-        // $filename        = pathinfo($filenameWithExt);
-        // //get just extension
-        // $extension       = $image->extension();
-        // return $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
-        // //Move to folder
-        // $path            = $image->move('uploads/company/logo/', $nameToStore);
-        // // $path            = $image->storeAs('uploads/employee/profile/', $nameToStore);
-        // return $nameToStore;
     }
 
 }
