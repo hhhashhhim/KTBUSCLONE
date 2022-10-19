@@ -24205,6 +24205,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       isShowEditDiv: false,
       BusClassName: "",
       updateSeatValue: [],
+      editSingleSeat: [],
       delId: "",
       seatNo: 0,
       data: {
@@ -24238,7 +24239,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 2:
               resBusClass = _context.sent;
-              console.log(resBusClass);
 
               if (resBusClass.status === 200) {
                 _this.busClasses = resBusClass.data;
@@ -24246,10 +24246,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(resBusClass);
               }
 
-              _context.next = 7;
+              _context.next = 6;
               return _this.callApi("post", "fare-class");
 
-            case 7:
+            case 6:
               resFareClass = _context.sent;
 
               if (resFareClass.status === 200) {
@@ -24258,7 +24258,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(res);
               }
 
-            case 9:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -24267,9 +24267,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    getSeat: function getSeat(rec) {
-      console.log(rec);
-    },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -24287,22 +24284,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     addSeatData: function addSeatData(col, row) {
-      if (this.seatModify.type === 0) {
-        return this.errorsArray("Please Select Seat Type", "Seat Type");
+      // if (this.seatModify.type == 0) {
+      //     // return this.errorsArray("Please Select Seat Type", "Seat Type");
+      //     swal('required', 'Please Select Seat Type', 'error');
+      //
+      // }
+      if (this.seatModify["class"] == 0) {
+        swal('required', 'Please Select Seat class', 'error');
+      } else {
+        var seatDetails = this.data.seatMap[row][col];
+        this.data.seatMap[row][col] = {
+          reserved: seatDetails.reserved,
+          seatNo: seatDetails.seatNo,
+          "class": this.seatModify["class"],
+          type: this.seatModify.type
+        };
+        this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
       }
-
-      if (this.seatModify["class"] === 0) {
-        return this.errorsArray("Please Select Seat Class", "Seat Class");
-      }
-
-      var seatDetails = this.data.seatMap[row][col];
-      this.data.seatMap[row][col] = {
-        reserved: seatDetails.reserved,
-        seatNo: seatDetails.seatNo,
-        "class": this.seatModify["class"],
-        type: this.seatModify.type
-      };
-      this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
     },
     modifySeatData: function modifySeatData(rowId, colId) {
       var _this$data$seatMap$ro, _this$data$seatMap$ro2;
@@ -24318,20 +24316,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log(this.updateSeatValue);
     },
     getSeatDetails: function getSeatDetails(rowId, colId) {
-      if (this.dataEdit.seat_map[rowId][colId].reserved) {
-        if (this.dataEdit.seat_map[rowId][colId]["class"]) {
-          var _this$dataEdit$seat_m, _this$dataEdit$seat_m2;
+      var _this$dataEdit$seat_m, _this$dataEdit$seat_m2;
 
-          this.editSeatModify = {
-            "class": (_this$dataEdit$seat_m = this.dataEdit.seat_map[rowId][colId]["class"]) !== null && _this$dataEdit$seat_m !== void 0 ? _this$dataEdit$seat_m : 0,
-            type: (_this$dataEdit$seat_m2 = this.dataEdit.seat_map[rowId][colId].type) !== null && _this$dataEdit$seat_m2 !== void 0 ? _this$dataEdit$seat_m2 : 0
-          };
-        } else {
-          this.editSeatModify = {
-            "class": 0,
-            type: 0
-          };
-        }
+      this.editSeatModify = {
+        "class": (_this$dataEdit$seat_m = this.dataEdit.seat_map[rowId][colId]["class"]) !== null && _this$dataEdit$seat_m !== void 0 ? _this$dataEdit$seat_m : 0,
+        type: (_this$dataEdit$seat_m2 = this.dataEdit.seat_map[rowId][colId].type) !== null && _this$dataEdit$seat_m2 !== void 0 ? _this$dataEdit$seat_m2 : 0
+      };
+      this.editSingleSeat = {
+        rowId: rowId,
+        colId: colId
+      };
+    },
+    updateSeatDetail: function updateSeatDetail(rowId, colId) {
+      console.log(rowId, colId); // if (this.editSeatModify.type == 0) {
+      //     return this.errorsArray("Please Select Seat Type", "Seat Type");
+      // }
+
+      if (this.editSeatModify["class"] == 0) {
+        swal('required', 'Please Select Seat class', 'error');
+      } else {
+        var singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
+        this.dataEdit.seat_map[rowId][colId] = {
+          reserved: singleSeatDetails.reserved,
+          seatNo: singleSeatDetails.seatNo,
+          "class": this.editSeatModify["class"],
+          type: this.editSeatModify.type
+        };
+        this.success = "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo;
       }
     },
     changeStatus: function changeStatus(row, col) {
@@ -33490,7 +33501,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "btn btn-block btn-success",
     onClick: _cache[24] || (_cache[24] = function ($event) {
-      return _ctx.udpateSeatDetail($data.updateSeatValue.modalColId, $data.updateSeatValue.modalRowId);
+      return $options.updateSeatDetail($data.editSingleSeat.rowId, $data.editSingleSeat.colId);
     }),
     "data-dismiss": "modal"
   }, " Update Seat Data ")])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {

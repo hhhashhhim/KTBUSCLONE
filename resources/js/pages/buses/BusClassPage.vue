@@ -496,7 +496,7 @@
                                             <button
                                                 type="button"
                                                 class="btn btn-block btn-success"
-                                                @click=" udpateSeatDetail(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
+                                                @click=" updateSeatDetail(editSingleSeat.rowId, editSingleSeat.colId)"
                                                 data-dismiss="modal"
                                             >
 
@@ -551,6 +551,7 @@ export default {
             isShowEditDiv: false,
             BusClassName: "",
             updateSeatValue: [],
+            editSingleSeat: [],
             delId: "",
             seatNo: 0,
             data: {
@@ -572,7 +573,6 @@ export default {
     },
     async created() {
         const resBusClass = await this.callApi("post", "bus_classes");
-        console.log(resBusClass);
         if (resBusClass.status === 200) {
             this.busClasses = resBusClass.data;
         } else {
@@ -586,9 +586,6 @@ export default {
         }
     },
     methods: {
-        getSeat: function (rec) {
-            console.log(rec);
-        },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -610,48 +607,67 @@ export default {
         },
 
         addSeatData: function (col, row) {
-            if (this.seatModify.type === 0) {
-                return this.errorsArray("Please Select Seat Type", "Seat Type");
-            }
-            if (this.seatModify.class === 0) {
-                return this.errorsArray("Please Select Seat Class", "Seat Class");
-            }
+            // if (this.seatModify.type == 0) {
+            //     // return this.errorsArray("Please Select Seat Type", "Seat Type");
+            //     swal('required', 'Please Select Seat Type', 'error');
+            //
+            // }
+            if (this.seatModify.class == 0) {
+                swal('required', 'Please Select Seat class', 'error');
+            }else {
+                const seatDetails = this.data.seatMap[row][col];
+                this.data.seatMap[row][col] = {
+                    reserved: seatDetails.reserved,
+                    seatNo: seatDetails.seatNo,
+                    class: this.seatModify.class,
+                    type: this.seatModify.type,
+                };
 
-            const seatDetails = this.data.seatMap[row][col];
-            this.data.seatMap[row][col] = {
-                reserved: seatDetails.reserved,
-                seatNo: seatDetails.seatNo,
-                class: this.seatModify.class,
-                type: this.seatModify.type,
-            };
-
-            this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+                this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+            }
         },
         modifySeatData: function (rowId, colId) {
             this.seatModify = {
                 class: this.data.seatMap[rowId][colId].class ?? 0,
                 type: this.data.seatMap[rowId][colId].type ?? 0,
             };
-            (this.updateSeatValue = {
+            this.updateSeatValue = {
                 modalRowId: rowId,
                 modalColId: colId,
-            });
+            };
             console.log(this.updateSeatValue);
         },
         getSeatDetails: function (rowId, colId) {
-            if (this.dataEdit.seat_map[rowId][colId].reserved) {
-                if (this.dataEdit.seat_map[rowId][colId].class) {
-                    this.editSeatModify = {
-                        class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
-                        type: this.dataEdit.seat_map[rowId][colId].type ?? 0,
-                    };
-                } else {
-                    this.editSeatModify = {
-                        class: 0,
-                        type: 0,
-                    };
-                }
+
+            this.editSeatModify = {
+                class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
+                type: this.dataEdit.seat_map[rowId][colId].type ?? 0,
+            };
+            this.editSingleSeat = {
+                rowId: rowId,
+                colId: colId,
+            };
+        },
+
+        updateSeatDetail: function (rowId, colId){
+
+            console.log(rowId, colId);
+            // if (this.editSeatModify.type == 0) {
+            //     return this.errorsArray("Please Select Seat Type", "Seat Type");
+            // }
+            if (this.editSeatModify.class == 0) {
+                swal('required', 'Please Select Seat class', 'error');
+            }else {
+                const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
+                this.dataEdit.seat_map[rowId][colId] = {
+                    reserved: singleSeatDetails.reserved,
+                    seatNo: singleSeatDetails.seatNo,
+                    class: this.editSeatModify.class,
+                    type: this.editSeatModify.type,
+                };
+                this.success = "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo;
             }
+
         },
 
         changeStatus: function (row, col) {
