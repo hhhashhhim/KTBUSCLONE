@@ -125,7 +125,7 @@ class CompanyController extends Controller
         $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
             . "_" . time() . '.' . $image->extension();
         $image->move(public_path('uploads/company/logo/'), $imageName);
-        return $imageName;
+            return $imageName;
     }
 
 }
