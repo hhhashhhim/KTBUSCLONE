@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Bus Class</h4>
                             <div class="card-header-action">
@@ -41,9 +41,6 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table
@@ -572,20 +569,23 @@ export default {
         };
     },
     async created() {
-        const resBusClass = await this.callApi("post", "bus_classes");
-        if (resBusClass.status === 200) {
-            this.busClasses = resBusClass.data;
-        } else {
-            console.log(resBusClass);
-        }
-        const resFareClass = await this.callApi("post", "fare-class");
-        if (resFareClass.status === 200) {
-            this.fareClasses = resFareClass.data;
-        } else {
-            console.log(res);
-        }
+        this.fetchBussClasses();
     },
     methods: {
+        async fetchBussClasses() {
+            const resBusClass = await this.callApi("post", "bus_classes");
+            if (resBusClass.status === 200) {
+                this.busClasses = resBusClass.data;
+            } else {
+                console.log(resBusClass);
+            }
+            const resFareClass = await this.callApi("post", "fare-class");
+            if (resFareClass.status === 200) {
+                this.fareClasses = resFareClass.data;
+            } else {
+                console.log(res);
+            }
+        },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -771,7 +771,9 @@ export default {
 
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
-                this.success = "Bus Class Added Successfully";
+                // this.success = "Bus Class Added Successfully";
+                swal('Success', 'Bus Class Added Successfully', 'success');
+                this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
@@ -801,7 +803,9 @@ export default {
                 this.dataEdit
             );
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Bus Class Updated Successfully";
+                this.fetchBussClasses();
+                // this.success = "Bus Class Updated Successfully";
+                swal('Success', 'Bus Class Updated Successfully', 'success');
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {

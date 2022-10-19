@@ -4,7 +4,7 @@
             <div class="section-body">
                 <div class="row">
                     <div class="col-12 col-md-12 col-lg-12">
-                        <div class="card card-success">
+                        <div class="card card-primary">
                             <div class="card-header">
                                 <h4>Companies</h4>
                                 <div class="card-header-action">
@@ -12,7 +12,7 @@
                                         href="#"
                                         data-toggle="modal"
                                         :data-target="'#' + formID"
-                                        class="btn btn-success"
+                                        class="btn btn-primary"
                                     >
                                         Add New Company
                                     </a>
@@ -23,14 +23,11 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card">
-                                            <div class="card-header">
-                                                <h4></h4>
-                                            </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
                                                     <table
                                                         class="table table-striped table-hover"
-                                                        id="edit_loc"
+                                                        id="company_table"
                                                     >
                                                         <thead>
                                                         <tr>
@@ -51,7 +48,7 @@
                                                             <td>
                                                                 <img
                                                                     :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)"
-                                                                    style="width:200px;" alt="">
+                                                                    style="width:120px;" alt="">
                                                             </td>
                                                             <td>
                                                                 <a
@@ -94,7 +91,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="name">Company Name</label>
+                            <label for="name">Company Name <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -104,7 +101,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="contact">Contact</label>
+                            <label for="contact">Contact <span class="text-danger">*</span></label>
                             <vue-mask
                                 class="form-control"
                                 v-model="data.contact"
@@ -112,25 +109,25 @@
                                 :raw="false"
                                 :options="options">
                             </vue-mask>
-<!--                            <input-->
-<!--                                type="text" @keypress="isNumber($event)"-->
-<!--                                class="form-control"-->
-<!--                                placeholder="Enter contact"-->
-<!--                                id="contact"-->
-<!--                                v-model="data.contact"-->
-<!--                            />-->
+                            <!--                            <input-->
+                            <!--                                type="text" @keypress="isNumber($event)"-->
+                            <!--                                class="form-control"-->
+                            <!--                                placeholder="Enter contact"-->
+                            <!--                                id="contact"-->
+                            <!--                                v-model="data.contact"-->
+                            <!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
                             <input
                                 type="file"
                                 class="form-control"
-                                id="Logo"
+                                id="Logo" accept=".jpg,.jpeg,.png"
                                 @change="uploadLogo($event, 'add')"
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="userName">Name</label>
+                            <label for="userName">Name <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -140,7 +137,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="email">Email</label>
+                            <label for="email">Email <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -150,7 +147,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="password">Password</label>
+                            <label for="password">Password <span class="text-danger">*</span></label>
                             <input
                                 type="password"
                                 class="form-control"
@@ -237,20 +234,16 @@
                         </template>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <button
-                                    type="button"
-                                    class="btn btn-block btn-success mt-4"
-                                    :class="loading?'disabled':''"
-                                    @click="add"
-                                >
-                                    {{ loading ? "Loading...." : "Add company" }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <template v-slot:button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            :class="loading?'disabled':''"
+                            @click="add"
+                        >
+                            {{ loading ? "Loading...." : "Add company" }}
+                        </button>
+                    </template>
                 </Add>
 
                 <!-- Add Modal -->
@@ -262,7 +255,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="name">Company Name</label>
+                            <label for="name">Company Name  <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -272,7 +265,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="contact">Contact</label>
+                            <label for="contact">Contact <span class="text-danger">*</span></label>
                             <vue-mask
                                 class="form-control"
                                 v-model="dataEdit.contact"
@@ -280,13 +273,13 @@
                                 :raw="false"
                                 :options="options">
                             </vue-mask>
-<!--                            <input-->
-<!--                                type="text" @keypress="isNumber($event)"-->
-<!--                                class="form-control"-->
-<!--                                placeholder="Enter contact"-->
-<!--                                id="contact"-->
-<!--                                v-model="dataEdit.contact"-->
-<!--                            />-->
+                            <!--                            <input-->
+                            <!--                                type="text" @keypress="isNumber($event)"-->
+                            <!--                                class="form-control"-->
+                            <!--                                placeholder="Enter contact"-->
+                            <!--                                id="contact"-->
+                            <!--                                v-model="dataEdit.contact"-->
+                            <!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
@@ -404,19 +397,15 @@
                         </template>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <button
-                                    type="button"
-                                    class="btn btn-block btn-success mt-4"
-                                    @click="update"
-                                >
-                                    Update company
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <template v-slot:button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="update"
+                        >
+                            Update company
+                        </button>
+                    </template>
                 </Edit>
 
                 <!-- Delete Modals -->
@@ -515,20 +504,23 @@ export default {
         };
     },
     async created() {
-        this.data.modules = this.dataEdit.modules = this.defaultModules;
-        const companyRes = await this.callApi("post", "company");
-        if (companyRes.status == 200) {
-            this.cities = companyRes.data;
-        }
+        this.fetchCompany();
     },
     methods: {
-        phoneFormat:function(string){
+        async fetchCompany() {
+            this.data.modules = this.dataEdit.modules = this.defaultModules;
+            const companyRes = await this.callApi("post", "company");
+            if (companyRes.status == 200) {
+                this.cities = companyRes.data;
+                setTimeout(() => {
+                    $("#company_table").DataTable();
+                }, 500);
+            }
+        },
+        phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
         async add(e) {
-            // console.log(this.data.modules);
-            // return ;
-
             const config = {
                 headers: {'content-type': 'multipart/form-data'}
             }
@@ -540,17 +532,20 @@ export default {
                 return this.errorsArray("Company Name is Required", "Name");
             if (this.data.contact == "")
                 return this.errorsArray("Company Contact is Required", "Contact");
+            if (this.data.userName == "")
+                return this.errorsArray("Name  is Required", "userName");
+            if (this.data.email == "")
+                return this.errorsArray("Company Email is Required", "Email");
+            if (this.data.password == "")
+                return this.errorsArray("Company password is Required", "Contact");
             this.loading = true;
 
             let logo = "";
             if (this.data.logo) {
                 const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
-                logo:logoRes ? logoRes.data.name : ""
+                logo = logoRes ? logoRes.data.name : ""
             }
-            const res = await this.callApi("post", "company/store", {
-                ...this.data,
-                logo
-            });
+            const res = await this.callApi("post", "company/store", { ...this.data,  logo });
             if (res.status == 201) {
                 this.loading = false;
                 this.success = "Company Created Successfully";
@@ -589,8 +584,6 @@ export default {
                 .filter(function (obj) {
                     return this.has(obj.name) ? false : this.add(obj.name);
                 }, new Set());
-
-            // console.log(modules);
 
             this.dataEdit = {
                 ...company,
@@ -649,12 +642,20 @@ export default {
             location.reload();
         },
         uploadLogo(e, name) {
-            if (name == "add") {
-                this.data.logo = e.target.files[0];
+            const imageFile = e.target.files[0];
+            if (imageFile.name.match(/\.(jpg|jpeg|png)$/i)) {
+                if (name == "add") {
+                    this.data.logo = imageFile;
+                }
+                if (name == "edit") {
+                    this.dataEdit.logo = imageFile;
+                }
+            } else {
+                swal('Image Extension', 'Uploded Image must be .jpg, .jpeg, .png', 'error');
+                e.target.value = '';
             }
-            if (name == "edit") {
-                this.dataEdit.logo = e.target.files[0];
-            }
+
+
         },
     },
     computed: {

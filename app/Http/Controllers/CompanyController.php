@@ -13,33 +13,40 @@ class CompanyController extends Controller
 {
     public $company_id;
 
-    public function __construct(){
-        $this->middleware(function ($request, $next){
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
-            return $next( $request );
+            return $next($request);
         });
     }
-    public function index(){
-        return Company::orderBy('id','desc')->get();
-    }
-    public function store( Request $request ){
 
+    public function index()
+    {
+        return Company::orderBy('id', 'desc')->get();
+    }
+
+
+
+
+    public function store(Request $request)
+    {
         $request->validate([
-            'name'=>'required | unique:companies',
-            'contact'=>'required',
-            'userName'=>'required',
-            'email'=>'required | unique:users',
-            'password'=>'required',
+            'name' => 'required | unique:companies',
+            'contact' => 'required',
+            'userName' => 'required',
+            'email' => 'required | unique:users',
+            'password' => 'required',
         ]);
         $contact_format = str_replace('-', '', $request->contact);
 
         $company = Company::create([
-            'name'=>$request->name,
-            'contact'=>$contact_format,
-            'location'=>$request->location,
-            'modules'=>$request->modules,
-            'logo'=>$request->logo,
-            'added_by'=>auth()->user()->id,
+            'name' => $request->name,
+            'contact' => $contact_format,
+            'location' => $request->location,
+            'modules' => $request->modules,
+            'logo' => $request->logo,
+            'added_by' => auth()->user()->id,
         ]);
 
         $role = Role::create([
@@ -49,65 +56,114 @@ class CompanyController extends Controller
         ]);
 
         $user = User::create([
-            'name'=>$request->userName,
-            'email'=>$request->email,
-            'contact'=>$contact_format,
-            'password'=>Hash::make($request->password),
-            'role_id'=>$role->id,
-            'company_id'=>$company->id,
+            'name' => $request->userName,
+            'email' => $request->email,
+            'contact' => $contact_format,
+            'password' => Hash::make($request->password),
+            'role_id' => $role->id,
+            'company_id' => $company->id,
         ]);
 
         return $company;
 
     }
-    public function logoUpload( Request $request ){
-        $name = $this->image($request->logo);
-        return response(['name'=>$name],200);
+
+    public function attachment_data($image, $type)
+    {
+        $file = $type == 'installment' ? 'installment/' : 'late_payment/';
+        $filenameWithExt = $image->getClientOriginalName();
+        //get just filename
+        $filename = pathinfo($filenameWithExt);
+        //get just extension
+        $extension = $image->extension();
+        $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
+        //Move to folder
+        $path = $image->storeAs('public/uploads/dispute/' . $file, $nameToStore);
+        return $nameToStore;
+
     }
-    public function update( Request $request ){
+
+
+////singleImageUpload($request, 'image','upload/fittingImages'),
+//if (!function_exists('singleImageUpload')) {
+//    function singleImageUpload($request, $input_name, $path): ?string
+//    {
+//        if ($request->hasFile($input_name)) {
+//            $image = $request->file($input_name);
+//            $name = time() . '.' . $image->getClientOriginalExtension();
+//            $destinationPath = storage_path('app/public/' . $path);
+//            if ($image->move($destinationPath, $name)) {
+//                return $path . '/' . $name;
+//            } else {
+//                return null;
+//            }
+//        } else {
+//            return null;
+//        }
+//    }
+//}
+//
+
+
+    public function logoUpload(Request $request)
+    {
+        $name = $this->image($request->logo);
+        return response(['name' => $name], 200);
+    }
+
+    public function update(Request $request)
+    {
         $request->validate([
-            'name'=>'required',
-            'contact'=>'required',
+            'name' => 'required',
+            'contact' => 'required',
         ]);
         $contact_format = str_replace('-', '', $request->contact);
-        Company::find( $request->id )->update([
-            'name'=>$request->name,
-            'contact'=>$contact_format,
-            'logo'=>$request->logo,
-            'location'=>$request->location,
-            'modules'=>$request->modules,
-            'added_by'=>auth()->user()->id,
+        Company::find($request->id)->update([
+            'name' => $request->name,
+            'contact' => $contact_format,
+            'logo' => $request->logo,
+            'location' => $request->location,
+            'modules' => $request->modules,
+            'added_by' => auth()->user()->id,
         ]);
         User::where('company_id', $request->id)->where('email', $request->email)->first()->update([
-            'name'=>$request->name,
-            'contact'=>$contact_format,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password),
+            'name' => $request->name,
+            'contact' => $contact_format,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
-        Role::where('company_id',$request->id)->where('name','admin')->update([
+        Role::where('company_id', $request->id)->where('name', 'admin')->update([
             'permissions' => $request->modules,
         ]);
         return response()->json([
-            'message'=>"Updated Successfully",
-        ],200);
+            'message' => "Updated Successfully",
+        ], 200);
 
     }
-    public function delete( Request $request ){
+
+    public function delete(Request $request)
+    {
         return Company::find($request->id)->delete();
     }
-    public function company_roles( Request $request ){
-        return Role::where('company_id',$this->company_id)->get();
+
+    public function company_roles(Request $request)
+    {
+        return Role::where('company_id', $this->company_id)->get();
     }
-    public function company( Request $request ){
-        return Company::where('companies.id',$request->id)
-        ->join('users','companies.id','users.company_id')
-        ->select('companies.*','users.name as userName','users.email')
-        ->first();
+
+    public function company(Request $request)
+    {
+        return Company::where('companies.id', $request->id)
+            ->join('users', 'companies.id', 'users.company_id')
+            ->select('companies.*', 'users.name as userName', 'users.email')
+            ->first();
     }
-    public function image($image){
+
+    public function image($image)
+    {
 
         $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-        ."_".time().'.'.$image->extension();
+            . "_" . time() . '.' . $image->extension();
 
         $image->move(public_path('uploads/company/logo/'), $imageName);
         return $imageName;
