@@ -59,6 +59,7 @@
                                 >
                                   <i class="far fa-eye"></i>
                                 </a>
+<<<<<<< HEAD
                                 <a
                                   href="#delete-modal"
                                   data-toggle="modal"
@@ -72,6 +73,65 @@
                           </tbody>
                         </table>
                       </div>
+=======
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4></h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table
+                                                    class="table table-striped table-hover"
+                                                    id="edit_dis"
+                                                >
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Sr No.</th>
+                                                        <th>Customer Name</th>
+                                                        <th>Date</th>
+                                                        <th>CNIC Number</th>
+                                                        <th>Cell Number</th>
+                                                        <th>Ticket Booked By</th>
+                                                        <th>No. of Tickets</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr v-for="(customer, i) in customers" :key="i">
+                                                        <td>{{ i + 1 }}</td>
+                                                        <td>{{ customer.name}}</td>
+                                                        <td>{{ customer.name}}</td>
+                                                        <td>{{ cnicFormat(customer.cnic) }}</td>
+                                                        <td>{{ phoneFormat(customer.contact) }}</td>
+                                                        <td>{{ customer.added_by.name }}</td>
+                                                        <td>{{ customer.tickets_count }}</td>
+                                                        <td>
+                                                            <a
+                                                                href="#detailTicketModal"
+                                                                data-toggle="modal"
+                                                                @click="viewDetail(customer)"
+                                                                class="btn btn-primary mx-1"
+                                                            >
+                                                                <i class="far fa-eye"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE -->
+                        </div>
+>>>>>>> c8d513b7075c49ff7af2c3dcf7d4b99b8eec14dc
                     </div>
                   </div>
                 </div>
@@ -463,6 +523,7 @@ export default {
       this.addForm.contact = resCnic.data.contact;
       this.addForm.customerName = resCnic.data.name;
     },
+<<<<<<< HEAD
     isNumber: function (evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -484,6 +545,46 @@ export default {
       if (!this.addForm.date)
         return this.errorsArray("Date is Required", "Date");
       this.validationErrors = [];
+=======
+    async created() {
+        const resTicket = await this.callApi("post", "booking");
+        console.log(resTicket.data);
+        if (resTicket.status == 200) {
+            this.customers = resTicket.data;
+        } else {
+            console.log(resTicket);
+        }
+    },
+
+    methods: {
+        cnicFormat:function(string){
+            return (string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3"));
+        },
+        phoneFormat:function(string){
+            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+        },
+        async getCustomer() {
+            const resCnic = await this.callApi("post", "booking/getCNIC", {cnicNumber: this.addForm.customerCNIC});
+            this.addForm.contact = resCnic.data.contact;
+            this.addForm.customerName = resCnic.data.name;
+        },
+        isNumber: function (evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
+        async fetchScheduleData() {
+            this.validationErrors = [];
+            if (!this.addForm.schedule)
+                return this.errorsArray("Schedule Name is Required", "Schedule");
+            if (!this.addForm.date)
+                return this.errorsArray("Date is Required", "Date");
+            this.validationErrors = [];
+>>>>>>> c8d513b7075c49ff7af2c3dcf7d4b99b8eec14dc
 
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
@@ -497,7 +598,7 @@ export default {
       } else {
         console.log(res);
       }
-      
+
     },
     selectSeat(row, col, seatNo) {
       

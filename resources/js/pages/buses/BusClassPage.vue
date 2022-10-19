@@ -228,7 +228,7 @@
                                     v-if="col.reserved"
                                     data-toggle="modal"
                                     data-target="#setSeatClass"
-                                    @click="updateSeatData(rowIndex, colIndex)"
+                                    @click="modifySeatData(rowIndex, colIndex)"
                                     :src="
                       $store.state.app_url +
                       'assets/img/buses/booked_seat_img.gif'
@@ -248,70 +248,6 @@
             </Add>
 
             <!-- Add Modal End -->
-<!--                    Modal for modify bus class-->
-            <div
-                class="modal fade"
-                id="setSeatClass"
-                tabindex="-1"
-                aria-labelledby="staticBackdropLabel"
-                aria-hidden="true"
-
-            >
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="card card-success">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Seat Detail</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_class">Seat Class</label>
-                                            <select class="form-control" v-model="seatModify.class">
-                                                <option value="0" selected>Select Class</option>
-                                                <option
-                                                    v-for="(fareClass, i) in fareClasses"
-                                                    :key="i"
-                                                    :value="fareClass.id"
-                                                >
-                                                    {{ fareClass.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_type">Seat Type</label>
-                                            <select class="form-control" v-model="seatModify.type">
-                                                <option value="0" selected>Select Type</option>
-                                                <option value="reserved_for_female">
-                                                    Reserved for Female
-                                                </option>
-                                                <option value="not_for_sale">Not for Sale</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button
-                                                type="button"
-                                                class="btn btn-block btn-success"
-                                                @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
-                                                data-dismiss="modal"
-                                            >
-                                                Add Seat Data
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-<!--End Modal-->
             <!--                    Modal for modify bus class-->
             <div
                 class="modal fade"
@@ -365,7 +301,6 @@
                                                 @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
                                                 data-dismiss="modal"
                                             >
-
                                                 Add Seat Data
                                             </button>
                                         </div>
@@ -377,7 +312,6 @@
                 </div>
             </div>
             <!--End Modal-->
-
             <!--            Edit Model-->
             <Edit
                 heading="Edit Bus Class"
@@ -470,11 +404,7 @@
                             >
                                 <img
                                     @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src="
-                      $store.state.app_url +
-                      'assets/img/buses/available_seat_img.gif'
-                    "
-                                    alt=""
+                                    :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""
                                 />
                             </td>
                         </tr>
@@ -493,7 +423,7 @@
                             >
                                 <img
                                     data-toggle="modal"
-                                    data-target="#setSeatClass"
+                                    data-target="#setEditSeatClass"
                                     @click="getSeatDetails(rowIndex, colIndex)"
                                     v-if="col.reserved"
                                     :src="
@@ -516,6 +446,71 @@
                     </button>
                 </template>
             </Edit>
+
+            <!--                    Modal for modify bus class-->
+            <div
+                class="modal fade"
+                id="setEditSeatClass"
+                tabindex="-1"
+                aria-labelledby="staticBackdropLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="card card-success">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4 class="modal-title">Edit Seat Detail</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label for="seat_class">Seat Class</label>
+                                            <select class="form-control" v-model="editSeatModify.class">
+                                                <option value="0" selected>Select Class</option>
+                                                <option
+                                                    v-for="(fareClass, i) in fareClasses"
+                                                    :key="i"
+                                                    :value="fareClass.id"
+                                                >
+                                                    {{ fareClass.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="seat_type">Seat Type</label>
+                                            <select class="form-control" v-model="editSeatModify.type">
+                                                <option value="0" selected>Select Type</option>
+                                                <option value="reserved_for_female">
+                                                    Reserved for Female
+                                                </option>
+                                                <option value="not_for_sale">Not for Sale</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button
+                                                type="button"
+                                                class="btn btn-block btn-success"
+                                                @click=" updateSeatDetail(editSingleSeat.rowId, editSingleSeat.colId)"
+                                                data-dismiss="modal"
+                                            >
+
+                                                Update Seat Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End Modal-->
             <!--            Edit MOdel End-->
             <Delete
                 confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
@@ -542,9 +537,13 @@ export default {
             fareClasses: [],
             formID: "addNewFareClass",
             validationErrors: [],
-            seatModify:{
-              class:0,
-              type:0,
+            seatModify: {
+                class: 0,
+                type: 0,
+            },
+            editSeatModify: {
+                class: 0,
+                type: 0,
             },
             success: false,
             error: false,
@@ -552,6 +551,7 @@ export default {
             isShowEditDiv: false,
             BusClassName: "",
             updateSeatValue: [],
+            editSingleSeat: [],
             delId: "",
             seatNo: 0,
             data: {
@@ -573,7 +573,6 @@ export default {
     },
     async created() {
         const resBusClass = await this.callApi("post", "bus_classes");
-        console.log(resBusClass);
         if (resBusClass.status === 200) {
             this.busClasses = resBusClass.data;
         } else {
@@ -587,9 +586,6 @@ export default {
         }
     },
     methods: {
-        getSeat: function (rec){
-            console.log(rec);
-        },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -611,67 +607,69 @@ export default {
         },
 
         addSeatData: function (col, row) {
-            if (this.seatModify.type === 0) {
-                return this.errorsArray("Please Select Seat Type", "Seat Type");
-            }
-            if (this.seatModify.class === 0) {
-                return this.errorsArray("Please Select Seat Class", "Seat Class");
-            }
+            // if (this.seatModify.type == 0) {
+            //     // return this.errorsArray("Please Select Seat Type", "Seat Type");
+            //     swal('required', 'Please Select Seat Type', 'error');
+            //
+            // }
+            if (this.seatModify.class == 0) {
+                swal('required', 'Please Select Seat class', 'error');
+            }else {
+                const seatDetails = this.data.seatMap[row][col];
+                this.data.seatMap[row][col] = {
+                    reserved: seatDetails.reserved,
+                    seatNo: seatDetails.seatNo,
+                    class: this.seatModify.class,
+                    type: this.seatModify.type,
+                };
 
-            const seatDetails = this.data.seatMap[row][col];
-            this.data.seatMap[row][col] = {
-                reserved: seatDetails.reserved,
-                seatNo: seatDetails.seatNo,
-                class: this.seatModify.class,
-                type: this.seatModify.type,
-            };
-
-            this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+                this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+            }
         },
-        updateSeatData: function (rowId, colId) {
+        modifySeatData: function (rowId, colId) {
             this.seatModify = {
-                class:this.data.seatMap[rowId][colId].class??0,
-                type:this.data.seatMap[rowId][colId].type??0,
+                class: this.data.seatMap[rowId][colId].class ?? 0,
+                type: this.data.seatMap[rowId][colId].type ?? 0,
             };
-                (this.updateSeatValue = {
-                    modalRowId: rowId,
-                    modalColId: colId,
-                });
+            this.updateSeatValue = {
+                modalRowId: rowId,
+                modalColId: colId,
+            };
             console.log(this.updateSeatValue);
         },
-        getSeatDetails: function(rowId, colId){
-            console.log(this.dataEdit.seat_map[rowId][colId]);
-            if (this.dataEdit.seat_map[rowId][colId].reserved) {
-                if (this.dataEdit.seat_map[rowId][colId].class) {
-                    this.seatModify = {
-                        class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
-                        type: this.dataEdit.seat_map[rowId][colId].type ?? 0,
-                    };
-                }else {
-                    this.seatModify = {
-                        class:  0,
-                        type:  0,
-                    };
-                }
+        getSeatDetails: function (rowId, colId) {
 
-            //     this.seatNo--;
-            //     // this.dataEdit.seat_map[rowId][colId] = {
-            //     //     reserved: false,
-            //     //     seatNo: 0,
-            //     // };
-            // } else {
-            //     this.seatNo++;
-            //     this.seatModify = {
-            //         class:this.dataEdit.seatMap[rowId][colId].class??0,
-            //         type:this.dataEdit.seatMap[rowId][colId].type??0,
-            //     };
-            //     this.dataEdit.seat_map[rowId][colId] = {
-            //         reserved: true,
-            //         seatNo: this.seatNo,
-            //
-            //     };
-            }
+            this.editSeatModify = {
+                class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
+                type: this.dataEdit.seat_map[rowId][colId].type ?? 0,
+            };
+            this.editSingleSeat = {
+                rowId: rowId,
+                colId: colId,
+            };
         },
+
+        updateSeatDetail: function (rowId, colId){
+
+            console.log(rowId, colId);
+            // if (this.editSeatModify.type == 0) {
+            //     return this.errorsArray("Please Select Seat Type", "Seat Type");
+            // }
+            if (this.editSeatModify.class == 0) {
+                swal('required', 'Please Select Seat class', 'error');
+            }else {
+                const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
+                this.dataEdit.seat_map[rowId][colId] = {
+                    reserved: singleSeatDetails.reserved,
+                    seatNo: singleSeatDetails.seatNo,
+                    class: this.editSeatModify.class,
+                    type: this.editSeatModify.type,
+                };
+                this.success = "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo;
+            }
+
+        },
+
         changeStatus: function (row, col) {
             if (this.data.seatMap[row][col].reserved) {
                 this.seatNo--;
@@ -705,10 +703,10 @@ export default {
         generateMap: function () {
             this.validationErrors = [];
             let vm = this;
-            if(vm.data.noOfRows == "")
-                return this.errorsArray("No of Rows Field is Required!", "No Of Rows" );
+            if (vm.data.noOfRows == "")
+                return this.errorsArray("No of Rows Field is Required!", "No Of Rows");
             if (vm.data.noOfCols == "")
-                return this.errorsArray( "No of Cols Field is required!", "No Of Cols" );
+                return this.errorsArray("No of Cols Field is required!", "No Of Cols");
 
             if (vm.data.noOfRows <= 15) {
                 if (vm.data.noOfCols <= 7) {
