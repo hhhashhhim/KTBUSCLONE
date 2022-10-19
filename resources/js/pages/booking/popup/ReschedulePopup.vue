@@ -67,7 +67,7 @@
                   ></div>
                   <span class="text-wrap">Issued</span>
                 </div>
-                <div class="my-2 align-self-end">
+                <div class="my-4 align-self-end">
                   <button class="btn btn-primary" @click="rescheduleSeats">Reschedule Seats</button>
                 </div>
               </div>
@@ -162,8 +162,9 @@ export default {
         ...this.addForm,
         bookingSeats:this.seats,
       });
-      if ( res.status === 201 ) {
+      if ( res.status == 200 ) {
         this.success = "Seats Rescheduled Successfully"
+        this.fetchScheduleData()
         window.scrollTo(0, 0);
       } else {
         if (res.status === 422) {
@@ -200,14 +201,15 @@ export default {
     selectSeat(row, col, seatNo) {
       
       let index = this.selectedSeats.indexOf(seatNo);
+      console.log(index);
       if (index != -1) {
+        this.schedule.selective_bus.seat_map[row][col].selected = false;
+        this.selectedSeats.splice(index, 1);
+      } else {
         if (this.seats.length==this.selectedSeats.length) {
           swal('Error', "New Seats Cannot Be Greater than the Previous Seats No." , 'error');
           return;
         }
-        this.schedule.selective_bus.seat_map[row][col].selected = false;
-        this.selectedSeats.splice(index, 1);
-      } else {
         this.schedule.selective_bus.seat_map[row][col].selected = true;
         this.selectedSeats.push(seatNo);
       }

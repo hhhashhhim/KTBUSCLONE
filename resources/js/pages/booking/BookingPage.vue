@@ -59,396 +59,308 @@
                                 >
                                   <i class="far fa-eye"></i>
                                 </a>
-<<<<<<< HEAD
-                                <a
-                                  href="#delete-modal"
-                                  data-toggle="modal"
-                                  @click="deleteModal(customer, i)"
-                                  class="btn btn-danger"
-                                >
-                                  <i class="far fa-trash-alt"></i>
-                                </a>
                               </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
-=======
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Table -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
-                                                >
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Customer Name</th>
-                                                        <th>Date</th>
-                                                        <th>CNIC Number</th>
-                                                        <th>Cell Number</th>
-                                                        <th>Ticket Booked By</th>
-                                                        <th>No. of Tickets</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr v-for="(customer, i) in customers" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ customer.name}}</td>
-                                                        <td>{{ customer.name}}</td>
-                                                        <td>{{ cnicFormat(customer.cnic) }}</td>
-                                                        <td>{{ phoneFormat(customer.contact) }}</td>
-                                                        <td>{{ customer.added_by.name }}</td>
-                                                        <td>{{ customer.tickets_count }}</td>
-                                                        <td>
-                                                            <a
-                                                                href="#detailTicketModal"
-                                                                data-toggle="modal"
-                                                                @click="viewDetail(customer)"
-                                                                class="btn btn-primary mx-1"
-                                                            >
-                                                                <i class="far fa-eye"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- END TABLE -->
-                        </div>
->>>>>>> c8d513b7075c49ff7af2c3dcf7d4b99b8eec14dc
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- END TABLE -->
+            </div>
+            <!-- END TABLE -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Modal -->
+    <Add
+      :heading="'Create Booking'"
+      :errors="this.validationErrors"
+      :formID="formID"
+    >
+      <div class="row">
+        <div class="col-md-5 class form-group">
+          <label for="DiscountName"
+            >Schedule Name <span class="text-danger">*</span></label
+          >
+          <select class="form-control" id="route" v-model="addForm.schedule">
+            <option value="0" selected>Select Schedule</option>
+            <option
+              v-for="(schedule, i) in allSchedules"
+              :value="schedule.id"
+              :key="i"
+            >
+              {{ schedule.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-3 class form-group">
+          <label for="date">Date <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" v-model="addForm.date" />
+        </div>
+        <div class="form-group col-md-2 d-flex align-items-center">
+          <label class="mt-4" for="active">Update Old Data</label>
+          <label class="colorinput mx-3 mt-3">
+            <span
+              ><input
+                type="checkbox"
+                class="colorinput-input"
+                v-model="addForm.oldBookings"
+                value="1"
+              />
+              <span class="colorinput-color bg-success"></span>
+            </span>
+          </label>
+        </div>
+        <div class="col-md-2">
+          <label>Action</label>
+          <button @click="fetchScheduleData" class="btn btn-block btn-primary">
+            Get Record
+          </button>
+        </div>
+        <div
+          class="col-md-6 d-flex justify-content-center mx-auto mb-3"
+          v-if="selectedBookedSeats.length"
+        >
+          <a
+            href="#reschedule-modal"
+            class="btn btn-primary mx-1"
+            data-toggle="modal"
+            >Partial Seats</a
+          >
+          <a
+            href="#reschedule-modal"
+            class="btn btn-primary mx-1"
+            data-toggle="modal"
+            >Shifting Seats</a
+          >
+          <a
+            href="#reschedule-modal"
+            class="btn btn-primary mx-1"
+            data-toggle="modal"
+            >Reschedule Seats</a
+          >
+        </div>
+        <h1 v-if="loading">Loading.........</h1>
+
+        <div class="col-md-12 row" v-if="showBookingDiv">
+          <div class="col-md-6">
+            <div class="card p-4">
+              <div class="form-group row">
+                <label
+                  class="col-md-3 pt-3 font-weight-bold"
+                  for="customer-cnic"
+                  >CNIC <span class="text-danger">*</span>
+                </label>
+                <vue-mask
+                  v-on:keyup.enter="getCustomer"
+                  class="form-control col-md-9"
+                  v-model="addForm.customerCNIC"
+                  mask="00000-0000000-0"
+                  :raw="false"
+                  :options="options"
+                >
+                </vue-mask>
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="fullName"
+                  >Full Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control col-md-9"
+                  id="fullName"
+                  v-model="addForm.customerName"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                  >Contact</label
+                >
+                <input
+                  type="text"
+                  @keypress="isNumber($event)"
+                  class="form-control col-md-9"
+                  id="contact"
+                  v-model="addForm.contact"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
+                  >Remarks</label
+                >
+                <input
+                  type="text"
+                  class="form-control col-md-9"
+                  id="remarks"
+                  v-model="addForm.remarks"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                  >Gender</label
+                >
+                <div class="col-md-9 pt-3">
+                  <input type="radio" v-model="addForm.gender" value="0" />
+                  <label class="mx-3">Female</label>
+                  <input type="radio" v-model="addForm.gender" value="1" />
+                  <label class="mx-3">Male</label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                  >Issue Or Book</label
+                >
+                <div class="col-md-9 pt-3">
+                  <input type="radio" v-model="addForm.type" value="booked" />
+                  <label class="mx-3">Issue</label>
+                  <input
+                    type="radio"
+                    v-model="addForm.type"
+                    value="advance booking"
+                  />
+                  <label class="mx-3">Book</label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="seatNo"
+                  >Seat No.</label
+                >
+                <input
+                  type="text"
+                  readonly
+                  class="form-control col-md-9"
+                  id="seatNo"
+                  v-model="addForm.selectedSeats"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                  >Total Seats</label
+                >
+                <input
+                  type="text"
+                  readonly
+                  class="form-control col-md-9"
+                  id="totalNoSeats"
+                  v-model="selectedSeats.length"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
+                  >Total Fare</label
+                >
+                <input
+                  type="text"
+                  readonly
+                  class="form-control col-md-9"
+                  id="totalFare"
+                  v-model="addForm.totalFare"
+                />
+              </div>
+              <div class="form-group row">
+                <label class="col-md-3 pt-3 font-weight-bold" for="discount"
+                  >Discount ( % )</label
+                >
+                <input
+                  type="text"
+                  readonly
+                  class="form-control col-md-9"
+                  id="discount"
+                  v-model="addForm.discount"
+                />
+              </div>
+
+              <div class="form-group text-right">
+                <button class="btn btn-primary mx-1" @click="add">Save</button>
+                <button class="btn btn-secondary mx-1">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card p-4">
+              <div class="col-md-12 mb-2 d-flex flex-wrap">
+                <div class="my-2">
+                  <div class="selected circles mr-1 border"></div>
+                  <span class="text-wrap">Selected</span>
+                </div>
+                <div class="my-2">
+                  <div class="for-female circles mr-1 border"></div>
+                  <span class="text-wrap">For Female</span>
+                </div>
+                <div class="my-2">
+                  <div class="for-male circles mr-1 border"></div>
+                  <span class="text-wrap">For Male</span>
+                </div>
+                <div class="my-2">
+                  <div class="not-for-sale circles mr-1 border"></div>
+                  <span class="text-wrap">Not For Sale</span>
+                </div>
+                <div class="my-3">
+                  <div class="circles icons-legend mr-1 border">
+                    <i class="fas fa-check"></i>
+                  </div>
+                  <span class="text-wrap">Booked</span>
+                </div>
+                <div class="my-3">
+                  <div
+                    class="fas fa-check-double circles icons-legend mr-1 border"
+                  ></div>
+                  <span class="text-wrap">Issued</span>
+                </div>
+              </div>
+              <div
+                class="d-flex justify-content-center seat-img p-0 m-0"
+                v-for="(record, rowIndex) in schedule.selective_bus.seat_map"
+                :key="rowIndex"
+              >
+                <div v-for="(col, colIndex) in record" :key="colIndex">
+                  <!-- <div v-if="colIndex==0">
+                                          {{ col }}
+                                        </div> -->
+                  <div
+                    v-if="col.reserved"
+                    class="image-span d-block text-center text-white"
+                    @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                    :class="getClasses(col)"
+                  >
+                    <!-- data-toggle="modal"
+                                            :data-target="col.type?'#booking-options-popup':''" -->
+                    <small>{{ col.seatNo }}</small>
+                    <br />
+                    <small v-if="col.type">
+                      <i
+                        class="fas"
+                        :class="
+                          col.type == 'booked' ? 'fa-check-double' : 'fa-check'
+                        "
+                      ></i>
+                    </small>
+                  </div>
+                  <span v-else></span>
+                </div>
+              </div>
+              <tr></tr>
+              <!-- schedule -->
             </div>
           </div>
         </div>
       </div>
+    </Add>
 
-      <!-- Add Modal -->
-      <Add
-        :heading="'Create Booking'"
-        :errors="this.validationErrors"
-        :formID="formID"
-      >
-        <div class="row">
-          <div class="col-md-5 class form-group">
-            <label for="DiscountName"
-              >Schedule Name <span class="text-danger">*</span></label
-            >
-            <select class="form-control" id="route" v-model="addForm.schedule">
-              <option value="0" selected>Select Schedule</option>
-              <option
-                v-for="(schedule, i) in allSchedules"
-                :value="schedule.id"
-                :key="i"
-              >
-                {{ schedule.name }}
-              </option>
-            </select>
-          </div>
+    <!--            DELETE MODAL-->
+    <Delete
+      confirmationMessage="Are You Sure You want To Delete This Booking ???"
+    />
 
-          <div class="col-md-3 class form-group">
-            <label for="date">Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" v-model="addForm.date" />
-          </div>
-          <div class="form-group col-md-2 d-flex align-items-center">
-            <label class="mt-4" for="active">Update Old Data</label>
-            <label class="colorinput mx-3 mt-3">
-              <span
-                ><input
-                  type="checkbox"
-                  class="colorinput-input"
-                  v-model="addForm.oldBookings"
-                  value="1"
-                />
-                <span class="colorinput-color bg-success"></span>
-              </span>
-            </label>
-          </div>
-          <div class="col-md-2">
-            <label>Action</label>
-            <button
-              @click="fetchScheduleData"
-              class="btn btn-block btn-primary"
-            >
-              Get Record
-            </button>
-          </div>
-          <div
-            class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-            v-if="selectedBookedSeats.length"
-          >
-            <a
-              href="#reschedule-modal"
-              class="btn btn-primary mx-1"
-              data-toggle="modal"
-              >Partial Seats</a
-            >
-            <a
-              href="#reschedule-modal"
-              class="btn btn-primary mx-1"
-              data-toggle="modal"
-              >Shifting Seats</a
-            >
-            <a
-              href="#reschedule-modal"
-              class="btn btn-primary mx-1"
-              data-toggle="modal"
-              >Reschedule Seats</a
-            >
-          </div>
-          <h1 v-if="loading">Loading.........</h1>
-
-          <div class="col-md-12 row" v-if="showBookingDiv">
-            <div class="col-md-6">
-              <div class="card p-4">
-                <div class="form-group row">
-                  <label
-                    class="col-md-3 pt-3 font-weight-bold"
-                    for="customer-cnic"
-                    >CNIC <span class="text-danger">*</span>
-                  </label>
-                  <vue-mask
-                    v-on:keyup.enter="getCustomer"
-                    class="form-control col-md-9"
-                    v-model="addForm.customerCNIC"
-                    mask="00000-0000000-0"
-                    :raw="false"
-                    :options="options"
-                  >
-                  </vue-mask>
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="fullName"
-                    >Full Name</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control col-md-9"
-                    id="fullName"
-                    v-model="addForm.customerName"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
-                    >Contact</label
-                  >
-                  <input
-                    type="text"
-                    @keypress="isNumber($event)"
-                    class="form-control col-md-9"
-                    id="contact"
-                    v-model="addForm.contact"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
-                    >Remarks</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control col-md-9"
-                    id="remarks"
-                    v-model="addForm.remarks"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
-                    >Gender</label
-                  >
-                  <div class="col-md-9 pt-3">
-                    <input type="radio" v-model="addForm.gender" value="0" />
-                    <label class="mx-3">Female</label>
-                    <input type="radio" v-model="addForm.gender" value="1" />
-                    <label class="mx-3">Male</label>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="contact"
-                    >Issue Or Book</label
-                  >
-                  <div class="col-md-9 pt-3">
-                    <input type="radio" v-model="addForm.type" value="booked" />
-                    <label class="mx-3">Issue</label>
-                    <input
-                      type="radio"
-                      v-model="addForm.type"
-                      value="advance booking"
-                    />
-                    <label class="mx-3">Book</label>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="seatNo"
-                    >Seat No.</label
-                  >
-                  <input
-                    type="text"
-                    readonly
-                    class="form-control col-md-9"
-                    id="seatNo"
-                    v-model="addForm.selectedSeats"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
-                    >Total Seats</label
-                  >
-                  <input
-                    type="text"
-                    readonly
-                    class="form-control col-md-9"
-                    id="totalNoSeats"
-                    v-model="selectedSeats.length"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="totalFare"
-                    >Total Fare</label
-                  >
-                  <input
-                    type="text"
-                    readonly
-                    class="form-control col-md-9"
-                    id="totalFare"
-                    v-model="addForm.totalFare"
-                  />
-                </div>
-                <div class="form-group row">
-                  <label class="col-md-3 pt-3 font-weight-bold" for="discount"
-                    >Discount ( % )</label
-                  >
-                  <input
-                    type="text"
-                    readonly
-                    class="form-control col-md-9"
-                    id="discount"
-                    v-model="addForm.discount"
-                  />
-                </div>
-
-                <div class="form-group text-right">
-                  <button class="btn btn-primary mx-1" @click="add">
-                    Save
-                  </button>
-                  <button class="btn btn-secondary mx-1">Reset</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="card p-4">
-                <div class="col-md-12 mb-2 d-flex flex-wrap">
-                  <div class="my-2">
-                    <div class="selected circles mr-1 border"></div>
-                    <span class="text-wrap">Selected</span>
-                  </div>
-                  <div class="my-2">
-                    <div class="for-female circles mr-1 border"></div>
-                    <span class="text-wrap">For Female</span>
-                  </div>
-                  <div class="my-2">
-                    <div class="for-male circles mr-1 border"></div>
-                    <span class="text-wrap">For Male</span>
-                  </div>
-                  <div class="my-2">
-                    <div class="not-for-sale circles mr-1 border"></div>
-                    <span class="text-wrap">Not For Sale</span>
-                  </div>
-                  <div class="my-3">
-                    <div class="circles icons-legend mr-1 border">
-                      <i class="fas fa-check"></i>
-                    </div>
-                    <span class="text-wrap">Booked</span>
-                  </div>
-                  <div class="my-3">
-                    <div
-                      class="
-                        fas
-                        fa-check-double
-                        circles
-                        icons-legend
-                        mr-1
-                        border
-                      "
-                    ></div>
-                    <span class="text-wrap">Issued</span>
-                  </div>
-                </div>
-                <div
-                  class="d-flex justify-content-center seat-img p-0 m-0"
-                  v-for="(record, rowIndex) in schedule.selective_bus.seat_map"
-                  :key="rowIndex"
-                >
-                  <div v-for="(col, colIndex) in record" :key="colIndex">
-                    <!-- <div v-if="colIndex==0">
-                                          {{ col }}
-                                        </div> -->
-                    <div
-                      v-if="col.reserved"
-                      class="image-span d-block text-center text-white"
-                      @click="selectSeat(rowIndex, colIndex, col.seatNo)"
-                      :class="getClasses(col)"
-                    >
-                      <!-- data-toggle="modal"
-                                            :data-target="col.type?'#booking-options-popup':''" -->
-                      <small>{{ col.seatNo }}</small>
-                      <br />
-                      <small v-if="col.type">
-                        <i
-                          class="fas"
-                          :class="
-                            col.type == 'booked'
-                              ? 'fa-check-double'
-                              : 'fa-check'
-                          "
-                        ></i>
-                      </small>
-                    </div>
-                    <span v-else></span>
-                  </div>
-                </div>
-                <tr></tr>
-                <!-- schedule -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </Add>
-
-      <!--            DELETE MODAL-->
-      <Delete
-        confirmationMessage="Are You Sure You want To Delete This Booking ???"
-      />
-
-      <PartialSeatPopup
-        :formID="partialSeatFormId"
-        :seats="bookedSeats"
-      />
-      <ReschedulePopup
-        :formID="rescheduleFormId"
-        :seats="bookedSeats"
-      />
-      <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />
-    </div>
+    <PartialSeatPopup :formID="partialSeatFormId" :seats="bookedSeats" />
+    <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" />
+    <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />
   </section>
 </template>
 
@@ -523,7 +435,19 @@ export default {
       this.addForm.contact = resCnic.data.contact;
       this.addForm.customerName = resCnic.data.name;
     },
-<<<<<<< HEAD
+    cnicFormat: function (string) {
+      return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
+    },
+    phoneFormat: function (string) {
+      return string.replace(/(\d{4})(\d{7})/, "$1-$2");
+    },
+    async getCustomer() {
+      const resCnic = await this.callApi("post", "booking/getCNIC", {
+        cnicNumber: this.addForm.customerCNIC,
+      });
+      this.addForm.contact = resCnic.data.contact;
+      this.addForm.customerName = resCnic.data.name;
+    },
     isNumber: function (evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -538,53 +462,12 @@ export default {
       }
     },
     async fetchScheduleData() {
-      
-      this.resetingArrays();
+      this.validationErrors = [];
       if (!this.addForm.schedule)
         return this.errorsArray("Schedule Name is Required", "Schedule");
       if (!this.addForm.date)
         return this.errorsArray("Date is Required", "Date");
       this.validationErrors = [];
-=======
-    async created() {
-        const resTicket = await this.callApi("post", "booking");
-        console.log(resTicket.data);
-        if (resTicket.status == 200) {
-            this.customers = resTicket.data;
-        } else {
-            console.log(resTicket);
-        }
-    },
-
-    methods: {
-        cnicFormat:function(string){
-            return (string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3"));
-        },
-        phoneFormat:function(string){
-            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
-        },
-        async getCustomer() {
-            const resCnic = await this.callApi("post", "booking/getCNIC", {cnicNumber: this.addForm.customerCNIC});
-            this.addForm.contact = resCnic.data.contact;
-            this.addForm.customerName = resCnic.data.name;
-        },
-        isNumber: function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
-        },
-        async fetchScheduleData() {
-            this.validationErrors = [];
-            if (!this.addForm.schedule)
-                return this.errorsArray("Schedule Name is Required", "Schedule");
-            if (!this.addForm.date)
-                return this.errorsArray("Date is Required", "Date");
-            this.validationErrors = [];
->>>>>>> c8d513b7075c49ff7af2c3dcf7d4b99b8eec14dc
 
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
@@ -598,11 +481,8 @@ export default {
       } else {
         console.log(res);
       }
-
     },
     selectSeat(row, col, seatNo) {
-      
-      
       this.validationErrors = [];
       if (
         this.addForm.oldBookings == 1 &&
@@ -611,44 +491,42 @@ export default {
         this.doScroll();
         return this.errorsArray("Please Select Already Booked Seat", "Oops");
       }
-      if ( this.schedule.selective_bus.seat_map[row][col].type && this.selectedSeats.length==0 ) {
-
+      if (
+        this.schedule.selective_bus.seat_map[row][col].type &&
+        this.selectedSeats.length == 0
+      ) {
         let index = this.selectedBookedSeats.indexOf(seatNo);
         if (index != -1) {
-            this.schedule.selective_bus.seat_map[row][col].selected = false;
-            this.selectedBookedSeats.splice(index, 1);
-            this.bookedSeats = this.bookedSeats.filter((seat)=>{
-              if ( seat.seatNo != seatNo ) {
-                return seat;
-              }
-            })  
+          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.selectedBookedSeats.splice(index, 1);
+          this.bookedSeats = this.bookedSeats.filter((seat) => {
+            if (seat.seatNo != seatNo) {
+              return seat;
+            }
+          });
         } else {
-            this.schedule.selective_bus.seat_map[row][col].selected = true;
-            this.selectedBookedSeats.push(seatNo);
-            this.bookedSeats.push(this.schedule.selective_bus.seat_map[row][col])
+          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.selectedBookedSeats.push(seatNo);
+          this.bookedSeats.push(this.schedule.selective_bus.seat_map[row][col]);
         }
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
-
-      }
-      else if ( !this.schedule.selective_bus.seat_map[row][col].type && this.selectedBookedSeats.length==0 ) {
-
+      } else if (
+        !this.schedule.selective_bus.seat_map[row][col].type &&
+        this.selectedBookedSeats.length == 0
+      ) {
         let index = this.selectedSeats.indexOf(seatNo);
         if (index != -1) {
-            this.schedule.selective_bus.seat_map[row][col].selected = false;
-            this.selectedSeats.splice(index, 1);
+          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.selectedSeats.splice(index, 1);
         } else {
-            this.schedule.selective_bus.seat_map[row][col].selected = true;
-            this.selectedSeats.push(seatNo);
+          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.selectedSeats.push(seatNo);
         }
         this.addForm.selectedSeats = this.selectedSeats;
-        
-      }
-      else{
-
+      } else {
         this.fetchScheduleData();
         this.resetingArrays();
         return this.errorsArray("Invalid Seat Combination", "Oops");
-
       }
 
       // setTimeout(() => {
@@ -657,7 +535,6 @@ export default {
       //   },0)
       //   console.log(sum);
       // }, 400);
-      
     },
     getClasses(col) {
       let gender =
@@ -695,8 +572,11 @@ export default {
       this.validationErrors = [];
 
       const res = await this.callApi("post", "booking/store", this.addForm);
-      if (res.status === 201 && res.statusText === "Created") {
+      if ( res.status === 200 ) {
         this.success = "Booking Created Successfully";
+        this.fetchScheduleData();
+        this.resetingArrays();
+        this.addForm={};
         window.scrollTo(0, 0);
       } else {
         if (res.status === 422) {
@@ -725,15 +605,13 @@ export default {
       };
       this.$store.commit("setDeleteObj", deletingObj);
     },
-    resetingArrays(){
-      
+    resetingArrays() {
       this.selectedSeats = [];
       this.selectedBookedSeats = [];
       this.addForm.selectedSeats = [];
       this.addForm.selectedBookedSeats = [];
       this.bookedSeats = [];
-
-    }
+    },
   },
   computed: {
     ...mapGetters(["getDeletingObj"]),

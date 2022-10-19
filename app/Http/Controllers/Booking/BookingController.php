@@ -24,12 +24,12 @@ class BookingController extends Controller
 
     public function index()
     {
-            $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)->get()->groupBy('booking_no');
-            $allBooking = $bookings->map(function($booking){
-                $booking[0]->count=$booking->count();
-                return $booking[0];
-            });
-            return $allBooking;
+        $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)->get()->groupBy('booking_no');
+        $allBooking = $bookings->map(function($booking){
+            $booking[0]->count=$booking->count();
+            return $booking[0];
+        });
+        return $allBooking;
     }
 
     public function store(Request $request)
@@ -53,7 +53,7 @@ class BookingController extends Controller
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([
                 'company_id'=>$schedule->company_id,
-                'bus_class_id'=>$schedule->selected_bus_class_id,
+                // 'bus_class_id'=>$schedule->selected_bus_class_id,
                 'seat_no'=>$seat,
                 'booking_no'=>$bookingNo,
                 'date'=>$request->date,
@@ -71,8 +71,15 @@ class BookingController extends Controller
 
     public function reschedule( Request $request ){
 
-        return $request;
-        Ticket::whereIn( 'id',$request->bookingSeats );
+        $request->bookingSeats = collect($request->bookingSeats);
+        foreach ($request->bookingSeats as $i => $bookedSeat) {
+            Ticket::where( 'id',$bookedSeat['id'] )->update([
+                'date'=>$request->date,
+                'schedule_id'=>$request->schedule,
+                'seat_no'=>$request->selectedSeats[$i],
+            ]);
+        }
+        return response()->json("Seats Rescheduled Successfully",200);
         
     }
     public function deleteBooking(Request $request)

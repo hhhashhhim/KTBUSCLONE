@@ -186,7 +186,8 @@ class ScheduleController extends Controller
     }
     public function selected(Request $request)
     {
-        $tickets = Ticket::where('schedule_id', $request->id)->whereDate('date', $request->date)->get();
+        $tickets = Ticket::where('company_id',$this->company_id)->where('schedule_id', $request->id)
+        ->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id', $request->id)->select('id', 'selected_bus_class_id')
             ->with('selective_bus')->first();
