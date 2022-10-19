@@ -24,7 +24,7 @@ class BookingController extends Controller
 
     public function index()
     {
-        return Booking::orderBy('id')->where('company_id', $this->company_id)->get();
+        return Customer::withCount('tickets')->with('addedBy')->where('company_id', $this->company_id)->get();
     }
 
     public function store(Request $request)
@@ -32,14 +32,14 @@ class BookingController extends Controller
         $schedule = Schedule::where('id',$request->schedule)
         ->select('id','selected_bus_class_id','company_id')->with('selective_bus')
         ->first();
-        $cnic = str_replace('-', '', $request->customerCNIC);
-        $customer = Customer::where('cnic',$cnic)->first();
+        $cnicFormat = str_replace('-', '', $request->customerCNIC);
+        $customer = Customer::where('cnic',$cnicFormat)->first();
         if (!$customer) {
             $customer = Customer::create([
                 'company_id'=>$this->company_id,
                 'added_by'=>Auth::user()->id,
                 'name'=>$request->customerName,
-                'cnic'=>$cnic,
+                'cnic'=>$cnicFormat,
                 'contact'=>$request->contact,
             ]);
         }
@@ -48,7 +48,7 @@ class BookingController extends Controller
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([
                 'company_id'=>$schedule->company_id,
-                'bus_id'=>$schedule->selected_bus_class_id,
+                'bus_class_id'=>$schedule->selected_bus_class_id,
                 'seat_no'=>$seat,
                 'booking_no'=>$bookingNo,
                 'date'=>$request->date,
@@ -64,54 +64,54 @@ class BookingController extends Controller
 
     }
 
-    public function updateBooking(Request $request)
-    {
-        $rules = [
-            'bus_number' => 'required',
-            'fare_class_id' => 'required|integer',
-            'chassis_number' => 'required',
-            'insurance_number' => 'required',
-            'no_of_seats' => 'required',
-            'route_permit_number' => 'required',
-            'no_of_rows' => 'required|integer',
-        ];
-
-        $customMessages = [
-            'bus_number.required' => 'Bus Number is Required!',
-            'fare_class_id.required' => 'Fare Class is Required!',
-            'chassis_number.required' => 'Chassis Number is Required!',
-            'insurance_number.required' => 'Insurance Number is Required!',
-            'no_of_seats.required' => 'Number Of Seats is Required!',
-            'route_permit_number.required' => 'Route Permit is Required!',
-            'no_of_rows.required' => 'No of Rows of Bus  is Required!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Booking::where('id', $request->id)->update([
-            'bus_number' => $request->bus_number,
-            'chassis_number' => $request->chassis_number,
-            'insurance_number' => $request->insurance_number,
-            'no_of_seats' => $request->no_of_seats,
-            'route_permit_number' => $request->route_permit_number,
-            'fare_class_id' => $request->fare_class_id,
-            'seat_map' => $request->seat_map,
-            'no_of_rows' => $request->no_of_rows,
-            'company_id' => $this->company_id,
-            'updated_by' => Auth::user()->id,
-        ]);
-    }
+//    public function updateBooking(Request $request)
+//    {
+//        $rules = [
+//            'bus_number' => 'required',
+//            'fare_class_id' => 'required|integer',
+//            'chassis_number' => 'required',
+//            'insurance_number' => 'required',
+//            'no_of_seats' => 'required',
+//            'route_permit_number' => 'required',
+//            'no_of_rows' => 'required|integer',
+//        ];
+//
+//        $customMessages = [
+//            'bus_number.required' => 'Bus Number is Required!',
+//            'fare_class_id.required' => 'Fare Class is Required!',
+//            'chassis_number.required' => 'Chassis Number is Required!',
+//            'insurance_number.required' => 'Insurance Number is Required!',
+//            'no_of_seats.required' => 'Number Of Seats is Required!',
+//            'route_permit_number.required' => 'Route Permit is Required!',
+//            'no_of_rows.required' => 'No of Rows of Bus  is Required!',
+//        ];
+//        $this->validate($request, $rules, $customMessages);
+//        return Booking::where('id', $request->id)->update([
+//            'bus_number' => $request->bus_number,
+//            'chassis_number' => $request->chassis_number,
+//            'insurance_number' => $request->insurance_number,
+//            'no_of_seats' => $request->no_of_seats,
+//            'route_permit_number' => $request->route_permit_number,
+//            'fare_class_id' => $request->fare_class_id,
+//            'seat_map' => $request->seat_map,
+//            'no_of_rows' => $request->no_of_rows,
+//            'company_id' => $this->company_id,
+//            'updated_by' => Auth::user()->id,
+//        ]);
+//    }
 
     public function deleteBooking(Request $request)
     {
-        return Booking::find($request->id)->delete();
-    }
-    public function getBookingData(Request $request)
-    {
-        return Booking::where('id',$request->id)->where('company_id', $this->company_id)->get();
+        return Ticket::find($request->id)->delete();
     }
 
     public function getCnic(Request  $request)
     {
-        $cnic = str_replace('-', '', $request['cnicNumber']);
-        return Customer::where('company_id', $this->company_id)->where('cnic',  $cnic)->first();
+        $cnicFormat = str_replace('-', '', $request['cnicNumber']);
+        return Customer::where('company_id', $this->company_id)->where('cnic',  $cnicFormat)->first();
+    }
+    public function detailTicket(Request  $request)
+    {
+        return Ticket::with('addedBy', 'company', 'bus_class', 'schedule')->where('company_id', $this->company_id)->where('customer_id', $request['id'])->get();
     }
 }

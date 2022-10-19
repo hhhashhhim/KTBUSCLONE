@@ -217,6 +217,8 @@ export default {
             if (res.status === 200) {
                 this.success = "Fare Table Updated Successfully";
                 this.cities = res.data
+                window.scrollTo(0, 0);
+                this.data = "";
                 setTimeout(() => {
                     this.success = "";
                     // $("#add-modal").modal("hide")

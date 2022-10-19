@@ -1,88 +1,86 @@
 <template>
-  <section class="section">
-    <div class="section-body">
-      <div class="row">
-        <div class="col-12 col-md-12 col-lg-12">
-          <div class="card card-success">
-            <div class="card-header d-flex justify-content-between">
-              <h4>Booking</h4>
-              <div class="card-header-action">
-                <a
-                  href="#"
-                  data-toggle="modal"
-                  :data-target="'#' + formID"
-                  class="btn btn-primary"
-                >
-                  Add Booking
-                </a>
-              </div>
-            </div>
-            <div class="card-body">
-              <!-- Table -->
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-header">
-                      <h4></h4>
-                    </div>
-                    <div class="card-body">
-                      <div class="table-responsive">
-                        <table
-                          class="table table-striped table-hover"
-                          id="edit_dis"
-                        >
-                          <thead>
-                            <tr>
-                              <th>Sr No.</th>
-                              <th>Name</th>
-                              <th>Percentage</th>
-                              <th>Status</th>
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-for="(surcharge, i) in surcharges" :key="i">
-                              <td>{{ i + 1 }}</td>
-                              <td>{{ surcharge.name }}</td>
-                              <td>{{ surcharge.percentage }}%</td>
-                              <td>
-                                {{
-                                  surcharge.is_active === 1
-                                    ? "Active"
-                                    : "InActive"
-                                }}
-                              </td>
-                              <td>
+    <section class="section">
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-12">
+                    <div class="card card-success">
+                        <div class="card-header d-flex justify-content-between">
+                            <h4>Booking</h4>
+                            <div class="card-header-action">
                                 <a
-                                  href="#edit-modal"
-                                  data-toggle="modal"
-                                  @click="edit(surcharge)"
-                                  class="btn btn-primary mx-1"
+                                    href="#"
+                                    data-toggle="modal"
+                                    :data-target="'#' + formID"
+                                    class="btn btn-primary"
                                 >
-                                  <i class="far fa-edit"></i>
+                                    Add Booking
                                 </a>
-                                <a
-                                  href="#delete-modal"
-                                  data-toggle="modal"
-                                  @click="deleteModal(surcharge, i)"
-                                  class="btn btn-danger"
-                                >
-                                  <i class="far fa-trash-alt"></i>
-                                </a>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4></h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table
+                                                    class="table table-striped table-hover"
+                                                    id="edit_dis"
+                                                >
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Sr No.</th>
+                                                        <th>Customer Name</th>
+                                                        <th>CNIC Number</th>
+                                                        <th>Cell Number</th>
+                                                        <th>Ticket Booked By</th>
+                                                        <th>No. of Tickets</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr v-for="(customer, i) in customers" :key="i">
+                                                        <td>{{ i + 1 }}</td>
+                                                        <td>{{ customer.name}}</td>
+                                                        <td>{{ cnicFormat(customer.cnic) }}</td>
+                                                        <td>{{ customer.contact }}</td>
+                                                        <td>{{ customer.added_by.name }}</td>
+                                                        <td>{{ customer.tickets_count }}</td>
+                                                        <td>
+                                                            <a
+                                                                href="#detail-modal"
+                                                                data-toggle="modal"
+                                                                @click="viewDetail(customer)"
+                                                                class="btn btn-primary mx-1"
+                                                            >
+                                                                <i class="far fa-eye"></i>
+                                                            </a>
+                                                            <a
+                                                                href="#delete-modal"
+                                                                data-toggle="modal"
+                                                                @click="deleteModal(customer, i)"
+                                                                class="btn btn-danger"
+                                                            >
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE -->
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
-              <!-- END TABLE -->
             </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Add Modal -->
       <Add
@@ -358,10 +356,10 @@
         </div>
       </Add>
 
-      <!--            Edit MOdel End-->
-      <Delete
-        confirmationMessage="Are You Sure You want To Delete This Surcharge ???"
-      />
+<!--            DELETE MODAL-->
+            <Delete
+                confirmationMessage="Are You Sure You want To Delete This Booking ???"
+            />
 
       <BookingOptionsPopup formID="booking-options-popup" :seatId="seatId" />
     </div>
@@ -377,87 +375,82 @@ import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
 
 export default {
-  name: "SurchargePage",
-  components: {
-    Add,
-    Edit,
-    Delete,
-    BookingOptionsPopup,
-    vueMask,
-  },
-  data() {
-    return {
-      options: {
-        placeholder: "xxxxx-xxxxxxx-x",
-        // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
-      },
-      surcharges: [],
-      isActive: 1,
-      formID: "addBooking",
-      validationErrors: [],
-      success: false,
-      error: false,
-      SurchargeName: "",
-      delId: "",
-      SurchargePercentage: "",
-      allSchedules: [],
-      schedule: "",
-      loading: false,
-      showBookingDiv: false,
-      selectedSeats: [],
-      selectedBookedSeats:[],
-      seatId: 0,
-      addForm: {
-        type: "booked",
-        gender: "1",
-        customerCNIC: "",
-        schedule: 0,
-      },
-      dataEdit: {
-        id: "",
-        name: "",
-        percentage: "",
-        is_Active: "",
-      },
-    };
-  },
-  async created() {
-    const res = await this.callApi("post", "schedule");
-    if (res.status == 200) {
-      this.allSchedules = res.data;
-    } else {
-      console.log(res);
-    }
-  },
+    name: "SurchargePage",
+    components: {
+        Add,
+        Edit,
+        Delete,
+        BookingOptionsPopup,
+        vueMask,
+    },
+    data() {
+        return {
+            options: {
+                placeholder: 'xxxxx-xxxxxxx-x',
+                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
+            customers: [],
+            ticketDetails: [],
+            isActive: 1,
+            formID: "addBooking",
+            validationErrors: [],
+            success: false,
+            error: false,
+            SurchargeName: "",
+            delId: "",
+            SurchargePercentage: "",
+            allSchedules: [],
+            schedule: "",
+            loading: false,
+            showBookingDiv: false,
+            selectedSeats: [],
+            selectedBookedSeats:[],
+            seatId: 0,
+            addForm: {
+                type: "booked",
+                gender: "1",
+                customerCNIC: "",
+                schedule: 0,
+            },
+            dataEdit: {
+                id: "",
+                name: "",
+                percentage: "",
+                is_Active: "",
+            },
+        };
+    },
+    async created() {
+        const res = await this.callApi("post", "schedule");
+        if (res.status == 200) {
+            this.allSchedules = res.data;
+        } else {
+            console.log(res);
+        }
+    },
 
-  methods: {
-    async getCustomer() {
-      const resCnic = await this.callApi("post", "booking/getCNIC", {
-        cnicNumber: this.addForm.customerCNIC,
-      });
-      this.addForm.contact = resCnic.data.contact;
-      this.addForm.customerName = resCnic.data.name;
-    },
-    isNumber: function (evt) {
-      evt = evt ? evt : window.event;
-      var charCode = evt.which ? evt.which : evt.keyCode;
-      if (
-        charCode > 31 &&
-        (charCode < 48 || charCode > 57) &&
-        charCode !== 46
-      ) {
-        evt.preventDefault();
-      } else {
-        return true;
-      }
-    },
-    async fetchScheduleData() {
-      this.validationErrors = [];
-      if (!this.addForm.schedule)
-        return this.errorsArray("Schedule Name is Required", "Schedule");
-      if (!this.addForm.date)
-        return this.errorsArray("Date is Required", "Date");
-      this.validationErrors = [];
+    methods: {
+        async getCustomer() {
+            const resCnic = await this.callApi("post", "booking/getCNIC", {cnicNumber: this.addForm.customerCNIC});
+            this.addForm.contact = resCnic.data.contact;
+            this.addForm.customerName = resCnic.data.name;
+        },
+        isNumber: function (evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
+        async fetchScheduleData() {
+            this.validationErrors = [];
+            if (!this.addForm.schedule)
+                return this.errorsArray("Schedule Name is Required", "Schedule");
+            if (!this.addForm.date)
+                return this.errorsArray("Date is Required", "Date");
+            this.validationErrors = [];
 
       this.loading = true;
       const res = await this.callApi("post", "schedule/selected", {
@@ -481,9 +474,9 @@ export default {
         this.doScroll();
         return this.errorsArray("Please Select Already Booked Seat", "Oops");
       }
-      
 
-      if ( this.schedule.selective_bus.seat_map[row][col].type && this.selectedSeats.length==0 ) {  
+
+      if ( this.schedule.selective_bus.seat_map[row][col].type && this.selectedSeats.length==0 ) {
         let index = this.selectedBookedSeats.indexOf(seatNo);
         if (index != -1) {
             this.schedule.selective_bus.seat_map[row][col].selected = false;
@@ -496,7 +489,7 @@ export default {
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
 
       }
-      else if ( !this.schedule.selective_bus.seat_map[row][col].type && this.selectedBookedSeats.length==0 ) {  
+      else if ( !this.schedule.selective_bus.seat_map[row][col].type && this.selectedBookedSeats.length==0 ) {
 
         let index = this.selectedSeats.indexOf(seatNo);
         if (index != -1) {
@@ -510,7 +503,7 @@ export default {
       }
 
       else{
-        this.fetchScheduleData();        
+        this.fetchScheduleData();
         this.selectedSeats = [];
         this.selectedBookedSeats = [];
         this.addForm.selectedSeats = [];
@@ -519,7 +512,7 @@ export default {
       }
     console.log(this.schedule.selective_bus.seat_map[row][col],this.selectedBookedSeats.length);
 
-      
+
     },
     getClasses(col) {
       let gender =
@@ -556,45 +549,52 @@ export default {
 
       this.validationErrors = [];
 
-      const res = await this.callApi("post", "booking/store", this.addForm);
-      if (res.status === 201 && res.statusText === "Created") {
-        this.success = "Booking Created Successfully";
-        window.scrollTo(0, 0);
-      } else {
-        if (res.status === 422) {
-          for (const key in res.addForm.errors) {
-            res.addForm.errors[key].forEach((element) => {
-              this.errorsArray(element, key);
-            });
-          }
-        }
-      }
+            const res = await this.callApi("post", "booking/store", this.addForm);
+            if (res.status === 201 && res.statusText === "Created") {
+                this.success = "Booking Created Successfully";
+                window.scrollTo(0, 0);
+            } else {
+                if (res.status === 422) {
+                    for (const key in res.addForm.errors) {
+                        res.addForm.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
+        doScroll: function () {
+            $('#addBooking').scrollTop(10);
+        },
+        async viewDetail(customer){
+            const resDetailTicket = await this.callApi("post", "booking/detail", {id: customer.id});
+            this.ticketDetails = resDetailTicket.data;
+
+
+
+        },
+        async deleteModal(surcharge, i) {
+            const deletingObj = {
+                url: "/surcharge/delete",
+                data: surcharge,
+                index: i,
+            };
+            this.$store.commit("setDeleteObj", deletingObj);
+        },
     },
-    doScroll: function () {
-      $("#addBooking").scrollTop(10);
+    computed: {
+        ...mapGetters(["getDeletingObj"]),
     },
-    async deleteModal(surcharge, i) {
-      const deletingObj = {
-        url: "/surcharge/delete",
-        data: surcharge,
-        index: i,
-      };
-      this.$store.commit("setDeleteObj", deletingObj);
+    watch: {
+        getDeletingObj(obj) {
+            if (obj.isDeleted) {
+                this.surcharges.splice(obj.index, 1);
+                setTimeout(function () {
+                    window.location.reload();
+                }, 2000);
+            }
+        },
     },
-  },
-  computed: {
-    ...mapGetters(["getDeletingObj"]),
-  },
-  watch: {
-    getDeletingObj(obj) {
-      if (obj.isDeleted) {
-        this.surcharges.splice(obj.index, 1);
-        setTimeout(function () {
-          window.location.reload();
-        }, 2000);
-      }
-    },
-  },
 };
 </script>
 <style scoped>

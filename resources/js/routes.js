@@ -21,8 +21,8 @@ import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
 import store from './store.js';
 
-const url = '/projects/kt/'
-// const url = '/'
+// const url = '/projects/kt/'
+const url = '/kt/'
 
 const routes = [
     {

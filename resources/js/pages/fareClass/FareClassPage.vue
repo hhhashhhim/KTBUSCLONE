@@ -642,6 +642,8 @@ export default {
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
+                window.scrollTo(0, 0);
+                this.data.FareClassName = "";
                 // await this.getClasses();
 
             } else {

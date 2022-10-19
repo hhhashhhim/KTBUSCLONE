@@ -19,6 +19,7 @@ class CreateTerminalCommissionsTable extends Migration
             $table->decimal('amount',12,2);
             $table->tinyInteger('per_seat')->default(0);
             $table->integer('added_by');
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

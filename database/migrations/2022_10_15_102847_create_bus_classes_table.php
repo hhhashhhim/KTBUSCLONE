@@ -24,7 +24,7 @@ class CreateBusClassesTable extends Migration
             $table->integer('no_of_rows')->nullable();
             $table->integer('no_of_cols')->nullable();
             $table->integer('added_by')->nullable();
-            $table->dateTime('time')->useCurrent();
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });

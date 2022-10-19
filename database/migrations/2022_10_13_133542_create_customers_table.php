@@ -18,10 +18,6 @@ class CreateCustomersTable extends Migration
             $table->string('name');
             $table->string('cnic');
             $table->string('contact');
-            $table->integer('company_id')->nullable();
-            $table->integer('added_by')->nullable();
-            $table->dateTime('time')->useCurrent();
-            $table->softDeletes();
             $table->timestamps();
         });
     }

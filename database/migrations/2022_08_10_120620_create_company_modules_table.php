@@ -18,6 +18,7 @@ class CreateCompanyModulesTable extends Migration
             $table->string('menu_name');
             $table->integer('company_id');
             $table->integer('added_by');
+            $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();
         });
