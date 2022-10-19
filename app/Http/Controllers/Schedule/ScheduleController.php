@@ -195,7 +195,7 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 $result = array_search($column['seatNo'], $ticketSeatNumbers);
                 if ($result !== false) {
-                    $seatMap[$i][$j]['seat_id'] = $tickets[$result]['id'];
+                    $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                 }
