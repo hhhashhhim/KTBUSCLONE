@@ -129,10 +129,8 @@ export default {
     return {
       partialSchedule: 0,
       addForm: {
-        type: "booked",
-        gender: "1",
-        customerCNIC: "",
         schedule: 0,
+        date: "",
       },
       showBookingDiv:false,
       schedule:"",

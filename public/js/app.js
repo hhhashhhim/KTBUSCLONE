@@ -24218,10 +24218,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       partialSchedule: 0,
       addForm: {
-        type: "booked",
-        gender: "1",
-        customerCNIC: "",
-        schedule: 0
+        schedule: 0,
+        date: ""
       },
       showBookingDiv: false,
       schedule: "",
