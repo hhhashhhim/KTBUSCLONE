@@ -136,12 +136,17 @@ class CityController extends Controller
             CityToCity::create([
                 'departure_city_id' => $city->id,
                 'destination_city_id' => $cityTo->id,
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+
             ]);
             // Creating Other Cities Relation with Newly added City
             if ($cityTo->id != $city->id) {
                 CityToCity::create([
                     'departure_city_id' => $cityTo->id,
                     'destination_city_id' => $city->id,
+                    'company_id' => $this->company_id,
+                    'added_by' => Auth::user()->id,
                 ]);
             }
         }

@@ -16,6 +16,7 @@ class CreateTerminalAllowedSeatsAdvanceTable extends Migration
         Schema::create('terminal_allowed_seats_advance', function (Blueprint $table) {
             $table->id();
             $table->integer('terminal_id');
+            $table->integer('company_id')->nullable();
             $table->integer('seats');
             $table->integer('added_by');
             $table->softDeletes();

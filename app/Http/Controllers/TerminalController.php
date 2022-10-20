@@ -60,7 +60,6 @@ class TerminalController extends Controller
             'online_terminal_name' => $request->online_terminal_name ?? " ",
             'status' => $request->active ? 1 : 0,
             'is_main' => $request->is_main ? 1 : 0,
-            'time'=>now(),
             'added_by' => Auth::user()->id,
             'company_id' => Auth::user()->is_super_admin == 0 ? $this->company_id : $request->company_id,
         ]);

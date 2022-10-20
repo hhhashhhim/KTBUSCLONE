@@ -5,7 +5,7 @@
 
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card ">
+                    <div class="card card-primary ">
                         <div class="card-header">
                             <h4>Cities</h4>
                             <div class="card-header-action">
@@ -67,7 +67,7 @@
             :formID="formID"
             >
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name">Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
                 <template v-slot:button>
@@ -83,7 +83,7 @@
             :formID="editFormID"
             >
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name">Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="dataEdit.name">
                 </div>
 
@@ -133,18 +133,20 @@ export default {
         }
     },
     async created(){
-        const resCity = await this.callApi("post",'cities');
-        if (resCity.status==200) {
-            this.cities=resCity.data
-        }
-        else{
-            console.log(res);
-        }
+        this.fetchCities();
     },
     methods:{
+        async fetchCities() {
+            const resCity = await this.callApi("post",'cities');
+            if (resCity.status==200) {
+                this.cities=resCity.data
+            }
+        },
         async add(){
-            this.validationErrors=[]
-            if(this.data.name === "") return this.errorsArray("City Name is Required","Name");
+            // this.validationErrors=[]
+            if(this.data.name === "")
+                // return this.errorsArray("City Name is Required","Name");
+            swal('Required','City Name is Required','error')
             const res = await this.callApi("post",'cities/store',this.data);
             console.log(res.data)
             if (res.status === 200) {
@@ -160,11 +162,13 @@ export default {
             }
             else{
                 if (res.status==422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach(element => {
-                            this.errorsArray(element,key)
-                        });
-                    }
+                    setTimeout(function(){
+                        for (const key in res.data.errors) {
+                            res.data.errors[key].forEach(element => {
+                                this.errorsArray(element,key)
+                            });
+                        }
+                    }, 2000);
                 }
             }
         },
@@ -174,11 +178,14 @@ export default {
         },
         async update(){
             this.validationErrors=[]
-            if(this.dataEdit.name=="") return this.errorsArray("City Name is Required","Name");
+            if(this.dataEdit.name=="")
+                // return this.errorsArray("City Name is Required","Name");
+                swal('Required','City Name is Required','error')
+
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             console.log(resEdit.data);
             if (resEdit.status==200) {
-                this.success="City Updated Successfully Named as" ;
+                this.success="City Updated Successfully " ;
                 // const res = await this.callApi("post",'cities');
                 // if (res.status==200) {
                 //     this.cities = res.data;

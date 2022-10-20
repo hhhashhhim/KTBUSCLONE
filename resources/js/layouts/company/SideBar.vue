@@ -20,14 +20,14 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
+<!--                        <li>-->
 
-                            <a href="/kt/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>
-                                <span>
-                                    Dashboard
-                                </span>
-                            </a>
-                        </li>
+<!--                            <a href="/kt/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>-->
+<!--                                <span>-->
+<!--                                    Dashboard-->
+<!--                                </span>-->
+<!--                            </a>-->
+<!--                        </li>-->
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name:'cities-page' }">
                                 <i class="fas fa-city"></i> Cities

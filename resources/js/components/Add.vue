@@ -17,7 +17,7 @@
                             <span class="sr-only">Close</span>
                         </button>
                         <!-- {{ errors.length }} -->
-                        <ul class="my-0">
+                        <ul class="my-0" style=" list-style-type: none;">
                             <li v-for="(error,i) in errors" :key="i">{{ error.desc }}</li>
                         </ul>
                     </div>

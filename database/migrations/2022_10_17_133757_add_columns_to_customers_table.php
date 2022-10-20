@@ -16,7 +16,7 @@ class AddColumnsToCustomersTable extends Migration
         Schema::table('customers', function (Blueprint $table) {
             $table->integer('company_id')->after('contact')->nullable();
             $table->integer('added_by')->after('company_id')->nullable();
-            $table->dateTime('time')->after('added_by')->useCurrent();
+            $table->timestamp('time')->after('added_by')->useCurrent();
             $table->softDeletes()->after('time');
         });
     }
