@@ -69,7 +69,6 @@ class FareTableController extends Controller
                     ->where('fare_class', $fare_class)
                     ->value('fare');
             }
-            //
             unset($city_from['city_to']);
             return $city_from;
         });

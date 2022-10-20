@@ -43,12 +43,9 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive" v-if="cities">
-                                                <table
-                                                    class="table table-striped table-hover table-bordered"
-                                                    id="edit_loc"
-                                                >
+                                                <table class="table table-striped table-hover table-bordered" >
                                                     <thead>
-                                                    <tr v-if="cities.length === 0">
+                                                    <tr v-if="cities.length == 0">
                                                         <th style="font-size:15px;">{{
                                                                 msg == 1 ? "Class Not Selected......." : "No Cities Found......."
                                                             }}
