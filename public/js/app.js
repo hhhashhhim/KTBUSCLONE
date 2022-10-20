@@ -25276,6 +25276,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
+      validationErrors: [],
       cities: [],
       formID: 'City',
       data: {
@@ -25361,27 +25362,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(res.data);
 
                 if (!(res.status === 200)) {
-                  _context3.next = 16;
+                  _context3.next = 15;
                   break;
                 }
 
-                // this.success="City Created Successfully Named as " + res.data.name;
-                swal('Success', 'City Added Successfully', 'success');
+                _this3.success = "City Created Successfully Named as " + res.data.name; // swal('Success', 'City Added Successfully', 'success');
+
                 _context3.next = 10;
                 return _this3.fetchCities();
 
               case 10:
-                _this3.cities.unshift(res.data);
-
                 _this3.data.name = "";
                 setTimeout(function () {
                   this.success = "";
                 }, 300);
                 setTimeout(function () {}, 2000);
-                _context3.next = 17;
+                _context3.next = 16;
                 break;
 
-              case 16:
+              case 15:
                 if (res.status == 422) {
                   setTimeout(function () {
                     var _this4 = this;
@@ -25398,7 +25397,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 }
 
-              case 17:
+              case 16:
               case "end":
                 return _context3.stop();
             }
@@ -25435,12 +25434,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                // this.success="City Updated Successfully " ;
-                swal('Success', 'City Updated Successfully', 'success'); // const res = await this.callApi("post",'cities');
-                // if (res.status==200) {
-                //     this.cities = res.data;
-                // }
-
+                swal('Success', 'City Updated Successfully', 'success');
                 _context4.next = 10;
                 return _this5.fetchCities();
 

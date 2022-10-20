@@ -32,7 +32,15 @@ class CityController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['name' => ['required', Rule::unique('cities')->where('company_id', $this->company_id)]]);
+        $rules = [
+            'name' => ['required', Rule::unique('cities')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+        ];
+
+        $customMessages = [
+            'name.required' => 'Name Field is Required!',
+            'name.unique' => 'This City Name is Already Exist',
+        ];
+        $this->validate($request, $rules, $customMessages);
         $city = City::create([
             'name' => $request->name,
             'company_id' => $this->company_id,

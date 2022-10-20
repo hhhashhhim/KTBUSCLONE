@@ -116,6 +116,7 @@ export default {
     },
     data(){
         return {
+            validationErrors:[],
             cities:[],
             formID:'City',
             data:{
@@ -151,10 +152,9 @@ export default {
             const res = await this.callApi("post",'cities/store',this.data);
             console.log(res.data)
             if (res.status === 200) {
-                // this.success="City Created Successfully Named as " + res.data.name;
-                swal('Success', 'City Added Successfully', 'success');
+                this.success="City Created Successfully Named as " + res.data.name;
+                // swal('Success', 'City Added Successfully', 'success');
                 await this.fetchCities();
-                this.cities.unshift(res.data);
                 this.data.name = "";
                 setTimeout(function(){
                     this.success = "";
@@ -187,12 +187,7 @@ export default {
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             console.log(resEdit.data);
             if (resEdit.status==200) {
-                // this.success="City Updated Successfully " ;
                 swal('Success', 'City Updated Successfully', 'success');
-                // const res = await this.callApi("post",'cities');
-                // if (res.status==200) {
-                //     this.cities = res.data;
-                // }
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
