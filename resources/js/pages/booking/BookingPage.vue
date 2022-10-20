@@ -126,24 +126,23 @@
           class="col-md-6 d-flex justify-content-center mx-auto mb-3"
           v-if="selectedBookedSeats.length"
         >
-          <a
+          <!-- <a
             href="#reschedule-modal"
             class="btn btn-primary mx-1"
             data-toggle="modal"
             >Partial Seats</a
-          >
+          > -->
           <a
             href="#reschedule-modal"
             class="btn btn-primary mx-1"
             data-toggle="modal"
-            >Shifting Seats</a
+            >Shifting ( Reschedule ) Seats</a
           >
-          <a
+          <!-- <a
             href="#reschedule-modal"
             class="btn btn-primary mx-1"
             data-toggle="modal"
-            >Reschedule Seats</a
-          >
+            ></a> -->
         </div>
         <h1 v-if="loading">Loading.........</h1>
 
