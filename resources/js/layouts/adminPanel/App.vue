@@ -9,7 +9,9 @@
             <CompanySideBar v-if="$store.state.user.is_super_admin == 0" />
             <!-- Main Content -->
             <div class="main-content">
-            <router-view></router-view>
+                <transition  mode="out-in" enter-active-class="loader" leave-active-class="loader" >
+                    <router-view></router-view>
+                </transition>
             </div>
         </div>
         <div v-else>

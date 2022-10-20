@@ -8,10 +8,10 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
-use App\Models\Route\RouteTerminal;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CityController extends Controller
 {
@@ -32,7 +32,7 @@ class CityController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required']);
+        $request->validate(['name' => ['required', Rule::unique('cities')->where('company_id', $this->company_id)]]);
         $city = City::create([
             'name' => $request->name,
             'company_id' => $this->company_id,

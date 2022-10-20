@@ -117,9 +117,7 @@ export default {
     data(){
         return {
             cities:[],
-            formID:'newCity',
-            editFormID:'editCity',
-            deleteFormID:'deleteCity',
+            formID:'City',
             data:{
                 name:"",
             },
@@ -146,7 +144,7 @@ export default {
             }, 50); //Time before execution
         },
         async add(){
-            // this.validationErrors=[]
+            this.validationErrors=[]
             if(this.data.name === "")
                 // return this.errorsArray("City Name is Required","Name");
             swal('Required','City Name is Required','error')
@@ -162,7 +160,6 @@ export default {
                     this.success = "";
                 },300)
                 setTimeout(function(){
-                    $('#'+ this.formID).modal('hide');
                 }, 2000);
             }
             else{

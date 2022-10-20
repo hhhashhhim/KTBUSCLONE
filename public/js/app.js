@@ -25277,9 +25277,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       cities: [],
-      formID: 'newCity',
-      editFormID: 'editCity',
-      deleteFormID: 'deleteCity',
+      formID: 'City',
       data: {
         name: ""
       },
@@ -25352,40 +25350,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                // this.validationErrors=[]
+                _this3.validationErrors = [];
                 if (_this3.data.name === "") // return this.errorsArray("City Name is Required","Name");
                   swal('Required', 'City Name is Required', 'error');
-                _context3.next = 3;
+                _context3.next = 4;
                 return _this3.callApi("post", 'cities/store', _this3.data);
 
-              case 3:
+              case 4:
                 res = _context3.sent;
                 console.log(res.data);
 
                 if (!(res.status === 200)) {
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
                 }
 
                 // this.success="City Created Successfully Named as " + res.data.name;
                 swal('Success', 'City Added Successfully', 'success');
-                _context3.next = 9;
+                _context3.next = 10;
                 return _this3.fetchCities();
 
-              case 9:
+              case 10:
                 _this3.cities.unshift(res.data);
 
                 _this3.data.name = "";
                 setTimeout(function () {
                   this.success = "";
                 }, 300);
-                setTimeout(function () {
-                  $('#' + this.formID).modal('hide');
-                }, 2000);
-                _context3.next = 16;
+                setTimeout(function () {}, 2000);
+                _context3.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 if (res.status == 422) {
                   setTimeout(function () {
                     var _this4 = this;
@@ -25402,7 +25398,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context3.stop();
             }
@@ -30164,7 +30160,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 2
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.$store.state.user.is_super_admin == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_CompanySideBar, {
     key: 3
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Main Content "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_view)])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_view, null, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Main Content "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
+    mode: "out-in",
+    "enter-active-class": "loader",
+    "leave-active-class": "loader"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_view)];
+    }),
+    _: 1
+    /* STABLE */
+
+  })])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_view, null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Login)];
     }),
@@ -35056,7 +35063,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit City Name",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.editFormID
+    formID: _ctx.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -41380,7 +41387,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/kt/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
