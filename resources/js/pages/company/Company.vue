@@ -638,7 +638,7 @@ export default {
         },
         async deleteModal(company, i) {
             const deletingObj = {
-                url: "/company/delete",
+                url: "company/delete",
                 data: company,
                 index: i,
             };

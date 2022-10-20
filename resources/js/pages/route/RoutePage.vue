@@ -366,7 +366,7 @@ export default {
 
         deleteModal(terminal, i) {
             const deletingObj = {
-                url: "/terminal/delete",
+                url: "terminal/delete",
                 data: terminal,
                 index: i,
             };

@@ -218,7 +218,6 @@ export default {
                 this.success = "Fare Table Updated Successfully";
                 this.cities = res.data
                 window.scrollTo(0, 0);
-                this.data = "";
                 setTimeout(() => {
                     this.success = "";
                     // $("#add-modal").modal("hide")
@@ -285,7 +284,7 @@ export default {
 
         deleteModal(terminal, i) {
             const deletingObj = {
-                url: "/terminal/delete",
+                url: "terminal/delete",
                 data: terminal,
                 index: i,
             };

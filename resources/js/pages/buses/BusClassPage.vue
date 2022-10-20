@@ -73,7 +73,7 @@
                                                         </td>
                                                         <td>
                                                             {{
-                                                                busClass.is_active === 1
+                                                                busClass.is_active == 1
                                                                     ? "Active"
                                                                     : "InActive"
                                                             }}
@@ -345,7 +345,7 @@
                         class="colorinput-input"
                         id="editCheckBox"
                         @change="editCheckBox($event)"
-                        v-bind:checked="dataEdit.is_active === 1"
+                        v-bind:checked="dataEdit.is_active == 1"
                     />
                     <span class="colorinput-color bg-success"></span>
                   </span>
@@ -569,7 +569,7 @@ export default {
         };
     },
     async created() {
-        this.fetchBussClasses();
+        await this.fetchBussClasses();
     },
     methods: {
         async fetchBussClasses() {
@@ -607,11 +607,6 @@ export default {
         },
 
         addSeatData: function (col, row) {
-            // if (this.seatModify.type == 0) {
-            //     // return this.errorsArray("Please Select Seat Type", "Seat Type");
-            //     swal('required', 'Please Select Seat Type', 'error');
-            //
-            // }
             if (this.seatModify.class == 0) {
                 swal('required', 'Please Select Seat class', 'error');
             }else {
@@ -652,9 +647,6 @@ export default {
         updateSeatDetail: function (rowId, colId){
 
             console.log(rowId, colId);
-            // if (this.editSeatModify.type == 0) {
-            //     return this.errorsArray("Please Select Seat Type", "Seat Type");
-            // }
             if (this.editSeatModify.class == 0) {
                 swal('required', 'Please Select Seat class', 'error');
             }else {
@@ -704,10 +696,11 @@ export default {
             this.validationErrors = [];
             let vm = this;
             if (vm.data.noOfRows == "")
-                return this.errorsArray("No of Rows Field is Required!", "No Of Rows");
+                swal('Required', 'No of Rows Field is Required!', 'error')
+                // return this.errorsArray("No of Rows Field is Required!", "No Of Rows");
             if (vm.data.noOfCols == "")
-                return this.errorsArray("No of Cols Field is required!", "No Of Cols");
-
+                // return this.errorsArray("No of Cols Field is required!", "No Of Cols");
+                swal('Required', 'No of Cols Field is Required!', 'error')
             if (vm.data.noOfRows <= 15) {
                 if (vm.data.noOfCols <= 7) {
                     let arr,
@@ -729,16 +722,18 @@ export default {
                     this.isShowDiv = true;
                     return (this.data.seatMap = map);
                 } else {
-                    return this.errorsArray(
-                        "No of Cols must be less then or equal to 7",
-                        "No Of Cols"
-                    );
+                    // return this.errorsArray(
+                    //     "No of Cols must be less then or equal to 7",
+                    //     "No Of Cols"
+                    // );
+                    swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
                 }
             } else {
-                return this.errorsArray(
-                    "No of Rows must be less then or equal to 15",
-                    "No Of Rows"
-                );
+                swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
+                // return this.errorsArray(
+                //     "No of Rows must be less then or equal to 15",
+                //     "No Of Rows"
+                // );
             }
         },
         editGenerateMap: function () {
@@ -763,17 +758,17 @@ export default {
         async addFareClass() {
             this.validationErrors = [];
             if (this.data.BusClassName === "")
-                return this.errorsArray("Bus Class Name is Required", "BusClassName");
+            swal('Required', 'Bus Class Name is Required', 'error')
             if (this.data.noOfRows === "0")
-                return this.errorsArray("Row Field is Required", "noOfRows");
+            swal('Required', 'Row Field is Required', 'error')
             if (this.data.noOfCols === "0")
-                return this.errorsArray("Col Field is Required", "noOfCols");
+            swal('Required', 'Col Field is Required', 'error')
 
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // this.success = "Bus Class Added Successfully";
                 swal('Success', 'Bus Class Added Successfully', 'success');
-                this.fetchBussClasses();
+                await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
@@ -791,11 +786,14 @@ export default {
         async updateFareClass() {
             this.validationErrors = [];
             if (this.dataEdit.BusClassName === "")
-                return this.errorsArray("Bus Class Name is Required", "BusClassName");
+                // return this.errorsArray("Bus Class Name is Required", "BusClassName");
+            swal('Required', 'Bus Class Name is Required', 'error')
             if (this.dataEdit.noOfRows === "0")
-                return this.errorsArray("Row Field is Required", "noOfRows");
+                // return this.errorsArray("Row Field is Required", "noOfRows");
+            swal('Required', 'Row Field is Required', 'error')
             if (this.dataEdit.noOfCols === "0")
-                return this.errorsArray("Col Field is Required", "noOfCols");
+                // return this.errorsArray("Col Field is Required", "noOfCols");
+            swal('Required', 'Col Field is Required', 'error')
 
             const res = await this.callApi(
                 "post",
@@ -803,7 +801,7 @@ export default {
                 this.dataEdit
             );
             if (res.status === 200 && res.statusText === "OK") {
-                this.fetchBussClasses();
+                await this.fetchBussClasses();
                 // this.success = "Bus Class Updated Successfully";
                 swal('Success', 'Bus Class Updated Successfully', 'success');
             } else {
@@ -837,6 +835,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.busClasses.splice(obj.index, 1);
+                this.fetchBussClasses();
             }
         },
     },

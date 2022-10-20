@@ -455,21 +455,16 @@ export default {
             this.validationErrors = [];
             if (this.data.name === "")
                 swal('Required', 'Terminal Name is Required', 'error')
-            // return this.errorsArray("Terminal Name is Required", "Name");
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 swal('Required', 'Company is Required', 'error')
-            // return this.errorsArray("Company is Required", "Password");
             if (this.data.city_id === "")
                 swal('Required', 'Terminal City is Required', 'error')
-            // return this.errorsArray("Terminal City is Required", "City");
             if (this.data.contact === "")
                 swal('Required', 'Terminal Contact is Required', 'error')
-            // return this.errorsArray("Terminal Contact is Required", "Contact");
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
                 swal('Success', 'Terminal Created Successfully', 'success');
                 await this.fetchTerminals();
-                // this.success = "Terminal Created Successfully";
                 this.terminals = res.data
                 this.data = {};
                 this.data.city_id = 0;
@@ -506,23 +501,17 @@ export default {
         async update() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                // return this.errorsArray("terminal Name is Required", "Name");
                 swal('Required', 'Terminal Name is Required', 'error')
-            // return this.errorsArray("Terminal Name is Required", "Name");
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 swal('Required', 'Company is Required', 'error')
-            // return this.errorsArray("Company is Required", "Password");
             if (this.dataEdit.city_id === "")
                 swal('Required', 'Terminal City is Required', 'error')
-            // return this.errorsArray("Terminal City is Required", "City");
             if (this.dataEdit.contact === "")
                 swal('Required', 'Terminal Contact is Required', 'error')
-            // return this.errorsArray("Terminal Contact is Required", "Contact");
 
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
                 swal('Success', 'Terminal Updated Successfully', 'success')
-                // this.success = "terminal Updated Successfully";
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
@@ -558,6 +547,7 @@ export default {
             console.log(obj);
             if (obj.isDeleted) {
                 this.terminals.splice(obj.index, 1);
+                this.fetchTerminals();
             }
         },
     },

@@ -103,7 +103,6 @@ class ScheduleController extends Controller
             'surcharge_id' => $req['surcharge_id'],
             'discount_id' => $req['discount_id'],
             'route_city_terminal' => $request->updated_route_city_terminal,
-            'bus_id' => $req['bus_id'],
             'selected_bus_class_id' => $req['selected_bus_class_id'],
             'updated_by' => Auth::user()->id,
         ]);
@@ -182,7 +181,7 @@ class ScheduleController extends Controller
         $routesWithMainSchedule = RouteFare::whereIn('departure_city_id',$scheduleCitiesList->pluck('departure_city_id'))
         ->whereIn('destination_city_id',$scheduleCitiesList->pluck('destination_city_id'))
         ->get();
-        
+
     }
     public function selected(Request $request)
     {

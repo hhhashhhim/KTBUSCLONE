@@ -337,7 +337,7 @@ export default {
     },
     async deleteModal(user, i) {
       const deletingObj = {
-        url: "/user/delete",
+        url: "user/delete",
         data: user,
         index: i,
       };
