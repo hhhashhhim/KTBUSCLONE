@@ -1,6 +1,6 @@
 /node_modules
 /vendor
-/.env
+.env
 .env.backup
 .env.dusk.local
 .phpunit.result.cache
@@ -11,3 +11,4 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+resources/js/routes.js

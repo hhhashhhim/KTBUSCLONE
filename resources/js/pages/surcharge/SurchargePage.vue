@@ -65,7 +65,7 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ surcharge.name }}</td>
                                                         <td>{{ surcharge.percentage }}%</td>
-                                                        <td>{{ surcharge.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                        <td>{{ surcharge.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ surcharge.added_by.name }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
@@ -167,7 +167,7 @@
                             <label class="colorinput mx-3 mt-3">
                             <span>
                                <input type="checkbox" class="colorinput-input" id="editCheckBox"
-                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active == 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -325,7 +325,7 @@ export default {
 
         async deleteModal(surcharge, i) {
             const deletingObj = {
-                url: "/surcharge/delete",
+                url: "surcharge/delete",
                 data: surcharge,
                 index: i,
             }

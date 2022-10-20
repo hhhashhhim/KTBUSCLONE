@@ -63,7 +63,7 @@
                                                     <tr v-for="(fareClass, i) in fareClasses" :key="i">
                                                         <td>{{ i+1 }}</td>
                                                         <td>{{ fareClass.name }}</td>
-                                                        <td>{{ fareClass.is_active === 1 ? 'Active' : 'InActive' }}</td>
+                                                        <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
                                                             <a href="#edit-modal" data-toggle="modal"
@@ -295,7 +295,7 @@
                             <label class="colorinput mx-3 mt-3">
                             <span>
                                <input type="checkbox"  class="colorinput-input" id="editCheckBox"
-                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active === 1"/>
+                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active == 1"/>
                                 <span class="colorinput-color bg-success"></span>
                             </span>
                             </label>
@@ -485,15 +485,16 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", 'fare-class');
-        if (res.status === 200) {
-            this.fareClasses = res.data
-        } else {
-            console.log(res);
-        }
+        await this.fetchFareClasses();
+
     },
     methods: {
-
+        async fetchFareClasses(){
+            const res = await this.callApi("post", 'fare-class');
+            if (res.status === 200) {
+                this.fareClasses = res.data
+            }
+        },
         // isNumber: function (evt) {
         //     evt = (evt) ? evt : window.event;
         //     var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -665,6 +666,7 @@ export default {
 
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
+                this.fetchFareClasses();
                 this.success = "Fare Class Updated Successfully";
 
             } else {

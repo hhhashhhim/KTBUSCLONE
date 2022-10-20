@@ -52,14 +52,14 @@
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
-<!--                                                            <a-->
-<!--                                                                href="#view-modal"-->
-<!--                                                                data-toggle="modal"-->
-<!--                                                                @click="viewBus(bus)"-->
-<!--                                                                class="btn btn-info mx-1"-->
-<!--                                                            >-->
-<!--                                                                <i class="far fa-eye"></i>-->
-<!--                                                            </a>-->
+                                                            <!--                                                            <a-->
+                                                            <!--                                                                href="#view-modal"-->
+                                                            <!--                                                                data-toggle="modal"-->
+                                                            <!--                                                                @click="viewBus(bus)"-->
+                                                            <!--                                                                class="btn btn-info mx-1"-->
+                                                            <!--                                                            >-->
+                                                            <!--                                                                <i class="far fa-eye"></i>-->
+                                                            <!--                                                            </a>-->
                                                             <a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
@@ -159,127 +159,121 @@
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Add Bus</h4>
-                                    <button
-                                        type="button"
-                                        class="close"
-                                        data-dismiss="modal"
-                                        aria-label="Close"
-                                        @click="close"
-                                    >
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div
-                                        class="alert alert-danger alert-dismissible fade show"
-                                        role="alert"
-                                        v-if="this.validationErrors.length"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"
+                            <h4 class="modal-title">Add Bus</h4>
+                            <button
+                                type="button"
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"
+                                @click="close"
+                            >
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <div
+                                class="alert alert-danger alert-dismissible fade show"
+                                role="alert"
+                                v-if="this.validationErrors.length"
+                            >
+                                <button
+                                    type="button"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                <!-- {{ this.validationErrors.length }} -->
+                                <ul>
+                                    <li v-for="(error, i) in this.validationErrors" :key="i">
+                                        {{ error.desc }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div
+                                class="alert alert-success alert-dismissible fade show"
+                                role="alert"
+                                v-if="success"
+                            >
+                                <button
+                                    type="button"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
+                                {{ success }}
+                            </div>
+                            <slot></slot>
+                            <div class="row">
+                                <div class=" form-group col-md-12">
+                                    <label for="city_id">Bus Class</label>
+                                    <select class="form-control" v-model="data.fare_class">
+                                        <option value="">Select Bus Class</option>
+                                        <option
+                                            v-for="(fareClass, i) in fareClasses"
+                                            :key="i"
+                                            :value="fareClass.id"
                                         >
-                                            <span aria-hidden="true">&times;</span>
-                                            <span class="sr-only">Close</span>
-                                        </button>
-                                        <!-- {{ this.validationErrors.length }} -->
-                                        <ul>
-                                            <li v-for="(error, i) in this.validationErrors" :key="i">
-                                                {{ error.desc }}
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div
-                                        class="alert alert-success alert-dismissible fade show"
-                                        role="alert"
-                                        v-if="success"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"
-                                        >
-                                            <span aria-hidden="true">&times;</span>
-                                            <span class="sr-only">Close</span>
-                                        </button>
-                                        {{ success }}
-                                    </div>
-                                    <slot></slot>
-                                    <div class="row">
-                                        <div class=" form-group col-md-12">
-                                            <label for="city_id">Fare Classes</label>
-                                            <select class="form-control" v-model="data.fare_class">
-                                                <option value="">Select Fare Class</option>
-                                                <option
-                                                    v-for="(fareClass, i) in fareClasses"
-                                                    :key="i"
-                                                    :value="fareClass.id"
-                                                >
-                                                    {{ fareClass.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Bus Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Bus Name"
-                                                v-model="data.busNumber"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Chassis Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Chasis Number"
-                                                v-model="data.chassisNumber"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Insurance Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Insurance Number"
-                                                v-model="data.insuranceNumber"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">No. of Seats</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter No. of Seats"
-                                                v-model="data.noOfSeats"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="name">Route Permit Number</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                placeholder="Enter Route Permit Number"
-                                                v-model="data.routePermit"
-                                                @keypress="isNumber($event)"
-                                            />
-                                        </div>
-                                    </div>
+                                            {{ fareClass.name }}
+                                        </option>
+                                    </select>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Bus Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Bus Name"
+                                        v-model="data.busNumber"
+                                    />
                                 </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Chassis Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Chasis Number"
+                                        v-model="data.chassisNumber"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Insurance Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Insurance Number"
+                                        v-model="data.insuranceNumber"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">No. of Seats</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter No. of Seats"
+                                        v-model="data.noOfSeats"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="name">Route Permit Number</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Route Permit Number"
+                                        v-model="data.routePermit"
+                                        @keypress="isNumber($event)"
+                                    />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -496,22 +490,25 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", "buses");
-        if (res.status === 200) {
-            this.buses = res.data;
-        } else {
-            console.log(res);
-        }
-
-        const resFareClass = await this.callApi("post", "bus_classes");
-        if (resFareClass.status === 200) {
-            this.fareClasses = resFareClass.data;
-        } else {
-            console.log(res);
-        }
+        await this.fetchBuses();
     },
 
     methods: {
+        async fetchBuses(){
+            const res = await this.callApi("post", "buses");
+            if (res.status === 200) {
+                this.buses = res.data;
+            } else {
+                console.log(res);
+            }
+
+            const resFareClass = await this.callApi("post", "bus_classes");
+            if (resFareClass.status === 200) {
+                this.fareClasses = resFareClass.data;
+            } else {
+                console.log(res);
+            }
+        },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -530,25 +527,27 @@ export default {
         async addBuses() {
             this.validationErrors = [];
             if (this.data.noOfSeats === "")
-                return this.errorsArray("No. Of Seats is Required", "noOfSeats");
+                                swal('Required', 'No. Of Seats is Required', 'error');
             if (this.data.busNumber === "")
-                return this.errorsArray("Bus Number is Required", "busNumber");
+                                swal('Required', 'Bus Number is Required', 'error');
             if (this.data.chassisNumber === "")
-                return this.errorsArray("Chassis Number is Required", "chassisNumber");
+                                swal('Required', 'Chassis Number is Required', 'error');
             if (this.data.insuranceNumber === "")
-                return this.errorsArray("Insurance Number is Required", "insuranceNumber");
+                                swal('Required', 'Insurance Number is Required', 'error');
             if (this.data.routePermit === "")
-                return this.errorsArray("Route Permit is Required", "routePermit");
+                                swal('Required', 'Route Permit is Required', 'error');
 
 
             if (this.data.fare_class === "")
                 return this.errorsArray("PLease Select Fare Class", "fare_class");
             const res = await this.callApi("post", "buses/store", this.data);
-            console.log(res);
             if (res.status === 201) {
-                this.success = "Bus Created Successfully";
+                // this.success = "Bus Created Successfully";
+                swal('Success', 'Bus Created Successfully', 'success');
+
                 window.scrollTo(0, 0);
                 this.data = "";
+                await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
                     this.isShowDiv = false;
@@ -573,15 +572,12 @@ export default {
         async updateBus() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                return this.errorsArray("City Name is Required", "Name");
+                return this.errorsArray("Bus Name is Required", "Name");
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
-                this.success = "Bus Record Updated Successfully";
-                const res = await this.callApi("post", "buses");
-                if (res.status === 200) {
-                    this.buses = res.data;
-
-                }
+                // this.success = "Bus Record Updated Successfully";
+                swal('Success', 'Bus Record Updated Successfully', 'success');
+                await this.fetchBuses();
                 setTimeout(() => {
                     this.success = "";
                     // window.location.reload();
@@ -598,7 +594,7 @@ export default {
         },
         async deleteBus(busVal, i) {
             const deletingObj = {
-                url: "/buses/delete",
+                url: "buses/delete",
                 data: busVal,
                 index: i,
             };
@@ -615,6 +611,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.buses.splice(obj.index, 1);
+                this.fetchBuses();
             }
         },
     },

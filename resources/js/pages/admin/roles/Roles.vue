@@ -193,7 +193,7 @@ export default {
         },
         async deleteModal( role,i ){
             const deletingObj = {
-                url:"/role/delete",
+                url:"role/delete",
                 data:role,
                 index:i,
             }

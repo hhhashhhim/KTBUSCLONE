@@ -76,13 +76,21 @@ class TerminalController extends Controller
             'name' => 'required',
             'contact' => 'required',
         ]);
-
         $contact_format = str_replace('-', '', $request->contact);
-
-        $user = Terminal::find($request->id)->update([
+        Terminal::find($request->id)->update([
             'name' => $request->name,
             'contact' => $contact_format,
-            'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
+            'address' => $request->address,
+            'longitude' => $request->longitude,
+            'latitude' => $request->latitude,
+            'time_difference' => $request->time_difference,
+            'advance_booking' => $request->advance_booking,
+            'available_seats' => $request->available_seats,
+            'city_id' => $request->city_id,
+            'online_terminal_name' => $request->online_terminal_name,
+            'is_main' => (int) $request->is_main ,
+            'active_sms' => $request->active_sms ? 1 : 0,
+            'status' => (int) $request->status,
         ]);
         return response()->json([
             'message' => 'Updated Successfully',
