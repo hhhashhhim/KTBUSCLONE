@@ -504,7 +504,7 @@ export default {
         };
     },
     async created() {
-        this.fetchCompany();
+        await this.fetchCompany();
     },
     methods: {
         async fetchCompany() {

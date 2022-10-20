@@ -1,78 +1,64 @@
 <template>
-  <section class="section">
-    <div class="section-body">
-      <div class="row">
-        <div class="col-12 col-md-12 col-lg-12">
-          <div class="card">
-            <div class="card-header">
-              <h4>Terminals</h4>
-              <div class="card-header-action">
-                <a
-                  href="#add-modal"
-                  data-toggle="modal"
-                  :data-target="'#' + formID"
-                  class="btn btn-primary"
-                >
-                  Add New Terminal
-                </a>
-              </div>
-            </div>
-            <div class="card-body">
-              <!-- Table -->
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-header">
-                      <h4></h4>
-                    </div>
-                    <div class="card-body">
-                      <div class="table-responsive">
-                        <table
-                          class="
-                            table table-striped table-hover
-                            dataTable
-                            no-footer
-                          "
-                          id="edit_loc"
-                        >
-                          <thead>
-                            <tr>
-                              <th>Sr No.</th>
-                              <th>City Name</th>
-                              <th>No.of Terminals</th>
-                              <th>Added By</th>
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr v-for="(terminal, i) in terminals" :key="i">
-                              <td>{{ i + 1 }}</td>
-                              <td>{{ terminal.name }}</td>
-                              <td>{{ terminal.terminal_count }}</td>
-                              <td>{{ terminal.added_by.name }}</td>
-                              <td>
+    <section class="section">
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h4>Terminals</h4>
+                            <div class="card-header-action">
                                 <a
-                                  href="#detail-modal"
-                                  data-toggle="modal"
-                                  @click="terminalDetail(terminal.id)"
-                                  class="btn btn-info mx-2"
+                                    href="#add-modal"
+                                    data-toggle="modal"
+                                    :data-target="'#' + formID"
+                                    class="btn btn-primary"
                                 >
-                                  <i class="far fa-eye"></i>
+                                    Add New Terminal
                                 </a>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover" id="terminal_table"
+                                        >
+                                            <thead>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>City Name</th>
+                                                <th>No.of Terminals</th>
+                                                <th>Added By</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="(terminal, i) in terminals" :key="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td>{{ terminal.name }}</td>
+                                                <td>{{ terminal.terminal_count }}</td>
+                                                <td>{{ terminal.added_by.name }}</td>
+                                                <td>
+                                                    <a
+                                                        href="#detail-modal"
+                                                        data-toggle="modal"
+                                                        @click="terminalDetail(terminal.id)"
+                                                        class="btn btn-info mx-2"
+                                                    >
+                                                        <i class="far fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
-              <!-- END TABLE -->
             </div>
-          </div>
-        </div>
-      </div>
 
             <!-- Add Modal -->
             <Add
@@ -85,7 +71,7 @@
                     <div class="form-group col-md-4">
                         <label for="city_id">Terminal City <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="data.city_id">
-                            <option value="">Select City</option>
+                            <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
@@ -106,8 +92,6 @@
                             :raw="false"
                             :options="optionsContact">
                         </vue-mask>
-<!--                        <input type="text" class="form-control" maxlength="11" v-model="data.contact"-->
-<!--                               @keypress="isNumber($event)">-->
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -115,8 +99,6 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <!--                        <input type="text" class="form-control" id="time_diff" v-model="data.time_difference">-->
-                        <!--                        <input type="text" id="timePicker" class="form-control" v-model="data.time_difference">-->
                         <vue-mask
                             class="form-control"
                             v-model="data.time_difference"
@@ -127,7 +109,8 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
-                        <input type="number" class="form-control" v-model="data.advance_booking">
+                        <input type="text" class="form-control" @keypress="isNumber($event)"
+                               v-model="data.advance_booking">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="longitude">Longitude</label>
@@ -152,41 +135,41 @@
             />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-          <div class="form-group col-md-2 d-flex align-items-center">
-            <label class="mt-4" for="sms">SMS</label>
-            <label class="colorinput mx-3 mt-3">
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">SMS</label>
+                        <label class="colorinput mx-3 mt-3">
               <span>
                 <input
-                  type="checkbox"
-                  class="colorinput-input"
-                  v-model="data.active_sms"
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="data.active_sms"
                 />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-          <div class="form-group col-md-2 d-flex align-items-center">
-            <label class="mt-4" for="sms">Main Terminal</label>
-            <label class="colorinput mx-3 mt-3">
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">Main Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
               <span>
                 <input
-                  type="checkbox"
-                  class="colorinput-input"
-                  v-model="data.is_main"
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="data.is_main"
                 />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-        </div>
-        <template v-slot:button>
-          <button type="button" class="btn btn-primary" @click="add">
-            Add New Terminal
-          </button>
-        </template>
-      </Add>
+                        </label>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="add">
+                        Add New Terminal
+                    </button>
+                </template>
+            </Add>
 
             <!-- Edit Modal -->
             <Edit
@@ -200,7 +183,7 @@
                     <div class="form-group col-md-4">
                         <label for="city_id">Terminal City <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="dataEdit.city_id">
-                            <option value="">Select City</option>
+                            <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
@@ -221,8 +204,8 @@
                             :raw="false"
                             :options="optionsContact">
                         </vue-mask>
-<!--                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"-->
-<!--                               @keypress="isNumber($event)">-->
+                        <!--                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"-->
+                        <!--                               @keypress="isNumber($event)">-->
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -240,7 +223,8 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
-                        <input type="number" class="form-control" v-model="dataEdit.advance_booking">
+                        <input type="text" class="form-control" @keypress="isNumber($event)"
+                               v-model="dataEdit.advance_booking">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="longitude">Longitude</label>
@@ -265,43 +249,43 @@
             />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-          <div class="form-group col-md-2 d-flex align-items-center">
-            <label class="mt-4" for="sms">SMS</label>
-            <label class="colorinput mx-3 mt-3">
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">SMS</label>
+                        <label class="colorinput mx-3 mt-3">
               <span>
                 <input
-                  type="checkbox"
-                  class="colorinput-input"
-                  v-model="dataEdit.active_sms"
-                  v-bind:checked="dataEdit.active_sms === 1"
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="dataEdit.active_sms"
+                    v-bind:checked="dataEdit.active_sms === 1"
                 />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-          <div class="form-group col-md-2 d-flex align-items-center">
-            <label class="mt-4" for="sms">Main Terminal</label>
-            <label class="colorinput mx-3 mt-3">
+                        </label>
+                    </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">Main Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
               <span>
                 <input
-                  type="checkbox"
-                  class="colorinput-input"
-                  v-model="dataEdit.is_main"
-                  v-bind:checked="dataEdit.is_main === 1"
+                    type="checkbox"
+                    class="colorinput-input"
+                    v-model="dataEdit.is_main"
+                    v-bind:checked="dataEdit.is_main === 1"
                 />
                 <span class="colorinput-color bg-success"></span>
               </span>
-            </label>
-          </div>
-        </div>
-        <template v-slot:button>
-          <button type="button" class="btn btn-primary" @click="update">
-            Update Terminal
-          </button>
-        </template>
-      </Edit>
+                        </label>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="update">
+                        Update Terminal
+                    </button>
+                </template>
+            </Edit>
 
             <!--View Details Model-->
             <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
@@ -319,56 +303,47 @@
                                 <!-- Table -->
                                 <div class="row">
                                     <div class="col-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="table-responsive">
-                                                    <table
-                                                        class="table table-striped table-hover dataTable no-footer"
-                                                        id="show_terminal"
+                                        <table class="table table-striped table-hover" id="show_terminal">
+                                            <thead>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Terminal Name</th>
+                                                <th>Address</th>
+                                                <th>Contact Number</th>
+                                                <th>Added By</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="(single, i) in terminalsDetails" :key="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td v-if="single.name">{{ single.name }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.address">{{ single.address }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.contact"> {{ phoneFormat(single.contact) }} </td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.added_by">{{ single.added_by.name }}</td>
+                                                <td v-else>N/A</td>
+                                                <td><a
+                                                    href="#edit-modal"
+                                                    data-toggle="modal"
+                                                    @click="editTerminal(single)"
+                                                    class="btn btn-warning mx-2"
+                                                >
+                                                    <i class="far fa-edit"></i>
+                                                </a>
+                                                    <a
+                                                        href="#delete-modal"
+                                                        data-toggle="modal"
+                                                        @click="deleteModal(single, i)"
+                                                        class="btn btn-danger"
                                                     >
-                                                        <thead>
-                                                        <tr>
-                                                            <th>Sr No.</th>
-                                                            <th>Terminal Name</th>
-                                                            <th>Address</th>
-                                                            <th>Contact Number</th>
-                                                            <th>Added By</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <tr v-for="(single, i) in terminalsDetails" :key="i">
-                                                            <td>{{ i + 1 }}</td>
-                                                            <td v-if="single.name">{{ single.name }}</td>
-                                                            <td v-else>N/A</td>
-                                                            <td v-if="single.address">{{ single.address }}</td>
-                                                            <td v-else>N/A</td>
-                                                            <td v-if="single.contact">{{phoneFormat(single.contact) }}</td>
-                                                            <td v-else>N/A</td>
-                                                            <td v-if="single.added_by">{{ single.added_by.name }}</td>
-                                                            <td v-else>N/A</td>
-                                                            <td><a
-                                                                href="#edit-modal"
-                                                                data-toggle="modal"
-                                                                @click="editTerminal(single)"
-                                                                class="btn btn-warning mx-2"
-                                                            >
-                                                                <i class="far fa-edit"></i>
-                                                            </a>
-                                                                <a
-                                                                    href="#delete-modal"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(single, i)"
-                                                                    class="btn btn-danger"
-                                                                >
-                                                                    <i class="far fa-trash-alt"></i>
-                                                                </a></td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </a></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                                 <!-- END TABLE -->
@@ -394,7 +369,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import vueMask from "vue-jquery-mask";
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     name: "Terminal",
@@ -431,7 +406,7 @@ export default {
                 advance_booking: "",
                 longitude: "",
                 latitude: "",
-                city_id: "",
+                city_id: 0,
                 online_terminal_name: "",
                 active: "",
                 inactive: "",
@@ -443,18 +418,20 @@ export default {
     },
 
     async created() {
-        const terminalRes = await this.callApi("post", "terminals");
-        const compRes = await this.callApi("post", "company");
-        const cities = await this.callApi("post", "cities");
-        this.terminals = terminalRes.data;
-        this.companies = compRes.data;
-        this.cities = cities.data;
-        setTimeout(() => {
-            $("#edit_loc").DataTable();
-        }, 500);
-
+        await this.fetchTerminals();
     },
     methods: {
+        async fetchTerminals() {
+            const terminalRes = await this.callApi("post", "terminals");
+            const compRes = await this.callApi("post", "company");
+            const cities = await this.callApi("post", "cities");
+            this.terminals = terminalRes.data;
+            this.companies = compRes.data;
+            this.cities = cities.data;
+            setTimeout(() => {
+                $("#terminal_table").DataTable();
+            }, 50);
+        },
 
         phoneFormat: function phoneFormat(string) {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
@@ -477,22 +454,31 @@ export default {
         async add() {
             this.validationErrors = [];
             if (this.data.name === "")
-                return this.errorsArray("Terminal Name is Required", "Name");
+                swal('Required', 'Terminal Name is Required', 'error')
+            // return this.errorsArray("Terminal Name is Required", "Name");
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
-                return this.errorsArray("Company is Required", "Password");
+                swal('Required', 'Company is Required', 'error')
+            // return this.errorsArray("Company is Required", "Password");
             if (this.data.city_id === "")
-                return this.errorsArray("Terminal City is Required", "City");
+                swal('Required', 'Terminal City is Required', 'error')
+            // return this.errorsArray("Terminal City is Required", "City");
             if (this.data.contact === "")
-                return this.errorsArray("Terminal Contact is Required", "Contact");
+                swal('Required', 'Terminal Contact is Required', 'error')
+            // return this.errorsArray("Terminal Contact is Required", "Contact");
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
-                this.success = "Terminal Created Successfully";
+                swal('Success', 'Terminal Created Successfully', 'success');
+                await this.fetchTerminals();
+                // this.success = "Terminal Created Successfully";
                 this.terminals = res.data
-                this.data = "";
+                this.data = {};
+                this.data.city_id = 0;
+
                 setTimeout(() => {
                     this.success = "";
-                    $("#add-modal").modal("hide")
-                    // window.location.reload();
+                    $("#add-modal").modal("hide");
+                    empty(this.errorsArray);
+                    // window.location.reload(
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -508,7 +494,6 @@ export default {
             }
         },
         async editTerminal(single) {
-            console.log(single);
             this.dataEdit = single;
         },
         async terminalDetail(id) {
@@ -516,20 +501,30 @@ export default {
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
-            }, 500);
+            }, 50);
         },
         async update() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                return this.errorsArray("terminal Name is Required", "Name");
+                // return this.errorsArray("terminal Name is Required", "Name");
+                swal('Required', 'Terminal Name is Required', 'error')
+            // return this.errorsArray("Terminal Name is Required", "Name");
+            if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
+                swal('Required', 'Company is Required', 'error')
+            // return this.errorsArray("Company is Required", "Password");
+            if (this.dataEdit.city_id === "")
+                swal('Required', 'Terminal City is Required', 'error')
+            // return this.errorsArray("Terminal City is Required", "City");
+            if (this.dataEdit.contact === "")
+                swal('Required', 'Terminal Contact is Required', 'error')
+            // return this.errorsArray("Terminal Contact is Required", "Contact");
+
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
-                this.success = "terminal Updated Successfully";
-                this.dataEdit = "";
-                const terminalRes = await this.callApi("post", "terminals", {});
-                this.terminals = terminalRes.data;
+                swal('Success', 'Terminal Updated Successfully', 'success')
+                // this.success = "terminal Updated Successfully";
+                await this.fetchTerminals();
                 setTimeout(() => {
-                    this.success = "";
                     $("#edit-modal").modal("hide");
                     // window.location.reload();
                 }, 3000);

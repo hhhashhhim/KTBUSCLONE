@@ -23,7 +23,7 @@
 
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" id="edit_loc">
+                                                <table class="table table-striped table-hover" id="city_table">
                                                     <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
@@ -133,7 +133,7 @@ export default {
         }
     },
     async created(){
-        this.fetchCities();
+        await this.fetchCities();
     },
     methods:{
         async fetchCities() {
@@ -141,6 +141,9 @@ export default {
             if (resCity.status==200) {
                 this.cities=resCity.data
             }
+            setTimeout(function(){
+                $("#city_table").DataTable();
+            }, 50); //Time before execution
         },
         async add(){
             // this.validationErrors=[]
