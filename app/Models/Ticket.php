@@ -15,7 +15,7 @@ class Ticket extends Model
 
     public function addedBy()
     {
-        return $this->hasOne(User::class, 'id', 'added_by');
+        return $this->hasOne( User::class, 'id', 'added_by');
     }
 
     public function updated_by()

@@ -29,32 +29,28 @@
                       <div class="table-responsive">
                         <table
                           class="table table-striped table-hover"
-                          id="edit_dis"
+                          id="booking-table"
                         >
                           <thead>
                             <tr>
                               <th>Sr No.</th>
-                              <th>Customer Name</th>
-                              <th>CNIC Number</th>
-                              <th>Cell Number</th>
-                              <th>Ticket Booked By</th>
-                              <th>No. of Tickets</th>
+                              <th>Date</th>
+                              <th>Schedule Name</th>
+                              <th>No. Of Bookings</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(customer, i) in customers" :key="i">
-                              <td>{{ i + 1 }}</td>
-                              <td>{{ customer.name }}</td>
-                              <td>{{ cnicFormat(customer.cnic) }}</td>
-                              <td>{{ customer.contact }}</td>
-                              <td>{{ customer.added_by.name }}</td>
-                              <td>{{ customer.tickets_count }}</td>
+                            <tr v-for="(booking, i) in allBookings" :key="i">
+                              <td>{{ parseInt(i)+1 }}</td>
+                              <td>{{ booking.date }}</td>
+                              <td>{{ booking.schedule.name }}</td>
+                              <td>{{ booking.count }}</td>
                               <td>
                                 <a
-                                  href="#detail-modal"
+                                  :href="'#'+detailsFormId"
                                   data-toggle="modal"
-                                  @click="viewDetail(customer)"
+                                  @click="details(booking.date,booking.schedule.id)"
                                   class="btn btn-primary mx-1"
                                 >
                                   <i class="far fa-eye"></i>
@@ -79,6 +75,7 @@
     <Add
       :heading="'Create Booking'"
       :errors="this.validationErrors"
+      :success="success"
       :formID="formID"
     >
       <div class="row">
@@ -332,7 +329,7 @@
                                             :data-target="col.type?'#booking-options-popup':''" -->
                     <small>{{ col.seatNo }}</small>
                     <br />
-                    <small v-if="col.type">
+                    <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                       <i
                         class="fas"
                         :class="
@@ -360,6 +357,7 @@
     <PartialSeatPopup :formID="partialSeatFormId" :seats="bookedSeats" />
     <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" />
     <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />
+    <DetailsModal :formID="detailsFormId" :details="bookingDetails" />
   </section>
 </template>
 
@@ -371,6 +369,7 @@ import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
 import ReschedulePopup from "./popup/ReschedulePopup.vue";
+import DetailsModal from "./popup/DetailsModal.vue";
 
 export default {
   name: "SurchargePage",
@@ -380,6 +379,7 @@ export default {
     Delete,
     PartialSeatPopup,
     ReschedulePopup,
+    DetailsModal,
     vueMask,
   },
   data() {
@@ -391,16 +391,14 @@ export default {
       rescheduleFormId: "reschedule-modal",
       shiftingFormId: "shifting-modal",
       partialSeatFormId: "partialSeat-modal",
+      detailsFormId:"details-modal",
       customers: [],
-      ticketDetails: [],
       isActive: 1,
       formID: "addBooking",
       validationErrors: [],
       success: false,
       error: false,
-      SurchargeName: "",
       delId: "",
-      SurchargePercentage: "",
       allSchedules: [],
       schedule: "",
       loading: false,
@@ -408,7 +406,8 @@ export default {
       selectedSeats: [],
       selectedBookedSeats: [],
       bookedSeats: [],
-      seatId: 0,
+      allBookings:[],
+      bookingDetails:[],
       addForm: {
         type: "booked",
         gender: "1",
@@ -419,8 +418,14 @@ export default {
   },
   async created() {
     const res = await this.callApi("post", "schedule");
-    if (res.status == 200) {
+    const resBooking = await this.callApi("post", "booking");
+    
+    if (res.status == 200 && resBooking.status == 200 ) {
       this.allSchedules = res.data;
+      this.allBookings = resBooking.data
+      setTimeout(() => {
+        $("#booking-table").dataTable();
+      }, 300);
     } else {
       console.log(res);
     }
@@ -590,27 +595,43 @@ export default {
     doScroll: function () {
       $("#addBooking").scrollTop(10);
     },
-    async viewDetail(customer) {
-      const resDetailTicket = await this.callApi("post", "booking/detail", {
-        id: customer.id,
-      });
-      this.ticketDetails = resDetailTicket.data;
-    },
     async deleteModal(surcharge, i) {
       const deletingObj = {
-        url: "surcharge/delete",
+        url: "/surcharge/delete",
         data: surcharge,
         index: i,
       };
       this.$store.commit("setDeleteObj", deletingObj);
     },
-    resetingArrays() {
+    async resetingArrays() {
       this.selectedSeats = [];
       this.selectedBookedSeats = [];
       this.addForm.selectedSeats = [];
       this.addForm.selectedBookedSeats = [];
       this.bookedSeats = [];
+      let resBooking = await this.callApi("post", "booking");
+      if ( resBooking.status == 200 ) {
+        this.allBookings = resBooking.data
+        setTimeout(() => {
+          $("#booking-table").dataTable();
+        }, 300);
+      } else {
+        console.log(res);
+      }
     },
+    async details(date,schedule_id){
+
+      const res = await this.callApi("post", "booking/details",{date,schedule_id});
+      if (res.status == 200 ) {
+        this.bookingDetails = res.data;
+        console.log(this.bookingDetails);
+        setTimeout(() => {
+          $("#"+this.detailsFormId+" table").dataTable();
+        }, 300);
+      } else {
+        console.log(res);
+      }
+    }
   },
   computed: {
     ...mapGetters(["getDeletingObj"]),

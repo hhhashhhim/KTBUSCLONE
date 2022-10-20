@@ -46,7 +46,7 @@ class Schedule extends Model
 
     public function selective_bus()
     {
-        return $this->hasOne(BusClass::class, 'id', 'selected_bus_class_id');
+        return $this->hasOne( BusClass::class,'id', 'selected_bus_class_id');
     }
     public function single_bus_class()
     {

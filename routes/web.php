@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::post("/login", [AuthController::class, 'login']);
 Route::post("/double-check", [AuthController::class, 'doubleCheck']);
 Route::get("/logout", [AuthController::class, 'logout'])->middleware([CustomMiddleware::class]);
@@ -149,7 +150,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/store', [BookingController::class, 'store']);
     Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
-    Route::post('/detail', [BookingController::class, 'detailTicket']);
+    Route::post('/details', [BookingController::class, 'detailTicket']);
     Route::post('/reschedule', [BookingController::class, 'reschedule']);
     
 });

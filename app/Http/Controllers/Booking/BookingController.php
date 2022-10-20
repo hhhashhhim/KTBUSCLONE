@@ -24,12 +24,22 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)->get()->groupBy('booking_no');
-        $allBooking = $bookings->map(function($booking){
-            $booking[0]->count=$booking->count();
-            return $booking[0];
-        });
+        $bookings = Ticket::select('schedule_id','date')->with('schedule:id,name')
+        ->where('company_id', $this->company_id)->get()->groupBy(['date','schedule_id']);
+        
+        $allBooking = [];
+        foreach ($bookings as $i => $singleBooking) {
+            $bookingWithDetails = $singleBooking->map(function($booking) use ($i){
+                $booking[0]->count=$booking->count();
+                $booking[0]->date = $i;
+                return $booking[0];
+            });
+            
+            $allBooking[]=$bookingWithDetails->first();
+        }
+        
         return $allBooking;
+
     }
 
     public function store(Request $request)
@@ -62,6 +72,7 @@ class BookingController extends Controller
                 'remarks'=>$request->remarks,
                 'gender'=>$request->gender,
                 'type'=>$request->type,
+                'added_by'=>Auth::user()->id,
                 'discount'=>$request->discount,
             ]);
         }
@@ -92,8 +103,16 @@ class BookingController extends Controller
         $cnicFormat = str_replace('-', '', $request['cnicNumber']);
         return Customer::where('company_id', $this->company_id)->where('cnic',  $cnicFormat)->first();
     }
-    public function detailTicket(Request  $request)
+    public function detailTicket(Request $request)
     {
-        return Ticket::with('addedBy', 'company', 'bus_class', 'schedule')->where('company_id', $this->company_id)->where('customer_id', $request['id'])->get();
+        $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)
+        ->whereDate('date',$request->date)
+        ->where('schedule_id',$request->schedule_id)
+        ->get()->groupBy('booking_no');
+        $allBooking = $bookings->map(function($booking){
+            $booking[0]->count=$booking->count();
+            return $booking[0];
+        });
+        return $allBooking;
     }
 }
