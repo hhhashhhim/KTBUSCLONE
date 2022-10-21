@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Bus Class
                                 </a>
@@ -254,7 +254,7 @@
                 aria-hidden="true"
 
             >
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="card card-success">
@@ -298,7 +298,7 @@
                                                 @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
                                                 data-dismiss="modal"
                                             >
-                                                Add Seat Data
+                                                Add Seat Detail
                                             </button>
                                         </div>
                                     </div>
@@ -532,7 +532,7 @@ export default {
         return {
             busClasses: [],
             fareClasses: [],
-            formID: "addNewFareClass",
+            formID: "busClass_form",
             validationErrors: [],
             seatModify: {
                 class: 0,
@@ -572,6 +572,10 @@ export default {
         await this.fetchBussClasses();
     },
     methods: {
+        clearForm : function () {
+          this.data = {};
+          this.isShowDiv = false;
+        },
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
             if (resBusClass.status === 200) {

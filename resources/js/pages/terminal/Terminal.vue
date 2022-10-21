@@ -11,7 +11,7 @@
                                     href="#add-modal"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Terminal
                                 </a>
@@ -393,7 +393,7 @@ export default {
             terminals: [],
             terminalsDetails: [],
             companies: [],
-            formID: "newTerminal",
+            formID: "terminal_form",
             cities: [],
             data: {
                 company_id: "",
@@ -421,6 +421,10 @@ export default {
         await this.fetchTerminals();
     },
     methods: {
+        clearForm : function(){
+            this.data = {};
+            this.data.city_id = 0;
+        },
         async fetchTerminals() {
             const terminalRes = await this.callApi("post", "terminals");
             const compRes = await this.callApi("post", "company");
@@ -518,14 +522,16 @@ export default {
                     // window.location.reload();
                 }, 3000);
             } else {
-                if (res.status === 422) {
-                    console.log();
+                if (res.status == 422) {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
+                setTimeout(function () {
+                    // window.location.reload();
+                }, 2000);
             }
         },
         async deleteModal(terminal, i) {
@@ -535,8 +541,9 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-            setTimeout(() => {
-            }, 3000);
+            // await this.fetchTerminals();
+            // setTimeout(() => {
+            // }, 3000);
         }
     },
     computed: {
@@ -546,8 +553,10 @@ export default {
         getDeletingObj(obj) {
             console.log(obj);
             if (obj.isDeleted) {
-                this.terminals.splice(obj.index, 1);
-                this.fetchTerminals();
+                this.terminalsDetails.splice(obj.index, 1);
+                setTimeout(() => {
+                    $("#show_terminal").DataTable();
+                }, 50);
             }
         },
     },
