@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Bus;
 use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusSeatMap;
+use App\Models\FareClass;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class BusController extends Controller
 {
@@ -101,5 +103,24 @@ class BusController extends Controller
     public function getBusData(Request $request)
     {
         return Bus::where('id', $request->id)->where('company_id', $this->company_id)->first();
+    }
+    public function saveFareClass(Request $request)
+    {
+        $rules = [
+            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+        ];
+
+        $customMessages = [
+            'FareClassName.required' => 'Fare Class Name is Required!',
+            'FareClassName.unique' => 'This Fare Class Name is Already Exist!',
+        ];
+        $this->validate($request, $rules, $customMessages);
+        return FareClass::create([
+            'name' => $request->FareClassName,
+            'is_active' => 1,
+            'company_id' => $this->company_id,
+            'added_by' => Auth::user()->id,
+        ]);
+
     }
 }

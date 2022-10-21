@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#addBus" data-toggle="modal" class="btn btn-primary">
+                                <a href="#addBus" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
                                     Add New Bus
                                 </a>
                             </div>
@@ -293,9 +293,9 @@
             >
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="city_id">Fare Classes</label>
+                        <label for="city_id">Bus Class</label>
                         <select class="form-control" v-model="dataEdit.fare_class_id">
-                            <option value="">Select Fare Class</option>
+                            <option value="">Select Bus Class</option>
                             <option
                                 v-for="(fareClass, i) in fareClasses"
                                 :key="i"
@@ -463,7 +463,7 @@ export default {
             columns: "",
             details: "",
             dataView: {},
-            formID: "newBuses",
+            formID: "bus_form",
             seatNo: 0,
             data: {
                 noOfSeats: "",
@@ -494,6 +494,11 @@ export default {
     },
 
     methods: {
+        clearForm:function(){
+            this.data = {};
+            this.data.fare_class = 0;
+
+        },
         async fetchBuses(){
             const res = await this.callApi("post", "buses");
             if (res.status === 200) {
@@ -527,23 +532,58 @@ export default {
         async addBuses() {
             this.validationErrors = [];
             if (this.data.noOfSeats === "")
-                                swal('Required', 'No. Of Seats is Required', 'error');
+            swal({
+                title: "Required!",
+                text: "No. Of Seats is required",
+                icon: "error",
+               timer: 2000
+            });
             if (this.data.busNumber === "")
-                                swal('Required', 'Bus Number is Required', 'error');
+                                // swal('Required', 'Bus Number is Required', 'error');
+                swal({
+                    title: "Required",
+                    text: "Bus Number is required",
+                    type: 'error',
+                   timer: 2000
+                });
             if (this.data.chassisNumber === "")
-                                swal('Required', 'Chassis Number is Required', 'error');
+                                // swal('Required', 'Chassis Number is Required', 'error');
+                swal({
+                    title: "Required",
+                    text: "Chassis Number is required!",
+                   icon: "error",
+                   timer: 2000
+                });
             if (this.data.insuranceNumber === "")
-                                swal('Required', 'Insurance Number is Required', 'error');
+                                // swal('Required', 'Insurance Number is Required', 'error');
+                swal({
+                    title: "Required",
+                    text: "Insurance Number is required",
+                   icon: "error",
+                   timer: 2000
+                });
             if (this.data.routePermit === "")
-                                swal('Required', 'Route Permit is Required', 'error');
+                                // swal('Required', 'Route Permit is Required', 'error');
+            swal({
+                title: "Required",
+                text: "Route Permit is Required",
+               icon: "error",
+               timer: 2000
+            });
 
 
             if (this.data.fare_class === "")
-                return this.errorsArray("PLease Select Fare Class", "fare_class");
+                return this.errorsArray("PLease Select Bus Class", "fare_class");
             const res = await this.callApi("post", "buses/store", this.data);
             if (res.status === 201) {
                 // this.success = "Bus Created Successfully";
-                swal('Success', 'Bus Created Successfully', 'success');
+                // swal('Success', 'Bus Created Successfully', 'success');
+                swal({
+                    title: "Success",
+                    text: "Bus Created Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
 
                 window.scrollTo(0, 0);
                 this.data = "";
@@ -577,6 +617,12 @@ export default {
             if (res.status === 200) {
                 // this.success = "Bus Record Updated Successfully";
                 swal('Success', 'Bus Record Updated Successfully', 'success');
+                swal({
+                    title: "Success",
+                    text: "Bus Record updated Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
                 await this.fetchBuses();
                 setTimeout(() => {
                     this.success = "";

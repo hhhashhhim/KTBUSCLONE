@@ -151,11 +151,22 @@ export default {
             this.validationErrors = []
             if(this.data.name == "")
                 // return this.errorsArray("City Name is Required","Name");
-            swal('Required','City Name is Required','error')
-            const res = await this.callApi("post",'cities/store',this.data);
+            // swal('Required','City Name is Required','error')
+                swal({
+                    title: "Required",
+                    text: "City Name is required",
+                    icon: "error",
+                   timer: 2000
+                });            const res = await this.callApi("post",'cities/store',this.data);
             console.log(res.data)
             if (res.status == 200) {
-                this.success="City Created Successfully Named as " + res.data.name;
+                // this.success="City Created Successfully Named as " + res.data.name;
+                swal({
+                    title: "Success",
+                    text: "City Created Succesfuly Named as  " + res.data.name,
+                    icon: "success",
+                   timer: 2000
+                });
                 // swal('Success', 'City Added Successfully', 'success');
                 // await this.fetchCities();
                 // this.cities.unshift(res.data);
@@ -187,12 +198,23 @@ export default {
             this.validationErrors=[]
             if(this.dataEdit.name=="")
                 // return this.errorsArray("City Name is Required","Name");
-                swal('Required','City Name is Required','error')
-
+                // swal('Required','City Name is Required','error')
+                swal({
+                    title: "Required",
+                    text: "city Name is required ",
+                    icon: "error",
+                   timer: 2000
+                });
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             console.log(resEdit.data);
             if (resEdit.status==200) {
-                swal('Success', 'City Updated Successfully', 'success');
+                // swal('Success', 'City Updated Successfully', 'success');
+                swal({
+                    title: "Success",
+                    text: "City updated Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {

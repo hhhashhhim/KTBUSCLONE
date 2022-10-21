@@ -136,6 +136,8 @@ Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/update', [BusController::class, 'updateBus']);
     Route::post('/delete', [BusController::class, 'deleteBus']);
     Route::post('/getBusData', [BusController::class, 'getBusData']);
+    Route::post('/storeFareClass', [BusController::class, 'saveFareClass']);
+
 });
 
 Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function () {
@@ -152,6 +154,6 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/details', [BookingController::class, 'detailTicket']);
     Route::post('/reschedule', [BookingController::class, 'reschedule']);
-    
+
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

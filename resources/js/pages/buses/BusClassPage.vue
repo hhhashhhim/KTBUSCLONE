@@ -185,7 +185,7 @@
                         <button
                             type="button"
                             class="btn btn-block btn-warning"
-                            @click="generateMap"
+                            @click="addFormGenerateMap"
                         >
                             Generate Seat Map
                         </button>
@@ -238,7 +238,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addFareClass">
+                    <button type="button" class="btn btn-primary" @click="addBusClass">
                         Add Bus Class
                     </button>
                 </template>
@@ -268,6 +268,10 @@
                                     <div class="row">
                                         <div class="form-group col-md-6">
                                             <label for="seat_class">Seat Class</label>
+                                            <div class="float-right badge badge-primary mx-0 mb-1"
+                                                 style="cursor: pointer;" data-toggle="modal"
+                                                 data-target="#addFareClass" @click="clearFareClassForm()">Add Fare Class
+                                            </div>
                                             <select class="form-control" v-model="seatModify.class">
                                                 <option value="0" selected>Select Class</option>
                                                 <option
@@ -309,36 +313,68 @@
                 </div>
             </div>
             <!--End Modal-->
-            <!--            Edit Model-->
-            <Edit
-                heading="Edit Bus Class"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label for="SurchargeName"
-                        >Name <span class="text-danger">*</span></label
-                        >
-                        <input type="text" class="form-control" v-model="dataEdit.name"/>
+
+            <div class="modal fade" id="addFareClass" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add Fare Class</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Fare Class Name"
+                                        id="name"
+                                        v-model="addData.FareClassName"
+                                    />
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="color">Color<span class="text-danger">*</span></label>
-                        <input
-                            type="color"
-                            class="form-control"
-                            id="color"
-                            v-model="dataEdit.busClassColor"
-                        />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="saveFareClass()">Save Fare Class</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-2">
-                        <h5>Status</h5>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="mt-4" for="active">Is Active</label>
-                            <label class="colorinput mx-3 mt-3">
+            </div>
+        </div>
+        <!--            Edit Model-->
+        <Edit
+            heading="Edit Bus Class"
+            :errors="this.validationErrors"
+            :success="success"
+            :formID="formID"
+        >
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="SurchargeName"
+                    >Name <span class="text-danger">*</span></label
+                    >
+                    <input type="text" class="form-control" v-model="dataEdit.name"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="color">Color<span class="text-danger">*</span></label>
+                    <input
+                        type="color"
+                        class="form-control"
+                        id="color"
+                        v-model="dataEdit.busClassColor"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-2">
+                    <h5>Status</h5>
+                    <div class="form-group d-flex align-items-center">
+                        <label class="mt-4" for="active">Is Active</label>
+                        <label class="colorinput mx-3 mt-3">
                   <span>
                     <input
                         type="checkbox"
@@ -349,157 +385,156 @@
                     />
                     <span class="colorinput-color bg-success"></span>
                   </span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label for="name"
-                        >No. of Rows <span class="text-danger">*</span></label
-                        >
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter No. of Rows"
-                            v-model="dataEdit.no_of_rows"
-                            @keypress="isNumber($event)"
-                        />
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label for="name"
-                        >No. of Cols <span class="text-danger">*</span></label
-                        >
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter No. of Cols"
-                            v-model="dataEdit.no_of_cols"
-                            @keypress="isNumber($event)"
-                        />
-                    </div>
-                    <div class="form-group col-md-3 my-4 pt-2">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-warning"
-                            @click="editGenerateMap"
-                        >
-                            Generate Seat Map
-                        </button>
+                        </label>
                     </div>
                 </div>
-                <div class="row mx-1 mainRow">
-                    <!--v-if="isShowEditDiv-->
-                    <div class="form-group col-md-6 border py-3">
-                        <tr
-                            class="seat-img p-0 m-0"
-                            v-for="(record, rowIndex) in dataEdit.seat_map"
-                            :key="rowIndex"
+                <div class="form-group col-md-3">
+                    <label for="name"
+                    >No. of Rows <span class="text-danger">*</span></label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter No. of Rows"
+                        v-model="dataEdit.no_of_rows"
+                        @keypress="isNumber($event)"
+                    />
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="name"
+                    >No. of Cols <span class="text-danger">*</span></label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter No. of Cols"
+                        v-model="dataEdit.no_of_cols"
+                        @keypress="isNumber($event)"
+                    />
+                </div>
+                <div class="form-group col-md-3 my-4 pt-2">
+                    <button
+                        type="button"
+                        class="btn btn-block btn-warning"
+                        @click="editGenerateMap"
+                    >
+                        Generate Seat Map
+                    </button>
+                </div>
+            </div>
+            <div class="row mx-1 mainRow">
+                <!--v-if="isShowEditDiv-->
+                <div class="form-group col-md-6 border py-3">
+                    <tr
+                        class="seat-img p-0 m-0"
+                        v-for="(record, rowIndex) in dataEdit.seat_map"
+                        :key="rowIndex"
+                    >
+                        <td
+                            v-for="(col, colIndex) in record"
+                            :key="colIndex"
+                            :class="col.reserved ? 'selected-row border' : ''"
                         >
-                            <td
-                                v-for="(col, colIndex) in record"
-                                :key="colIndex"
-                                :class="col.reserved ? 'selected-row border' : ''"
-                            >
-                                <img
-                                    @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""
-                                />
-                            </td>
-                        </tr>
-                    </div>
-                    <div class="form-group col-md-6 border py-3">
-                        <tr
-                            class="seat-img p-0 m-0"
-                            v-for="(record, rowIndex) in dataEdit.seat_map"
-                            :key="rowIndex"
+                            <img
+                                @click="changeEditStatus(rowIndex, colIndex)"
+                                :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""
+                            />
+                        </td>
+                    </tr>
+                </div>
+                <div class="form-group col-md-6 border py-3">
+                    <tr
+                        class="seat-img p-0 m-0"
+                        v-for="(record, rowIndex) in dataEdit.seat_map"
+                        :key="rowIndex"
+                    >
+
+                        <td v-for="(col, colIndex) in record"
+
+                            :key="colIndex"
+                            :class="col.reserved ? 'selected-row border' : ''"
                         >
-
-                            <td v-for="(col, colIndex) in record"
-
-                                :key="colIndex"
-                                :class="col.reserved ? 'selected-row border' : ''"
-                            >
-                                <img
-                                    data-toggle="modal"
-                                    data-target="#setEditSeatClass"
-                                    @click="getSeatDetails(rowIndex, colIndex)"
-                                    v-if="col.reserved"
-                                    :src="
+                            <img
+                                data-toggle="modal"
+                                data-target="#setEditSeatClass"
+                                @click="getSeatDetails(rowIndex, colIndex)"
+                                v-if="col.reserved"
+                                :src="
                       $store.state.app_url +
                       'assets/img/buses/booked_seat_img.gif'
                     "
-                                    alt=""
-                                />
-                            </td>
-                        </tr>
-                    </div>
+                                alt=""
+                            />
+                        </td>
+                    </tr>
                 </div>
-                <template v-slot:button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        @click="updateFareClass"
-                    >
-                        Update Bus Class
-                    </button>
-                </template>
-            </Edit>
+            </div>
+            <template v-slot:button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="updateFareClass"
+                >
+                    Update Bus Class
+                </button>
+            </template>
+        </Edit>
 
-            <!--                    Modal for modify bus class-->
-            <div
-                class="modal fade"
-                id="setEditSeatClass"
-                tabindex="-1"
-                aria-labelledby="staticBackdropLabel"
-                aria-hidden="true"
-            >
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="card card-success">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Edit Seat Detail</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_class">Seat Class</label>
-                                            <select class="form-control" v-model="editSeatModify.class">
-                                                <option value="0" selected>Select Class</option>
-                                                <option
-                                                    v-for="(fareClass, i) in fareClasses"
-                                                    :key="i"
-                                                    :value="fareClass.id"
-                                                >
-                                                    {{ fareClass.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_type">Seat Type</label>
-                                            <select class="form-control" v-model="editSeatModify.type">
-                                                <option value="0" selected>Select Type</option>
-                                                <option value="reserved_for_female">
-                                                    Reserved for Female
-                                                </option>
-                                                <option value="not_for_sale">Not for Sale</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button
-                                                type="button"
-                                                class="btn btn-block btn-success"
-                                                @click=" updateSeatDetail(editSingleSeat.rowId, editSingleSeat.colId)"
-                                                data-dismiss="modal"
+        <!--                    Modal for modify bus class-->
+        <div
+            class="modal fade"
+            id="setEditSeatClass"
+            tabindex="-1"
+            aria-labelledby="staticBackdropLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="card card-success">
+                            <div class="card-header d-flex justify-content-between">
+                                <h4 class="modal-title">Edit Seat Detail</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label for="seat_class">Seat Class</label>
+                                        <select class="form-control" v-model="editSeatModify.class">
+                                            <option value="0" selected>Select Class</option>
+                                            <option
+                                                v-for="(fareClass, i) in fareClasses"
+                                                :key="i"
+                                                :value="fareClass.id"
                                             >
+                                                {{ fareClass.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="seat_type">Seat Type</label>
+                                        <select class="form-control" v-model="editSeatModify.type">
+                                            <option value="0" selected>Select Type</option>
+                                            <option value="reserved_for_female">
+                                                Reserved for Female
+                                            </option>
+                                            <option value="not_for_sale">Not for Sale</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button
+                                            type="button"
+                                            class="btn btn-block btn-success"
+                                            @click=" updateSeatDetail(editSingleSeat.rowId, editSingleSeat.colId)"
+                                            data-dismiss="modal"
+                                        >
 
-                                                Update Seat Data
-                                            </button>
-                                        </div>
+                                            Update Seat Data
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -507,11 +542,12 @@
                     </div>
                 </div>
             </div>
-            <!--End Modal-->
-            <!--            Edit MOdel End-->
-            <Delete
-                confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
-            />
+        </div>
+        <!--End Modal-->
+        <!--            Edit MOdel End-->
+        <Delete
+            confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
+        />
         </div>
     </section>
 </template>
@@ -551,6 +587,7 @@ export default {
             editSingleSeat: [],
             delId: "",
             seatNo: 0,
+            addData: {},
             data: {
                 noOfRows: "",
                 noOfCols: "",
@@ -572,9 +609,12 @@ export default {
         await this.fetchBussClasses();
     },
     methods: {
-        clearForm : function () {
-          this.data = {};
-          this.isShowDiv = false;
+        clearForm: function () {
+            this.data = {};
+            this.isShowDiv = false;
+        },
+        clearFareClassForm: function () {
+            this.addData = {};
         },
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
@@ -609,11 +649,30 @@ export default {
                 event.preventDefault();
             }
         },
-
+        async saveFareClass(){
+            const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
+            if (resSaveFareClass.status === 201) {
+                swal({
+                    title: "Success",
+                    text: "Fare Class Added Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fareClasses.push(resSaveFareClass.data);
+            } else {
+                console.log(resSaveFareClass);
+            }
+        },
         addSeatData: function (col, row) {
             if (this.seatModify.class == 0) {
-                swal('required', 'Please Select Seat class', 'error');
-            }else {
+                // swal('required', 'Please Select Seat class', 'error');
+                swal({
+                    title: "Required",
+                    text: "Please Select Seat Class ",
+                   icon: "error",
+                   timer: 2000
+                });
+            } else {
                 const seatDetails = this.data.seatMap[row][col];
                 this.data.seatMap[row][col] = {
                     reserved: seatDetails.reserved,
@@ -648,12 +707,18 @@ export default {
             };
         },
 
-        updateSeatDetail: function (rowId, colId){
+        updateSeatDetail: function (rowId, colId) {
 
             console.log(rowId, colId);
             if (this.editSeatModify.class == 0) {
-                swal('required', 'Please Select Seat class', 'error');
-            }else {
+                // swal('required', 'Please Select Seat class', 'error');
+                swal({
+                    title: "required",
+                    text: "Please Select Seat Class",
+                   icon: "error",
+                   timer: 2000
+                });
+            } else {
                 const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
                 this.dataEdit.seat_map[rowId][colId] = {
                     reserved: singleSeatDetails.reserved,
@@ -696,15 +761,26 @@ export default {
                 };
             }
         },
-        generateMap: function () {
+        addFormGenerateMap: function () {
             this.validationErrors = [];
             let vm = this;
-            if (vm.data.noOfRows == "")
+            console.log(vm.data.noOfRows, vm.data.noOfCols)
+            if (/*vm.data.noOfRows == "undefined" ||*/ vm.data.noOfRows == "")
                 swal('Required', 'No of Rows Field is Required!', 'error')
-                // return this.errorsArray("No of Rows Field is Required!", "No Of Rows");
-            if (vm.data.noOfCols == "")
-                // return this.errorsArray("No of Cols Field is required!", "No Of Cols");
+            // swal({
+            //     title: "Required",
+            //     text: "no of rows Field is required",
+            //    icon: "error",
+            //    timer: 2000
+            // });
+            if (/*vm.data.noOfCols == "undefined"  ||*/ vm.data.noOfCols == "" )
                 swal('Required', 'No of Cols Field is Required!', 'error')
+            // swal({
+            //     title: "Required!",
+            //     text: "No of Cols Field is Required",
+            //    icon: "error",
+            //    timer: 2000
+            // });
             if (vm.data.noOfRows <= 15) {
                 if (vm.data.noOfCols <= 7) {
                     let arr,
@@ -726,24 +802,29 @@ export default {
                     this.isShowDiv = true;
                     return (this.data.seatMap = map);
                 } else {
-                    // return this.errorsArray(
-                    //     "No of Cols must be less then or equal to 7",
-                    //     "No Of Cols"
-                    // );
-                    swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
+                    // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
+                    swal({
+                        title: "Limited",
+                        text: "No of Cols must be less then or equal to 7",
+                        icon: "error",
+                       timer: 2000
+                    });
                 }
             } else {
-                swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
-                // return this.errorsArray(
-                //     "No of Rows must be less then or equal to 15",
-                //     "No Of Rows"
-                // );
+                // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
+                swal({
+                    title: "Limited",
+                    text: "No of Rows must be less then or equal to 15",
+                    icon: "error",
+                   timer: 2000
+                });
             }
         },
         editGenerateMap: function () {
             this.isShowEditDiv = true;
         },
 
+        // async
         checkBox: function (e) {
             if (e.target.checked) {
                 this.data.isActive = 1;
@@ -759,19 +840,41 @@ export default {
             }
         },
 
-        async addFareClass() {
+        async addBusClass() {
             this.validationErrors = [];
             if (this.data.BusClassName === "")
-            swal('Required', 'Bus Class Name is Required', 'error')
+                // swal('Required', 'Bus Class Name is Required', 'error')
+                swal({
+                    title: "Required",
+                    text: "Bus Class Name is Required",
+                    icon: "error",
+                   timer: 2000
+                });
             if (this.data.noOfRows === "0")
-            swal('Required', 'Row Field is Required', 'error')
+                // swal('Required', 'Row Field is Required', 'error')
+                swal({
+                    title: "Required ",
+                    text: "Row Field is Required",
+                    icon: "error",
+                   timer: 2000
+                });
             if (this.data.noOfCols === "0")
-            swal('Required', 'Col Field is Required', 'error')
-
+                // swal('Required', 'Col Field is Required', 'error')
+                swal({
+                    title: "Required",
+                    text: "Col Field is required",
+                    icon: "error",
+                   timer: 2000
+                });
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
-                // this.success = "Bus Class Added Successfully";
                 swal('Success', 'Bus Class Added Successfully', 'success');
+                swal({
+                    title: "Success",
+                    text: "bus Class Added Successfully",
+                    icon: "error",
+                   timer: 2000
+                });
                 await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
@@ -791,13 +894,31 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.BusClassName === "")
                 // return this.errorsArray("Bus Class Name is Required", "BusClassName");
-            swal('Required', 'Bus Class Name is Required', 'error')
+                // swal('Required', 'Bus Class Name is Required', 'error')
+                swal({
+                    title: "Required",
+                    text: "Bus Class name is required",
+                    icon: "error",
+                   timer: 2000
+                });
             if (this.dataEdit.noOfRows === "0")
                 // return this.errorsArray("Row Field is Required", "noOfRows");
-            swal('Required', 'Row Field is Required', 'error')
+                // swal('Required', 'Row Field is Required', 'error')
+                swal({
+                    title: "Required",
+                    text: "row Field is required",
+                    icon: "error",
+                   timer: 2000
+                });
             if (this.dataEdit.noOfCols === "0")
                 // return this.errorsArray("Col Field is Required", "noOfCols");
-            swal('Required', 'Col Field is Required', 'error')
+                // swal('Required', 'Col Field is Required', 'error')
+                swal({
+                    title: "Required",
+                    text: "Col Field is Required",
+                    icon: "error",
+                   timer: 2000
+                });
 
             const res = await this.callApi(
                 "post",
@@ -806,8 +927,12 @@ export default {
             );
             if (res.status === 200 && res.statusText === "OK") {
                 await this.fetchBussClasses();
-                // this.success = "Bus Class Updated Successfully";
-                swal('Success', 'Bus Class Updated Successfully', 'success');
+                swal({
+                    title: "Success",
+                    text: "Bus Class Updated Successfully",
+                    icon: "error",
+                   timer: 2000
+                });
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
