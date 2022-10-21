@@ -250,7 +250,7 @@
                                         @keypress="isNumber($event)"
                                     />
                                 </div>
-                                <div class="form-group col-md-6">
+                                <!-- <div class="form-group col-md-6">
                                     <label for="name">No. of Seats</label>
                                     <input
                                         type="text"
@@ -259,7 +259,7 @@
                                         v-model="data.noOfSeats"
                                         @keypress="isNumber($event)"
                                     />
-                                </div>
+                                </div> -->
                                 <div class="form-group col-md-6">
                                     <label for="name">Route Permit Number</label>
                                     <input
@@ -334,7 +334,7 @@
                             @keypress="isNumber($event)"
                         />
                     </div>
-                    <div class="form-group col-md-6">
+                    <!-- <div class="form-group col-md-6">
                         <label for="name">No. of Seats</label>
                         <input
                             type="text"
@@ -343,7 +343,7 @@
                             v-model="dataEdit.no_of_seats"
                             @keypress="isNumber($event)"
                         />
-                    </div>
+                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="name">Route Permit Number</label>
                         <input
@@ -463,7 +463,7 @@ export default {
             columns: "",
             details: "",
             dataView: {},
-            formID: "bus_form",
+            formID: "newBuses",
             seatNo: 0,
             data: {
                 noOfSeats: "",
@@ -586,7 +586,7 @@ export default {
                 });
 
                 window.scrollTo(0, 0);
-                this.data = "";
+                this.data = {};
                 await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
@@ -616,7 +616,7 @@ export default {
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
                 // this.success = "Bus Record Updated Successfully";
-                swal('Success', 'Bus Record Updated Successfully', 'success');
+                // swal('Success', 'Bus Record Updated Successfully', 'success');
                 swal({
                     title: "Success",
                     text: "Bus Record updated Successfully",
