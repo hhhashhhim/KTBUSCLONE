@@ -136,7 +136,7 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Surcharge"
+                heading="Edit Fare Class"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
@@ -161,135 +161,10 @@
                             </label>
                         </div>
                     </div>
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Rows <span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Rows"-->
-<!--                            v-model="dataEdit.no_of_rows"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Cols <span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Cols"-->
-<!--                            v-model="dataEdit.no_of_cols"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3 my-4 pt-2">-->
-<!--                        <button-->
-<!--                            type="button"-->
-<!--                            class="btn btn-block btn-warning"-->
-<!--                            @click="editGenerateMap"-->
-<!--                        >-->
-<!--                            Generate Seat Map-->
-<!--                        </button>-->
-<!--                    </div>-->
                 </div>
-<!--                <div class="row mx-1 mainRow">  &lt;!&ndash;v-if="isShowEditDiv&ndash;&gt;-->
-<!--                    <div class="form-group col-md-6 border py-3">-->
-<!--                            <tr-->
-<!--                                class="seat-img p-0 m-0"-->
-<!--                                v-for="(record, rowIndex) in dataEdit.seat_map"-->
-<!--                                :key="rowIndex"-->
-<!--                            >-->
-<!--                                <td-->
-<!--                                    v-for="(col, colIndex) in record"-->
-<!--                                    :key="colIndex"-->
-<!--                                    :class="col.reserved ? 'selected-row border' : ''"-->
-<!--                                >-->
-<!--                                    <img-->
-<!--                                        @click="changeEditStatus(rowIndex, colIndex)"-->
-<!--                                        :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif'" alt=""/>-->
-<!--                                </td>-->
-<!--                            </tr>-->
-<!--                        </div>-->
-<!--                    <div class="col-md-4 form-group  ">-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0 ">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="selected-row mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Selected</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline;">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="booked_Seat mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Booked</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="notForSale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Not For Sale</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="anyElseClass pr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Other Class</span>-->
-
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="economy mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Economy</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="exective mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Executive</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="business mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Business</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="reservedForFemale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-wrap">Reserved For Female</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    </div>-->
                 <template v-slot:button>
                         <button type="button" class="btn btn-primary" @click="updateFareClass">Update
-                            Surcharge
+                            Fare Class
                         </button>
                 </template>
             </Edit>
@@ -319,7 +194,7 @@ export default {
     data() {
         return {
             fareClasses: [],
-            formID: "addNewFareClass",
+            formID: "fareClass_form",
             validationErrors: [],
             success: false,
             error: false,

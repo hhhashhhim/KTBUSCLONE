@@ -211,7 +211,7 @@
                                 <div class=" form-group col-md-12">
                                     <label for="city_id">Bus Class</label>
                                     <select class="form-control" v-model="data.fare_class">
-                                        <option value="">Select Bus Class</option>
+                                        <option value="0">Select Bus Class</option>
                                         <option
                                             v-for="(fareClass, i) in fareClasses"
                                             :key="i"
@@ -250,16 +250,6 @@
                                         @keypress="isNumber($event)"
                                     />
                                 </div>
-                                <!-- <div class="form-group col-md-6">
-                                    <label for="name">No. of Seats</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        placeholder="Enter No. of Seats"
-                                        v-model="data.noOfSeats"
-                                        @keypress="isNumber($event)"
-                                    />
-                                </div> -->
                                 <div class="form-group col-md-6">
                                     <label for="name">Route Permit Number</label>
                                     <input
@@ -295,7 +285,7 @@
                     <div class="form-group col-md-12">
                         <label for="city_id">Bus Class</label>
                         <select class="form-control" v-model="dataEdit.fare_class_id">
-                            <option value="">Select Bus Class</option>
+                            <option value="0">Select Bus Class</option>
                             <option
                                 v-for="(fareClass, i) in fareClasses"
                                 :key="i"
@@ -334,16 +324,6 @@
                             @keypress="isNumber($event)"
                         />
                     </div>
-                    <!-- <div class="form-group col-md-6">
-                        <label for="name">No. of Seats</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter No. of Seats"
-                            v-model="dataEdit.no_of_seats"
-                            @keypress="isNumber($event)"
-                        />
-                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="name">Route Permit Number</label>
                         <input
@@ -463,7 +443,7 @@ export default {
             columns: "",
             details: "",
             dataView: {},
-            formID: "newBuses",
+            formID: "bus_form",
             seatNo: 0,
             data: {
                 noOfSeats: "",
