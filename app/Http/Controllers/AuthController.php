@@ -18,15 +18,15 @@ use stdClass;
 class AuthController extends Controller
 {
 
-    public $company_id;
+    // public $company_id;
 
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware(function ($request, $next) {
+    //         $this->company_id = Auth::user()->company_id;
+    //         return $next($request);
+    //     });
+    // }
     public function index(Request $request)
     {
 

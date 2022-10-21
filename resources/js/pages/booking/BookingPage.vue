@@ -95,23 +95,9 @@
           </select>
         </div>
 
-        <div class="col-md-3 class form-group">
+        <div class="col-md-5 class form-group">
           <label for="date">Date <span class="text-danger">*</span></label>
           <input type="date" class="form-control" v-model="addForm.date" />
-        </div>
-        <div class="form-group col-md-2 d-flex align-items-center">
-          <label class="mt-4" for="active">Update Old Data</label>
-          <label class="colorinput mx-3 mt-3">
-            <span
-              ><input
-                type="checkbox"
-                class="colorinput-input"
-                v-model="addForm.oldBookings"
-                value="1"
-              />
-              <span class="colorinput-color bg-success"></span>
-            </span>
-          </label>
         </div>
         <div class="col-md-2">
           <label>Action</label>
@@ -177,13 +163,22 @@
                 <label class="col-md-3 pt-3 font-weight-bold" for="contact"
                   >Contact</label
                 >
-                <input
+                <vue-mask
+                  v-on:keyup.enter="getCustomer"
+                  class="form-control col-md-9"
+                  v-model="addForm.contact"
+                  mask="0000-0000000"
+                  :raw="false"
+                  :options="options"
+                >
+                </vue-mask>
+                <!-- <input
                   type="text"
-                  @keypress="isNumber($event)"
+                  @keypress="phoneFormat($event)"
                   class="form-control col-md-9"
                   id="contact"
                   v-model="addForm.contact"
-                />
+                /> -->
               </div>
               <div class="form-group row">
                 <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
@@ -466,6 +461,7 @@ export default {
       }
     },
     async fetchScheduleData() {
+      this.resetingArrays();
       this.validationErrors = [];
       if (!this.addForm.schedule)
         return this.errorsArray("Schedule Name is Required", "Schedule");

@@ -40,13 +40,14 @@ class DiscountController extends Controller
             'percentage.max' => 'Discount percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
-        return Discount::create([
+        $discount = Discount::create([
             'name' => $request->name,
             'percentage' => $request->percentage,
             'company_id' => $this->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
+        return Discount::with('added_by')->find($discount->id);
     }
 
     public function updateDiscount(Request $request)

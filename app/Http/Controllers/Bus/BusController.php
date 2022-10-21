@@ -29,17 +29,14 @@ class BusController extends Controller
     public function storeBus(Request $request)
     {
         $rules = [
-            'noOfSeats' => 'required',
             'busNumber' => 'required',
             'fare_class' => 'required|integer',
             'chassisNumber' => 'required',
             'insuranceNumber' => 'required',
             'routePermit' => 'required',
-
         ];
 
         $customMessages = [
-            'noOfSeats.required' => 'Number Of Seats is Required!',
             'busNumber.required' => 'Bus Number is Required!',
             'fare_class.required' => 'Fare Class is Required!',
             'chassisNumber.required' => 'Chassis Number is Required!',

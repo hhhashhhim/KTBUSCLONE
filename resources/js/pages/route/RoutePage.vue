@@ -219,9 +219,7 @@ export default {
             addTerminalsOnClick: [],
             routes: [],
             formID: "addNewRoute",
-            data: {
-                fare_class: "0",
-            },
+            data: {},
             dataEdit: {},
             from: {},
             to: {},
@@ -258,6 +256,9 @@ export default {
             }
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
+                this.routeName = "";
+                this.loop = 0;
+                this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
                 this.success = "Route Created Successfully";
                 setTimeout(() => {
                     // window.location.reload();
@@ -271,6 +272,7 @@ export default {
                 this.success = "Fare Table Updated Created Successfully";
                 // Object.keys(obj).forEach((i) => obj[i] = null);
                 this.data = {};
+                
                 this.cities = res.data;
                 window.scrollTo(0, 0);
                 this.

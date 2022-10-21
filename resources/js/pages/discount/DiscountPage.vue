@@ -276,13 +276,12 @@ export default {
 
             const res = await this.callApi("post", "discount/store", data);
             if (res.status === 201 && res.statusText === "Created") {
+                this.discounts.unshift(res.data);
                 this.success = "Discount Created Successfully";
                 window.scrollTo(0, 0);
                 this.DiscountName = "";
                 this.PercentageName = "";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+                
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {

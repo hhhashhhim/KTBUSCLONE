@@ -250,7 +250,7 @@
                                         @keypress="isNumber($event)"
                                     />
                                 </div>
-                                <div class="form-group col-md-6">
+                                <!-- <div class="form-group col-md-6">
                                     <label for="name">No. of Seats</label>
                                     <input
                                         type="text"
@@ -259,7 +259,7 @@
                                         v-model="data.noOfSeats"
                                         @keypress="isNumber($event)"
                                     />
-                                </div>
+                                </div> -->
                                 <div class="form-group col-md-6">
                                     <label for="name">Route Permit Number</label>
                                     <input
@@ -334,7 +334,7 @@
                             @keypress="isNumber($event)"
                         />
                     </div>
-                    <div class="form-group col-md-6">
+                    <!-- <div class="form-group col-md-6">
                         <label for="name">No. of Seats</label>
                         <input
                             type="text"
@@ -343,7 +343,7 @@
                             v-model="dataEdit.no_of_seats"
                             @keypress="isNumber($event)"
                         />
-                    </div>
+                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="name">Route Permit Number</label>
                         <input
@@ -526,8 +526,6 @@ export default {
 
         async addBuses() {
             this.validationErrors = [];
-            if (this.data.noOfSeats === "")
-                                swal('Required', 'No. Of Seats is Required', 'error');
             if (this.data.busNumber === "")
                                 swal('Required', 'Bus Number is Required', 'error');
             if (this.data.chassisNumber === "")
@@ -546,7 +544,7 @@ export default {
                 swal('Success', 'Bus Created Successfully', 'success');
 
                 window.scrollTo(0, 0);
-                this.data = "";
+                this.data = {};
                 await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
