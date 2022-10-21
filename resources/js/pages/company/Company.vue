@@ -662,7 +662,13 @@ export default {
                     this.dataEdit.logo = imageFile;
                 }
             } else {
-                swal('Image Extension', 'Uploaded Image must be .jpg, .jpeg, .png', 'error');
+                // swal('Image Extension', 'Uploaded Image must be .jpg, .jpeg, .png', 'error');
+                swal({
+                    title: "Select Image",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png",
+                    icon: "error",
+                   timer: 2000
+                });
                 e.target.value = '';
             }
 

@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Fare Class
                                 </a>
@@ -120,147 +120,7 @@
                             </label>
                         </div>
                     </div>
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Rows<span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Rows"-->
-<!--                            v-model="data.noOfRows"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Cols<span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Cols"-->
-<!--                            v-model="data.noOfCols"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3 my-4 pt-2">-->
-<!--                        <button-->
-<!--                            type="button"-->
-<!--                            class="btn btn-block btn-warning"-->
-<!--                            @click="generateMap"-->
-<!--                        >-->
-<!--                            Generate Seat Map-->
-<!--                        </button>-->
-<!--                    </div>-->
                 </div>
-<!--                <div class="row mx-3 mainRow" v-if="isShowDiv">-->
-<!--                    <div class="form-group col-md-5 border py-3">-->
-<!--                        <tr-->
-<!--                            class="seat-img p-0 m-0 s"-->
-<!--                            v-for="(record, rowIndex) in data.seatMap"-->
-<!--                            :key="rowIndex"-->
-<!--                        >-->
-<!--                            <td-->
-<!--                                v-for="(col, colIndex) in record"-->
-<!--                                :key="colIndex"-->
-<!--                                :class="col.reserved ? 'selected-row border' : ''"-->
-<!--                            >-->
-<!--                                <img @click="changeStatus(rowIndex, colIndex)"-->
-<!--                                     :src=" $store.state.app_url + 'assets/img/buses/available_seat_img.gif' "-->
-<!--                                     alt=""-->
-<!--                                />-->
-<!--                            </td>-->
-<!--                        </tr>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-5 border py-3">-->
-<!--                        <tr-->
-<!--                            class="seat-img p-0 m-0"-->
-<!--                            v-for="(record, rowIndex) in data.seatMap"-->
-<!--                            :key="rowIndex"-->
-<!--                        >-->
-<!--                            <td v-for="(col, colIndex) in record" :key="colIndex">-->
-<!--                                <img v-if="col.reserved"-->
-<!--                                     :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' "-->
-<!--                                     alt=""/>-->
-<!--                                <span v-else></span>-->
-<!--                            </td>-->
-<!--                        </tr>-->
-<!--                    </div>-->
-<!--                    <div class="col-md-2 form-group  ">-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0 ">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="selected-row mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Selected</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline;">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="booked_Seat mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Booked</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="notForSale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Not For Sale</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="anyElseClass pr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Other Class</span>-->
-
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="economy mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Economy</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="exective mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Executive</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="business mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Business</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="reservedForFemale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-wrap">Reserved For Female</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <template v-slot:button>
                     <button
                         type="button"
@@ -276,7 +136,7 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Surcharge"
+                heading="Edit Fare Class"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
@@ -301,135 +161,10 @@
                             </label>
                         </div>
                     </div>
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Rows <span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Rows"-->
-<!--                            v-model="dataEdit.no_of_rows"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3">-->
-<!--                        <label for="name">No. of Cols <span class="text-danger">*</span></label>-->
-<!--                        <input-->
-<!--                            type="text"-->
-<!--                            class="form-control"-->
-<!--                            placeholder="Enter No. of Cols"-->
-<!--                            v-model="dataEdit.no_of_cols"-->
-<!--                            @keypress="isNumber($event)"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-3 my-4 pt-2">-->
-<!--                        <button-->
-<!--                            type="button"-->
-<!--                            class="btn btn-block btn-warning"-->
-<!--                            @click="editGenerateMap"-->
-<!--                        >-->
-<!--                            Generate Seat Map-->
-<!--                        </button>-->
-<!--                    </div>-->
                 </div>
-<!--                <div class="row mx-1 mainRow">  &lt;!&ndash;v-if="isShowEditDiv&ndash;&gt;-->
-<!--                    <div class="form-group col-md-6 border py-3">-->
-<!--                            <tr-->
-<!--                                class="seat-img p-0 m-0"-->
-<!--                                v-for="(record, rowIndex) in dataEdit.seat_map"-->
-<!--                                :key="rowIndex"-->
-<!--                            >-->
-<!--                                <td-->
-<!--                                    v-for="(col, colIndex) in record"-->
-<!--                                    :key="colIndex"-->
-<!--                                    :class="col.reserved ? 'selected-row border' : ''"-->
-<!--                                >-->
-<!--                                    <img-->
-<!--                                        @click="changeEditStatus(rowIndex, colIndex)"-->
-<!--                                        :src="$store.state.app_url + 'assets/img/buses/available_seat_img.gif'" alt=""/>-->
-<!--                                </td>-->
-<!--                            </tr>-->
-<!--                        </div>-->
-<!--                    <div class="col-md-4 form-group  ">-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0 ">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="selected-row mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Selected</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline;">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="booked_Seat mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Booked</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="notForSale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Not For Sale</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="anyElseClass pr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Other Class</span>-->
-
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                            <div class="col-md-6">-->
-<!--                                <ul style="list-style: none;" class="m-0 p-0">-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="economy mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Economy</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="exective mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Executive</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="business mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-nowrap">Business</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                    <li style="display:inline; ">-->
-<!--                                        <div-->
-<!--                                            style="width: 30px; height: 30px; -moz-border-radius: 25px;	-webkit-border-radius: 25px; border-radius: 50px;"-->
-<!--                                            class="reservedForFemale mr-1 border">-->
-<!--                                        </div>-->
-<!--                                        <span class="text-wrap">Reserved For Female</span>-->
-<!--                                    </li>-->
-<!--                                    <br>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    </div>-->
                 <template v-slot:button>
                         <button type="button" class="btn btn-primary" @click="updateFareClass">Update
-                            Surcharge
+                            Fare Class
                         </button>
                 </template>
             </Edit>
@@ -459,28 +194,19 @@ export default {
     data() {
         return {
             fareClasses: [],
-            formID: "addNewFareClass",
+            formID: "fareClass_form",
             validationErrors: [],
             success: false,
             error: false,
-            // isShowDiv: false,
-            // isShowEditDiv: false,
             FareClassName:'',
             delId:"",
-            // seatNo: 0,
             data:{
-                // noOfRows: "",
-                // noOfCols: "",
-                // seatMap: [],
                 isActive:1,
                 FareClassName:"",
             },
             dataEdit: {
                 FareClassName: '',
                 is_Active: '',
-                // noOfRows: "",
-                // no_of_cols: "",
-                // seatMap: [],
             },
         };
     },
@@ -489,124 +215,23 @@ export default {
 
     },
     methods: {
+        clearForm: function(){
+          this.data = {};
+          this.data.isActive = 1
+        },
         async fetchFareClasses(){
             const res = await this.callApi("post", 'fare-class');
             if (res.status === 200) {
                 this.fareClasses = res.data
             }
         },
-        // isNumber: function (evt) {
-        //     evt = (evt) ? evt : window.event;
-        //     var charCode = (evt.which) ? evt.which : evt.keyCode;
-        //     if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-        //         evt.preventDefault();
-        //     } else {
-        //         return true;
-        //     }
-        // },
+
         isAlphabet: function (evet) {
             if (!/[a-zA-Z\s]/.test(event.key)) {
                 this.ignoredValue = event.key ? event.key : "";
                 event.preventDefault();
             }
         },
-
-
-        // addSeatData: function (col, row) {
-        //     if (this.seatType === 0) {
-        //         return this.errorsArray("Please Select Seat Type", "Seat Type");
-        //     }
-        //     if (this.seatClass === 0) {
-        //         return this.errorsArray("Please Select Seat Class", "Seat Class");
-        //     }
-        //
-        //     const seatDetails = this.data.seatMap[row][col];
-        //     this.data.seatMap[row][col] = {
-        //         reserved: seatDetails.reserved,
-        //         seatNo: seatDetails.seatNo,
-        //         class: this.seatClass,
-        //         type: this.seatType,
-        //     };
-        //
-        //     this.success = "Seat Classes Added Successfully ";
-        // },
-        // updateSeatData: function (rowId, colId) {
-        //     (this.seatClass = "0"),
-        //         (this.seatType = "0"),
-        //         (this.updateSeatValue = {
-        //             modalRowId: rowId,
-        //             modalColId: colId,
-        //         });
-        //     console.log(this.updateSeatValue);
-        // },
-        // getSeatFareClass: function () {
-        //     $("#setSeatClass").appendTo("body");
-        // },
-        // changeStatus: function (row, col) {
-        //     if (this.data.seatMap[row][col].reserved) {
-        //         this.seatNo--;
-        //         this.data.seatMap[row][col] = {
-        //             reserved: false,
-        //             seatNo: 0,
-        //         };
-        //     } else {
-        //         this.seatNo++;
-        //         this.data.seatMap[row][col] = {
-        //             reserved: true,
-        //             seatNo: this.seatNo,
-        //         };
-        //     }
-        // },
-        // changeEditStatus: function (row, col) {
-        //     if (this.dataEdit.seat_map[row][col].reserved) {
-        //         this.seatNo--;
-        //         this.dataEdit.seat_map[row][col] = {
-        //             reserved: false,
-        //             seatNo: 0,
-        //         };
-        //     } else {
-        //         this.seatNo++;
-        //         this.dataEdit.seat_map[row][col] = {
-        //             reserved: true,
-        //             seatNo: this.seatNo,
-        //         };
-        //     }
-        // },
-        // generateMap: function () {
-        //     this.validationErrors = [];
-        //     let vm = this;
-        //     if (vm.data.noOfRows <= 15) {
-        //         if (vm.data.noOfCols <= 7) {
-        //             let arr,
-        //                 count = 0;
-        //             var map = new Array(parseInt(vm.data.noOfRows)); // creating rows
-        //             for (var i = 0; i < map.length; i++) {
-        //                 map[i] = new Array(vm.data.noOfCols); // creating columns
-        //             }
-        //
-        //             for (var i = 0; i < vm.data.noOfRows; i++) {
-        //                 for (var j = 0; j < vm.data.noOfCols; j++) {
-        //                     count++;
-        //                     map[i][j] = {
-        //                         reserved: false,
-        //                         seatNo: 0,
-        //                     };
-        //                 }
-        //             }
-        //             this.isShowDiv = true;
-        //             return (this.data.seatMap = map);
-        //         } else {
-        //             return this.errorsArray("No of Cols must be less then or equal to 7", "No Of Cols");
-        //         }
-        //     } else {
-        //         return this.errorsArray("No of Rows must be less then or equal to 15", "No Of Rows");
-        //
-        //     }
-        // },
-        // editGenerateMap: function () {
-        //     this.isShowEditDiv = true;
-        // },
-
 
         checkBox: function (e) {
             if (e.target.checked) {
@@ -622,27 +247,16 @@ export default {
                 this.dataEdit.is_Active = 0;
             }
         },
-        // async getClasses() {
-        //     const res = await this.callApi("post", 'fare-table/fare_class/get');
-        //     if (res.status === 200) {
-        //         this.fareClasses = res.data
-        //     } else {
-        //         console.log(res);
-        //     }
-        // },
 
         async addFareClass() {
             this.validationErrors = [];
             if (this.data.FareClassName === "")
                 return this.errorsArray("Fare Class Name is Required", "FareClassName");
-            // if (this.data.noOfRows === "0")
-            //     return this.errorsArray("Row Field is Required", "noOfRows");
-            // if (this.data.noOfCols === "0")
-            //     return this.errorsArray("Col Field is Required", "noOfCols");
 
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
+                await this.fetchFareClasses();
                 window.scrollTo(0, 0);
                 this.data.FareClassName = "";
                 // await this.getClasses();
@@ -666,7 +280,7 @@ export default {
 
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.fetchFareClasses();
+                await this.fetchFareClasses();
                 this.success = "Fare Class Updated Successfully";
 
             } else {
