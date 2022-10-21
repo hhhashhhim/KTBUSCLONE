@@ -24,11 +24,11 @@
             <tbody>
               <tr v-for="(booking, i) in details" :key="i">
                 <td>{{ parseInt(i) }}</td>
-                <td>{{ booking.customer.name }}</td>
+                <td>{{ booking.customer?booking.customer.name:"N/A" }}</td>
                 <td>{{ cnicFormat(booking.customer.cnic) }}</td>
                 <td>{{ booking.customer.contact }}</td>
                 <td>{{ booking.date }}</td>
-                <td>{{ booking.added_by.name }}</td>
+                <td>{{ booking.added_by?booking.added_by.name:"N/A" }}</td>
                 <td>{{ booking.count }}</td>
               </tr>
             </tbody>
