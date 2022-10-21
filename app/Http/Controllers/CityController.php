@@ -39,7 +39,7 @@ class CityController extends Controller
 
         $customMessages = [
             'name.required' => 'Name Field is Required!',
-            'name.unique' => 'This City Name is Already Exist',
+            'name.unique' => 'City Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);
         $city = City::create([
@@ -53,9 +53,15 @@ class CityController extends Controller
 
     public function update(Request $request)
     {
-        $request->validate([
-            'name' => 'required'
-        ]);
+        $rules = [
+            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+        ];
+
+        $customMessages = [
+            'name.required' => 'Name Field is Required!',
+            'name.unique' => 'City Name is Already Exist',
+        ];
+        $this->validate($request, $rules, $customMessages);
         return City::find($request->id)->update([
             'name' => $request->name,
         ]);

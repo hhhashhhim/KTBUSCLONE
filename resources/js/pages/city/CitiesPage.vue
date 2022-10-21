@@ -9,7 +9,7 @@
                         <div class="card-header">
                             <h4>Cities</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" class="btn btn-primary">
+                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
                                     Add New City
                                 </a>
                             </div>
@@ -80,7 +80,7 @@
             heading="Edit City Name"
             :errors="this.validationErrors"
             :success="success"
-            :formID="editFormID"
+            :formID="formID"
             >
                 <div class="form-group">
                     <label for="name">Name <span class="text-danger">*</span></label>
@@ -116,9 +116,9 @@ export default {
     },
     data(){
         return {
-            validationErrors:[],
-            cities:[],
-            formID:'City',
+            validationErrors: [],
+            cities: [],
+            formID:'city_form',
             data:{
                 name:"",
             },
@@ -135,6 +135,9 @@ export default {
         await this.fetchCities();
     },
     methods:{
+        clearForm : function(){
+            this.data = {};
+        },
         async fetchCities() {
             const resCity = await this.callApi("post",'cities');
             if (resCity.status==200) {
@@ -145,33 +148,35 @@ export default {
             }, 50); //Time before execution
         },
         async add(){
-            this.validationErrors=[]
-            if(this.data.name === "")
+            this.validationErrors = []
+            if(this.data.name == "")
                 // return this.errorsArray("City Name is Required","Name");
             swal('Required','City Name is Required','error')
             const res = await this.callApi("post",'cities/store',this.data);
             console.log(res.data)
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.success="City Created Successfully Named as " + res.data.name;
                 // swal('Success', 'City Added Successfully', 'success');
-                await this.fetchCities();
+                // await this.fetchCities();
+                // this.cities.unshift(res.data);
+                this.cities.push(res.data);
                 this.data.name = "";
                 setTimeout(function(){
                     this.success = "";
+                    this.data = "";
                 },300)
-                setTimeout(function(){
-                }, 2000);
             }
-            else{
-                if (res.status==422) {
-                    setTimeout(function(){
-                        for (const key in res.data.errors) {
-                            res.data.errors[key].forEach(element => {
-                                this.errorsArray(element,key)
-                            });
-                        }
-                    }, 2000);
+            else {
+                if (res.status == 422) {
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
                 }
+                setTimeout(function () {
+                    document.querySelector('.alert-danger').style.display = 'none';
+                }, 2000);
             }
         },
         edit( city ){

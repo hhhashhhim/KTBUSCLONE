@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class TerminalController extends Controller
 {
@@ -28,12 +29,20 @@ class TerminalController extends Controller
     }
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
+
+        $rules = [
+            'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', $this->company_id)->whereNull('deleted_at')],
             'city_id' => 'required',
             'contact' => 'required',
-        ]);
+        ];
 
+        $customMessages = [
+            'name.required' => 'Name Field is Required!',
+            'name.unique' => 'Terminal Name already exist against This City',
+            'city_id.required' => 'Please Select Any City ',
+            'contact.required' => 'Please Enter your Phone Number   '
+        ];
+        $this->validate($request, $rules, $customMessages);
         if ($request->is_main) {
             $main = Terminal::where('city_id', $request->city_id)
                 ->where('company_id', $this->company_id)
@@ -66,7 +75,7 @@ class TerminalController extends Controller
 
         return $this->index();
     }
-    public function delete(Request $request)
+    public function  delete(Request $request)
     {
         return Terminal::find($request->id)->delete();
     }
