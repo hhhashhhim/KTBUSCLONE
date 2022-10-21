@@ -9,7 +9,7 @@
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
                 <li class="dropdown active">
-                    <a href="/" class="nav-link">
+                    <a :href="$store.state.app_url + '/admin/dashboard'" class="nav-link">
                         <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
                 <li class="dropdown" v-if="checkPermission('admin')">

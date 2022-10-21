@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Fare Class
                                 </a>
@@ -215,6 +215,10 @@ export default {
 
     },
     methods: {
+        clearForm: function(){
+          this.data = {};
+          this.data.isActive = 1
+        },
         async fetchFareClasses(){
             const res = await this.callApi("post", 'fare-class');
             if (res.status === 200) {
@@ -252,6 +256,7 @@ export default {
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
                 this.success = "Fare Class Added Successfully";
+                await this.fetchFareClasses();
                 window.scrollTo(0, 0);
                 this.data.FareClassName = "";
                 // await this.getClasses();
@@ -275,7 +280,7 @@ export default {
 
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.fetchFareClasses();
+                await this.fetchFareClasses();
                 this.success = "Fare Class Updated Successfully";
 
             } else {

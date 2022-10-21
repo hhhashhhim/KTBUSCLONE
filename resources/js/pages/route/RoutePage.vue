@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Route
                                 </a>
@@ -237,6 +237,9 @@ export default {
         this.fetchCities();
     },
     methods: {
+        clearForm: function () {
+          this.data = {};
+        },
         fareClassValue(data, className) {
             const dataTwo = data;
             const converted = Object.keys(dataTwo)
@@ -272,7 +275,7 @@ export default {
                 this.success = "Fare Table Updated Created Successfully";
                 // Object.keys(obj).forEach((i) => obj[i] = null);
                 this.data = {};
-                
+
                 this.cities = res.data;
                 window.scrollTo(0, 0);
                 this.
