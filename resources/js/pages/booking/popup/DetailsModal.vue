@@ -18,6 +18,7 @@
                 <th>Date</th>
                 <th>Ticket Booked By</th>
                 <th>No. of Tickets</th>
+                <!-- <th>Action</th> -->
               </tr>
             </thead>
             <tbody>

@@ -41,6 +41,7 @@ class ScheduleController extends Controller
             'name' => 'required',
             'StartDate' => 'required',
             'EndDate' => 'required',
+            'fareClass' => 'required',
             'route' => 'required',
             'busClass' => 'required',
         ];
