@@ -35870,7 +35870,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
       src: _ctx.$store.state.app_url + 'uploads/company/logo/' + company.logo,
       style: {
-        "width": "120px"
+        "width": "120px",
+        "height": "150px"
       },
       alt: ""
     }, null, 8

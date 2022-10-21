@@ -45,7 +45,7 @@ class BusClassController extends Controller
         return BusClass::create([
             'name' => $request->BusClassName,
             'color' => $request->BusClassColor,
-            'is_active' => $request->isActive,
+            'is_active' => $request->isActive??0,
             'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
             'no_of_cols' => $request->noOfCols,
