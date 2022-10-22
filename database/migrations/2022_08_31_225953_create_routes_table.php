@@ -13,15 +13,15 @@ class CreateRoutesTable extends Migration
      */
     public function up()
     {
-        Schema::create('routes', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->bigInteger('company_id');
-            $table->bigInteger('added_by');
-            $table->timestamp('time')->useCurrent();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('routes', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('name');
+        //     $table->bigInteger('company_id');
+        //     $table->bigInteger('added_by');
+        //     $table->timestamp('time')->useCurrent();
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**

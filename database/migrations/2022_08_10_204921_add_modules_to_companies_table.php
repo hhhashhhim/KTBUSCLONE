@@ -13,9 +13,9 @@ class AddModulesToCompaniesTable extends Migration
      */
     public function up()
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->json('modules')->after('location')->nullable();
-        });
+        // Schema::table('companies', function (Blueprint $table) {
+        //     $table->json('modules')->after('location')->nullable();
+        // });
     }
 
     /**

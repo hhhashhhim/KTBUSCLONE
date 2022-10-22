@@ -13,16 +13,16 @@ class CreateRoutesTerminalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('routes_terminals', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('route_id');
-            $table->bigInteger('terminal_id');
-            $table->bigInteger('company_id');
-            $table->bigInteger('added_by');
-            $table->timestamp('time')->useCurrent();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('routes_terminals', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->bigInteger('route_id');
+        //     $table->bigInteger('terminal_id');
+        //     $table->bigInteger('company_id');
+        //     $table->bigInteger('added_by');
+        //     $table->timestamp('time')->useCurrent();
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**

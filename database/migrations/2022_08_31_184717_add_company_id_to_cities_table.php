@@ -13,9 +13,9 @@ class AddCompanyIdToCitiesTable extends Migration
      */
     public function up()
     {
-        Schema::table('cities', function (Blueprint $table) {
-            $table->bigInteger('company_id')->after('name');
-        });
+        // Schema::table('cities', function (Blueprint $table) {
+        //     $table->bigInteger('company_id')->after('name');
+        // });
     }
 
     /**

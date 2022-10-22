@@ -13,18 +13,18 @@ class CreateDiscountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('discounts', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->integer('percentage')->nullable();
-            $table->integer('company_id')->nullable();
-            $table->boolean('is_active')->default(1);
-            $table->integer('added_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->timestamp('time')->useCurrent();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('discounts', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('name')->nullable();
+        //     $table->integer('percentage')->nullable();
+        //     $table->integer('company_id')->nullable();
+        //     $table->boolean('is_active')->default(1);
+        //     $table->integer('added_by')->nullable();
+        //     $table->integer('updated_by')->nullable();
+        //     $table->timestamp('time')->useCurrent();
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**

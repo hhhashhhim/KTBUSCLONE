@@ -13,18 +13,18 @@ class CreateSurchargesTable extends Migration
      */
     public function up()
     {
-        Schema::create('surcharges', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->integer('percentage')->nullable();
-            $table->boolean('is_active')->default(1);
-            $table->integer('company_id')->nullable();
-            $table->integer('added_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->timestamp('time')->useCurrent();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('surcharges', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('name')->nullable();
+        //     $table->integer('percentage')->nullable();
+        //     $table->boolean('is_active')->default(1);
+        //     $table->integer('company_id')->nullable();
+        //     $table->integer('added_by')->nullable();
+        //     $table->integer('updated_by')->nullable();
+        //     $table->timestamp('time')->useCurrent();
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**

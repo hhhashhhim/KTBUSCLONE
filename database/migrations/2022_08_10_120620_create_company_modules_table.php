@@ -13,15 +13,15 @@ class CreateCompanyModulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('company_modules', function (Blueprint $table) {
-            $table->id();
-            $table->string('menu_name');
-            $table->integer('company_id');
-            $table->integer('added_by');
-            $table->timestamp('time')->useCurrent();
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('company_modules', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('menu_name');
+        //     $table->integer('company_id');
+        //     $table->integer('added_by');
+        //     $table->timestamp('time')->useCurrent();
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**

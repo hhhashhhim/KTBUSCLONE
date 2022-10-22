@@ -13,9 +13,9 @@ class AddColorToFareClassesTable extends Migration
      */
     public function up()
     {
-        Schema::table('fare_classes', function (Blueprint $table) {
-            $table->string('color')->after('name')->nullable();
-        });
+        // Schema::table('fare_classes', function (Blueprint $table) {
+        //     $table->string('color')->after('name')->nullable();
+        // });
     }
 
     /**
