@@ -781,8 +781,8 @@ export default {
             if (res.status === 201) {
                 // swal('Success', 'Terminal Updated Successfully', 'success')
                 swal({
-                    title: "Success!",
-                    text: "Terminal Updated Successfully!",
+                    title: "Deleted!",
+                    text: "Terminal Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });

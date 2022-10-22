@@ -277,37 +277,44 @@
             <div class="card p-4">
               <div class="col-md-12 mb-2 d-flex flex-wrap">
                 <div class="my-2">
-                  <div class="selected circles mr-1 border"></div>
+                  <div class="selected circles mr-1 border shadow"></div>
                   <span class="text-wrap">Selected</span>
                 </div>
                 <div class="my-2">
-                  <div class="for-female circles mr-1 border"></div>
+                  <div class="for-female circles mr-1 border shadow"></div>
                   <span class="text-wrap">For Female</span>
                 </div>
                 <div class="my-2">
-                  <div class="for-male circles mr-1 border"></div>
+                  <div class="for-male circles mr-1 border shadow"></div>
                   <span class="text-wrap">For Male</span>
                 </div>
                 <div class="my-2">
-                  <div class="not-for-sale circles mr-1 border"></div>
+                  <div class="not-for-sale circles mr-1 border shadow"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
+                
+                <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
+                  <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                  <span class="text-wrap">{{ seatClass.name }}</span>
+                </div>
+
+
                 <div class="my-3">
-                  <div class="circles icons-legend mr-1 border">
+                  <div class="circles icons-legend mr-1 border shadow">
                     <i class="fas fa-check"></i>
                   </div>
                   <span class="text-wrap">Booked</span>
                 </div>
                 <div class="my-3">
                   <div
-                    class="fas fa-check-double circles icons-legend mr-1 border"
+                    class="fas fa-check-double circles icons-legend shadow mr-1 border"
                   ></div>
                   <span class="text-wrap">Issued</span>
                 </div>
               </div>
               <div
                 class="d-flex justify-content-center seat-img p-0 m-0"
-                v-for="(record, rowIndex) in schedule.selective_bus.seat_map"
+                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
                 :key="rowIndex"
               >
                 <div v-for="(col, colIndex) in record" :key="colIndex">
@@ -322,7 +329,7 @@
                   >
                     <!-- data-toggle="modal"
                                             :data-target="col.type?'#booking-options-popup':''" -->
-                    <small>{{ col.seatNo }}</small>
+                    <small>{{ col.seatNo }} </small>
                     <br />
                     <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                       <i
@@ -403,6 +410,7 @@ export default {
       bookedSeats: [],
       allBookings:[],
       bookingDetails:[],
+      allSeatClasses:[],
       addForm: {
         type: "booked",
         gender: "1",
@@ -414,10 +422,11 @@ export default {
   async created() {
     const res = await this.callApi("post", "schedule");
     const resBooking = await this.callApi("post", "booking");
-    
-    if (res.status == 200 && resBooking.status == 200 ) {
+    const resClass = await this.callApi("post","fare-class")
+    if (res.status == 200 && resBooking.status == 200 && resClass.status == 200 ) {
       this.allSchedules = res.data;
-      this.allBookings = resBooking.data
+      this.allBookings = resBooking.data;
+      this.allSeatClasses = resClass.data;
       setTimeout(() => {
         $("#booking-table").dataTable();
       }, 300);
@@ -486,18 +495,18 @@ export default {
       this.validationErrors = [];
       if (
         this.addForm.oldBookings == 1 &&
-        !this.schedule.selective_bus.seat_map[row][col].type
+        !this.schedule.bus_class.seat_map[row][col].type
       ) {
         this.doScroll();
         return this.errorsArray("Please Select Already Booked Seat", "Oops");
       }
       if (
-        this.schedule.selective_bus.seat_map[row][col].type &&
+        this.schedule.bus_class.seat_map[row][col].type &&
         this.selectedSeats.length == 0
       ) {
         let index = this.selectedBookedSeats.indexOf(seatNo);
         if (index != -1) {
-          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.schedule.bus_class.seat_map[row][col].selected = false;
           this.selectedBookedSeats.splice(index, 1);
           this.bookedSeats = this.bookedSeats.filter((seat) => {
             if (seat.seatNo != seatNo) {
@@ -505,21 +514,21 @@ export default {
             }
           });
         } else {
-          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedBookedSeats.push(seatNo);
-          this.bookedSeats.push(this.schedule.selective_bus.seat_map[row][col]);
+          this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
         }
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
       } else if (
-        !this.schedule.selective_bus.seat_map[row][col].type &&
+        !this.schedule.bus_class.seat_map[row][col].type &&
         this.selectedBookedSeats.length == 0
       ) {
         let index = this.selectedSeats.indexOf(seatNo);
         if (index != -1) {
-          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.schedule.bus_class.seat_map[row][col].selected = false;
           this.selectedSeats.splice(index, 1);
         } else {
-          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedSeats.push(seatNo);
         }
         this.addForm.selectedSeats = this.selectedSeats;

@@ -423,8 +423,6 @@ export default {
                icon: "error",
                timer: 2000
             });
-
-
             if (this.data.fare_class === "")
                 return this.errorsArray("PLease Select Bus Class", "fare_class");
             const res = await this.callApi("post", "buses/store", this.data);

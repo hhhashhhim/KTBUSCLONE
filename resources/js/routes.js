@@ -1,4 +1,3 @@
-import Vue from "vue";
 import Profile from "./components/Profile.vue";
 import { createWebHistory,createRouter } from "vue-router";
 
@@ -19,10 +18,9 @@ import FareClass from "./pages/fareClass/FareClassPage";
 import BusesPage from "./pages/buses/BusesPage";
 import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
-import store from './store.js';
 
 // const url = '/projects/kt/'
-const url = '/kt/'
+const url = '/'
 
 const routes = [
     {

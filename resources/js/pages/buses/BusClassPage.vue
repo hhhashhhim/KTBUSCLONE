@@ -462,6 +462,7 @@
                     "
                                 alt=""
                             />
+                            <span v-else></span>
                         </td>
                     </tr>
                 </div>
@@ -578,7 +579,6 @@ export default {
             updateSeatValue: [],
             editSingleSeat: [],
             delId: "",
-            seatNo: 0,
             addData: {},
             data: {
                 noOfRows: "",
@@ -658,25 +658,31 @@ export default {
             }
         },
         addSeatData: function (col, row) {
-            if (this.seatModify.class == 0) {
-                // swal('required', 'Please Select Seat class', 'error');
-                swal({
-                    title: "Required",
-                    text: "Please Select Seat Class ",
-                   icon: "error",
-                   timer: 2000
-                });
-            } else {
+
+            if (this.seatModify.class || this.seatModify.type) {
+
                 const seatDetails = this.data.seatMap[row][col];
                 this.data.seatMap[row][col] = {
                     reserved: seatDetails.reserved,
                     seatNo: seatDetails.seatNo,
-                    class: this.seatModify.class,
-                    type: this.seatModify.type,
+                    class: this.seatModify.class??0,
+                    type: this.seatModify.type??0,
                 };
 
                 this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+
             }
+            else{
+
+                swal({
+                    title: "Required",
+                    text: "Please Select Any Field For Seat Modification !!!!",
+                   icon: "error",
+                   timer: 2000
+                });
+
+            }
+
         },
         modifySeatData: function (rowId, colId) {
             this.seatModify = {
@@ -727,31 +733,23 @@ export default {
 
         changeStatus: function (row, col) {
             if (this.data.seatMap[row][col].reserved) {
-                this.seatNo--;
                 this.data.seatMap[row][col] = {
                     reserved: false,
-                    seatNo: 0,
                 };
             } else {
-                this.seatNo++;
                 this.data.seatMap[row][col] = {
                     reserved: true,
-                    seatNo: this.seatNo,
                 };
             }
         },
         changeEditStatus: function (row, col) {
             if (this.dataEdit.seat_map[row][col].reserved) {
-                this.seatNo--;
                 this.dataEdit.seat_map[row][col] = {
                     reserved: false,
-                    seatNo: 0,
                 };
             } else {
-                this.seatNo++;
                 this.dataEdit.seat_map[row][col] = {
                     reserved: true,
-                    seatNo: this.seatNo,
                 };
             }
         },
@@ -759,22 +757,10 @@ export default {
             this.validationErrors = [];
             let vm = this;
             console.log(vm.data.noOfRows, vm.data.noOfCols)
-            if (/*vm.data.noOfRows == "undefined" ||*/ vm.data.noOfRows == "")
+            if ( vm.data.noOfRows == "")
                 swal('Required', 'No of Rows Field is Required!', 'error')
-            // swal({
-            //     title: "Required",
-            //     text: "no of rows Field is required",
-            //    icon: "error",
-            //    timer: 2000
-            // });
-            if (/*vm.data.noOfCols == "undefined"  ||*/ vm.data.noOfCols == "" )
+            if ( vm.data.noOfCols == "" )
                 swal('Required', 'No of Cols Field is Required!', 'error')
-            // swal({
-            //     title: "Required!",
-            //     text: "No of Cols Field is Required",
-            //    icon: "error",
-            //    timer: 2000
-            // });
             if (vm.data.noOfRows <= 15) {
                 if (vm.data.noOfCols <= 7) {
                     let arr,
@@ -789,7 +775,6 @@ export default {
                             count++;
                             map[i][j] = {
                                 reserved: false,
-                                seatNo: 0,
                             };
                         }
                     }
@@ -836,6 +821,16 @@ export default {
 
         async addBusClass() {
             this.validationErrors = [];
+            let seatNo=0;
+            this.data.seatMap = this.data.seatMap.map( (seat)=>{
+                for (let i = (seat.length-1); i >= 0; i--) {
+                    if (seat[i].reserved) {
+                        seat[i]['seatNo']=++seatNo;
+                    }
+                }
+                return seat;
+            });
+
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
                 swal({
@@ -889,8 +884,7 @@ export default {
         async updateFareClass() {
             this.validationErrors = [];
             if (this.dataEdit.BusClassName === "")
-                // return this.errorsArray("Bus Class Name is Required", "BusClassName");
-                // swal('Required', 'Bus Class Name is Required', 'error')
+
                 swal({
                     title: "Required",
                     text: "Bus Class name is required",
@@ -898,8 +892,7 @@ export default {
                    timer: 2000
                 });
             if (this.dataEdit.noOfRows === "0")
-                // return this.errorsArray("Row Field is Required", "noOfRows");
-                // swal('Required', 'Row Field is Required', 'error')
+
                 swal({
                     title: "Required",
                     text: "row Field is required",
@@ -907,8 +900,7 @@ export default {
                    timer: 2000
                 });
             if (this.dataEdit.noOfCols === "0")
-                // return this.errorsArray("Col Field is Required", "noOfCols");
-                // swal('Required', 'Col Field is Required', 'error')
+
                 swal({
                     title: "Required",
                     text: "Col Field is Required",
@@ -916,6 +908,18 @@ export default {
                    timer: 2000
                 });
                 this.loading = true;
+
+            let seatNo=0;
+
+            this.dataEdit.seat_map = this.dataEdit.seat_map.map( (seat)=>{
+                for (let i = (seat.length-1); i >= 0; i--) {
+                    if (seat[i].reserved) {
+                        seat[i]['seatNo']=++seatNo;
+                    }
+                }
+                return seat;
+            });
+
             const res = await this.callApi(
                 "post",
                 "bus_classes/update",
@@ -925,7 +929,7 @@ export default {
                 swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",
-                    icon: "error",
+                    icon: "success",
                    timer: 2000
                 });
                 this.loading = false;

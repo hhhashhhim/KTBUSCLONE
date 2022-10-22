@@ -56,18 +56,7 @@ class BusClassController extends Controller
 
     public function updateBusClass(Request $request)
     {
-        // $rules = [
-        //     'name' => 'required',
-        //     'no_of_rows' => 'required|integer',
-        //     'no_of_cols' => 'required|integer',
-        // ];
-
-        // $customMessages = [
-        //     'name.required' => 'FareClass Name is Required!',
-        //     'no_of_rows.required' => 'No of Rows of Bus  is Required!',
-        //     'no_of_cols.required' => 'No of Cols of Bus  is Required!',
-        // ];
-        // $this->validate($request, $rules, $customMessages);
+    
         return BusClass::where('id', $request->id)->update([
             'name' => $request->name,
             'color' => $request->busClassColor,
