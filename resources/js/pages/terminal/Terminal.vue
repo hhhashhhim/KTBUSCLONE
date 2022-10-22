@@ -571,7 +571,7 @@ export default {
                 // swal('Success', 'Terminal Updated Successfully', 'success')
                 swal({
                     title: "Deleted!",
-                    text: "Your row has been deleted.",
+                    text: "Terminal Updated Successfully",
                     icon: "success",
                    timer: 2000
                 });

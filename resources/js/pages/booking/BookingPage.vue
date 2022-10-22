@@ -292,6 +292,13 @@
                   <div class="not-for-sale circles mr-1 border"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
+                
+                <div class="my-2" v-for="(seatClass,i) in seatClasses" :key="i">
+                  <div class="not-for-sale circles mr-1 border"></div>
+                  <span class="text-wrap">Not For Sale</span>
+                </div>
+
+
                 <div class="my-3">
                   <div class="circles icons-legend mr-1 border">
                     <i class="fas fa-check"></i>
@@ -403,6 +410,7 @@ export default {
       bookedSeats: [],
       allBookings:[],
       bookingDetails:[],
+      seatClasses:[],
       addForm: {
         type: "booked",
         gender: "1",
@@ -414,7 +422,7 @@ export default {
   async created() {
     const res = await this.callApi("post", "schedule");
     const resBooking = await this.callApi("post", "booking");
-    
+    const resClass = await this.callApi("post","fare-class")
     if (res.status == 200 && resBooking.status == 200 ) {
       this.allSchedules = res.data;
       this.allBookings = resBooking.data

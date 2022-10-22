@@ -664,25 +664,31 @@ export default {
             }
         },
         addSeatData: function (col, row) {
-            if (this.seatModify.class == 0) {
-                // swal('required', 'Please Select Seat class', 'error');
-                swal({
-                    title: "Required",
-                    text: "Please Select Seat Class ",
-                   icon: "error",
-                   timer: 2000
-                });
-            } else {
+            
+            if (this.seatModify.class || this.seatModify.type) {
+                
                 const seatDetails = this.data.seatMap[row][col];
                 this.data.seatMap[row][col] = {
                     reserved: seatDetails.reserved,
                     seatNo: seatDetails.seatNo,
-                    class: this.seatModify.class,
-                    type: this.seatModify.type,
+                    class: this.seatModify.class??0,
+                    type: this.seatModify.type??0,
                 };
 
                 this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
+                
             }
+            else{
+
+                swal({
+                    title: "Required",
+                    text: "Please Select Any Field For Seat Modification !!!!",
+                   icon: "error",
+                   timer: 2000
+                });
+
+            }
+            
         },
         modifySeatData: function (rowId, colId) {
             this.seatModify = {
@@ -872,7 +878,7 @@ export default {
                 swal({
                     title: "Success",
                     text: "bus Class Added Successfully",
-                    icon: "error",
+                    icon: "success",
                    timer: 2000
                 });
                 await this.fetchBussClasses();
