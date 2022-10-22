@@ -1,6 +1,7 @@
 /node_modules
 /vendor
-.env
+/storage
+/.env
 .env.backup
 .env.dusk.local
 .phpunit.result.cache

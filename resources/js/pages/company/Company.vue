@@ -48,7 +48,7 @@
                                                             <td>
                                                                 <img
                                                                     :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)"
-                                                                    style="width:120px;" alt="">
+                                                                    style="width:120px;height:150px;" alt="">
                                                             </td>
                                                             <td>
                                                                 <a
