@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4 mt-4">
+                    <div class="form-group col-md-4 mt-4 pt-3">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="comma_separated" name="valueType" checked="" value="comma" v-model="dataCheck.seatNumberType" @click="applyMaks('comma')">
                             <label class="form-check-label" for="comma_separated">
@@ -117,6 +117,40 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="form-group col-md-3 mt-4 pt-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime" checked="" value="positiveTime" v-model="dataTime.time" @click="applyTimeMaks('positive')">
+                            <label class="form-check-label" for="positive_time">
+                                Positive
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime" value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">
+                            <label class="form-check-label" for="negative_time">
+                                Negative
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-5" v-if="showDivPositive">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.time_difference"
+                            mask="00:00"
+                            :raw="false"
+                            :options="optionsPositive">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-5" v-if="showDivNegative">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.time_difference"
+                            mask="-00:00"
+                            :raw="false"
+                            :options="optionsNegative">
+                        </vue-mask>
+                    </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
                         <vue-mask
@@ -127,20 +161,14 @@
                             :options="optionsContact">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
                         <label for="address">Address</label>
-                        <input type="text" class="form-control" v-model="data.address">
+                        <textarea  class="form-control" spellcheck="false" v-model="data.address"></textarea>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="data.time_difference"
-                            mask="00:00"
-                            :raw="false"
-                            :options="options">
-                        </vue-mask>
-                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
@@ -199,9 +227,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add">
-                        Add New Terminal
-                    </button>
+                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="add">{{ loading ? 'Loading...' : 'Add New Terminal' }} </button>
                 </template>
             </Add>
 
@@ -227,7 +253,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4 mt-4">
+                    <div class="form-group col-md-4 mt-4 pt-3">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="editComma_separated" name="editValueType" checked="" value="comma" v-model="dataEditCheck.seatNumberType" @click="editApplyMaks('comma')">
                             <label class="form-check-label" for="editComma_separated">
@@ -261,12 +287,42 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-8">
-                        <label for="available_seats">Allowed Seats</label>
-                        <input type="text" class="form-control" v-model="dataEdit.available_seats">
-                    </div>
                 </div>
                 <div class="row">
+                    <div class="form-group col-md-3 mt-4 pt-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime" checked="" value="positiveTimeEdit" v-model="dataEditTime.time" @click="editApplyMaks('positive')">
+                            <label class="form-check-label" for="positive_edit_time">
+                                Positive
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime" value="negativeTimeEdit" v-model="dataEditTime.time" @click="editApplyMaks('negative')">
+                            <label class="form-check-label" for="negative_edit_time">
+                                Negative
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-5" v-if="showEditDivPositive">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.time_difference"
+                            mask="00:00"
+                            :raw="false"
+                            :options="optionsPositive">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-5" v-if="showEditDivNegative">
+                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.time_difference"
+                            mask="-00:00"
+                            :raw="false"
+                            :options="optionsNegative">
+                        </vue-mask>
+                    </div>
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
                         <vue-mask
@@ -277,20 +333,24 @@
                             :options="optionsContact">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+<!--                        <vue-mask-->
+<!--                            class="form-control"-->
+<!--                            v-model="dataEdit.time_difference"-->
+<!--                            mask="00:00"-->
+<!--                            :raw="false"-->
+<!--                            :options="options">-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
+                    </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
                         <label for="address">Address</label>
-                        <input type="text" class="form-control" v-model="dataEdit.address">
+                        <textarea  class="form-control" spellcheck="false" v-model="dataEdit.address"></textarea>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="dataEdit.time_difference"
-                            mask="00:00"
-                            :raw="false"
-                            :options="options">
-                        </vue-mask>
-                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
@@ -351,9 +411,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="update">
-                        Update Terminal
-                    </button>
+                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="update">{{ loading ? 'Loading...' : 'Update Terminal' }}</button>
                 </template>
             </Edit>
 
@@ -452,7 +510,10 @@ export default {
     data() {
         return {
             date: null,
-            options: {
+            optionsNegative: {
+                placeholder: '-HH:MM',
+            },
+            optionsPositive: {
                 placeholder: 'HH:MM',
             },
             optionsContact: {
@@ -466,10 +527,15 @@ export default {
             },
             validationErrors: '',
             seen: true,
+            loading:false,
             showDivComma: true,
+            showDivPositive: true,
             showEditDivComma: true,
+            showEditDivPositive: true,
             showDivDash: false,
+            showDivNegative: false,
             showEditDivDash: false,
+            showEditDivNegative: false,
             terminals: [],
             terminalsDetails: [],
             companies: [],
@@ -477,6 +543,8 @@ export default {
             cities: [],
             dataEditCheck:{},
             dataCheck:{},
+            dataTime:{},
+            dataEditTime:{},
             data: {
                 company_id: "",
                 name: "",
@@ -504,6 +572,7 @@ export default {
     },
     methods: {
         applyMaks: function (value) {
+            console.log(value, typeof value);
             if(value == 'comma'){
                 this.showDivComma = true;
                 this.showDivDash = false;
@@ -511,6 +580,29 @@ export default {
             if(value == 'dash'){
                 this.showDivComma = false;
                 this.showDivDash = true;
+            }
+
+            if(value == 'positive'){
+                this.showDivPositive = true;
+                this.showDivNegative = false;
+            }
+            if(value == 'negative'){
+                this.showDivPositive = false;
+                this.showDivNegative = true;
+            }
+        },
+        applyTimeMaks: function (value) {
+            console.log(value, typeof value);
+            if(value == 'positive'){
+                this.showDivPositive = true;
+                this.showDivNegative = false;
+            }
+            if(value == 'negative'){
+                this.showDivPositive = false;
+                this.showDivNegative = true;
+                if(this.dataTime.time == "negativeTime"){
+                    this.data.time_difference == "";
+                }
             }
         },
         editApplyMaks: function (value) {
@@ -522,10 +614,22 @@ export default {
                 this.showEditDivComma = false;
                 this.showEditDivDash = true;
             }
+            if(value == 'positive'){
+                this.showEditDivPositive = true;
+                this.showEditDivNegative = false;
+            }
+            if(value == 'negative'){
+                this.showEditDivPositive = false;
+                this.showEditDivNegative = true;
+            }
         },
         clearForm: function () {
             this.data = {};
             this.data.city_id = 0;
+            this.dataTime.time = "positiveTime";
+            this.dataCheck.seatNumberType = "comma";
+            this.showDivComma = true;
+            this.showDivPositive = true;
         },
         async fetchTerminals() {
             const terminalRes = await this.callApi("post", "terminals");
@@ -591,6 +695,8 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+
+            this.loading = true;
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
                 // swal('Success', 'Terminal Created Successfully', 'success');
@@ -600,6 +706,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.loading = false;
                 await this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
@@ -668,6 +775,8 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+
+            this.loading = true;
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
                 // swal('Success', 'Terminal Updated Successfully', 'success')
@@ -677,6 +786,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.loading = false;
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");

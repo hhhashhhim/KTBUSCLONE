@@ -144,9 +144,7 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="addFareClass"
-                    >
-                        Add Fare Class
+                        @click="addFareClass" :class="loading?'disabled':''" >{{loading ? 'Loading...' :  'Add Fare Class' }}
                     </button>
                 </template>
             </Add>
@@ -186,9 +184,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="updateFareClass">Update
-                            Fare Class
-                        </button>
+                        <button type="button" class="btn btn-primary" @click="updateFareClass" :class="loading?'disabled':''"> {{loading ? 'Loading...' : 'Update Fare Class' }} </button>
                 </template>
             </Edit>
             <!--            Edit MOdel End-->
@@ -216,6 +212,7 @@ export default {
     },
     data() {
         return {
+            loading : false,
             fareClasses: [],
             formID: "fareClass_form",
             validationErrors: [],
@@ -276,15 +273,31 @@ export default {
         async addFareClass() {
             this.validationErrors = [];
             if (this.data.FareClassName === "")
-                return this.errorsArray("Fare Class Name is Required", "FareClassName");
-
+            swal({
+                title: "Required!",
+                text: "Fare Class Name is Required",
+                icon: "error",
+                timer: 2000
+            });
+            if (this.data.FareClassColor === "")
+            swal({
+                title: "Required!",
+                text: "Fare Class Color is Required",
+                icon: "error",
+                timer: 2000
+            });
+                this.loading = true;
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
-                this.success = "Fare Class Added Successfully";
+                swal({
+                    title: "Success!",
+                    text: "Fare Class Added Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);
-                this.data.FareClassName = "";
-                // await this.getClasses();
 
             } else {
                 if (res.status === 422) {
@@ -301,12 +314,31 @@ export default {
         async updateFareClass() {
             this.validationErrors = [];
             if (this.dataEdit.FareClassName === "")
-                return this.errorsArray("Fare Class Name is Required", "FareClassName");
+                swal({
+                    title: "Required!",
+                    text: "Fare Class Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+                if (this.dataEdit.FareClassColor === "")
+                swal({
+                    title: "Required!",
+                    text: "Fare Class Color is Required",
+                    icon: "error",
+                    timer: 2000
+                });
 
+                this.loading = true;
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
+                swal({
+                    title: "Success!",
+                    text: "Fare Class Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
                 await this.fetchFareClasses();
-                this.success = "Fare Class Updated Successfully";
 
             } else {
                 if (res.status === 422) {

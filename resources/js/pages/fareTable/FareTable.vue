@@ -16,8 +16,8 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord">Fetch
-                                    Record
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord" :class="loading?'disabled':''">
+                                    {{loading ? 'Loading...' : 'Fetch Record' }}
                                 </button>
                             </div>
                         </div>
@@ -166,10 +166,10 @@ export default {
     },
     data() {
         return {
+            loading : false,
             date: null,
             options: {
                 placeholder: 'HH:MM',
-                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
             cities: [],
             companies: [],
@@ -177,7 +177,7 @@ export default {
             validationErrors: [],
             FareClassName: '',
             msg: 1,
-            formID: "fareTablePopup",
+            formID: "fareTable_form",
             fareClasses: [],
             data: {
                 fare_class: '0',
@@ -265,12 +265,16 @@ export default {
                 this.error = true;
                 return
             }
+            this.loading =true;
+
             const res = await this.callApi("post", "fare-table", {
                 company_id: this.data.company_id, fare_class: this.data.fare_class
             });
             if (res.status === 200) {
+
                 this.msg = 2;
                 this.cities = res.data
+                this.loading = false;
                 setTimeout(() => {
                     this.success = "";
                 }, 3000);

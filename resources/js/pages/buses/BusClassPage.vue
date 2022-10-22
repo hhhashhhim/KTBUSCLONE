@@ -238,8 +238,8 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addBusClass">
-                        Add Bus Class
+                    <button type="button" class="btn btn-primary" @click="addBusClass" :class="loading?'disabled':''">
+                        {{loading ? 'Loading...' : 'Add Bus Class' }}
                     </button>
                 </template>
             </Add>
@@ -300,10 +300,7 @@
                                                 type="button"
                                                 class="btn btn-block btn-success"
                                                 @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
-                                                data-dismiss="modal"
-                                            >
-                                                Add Seat Detail
-                                            </button>
+                                                data-dismiss="modal" :class="loading?'disabled':''" > {{loading ? 'Loading...' : 'Add Seat Detail'}} </button>
                                         </div>
                                     </div>
                                 </div>
@@ -339,7 +336,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" @click="saveFareClass()">Save Fare Class</button>
+                        <button type="button" class="btn btn-primary" @click="saveFareClass()" :class="loading?'disabled':''" > {{ loading ? 'Loading...' : 'Save Fare Class' }}</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -473,9 +470,7 @@
                 <button
                     type="button"
                     class="btn btn-primary"
-                    @click="updateFareClass"
-                >
-                    Update Bus Class
+                    @click="updateFareClass" :class="loading?'disabled':''" >{{ loading ? 'Loading...' : 'Update Bus Class' }}
                 </button>
             </template>
         </Edit>
@@ -530,11 +525,7 @@
                                             type="button"
                                             class="btn btn-block btn-success"
                                             @click=" updateSeatDetail(editSingleSeat.rowId, editSingleSeat.colId)"
-                                            data-dismiss="modal"
-                                        >
-
-                                            Update Seat Data
-                                        </button>
+                                            data-dismiss="modal"> Update Seat Data </button>
                                     </div>
                                 </div>
                             </div>
@@ -579,6 +570,7 @@ export default {
                 type: 0,
             },
             success: false,
+            loading: false,
             error: false,
             isShowDiv: false,
             isShowEditDiv: false,
@@ -650,6 +642,7 @@ export default {
             }
         },
         async saveFareClass(){
+            this.loading = true;
             const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
             if (resSaveFareClass.status === 201) {
                 swal({
@@ -658,6 +651,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.loading = false;
                 this.fareClasses.push(resSaveFareClass.data);
             } else {
                 console.log(resSaveFareClass);
@@ -866,15 +860,17 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
+            this.loading = true;
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
-                swal('Success', 'Bus Class Added Successfully', 'success');
+                // swal('Success', 'Bus Class Added Successfully', 'success');
                 swal({
                     title: "Success",
-                    text: "bus Class Added Successfully",
-                    icon: "error",
+                    text: "Bus Class Added Successfully",
+                    icon: "success",
                    timer: 2000
                 });
+                this.loading = false;
                 await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
@@ -919,20 +915,22 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-
+                this.loading = true;
             const res = await this.callApi(
                 "post",
                 "bus_classes/update",
                 this.dataEdit
             );
             if (res.status === 200 && res.statusText === "OK") {
-                await this.fetchBussClasses();
                 swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",
                     icon: "error",
                    timer: 2000
                 });
+                this.loading = false;
+                await this.fetchBussClasses();
+
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {

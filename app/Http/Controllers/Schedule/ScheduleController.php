@@ -91,7 +91,6 @@ class ScheduleController extends Controller
 
     public function updateSchedule(Request $request)
     {
-//        dd($request->all());
         $req = $request->schedules;
         return Schedule::where('id', $req['id'])->update([
             'name' => $req['name'],

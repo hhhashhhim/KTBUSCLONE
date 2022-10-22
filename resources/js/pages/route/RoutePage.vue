@@ -93,7 +93,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="name">Name</label>
+                        <label for="name">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeName"/>
                     </div>
 
@@ -110,7 +110,6 @@
                             <thead>
                             <tr>
                                 <th>City From</th>
-                                <!--                                <th>Select Terminal</th>-->
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -134,8 +133,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addRoute">
-                        Save Route Details
+                    <button type="button" class="btn btn-primary" @click="addRoute" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Route' }}
                     </button>
                 </template>
             </Add>
@@ -209,6 +207,7 @@ export default {
     },
     data() {
         return {
+            loading : false,
             cities: [],
             validationErrors: [],
             city: 0,
@@ -218,7 +217,7 @@ export default {
             fetchedData: [],
             addTerminalsOnClick: [],
             routes: [],
-            formID: "addNewRoute",
+            formID: "route_form",
             data: {},
             dataEdit: {},
             from: {},
@@ -257,12 +256,20 @@ export default {
                 cities: this.addCities,
                 terminals: this.addTerminalsOnClick
             }
+
+            this.loading = true;
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
                 this.routeName = "";
                 this.loop = 0;
                 this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
-                this.success = "Route Created Successfully";
+                // this.success = "Route Created Successfully";
+                swal({
+                    title: "Success",
+                    text: "Route Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
                 setTimeout(() => {
                     // window.location.reload();
                 }, 3000);
@@ -272,7 +279,13 @@ export default {
             this.validationErrors = [];
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {
-                this.success = "Fare Table Updated Created Successfully";
+                // this.success = "Fare Table Updated Created Successfully";
+                swal({
+                    title: "Success",
+                    text: "Fare Table Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
                 // Object.keys(obj).forEach((i) => obj[i] = null);
                 this.data = {};
 

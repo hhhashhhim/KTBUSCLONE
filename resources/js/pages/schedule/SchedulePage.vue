@@ -181,7 +181,7 @@
         <section class="section1" :class="activeSection != 0 ? 'd-none' : ''">
           <div class="row">
             <div class="col-md-6">
-              <label for="name">Name</label>
+              <label for="name">Name <span class="text-danger">*</span></label>
               <input
                 type="text"
                 id="name"
@@ -190,7 +190,7 @@
               />
             </div>
             <div class="col-md-6 class form-group">
-              <label for="start">Start Date</label>
+              <label for="start">Start Date <span class="text-danger">*</span></label>
               <input
                 type="date"
                 id="start"
@@ -201,7 +201,7 @@
           </div>
           <div class="row">
             <div class="col-md-6 class form-group">
-              <label for="end">End Date</label>
+              <label for="end">End Date <span class="text-danger">*</span></label>
               <input
                 type="date"
                 id="end"
@@ -209,9 +209,9 @@
                 v-model="data.EndDate"
               />
             </div>
-            
+
             <div class="col-md-6 class form-group">
-              <label for="busCLass">Bus Class</label>
+              <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
               <select
                 class="form-control"
                 id="busCLass"
@@ -247,7 +247,7 @@
         >
           <div class="row">
             <div class="col-md-12 class form-group">
-              <label for="DiscountName">Routes</label>
+              <label for="DiscountName">Routes <span class="text-danger">*</span></label>
               <select
                 class="form-control"
                 id="route"
@@ -461,9 +461,8 @@
               <button
                 id="submitFormButton"
                 class="btn btn-success float-right"
-                @click="addSchedule()"
-              >
-                Save Schedule
+                @click="addSchedule()" :class="loading?'disabled':''"
+              > {{ loading ? 'Loading...' : 'Save Schedule' }}
               </button>
             </div>
           </div>
@@ -514,7 +513,7 @@
         >
           <div class="row">
             <div class="col-md-6">
-              <label for="name">Name</label>
+              <label for="name">Name <span class="text-danger">*</span></label>
               <input
                 type="text"
                 id="name"
@@ -523,7 +522,7 @@
               />
             </div>
             <div class="col-md-6 class form-group">
-              <label for="start">Start Date </label>
+              <label for="start">Start Date  <span class="text-danger">*</span></label>
               <input
                 type="date"
                 id="start"
@@ -534,7 +533,7 @@
           </div>
           <div class="row">
             <div class="col-md-6 class form-group">
-              <label for="end">End Date </label>
+              <label for="end">End Date  <span class="text-danger">*</span></label>
               <input
                 type="date"
                 id="end"
@@ -543,13 +542,13 @@
               />
             </div>
             <div class="col-md-6 class form-group">
-              <label for="busType">Bus Type</label>
+              <label for="busType">Bus Class <span class="text-danger">*</span></label>
               <select
                 class="form-control"
                 id="busType"
                 v-model="dataEdit.schedules.bus_class_id"
               >
-                <option value="" selected>Select Type</option>
+                <option value="" selected>Select Class</option>
                 <option
                   v-for="(type, i) in editClasses"
                   :value="type.id"
@@ -582,7 +581,7 @@
         >
           <div class="row">
             <div class="col-md-12 class form-group">
-              <label for="DiscountName">Routes</label>
+              <label for="DiscountName">Routes <span class="text-danger">*</span></label>
               <select
                 class="form-control"
                 id="route"
@@ -741,9 +740,9 @@
               <button
                 id="submitFormButton"
                 class="btn btn-success float-right"
-                @click="updateSchedule"
+                @click="updateSchedule" :class="loading?'disabled':''"
               >
-                Update Schedule
+                  {{loading ? 'Loading...' : 'Update Schedule' }}
               </button>
             </div>
           </div>
@@ -772,10 +771,11 @@ export default {
   },
   data() {
     return {
+        loading : false,
       schedules: [],
       discounts: [],
       surcharges: [],
-      formID: "addNewSchedule",
+      formID: "schedule_form",
       validationErrors: [],
       value: [],
       editClasses: [],
@@ -994,28 +994,63 @@ export default {
 
     async addSchedule() {
       this.validationErrors = [];
-      if (this.data.name === "")
-        return this.errorsArray("Schedule Name is Required", "Name");
-      if (this.data.StartDate === "")
-        return this.errorsArray(
-          "Departure Date and Time is Required",
-          "StartDate"
-        );
-      if (this.data.EndDate === "")
-        return this.errorsArray("End Date and Time is Required", "EndDate");
-      if (this.data.busClass === "")
-        return this.errorsArray("Bus Class is Required", "BusClass");
-      if (this.data.route === "")
-        return this.errorsArray("Route is Required", "Route");
+      if (this.data.name == "")
+        // return this.errorsArray("Schedule Name is Required", "Name");
+        swal({
+            title: "Required!",
+            text: "name Field is Required ",
+            icon: "error",
+            timer: 2000
+        });
+      if (this.data.StartDate == "")
+        // return this.errorsArray(
+        //   "Departure Date and Time is Required",
+        //   "StartDate"
+        // );
+        swal({
+            title: "Required!",
+            text: "Start Date is Required",
+            icon: "error",
+            timer: 2000
+        });
+      if (this.data.EndDate == "")
+        // return this.errorsArray("End Date and Time is Required", "EndDate");
+          swal({
+              title: "Required!",
+              text: "End Date is Required",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.data.busClass == "")
+        // return this.errorsArray("Bus Class is Required", "BusClass");
+          swal({
+              title: "Required!",
+              text: "Bus Class is Required",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.data.route == "")
+        // return this.errorsArray("Route is Required", "Route");
+          swal({
+              title: "Required!",
+              text: "Route is Required",
+              icon: "error",
+              timer: 2000
+          });
 
+      this.loading = true;
       const res = await this.callApi("post", "schedule/store", this.data);
       if (res.status === 201) {
         // this.success = "Schedule Created Successfully";
-        swal("Success", "Schedule Created Successfully", "success");
+        // swal("Success", "Schedule Created Successfully", "success");
+          swal({
+              title: "Success",
+              text: "Schedule Created Successfully",
+              icon: "success",
+              timer: 2000
+          });
+          this.loading = false;
         await this.fetchSchedule();
-        setTimeout(function () {
-          // window.location.reload();
-        }, 2000);
       } else {
         if (res.status === 422) {
           for (const key in res.data.errors) {
@@ -1032,35 +1067,71 @@ export default {
 
     async updateSchedule() {
       this.validationErrors = [];
-      if (this.dataEdit.schedules.name === "")
+      if (this.dataEdit.schedules.name == "")
         return this.errorsArray("Schedule Name is Required", "Name");
-      if (this.dataEdit.schedules.startDate === "")
-        return this.errorsArray(
-          "Departure Date and Time is Required",
-          "StartDate"
-        );
-      if (this.dataEdit.schedules.endDate === "")
-        return this.errorsArray(
-          "End Date and Time is Required",
-          "DestinationDateTime"
-        );
-      if (this.dataEdit.schedules.selected_bus_class_id === "")
-        return this.errorsArray(
-          "Selected Bus Class is Required",
-          "Selected Bus Class"
-        );
-      if (this.dataEdit.schedules.route_id === "")
-        return this.errorsArray("Route is Required", "Route");
-
+        swal({
+            title: "Required!",
+            text: "name is Required",
+            icon: "error",
+            timer: 2000
+        });
+      if (this.dataEdit.schedules.startDate == "")
+        // return this.errorsArray(
+        //   "Departure Date and Time is Required",
+        //   "StartDate"
+        // );
+          swal({
+              title: "Required!",
+              text: "Start Date id Required",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.dataEdit.schedules.endDate == "")
+        // return this.errorsArray(
+        //   "End Date and Time is Required",
+        //   "DestinationDateTime"
+        // );
+          swal({
+              title: "Required!",
+              text: "End Date is Required",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.dataEdit.schedules.selected_bus_class_id == "0")
+        // return this.errorsArray(
+        //   "Selected Bus Class is Required",
+        //   "Selected Bus Class"
+        // );
+          swal({
+              title: "Required!",
+              text: "Bus Class is Required",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.dataEdit.schedules.route_id == "0")
+        // return this.errorsArray("Route is Required", "Route");
+          swal({
+              title: "Required!",
+              text: "Route is Required",
+              icon: "error",
+              timer: 2000
+          });
+this.loading = true;
       const resEdit = await this.callApi(
         "post",
         "schedule/update",
         this.dataEdit
       );
-      console.log(resEdit);
       if (resEdit.status === 200 && resEdit.statusText === "OK") {
         // this.success = "Schedule Updated Successfully";
-        swal("Success", "Schedule Updated Successfully", "success");
+        // swal("Success", "Schedule Updated Successfully", "success");
+          swal({
+              title: "Success",
+              text: "Schedule Updated Succesfully",
+              icon: "success",
+              timer: 2000
+          });
+          this.loading = false;
         await this.fetchSchedule();
 
         setTimeout(function () {
