@@ -19,8 +19,8 @@ import BusesPage from "./pages/buses/BusesPage";
 import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
 
-// const url = '/projects/kt/'
-const url = '/'
+const url = '/projects/kt/'
+// const url = '/'
 
 const routes = [
     {
