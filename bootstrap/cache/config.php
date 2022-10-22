@@ -4,7 +4,7 @@
     'name' => 'Laravel',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://localhost/projects/kt/',
+    'url' => 'http://localhost/kt/',
     'asset_url' => NULL,
     'timezone' => 'UTC',
     'locale' => 'en',
@@ -184,7 +184,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\framework/cache/data',
+        'path' => 'D:\\xampp\\htdocs\\kt\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -267,7 +267,7 @@
       array (
         'driver' => 'sqlite',
         'url' => NULL,
-        'database' => 'laravel_vue',
+        'database' => 'kttest',
         'prefix' => '',
         'foreign_key_constraints' => true,
       ),
@@ -277,7 +277,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'laravel_vue',
+        'database' => 'kttest',
         'username' => 'root',
         'password' => '',
         'unix_socket' => '',
@@ -297,7 +297,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'laravel_vue',
+        'database' => 'kttest',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -312,7 +312,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'laravel_vue',
+        'database' => 'kttest',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -355,13 +355,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\app',
+        'root' => 'D:\\xampp\\htdocs\\kt\\storage\\app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\app/public',
-        'url' => 'http://localhost/projects/kt//storage',
+        'root' => 'D:\\xampp\\htdocs\\kt\\storage\\app/public',
+        'url' => 'http://localhost/kt//storage',
         'visibility' => 'public',
       ),
       's3' => 
@@ -378,7 +378,7 @@
     ),
     'links' => 
     array (
-      'D:\\xampp\\htdocs\\projects\\kt\\public\\storage' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\app/public',
+      'D:\\xampp\\htdocs\\kt\\public\\storage' => 'D:\\xampp\\htdocs\\kt\\storage\\app/public',
     ),
   ),
   'hashing' => 
@@ -413,13 +413,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\logs/laravel.log',
+        'path' => 'D:\\xampp\\htdocs\\kt\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\logs/laravel.log',
+        'path' => 'D:\\xampp\\htdocs\\kt\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -470,7 +470,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\logs/laravel.log',
+        'path' => 'D:\\xampp\\htdocs\\kt\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -536,7 +536,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'D:\\xampp\\htdocs\\projects\\kt\\resources\\views/vendor/mail',
+        0 => 'D:\\xampp\\htdocs\\kt\\resources\\views/vendor/mail',
       ),
     ),
   ),
@@ -641,7 +641,7 @@
     'lifetime' => '1200',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\framework/sessions',
+    'files' => 'D:\\xampp\\htdocs\\kt\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -661,9 +661,9 @@
   array (
     'paths' => 
     array (
-      0 => 'D:\\xampp\\htdocs\\projects\\kt\\resources\\views',
+      0 => 'D:\\xampp\\htdocs\\kt\\resources\\views',
     ),
-    'compiled' => 'D:\\xampp\\htdocs\\projects\\kt\\storage\\framework\\views',
+    'compiled' => 'D:\\xampp\\htdocs\\kt\\storage\\framework\\views',
   ),
   'flare' => 
   array (

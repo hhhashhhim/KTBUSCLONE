@@ -30,23 +30,19 @@ class FareClassController extends Controller
     {
         $rules = [
             'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
-//            'noOfRows' => 'required|integer',
-//            'noOfCols' => 'required|integer',
+            'FareClassColor' => 'required',
         ];
 
         $customMessages = [
             'FareClassName.required' => 'Fare Class Name is Required!',
             'name.unique' => 'Fare Class Name is already available!',
-//            'noOfRows.required' => 'No of Rows of Bus  is Required!',
-//            'noOfCols.required' => 'No of Cols of Bus  is Required!',
+            'FareClassColor.required' => 'Fare Class Color is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return FareClass::create([
             'name' => $request->FareClassName,
+            'color' => $request->FareClassColor,
             'is_active' => $request->isActive,
-//            'seat_map' => $request->seatMap,
-//            'no_of_rows' => $request->noOfRows,
-//            'no_of_cols' => $request->noOfCols,
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
@@ -56,22 +52,17 @@ class FareClassController extends Controller
     {
         $rules = [
             'name' => 'required',
-//            'no_of_rows' => 'required|integer',
-//            'no_of_cols' => 'required|integer',
+            'color' => 'required',
         ];
 
         $customMessages = [
             'name.required' => 'FareClass Name is Required!',
-//            'no_of_rows.required' => 'No of Rows of Bus  is Required!',
-//            'no_of_cols.required' => 'No of Cols of Bus  is Required!',
+            'color.required' => 'FareClass Color is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return FareClass::where('id', $request->id)->update([
             'name' => $request->name,
-//            'seat_map' => $request->seat_map,
-//            'no_of_rows' => $request->no_of_rows,
-//            'no_of_cols' => $request->no_of_cols,
-            'company_id' => $this->company_id,
+            'color' => $request->color,
             'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);

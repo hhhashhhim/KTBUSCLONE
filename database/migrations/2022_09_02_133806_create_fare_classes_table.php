@@ -16,7 +16,8 @@ class CreateFareClassesTable extends Migration
     {
         Schema::create('fare_classes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
+            $table->string('color')->nullable();
             $table->boolean('is_active')->default(1);
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();

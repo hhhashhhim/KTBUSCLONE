@@ -953,8 +953,8 @@ export default {
             this.$store.commit("setDeleteObj", deletingObj);
         },
 
-        edit(fare_class) {
-            this.dataEdit = {...fare_class, busClassColor: fare_class.color};
+        edit(bus_class) {
+            this.dataEdit = {...bus_class, busClassColor: bus_class.color};
         },
     },
     computed: {
