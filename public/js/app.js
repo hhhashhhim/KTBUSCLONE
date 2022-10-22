@@ -29331,8 +29331,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 // swal('Success', 'Terminal Updated Successfully', 'success')
                 swal({
-                  title: "Deleted!",
-                  text: "Your row has been deleted.",
+                  title: "Success!",
+                  text: "Terminal Updated Successfully!",
                   icon: "success",
                   timer: 2000
                 });
