@@ -277,37 +277,37 @@
             <div class="card p-4">
               <div class="col-md-12 mb-2 d-flex flex-wrap">
                 <div class="my-2">
-                  <div class="selected circles mr-1 border"></div>
+                  <div class="selected circles mr-1 border shadow"></div>
                   <span class="text-wrap">Selected</span>
                 </div>
                 <div class="my-2">
-                  <div class="for-female circles mr-1 border"></div>
+                  <div class="for-female circles mr-1 border shadow"></div>
                   <span class="text-wrap">For Female</span>
                 </div>
                 <div class="my-2">
-                  <div class="for-male circles mr-1 border"></div>
+                  <div class="for-male circles mr-1 border shadow"></div>
                   <span class="text-wrap">For Male</span>
                 </div>
                 <div class="my-2">
-                  <div class="not-for-sale circles mr-1 border"></div>
+                  <div class="not-for-sale circles mr-1 border shadow"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
                 
-                <div class="my-2" v-for="(seatClass,i) in seatClasses" :key="i">
-                  <div class="not-for-sale circles mr-1 border"></div>
-                  <span class="text-wrap">Not For Sale</span>
+                <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
+                  <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                  <span class="text-wrap">{{ seatClass.name }}</span>
                 </div>
 
 
                 <div class="my-3">
-                  <div class="circles icons-legend mr-1 border">
+                  <div class="circles icons-legend mr-1 border shadow">
                     <i class="fas fa-check"></i>
                   </div>
                   <span class="text-wrap">Booked</span>
                 </div>
                 <div class="my-3">
                   <div
-                    class="fas fa-check-double circles icons-legend mr-1 border"
+                    class="fas fa-check-double circles icons-legend shadow mr-1 border"
                   ></div>
                   <span class="text-wrap">Issued</span>
                 </div>
@@ -329,7 +329,7 @@
                   >
                     <!-- data-toggle="modal"
                                             :data-target="col.type?'#booking-options-popup':''" -->
-                    <small>{{ col.seatNo }}</small>
+                    <small>{{ col.seatNo }} </small>
                     <br />
                     <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                       <i
@@ -410,7 +410,7 @@ export default {
       bookedSeats: [],
       allBookings:[],
       bookingDetails:[],
-      seatClasses:[],
+      allSeatClasses:[],
       addForm: {
         type: "booked",
         gender: "1",
@@ -423,9 +423,10 @@ export default {
     const res = await this.callApi("post", "schedule");
     const resBooking = await this.callApi("post", "booking");
     const resClass = await this.callApi("post","fare-class")
-    if (res.status == 200 && resBooking.status == 200 ) {
+    if (res.status == 200 && resBooking.status == 200 && resClass.status == 200 ) {
       this.allSchedules = res.data;
-      this.allBookings = resBooking.data
+      this.allBookings = resBooking.data;
+      this.allSeatClasses = resClass.data;
       setTimeout(() => {
         $("#booking-table").dataTable();
       }, 300);

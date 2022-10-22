@@ -190,7 +190,7 @@ class ScheduleController extends Controller
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
         ->select('id', 'selected_bus_class_id')
-        ->with('selective_bus')->first();
+        ->with('selective_bus:id,seat_map')->first();
         $seatMap = $schedule->selective_bus->seat_map;
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
