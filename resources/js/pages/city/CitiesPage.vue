@@ -71,7 +71,7 @@
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add">Add New City</button>
+                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="add">{{ loading ? 'Loading...': 'Add New City' }}</button>
                 </template>
             </Add>
 
@@ -88,7 +88,7 @@
                 </div>
 
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="update">Update City</button>
+                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="update">{{ loading ? 'Loading...': 'Update City' }}</button>
                 </template>
             </Edit>
 
@@ -118,6 +118,7 @@ export default {
         return {
             validationErrors: [],
             cities: [],
+            loading : false,
             formID:'city_form',
             data:{
                 name:"",
@@ -157,8 +158,9 @@ export default {
                     text: "City Name is required",
                     icon: "error",
                    timer: 2000
-                });            const res = await this.callApi("post",'cities/store',this.data);
-            console.log(res.data)
+                });
+            this.loading = true;
+            const res = await this.callApi("post",'cities/store',this.data);
             if (res.status == 200) {
                 // this.success="City Created Successfully Named as " + res.data.name;
                 swal({
@@ -167,6 +169,8 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
+
+                this.loading = false;
                 // swal('Success', 'City Added Successfully', 'success');
                 // await this.fetchCities();
                 // this.cities.unshift(res.data);
@@ -205,8 +209,8 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
+            this.loading = true;
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
-            console.log(resEdit.data);
             if (resEdit.status==200) {
                 // swal('Success', 'City Updated Successfully', 'success');
                 swal({
@@ -215,6 +219,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
+                this.loading = false;
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {

@@ -33,7 +33,6 @@
                                                         <th>Bus Number</th>
                                                         <th>Chassis Number</th>
                                                         <th>Insurance Number</th>
-                                                        <th>No. of Seats</th>
                                                         <th>Route Permit</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -47,12 +46,10 @@
                                                         <td>{{ bus.bus_number }}</td>
                                                         <td>{{ bus.chassis_number }}</td>
                                                         <td>{{ bus.insurance_number }}</td>
-                                                        <td>{{ bus.no_of_seats }}</td>
                                                         <td>{{ bus.route_permit_number }}</td>
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
-                                                            
                                                             <a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
@@ -69,7 +66,6 @@
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
                                                             </a>
-
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -93,61 +89,6 @@
                 :formID="formID"
             >
             </Add>
-            <!--view modal-->
-            <div
-                class="modal fade"
-                id="view-modal"
-                aria-labelledby="exampleModalLabel"
-                aria-hidden="true"
-            >
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">View Bus Details</h4>
-                                    <button
-                                        type="button"
-                                        class="close"
-                                        data-dismiss="modal"
-                                        aria-label="Close"
-                                        @click="close"
-                                    >
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table
-                                            class="table table-striped table-hover"
-                                            id="view_bus"
-                                        >
-                                            <thead>
-                                            <tr>
-                                                <th>Bus Number</th>
-                                                <th>Chassis Number</th>
-                                                <th>Insurance Number</th>
-                                                <th>No. of Seats</th>
-                                                <th>Route Permit</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>{{ dataView.bus_number }}</td>
-                                                <td>{{ dataView.chassis_number }}</td>
-                                                <td>{{ dataView.insurance_number }}</td>
-                                                <td>{{ dataView.no_of_seats }}</td>
-                                                <td>{{ dataView.route_permit_number }}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="modal fade" id="addBus" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -203,7 +144,7 @@
                             <slot></slot>
                             <div class="row">
                                 <div class=" form-group col-md-12">
-                                    <label for="city_id">Bus Class</label>
+                                    <label for="city_id">Bus Class <span class="text-danger">*</span></label>
                                     <select class="form-control" v-model="data.fare_class">
                                         <option value="0">Select Bus Class</option>
                                         <option
@@ -216,7 +157,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Bus Number</label>
+                                    <label for="name">Bus Number <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -225,7 +166,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Chassis Number</label>
+                                    <label for="name">Chassis Number <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -235,7 +176,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Insurance Number</label>
+                                    <label for="name">Insurance Number <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -245,7 +186,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Route Permit Number</label>
+                                    <label for="name">Route Permit Number <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -256,7 +197,8 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" @click="addBuses"> Add Bus</button>
+                                <button type="button" class="btn btn-primary" @click="addBuses" :class="loading?'disabled':''">
+                                    {{loading ? 'Loading...' : 'Add Bus' }}</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -277,7 +219,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label for="city_id">Bus Class</label>
+                        <label for="city_id">Bus Class <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="dataEdit.fare_class_id">
                             <option value="0">Select Bus Class</option>
                             <option
@@ -290,7 +232,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Bus Number</label>
+                        <label for="name">Bus Number <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -299,7 +241,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Chassis Number</label>
+                        <label for="name">Chassis Number <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -309,7 +251,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Insurance Number</label>
+                        <label for="name">Insurance Number <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -319,7 +261,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Route Permit Number</label>
+                        <label for="name">Route Permit Number <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -333,9 +275,9 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="updateBus"
+                        @click="updateBus" :class="loading?'disabled':''"
                     >
-                        Update Bus
+                        {{ loading ? 'Loading...' : 'Update Bus' }}
                     </button>
                 </template>
             </Edit>
@@ -343,70 +285,6 @@
             <Delete
                 confirmationMessage="Are You Sure You want To Delete This Bus Record ???"
             />
-
-            <!-- Modal -->
-            <div
-                class="modal fade"
-                id="setSeatClass"
-                tabindex="-1"
-                aria-labelledby="staticBackdropLabel"
-                aria-hidden="true"
-
-            >
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Add Class To Seat</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_class">Seat Class</label>
-                                            <select class="form-control" v-model="seatClass">
-                                                <option value="0">Select Class</option>
-                                                <option
-                                                    v-for="(fareClass, i) in fareClasses"
-                                                    :key="i"
-                                                    :value="fareClass.name"
-                                                >
-                                                    {{ fareClass.name }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="seat_type">Seat Type</label>
-                                            <select class="form-control" v-model="seatType">
-                                                <option value="0">Select Type</option>
-                                                <option value="reserved_for_female">
-                                                    Reserved for Female
-                                                </option>
-                                                <option value="not_for_sale">Not for Sale</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button
-                                                type="button"
-                                                class="btn btn-block btn-success"
-                                                @click=" addSeatData(updateSeatValue.modalColId, updateSeatValue.modalRowId)"
-                                                data-dismiss="modal"
-                                            >
-                                                Add Seat Data
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 </template>
@@ -427,6 +305,7 @@ export default {
     },
     data() {
         return {
+            loading : false,
             buses: [],
             seatClass: "0",
             seatType: "0",

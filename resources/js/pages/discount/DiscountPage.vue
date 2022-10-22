@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Discount
                                 </a>
@@ -100,11 +100,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="DiscountName">Name</label>
+                        <label for="DiscountName">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="DiscountName" @keypress="isAlphabet($event)"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="PercentageName">Percentage</label>
+                        <label for="PercentageName">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="PercentageName"
                                    @keypress="isNumber($event)">
@@ -128,8 +128,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addDiscount">
-                        Save Discount Details
+                    <button type="button" class="btn btn-primary" @click="addDiscount" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Discount' }}
                     </button>
                 </template>
             </Add>
@@ -145,11 +144,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="DiscountName">Name</label>
+                        <label for="DiscountName">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name" @keypress="isAlphabet($event)"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="PercentageName">Percentage</label>
+                        <label for="PercentageName">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
                                    @keypress="isNumber($event)">
@@ -175,8 +174,8 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateDiscount">Update
-                        Discount
+                    <button type="button" class="btn btn-primary" @click="updateDiscount" :class="loading?'disabled':''">
+                        {{ loading ? 'Loading...' : 'Update Discount' }}
                     </button>
                 </template>
             </Edit>
@@ -205,9 +204,10 @@ export default {
     },
     data() {
         return {
+            loading : false,
             discounts: [],
             isActive: 1,
-            formID: "addNewDiscount",
+            formID: "discount_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -223,14 +223,22 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", 'discount');
-        if (res.status == 200) {
-            this.discounts = res.data
-        } else {
-            console.log(res);
-        }
+       await this.fetchDiscount();
     },
     methods: {
+        async fetchDiscount(){
+            const res = await this.callApi("post", 'discount');
+            if (res.status == 200) {
+                this.discounts = res.data
+            } else {
+                console.log(res);
+            }
+        },
+        clearForm:function(){
+            this.DiscountName = '';
+            this.PercentageName = '';
+            this.isActive = 1;
+        },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -264,10 +272,20 @@ export default {
         async addDiscount() {
             this.validationErrors = [];
             if (this.DiscountName === "")
-                return this.errorsArray("Name is Required", "DiscountName");
+            swal({
+                title: "Required!",
+                text: "Name Field is Required",
+                icon: "error",
+                timer: 2000
+            });
             if (this.PercentageName === "")
-                return this.errorsArray("Percentage is Required", "PercentageName");
-
+                swal({
+                    title: "Required!",
+                    text: "Percentage Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+        this.loading= true;
             const data = {
                 name: this.DiscountName,
                 percentage: this.PercentageName,
@@ -275,13 +293,18 @@ export default {
             }
 
             const res = await this.callApi("post", "discount/store", data);
-            if (res.status === 201 && res.statusText === "Created") {
+            if (res.status == 201 && res.statusText == "Created") {
                 this.discounts.unshift(res.data);
-                this.success = "Discount Created Successfully";
+                swal({
+                    title: "Success",
+                    text: "Discount Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchDiscount();
+                this.loading = false;
                 window.scrollTo(0, 0);
-                this.DiscountName = "";
-                this.PercentageName = "";
-                
+
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {
@@ -299,16 +322,33 @@ export default {
         async updateDiscount() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                return this.errorsArray("Name is Required", "DiscountName");
+                // return this.errorsArray("Name is Required", "DiscountName");
+                swal({
+                    title: "Required!",
+                    text: "Name Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.dataEdit.percentage === "")
-                return this.errorsArray("Percentage is Required", "PercentageName");
-
+                // return this.errorsArray("Percentage is Required", "PercentageName");
+                swal({
+                    title: "Required!",
+                    text: "Percentage Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+                this.loading = true;
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Discount Updated Successfully";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+                // this.success = "Discount Updated Successfully";
+                swal({
+                    title: "Required!",
+                    text: "No. Of Seats is required",
+                    icon: "error",
+                    timer: 2000
+                });
+                this.loading = false;
+                await this.fetchDiscount();
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {

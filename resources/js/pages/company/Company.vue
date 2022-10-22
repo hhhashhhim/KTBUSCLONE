@@ -109,13 +109,6 @@
                                 :raw="false"
                                 :options="options">
                             </vue-mask>
-                            <!--                            <input-->
-                            <!--                                type="text" @keypress="isNumber($event)"-->
-                            <!--                                class="form-control"-->
-                            <!--                                placeholder="Enter contact"-->
-                            <!--                                id="contact"-->
-                            <!--                                v-model="data.contact"-->
-                            <!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
@@ -273,13 +266,6 @@
                                 :raw="false"
                                 :options="options">
                             </vue-mask>
-                            <!--                            <input-->
-                            <!--                                type="text" @keypress="isNumber($event)"-->
-                            <!--                                class="form-control"-->
-                            <!--                                placeholder="Enter contact"-->
-                            <!--                                id="contact"-->
-                            <!--                                v-model="dataEdit.contact"-->
-                            <!--                            />-->
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>

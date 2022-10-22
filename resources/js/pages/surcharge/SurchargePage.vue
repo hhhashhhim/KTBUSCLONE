@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Surcharge
                                 </a>
@@ -100,11 +100,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="SurchargeName">Name</label>
-                        <input type="text" class="form-control" v-model="SurchargeName" @keypress="isAlphabet($event)"/>
+                        <label for="SurchargeName">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="SurchargeName"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="SurchargePercentage">Percentage</label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
                                    @keypress="isNumber($event)">
@@ -130,9 +130,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addSurcharge">
-                        Save Surcharge Details
-                    </button>
+                    <button type="button" class="btn btn-primary" @click="addSurcharge" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Surcharge' }} </button>
                 </template>
             </Add>
 
@@ -147,11 +145,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="SurchargeName">Name</label>
-                        <input type="text" class="form-control" v-model="dataEdit.name" @keypress="isAlphabet($event)"/>
+                        <label for="SurchargeName">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="SurchargePercentage">Percentage</label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
                                    @keypress="isNumber($event)">
@@ -175,9 +173,7 @@
                     </div>
                 </div>
                     <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="updateSurcharge">Update
-                            Surcharge
-                        </button>
+                        <button type="button" class="btn btn-primary" @click="updateSurcharge" :class="loading?'disabled':''"> {{loading ? 'Loading...' : 'Update Surcharge' }} </button>
                     </template>
             </Edit>
             <!--            Edit MOdel End-->
@@ -205,9 +201,10 @@ export default {
     },
     data() {
         return {
+            loading : false,
             surcharges: [],
             isActive: 1,
-            formID: "addNewSurcharge",
+            formID: "surcharge_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -223,14 +220,22 @@ export default {
         };
     },
     async created() {
-        const res = await this.callApi("post", 'surcharge');
-        if (res.status == 200) {
-            this.surcharges = res.data
-        } else {
-            console.log(res);
-        }
+        await this.fetchSurcharges();
     },
     methods: {
+        async fetchSurcharges(){
+            const res = await this.callApi("post", 'surcharge');
+            if (res.status == 200) {
+                this.surcharges = res.data
+            } else {
+                console.log(res);
+            }
+        },
+        clearForm: function () {
+               this.SurchargeName = "";
+                this.SurchargePercentage = "";
+                this.isActive = 1;
+        },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -264,9 +269,20 @@ export default {
         async addSurcharge() {
             this.validationErrors = [];
             if (this.SurchargeName == "")
-                return this.errorsArray("Name is Required", "SurchargeName");
+            swal({
+                title: "Required!",
+                text: "Name is Required",
+                icon: "error",
+                timer: 2000
+            });
             if (this.SurchargePercentage == "")
-                return this.errorsArray("Percentage is Required", "SurchargePercentage");
+            swal({
+                title: "Required!",
+                text: "Percentage Field is Required",
+                icon: "error",
+                timer: 2000
+            });
+            this.loading = true;
 
             const data = {
                 name: this.SurchargeName,
@@ -275,11 +291,16 @@ export default {
             }
 
             const res = await this.callApi("post", "surcharge/store", data);
-            if (res.status === 201 && res.statusText === "Created") {
-                this.success = "Surcharge Created Successfully";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+            if (res.status == 201 && res.statusText == "Created") {
+
+                // this.success = "Surcharge Created Successfully";
+                swal({
+                    title: "Success",
+                    text: "Surcharge Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchSurcharges();
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
@@ -288,25 +309,39 @@ export default {
                         });
                     }
                 }
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
             }
         },
 
         async updateSurcharge() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                return this.errorsArray("Name is Required", "SurchargeName");
+                // return this.errorsArray("Name is Required", "SurchargeName");
+            swal({
+                title: "Required!",
+                text: "Name Field is Required ",
+                icon: "error",
+                timer: 2000
+            });
             if (this.dataEdit.percentage === "")
-                return this.errorsArray("Percentage is Required", "SurchargePercentage");
-
+                // return this.errorsArray("Percentage is Required", "SurchargePercentage");
+                swal({
+                    title: "Required!",
+                    text: "Percentage is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+                this.loading = true;
             const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
-                this.success = "Surcharge Updated Successfully";
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+                // this.success = "Surcharge Updated Successfully";
+                swal({
+                    title: "Success",
+                    text: "Surcharge Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                await this.fetchSurcharges();
             } else {
                 if (res.status === 422) {
                     for (const key in res.data.errors) {
