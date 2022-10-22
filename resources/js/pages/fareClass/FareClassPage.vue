@@ -54,6 +54,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
+                                                        <th>Color</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -63,6 +64,16 @@
                                                     <tr v-for="(fareClass, i) in fareClasses" :key="i">
                                                         <td>{{ i+1 }}</td>
                                                         <td>{{ fareClass.name }}</td>
+                                                        <td>
+                                                            <div
+                                                                style="
+                                      border-radius: 50%;
+                                      height: 50px;
+                                      width: 50px;
+                                    "
+                                                                :style="{ backgroundColor: fareClass.color }"
+                                                            ></div>
+                                                        </td>
                                                         <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
@@ -97,7 +108,7 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         <label for="name">Name<span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -105,6 +116,14 @@
                             placeholder="Enter Fare Class Name"
                             id="name"
                             v-model="data.FareClassName"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="name">Color<span class="text-danger">*</span></label>
+                        <input
+                            type="color"
+                            class="form-control"
+                            v-model="data.FareClassColor"
                         />
                     </div>
                     <div class="form-group col-md-2">
@@ -142,9 +161,13 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         <label for="SurchargeName">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="SurchargeName">Color <span class="text-danger">*</span></label>
+                        <input type="color" class="form-control" v-model="dataEdit.color"/>
                     </div>
                 </div>
                 <div class="row">
@@ -203,6 +226,7 @@ export default {
             data:{
                 isActive:1,
                 FareClassName:"",
+                FareClassColor : "#000000",
             },
             dataEdit: {
                 FareClassName: '',
@@ -217,6 +241,7 @@ export default {
     methods: {
         clearForm: function(){
           this.data = {};
+          this.data.FareClassColor = "#000000";
           this.data.isActive = 1
         },
         async fetchFareClasses(){
@@ -304,9 +329,8 @@ export default {
             this.$store.commit("setDeleteObj",deletingObj);
         },
 
-        edit(fare_class) {
-            console.log(fare_class);
-            this.dataEdit = fare_class;
+        edit(fare_clases) {
+            this.dataEdit = {...fare_clases, busClassColor: fare_clases.color};
         },
     },
     computed:{

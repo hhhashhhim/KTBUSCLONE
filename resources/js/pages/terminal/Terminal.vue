@@ -68,21 +68,55 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-6">
                         <label for="city_id">Terminal City <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="data.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-6">
                         <label for="name">Terminal Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="data.name">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="available_seats">Allowed Seats</label>
-                        <input type="text" class="form-control" v-model="data.available_seats">
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4 mt-4">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="comma_separated" name="valueType" checked="" value="comma" v-model="dataCheck.seatNumberType" @click="applyMaks('comma')">
+                            <label class="form-check-label" for="comma_separated">
+                                Comma Separated
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="seat_range_dash" name="valueType" value="dash" v-model="dataCheck.seatNumberType" @click="applyMaks('dash')">
+                            <label class="form-check-label" for="seat_range_dash">
+                                Seat Range
+                            </label>
+                        </div>
                     </div>
+                    <div class="form-group col-md-8" v-if="showDivComma">
+                        <label for="available_seats">Allowed Seats</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.available_seats"
+                            mask="00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"
+                            :raw="false"
+                            :options="optionComma">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-8" v-if="showDivDash">
+                        <label for="available_seats">Allowed Seats</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="data.available_seats"
+                            mask="00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,"
+                            :raw="false"
+                            :options="optionDash">
+                        </vue-mask>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
                         <vue-mask
@@ -180,21 +214,59 @@
 
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-6">
                         <label for="city_id">Terminal City <span class="text-danger">*</span></label>
                         <select class="form-control" v-model="dataEdit.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-6">
                         <label for="name">Terminal Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name">
                     </div>
-                    <div class="form-group col-md-4">
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4 mt-4">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="editComma_separated" name="editValueType" checked="" value="comma" v-model="dataEditCheck.seatNumberType" @click="editApplyMaks('comma')">
+                            <label class="form-check-label" for="editComma_separated">
+                                Comma Separated
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="editSeat_range_dash" name="editValueType" value="dash" v-model="dataEditCheck.seatNumberType" @click="editApplyMaks('dash')">
+                            <label class="form-check-label" for="editSeat_range_dash">
+                                Seat Range
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-8" v-if="showEditDivComma">
+                        <label for="available_seats">Allowed Seats</label>
+                        <vue-mask
+                            class="form-control"
+                           v-model="dataEdit.available_seats"
+                            mask="00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"
+                            :raw="false"
+                            :options="optionComma">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-8" v-if="showEditDivDash">
+                        <label for="available_seats">Allowed Seats</label>
+                        <vue-mask
+                            class="form-control"
+                           v-model="dataEdit.available_seats"
+                            mask="00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,00-00,"
+                            :raw="false"
+                            :options="optionDash">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-8">
                         <label for="available_seats">Allowed Seats</label>
                         <input type="text" class="form-control" v-model="dataEdit.available_seats">
                     </div>
+                </div>
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
                         <vue-mask
@@ -204,8 +276,6 @@
                             :raw="false"
                             :options="optionsContact">
                         </vue-mask>
-                        <!--                        <input type="text" class="form-control" maxlength="11" v-model="dataEdit.contact"-->
-                        <!--                               @keypress="isNumber($event)">-->
                     </div>
                     <div class="form-group col-md-4">
                         <label for="address">Address</label>
@@ -321,7 +391,7 @@
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.address">{{ single.address }}</td>
                                                 <td v-else>N/A</td>
-                                                <td v-if="single.contact"> {{ phoneFormat(single.contact) }} </td>
+                                                <td v-if="single.contact"> {{ phoneFormat(single.contact) }}</td>
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                 <td v-else>N/A</td>
@@ -388,13 +458,25 @@ export default {
             optionsContact: {
                 placeholder: '0300-0000000',
             },
+            optionComma: {
+                placeholder: '00,00,00,...',
+            },
+            optionDash: {
+                placeholder: '00-00,00-00,00-00,...',
+            },
             validationErrors: '',
             seen: true,
+            showDivComma: true,
+            showEditDivComma: true,
+            showDivDash: false,
+            showEditDivDash: false,
             terminals: [],
             terminalsDetails: [],
             companies: [],
             formID: "terminal_form",
             cities: [],
+            dataEditCheck:{},
+            dataCheck:{},
             data: {
                 company_id: "",
                 name: "",
@@ -421,7 +503,27 @@ export default {
         await this.fetchTerminals();
     },
     methods: {
-        clearForm : function(){
+        applyMaks: function (value) {
+            if(value == 'comma'){
+                this.showDivComma = true;
+                this.showDivDash = false;
+            }
+            if(value == 'dash'){
+                this.showDivComma = false;
+                this.showDivDash = true;
+            }
+        },
+        editApplyMaks: function (value) {
+            if(value == 'comma'){
+                this.showEditDivComma = true;
+                this.showEditDivDash = false;
+            }
+            if(value == 'dash'){
+                this.showEditDivComma = false;
+                this.showEditDivDash = true;
+            }
+        },
+        clearForm: function () {
             this.data = {};
             this.data.city_id = 0;
         },
@@ -463,7 +565,7 @@ export default {
                     title: "Required",
                     text: "Terminal Name is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 // swal('Required', 'Company is Required', 'error')
@@ -471,7 +573,7 @@ export default {
                     title: "Required",
                     text: "Company is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.data.city_id === "")
                 // swal('Required', 'Terminal City is Required', 'error')
@@ -479,7 +581,7 @@ export default {
                     title: "Required",
                     text: "Terminal City is rquired",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.data.contact === "")
                 // swal('Required', 'Terminal Contact is Required', 'error')
@@ -487,7 +589,7 @@ export default {
                     title: "Required",
                     text: "Terminal Contact is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
@@ -496,7 +598,7 @@ export default {
                     title: "Success",
                     text: "Terminal Created Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 await this.fetchTerminals();
                 this.terminals = res.data
@@ -530,7 +632,7 @@ export default {
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
-            }, 50);
+            }, 500);
         },
         async update() {
             this.validationErrors = [];
@@ -540,7 +642,7 @@ export default {
                     title: "Required",
                     text: "Terminal name is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 // swal('Required', 'Company is Required', 'error')
@@ -548,7 +650,7 @@ export default {
                     title: "Required",
                     text: "Company is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.dataEdit.city_id === "")
                 // swal('Required', 'Terminal City is Required', 'error')
@@ -556,7 +658,7 @@ export default {
                     title: "Required",
                     text: "Terminal City is required ",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.dataEdit.contact === "")
                 // swal('Required', 'Terminal Contact is Required', 'error')
@@ -564,7 +666,7 @@ export default {
                     title: "Required",
                     text: "Terminal Contact is required",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
@@ -573,7 +675,7 @@ export default {
                     title: "Deleted!",
                     text: "Terminal Updated Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 await this.fetchTerminals();
                 setTimeout(() => {
@@ -615,7 +717,7 @@ export default {
                 this.terminalsDetails.splice(obj.index, 1);
                 setTimeout(() => {
                     $("#show_terminal").DataTable();
-                }, 50);
+                }, 500);
             }
         },
     },
