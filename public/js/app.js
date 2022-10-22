@@ -41918,27 +41918,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
-/* harmony import */ var _components_Profile_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/Profile.vue */ "./resources/js/components/Profile.vue");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm-bundler.js");
-/* harmony import */ var _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/users/Users.vue */ "./resources/js/pages/users/Users.vue");
-/* harmony import */ var _pages_roles_Roles_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/roles/Roles.vue */ "./resources/js/pages/roles/Roles.vue");
-/* harmony import */ var _pages_company_Company_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./pages/company/Company.vue */ "./resources/js/pages/company/Company.vue");
-/* harmony import */ var _pages_roles_Permissions_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/roles/Permissions.vue */ "./resources/js/pages/roles/Permissions.vue");
-/* harmony import */ var _pages_auth_Login_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/auth/Login.vue */ "./resources/js/pages/auth/Login.vue");
-/* harmony import */ var _pages_terminal_Terminal_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/terminal/Terminal.vue */ "./resources/js/pages/terminal/Terminal.vue");
-/* harmony import */ var _pages_auth_Dashboard_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/auth/Dashboard.vue */ "./resources/js/pages/auth/Dashboard.vue");
-/* harmony import */ var _pages_fareTable_FareTable_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./pages/fareTable/FareTable.vue */ "./resources/js/pages/fareTable/FareTable.vue");
-/* harmony import */ var _pages_route_RoutePage_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pages/route/RoutePage.vue */ "./resources/js/pages/route/RoutePage.vue");
-/* harmony import */ var _pages_city_CitiesPage_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/city/CitiesPage.vue */ "./resources/js/pages/city/CitiesPage.vue");
-/* harmony import */ var _pages_discount_DiscountPage__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./pages/discount/DiscountPage */ "./resources/js/pages/discount/DiscountPage.vue");
-/* harmony import */ var _pages_surcharge_SurchargePage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./pages/surcharge/SurchargePage */ "./resources/js/pages/surcharge/SurchargePage.vue");
-/* harmony import */ var _pages_schedule_SchedulePage__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./pages/schedule/SchedulePage */ "./resources/js/pages/schedule/SchedulePage.vue");
-/* harmony import */ var _pages_fareClass_FareClassPage__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./pages/fareClass/FareClassPage */ "./resources/js/pages/fareClass/FareClassPage.vue");
-/* harmony import */ var _pages_buses_BusesPage__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./pages/buses/BusesPage */ "./resources/js/pages/buses/BusesPage.vue");
-/* harmony import */ var _pages_buses_BusClassPage__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./pages/buses/BusClassPage */ "./resources/js/pages/buses/BusClassPage.vue");
-/* harmony import */ var _pages_booking_BookingPage__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./pages/booking/BookingPage */ "./resources/js/pages/booking/BookingPage.vue");
-/* harmony import */ var _store_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./store.js */ "./resources/js/store.js");
+/* harmony import */ var _components_Profile_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Profile.vue */ "./resources/js/components/Profile.vue");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm-bundler.js");
+/* harmony import */ var _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pages/users/Users.vue */ "./resources/js/pages/users/Users.vue");
+/* harmony import */ var _pages_roles_Roles_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/roles/Roles.vue */ "./resources/js/pages/roles/Roles.vue");
+/* harmony import */ var _pages_company_Company_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/company/Company.vue */ "./resources/js/pages/company/Company.vue");
+/* harmony import */ var _pages_roles_Permissions_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./pages/roles/Permissions.vue */ "./resources/js/pages/roles/Permissions.vue");
+/* harmony import */ var _pages_auth_Login_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/auth/Login.vue */ "./resources/js/pages/auth/Login.vue");
+/* harmony import */ var _pages_terminal_Terminal_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/terminal/Terminal.vue */ "./resources/js/pages/terminal/Terminal.vue");
+/* harmony import */ var _pages_auth_Dashboard_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/auth/Dashboard.vue */ "./resources/js/pages/auth/Dashboard.vue");
+/* harmony import */ var _pages_fareTable_FareTable_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/fareTable/FareTable.vue */ "./resources/js/pages/fareTable/FareTable.vue");
+/* harmony import */ var _pages_route_RoutePage_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./pages/route/RoutePage.vue */ "./resources/js/pages/route/RoutePage.vue");
+/* harmony import */ var _pages_city_CitiesPage_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pages/city/CitiesPage.vue */ "./resources/js/pages/city/CitiesPage.vue");
+/* harmony import */ var _pages_discount_DiscountPage__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./pages/discount/DiscountPage */ "./resources/js/pages/discount/DiscountPage.vue");
+/* harmony import */ var _pages_surcharge_SurchargePage__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./pages/surcharge/SurchargePage */ "./resources/js/pages/surcharge/SurchargePage.vue");
+/* harmony import */ var _pages_schedule_SchedulePage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./pages/schedule/SchedulePage */ "./resources/js/pages/schedule/SchedulePage.vue");
+/* harmony import */ var _pages_fareClass_FareClassPage__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./pages/fareClass/FareClassPage */ "./resources/js/pages/fareClass/FareClassPage.vue");
+/* harmony import */ var _pages_buses_BusesPage__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./pages/buses/BusesPage */ "./resources/js/pages/buses/BusesPage.vue");
+/* harmony import */ var _pages_buses_BusClassPage__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./pages/buses/BusClassPage */ "./resources/js/pages/buses/BusClassPage.vue");
+/* harmony import */ var _pages_booking_BookingPage__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./pages/booking/BookingPage */ "./resources/js/pages/booking/BookingPage.vue");
 
 
 
@@ -41957,90 +41955,88 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/projects/kt/'
 
-
-
-var url = '/projects/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
-  component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+  component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
   name: "home"
 }, {
   path: url + "login",
-  component: _pages_auth_Login_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+  component: _pages_auth_Login_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
   name: "login"
 }, {
   path: url + "users",
-  component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+  component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
   name: "users"
 }, {
   path: url + "roles",
-  component: _pages_roles_Roles_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+  component: _pages_roles_Roles_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
   name: "roles"
 }, {
   path: url + "permissions/:id",
-  component: _pages_roles_Permissions_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+  component: _pages_roles_Permissions_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
   name: "role.permission"
 }, {
   path: url + "profiles",
-  component: _components_Profile_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+  component: _components_Profile_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
   name: "profile"
 }, {
   path: url + "companies",
-  component: _pages_company_Company_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+  component: _pages_company_Company_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
   name: "company"
 }, {
   path: url + "terminals",
-  component: _pages_terminal_Terminal_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
+  component: _pages_terminal_Terminal_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
   name: "terminal"
 }, {
   path: url + "admin/dashboard",
-  component: _pages_auth_Dashboard_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+  component: _pages_auth_Dashboard_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
   name: "admin-dashboard"
 }, {
   path: url + "fare-table",
-  component: _pages_fareTable_FareTable_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+  component: _pages_fareTable_FareTable_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
   name: "fare-table"
 }, {
   path: url + "fare-class",
-  component: _pages_fareClass_FareClassPage__WEBPACK_IMPORTED_MODULE_15__["default"],
+  component: _pages_fareClass_FareClassPage__WEBPACK_IMPORTED_MODULE_14__["default"],
   name: "fare-class"
 }, {
   path: url + "routes",
-  component: _pages_route_RoutePage_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+  component: _pages_route_RoutePage_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
   name: "routes-page"
 }, {
   path: url + "discounts",
-  component: _pages_discount_DiscountPage__WEBPACK_IMPORTED_MODULE_12__["default"],
+  component: _pages_discount_DiscountPage__WEBPACK_IMPORTED_MODULE_11__["default"],
   name: "discount-page"
 }, {
   path: url + "surcharge",
-  component: _pages_surcharge_SurchargePage__WEBPACK_IMPORTED_MODULE_13__["default"],
+  component: _pages_surcharge_SurchargePage__WEBPACK_IMPORTED_MODULE_12__["default"],
   name: "surcharge-page"
 }, {
   path: url + "cities",
-  component: _pages_city_CitiesPage_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
+  component: _pages_city_CitiesPage_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
   name: "cities-page"
 }, {
   path: url + "schedule",
-  component: _pages_schedule_SchedulePage__WEBPACK_IMPORTED_MODULE_14__["default"],
+  component: _pages_schedule_SchedulePage__WEBPACK_IMPORTED_MODULE_13__["default"],
   name: "schedule-page"
 }, {
   path: url + "buses",
-  component: _pages_buses_BusesPage__WEBPACK_IMPORTED_MODULE_16__["default"],
+  component: _pages_buses_BusesPage__WEBPACK_IMPORTED_MODULE_15__["default"],
   name: "buses-page"
 }, {
   path: url + "bus-class",
-  component: _pages_buses_BusClassPage__WEBPACK_IMPORTED_MODULE_17__["default"],
+  component: _pages_buses_BusClassPage__WEBPACK_IMPORTED_MODULE_16__["default"],
   name: "bus-class-page"
 }, {
   path: url + "booking",
-  component: _pages_booking_BookingPage__WEBPACK_IMPORTED_MODULE_18__["default"],
+  component: _pages_booking_BookingPage__WEBPACK_IMPORTED_MODULE_17__["default"],
   name: "booking-page"
 }];
-var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_20__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_20__.createWebHistory)(),
+var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_18__.createRouter)({
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_18__.createWebHistory)(),
   mode: history,
   routes: routes
 }); // router.beforeEach(()=>{
