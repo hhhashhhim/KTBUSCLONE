@@ -23965,16 +23965,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   }), _defineProperty(_methods, "selectSeat", function selectSeat(row, col, seatNo) {
     this.validationErrors = [];
 
-    if (this.addForm.oldBookings == 1 && !this.schedule.selective_bus.seat_map[row][col].type) {
+    if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
       this.doScroll();
       return this.errorsArray("Please Select Already Booked Seat", "Oops");
     }
 
-    if (this.schedule.selective_bus.seat_map[row][col].type && this.selectedSeats.length == 0) {
+    if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
       var index = this.selectedBookedSeats.indexOf(seatNo);
 
       if (index != -1) {
-        this.schedule.selective_bus.seat_map[row][col].selected = false;
+        this.schedule.bus_class.seat_map[row][col].selected = false;
         this.selectedBookedSeats.splice(index, 1);
         this.bookedSeats = this.bookedSeats.filter(function (seat) {
           if (seat.seatNo != seatNo) {
@@ -23982,20 +23982,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         });
       } else {
-        this.schedule.selective_bus.seat_map[row][col].selected = true;
+        this.schedule.bus_class.seat_map[row][col].selected = true;
         this.selectedBookedSeats.push(seatNo);
-        this.bookedSeats.push(this.schedule.selective_bus.seat_map[row][col]);
+        this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
       }
 
       this.addForm.selectedBookedSeats = this.selectedBookedSeats;
-    } else if (!this.schedule.selective_bus.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
+    } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
       var _index = this.selectedSeats.indexOf(seatNo);
 
       if (_index != -1) {
-        this.schedule.selective_bus.seat_map[row][col].selected = false;
+        this.schedule.bus_class.seat_map[row][col].selected = false;
         this.selectedSeats.splice(_index, 1);
       } else {
-        this.schedule.selective_bus.seat_map[row][col].selected = true;
+        this.schedule.bus_class.seat_map[row][col].selected = true;
         this.selectedSeats.push(seatNo);
       }
 
@@ -24587,7 +24587,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       updateSeatValue: [],
       editSingleSeat: [],
       delId: "",
-      seatNo: 0,
       addData: {},
       data: {
         noOfRows: "",
@@ -24796,31 +24795,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     changeStatus: function changeStatus(row, col) {
       if (this.data.seatMap[row][col].reserved) {
-        this.seatNo--;
         this.data.seatMap[row][col] = {
-          reserved: false,
-          seatNo: 0
+          reserved: false
         };
       } else {
-        this.seatNo++;
         this.data.seatMap[row][col] = {
-          reserved: true,
-          seatNo: this.seatNo
+          reserved: true
         };
       }
     },
     changeEditStatus: function changeEditStatus(row, col) {
       if (this.dataEdit.seat_map[row][col].reserved) {
-        this.seatNo--;
         this.dataEdit.seat_map[row][col] = {
-          reserved: false,
-          seatNo: 0
+          reserved: false
         };
       } else {
-        this.seatNo++;
         this.dataEdit.seat_map[row][col] = {
-          reserved: true,
-          seatNo: this.seatNo
+          reserved: true
         };
       }
     },
@@ -24828,23 +24819,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.validationErrors = [];
       var vm = this;
       console.log(vm.data.noOfRows, vm.data.noOfCols);
-      if (
-      /*vm.data.noOfRows == "undefined" ||*/
-      vm.data.noOfRows == "") swal('Required', 'No of Rows Field is Required!', 'error'); // swal({
-      //     title: "Required",
-      //     text: "no of rows Field is required",
-      //    icon: "error",
-      //    timer: 2000
-      // });
-
-      if (
-      /*vm.data.noOfCols == "undefined"  ||*/
-      vm.data.noOfCols == "") swal('Required', 'No of Cols Field is Required!', 'error'); // swal({
-      //     title: "Required!",
-      //     text: "No of Cols Field is Required",
-      //    icon: "error",
-      //    timer: 2000
-      // });
+      if (vm.data.noOfRows == "") swal('Required', 'No of Rows Field is Required!', 'error');
+      if (vm.data.noOfCols == "") swal('Required', 'No of Cols Field is Required!', 'error');
 
       if (vm.data.noOfRows <= 15) {
         if (vm.data.noOfCols <= 7) {
@@ -24860,8 +24836,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             for (var j = 0; j < vm.data.noOfCols; j++) {
               count++;
               map[i][j] = {
-                reserved: false,
-                seatNo: 0
+                reserved: false
               };
             }
           }
@@ -24909,13 +24884,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res, _loop, key;
+        var seatNo, res, _loop, key;
 
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this4.validationErrors = [];
+                seatNo = 0;
+                _this4.data.seatMap = _this4.data.seatMap.map(function (seat) {
+                  for (var i = seat.length - 1; i >= 0; i--) {
+                    if (seat[i].reserved) {
+                      seat[i]['seatNo'] = ++seatNo;
+                    }
+                  }
+
+                  return seat;
+                });
                 if (_this4.data.BusClassName === "") // swal('Required', 'Bus Class Name is Required', 'error')
                   swal({
                     title: "Required",
@@ -24937,35 +24922,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "error",
                     timer: 2000
                   });
-                _context4.next = 6;
+                _context4.next = 8;
                 return _this4.callApi("post", "bus_classes/store", _this4.data);
 
-              case 6:
+              case 8:
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 17;
+                  _context4.next = 18;
                   break;
                 }
 
-                swal('Success', 'Bus Class Added Successfully', 'success');
                 swal({
                   title: "Success",
-                  text: "bus Class Added Successfully",
+                  text: "Bus Class Added Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 12;
+                _context4.next = 13;
                 return _this4.fetchBussClasses();
 
-              case 12:
+              case 13:
                 _this4.data = "";
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 18;
+                _context4.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -24978,7 +24962,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context4.stop();
             }
@@ -24990,62 +24974,66 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var res, _loop2, key;
+        var seatNo, res, _loop2, key;
 
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _this5.validationErrors = [];
-                if (_this5.dataEdit.BusClassName === "") // return this.errorsArray("Bus Class Name is Required", "BusClassName");
-                  // swal('Required', 'Bus Class Name is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Bus Class name is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this5.dataEdit.noOfRows === "0") // return this.errorsArray("Row Field is Required", "noOfRows");
-                  // swal('Required', 'Row Field is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "row Field is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this5.dataEdit.noOfCols === "0") // return this.errorsArray("Col Field is Required", "noOfCols");
-                  // swal('Required', 'Col Field is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Col Field is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _context5.next = 6;
-                return _this5.callApi("post", "bus_classes/update", _this5.dataEdit);
-
-              case 6:
-                res = _context5.sent;
-
-                if (!(res.status === 200 && res.statusText === "OK")) {
-                  _context5.next = 13;
-                  break;
-                }
-
-                _context5.next = 10;
-                return _this5.fetchBussClasses();
-
-              case 10:
-                swal({
-                  title: "Success",
-                  text: "Bus Class Updated Successfully",
+                if (_this5.dataEdit.BusClassName === "") swal({
+                  title: "Required",
+                  text: "Bus Class name is required",
                   icon: "error",
                   timer: 2000
                 });
-                _context5.next = 14;
+                if (_this5.dataEdit.noOfRows === "0") swal({
+                  title: "Required",
+                  text: "row Field is required",
+                  icon: "error",
+                  timer: 2000
+                });
+                if (_this5.dataEdit.noOfCols === "0") swal({
+                  title: "Required",
+                  text: "Col Field is Required",
+                  icon: "error",
+                  timer: 2000
+                });
+                seatNo = 0;
+                _this5.dataEdit.seat_map = _this5.dataEdit.seat_map.map(function (seat) {
+                  for (var i = seat.length - 1; i >= 0; i--) {
+                    if (seat[i].reserved) {
+                      seat[i]['seatNo'] = ++seatNo;
+                    }
+                  }
+
+                  return seat;
+                });
+                _context5.next = 8;
+                return _this5.callApi("post", "bus_classes/update", _this5.dataEdit);
+
+              case 8:
+                res = _context5.sent;
+
+                if (!(res.status === 200 && res.statusText === "OK")) {
+                  _context5.next = 15;
+                  break;
+                }
+
+                _context5.next = 12;
+                return _this5.fetchBussClasses();
+
+              case 12:
+                swal({
+                  title: "Success",
+                  text: "Bus Class Updated Successfully",
+                  icon: "success",
+                  timer: 2000
+                });
+                _context5.next = 16;
                 break;
 
-              case 13:
+              case 15:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -25058,7 +25046,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 16:
               case "end":
                 return _context5.stop();
             }
@@ -33067,7 +33055,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 128
       /* KEYED_FRAGMENT */
-      )), _hoisted_73, _hoisted_74]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.selective_bus.seat_map, function (record, rowIndex) {
+      )), _hoisted_73, _hoisted_74]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.bus_class.seat_map, function (record, rowIndex) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           "class": "d-flex justify-content-center seat-img p-0 m-0",
           key: rowIndex
@@ -34020,26 +34008,29 @@ var _hoisted_101 = {
 };
 var _hoisted_102 = ["onClick", "src"];
 var _hoisted_103 = {
+  key: 1
+};
+var _hoisted_104 = {
   "class": "modal fade",
   id: "setEditSeatClass",
   tabindex: "-1",
   "aria-labelledby": "staticBackdropLabel",
   "aria-hidden": "true"
 };
-var _hoisted_104 = {
+var _hoisted_105 = {
   "class": "modal-dialog modal-xl"
 };
-var _hoisted_105 = {
+var _hoisted_106 = {
   "class": "modal-content"
 };
-var _hoisted_106 = {
+var _hoisted_107 = {
   "class": "modal-body"
 };
-var _hoisted_107 = {
+var _hoisted_108 = {
   "class": "card card-success"
 };
 
-var _hoisted_108 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_109 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "card-header d-flex justify-content-between"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
@@ -34056,17 +34047,17 @@ var _hoisted_108 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_109 = {
+var _hoisted_110 = {
   "class": "card-body"
 };
-var _hoisted_110 = {
+var _hoisted_111 = {
   "class": "row"
 };
-var _hoisted_111 = {
+var _hoisted_112 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_112 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_113 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "seat_class"
   }, "Seat Class", -1
@@ -34074,7 +34065,7 @@ var _hoisted_112 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_113 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_114 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0",
     selected: ""
@@ -34083,12 +34074,12 @@ var _hoisted_113 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_114 = ["value"];
-var _hoisted_115 = {
+var _hoisted_115 = ["value"];
+var _hoisted_116 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_116 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "seat_type"
   }, "Seat Type", -1
@@ -34096,7 +34087,7 @@ var _hoisted_116 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_118 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0",
     selected: ""
@@ -34105,7 +34096,7 @@ var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_118 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_119 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "reserved_for_female"
   }, " Reserved for Female ", -1
@@ -34113,7 +34104,7 @@ var _hoisted_118 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_119 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_120 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "not_for_sale"
   }, "Not for Sale", -1
@@ -34121,11 +34112,11 @@ var _hoisted_119 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_120 = [_hoisted_117, _hoisted_118, _hoisted_119];
-var _hoisted_121 = {
+var _hoisted_121 = [_hoisted_118, _hoisted_119, _hoisted_120];
+var _hoisted_122 = {
   "class": "row"
 };
-var _hoisted_122 = {
+var _hoisted_123 = {
   "class": "col-md-12"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -34506,7 +34497,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             alt: ""
           }, null, 8
           /* PROPS */
-          , _hoisted_102)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2
+          , _hoisted_102)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_103))], 2
           /* CLASS */
           );
         }), 128
@@ -34521,30 +34512,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Modal for modify bus class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_103, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [_hoisted_108, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_109, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [_hoisted_112, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Modal for modify bus class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [_hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-control",
     "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
       return $data.editSeatModify["class"] = $event;
     })
-  }, [_hoisted_113, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fareClasses, function (fareClass, i) {
+  }, [_hoisted_114, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fareClasses, function (fareClass, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: i,
       value: fareClass.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(fareClass.name), 9
     /* TEXT, PROPS */
-    , _hoisted_114);
+    , _hoisted_115);
   }), 128
   /* KEYED_FRAGMENT */
   ))], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify["class"]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_115, [_hoisted_116, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify["class"]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [_hoisted_117, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-control",
     "onUpdate:modelValue": _cache[27] || (_cache[27] = function ($event) {
       return $data.editSeatModify.type = $event;
     })
-  }, _hoisted_120, 512
+  }, _hoisted_121, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify.type]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify.type]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-block btn-success",
     onClick: _cache[28] || (_cache[28] = function ($event) {
@@ -35035,7 +35026,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), bus.added_by ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.added_by.name), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <a"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                href=\"#view-modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                @click=\"viewBus(bus)\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                class=\"btn btn-info mx-1\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            >"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <i class=\"far fa-eye\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            </a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
       href: "#edit-modal",
       "data-toggle": "modal",
       onClick: function onClick($event) {
@@ -41968,9 +41959,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/projects/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],

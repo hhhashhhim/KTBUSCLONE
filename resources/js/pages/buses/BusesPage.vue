@@ -52,14 +52,7 @@
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
-                                                            <!--                                                            <a-->
-                                                            <!--                                                                href="#view-modal"-->
-                                                            <!--                                                                data-toggle="modal"-->
-                                                            <!--                                                                @click="viewBus(bus)"-->
-                                                            <!--                                                                class="btn btn-info mx-1"-->
-                                                            <!--                                                            >-->
-                                                            <!--                                                                <i class="far fa-eye"></i>-->
-                                                            <!--                                                            </a>-->
+                                                            
                                                             <a
                                                                 href="#edit-modal"
                                                                 data-toggle="modal"
@@ -76,6 +69,7 @@
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
                                                             </a>
+
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -550,8 +544,6 @@ export default {
                icon: "error",
                timer: 2000
             });
-
-
             if (this.data.fare_class === "")
                 return this.errorsArray("PLease Select Bus Class", "fare_class");
             const res = await this.callApi("post", "buses/store", this.data);

@@ -314,7 +314,7 @@
               </div>
               <div
                 class="d-flex justify-content-center seat-img p-0 m-0"
-                v-for="(record, rowIndex) in schedule.selective_bus.seat_map"
+                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
                 :key="rowIndex"
               >
                 <div v-for="(col, colIndex) in record" :key="colIndex">
@@ -495,18 +495,18 @@ export default {
       this.validationErrors = [];
       if (
         this.addForm.oldBookings == 1 &&
-        !this.schedule.selective_bus.seat_map[row][col].type
+        !this.schedule.bus_class.seat_map[row][col].type
       ) {
         this.doScroll();
         return this.errorsArray("Please Select Already Booked Seat", "Oops");
       }
       if (
-        this.schedule.selective_bus.seat_map[row][col].type &&
+        this.schedule.bus_class.seat_map[row][col].type &&
         this.selectedSeats.length == 0
       ) {
         let index = this.selectedBookedSeats.indexOf(seatNo);
         if (index != -1) {
-          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.schedule.bus_class.seat_map[row][col].selected = false;
           this.selectedBookedSeats.splice(index, 1);
           this.bookedSeats = this.bookedSeats.filter((seat) => {
             if (seat.seatNo != seatNo) {
@@ -514,21 +514,21 @@ export default {
             }
           });
         } else {
-          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedBookedSeats.push(seatNo);
-          this.bookedSeats.push(this.schedule.selective_bus.seat_map[row][col]);
+          this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
         }
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
       } else if (
-        !this.schedule.selective_bus.seat_map[row][col].type &&
+        !this.schedule.bus_class.seat_map[row][col].type &&
         this.selectedBookedSeats.length == 0
       ) {
         let index = this.selectedSeats.indexOf(seatNo);
         if (index != -1) {
-          this.schedule.selective_bus.seat_map[row][col].selected = false;
+          this.schedule.bus_class.seat_map[row][col].selected = false;
           this.selectedSeats.splice(index, 1);
         } else {
-          this.schedule.selective_bus.seat_map[row][col].selected = true;
+          this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedSeats.push(seatNo);
         }
         this.addForm.selectedSeats = this.selectedSeats;

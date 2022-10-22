@@ -45,7 +45,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $schedule = Schedule::where('id',$request->schedule)
-        ->select('id','selected_bus_class_id','company_id')->with('selective_bus')
+        ->select('id','selected_bus_class_id','company_id')->with('bus_class')
         ->first();
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
         $customer = Customer::where('cnic',$cnicFormat)->first();

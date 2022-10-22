@@ -32,7 +32,7 @@ class ScheduleController extends Controller
 
     public function index()
     {
-        return Schedule::with('single_bus_class', 'single_bus.busClass', 'selective_bus', 'singleRoute', 'singleCity', 'singleTerminal', 'addedBy')->where('company_id', $this->company_id)->orderBy('id')->get();
+        return Schedule::with('single_bus_class', 'single_bus.busClass', 'bus_class', 'singleRoute', 'singleCity', 'singleTerminal', 'addedBy')->where('company_id', $this->company_id)->orderBy('id')->get();
     }
 
     public function storeSchedule(Request $request)
@@ -190,11 +190,11 @@ class ScheduleController extends Controller
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
         ->select('id', 'selected_bus_class_id')
-        ->with('selective_bus:id,seat_map')->first();
-        $seatMap = $schedule->selective_bus->seat_map;
+        ->with('bus_class:id,seat_map')->first();
+        $seatMap = $schedule->bus_class->seat_map;
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
-                $result = array_search($column['seatNo'], $ticketSeatNumbers);
+                $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
                 if ($result !== false) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
@@ -202,7 +202,7 @@ class ScheduleController extends Controller
                 }
             }
         }
-        $schedule->selective_bus->seat_map = $seatMap;
+        $schedule->bus_class->seat_map = $seatMap;
         return $schedule;
     }
 
