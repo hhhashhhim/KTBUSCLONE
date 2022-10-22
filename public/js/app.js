@@ -26900,9 +26900,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 res = _context4.sent;
+                console.log(res.data);
 
-                if (!(res.status === 200 && res.statusText === "OK")) {
-                  _context4.next = 14;
+                if (!(res.status == 200)) {
+                  _context4.next = 15;
                   break;
                 }
 
@@ -26913,14 +26914,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 12;
+                _context4.next = 13;
                 return _this4.fetchFareClasses();
 
-              case 12:
-                _context4.next = 15;
+              case 13:
+                _context4.next = 16;
                 break;
 
-              case 14:
+              case 15:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -26933,7 +26934,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 15:
+              case 16:
               case "end":
                 return _context4.stop();
             }
@@ -42229,7 +42230,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/kt/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

@@ -330,7 +330,8 @@ export default {
 
                 this.loading = true;
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
-            if (res.status === 200 && res.statusText === "OK") {
+            console.log(res.data);
+            if (res.status == 200) {
                 swal({
                     title: "Success!",
                     text: "Fare Class Updated Successfully",
