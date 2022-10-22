@@ -323,7 +323,7 @@
                                         </div> -->
                   <div
                     v-if="col.reserved"
-                    class="image-span d-block text-center text-white"
+                    class="image-span d-block text-center text-white shadow-sm"
                     @click="selectSeat(rowIndex, colIndex, col.seatNo)"
                     :class="getClasses(col)"
                     :style="{border:'3px solid '+col.color+' !important'}"
