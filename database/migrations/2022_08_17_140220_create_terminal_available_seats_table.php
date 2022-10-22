@@ -13,16 +13,16 @@ class CreateTerminalAvailableSeatsTable extends Migration
      */
     public function up()
     {
-        // Schema::create('terminal_available_seats', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->integer('terminal_id');
-        //     $table->integer('company_id')->nullable();
-        //     $table->integer('seats');
-        //     $table->integer('added_by');
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('terminal_available_seats', function (Blueprint $table) {
+            $table->id();
+            $table->integer('terminal_id');
+            $table->integer('company_id')->nullable();
+            $table->integer('seats');
+            $table->integer('added_by');
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

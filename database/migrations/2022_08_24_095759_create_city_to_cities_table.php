@@ -15,16 +15,16 @@ class CreateCityToCitiesTable extends Migration
      */
     public function up()
     {
-        // Schema::create('city_to_city', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->bigInteger('departure_city_id');
-        //     $table->bigInteger('destination_city_id');
-        //     $table->integer('company_id')->nullable();
-        //     $table->integer('added_by')->nullable();
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('city_to_city', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('departure_city_id');
+            $table->bigInteger('destination_city_id');
+            $table->integer('company_id')->nullable();
+            $table->integer('added_by')->nullable();
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
 
     }
 

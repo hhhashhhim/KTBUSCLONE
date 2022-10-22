@@ -13,19 +13,19 @@ class CreateRoutesFaresTable extends Migration
      */
     public function up()
     {
-        // Schema::create('routes_fares', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->bigInteger('route_id');
-        //     $table->bigInteger('fare_id');
-        //     $table->bigInteger('fare_class_id');
-        //     $table->bigInteger('departure_city_id');
-        //     $table->bigInteger('destination_city_id');
-        //     $table->bigInteger('company_id');
-        //     $table->bigInteger('added_by');
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('routes_fares', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('route_id');
+            $table->bigInteger('fare_id');
+            $table->bigInteger('fare_class_id');
+            $table->bigInteger('departure_city_id');
+            $table->bigInteger('destination_city_id');
+            $table->bigInteger('company_id');
+            $table->bigInteger('added_by');
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

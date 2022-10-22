@@ -13,9 +13,9 @@ class AddCompanyIdToUsersTable extends Migration
      */
     public function up()
     {
-        // Schema::table('users', function (Blueprint $table) {
-        //     $table->integer('company_id')->after('email');
-        // });
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('company_id')->after('email');
+        });
     }
 
     /**

@@ -13,17 +13,17 @@ class CreateCompaniesTable extends Migration
      */
     public function up()
     {
-        // Schema::create('companies', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->string('contact');
-        //     $table->string('logo')->nullable();
-        //     $table->text('location')->nullable();
-        //     $table->integer('added_by')->nullable();
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('companies', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('contact');
+            $table->string('logo')->nullable();
+            $table->text('location')->nullable();
+            $table->integer('added_by')->nullable();
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

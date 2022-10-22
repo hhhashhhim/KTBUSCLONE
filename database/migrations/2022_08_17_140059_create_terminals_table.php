@@ -13,26 +13,26 @@ class CreateTerminalsTable extends Migration
      */
     public function up()
     {
-        // Schema::create('terminals', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->string('contact');
-        //     $table->text('address');
-        //     $table->string('longitude')->nullable();
-        //     $table->string('latitude')->nullable();
-        //     $table->string('time_difference')->nullable();
-        //     $table->string('advance_booking')->nullable();
-        //     $table->string('available_seats')->nullable();
-        //     $table->tinyInteger('active_sms')->nullable();
-        //     $table->integer('city_id');
-        //     $table->integer('company_id');
-        //     $table->string('online_terminal_name');
-        //     $table->string('status')->default('inactive');
-        //     $table->integer('added_by');
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('terminals', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('contact');
+            $table->text('address');
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('time_difference')->nullable();
+            $table->string('advance_booking')->nullable();
+            $table->string('available_seats')->nullable();
+            $table->tinyInteger('active_sms')->nullable();
+            $table->integer('city_id');
+            $table->integer('company_id');
+            $table->string('online_terminal_name');
+            $table->string('status')->default('inactive');
+            $table->integer('added_by');
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

@@ -13,16 +13,16 @@ class CreateActivityLogsTable extends Migration
      */
     public function up()
     {
-        // Schema::create('activity_logs', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('message');
-        //     $table->integer('activity_by');
-        //     $table->ipAddress('requested_host');
-        //     $table->enum('status', ['Read', 'Unread']);
-        //     $table->timestamp('time')->useCurrent();
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('message');
+            $table->integer('activity_by');
+            $table->ipAddress('requested_host');
+            $table->enum('status', ['Read', 'Unread']);
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**

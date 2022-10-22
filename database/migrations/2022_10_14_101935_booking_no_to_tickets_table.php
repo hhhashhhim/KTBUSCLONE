@@ -13,14 +13,14 @@ class BookingNoToTicketsTable extends Migration
      */
     public function up()
     {
-        // Schema::table('tickets', function (Blueprint $table) {
-        //     $table->integer('booking_no')->after('bus_class_id');
-        //     $table->string('date')->after('booking_no')->nullable();
-        //     $table->timestamp('time')->after('discount')->useCurrent();
-        //     $table->integer('added_by')->after('time')->nullable();
-        //     $table->softDeletes()->after('time')->nullable();
-        //     $table->renameColumn('for_female', 'gender');
-        // });
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->integer('booking_no')->after('bus_class_id');
+            $table->string('date')->after('booking_no')->nullable();
+            $table->timestamp('time')->after('discount')->useCurrent();
+            $table->integer('added_by')->after('time')->nullable();
+            $table->softDeletes()->after('time')->nullable();
+            $table->renameColumn('for_female', 'gender');
+        });
     }
 
     /**

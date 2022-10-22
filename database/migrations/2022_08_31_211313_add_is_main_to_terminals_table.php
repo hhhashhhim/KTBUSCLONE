@@ -13,9 +13,9 @@ class AddIsMainToTerminalsTable extends Migration
      */
     public function up()
     {
-        // Schema::table('terminals', function (Blueprint $table) {
-        //     $table->tinyInteger('is_main')->after('available_seats');
-        // });
+        Schema::table('terminals', function (Blueprint $table) {
+            $table->tinyInteger('is_main')->after('available_seats');
+        });
     }
 
     /**

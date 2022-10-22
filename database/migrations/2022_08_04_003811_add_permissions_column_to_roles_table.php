@@ -13,10 +13,10 @@ class AddPermissionsColumnToRolesTable extends Migration
      */
     public function up()
     {
-        // Schema::table('roles', function (Blueprint $table) {
-        //     $table->json('permissions')->after('name')->nullable();
-        //     $table->softDeletes();
-        // });
+        Schema::table('roles', function (Blueprint $table) {
+            $table->json('permissions')->after('name')->nullable();
+            $table->softDeletes();
+        });
     }
 
     /**

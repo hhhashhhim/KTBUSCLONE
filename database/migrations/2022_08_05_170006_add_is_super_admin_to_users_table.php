@@ -13,9 +13,9 @@ class AddIsSuperAdminToUsersTable extends Migration
      */
     public function up()
     {
-        // Schema::table('users', function (Blueprint $table) {
-        //     $table->integer('is_super_admin')->default('0')->after('role_id');
-        // });
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('is_super_admin')->default('0')->after('role_id');
+        });
     }
 
     /**

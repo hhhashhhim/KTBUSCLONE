@@ -13,9 +13,9 @@ class AddCompanyIdToRolesTable extends Migration
      */
     public function up()
     {
-        // Schema::table('roles', function (Blueprint $table) {
-        //     $table->integer('company_id')->after('name');
-        // });
+        Schema::table('roles', function (Blueprint $table) {
+            $table->integer('company_id')->after('name');
+        });
     }
 
     /**

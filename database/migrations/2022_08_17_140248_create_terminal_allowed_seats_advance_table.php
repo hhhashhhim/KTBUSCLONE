@@ -13,15 +13,15 @@ class CreateTerminalAllowedSeatsAdvanceTable extends Migration
      */
     public function up()
     {
-        // Schema::create('terminal_allowed_seats_advance', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->integer('terminal_id');
-        //     $table->integer('company_id')->nullable();
-        //     $table->integer('seats');
-        //     $table->integer('added_by');
-        //     $table->softDeletes();
-        //     $table->timestamps();
-        // });
+        Schema::create('terminal_allowed_seats_advance', function (Blueprint $table) {
+            $table->id();
+            $table->integer('terminal_id');
+            $table->integer('company_id')->nullable();
+            $table->integer('seats');
+            $table->integer('added_by');
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     /**
