@@ -257,7 +257,7 @@ export default {
                 terminals: this.addTerminalsOnClick
             }
 
-            //this.loading = true
+            this.loading = true
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
                 this.routeName = "";

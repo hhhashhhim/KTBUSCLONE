@@ -162,7 +162,7 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            //this.loading = true
+            this.loading = true
             const res = await this.callApi("post",'cities/store',this.data);
             if (res.status == 200) {
                 // this.success="City Created Successfully Named as " + res.data.name;
@@ -173,7 +173,7 @@ export default {
                    timer: 2000
                 });
 
-                //this.loading = false
+                this.loading = false
                 // swal('Success', 'City Added Successfully', 'success');
                 // await this.fetchCities();
                 // this.cities.unshift(res.data);
@@ -193,7 +193,7 @@ export default {
                     }
                 }
                 setTimeout(function () {
-                  //this.loading = false
+                  this.loading = false
                 }, 2000);
             }
         },
@@ -212,7 +212,7 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            //this.loading = true
+            this.loading = true
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             if (resEdit.status==200) {
                 // swal('Success', 'City Updated Successfully', 'success');
@@ -222,7 +222,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
@@ -239,7 +239,7 @@ export default {
                     }
                 }
                 setTimeout(() => {
-                    //this.loading = false
+                    this.loading = false
                 }, 3000);
             }
         },

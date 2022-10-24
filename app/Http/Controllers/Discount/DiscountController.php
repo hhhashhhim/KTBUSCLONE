@@ -27,47 +27,49 @@ class DiscountController extends Controller
 
     public function storeDiscount(Request $request)
     {
+//        dd($request->all());
         $rules = [
             'name' => ['required', Rule::unique('discounts', 'name')->whereNull('deleted_at')],
-            'percentage' => 'required|numeric|min:0|max:100',
+//            'percentage' => 'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Discount Name is Required!',
             'name.unique' => 'Discount Name not be Repeated!',
-            'percentage.required' => 'Discount percentage is Required!',
-            'percentage.min' => 'Discount percentage never be less then 0',
-            'percentage.max' => 'Discount percentage never be greater then 100',
+//            'percentage.required' => 'Discount percentage is Required!',
+//            'percentage.min' => 'Discount percentage never be less then 0',
+//            'percentage.max' => 'Discount percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         $discount = Discount::create([
             'name' => $request->name,
-            'percentage' => $request->percentage,
+            'type' => $request->type,
+            'amount' => $request->amount,
             'company_id' => $this->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
-        return Discount::with('added_by')->find($discount->id);
+        return Discount::with('addedBy')->find($discount->id);
     }
 
     public function updateDiscount(Request $request)
     {
         $rules = [
             'name' => 'required',
-            'percentage' => 'required|numeric|min:0|max:100',
+//            'percentage' => 'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Discount Name is Required!',
-            'percentage.required' => 'Discount percentage is Required!',
-            'percentage.min' => 'Discount percentage never be less then 0',
-            'percentage.max' => 'Discount percentage never be greater then 100',
+//            'percentage.required' => 'Discount percentage is Required!',
+//            'percentage.min' => 'Discount percentage never be less then 0',
+//            'percentage.max' => 'Discount percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         return Discount::where('id', $request->id)->update([
             'name' => $request->name,
-            'percentage' => $request->percentage,
-            'company_id' => $this->company_id,
+            'type' => $request->type,
+            'amount' => $request->amount,
             'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);

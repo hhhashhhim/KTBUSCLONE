@@ -525,7 +525,7 @@ export default {
                 return this.errorsArray("Company Email is Required", "Email");
             if (this.data.password == "")
                 return this.errorsArray("Company password is Required", "Contact");
-            //this.loading = true
+            this.loading = true
 
             let logo = "";
             if (this.data.logo) {
@@ -534,7 +534,7 @@ export default {
             }
             const res = await this.callApi("post", "company/store", { ...this.data,  logo });
             if (res.status == 201) {
-                //this.loading = false
+                this.loading = false
                 this.success = "Company Created Successfully";
                 this.cities.unshift(res.data);
                 this.fetchCompany();
@@ -548,7 +548,7 @@ export default {
                 }, 2000);
             } else {
                 if (res.status == 422) {
-                    //this.loading = false
+                    this.loading = false
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -650,7 +650,7 @@ export default {
                 }
             } else {
                 // swal('Image Extension', 'Uploaded Image must be .jpg, .jpeg, .png', 'error');
-                swal({
+               return swal({
                     title: "Select Image",
                     text: "Uploaded File must be in .jpg, .jpeg, .png",
                     icon: "error",
