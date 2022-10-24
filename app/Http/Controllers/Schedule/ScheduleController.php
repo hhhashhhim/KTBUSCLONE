@@ -191,6 +191,7 @@ class ScheduleController extends Controller
         ->select('id', 'selected_bus_class_id')
         ->with('bus_class:id,seat_map')->first();
         $seatMap = $schedule->bus_class->seat_map;
+        $busClasses = FareClass::get();
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
                 $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
@@ -198,6 +199,10 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+                }
+                // print_r($column);
+                if ( isset($column['class']) ) {
+                    $seatMap[$i][$j]['color'] = $busClasses->where('id',$column['class'])->first()?$busClasses->where('id',$column['class'])->first()->color:'';
                 }
             }
         }
