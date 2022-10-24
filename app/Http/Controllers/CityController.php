@@ -123,7 +123,6 @@ class CityController extends Controller
                 }
             }
         }
-        return "Reaching";
         $route = Route::create([
             'name' => $request['route'],
             'company_id' => $this->company_id,
