@@ -48,7 +48,6 @@ class BusController extends Controller
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::create([
-            'no_of_seats' => $request->noOfSeats,
             'bus_number' => $request->busNumber,
             'fare_class_id' => $request->fare_class,
             'chassis_number' => $request->chassisNumber,
@@ -82,7 +81,6 @@ class BusController extends Controller
             'bus_number' => $request->bus_number,
             'chassis_number' => $request->chassis_number,
             'insurance_number' => $request->insurance_number,
-            'no_of_seats' => $request->no_of_seats??0,
             'route_permit_number' => $request->route_permit_number,
             'fare_class_id' => $request->fare_class_id,
             'company_id' => $this->company_id,

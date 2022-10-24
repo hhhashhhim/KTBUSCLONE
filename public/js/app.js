@@ -23232,7 +23232,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     confirmationMessage: String,
-    confirmModalID: String
+    confirmModalID: String,
+    deleteForm: String
   },
   data: function data() {
     return {
@@ -23329,7 +23330,7 @@ __webpack_require__.r(__webpack_exports__);
     errors: Array,
     success: String,
     dataEdit: Object,
-    formID: String
+    editForm: String
   },
   methods: {
     close: function close() {
@@ -23762,8 +23763,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       options: {
-        placeholder: "xxxxx-xxxxxxx-x" // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
-
+        placeholder: "xxxxx-xxxxxxx-x"
       },
       rescheduleFormId: "reschedule-modal",
       shiftingFormId: "shifting-modal",
@@ -23772,6 +23772,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       customers: [],
       isActive: 1,
       formID: "addBooking",
+      deleteFormID: "delete_addBooking",
       validationErrors: [],
       success: false,
       error: false,
@@ -23937,26 +23938,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _context4.abrupt("return", _this4.errorsArray("Date is Required", "Date"));
 
             case 6:
-              _this4.validationErrors = [];
-              _this4.loading = true;
-              _context4.next = 10;
+              _this4.validationErrors = []; //this.loading = true
+
+              _context4.next = 9;
               return _this4.callApi("post", "schedule/selected", {
                 id: _this4.addForm.schedule,
                 date: _this4.addForm.date
               });
 
-            case 10:
+            case 9:
               res = _context4.sent;
 
               if (res.status == 200) {
-                _this4.loading = false;
+                //this.loading = false
                 _this4.showBookingDiv = true;
                 _this4.schedule = res.data;
               } else {
                 console.log(res);
               }
 
-            case 12:
+            case 11:
             case "end":
               return _context4.stop();
           }
@@ -24465,26 +24466,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context3.abrupt("return", _this3.errorsArray("Date is Required", "Date"));
 
               case 6:
-                _this3.validationErrors = [];
-                _this3.loading = true;
-                _context3.next = 10;
+                _this3.validationErrors = []; //this.loading = true
+
+                _context3.next = 9;
                 return _this3.callApi("post", "schedule/selected", {
                   id: _this3.addForm.schedule,
                   date: _this3.addForm.date
                 });
 
-              case 10:
+              case 9:
                 res = _context3.sent;
 
                 if (res.status == 200) {
-                  _this3.loading = false;
+                  //this.loading = false
                   _this3.showBookingDiv = true;
                   _this3.schedule = res.data;
                 } else {
                   console.log(res);
                 }
 
-              case 12:
+              case 11:
               case "end":
                 return _context3.stop();
             }
@@ -24573,6 +24574,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       busClasses: [],
       fareClasses: [],
       formID: "busClass_form",
+      editFormID: "edit_busClass_form",
+      deleteFormID: "delete_busClass_form",
       validationErrors: [],
       seatModify: {
         "class": 0,
@@ -24702,28 +24705,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this3.loading = true;
-                _context3.next = 3;
+                _context3.next = 2;
                 return _this3.callApi("post", "buses/storeFareClass", _this3.addData);
 
-              case 3:
+              case 2:
                 resSaveFareClass = _context3.sent;
 
-                if (resSaveFareClass.status === 201) {
-                  swal({
-                    title: "Success",
-                    text: "Fare Class Added Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this3.loading = false;
-
-                  _this3.fareClasses.push(resSaveFareClass.data);
-                } else {
-                  console.log(resSaveFareClass);
+                if (!(resSaveFareClass.status === 201)) {
+                  _context3.next = 8;
+                  break;
                 }
 
-              case 5:
+                return _context3.abrupt("return", swal({
+                  title: "Success",
+                  text: "Fare Class Added Successfully",
+                  icon: "success",
+                  timer: 2000
+                }));
+
+              case 8:
+                console.log(resSaveFareClass);
+
+              case 9:
               case "end":
                 return _context3.stop();
             }
@@ -24744,7 +24747,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         };
         this.success = "Seat Class Customize Successfully to Seat Number " + seatDetails.seatNo;
       } else {
-        swal({
+        return swal({
           title: "Required",
           text: "Please Select Any Field For Seat Modification !!!!",
           icon: "error",
@@ -24782,7 +24785,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       if (this.editSeatModify["class"] == 0) {
         // swal('required', 'Please Select Seat class', 'error');
-        swal({
+        return swal({
           title: "required",
           text: "Please Select Seat Class",
           icon: "error",
@@ -24851,7 +24854,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return this.data.seatMap = map;
         } else {
           // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
-          swal({
+          return swal({
             title: "Limited",
             text: "No of Cols must be less then or equal to 7",
             icon: "error",
@@ -24860,7 +24863,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       } else {
         // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
-        swal({
+        return swal({
           title: "Limited",
           text: "No of Rows must be less then or equal to 15",
           icon: "error",
@@ -24907,58 +24910,72 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   return seat;
                 });
-                if (_this4.data.BusClassName === "") // swal('Required', 'Bus Class Name is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Bus Class Name is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this4.data.noOfRows === "0") // swal('Required', 'Row Field is Required', 'error')
-                  swal({
-                    title: "Required ",
-                    text: "Row Field is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this4.data.noOfCols === "0") // swal('Required', 'Col Field is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Col Field is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this4.loading = true;
-                _context4.next = 9;
-                return _this4.callApi("post", "bus_classes/store", _this4.data);
 
-              case 9:
-                res = _context4.sent;
-
-                if (!(res.status === 201)) {
-                  _context4.next = 20;
+                if (!(_this4.data.BusClassName === "")) {
+                  _context4.next = 5;
                   break;
                 }
 
-                // swal('Success', 'Bus Class Added Successfully', 'success');
-                swal({
+                return _context4.abrupt("return", swal({
+                  title: "Required",
+                  text: "Bus Class Name is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this4.data.noOfRows === "0")) {
+                  _context4.next = 7;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required ",
+                  text: "Row Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this4.data.noOfCols === "0")) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required",
+                  text: "Col Field is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                _context4.next = 11;
+                return _this4.callApi("post", "bus_classes/store", _this4.data);
+
+              case 11:
+                res = _context4.sent;
+
+                if (!(res.status === 201)) {
+                  _context4.next = 21;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
                   title: "Success",
                   text: "Bus Class Added Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this4.loading = false;
-                _context4.next = 15;
-                return _this4.fetchBussClasses();
+                }));
 
-              case 15:
+              case 16:
                 _this4.data = "";
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 21;
+                _context4.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -24971,7 +24988,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context4.stop();
             }
@@ -24990,25 +25007,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context5.prev = _context5.next) {
               case 0:
                 _this5.validationErrors = [];
-                if (_this5.dataEdit.BusClassName === "") swal({
+
+                if (!(_this5.dataEdit.BusClassName === "")) {
+                  _context5.next = 3;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Bus Class name is required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this5.dataEdit.noOfRows === "0") swal({
+                }));
+
+              case 3:
+                if (!(_this5.dataEdit.noOfRows === "0")) {
+                  _context5.next = 5;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "row Field is required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this5.dataEdit.noOfCols === "0") swal({
+                }));
+
+              case 5:
+                if (!(_this5.dataEdit.noOfCols === "0")) {
+                  _context5.next = 7;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Col Field is Required",
                   icon: "error",
                   timer: 2000
-                });
-                _this5.loading = true;
+                }));
+
+              case 7:
+                //this.loading = true
                 seatNo = 0;
                 _this5.dataEdit.seat_map = _this5.dataEdit.seat_map.map(function (seat) {
                   for (var i = seat.length - 1; i >= 0; i--) {
@@ -25019,32 +25058,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   return seat;
                 });
-                _context5.next = 9;
+                _context5.next = 11;
                 return _this5.callApi("post", "bus_classes/update", _this5.dataEdit);
 
-              case 9:
+              case 11:
                 res = _context5.sent;
 
                 if (!(res.status === 200 && res.statusText === "OK")) {
-                  _context5.next = 17;
+                  _context5.next = 18;
                   break;
                 }
 
-                swal({
+                return _context5.abrupt("return", swal({
                   title: "Success",
                   text: "Bus Class Updated Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this5.loading = false;
-                _context5.next = 15;
-                return _this5.fetchBussClasses();
+                }));
 
-              case 15:
-                _context5.next = 18;
+              case 16:
+                _context5.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -25057,7 +25093,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context5.stop();
             }
@@ -25163,6 +25199,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       details: "",
       dataView: {},
       formID: "bus_form",
+      editFormID: "edit_bus_form",
+      deleteFormID: "delete_bus_form",
       seatNo: 0,
       data: {
         noOfSeats: "",
@@ -25274,57 +25312,88 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.validationErrors = [];
-                if (_this3.data.noOfSeats === "") swal({
+
+                if (!(_this3.data.noOfSeats === "")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
                   title: "Required!",
                   text: "No. Of Seats is required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this3.data.busNumber === "") // swal('Required', 'Bus Number is Required', 'error');
-                  swal({
-                    title: "Required",
-                    text: "Bus Number is required",
-                    type: 'error',
-                    timer: 2000
-                  });
-                if (_this3.data.chassisNumber === "") // swal('Required', 'Chassis Number is Required', 'error');
-                  swal({
-                    title: "Required",
-                    text: "Chassis Number is required!",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this3.data.insuranceNumber === "") // swal('Required', 'Insurance Number is Required', 'error');
-                  swal({
-                    title: "Required",
-                    text: "Insurance Number is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this3.data.routePermit === "") // swal('Required', 'Route Permit is Required', 'error');
-                  swal({
-                    title: "Required",
-                    text: "Route Permit is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
+                }));
 
+              case 3:
+                if (!(_this3.data.busNumber === "")) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Bus Number is required",
+                  type: 'error',
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this3.data.chassisNumber === "")) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Chassis Number is required!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this3.data.insuranceNumber === "")) {
+                  _context3.next = 9;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Insurance Number is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!(_this3.data.routePermit === "")) {
+                  _context3.next = 11;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Route Permit is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 11:
                 if (!(_this3.data.fare_class === "")) {
-                  _context3.next = 8;
+                  _context3.next = 13;
                   break;
                 }
 
                 return _context3.abrupt("return", _this3.errorsArray("PLease Select Bus Class", "fare_class"));
 
-              case 8:
-                _context3.next = 10;
+              case 13:
+                _context3.next = 15;
                 return _this3.callApi("post", "buses/store", _this3.data);
 
-              case 10:
+              case 15:
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 20;
+                  _context3.next = 25;
                   break;
                 }
 
@@ -25338,18 +25407,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 window.scrollTo(0, 0);
                 _this3.data = {};
-                _context3.next = 17;
+                _context3.next = 22;
                 return _this3.fetchBuses();
 
-              case 17:
+              case 22:
                 setTimeout(function () {
                   // window.location.reload();
                   _this3.isShowDiv = false;
                 }, 2000);
-                _context3.next = 21;
+                _context3.next = 26;
                 break;
 
-              case 20:
+              case 25:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -25362,7 +25431,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 26:
               case "end":
                 return _context3.stop();
             }
@@ -25535,6 +25604,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       cities: [],
       loading: false,
       formID: 'city_form',
+      editFormID: 'edit_city_form',
+      deleteFormID: 'delete_city_form',
       data: {
         name: ""
       },
@@ -25592,6 +25663,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   $("#city_table").DataTable();
                 }, 50); //Time before execution
+                //Time before execution
 
               case 5:
               case "end":
@@ -25612,15 +25684,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.validationErrors = [];
-                if (_this3.data.name == "") // return this.errorsArray("City Name is Required","Name");
-                  // swal('Required','City Name is Required','error')
-                  swal({
-                    title: "Required",
-                    text: "City Name is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this3.loading = true;
+
+                if (!(_this3.data.name == "")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "City Name is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
                 _context3.next = 5;
                 return _this3.callApi("post", 'cities/store', _this3.data);
 
@@ -25634,8 +25711,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "City Created Succesfuly Named as  " + res.data.name,
                     icon: "success",
                     timer: 2000
-                  });
-                  _this3.loading = false; // swal('Success', 'City Added Successfully', 'success');
+                  }); //this.loading = false
+                  // swal('Success', 'City Added Successfully', 'success');
                   // await this.fetchCities();
                   // this.cities.unshift(res.data);
 
@@ -25659,8 +25736,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }
 
-                  setTimeout(function () {
-                    document.querySelector('.alert-danger').style.display = 'none';
+                  setTimeout(function () {//this.loading = false
                   }, 2000);
                 }
 
@@ -25687,15 +25763,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this4.validationErrors = [];
-                if (_this4.dataEdit.name == "") // return this.errorsArray("City Name is Required","Name");
-                  // swal('Required','City Name is Required','error')
-                  swal({
-                    title: "Required",
-                    text: "city Name is required ",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this4.loading = true;
+
+                if (!(_this4.dataEdit.name == "")) {
+                  _context4.next = 3;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required",
+                  text: "city Name is required ",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
                 _context4.next = 5;
                 return _this4.callApi("post", 'cities/update', _this4.dataEdit);
 
@@ -25703,7 +25784,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 15;
+                  _context4.next = 14;
                   break;
                 }
 
@@ -25713,12 +25794,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "City updated Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this4.loading = false;
-                _context4.next = 11;
+                }); //this.loading = false
+
+                _context4.next = 10;
                 return _this4.fetchCities();
 
-              case 11:
+              case 10:
                 _this4.dataEdit.name = _this4.dataEdit.company_id = "";
                 setTimeout(function () {
                   _this4.success = "";
@@ -25727,7 +25808,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context4.next = 16;
                 break;
 
-              case 15:
+              case 14:
                 if (res.status == 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -25739,6 +25820,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _loop2(key);
                   }
                 }
+
+                setTimeout(function () {//this.loading = false
+                }, 3000);
 
               case 16:
               case "end":
@@ -25847,6 +25931,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       roles: [],
       formID: "newCompany",
       confirmModalID: "confirmModal",
+      editFormID: 'edit_company_form',
       loading: false,
       data: {
         name: "",
@@ -26026,32 +26111,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context3.abrupt("return", _this3.errorsArray("Company password is Required", "Contact"));
 
               case 14:
-                _this3.loading = true;
+                //this.loading = true
                 logo = "";
 
                 if (!_this3.data.logo) {
-                  _context3.next = 21;
+                  _context3.next = 20;
                   break;
                 }
 
-                _context3.next = 19;
+                _context3.next = 18;
                 return _this3.callApi("post", "company/logo-upload", formData, config);
 
-              case 19:
+              case 18:
                 logoRes = _context3.sent;
                 logo = logoRes ? logoRes.data.name : "";
 
-              case 21:
-                _context3.next = 23;
+              case 20:
+                _context3.next = 22;
                 return _this3.callApi("post", "company/store", _objectSpread(_objectSpread({}, _this3.data), {}, {
                   logo: logo
                 }));
 
-              case 23:
+              case 22:
                 res = _context3.sent;
 
                 if (res.status == 201) {
-                  _this3.loading = false;
+                  //this.loading = false
                   _this3.success = "Company Created Successfully";
 
                   _this3.cities.unshift(res.data);
@@ -26068,21 +26153,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 } else {
                   if (res.status == 422) {
-                    _this3.loading = false;
-
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this3.errorsArray(element, key);
                       });
                     };
 
+                    //this.loading = false
                     for (key in res.data.errors) {
                       _loop(key);
                     }
                   }
                 }
 
-              case 25:
+              case 24:
               case "end":
                 return _context3.stop();
             }
@@ -26370,6 +26454,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       discounts: [],
       isActive: 1,
       formID: "discount_form",
+      editFormID: "edit_discount_form",
+      deleteFormID: "delete_discount_form",
       validationErrors: [],
       success: false,
       error: false,
@@ -26504,7 +26590,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201 && res.statusText == "Created")) {
-                  _context3.next = 17;
+                  _context3.next = 16;
                   break;
                 }
 
@@ -26520,12 +26606,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this3.fetchDiscount();
 
               case 13:
-                _this3.loading = false;
+                //this.loading = false
                 window.scrollTo(0, 0);
-                _context3.next = 19;
+                _context3.next = 18;
                 break;
 
-              case 17:
+              case 16:
                 if (res.status == 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -26541,7 +26627,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 19:
+              case 18:
               case "end":
                 return _context3.stop();
             }
@@ -26573,16 +26659,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "Percentage Field is Required",
                     icon: "error",
                     timer: 2000
-                  });
-                _this4.loading = true;
-                _context4.next = 6;
+                  }); //this.loading = true
+
+                _context4.next = 5;
                 return _this4.callApi("post", 'discount/update', _this4.dataEdit);
 
-              case 6:
+              case 5:
                 res = _context4.sent;
 
                 if (!(res.status === 200 && res.statusText === "OK")) {
-                  _context4.next = 14;
+                  _context4.next = 12;
                   break;
                 }
 
@@ -26592,16 +26678,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "No. Of Seats is required",
                   icon: "error",
                   timer: 2000
-                });
-                _this4.loading = false;
-                _context4.next = 12;
+                }); //this.loading = false
+
+                _context4.next = 10;
                 return _this4.fetchDiscount();
 
-              case 12:
-                _context4.next = 16;
+              case 10:
+                _context4.next = 14;
                 break;
 
-              case 14:
+              case 12:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -26617,7 +26703,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 16:
+              case 14:
               case "end":
                 return _context4.stop();
             }
@@ -26715,6 +26801,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       fareClasses: [],
       formID: "fareClass_form",
+      editFormID: "edit_fareClass_form",
+      deleteFormID: "delete_fareClass_form",
       validationErrors: [],
       success: false,
       error: false,
@@ -26814,23 +26902,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.validationErrors = [];
-                if (_this3.data.FareClassName === "") swal({
+
+                if (!(_this3.data.FareClassName === "")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
                   title: "Required!",
                   text: "Fare Class Name is Required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this3.data.FareClassColor === "") swal({
+                }));
+
+              case 3:
+                if (!(_this3.data.FareClassColor === "")) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
                   title: "Required!",
                   text: "Fare Class Color is Required",
                   icon: "error",
                   timer: 2000
-                });
-                _this3.loading = true;
-                _context3.next = 6;
+                }));
+
+              case 5:
+                _context3.next = 7;
                 return _this3.callApi("post", "fare-class/store", _this3.data);
 
-              case 6:
+              case 7:
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
@@ -26843,8 +26945,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Fare Class Added Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this3.loading = false;
+                }); //this.loading = false
+
                 _context3.next = 12;
                 return _this3.fetchFareClasses();
 
@@ -26885,28 +26987,41 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this4.validationErrors = [];
-                if (_this4.dataEdit.FareClassName === "") swal({
+
+                if (!(_this4.dataEdit.FareClassName === "")) {
+                  _context4.next = 3;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
                   title: "Required!",
                   text: "Fare Class Name is Required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this4.dataEdit.FareClassColor === "") swal({
+                }));
+
+              case 3:
+                if (!(_this4.dataEdit.FareClassColor === "")) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
                   title: "Required!",
                   text: "Fare Class Color is Required",
                   icon: "error",
                   timer: 2000
-                });
-                _this4.loading = true;
-                _context4.next = 6;
+                }));
+
+              case 5:
+                _context4.next = 7;
                 return _this4.callApi("post", 'fare-class/update', _this4.dataEdit);
 
-              case 6:
+              case 7:
                 res = _context4.sent;
-                console.log(res.data);
 
                 if (!(res.status == 200)) {
-                  _context4.next = 15;
+                  _context4.next = 14;
                   break;
                 }
 
@@ -26915,16 +27030,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Fare Class Updated Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this4.loading = false;
-                _context4.next = 13;
+                }); //this.loading = false
+
+                _context4.next = 12;
                 return _this4.fetchFareClasses();
 
-              case 13:
-                _context4.next = 16;
+              case 12:
+                _context4.next = 15;
                 break;
 
-              case 15:
+              case 14:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -26937,7 +27052,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 15:
               case "end":
                 return _context4.stop();
             }
@@ -27227,8 +27342,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200) {
                   _this4.msg = 2;
-                  _this4.cities = res.data;
-                  _this4.loading = false;
+                  _this4.cities = res.data; //this.loading = false
+
                   setTimeout(function () {
                     _this4.success = "";
                   }, 3000);
@@ -27745,12 +27860,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   route: _this.routeName,
                   cities: _this.addCities,
                   terminals: _this.addTerminalsOnClick
-                };
-                _this.loading = true;
-                _context.next = 4;
+                }; //this.loading = true
+
+                _context.next = 3;
                 return _this.callApi("post", "cities/routes", data);
 
-              case 4:
+              case 3:
                 res = _context.sent;
 
                 if (res.status === 200) {
@@ -27768,7 +27883,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 3000);
                 }
 
-              case 6:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -28094,6 +28209,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       discounts: [],
       surcharges: [],
       formID: "schedule_form",
+      editFormID: "edit_schedule_form",
+      deleteFormID: "delete_schedule_form",
       validationErrors: [],
       value: [],
       editClasses: [],
@@ -28491,16 +28608,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "Route is Required",
                     icon: "error",
                     timer: 2000
-                  });
-                _this7.loading = true;
-                _context7.next = 9;
+                  }); //this.loading = true
+
+                _context7.next = 8;
                 return _this7.callApi("post", "schedule/store", _this7.data);
 
-              case 9:
+              case 8:
                 res = _context7.sent;
 
                 if (!(res.status === 201)) {
-                  _context7.next = 17;
+                  _context7.next = 15;
                   break;
                 }
 
@@ -28511,16 +28628,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Schedule Created Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this7.loading = false;
-                _context7.next = 15;
+                }); //this.loading = false
+
+                _context7.next = 13;
                 return _this7.fetchSchedule();
 
-              case 15:
-                _context7.next = 18;
+              case 13:
+                _context7.next = 16;
                 break;
 
-              case 17:
+              case 15:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -28536,7 +28653,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 16:
               case "end":
                 return _context7.stop();
             }
@@ -28606,16 +28723,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "Route is Required",
                     icon: "error",
                     timer: 2000
-                  });
-                _this8.loading = true;
-                _context8.next = 11;
+                  }); //this.loading = true
+
+                _context8.next = 10;
                 return _this8.callApi("post", "schedule/update", _this8.dataEdit);
 
-              case 11:
+              case 10:
                 resEdit = _context8.sent;
 
                 if (!(resEdit.status === 200 && resEdit.statusText === "OK")) {
-                  _context8.next = 20;
+                  _context8.next = 18;
                   break;
                 }
 
@@ -28626,18 +28743,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Schedule Updated Succesfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this8.loading = false;
-                _context8.next = 17;
+                }); //this.loading = false
+
+                _context8.next = 15;
                 return _this8.fetchSchedule();
 
-              case 17:
+              case 15:
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
-                _context8.next = 21;
+                _context8.next = 19;
                 break;
 
-              case 20:
+              case 18:
                 if (resEdit.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -28650,7 +28767,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 19:
               case "end":
                 return _context8.stop();
             }
@@ -28808,6 +28925,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       surcharges: [],
       isActive: 1,
       formID: "surcharge_form",
+      editFormID: "edit_surcharge_form",
+      deleteFormID: "delete_surcharge_form",
       validationErrors: [],
       success: false,
       error: false,
@@ -28928,21 +29047,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Percentage Field is Required",
                   icon: "error",
                   timer: 2000
-                });
-                _this3.loading = true;
+                }); //this.loading = true
+
                 data = {
                   name: _this3.SurchargeName,
                   percentage: _this3.SurchargePercentage,
                   active: _this3.isActive
                 };
-                _context3.next = 7;
+                _context3.next = 6;
                 return _this3.callApi("post", "surcharge/store", data);
 
-              case 7:
+              case 6:
                 res = _context3.sent;
 
                 if (!(res.status == 201 && res.statusText == "Created")) {
-                  _context3.next = 14;
+                  _context3.next = 13;
                   break;
                 }
 
@@ -28953,14 +29072,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 12;
+                _context3.next = 11;
                 return _this3.fetchSurcharges();
 
-              case 12:
-                _context3.next = 15;
+              case 11:
+                _context3.next = 14;
                 break;
 
-              case 14:
+              case 13:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -28973,7 +29092,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 15:
+              case 14:
               case "end":
                 return _context3.stop();
             }
@@ -29005,16 +29124,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "Percentage is Required",
                     icon: "error",
                     timer: 2000
-                  });
-                _this4.loading = true;
-                _context4.next = 6;
+                  }); //this.loading = true
+
+                _context4.next = 5;
                 return _this4.callApi("post", 'surcharge/update', _this4.dataEdit);
 
-              case 6:
+              case 5:
                 res = _context4.sent;
 
                 if (!(res.status === 200 && res.statusText === "OK")) {
-                  _context4.next = 14;
+                  _context4.next = 12;
                   break;
                 }
 
@@ -29024,17 +29143,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Surcharge Updated Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this4.loading = false;
-                _context4.next = 12;
+                }); //this.loading = false
+
+                _context4.next = 10;
                 return _this4.fetchSurcharges();
 
-              case 12:
-                _context4.next = 15;
+              case 10:
+                _context4.next = 13;
                 break;
 
-              case 14:
-                if (res.status === 422) {
+              case 12:
+                if (res.status == 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -29044,12 +29163,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   for (key in res.data.errors) {
                     _loop2(key);
                   }
-
-                  setTimeout(function () {// window.location.reload();
-                  }, 2000);
                 }
 
-              case 15:
+              case 13:
               case "end":
                 return _context4.stop();
             }
@@ -29177,6 +29293,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       terminalsDetails: [],
       companies: [],
       formID: "terminal_form",
+      editFormID: "edit_terminal_form",
+      deleteFormID: "delete_terminal_form",
       cities: [],
       dataEditCheck: {},
       dataCheck: {},
@@ -29223,6 +29341,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
+    datatableReset: function datatableReset() {
+      setTimeout(function () {
+        $("#show_terminal").DataTable();
+      }, 50);
+    },
     applyMaks: function applyMaks(value) {
       console.log(value, _typeof(value));
 
@@ -29361,43 +29484,67 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.validationErrors = [];
-                if (_this3.data.name === "") // swal('Required', 'Terminal Name is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal Name is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this3.$store.state.user.is_super_admin === 1 && _this3.data.company_id === "") // swal('Required', 'Company is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Company is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this3.data.city_id === "") // swal('Required', 'Terminal City is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal City is rquired",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this3.data.contact === "") // swal('Required', 'Terminal Contact is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal Contact is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this3.loading = true;
-                _context3.next = 8;
+
+                if (!(_this3.data.name === "")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal Name is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this3.$store.state.user.is_super_admin === 1 && _this3.data.company_id === "")) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Company is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this3.data.city_id === "")) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal City is rquired",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this3.data.contact === "")) {
+                  _context3.next = 9;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal Contact is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                _context3.next = 11;
                 return _this3.callApi("post", "terminals/store", _this3.data);
 
-              case 8:
+              case 11:
                 res = _context3.sent;
 
                 if (!(res.status === 200)) {
-                  _context3.next = 20;
+                  _context3.next = 22;
                   break;
                 }
 
@@ -29407,12 +29554,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Terminal Created Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this3.loading = false;
-                _context3.next = 14;
+                }); //this.loading = false
+
+                _context3.next = 16;
                 return _this3.fetchTerminals();
 
-              case 14:
+              case 16:
                 _this3.terminals = res.data;
                 _this3.data = {};
                 _this3.data.city_id = 0;
@@ -29421,10 +29568,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   $("#add-modal").modal("hide");
                   empty(_this3.errorsArray); // window.location.reload(
                 }, 2000);
-                _context3.next = 22;
+                _context3.next = 24;
                 break;
 
-              case 20:
+              case 22:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -29441,7 +29588,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this3.errorsArray(res.data.is_main, 'Main Terminal');
                 }
 
-              case 22:
+              case 24:
               case "end":
                 return _context3.stop();
             }
@@ -29507,43 +29654,67 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context6.prev = _context6.next) {
               case 0:
                 _this6.validationErrors = [];
-                if (_this6.dataEdit.name === "") // swal('Required', 'Terminal Name is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal name is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this6.$store.state.user.is_super_admin === 1 && _this6.data.company_id === "") // swal('Required', 'Company is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Company is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this6.dataEdit.city_id === "") // swal('Required', 'Terminal City is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal City is required ",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this6.dataEdit.contact === "") // swal('Required', 'Terminal Contact is Required', 'error')
-                  swal({
-                    title: "Required",
-                    text: "Terminal Contact is required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this6.loading = true;
-                _context6.next = 8;
+
+                if (!(_this6.dataEdit.name === "")) {
+                  _context6.next = 3;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal name is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this6.$store.state.user.is_super_admin === 1 && _this6.data.company_id === "")) {
+                  _context6.next = 5;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Company is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this6.dataEdit.city_id === "")) {
+                  _context6.next = 7;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal City is required ",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this6.dataEdit.contact === "")) {
+                  _context6.next = 9;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Terminal Contact is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                _context6.next = 11;
                 return _this6.callApi("post", "terminals/update", _this6.dataEdit);
 
-              case 8:
+              case 11:
                 res = _context6.sent;
 
                 if (!(res.status === 201)) {
-                  _context6.next = 17;
+                  _context6.next = 19;
                   break;
                 }
 
@@ -29553,19 +29724,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Terminal Updated Successfully",
                   icon: "success",
                   timer: 2000
-                });
-                _this6.loading = false;
-                _context6.next = 14;
+                }); //this.loading = false
+
+                _context6.next = 16;
                 return _this6.fetchTerminals();
 
-              case 14:
+              case 16:
                 setTimeout(function () {
                   $("#edit-modal").modal("hide"); // window.location.reload();
                 }, 3000);
-                _context6.next = 19;
+                _context6.next = 21;
                 break;
 
-              case 17:
+              case 19:
                 if (res.status == 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -29581,7 +29752,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 19:
+              case 21:
               case "end":
                 return _context6.stop();
             }
@@ -30299,14 +30470,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-var _hoisted_1 = {
-  "class": "modal fade",
-  id: "delete-modal",
-  tabindex: "-1",
-  role: "dialog",
-  "aria-labelledby": "modelTitleId",
-  "aria-hidden": "true"
-};
+var _hoisted_1 = ["id"];
 var _hoisted_2 = {
   "class": "modal-dialog modal-lg modal-dialog-centered",
   role: "document"
@@ -30362,7 +30526,14 @@ var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$data.success ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.success), 1
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("       id=\"delete-modal\"  Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal fade",
+    id: $props.deleteForm,
+    tabindex: "-1",
+    role: "dialog",
+    "aria-labelledby": "modelTitleId",
+    "aria-hidden": "true"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$data.success ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.success), 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.confirmationMessage), 1
   /* TEXT */
@@ -30384,7 +30555,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.deleteData && $options.deleteData.apply($options, arguments);
     }),
     "class": "btn btn-danger btn-block"
-  }, " Yes, I want to Delete ")), _hoisted_13])])])])], 2112
+  }, " Yes, I want to Delete ")), _hoisted_13])])])], 8
+  /* PROPS */
+  , _hoisted_1)], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
   );
 }
@@ -30404,14 +30577,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-var _hoisted_1 = {
-  "class": "modal fade",
-  id: "edit-modal",
-  tabindex: "-1",
-  role: "dialog",
-  "aria-labelledby": "modelTitleId",
-  "aria-hidden": "true"
-};
+var _hoisted_1 = ["id"];
 var _hoisted_2 = {
   "class": "modal-dialog modal-xl modal-dialog-centered",
   role: "document"
@@ -30473,7 +30639,14 @@ var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal fade",
+    id: $props.editForm,
+    tabindex: "-1",
+    role: "dialog",
+    "aria-labelledby": "modelTitleId",
+    "aria-hidden": "true"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     innerHTML: $props.heading
   }, null, 8
   /* PROPS */
@@ -30485,7 +30658,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     );
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "button"), _hoisted_12])])])])], 2112
+  ))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "button"), _hoisted_12])])])], 8
+  /* PROPS */
+  , _hoisted_1)], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
   );
 }
@@ -31095,7 +31270,7 @@ var _hoisted_20 = {
 };
 
 var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fa fa-bus"
+  "class": "fas fa-table"
 }, null, -1
 /* HOISTED */
 );
@@ -31117,7 +31292,7 @@ var _hoisted_24 = {
 };
 
 var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-table"
+  "class": "fa fa-bus"
 }, null, -1
 /* HOISTED */
 );
@@ -31306,14 +31481,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('fare-table') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'bus-class-page'
+      name: 'fare-class'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bus Class ")];
+      return [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Fare Class ")];
     }),
     _: 1
     /* STABLE */
@@ -31321,23 +31496,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'buses-page'
+      name: 'bus-class-page'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Buses ")];
+      return [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bus Class ")];
     }),
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('fare-table') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'fare-class'
+      name: 'buses-page'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Fare Class ")];
+      return [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Buses ")];
     }),
     _: 1
     /* STABLE */
@@ -33316,8 +33491,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, 8
   /* PROPS */
   , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            DELETE MODAL"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Booking ???"
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PartialSeatPopup, {
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PartialSeatPopup, {
     formID: $data.partialSeatFormId,
     seats: $data.bookedSeats
   }, null, 8
@@ -33812,7 +33990,7 @@ var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_22 = ["onClick"];
+var _hoisted_22 = ["data-target", "onClick"];
 
 var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -33823,7 +34001,7 @@ var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_24 = [_hoisted_23];
-var _hoisted_25 = ["onClick"];
+var _hoisted_25 = ["data-target", "onClick"];
 
 var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -34400,8 +34578,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(busClass.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(busClass);
@@ -34409,8 +34587,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_24, 8
     /* PROPS */
-    , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(busClass, i);
@@ -34617,7 +34795,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Bus Class",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -34746,7 +34924,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Modal for modify bus class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [_hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Modal for modify bus class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [_hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-control",
     "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
       return $data.editSeatModify["class"] = $event;
@@ -34777,8 +34955,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "data-dismiss": "modal"
   }, " Update Seat Data ")])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Bus Class ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -34868,7 +35049,7 @@ var _hoisted_20 = {
 var _hoisted_21 = {
   key: 3
 };
-var _hoisted_22 = ["onClick"];
+var _hoisted_22 = ["data-target", "onClick"];
 
 var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-edit"
@@ -34877,7 +35058,7 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_24 = [_hoisted_23];
-var _hoisted_25 = ["onClick"];
+var _hoisted_25 = ["data-target", "onClick"];
 
 var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-trash-alt"
@@ -35135,8 +35316,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), bus.added_by ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.added_by.name), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.editBus(bus);
@@ -35144,8 +35325,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_24, 8
     /* PROPS */
-    , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteBus(bus, i);
@@ -35254,7 +35435,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Bus",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -35336,9 +35517,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Bus Record ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -35410,7 +35594,7 @@ var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_18 = ["onClick"];
+var _hoisted_18 = ["data-target", "onClick"];
 
 var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-edit"
@@ -35419,7 +35603,7 @@ var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_20 = [_hoisted_19];
-var _hoisted_21 = ["onClick"];
+var _hoisted_21 = ["data-target", "onClick"];
 
 var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-trash-alt"
@@ -35478,22 +35662,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(city);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "text-light btn btn-primary mx-1"
     }, _hoisted_20, 8
     /* PROPS */
-    , _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(city, i);
       },
-      "class": "btn btn-danger"
+      "class": "text-light btn btn-danger"
     }, _hoisted_23, 8
     /* PROPS */
     , _hoisted_21)])]);
@@ -35537,7 +35721,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit City Name",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -35567,9 +35751,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This City ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -35651,7 +35838,7 @@ var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_18 = ["src"];
-var _hoisted_19 = ["onClick"];
+var _hoisted_19 = ["data-target", "onClick"];
 
 var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -36032,8 +36219,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       alt: ""
     }, null, 8
     /* PROPS */
-    , _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    , _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(company.id, i);
@@ -36186,7 +36373,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Company",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -36318,7 +36505,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Delete Modals "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ConfirmationModal, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Delete Modals "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ConfirmationModal, {
     formID: $data.confirmModalID,
     onConfirmDeleteModal: _cache[16] || (_cache[16] = function ($event) {
       return $options.confirmDeleteModal(_ctx.event);
@@ -36443,7 +36630,7 @@ var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_23 = ["onClick"];
+var _hoisted_23 = ["data-target", "onClick"];
 
 var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -36454,7 +36641,7 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["onClick"];
+var _hoisted_26 = ["data-target", "onClick"];
 
 var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -36673,8 +36860,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(discount);
@@ -36682,8 +36869,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_25, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(discount, i);
@@ -36756,7 +36943,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Discount",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -36810,9 +36997,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit modal End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit modal End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Discount ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -36925,7 +37115,7 @@ var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_23 = ["onClick"];
+var _hoisted_23 = ["data-target", "onClick"];
 
 var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -36936,7 +37126,7 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["onClick"];
+var _hoisted_26 = ["data-target", "onClick"];
 
 var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -37138,8 +37328,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(fareClass.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(fareClass);
@@ -37147,8 +37337,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_25, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(fareClass, i);
@@ -37216,7 +37406,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Fare Class",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -37263,9 +37453,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Fare Class ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -38679,7 +38872,7 @@ var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_23 = ["onClick"];
+var _hoisted_23 = ["data-target", "onClick"];
 
 var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -38690,7 +38883,7 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["onClick"];
+var _hoisted_26 = ["data-target", "onClick"];
 
 var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -39414,8 +39607,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.added_by ? schedule.added_by.name : "N/A"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         $options.edit(schedule);
@@ -39424,8 +39617,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mr-1"
     }, _hoisted_25, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteSchedule(schedule, i);
@@ -39670,7 +39863,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Schedule",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -39877,9 +40070,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Model End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Model End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Schedule ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -39992,7 +40188,7 @@ var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_23 = ["onClick"];
+var _hoisted_23 = ["data-target", "onClick"];
 
 var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -40003,7 +40199,7 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["onClick"];
+var _hoisted_26 = ["data-target", "onClick"];
 
 var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -40222,8 +40418,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.edit(surcharge);
@@ -40231,8 +40427,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_25, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(surcharge, i);
@@ -40302,7 +40498,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit Surcharge",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -40353,9 +40549,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This Surcharge ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),
@@ -41046,7 +41245,7 @@ var _hoisted_148 = {
 var _hoisted_149 = {
   key: 7
 };
-var _hoisted_150 = ["onClick"];
+var _hoisted_150 = ["data-target", "onClick"];
 
 var _hoisted_151 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-edit"
@@ -41055,7 +41254,7 @@ var _hoisted_151 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 );
 
 var _hoisted_152 = [_hoisted_151];
-var _hoisted_153 = ["onClick"];
+var _hoisted_153 = ["data-target", "onClick"];
 
 var _hoisted_154 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-trash-alt"
@@ -41105,11 +41304,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(terminal.added_by.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#detail-modal",
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": "#detail-modal",
       "data-toggle": "modal",
       onClick: function onClick($event) {
-        return $options.terminalDetail(terminal.id);
+        $options.terminalDetail(terminal.id);
+        $options.datatableReset();
       },
       "class": "btn btn-info mx-2"
     }, _hoisted_18, 8
@@ -41350,7 +41550,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Edit terminal",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -41578,7 +41778,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("View Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_131, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [_hoisted_133, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("View Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_131, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [_hoisted_133, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
@@ -41599,8 +41799,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_147, "N/A")), single.added_by ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_148, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.added_by.name), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_149, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#edit-modal",
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_149, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.editTerminal(single);
@@ -41608,8 +41808,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-warning mx-2"
     }, _hoisted_152, 8
     /* PROPS */
-    , _hoisted_150), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      href: "#delete-modal",
+    , _hoisted_150), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(single, i);
@@ -41621,8 +41821,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])]), _hoisted_156])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Delete Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
+    deleteForm: $data.deleteFormID,
     confirmationMessage: "Are You Sure You want To Delete This terminal ???"
-  })])]);
+  }, null, 8
+  /* PROPS */
+  , ["deleteForm"])])]);
 }
 
 /***/ }),

@@ -33,9 +33,9 @@
             Get Record
           </button>
         </div>
-        
+
         <div class="col-md-12 row" v-if="showBookingDiv">
-          
+
           <div class="col-md-12 mx-auto">
             <div class="card p-4">
               <div class="col-md-12 mb-2 d-flex flex-wrap">
@@ -152,7 +152,7 @@ export default {
         this.doScroll();
         return this.errorsArray("Date is Required", "Date");
       }
-      
+
       if (this.selectedSeats.length == 0)
         return this.errorsArray("Please Select At Least One Seat", "Seat");
 
@@ -185,13 +185,13 @@ export default {
         return this.errorsArray("Date is Required", "Date");
       this.validationErrors = [];
 
-      this.loading = true;
+      //this.loading = true
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
         date: this.addForm.date,
       });
       if (res.status == 200) {
-        this.loading = false;
+        //this.loading = false
         this.showBookingDiv = true;
         this.schedule = res.data;
       } else {
@@ -199,7 +199,7 @@ export default {
       }
     },
     selectSeat(row, col, seatNo) {
-      
+
       let index = this.selectedSeats.indexOf(seatNo);
       console.log(index);
       if (index != -1) {

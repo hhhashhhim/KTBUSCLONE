@@ -51,14 +51,14 @@
                                                                     style="width:120px;height:150px;" alt="">
                                                             </td>
                                                             <td>
-                                                                <a
-                                                                    href="#edit-modal"
+                                                                <button
+                                                                    :data-target="'#'+ editFormID"
                                                                     data-toggle="modal"
                                                                     @click="edit(company.id, i)"
                                                                     class="btn btn-primary mx-1"
                                                                 >
                                                                     <i class="far fa-edit"></i>
-                                                                </a>
+                                                                </button>
                                                                 <!--                                  <a-->
                                                                 <!--                                    href="#delete-modal"-->
                                                                 <!--                                    data-toggle="modal"-->
@@ -244,7 +244,7 @@
                     heading="Edit Company"
                     :errors="this.validationErrors"
                     :success="success"
-                    :formID="formID"
+                    :editForm="editFormID"
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
@@ -438,6 +438,7 @@ export default {
             roles: [],
             formID: "newCompany",
             confirmModalID: "confirmModal",
+            editFormID:'edit_company_form',
             loading: false,
             data: {
                 name: "",
@@ -524,7 +525,7 @@ export default {
                 return this.errorsArray("Company Email is Required", "Email");
             if (this.data.password == "")
                 return this.errorsArray("Company password is Required", "Contact");
-            this.loading = true;
+            //this.loading = true
 
             let logo = "";
             if (this.data.logo) {
@@ -533,7 +534,7 @@ export default {
             }
             const res = await this.callApi("post", "company/store", { ...this.data,  logo });
             if (res.status == 201) {
-                this.loading = false;
+                //this.loading = false
                 this.success = "Company Created Successfully";
                 this.cities.unshift(res.data);
                 this.fetchCompany();
@@ -547,7 +548,7 @@ export default {
                 }, 2000);
             } else {
                 if (res.status == 422) {
-                    this.loading = false;
+                    //this.loading = false
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

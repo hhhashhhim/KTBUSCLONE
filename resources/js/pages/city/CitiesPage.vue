@@ -38,12 +38,12 @@
                                                             <td>{{ city.name }}</td>
                                                             <td>{{ city.added_by.name }}</td>
                                                             <td>
-                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(city)" class="btn btn-primary mx-1">
+                                                                <button :data-target="'#' + editFormID" data-toggle="modal" @click="edit(city)" class=" text-light btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
-                                                                </a>
-                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(city,i)" class="btn btn-danger">
+                                                                </button>
+                                                                <button :data-target="'#'+ deleteFormID" data-toggle="modal" @click="deleteModal(city,i)" class=" text-light btn btn-danger">
                                                                     <i class="far fa-trash-alt"></i>
-                                                                </a>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -80,7 +80,7 @@
             heading="Edit City Name"
             :errors="this.validationErrors"
             :success="success"
-            :formID="formID"
+            :editForm="editFormID"
             >
                 <div class="form-group">
                     <label for="name">Name <span class="text-danger">*</span></label>
@@ -93,7 +93,7 @@
             </Edit>
 
             <!-- Add Modal -->
-            <Delete confirmationMessage="Are You Sure You want To Delete This City ???" />
+            <Delete :deleteForm="deleteFormID" confirmationMessage="Are You Sure You want To Delete This City ???" />
 
         </div>
     </section>
@@ -120,6 +120,8 @@ export default {
             cities: [],
             loading : false,
             formID:'city_form',
+            editFormID:'edit_city_form',
+            deleteFormID:'delete_city_form',
             data:{
                 name:"",
             },
@@ -147,30 +149,31 @@ export default {
             setTimeout(function(){
                 $("#city_table").DataTable();
             }, 50); //Time before execution
+             //Time before execution
         },
         async add(){
             this.validationErrors = []
             if(this.data.name == "")
                 // return this.errorsArray("City Name is Required","Name");
             // swal('Required','City Name is Required','error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "City Name is required",
                     icon: "error",
                    timer: 2000
                 });
-            this.loading = true;
+            //this.loading = true
             const res = await this.callApi("post",'cities/store',this.data);
             if (res.status == 200) {
                 // this.success="City Created Successfully Named as " + res.data.name;
-                swal({
+               swal({
                     title: "Success",
                     text: "City Created Succesfuly Named as  " + res.data.name,
                     icon: "success",
                    timer: 2000
                 });
 
-                this.loading = false;
+                //this.loading = false
                 // swal('Success', 'City Added Successfully', 'success');
                 // await this.fetchCities();
                 // this.cities.unshift(res.data);
@@ -190,7 +193,7 @@ export default {
                     }
                 }
                 setTimeout(function () {
-                    document.querySelector('.alert-danger').style.display = 'none';
+                  //this.loading = false
                 }, 2000);
             }
         },
@@ -203,23 +206,23 @@ export default {
             if(this.dataEdit.name=="")
                 // return this.errorsArray("City Name is Required","Name");
                 // swal('Required','City Name is Required','error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "city Name is required ",
                     icon: "error",
                    timer: 2000
                 });
-            this.loading = true;
+            //this.loading = true
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             if (resEdit.status==200) {
                 // swal('Success', 'City Updated Successfully', 'success');
-                swal({
+               swal({
                     title: "Success",
                     text: "City updated Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
@@ -228,13 +231,16 @@ export default {
                 }, 3000);
             }
             else{
-                if (res.status==422) {
+                if (res.status == 422) {
                     for (const key in res.data.errors) {
-                        res.data.errors[key].forEach(element => {
-                            this.errorsArray(element,key)
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
                         });
                     }
                 }
+                setTimeout(() => {
+                    //this.loading = false
+                }, 3000);
             }
         },
         async deleteModal( city,i ){

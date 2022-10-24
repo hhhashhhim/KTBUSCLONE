@@ -50,22 +50,22 @@
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
-                                                            <a
-                                                                href="#edit-modal"
+                                                            <button
+                                                                :data-target="'#' + editFormID"
                                                                 data-toggle="modal"
                                                                 @click="editBus(bus)"
                                                                 class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a
-                                                                href="#delete-modal"
+                                                            </button>
+                                                            <button
+                                                                :data-target="'#' + deleteFormID"
                                                                 data-toggle="modal"
                                                                 @click="deleteBus(bus, i)"
                                                                 class="btn btn-danger"
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -215,7 +215,7 @@
                 heading="Edit Bus"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-12">
@@ -282,7 +282,7 @@
                 </template>
             </Edit>
             <!-- Add Modal -->
-            <Delete
+            <Delete :deleteForm="deleteFormID"
                 confirmationMessage="Are You Sure You want To Delete This Bus Record ???"
             />
         </div>
@@ -317,6 +317,8 @@ export default {
             details: "",
             dataView: {},
             formID: "bus_form",
+            editFormID: "edit_bus_form",
+            deleteFormID: "delete_bus_form",
             seatNo: 0,
             data: {
                 noOfSeats: "",
@@ -385,7 +387,7 @@ export default {
         async addBuses() {
             this.validationErrors = [];
             if (this.data.noOfSeats === "")
-            swal({
+          return swal({
                 title: "Required!",
                 text: "No. Of Seats is required",
                 icon: "error",
@@ -393,7 +395,7 @@ export default {
             });
             if (this.data.busNumber === "")
                                 // swal('Required', 'Bus Number is Required', 'error');
-                swal({
+              return swal({
                     title: "Required",
                     text: "Bus Number is required",
                     type: 'error',
@@ -401,7 +403,7 @@ export default {
                 });
             if (this.data.chassisNumber === "")
                                 // swal('Required', 'Chassis Number is Required', 'error');
-                swal({
+              return swal({
                     title: "Required",
                     text: "Chassis Number is required!",
                    icon: "error",
@@ -409,7 +411,7 @@ export default {
                 });
             if (this.data.insuranceNumber === "")
                                 // swal('Required', 'Insurance Number is Required', 'error');
-                swal({
+              return swal({
                     title: "Required",
                     text: "Insurance Number is required",
                    icon: "error",
@@ -417,7 +419,7 @@ export default {
                 });
             if (this.data.routePermit === "")
                                 // swal('Required', 'Route Permit is Required', 'error');
-            swal({
+          return swal({
                 title: "Required",
                 text: "Route Permit is Required",
                icon: "error",
@@ -429,7 +431,7 @@ export default {
             if (res.status === 201) {
                 // this.success = "Bus Created Successfully";
                 // swal('Success', 'Bus Created Successfully', 'success');
-                swal({
+              swal({
                     title: "Success",
                     text: "Bus Created Successfully",
                     icon: "success",
@@ -468,7 +470,7 @@ export default {
             if (res.status === 200) {
                 // this.success = "Bus Record Updated Successfully";
                 // swal('Success', 'Bus Record Updated Successfully', 'success');
-                swal({
+               swal({
                     title: "Success",
                     text: "Bus Record updated Successfully",
                     icon: "success",
