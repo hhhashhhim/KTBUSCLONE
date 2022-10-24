@@ -198,7 +198,7 @@ class ScheduleController extends Controller
         // Getting Already Booked Tickets
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
-        ->select('id', 'selected_bus_class_id','route_id')
+        ->select('id', 'selected_bus_class_id','route_id','bus_class_id')
         ->with('bus_class:id,seat_map','singleRoute:id,name','singleRoute.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
         // Fare Fetching About the Schedule
