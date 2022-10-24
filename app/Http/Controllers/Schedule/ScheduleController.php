@@ -44,6 +44,8 @@ class ScheduleController extends Controller
             'EndDate' => 'required',
             'route' => 'required',
             'busClass' => 'required',
+            'fareClass'=> 'required',
+            'time'=> 'required',
         ];
 
         $customMessages = [
@@ -59,7 +61,7 @@ class ScheduleController extends Controller
             'name' => $request->name,
             'start_date' => $request->StartDate,
             'end_date' => $request->EndDate,
-            // 'bus_class_id' => $request->fareClass,
+            'bus_class_id' => $request->fareClass,
             'route_id' => $request->route,
             'surcharge_id' => $request->surcharge,
             'discount_id' => $request->discount,
@@ -148,7 +150,7 @@ class ScheduleController extends Controller
     public function getEntire(Request $request)
     {
         return [
-            'fareClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
+            'fareClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->fareClass)->first()->name,
             'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
             'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
             'busClass' => BusClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
@@ -206,7 +208,7 @@ class ScheduleController extends Controller
         ->where('company_id',$this->company_id)
         ->get();
 
-        $fare = (float) $fareForAllClasses->where('fare_class',$schedule->selected_bus_class_id)->first()->fare;
+        $fare = (float) $fareForAllClasses->where('fare_class',$schedule->bus_class_id)->first()->fare;
         
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;

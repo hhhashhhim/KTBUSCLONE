@@ -239,7 +239,8 @@
                 </option>
               </select>
             </div>
-            <div class="col-md-6 class form-group">
+            
+            <div class="col-md-3 class form-group">
               <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
               <select
                 class="form-control"
@@ -249,6 +250,23 @@
                 <option value="0" selected>Select Route Bus CLass</option>
                 <option
                   v-for="(type, i) in busClasses"
+                  :value="type.id"
+                  :key="i"
+                >
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3 class form-group">
+              <label for="busCLass">Defaul Fare CLass <span class="text-danger">*</span></label>
+              <select
+                class="form-control"
+                id="busCLass"
+                v-model="data.fareClass"
+              >
+                <option value="0" selected>Select Default Fare CLass</option>
+                <option
+                  v-for="(type, i) in fareClasses"
                   :value="type.id"
                   :key="i"
                 >
@@ -414,6 +432,10 @@
                     <td> {{ this.dataPreview.time }} </td>
                     <th class="mr-3">Selected Bus Class</th>
                     <td>{{ this.dataPreview.busClass }}</td>
+                  </tr>
+                  <tr>
+                    <th class="mr-3">Default Bus Fare Class</th>
+                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>
                   </tr>
                   <tr>
                     <th class="mr-3">Route</th>
@@ -804,6 +826,7 @@ export default {
         surcharge: 0,
         discount: 0,
         busClass: 0,
+        fareClass: 0,
         addTerminalsOnClick: [],
       },
       dataEdit: {
@@ -837,6 +860,7 @@ export default {
     },
 
     async getEntireForm() {
+      console.log(this.data);
       const resEntire = await this.callApi(
         "post",
         "schedule/getEntire",
