@@ -57,6 +57,7 @@
                               <th>Name</th>
                               <th>Start Date</th>
                               <th>End Date</th>
+                              <th>Time</th>
                               <th>Fare Class</th>
                               <th>Route</th>
                               <th>Bus Class</th>
@@ -70,6 +71,7 @@
                               <td>{{ schedule.name }}</td>
                               <td>{{ schedule.start_date }}</td>
                               <td>{{ schedule.end_date }}</td>
+                              <td>{{ schedule.time }}</td>
                               <td>
                                 {{
                                   schedule.single_bus_class
