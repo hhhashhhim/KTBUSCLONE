@@ -77,14 +77,14 @@
                                                         <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
-                                                            <a href="#edit-modal" data-toggle="modal"
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                @click="edit(fareClass)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
+                                                            </button>
+                                                            <button :data-target="'#' + deleteFormID " data-toggle="modal"
                                                                @click="deleteModal(fareClass,i)" class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -156,7 +156,7 @@
                 heading="Edit Fare Class"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -188,7 +188,7 @@
                 </template>
             </Edit>
             <!--            Edit MOdel End-->
-            <Delete
+            <Delete :deleteForm="deleteFormID"
                 confirmationMessage='Are You Sure You want To Delete This Fare Class ???'
             />
 
@@ -215,6 +215,8 @@ export default {
             loading : false,
             fareClasses: [],
             formID: "fareClass_form",
+            editFormID: "edit_fareClass_form",
+            deleteFormID: "delete_fareClass_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -273,29 +275,29 @@ export default {
         async addFareClass() {
             this.validationErrors = [];
             if (this.data.FareClassName === "")
-            swal({
+          return swal({
                 title: "Required!",
                 text: "Fare Class Name is Required",
                 icon: "error",
                 timer: 2000
             });
             if (this.data.FareClassColor === "")
-            swal({
+          return swal({
                 title: "Required!",
                 text: "Fare Class Color is Required",
                 icon: "error",
                 timer: 2000
             });
-                this.loading = true;
+                //this.loading = true
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
-                swal({
+               swal({
                     title: "Success!",
                     text: "Fare Class Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);
 
@@ -314,30 +316,30 @@ export default {
         async updateFareClass() {
             this.validationErrors = [];
             if (this.dataEdit.FareClassName === "")
-                swal({
+              return swal({
                     title: "Required!",
                     text: "Fare Class Name is Required",
                     icon: "error",
                     timer: 2000
                 });
                 if (this.dataEdit.FareClassColor === "")
-                swal({
+              return swal({
                     title: "Required!",
                     text: "Fare Class Color is Required",
                     icon: "error",
                     timer: 2000
                 });
 
-                this.loading = true;
+                //this.loading = true
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status == 200) {
-                swal({
+               swal({
                     title: "Success!",
                     text: "Fare Class Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchFareClasses();
 
             } else {

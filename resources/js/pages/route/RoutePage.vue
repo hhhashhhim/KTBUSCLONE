@@ -257,14 +257,14 @@ export default {
                 terminals: this.addTerminalsOnClick
             }
 
-            this.loading = true;
+            //this.loading = true
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
                 this.routeName = "";
                 this.loop = 0;
                 this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
                 // this.success = "Route Created Successfully";
-                swal({
+               swal({
                     title: "Success",
                     text: "Route Created Successfully",
                     icon: "success",
@@ -280,7 +280,7 @@ export default {
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {
                 // this.success = "Fare Table Updated Created Successfully";
-                swal({
+               swal({
                     title: "Success",
                     text: "Fare Table Created Successfully",
                     icon: "success",

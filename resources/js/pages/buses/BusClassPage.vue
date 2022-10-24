@@ -81,22 +81,22 @@
                                                         <td>{{ busClass.added_by.name }}</td>
 
                                                         <td>
-                                                            <a
-                                                                href="#edit-modal"
+                                                            <button
+                                                                :data-target ="'#' + editFormID"
                                                                 data-toggle="modal"
                                                                 @click="edit(busClass)"
                                                                 class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a
-                                                                href="#delete-modal"
+                                                            </button>
+                                                            <button
+                                                                :data-target ="'#' +  deleteFormID"
                                                                 data-toggle="modal"
                                                                 @click="deleteModal(busClass, i)"
                                                                 class="btn btn-danger"
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -347,7 +347,7 @@
             heading="Edit Bus Class"
             :errors="this.validationErrors"
             :success="success"
-            :formID="formID"
+            :editForm="editFormID"
         >
             <div class="row">
                 <div class="form-group col-md-6">
@@ -537,7 +537,7 @@
         </div>
         <!--End Modal-->
         <!--            Edit MOdel End-->
-        <Delete
+        <Delete :deleteForm="deleteFormID"
             confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
         />
         </div>
@@ -561,6 +561,8 @@ export default {
             busClasses: [],
             fareClasses: [],
             formID: "busClass_form",
+            editFormID: "edit_busClass_form",
+            deleteFormID: "delete_busClass_form",
             validationErrors: [],
             seatModify: {
                 class: 0,
@@ -642,16 +644,16 @@ export default {
             }
         },
         async saveFareClass(){
-            this.loading = true;
+            //this.loading = true
             const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
             if (resSaveFareClass.status === 201) {
-                swal({
+              return swal({
                     title: "Success",
                     text: "Fare Class Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 this.fareClasses.push(resSaveFareClass.data);
             } else {
                 console.log(resSaveFareClass);
@@ -674,7 +676,7 @@ export default {
             }
             else{
 
-                swal({
+              return swal({
                     title: "Required",
                     text: "Please Select Any Field For Seat Modification !!!!",
                    icon: "error",
@@ -712,7 +714,7 @@ export default {
             console.log(rowId, colId);
             if (this.editSeatModify.class == 0) {
                 // swal('required', 'Please Select Seat class', 'error');
-                swal({
+              return swal({
                     title: "required",
                     text: "Please Select Seat Class",
                    icon: "error",
@@ -782,7 +784,7 @@ export default {
                     return (this.data.seatMap = map);
                 } else {
                     // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
-                    swal({
+                  return swal({
                         title: "Limited",
                         text: "No of Cols must be less then or equal to 7",
                         icon: "error",
@@ -791,7 +793,7 @@ export default {
                 }
             } else {
                 // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
-                swal({
+              return swal({
                     title: "Limited",
                     text: "No of Rows must be less then or equal to 15",
                     icon: "error",
@@ -833,7 +835,7 @@ export default {
 
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Bus Class Name is Required",
                     icon: "error",
@@ -841,7 +843,7 @@ export default {
                 });
             if (this.data.noOfRows === "0")
                 // swal('Required', 'Row Field is Required', 'error')
-                swal({
+              return swal({
                     title: "Required ",
                     text: "Row Field is Required",
                     icon: "error",
@@ -849,23 +851,23 @@ export default {
                 });
             if (this.data.noOfCols === "0")
                 // swal('Required', 'Col Field is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Col Field is required",
                     icon: "error",
                    timer: 2000
                 });
-            this.loading = true;
+            //this.loading = true
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // swal('Success', 'Bus Class Added Successfully', 'success');
-                swal({
+              return swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
@@ -885,7 +887,7 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.BusClassName === "")
 
-                swal({
+              return swal({
                     title: "Required",
                     text: "Bus Class name is required",
                     icon: "error",
@@ -893,7 +895,7 @@ export default {
                 });
             if (this.dataEdit.noOfRows === "0")
 
-                swal({
+              return swal({
                     title: "Required",
                     text: "row Field is required",
                     icon: "error",
@@ -901,13 +903,13 @@ export default {
                 });
             if (this.dataEdit.noOfCols === "0")
 
-                swal({
+              return swal({
                     title: "Required",
                     text: "Col Field is Required",
                     icon: "error",
                    timer: 2000
                 });
-                this.loading = true;
+                //this.loading = true
 
             let seatNo=0;
 
@@ -926,13 +928,13 @@ export default {
                 this.dataEdit
             );
             if (res.status === 200 && res.statusText === "OK") {
-                swal({
+              return swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchBussClasses();
 
             } else {

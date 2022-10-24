@@ -68,14 +68,14 @@
                                                         <td>{{ discount.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ discount.added_by.name }}</td>
                                                         <td>
-                                                            <a href="#edit-modal" data-toggle="modal"
+                                                            <button :data-target = "'#' + editFormID" data-toggle="modal"
                                                                @click="edit(discount)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
+                                                            </button>
+                                                            <button :data-target = "'#' + deleteFormID" data-toggle="modal"
                                                                @click="deleteModal(discount,i)" class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -140,7 +140,7 @@
                 heading="Edit Discount"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -180,7 +180,7 @@
                 </template>
             </Edit>
             <!--            Edit modal End-->
-            <Delete
+            <Delete :deleteForm="deleteFormID"
                 confirmationMessage='Are You Sure You want To Delete This Discount ???'
             />
 
@@ -208,6 +208,8 @@ export default {
             discounts: [],
             isActive: 1,
             formID: "discount_form",
+            editFormID: "edit_discount_form",
+            deleteFormID: "delete_discount_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -302,7 +304,7 @@ export default {
                     timer: 2000
                 });
                 await this.fetchDiscount();
-                this.loading = false;
+                //this.loading = false
                 window.scrollTo(0, 0);
 
             } else {
@@ -337,7 +339,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-                this.loading = true;
+                //this.loading = true
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 // this.success = "Discount Updated Successfully";
@@ -347,7 +349,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchDiscount();
             } else {
                 if (res.status === 422) {

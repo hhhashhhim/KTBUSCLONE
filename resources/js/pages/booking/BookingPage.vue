@@ -292,7 +292,7 @@
                   <div class="not-for-sale circles mr-1 border shadow"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
-                
+
                 <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                   <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                   <span class="text-wrap">{{ seatClass.name }}</span>
@@ -353,7 +353,7 @@
     </Add>
 
     <!--            DELETE MODAL-->
-    <Delete
+    <Delete :deleteForm="deleteFormID"
       confirmationMessage="Are You Sure You want To Delete This Booking ???"
     />
 
@@ -389,7 +389,6 @@ export default {
     return {
       options: {
         placeholder: "xxxxx-xxxxxxx-x",
-        // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
       },
       rescheduleFormId: "reschedule-modal",
       shiftingFormId: "shifting-modal",
@@ -398,6 +397,7 @@ export default {
       customers: [],
       isActive: 1,
       formID: "addBooking",
+      deleteFormID: "delete_addBooking",
       validationErrors: [],
       success: false,
       error: false,
@@ -479,13 +479,13 @@ export default {
         return this.errorsArray("Date is Required", "Date");
       this.validationErrors = [];
 
-      this.loading = true;
+      //this.loading = true
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
         date: this.addForm.date,
       });
       if (res.status == 200) {
-        this.loading = false;
+        //this.loading = false
         this.showBookingDiv = true;
         this.schedule = res.data;
       } else {

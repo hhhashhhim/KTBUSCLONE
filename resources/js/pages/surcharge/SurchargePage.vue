@@ -68,14 +68,14 @@
                                                         <td>{{ surcharge.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ surcharge.added_by.name }}</td>
                                                         <td>
-                                                            <a href="#edit-modal" data-toggle="modal"
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                @click="edit(surcharge)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a href="#delete-modal" data-toggle="modal"
+                                                            </button>
+                                                            <button :data-target="'#' + deleteFormID" data-toggle="modal"
                                                                @click="deleteModal(surcharge,i)" class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </a>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -141,7 +141,7 @@
                 heading="Edit Surcharge"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -177,7 +177,7 @@
                     </template>
             </Edit>
             <!--            Edit MOdel End-->
-            <Delete
+            <Delete :deleteForm="deleteFormID"
                 confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
             />
 
@@ -205,6 +205,8 @@ export default {
             surcharges: [],
             isActive: 1,
             formID: "surcharge_form",
+            editFormID: "edit_surcharge_form",
+            deleteFormID: "delete_surcharge_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -282,7 +284,7 @@ export default {
                 icon: "error",
                 timer: 2000
             });
-            this.loading = true;
+            //this.loading = true
 
             const data = {
                 name: this.SurchargeName,
@@ -330,7 +332,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-                this.loading = true;
+                //this.loading = true
             const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200 && res.statusText === "OK") {
                 // this.success = "Surcharge Updated Successfully";
@@ -340,7 +342,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchSurcharges();
             } else {
                 if (res.status == 422) {

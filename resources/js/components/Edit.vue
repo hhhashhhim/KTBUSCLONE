@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal fade" :id="editForm" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -41,7 +41,7 @@ export default {
         errors:Array,
         success:String,
         dataEdit:Object,
-        formID:String
+        editForm:String
     },
     methods:{
         close(){

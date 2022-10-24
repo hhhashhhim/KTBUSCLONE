@@ -99,25 +99,12 @@
                                 }}
                               </td>
                               <td>
-                                <a
-                                  href="#edit-modal"
-                                  data-toggle="modal"
-                                  @click="
-                                    edit(schedule);
-                                    genericData();
-                                  "
-                                  class="btn btn-primary mr-1"
-                                >
+                                <button :data-target="'#' + editFormID" data-toggle="modal" @click=" edit(schedule); genericData(); " class="btn btn-primary mr-1" >
                                   <i class="far fa-edit"></i>
-                                </a>
-                                <a
-                                  href="#delete-modal"
-                                  data-toggle="modal"
-                                  @click="deleteSchedule(schedule, i)"
-                                  class="btn btn-danger"
-                                >
+                                </button>
+                                <button :data-target ="'#' + deleteFormID" data-toggle="modal" @click="deleteSchedule(schedule, i)" class="btn btn-danger" >
                                   <i class="far fa-trash-alt"></i>
-                                </a>
+                                </button>
                               </td>
                             </tr>
                           </tbody>
@@ -475,7 +462,7 @@
         heading="Edit Schedule"
         :errors="this.validationErrors"
         :success="success"
-        :formID="formID"
+        :editForm="editFormID"
       >
         <div class="row mb-3">
           <div
@@ -749,7 +736,7 @@
         </section>
       </Edit>
       <!--            Edit Model End-->
-      <Delete
+      <Delete :deleteForm="deleteFormID"
         confirmationMessage="Are You Sure You want To Delete This Schedule ???"
       />
     </div>
@@ -776,6 +763,8 @@ export default {
       discounts: [],
       surcharges: [],
       formID: "schedule_form",
+      editFormID: "edit_schedule_form",
+      deleteFormID: "delete_schedule_form",
       validationErrors: [],
       value: [],
       editClasses: [],
@@ -1038,7 +1027,7 @@ export default {
               timer: 2000
           });
 
-      this.loading = true;
+      //this.loading = true
       const res = await this.callApi("post", "schedule/store", this.data);
       if (res.status === 201) {
         // this.success = "Schedule Created Successfully";
@@ -1049,7 +1038,7 @@ export default {
               icon: "success",
               timer: 2000
           });
-          this.loading = false;
+          //this.loading = false
         await this.fetchSchedule();
       } else {
         if (res.status === 422) {
@@ -1116,7 +1105,7 @@ export default {
               icon: "error",
               timer: 2000
           });
-this.loading = true;
+//this.loading = true
       const resEdit = await this.callApi(
         "post",
         "schedule/update",
@@ -1131,7 +1120,7 @@ this.loading = true;
               icon: "success",
               timer: 2000
           });
-          this.loading = false;
+          //this.loading = false
         await this.fetchSchedule();
 
         setTimeout(function () {

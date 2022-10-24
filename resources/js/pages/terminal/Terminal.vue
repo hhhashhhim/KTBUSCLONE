@@ -40,14 +40,14 @@
                                                 <td>{{ terminal.terminal_count }}</td>
                                                 <td>{{ terminal.added_by.name }}</td>
                                                 <td>
-                                                    <a
-                                                        href="#detail-modal"
+                                                    <button
+                                                        data-target="#detail-modal"
                                                         data-toggle="modal"
-                                                        @click="terminalDetail(terminal.id)"
+                                                        @click="terminalDetail(terminal.id); datatableReset()"
                                                         class="btn btn-info mx-2"
                                                     >
                                                         <i class="far fa-eye"></i>
-                                                    </a>
+                                                    </button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -236,7 +236,7 @@
                 heading="Edit terminal"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
 
             >
                 <div class="row">
@@ -453,22 +453,22 @@
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                 <td v-else>N/A</td>
-                                                <td><a
-                                                    href="#edit-modal"
+                                                <td><button
+                                                    :data-target="'#' + editFormID"
                                                     data-toggle="modal"
                                                     @click="editTerminal(single)"
                                                     class="btn btn-warning mx-2"
                                                 >
                                                     <i class="far fa-edit"></i>
-                                                </a>
-                                                    <a
-                                                        href="#delete-modal"
+                                                </button>
+                                                    <button
+                                                        :data-target="'#' + deleteFormID"
                                                         data-toggle="modal"
                                                         @click="deleteModal(single, i)"
                                                         class="btn btn-danger"
                                                     >
                                                         <i class="far fa-trash-alt"></i>
-                                                    </a></td>
+                                                    </button></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -485,7 +485,7 @@
             </div>
 
             <!-- Delete Modal -->
-            <Delete
+            <Delete :deleteForm="deleteFormID"
                 confirmationMessage='Are You Sure You want To Delete This terminal ???'
             />
         </div>
@@ -540,6 +540,8 @@ export default {
             terminalsDetails: [],
             companies: [],
             formID: "terminal_form",
+            editFormID: "edit_terminal_form",
+            deleteFormID: "delete_terminal_form",
             cities: [],
             dataEditCheck:{},
             dataCheck:{},
@@ -571,6 +573,11 @@ export default {
         await this.fetchTerminals();
     },
     methods: {
+        datatableReset : function () {
+            setTimeout(() => {
+                $("#show_terminal").DataTable();
+            }, 50);
+        },
         applyMaks: function (value) {
             console.log(value, typeof value);
             if(value == 'comma'){
@@ -665,7 +672,7 @@ export default {
             this.validationErrors = [];
             if (this.data.name === "")
                 // swal('Required', 'Terminal Name is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal Name is required",
                     icon: "error",
@@ -673,7 +680,7 @@ export default {
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 // swal('Required', 'Company is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Company is required",
                     icon: "error",
@@ -681,7 +688,7 @@ export default {
                 });
             if (this.data.city_id === "")
                 // swal('Required', 'Terminal City is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal City is rquired",
                     icon: "error",
@@ -689,24 +696,24 @@ export default {
                 });
             if (this.data.contact === "")
                 // swal('Required', 'Terminal Contact is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal Contact is required",
                     icon: "error",
                     timer: 2000
                 });
 
-            this.loading = true;
+            //this.loading = true
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
                 // swal('Success', 'Terminal Created Successfully', 'success');
-                swal({
+               swal({
                     title: "Success",
                     text: "Terminal Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
@@ -745,7 +752,7 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 // swal('Required', 'Terminal Name is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal name is required",
                     icon: "error",
@@ -753,7 +760,7 @@ export default {
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
                 // swal('Required', 'Company is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Company is required",
                     icon: "error",
@@ -761,7 +768,7 @@ export default {
                 });
             if (this.dataEdit.city_id === "")
                 // swal('Required', 'Terminal City is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal City is required ",
                     icon: "error",
@@ -769,24 +776,24 @@ export default {
                 });
             if (this.dataEdit.contact === "")
                 // swal('Required', 'Terminal Contact is Required', 'error')
-                swal({
+              return swal({
                     title: "Required",
                     text: "Terminal Contact is required",
                     icon: "error",
                     timer: 2000
                 });
 
-            this.loading = true;
+            //this.loading = true
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
                 // swal('Success', 'Terminal Updated Successfully', 'success')
-                swal({
+               swal({
                     title: "Deleted!",
                     text: "Terminal Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false;
+                //this.loading = false
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
