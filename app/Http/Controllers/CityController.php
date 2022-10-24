@@ -89,7 +89,19 @@ class CityController extends Controller
 
     public function cityRoutes(Request $request)
     {
-
+        $request->validate([
+            'route'=>'required',
+            'cities'=>'required',
+        ],[
+            'route.required'=>'Route Name is Required !!!!'
+        ]);
+        if ( count( $request->cities ) < 2 ) {
+            return response()->json([
+                "errors"=>[
+                    "Cities Error"=>["Please Select At leat 2 Cities !!!"]
+                ]
+            ],422);
+        }
         foreach ($request['cities'] as $index => $city) {
             $used_cities[] = $city;
             foreach ($request['cities'] as $innerIndex => $innerCity) {
@@ -111,6 +123,7 @@ class CityController extends Controller
                 }
             }
         }
+        return "Reaching";
         $route = Route::create([
             'name' => $request['route'],
             'company_id' => $this->company_id,

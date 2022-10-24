@@ -27932,7 +27932,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var data, res, key, errorContent;
+        var data, res;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -27962,25 +27962,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this.fetchCities();
 
+                  _this.loading = false;
                   setTimeout(function () {// window.location.reload();
                   }, 3000);
                 } else {
+                  _this.loading = false;
+
                   if (res.status == 422) {
-                    for (key in res.data.errors) {
-                      errorContent = "";
-                      res.data.errors[key].forEach(function (element, i) {
-                        errorContent += i + 1 + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 4000
-                      });
-                    }
+                    (function () {
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 4000
+                        });
+                      }
+                    })();
                   }
                 }
 
@@ -42956,9 +42963,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/projects/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

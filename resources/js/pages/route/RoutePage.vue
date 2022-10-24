@@ -270,17 +270,20 @@ export default {
                     timer: 2000
                 });
                 this.fetchCities();
+                this.loading = false;
                 setTimeout(() => {
                     // window.location.reload();
                 }, 3000);
             }
             else {
+                this.loading = false;
                 if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in res.data.errors) {
-                        let errorContent = "";
-                        res.data.errors[key].forEach((element,i) => {
+                        res.data.errors[key].forEach((element) => {
                             errorContent += (
-                                (i+1) + " - " + //creating serial no.
+                                (++count) + " - " + //creating serial no.
                                 element + // main error
                                 "\n" // creating new line
                             );
