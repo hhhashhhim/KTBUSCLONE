@@ -473,6 +473,7 @@ export default {
     },
     async fetchScheduleData() {
       this.resetingArrays();
+      this.addForm.totalFare=0;
       this.validationErrors = [];
       if (!this.addForm.schedule)
         return this.errorsArray("Schedule Name is Required", "Schedule");

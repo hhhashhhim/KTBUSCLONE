@@ -73,21 +73,25 @@
               </div>
               <div
                 class="d-flex justify-content-center seat-img p-0 m-0"
-                v-for="(record, rowIndex) in schedule.selective_bus.seat_map"
+                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
                 :key="rowIndex"
               >
                 <div v-for="(col, colIndex) in record" :key="colIndex">
+                  <!-- <div v-if="colIndex==0">
+                                          {{ col }}
+                                        </div> -->
                   <div
                     v-if="col.reserved"
-                    class="image-span d-block text-center text-white"
-                    @click="col.type?'':selectSeat(rowIndex, colIndex, col.seatNo)"
+                    class="image-span d-block text-center text-white shadow-sm"
+                    @click="col.type?bookingError():selectSeat(rowIndex, colIndex, col.seatNo)"
                     :class="getClasses(col)"
+                    :style="{border:'3px solid '+col.color+' !important'}"
                   >
                     <!-- data-toggle="modal"
                                             :data-target="col.type?'#booking-options-popup':''" -->
-                    <small>{{ col.seatNo }}</small>
+                    <small>{{ col.seatNo }} </small>
                     <br />
-                    <small v-if="col.type">
+                    <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                       <i
                         class="fas"
                         :class="
@@ -203,14 +207,14 @@ export default {
       let index = this.selectedSeats.indexOf(seatNo);
       console.log(index);
       if (index != -1) {
-        this.schedule.selective_bus.seat_map[row][col].selected = false;
+        this.schedule.bus_class.seat_map[row][col].selected = false;
         this.selectedSeats.splice(index, 1);
       } else {
         if (this.seats.length==this.selectedSeats.length) {
           swal('Error', "New Seats Cannot Be Greater than the Previous Seats No." , 'error');
           return;
         }
-        this.schedule.selective_bus.seat_map[row][col].selected = true;
+        this.schedule.bus_class.seat_map[row][col].selected = true;
         this.selectedSeats.push(seatNo);
       }
       this.addForm.selectedSeats = this.selectedSeats;
@@ -224,6 +228,9 @@ export default {
           : "";
       let selected = col.selected ? "selected" : "";
       return gender + " " + selected;
+    },
+    bookingError(){
+      swal('error','Already Booked !!!!','error')
     },
   },
   watch: {

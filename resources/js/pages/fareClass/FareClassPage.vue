@@ -297,6 +297,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.data = {
+                    FareClassColor : "#000000",
+                };
                 //this.loading = false
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);

@@ -23920,33 +23920,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this4.resetingArrays();
 
+              _this4.addForm.totalFare = 0;
               _this4.validationErrors = [];
 
               if (_this4.addForm.schedule) {
-                _context4.next = 4;
+                _context4.next = 5;
                 break;
               }
 
               return _context4.abrupt("return", _this4.errorsArray("Schedule Name is Required", "Schedule"));
 
-            case 4:
+            case 5:
               if (_this4.addForm.date) {
-                _context4.next = 6;
+                _context4.next = 7;
                 break;
               }
 
               return _context4.abrupt("return", _this4.errorsArray("Date is Required", "Date"));
 
-            case 6:
+            case 7:
               _this4.validationErrors = []; //this.loading = true
 
-              _context4.next = 9;
+              _context4.next = 10;
               return _this4.callApi("post", "schedule/selected", {
                 id: _this4.addForm.schedule,
                 date: _this4.addForm.date
               });
 
-            case 9:
+            case 10:
               res = _context4.sent;
 
               if (res.status == 200) {
@@ -23957,7 +23958,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(res);
               }
 
-            case 11:
+            case 12:
             case "end":
               return _context4.stop();
           }
@@ -24498,7 +24499,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log(index);
 
       if (index != -1) {
-        this.schedule.selective_bus.seat_map[row][col].selected = false;
+        this.schedule.bus_class.seat_map[row][col].selected = false;
         this.selectedSeats.splice(index, 1);
       } else {
         if (this.seats.length == this.selectedSeats.length) {
@@ -24506,7 +24507,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return;
         }
 
-        this.schedule.selective_bus.seat_map[row][col].selected = true;
+        this.schedule.bus_class.seat_map[row][col].selected = true;
         this.selectedSeats.push(seatNo);
       }
 
@@ -24516,6 +24517,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
       var selected = col.selected ? "selected" : "";
       return gender + " " + selected;
+    },
+    bookingError: function bookingError() {
+      swal('error', 'Already Booked !!!!', 'error');
     }
   },
   watch: {
@@ -24712,21 +24716,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resSaveFareClass = _context3.sent;
 
                 if (!(resSaveFareClass.status === 201)) {
-                  _context3.next = 8;
+                  _context3.next = 10;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                swal({
                   title: "Success",
                   text: "Fare Class Added Successfully",
                   icon: "success",
                   timer: 2000
-                }));
+                });
+                _context3.next = 7;
+                return _this3.fetchBussClasses();
 
-              case 8:
+              case 7:
+                return _context3.abrupt("return", _context3.sent);
+
+              case 10:
                 console.log(resSaveFareClass);
 
-              case 9:
+              case 11:
               case "end":
                 return _context3.stop();
             }
@@ -24961,15 +24970,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                // swal('Success', 'Bus Class Added Successfully', 'success');
+                swal({
                   title: "Success",
                   text: "Bus Class Added Successfully",
                   icon: "success",
                   timer: 2000
-                }));
+                }); //this.loading = false
+
+                _context4.next = 16;
+                return _this4.fetchBussClasses();
 
               case 16:
-                _this4.data = "";
+                _this4.data = {
+                  busClassColor: "#00000"
+                };
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
                 _context4.next = 22;
@@ -26936,7 +26951,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
                 }
 
@@ -26945,17 +26960,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Fare Class Added Successfully",
                   icon: "success",
                   timer: 2000
-                }); //this.loading = false
+                });
+                _this3.data = {
+                  FareClassColor: "#000000"
+                }; //this.loading = false
 
-                _context3.next = 12;
+                _context3.next = 13;
                 return _this3.fetchFareClasses();
 
-              case 12:
+              case 13:
                 window.scrollTo(0, 0);
-                _context3.next = 16;
+                _context3.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 if (res.status === 422) {
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -26968,7 +26986,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context3.stop();
             }
@@ -27209,7 +27227,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 3:
                 res = _context.sent;
-                console.log(res.data);
 
                 if (res.status === 200) {
                   _this.success = "Fare Table Updated Successfully";
@@ -27233,7 +27250,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 6:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -27342,8 +27359,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200) {
                   _this4.msg = 2;
-                  _this4.cities = res.data; //this.loading = false
-
+                  _this4.cities = res.data;
+                  _this4.loading = false;
                   setTimeout(function () {
                     _this4.success = "";
                   }, 3000);
@@ -27851,7 +27868,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var data, res;
+        var data, res, key, errorContent;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -27870,17 +27887,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200) {
                   _this.routeName = "";
-                  _this.loop = 0;
-                  _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = []; // this.success = "Route Created Successfully";
-
+                  _this.loop = 1;
+                  _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = [];
                   swal({
                     title: "Success",
                     text: "Route Created Successfully",
                     icon: "success",
                     timer: 2000
                   });
+
+                  _this.fetchCities();
+
                   setTimeout(function () {// window.location.reload();
                   }, 3000);
+                } else {
+                  if (res.status == 422) {
+                    for (key in res.data.errors) {
+                      errorContent = "";
+                      res.data.errors[key].forEach(function (element, i) {
+                        errorContent += i + 1 + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                      });
+                    }
+                  }
                 }
 
               case 5:
@@ -31281,7 +31318,7 @@ var _hoisted_22 = {
 };
 
 var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fa fa-bus"
+  "class": "fas fa-table"
 }, null, -1
 /* HOISTED */
 );
@@ -31303,7 +31340,7 @@ var _hoisted_26 = {
 };
 
 var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-table"
+  "class": "fa fa-bus"
 }, null, -1
 /* HOISTED */
 );
@@ -31493,14 +31530,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('fare-table') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'bus-class-page'
+      name: 'fare-table'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bus Class ")];
+      return [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Fare Table ")];
     }),
     _: 1
     /* STABLE */
@@ -31508,23 +31545,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'buses-page'
+      name: 'bus-class-page'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Buses ")];
+      return [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bus Class ")];
     }),
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('fare-table') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('terminal') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
-      name: 'fare-table'
+      name: 'buses-page'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Fare Table ")];
+      return [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Buses ")];
     }),
     _: 1
     /* STABLE */
@@ -33852,27 +33889,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[3] || (_cache[3] = function () {
           return $options.rescheduleSeats && $options.rescheduleSeats.apply($options, arguments);
         })
-      }, "Reschedule Seats")])]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.selective_bus.seat_map, function (record, rowIndex) {
+      }, "Reschedule Seats")])]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.bus_class.seat_map, function (record, rowIndex) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           "class": "d-flex justify-content-center seat-img p-0 m-0",
           key: rowIndex
         }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(record, function (col, colIndex) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: colIndex
-          }, [col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"colIndex==0\">\r\n                                          {{ col }}\r\n                                        </div> "), col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: 0,
-            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white", $options.getClasses(col)]),
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow-sm", $options.getClasses(col)]),
             onClick: function onClick($event) {
-              return col.type ? '' : $options.selectSeat(rowIndex, colIndex, col.seatNo);
-            }
+              return col.type ? $options.bookingError() : $options.selectSeat(rowIndex, colIndex, col.seatNo);
+            },
+            style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+              border: '3px solid ' + col.color + ' !important'
+            })
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" data-toggle=\"modal\"\r\n                                            :data-target=\"col.type?'#booking-options-popup':''\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
           /* TEXT */
-          ), _hoisted_23, col.type ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+          ), _hoisted_23, col.type && (col.type == 'booked' || col.type == 'advance booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
             "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["fas", col.type == 'booked' ? 'fa-check-double' : 'fa-check'])
           }, null, 2
           /* CLASS */
-          )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 10
-          /* CLASS, PROPS */
+          )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14
+          /* CLASS, STYLE, PROPS */
           , _hoisted_22)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_25))]);
         }), 128
         /* KEYED_FRAGMENT */

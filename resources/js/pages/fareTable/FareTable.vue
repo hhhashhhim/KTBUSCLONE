@@ -210,7 +210,6 @@ export default {
         async add() {
             this.validationErrors = [];
             const res = await this.callApi("post", "fare-table/store", this.data);
-            console.log(res.data)
             if (res.status === 200) {
                 this.success = "Fare Table Updated Successfully";
                 this.cities = res.data
@@ -274,7 +273,8 @@ export default {
 
                 this.msg = 2;
                 this.cities = res.data
-                //this.loading = false
+                this.loading =false;
+                
                 setTimeout(() => {
                     this.success = "";
                 }, 3000);

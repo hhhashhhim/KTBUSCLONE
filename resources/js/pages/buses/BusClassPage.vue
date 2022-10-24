@@ -647,14 +647,15 @@ export default {
             //this.loading = true
             const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
             if (resSaveFareClass.status === 201) {
-              return swal({
+                swal({
                     title: "Success",
                     text: "Fare Class Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                return await this.fetchBussClasses();
                 //this.loading = false
-                this.fareClasses.push(resSaveFareClass.data);
+
             } else {
                 console.log(resSaveFareClass);
             }
@@ -861,7 +862,7 @@ export default {
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // swal('Success', 'Bus Class Added Successfully', 'success');
-              return swal({
+              swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
                     icon: "success",
@@ -869,7 +870,9 @@ export default {
                 });
                 //this.loading = false
                 await this.fetchBussClasses();
-                this.data = "";
+                this.data = {
+                    busClassColor:"#00000"
+                };
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
             } else {

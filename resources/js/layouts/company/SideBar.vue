@@ -43,6 +43,11 @@
                                 <i class="fas fa-table"></i> Fare Class
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }">
+                                <i class="fas fa-table"></i> Fare Table
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('terminal')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'bus-class-page' }">
                                 <i class="fa fa-bus"></i> Bus Class
@@ -53,11 +58,7 @@
                                 <i class="fa fa-bus"></i> Buses
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
-                            <router-link class="nav-link text-capitalize" :to="{ name:'fare-table' }">
-                                <i class="fas fa-table"></i> Fare Table
-                            </router-link>
-                        </li>
+                        
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
                                 <i class="fas fa-route"></i> Routes
