@@ -644,7 +644,7 @@ export default {
             }
         },
         async saveFareClass(){
-            //this.loading = true
+            this.loading = true
             const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
             if (resSaveFareClass.status === 201) {
               return swal({
@@ -653,7 +653,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 this.fareClasses.push(resSaveFareClass.data);
             } else {
                 console.log(resSaveFareClass);
@@ -857,17 +857,17 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            //this.loading = true
+            this.loading = true
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // swal('Success', 'Bus Class Added Successfully', 'success');
-              return swal({
+               swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
@@ -909,7 +909,7 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-                //this.loading = true
+                this.loading = true
 
             let seatNo=0;
 
@@ -927,14 +927,14 @@ export default {
                 "bus_classes/update",
                 this.dataEdit
             );
-            if (res.status === 200 && res.statusText === "OK") {
-              return swal({
+            if (res.status === 200 ) {
+               swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchBussClasses();
 
             } else {

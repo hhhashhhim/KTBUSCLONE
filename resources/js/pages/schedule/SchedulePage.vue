@@ -179,7 +179,7 @@
             <div class="col-md-6 class form-group">
               <label for="start">Start Date <span class="text-danger">*</span></label>
               <input
-                type="date"
+                type="datetime-local"
                 id="start"
                 class="form-control"
                 v-model="data.StartDate"
@@ -190,7 +190,7 @@
             <div class="col-md-6 class form-group">
               <label for="end">End Date <span class="text-danger">*</span></label>
               <input
-                type="date"
+                type="datetime-local"
                 id="end"
                 class="form-control"
                 v-model="data.EndDate"
@@ -511,7 +511,7 @@
             <div class="col-md-6 class form-group">
               <label for="start">Start Date  <span class="text-danger">*</span></label>
               <input
-                type="date"
+                type="datetime-local"
                 id="start"
                 class="form-control"
                 v-model="dataEdit.schedules.start_date"
@@ -522,7 +522,7 @@
             <div class="col-md-6 class form-group">
               <label for="end">End Date  <span class="text-danger">*</span></label>
               <input
-                type="date"
+                type="datetime-local"
                 id="end"
                 class="form-control"
                 v-model="dataEdit.schedules.end_date"
@@ -692,7 +692,7 @@
                   :value="surcharge.id"
                   :key="i"
                 >
-                  {{ surcharge.name }} - {{ surcharge.percentage }}%
+                  {{ surcharge.name }} - {{ surcharge.amount }}{{surcharge.type == 'percentage' ? '%' : ''}}
                 </option>
               </select>
             </div>
@@ -709,7 +709,7 @@
                   :value="discount.id"
                   :key="i"
                 >
-                  {{ discount.name }} - {{ discount.percentage }}%
+                  {{ discount.name }} - {{ discount.amount }}{{ discount.type == 'percentage' ? '%' : '' }}
                 </option>
               </select>
             </div>
@@ -1027,7 +1027,7 @@ export default {
               timer: 2000
           });
 
-      //this.loading = true
+      this.loading = true
       const res = await this.callApi("post", "schedule/store", this.data);
       if (res.status === 201) {
         // this.success = "Schedule Created Successfully";
@@ -1038,7 +1038,7 @@ export default {
               icon: "success",
               timer: 2000
           });
-          //this.loading = false
+          this.loading = false
         await this.fetchSchedule();
       } else {
         if (res.status === 422) {
@@ -1105,13 +1105,13 @@ export default {
               icon: "error",
               timer: 2000
           });
-//this.loading = true
+this.loading = true
       const resEdit = await this.callApi(
         "post",
         "schedule/update",
         this.dataEdit
       );
-      if (resEdit.status === 200 && resEdit.statusText === "OK") {
+      if (resEdit.status === 200) {
         // this.success = "Schedule Updated Successfully";
         // swal("Success", "Schedule Updated Successfully", "success");
           swal({
@@ -1120,7 +1120,7 @@ export default {
               icon: "success",
               timer: 2000
           });
-          //this.loading = false
+          this.loading = false
         await this.fetchSchedule();
 
         setTimeout(function () {

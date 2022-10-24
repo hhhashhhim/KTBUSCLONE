@@ -479,13 +479,13 @@ export default {
         return this.errorsArray("Date is Required", "Date");
       this.validationErrors = [];
 
-      //this.loading = true
+      this.loading = true
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
         date: this.addForm.date,
       });
       if (res.status == 200) {
-        //this.loading = false
+        this.loading = false
         this.showBookingDiv = true;
         this.schedule = res.data;
       } else {

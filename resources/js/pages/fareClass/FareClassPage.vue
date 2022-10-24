@@ -288,7 +288,7 @@ export default {
                 icon: "error",
                 timer: 2000
             });
-                //this.loading = true
+                this.loading = true
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
                swal({
@@ -297,7 +297,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);
 
@@ -330,7 +330,7 @@ export default {
                     timer: 2000
                 });
 
-                //this.loading = true
+                this.loading = true
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status == 200) {
                swal({
@@ -339,7 +339,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchFareClasses();
 
             } else {

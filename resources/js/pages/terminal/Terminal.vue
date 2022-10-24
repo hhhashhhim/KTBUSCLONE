@@ -703,7 +703,7 @@ export default {
                     timer: 2000
                 });
 
-            //this.loading = true
+            this.loading = true
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status === 200) {
                 // swal('Success', 'Terminal Created Successfully', 'success');
@@ -713,7 +713,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
@@ -783,7 +783,7 @@ export default {
                     timer: 2000
                 });
 
-            //this.loading = true
+            this.loading = true
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
                 // swal('Success', 'Terminal Updated Successfully', 'success')
@@ -793,7 +793,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                //this.loading = false
+                this.loading = false
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");

@@ -426,7 +426,14 @@ export default {
                timer: 2000
             });
             if (this.data.fare_class === "")
-                return this.errorsArray("PLease Select Bus Class", "fare_class");
+                return swal({
+                    title: "Required",
+                    text: "Bus Class is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+                // return this.errorsArray("PLease Select Bus Class", "fare_class");
+            this.loadig = true;
             const res = await this.callApi("post", "buses/store", this.data);
             if (res.status === 201) {
                 // this.success = "Bus Created Successfully";
@@ -437,7 +444,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-
+            this.loading = false;
                 window.scrollTo(0, 0);
                 this.data = {};
                 await this.fetchBuses();
@@ -447,6 +454,7 @@ export default {
                 }, 2000);
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

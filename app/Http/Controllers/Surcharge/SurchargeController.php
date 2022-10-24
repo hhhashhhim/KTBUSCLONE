@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Surcharge;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Surcharge\StoreSurchargeRequest;
 use App\Models\Surcharge\Surcharge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,22 +28,24 @@ class SurchargeController extends Controller
 
     public function storeSurcharge(Request $request)
     {
+//        dd($request->all());
         $rules = [
             'name' => ['required', Rule::unique('schedules', 'name')->whereNull('deleted_at')],
-            'percentage' => 'required|numeric|min:0|max:100',
+//            'amount' => if($request->type == 'percentage')'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Surcharge Name is Required!',
             'name.unique' => 'Surcharge Name not be Repeated!',
-            'percentage.required' => 'Surcharge percentage is Required!',
-            'percentage.min' => 'Surcharge percentage never be less then 0',
-            'percentage.max' => 'Surcharge percentage never be greater then 100',
+//            'amount.required' => 'Surcharge amount is Required!',
+//            'amount.min' => 'Surcharge amount never be less then 0',
+//            'amount.max' => 'Surcharge amount never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         return Surcharge::create([
             'name' => $request->name,
-            'percentage' => $request->percentage,
+            'type' => $request->type,
+            'amount' => $request->amount,
             'company_id' => $this->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
@@ -51,21 +54,23 @@ class SurchargeController extends Controller
 
     public function updateSurcharge(Request $request)
     {
+//        dd($request->all());
         $rules = [
             'name' => 'required',
-            'percentage' => 'required|numeric|min:0|max:100',
+//            'percentage' => 'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Surcharge Name is Required!',
-            'percentage.required' => 'Surcharge percentage is Required!',
-            'percentage.min' => 'Surcharge percentage never be less then 0',
-            'percentage.max' => 'Surcharge percentage never be greater then 100',
+//            'percentage.required' => 'Surcharge percentage is Required!',
+//            'percentage.min' => 'Surcharge percentage never be less then 0',
+//            'percentage.max' => 'Surcharge percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         return Surcharge::where('id', $request->id)->update([
             'name' => $request->name,
-            'percentage' => $request->percentage,
+            'type' => $request->type,
+            'amount' => $request->amount,
             'company_id' => $this->company_id,
             'is_active'=> !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
