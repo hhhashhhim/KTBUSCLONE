@@ -14,8 +14,9 @@ class ChangeNameToSchedulesTable extends Migration
     public function up()
     {
         Schema::table('schedules', function (Blueprint $table) {
-            $table->dateTime('start_date')->change();
-            $table->dateTime('end_date')->change();
+            $table->date('start_date')->change();
+            $table->date('end_date')->change();
+            $table->string('time')->change();
         });
     }
 

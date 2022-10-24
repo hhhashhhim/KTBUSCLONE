@@ -64,6 +64,7 @@ class ScheduleController extends Controller
             'surcharge_id' => $request->surcharge,
             'discount_id' => $request->discount,
             'route_city_terminal' => $request->addTerminalsOnClick,
+            'time' => $request->time,
             'selected_bus_class_id' => $request->busClass,
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
@@ -151,8 +152,8 @@ class ScheduleController extends Controller
             'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
             'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
             'busClass' => BusClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
-            'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->pluck('percentage')->first(),
-            'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->pluck('percentage')->first(),
+            'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->pluck('amount')->first(),
+            'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->pluck('amount')->first(),
         ];
     }
 
