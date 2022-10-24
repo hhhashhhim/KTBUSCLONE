@@ -113,7 +113,7 @@ class CityController extends Controller
                     //   echo $fare->count()."==";
                     //   echo $fareClasses."<br>";
                     //   echo "<br>line end";
-                    if ($fare->count() < $fareClasses) {
+                    if ( $fareClasses > 0 && $fare->count() < $fareClasses) {
                         return response()->json([
                             "errors"=>[
                                 "Fare Error"=>["Please Fill the Fare Table Completelly First ( For All Fare Classes ) !!!"]
