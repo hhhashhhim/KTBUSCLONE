@@ -113,7 +113,8 @@ class CityController extends Controller
                     //   echo $fare->count()."==";
                     //   echo $fareClasses."<br>";
                     //   echo "<br>line end";
-                    if ( $fareClasses > 0 && $fare->count() < $fareClasses) {
+                    
+                    if ( $fareClasses==0 || $fare->count() < $fareClasses) {
                         return response()->json([
                             "errors"=>[
                                 "Fare Error"=>["Please Fill the Fare Table Completelly First ( For All Fare Classes ) !!!"]
@@ -136,6 +137,7 @@ class CityController extends Controller
                     continue;
                 } else {
                     $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+
                     if ($fare->count() > 0) {
                         foreach ($fare as $detail) {
                             RouteFare::create([
