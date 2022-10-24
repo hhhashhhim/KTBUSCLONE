@@ -173,7 +173,7 @@ export default {
                    timer: 2000
                 });
 
-                this.loading = false
+                this.loading = false;
                 // swal('Success', 'City Added Successfully', 'success');
                 // await this.fetchCities();
                 // this.cities.unshift(res.data);
@@ -186,6 +186,7 @@ export default {
             }
             else {
                 if (res.status == 422) {
+                    this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -212,7 +213,7 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            this.loading = true
+            this.loading = true;
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             if (resEdit.status==200) {
                 // swal('Success', 'City Updated Successfully', 'success');
@@ -222,7 +223,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 await this.fetchCities();
                 this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
@@ -232,6 +233,7 @@ export default {
             }
             else{
                 if (res.status == 422) {
+                    this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

@@ -644,23 +644,22 @@ export default {
             }
         },
         async saveFareClass(){
-            this.loading = true
+            this.loading = true;
             const resSaveFareClass = await this.callApi("post", "buses/storeFareClass", this.addData);
             if (resSaveFareClass.status === 201) {
-              return swal({
+              swal({
                     title: "Success",
                     text: "Fare Class Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 this.fareClasses.push(resSaveFareClass.data);
             } else {
                 console.log(resSaveFareClass);
             }
         },
         addSeatData: function (col, row) {
-
             if (this.seatModify.class || this.seatModify.type) {
 
                 const seatDetails = this.data.seatMap[row][col];
@@ -710,8 +709,6 @@ export default {
         },
 
         updateSeatDetail: function (rowId, colId) {
-
-            console.log(rowId, colId);
             if (this.editSeatModify.class == 0) {
                 // swal('required', 'Please Select Seat class', 'error');
               return swal({
@@ -857,7 +854,7 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            this.loading = true
+            this.loading = true;
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // swal('Success', 'Bus Class Added Successfully', 'success');
@@ -867,13 +864,15 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 await this.fetchBussClasses();
                 this.data = "";
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -921,6 +920,7 @@ export default {
                 }
                 return seat;
             });
+            this.loading = true;
 
             const res = await this.callApi(
                 "post",
@@ -934,11 +934,13 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 await this.fetchBussClasses();
 
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors.percentage.forEach((element) => {
                             this.errorsArray(element, key);

@@ -474,6 +474,8 @@ export default {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 return this.errorsArray("Bus Name is Required", "Name");
+            this.loading = true;
+
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
                 // this.success = "Bus Record Updated Successfully";
@@ -484,6 +486,8 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
+                this.loading = false;
+
                 await this.fetchBuses();
                 setTimeout(() => {
                     this.success = "";
@@ -491,6 +495,8 @@ export default {
                 }, 2000);
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

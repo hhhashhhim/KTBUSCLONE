@@ -1027,7 +1027,7 @@ export default {
               timer: 2000
           });
 
-      this.loading = true
+      this.loading = true;
       const res = await this.callApi("post", "schedule/store", this.data);
       if (res.status === 201) {
         // this.success = "Schedule Created Successfully";
@@ -1038,11 +1038,13 @@ export default {
               icon: "success",
               timer: 2000
           });
-          this.loading = false
+          this.loading = false;
         await this.fetchSchedule();
       } else {
         if (res.status === 422) {
-          for (const key in res.data.errors) {
+            this.loading = false;
+
+            for (const key in res.data.errors) {
             res.data.errors.percentage.forEach((element) => {
               this.errorsArray(element, key);
             });
@@ -1105,7 +1107,7 @@ export default {
               icon: "error",
               timer: 2000
           });
-this.loading = true
+this.loading = true;
       const resEdit = await this.callApi(
         "post",
         "schedule/update",
@@ -1120,7 +1122,7 @@ this.loading = true
               icon: "success",
               timer: 2000
           });
-          this.loading = false
+          this.loading = false;
         await this.fetchSchedule();
 
         setTimeout(function () {
@@ -1128,6 +1130,7 @@ this.loading = true
         }, 2000);
       } else {
         if (resEdit.status === 422) {
+            this.loading = false;
           for (const key in res.data.errors) {
             res.data.errors.percentage.forEach((element) => {
               this.errorsArray(element, key);

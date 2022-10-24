@@ -428,7 +428,7 @@ export default {
             //         icon: "error",
             //         timer: 2000
             //     });
-                this.loading = true
+                this.loading = true;
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200) {
                 this.loading = false;

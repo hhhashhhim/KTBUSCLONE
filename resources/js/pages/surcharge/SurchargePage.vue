@@ -378,7 +378,7 @@ export default {
             //     icon: "error",
             //     timer: 2000
             // });
-            this.loading = true
+            this.loading = true;
 
             const data = {
                 name: this.SurchargeName,
@@ -389,6 +389,7 @@ export default {
 
             const res = await this.callApi("post", "surcharge/store", data);
             if (res.status == 201) {
+                this.loading = false;
 
                 // this.success = "Surcharge Created Successfully";
                 swal({
@@ -400,6 +401,8 @@ export default {
                 await this.fetchSurcharges();
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -427,7 +430,7 @@ export default {
             //         icon: "error",
             //         timer: 2000
             //     });
-                this.loading = true
+                this.loading = true;
             const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200) {
                 // this.success = "Surcharge Updated Successfully";
@@ -437,10 +440,12 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 await this.fetchSurcharges();
             } else {
                 if (res.status == 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

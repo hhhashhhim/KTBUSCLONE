@@ -24709,22 +24709,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 3:
                 resSaveFareClass = _context3.sent;
 
-                if (!(resSaveFareClass.status === 201)) {
-                  _context3.next = 10;
-                  break;
+                if (resSaveFareClass.status === 201) {
+                  swal({
+                    title: "Success",
+                    text: "Fare Class Added Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this3.loading = false;
+
+                  _this3.fareClasses.push(resSaveFareClass.data);
+                } else {
+                  console.log(resSaveFareClass);
                 }
 
-                return _context3.abrupt("return", swal({
-                  title: "Success",
-                  text: "Fare Class Added Successfully",
-                  icon: "success",
-                  timer: 2000
-                }));
-
-              case 10:
-                console.log(resSaveFareClass);
-
-              case 11:
+              case 5:
               case "end":
                 return _context3.stop();
             }
@@ -24779,8 +24778,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
     },
     updateSeatDetail: function updateSeatDetail(rowId, colId) {
-      console.log(rowId, colId);
-
       if (this.editSeatModify["class"] == 0) {
         // swal('required', 'Please Select Seat class', 'error');
         return swal({
@@ -24980,6 +24977,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 23:
                 if (res.status === 422) {
+                  _this4.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -25061,14 +25060,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   return seat;
                 });
-                _context5.next = 12;
+                _this5.loading = true;
+                _context5.next = 13;
                 return _this5.callApi("post", "bus_classes/update", _this5.dataEdit);
 
-              case 12:
+              case 13:
                 res = _context5.sent;
 
                 if (!(res.status === 200)) {
-                  _context5.next = 20;
+                  _context5.next = 21;
                   break;
                 }
 
@@ -25079,15 +25079,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this5.loading = false;
-                _context5.next = 18;
+                _context5.next = 19;
                 return _this5.fetchBussClasses();
 
-              case 18:
-                _context5.next = 21;
+              case 19:
+                _context5.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status === 422) {
+                  _this5.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this5.errorsArray(element, key);
@@ -25099,7 +25101,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context5.stop();
             }
@@ -25482,14 +25484,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context4.abrupt("return", _this4.errorsArray("Bus Name is Required", "Name"));
 
               case 3:
-                _context4.next = 5;
+                _this4.loading = true;
+                _context4.next = 6;
                 return _this4.callApi("post", "buses/update", _this4.dataEdit);
 
-              case 5:
+              case 6:
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 13;
+                  _context4.next = 15;
                   break;
                 }
 
@@ -25501,18 +25504,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 10;
+                _this4.loading = false;
+                _context4.next = 12;
                 return _this4.fetchBuses();
 
-              case 10:
+              case 12:
                 setTimeout(function () {
                   _this4.success = ""; // window.location.reload();
                 }, 2000);
-                _context4.next = 14;
+                _context4.next = 16;
                 break;
 
-              case 13:
+              case 15:
                 if (res.status === 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -25524,7 +25530,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 16:
               case "end":
                 return _context4.stop();
             }
@@ -25742,6 +25748,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 300);
                 } else {
                   if (res.status == 422) {
+                    _this3.loading = false;
+
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this3.errorsArray(element, key);
@@ -25829,6 +25837,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
                 if (res.status == 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -27020,6 +27030,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 17:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -27105,6 +27117,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
                 if (res.status === 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -27268,15 +27282,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _this.validationErrors = [];
-                _context.next = 3;
+                _this.loading = true;
+                _context.next = 4;
                 return _this.callApi("post", "fare-table/store", _this.data);
 
-              case 3:
+              case 4:
                 res = _context.sent;
-                console.log(res.data);
 
                 if (res.status === 200) {
-                  _this.success = "Fare Table Updated Successfully";
+                  _this.loading = false;
+                  swal({
+                    title: "Success",
+                    text: "Fare Table Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  }); // this.success = "Fare Table Updated Successfully";
+
                   _this.cities = res.data;
                   window.scrollTo(0, 0);
                   setTimeout(function () {
@@ -27285,6 +27306,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 } else {
                   if (res.status === 422) {
+                    _this.loading = false;
+
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this.errorsArray(element, key);
@@ -27933,6 +27956,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (res.status === 200) {
+                  _this.loading = false;
                   _this.routeName = "";
                   _this.loop = 0;
                   _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = []; // this.success = "Route Created Successfully";
@@ -27966,14 +27990,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this2.validationErrors = [];
-                _context2.next = 3;
+                _this2.loading = true;
+                _context2.next = 4;
                 return _this2.callApi("post", "fare-table/store", _this2.data);
 
-              case 3:
+              case 4:
                 res = _context2.sent;
 
                 if (res.status === 200) {
-                  // this.success = "Fare Table Updated Created Successfully";
+                  _this2.loading = false; // this.success = "Fare Table Updated Created Successfully";
+
                   swal({
                     title: "Success",
                     text: "Fare Table Created Successfully",
@@ -27991,6 +28017,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 3000);
                 } else {
                   if (res.status === 422) {
+                    _this2.loading = false;
+
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this2.errorsArray(element, key);
@@ -28003,7 +28031,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 5:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -28703,6 +28731,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 17:
                 if (res.status === 422) {
+                  _this7.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this7.errorsArray(element, key);
@@ -28820,6 +28850,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 20:
                 if (resEdit.status === 422) {
+                  _this8.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this8.errorsArray(element, key);
@@ -29173,26 +29205,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 14;
+                  _context3.next = 15;
                   break;
                 }
 
-                // this.success = "Surcharge Created Successfully";
+                _this3.loading = false; // this.success = "Surcharge Created Successfully";
+
                 swal({
                   title: "Success",
                   text: "Surcharge Created Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 12;
+                _context3.next = 13;
                 return _this3.fetchSurcharges();
 
-              case 12:
-                _context3.next = 15;
+              case 13:
+                _context3.next = 16;
                 break;
 
-              case 14:
+              case 15:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -29204,7 +29239,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 15:
+              case 16:
               case "end":
                 return _context3.stop();
             }
@@ -29267,6 +29302,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 13:
                 if (res.status == 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -29687,6 +29724,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 24:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -29848,11 +29887,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   $("#edit-modal").modal("hide"); // window.location.reload();
                 }, 3000);
-                _context6.next = 23;
+                _context6.next = 22;
                 break;
 
               case 21:
                 if (res.status == 422) {
+                  _this6.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this6.errorsArray(element, key);
@@ -29864,10 +29905,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-                setTimeout(function () {// window.location.reload();
-                }, 2000);
-
-              case 23:
+              case 22:
               case "end":
                 return _context6.stop();
             }
@@ -38053,11 +38091,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
-        "class": "btn btn-primary",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-primary", $data.loading ? 'disabled' : '']),
         onClick: _cache[8] || (_cache[8] = function () {
           return $options.add && $options.add.apply($options, arguments);
         })
-      }, " Save Fare Details ")];
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading... ' : 'Save Fare Details'), 3
+      /* TEXT, CLASS */
+      )];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
