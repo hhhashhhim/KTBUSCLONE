@@ -23790,7 +23790,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         type: "booked",
         gender: "1",
         customerCNIC: "",
-        schedule: 0
+        schedule: 0,
+        totalFare: 0
       }
     };
   },
@@ -23993,9 +23994,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       if (_index != -1) {
         this.schedule.bus_class.seat_map[row][col].selected = false;
+        this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
         this.selectedSeats.splice(_index, 1);
       } else {
         this.schedule.bus_class.seat_map[row][col].selected = true;
+        this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
         this.selectedSeats.push(seatNo);
       }
 
@@ -33237,7 +33240,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.selectedSeats.length]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         readonly: "",
-        "class": "form-control col-md-9",
+        "class": "form-control col-md-9 font-weight-bold",
         id: "totalFare",
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.addForm.totalFare = $event;
@@ -42231,9 +42234,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/projects/kt/'
 
-var url = '/';
+var url = '/projects/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

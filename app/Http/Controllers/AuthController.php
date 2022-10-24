@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\CityToCity;
+use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
+use App\Models\Schedule\Schedule;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,7 +22,50 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+        // // Getting Already Booked Tickets
+        // $tickets = Ticket::where('company_id',1)->where('schedule_id', $request->id)
+        // ->whereDate('date', "2022-10-18")->get();
+        // $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
 
+        // // Getting Already Booked Tickets
+        // $schedule = Schedule::where('id', 1)
+        // ->where('company_id',1)
+        // ->select('id', 'selected_bus_class_id','route_id')
+        // ->with('bus_class:id,seat_map','singleRoute:id,name','singleRoute.fares:id,route_id,departure_city_id,destination_city_id')->first();
+
+        // // Fare Fetching About the Schedule
+        // $departure_city_id = $schedule->singleRoute->fares->first()->departure_city_id;
+        // $destination_city_id = $schedule->singleRoute->fares->last()->destination_city_id;
+        // $fare =(float) FareTable::where('from_city_id',$departure_city_id)->where('to_city_id',$destination_city_id)
+        // ->where('fare_class',$schedule->selected_bus_class_id)
+        // ->value('fare');
+
+        // // Looping Throug the each seat of the bus
+        // $seatMap = $schedule->bus_class->seat_map;
+        // $busClasses = FareClass::get();
+        // for ($i = 0; $i < count($seatMap); $i++) {
+        //     foreach ($seatMap[$i] as $j => $column) {
+        //         $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
+        //         if ($result !== false) {
+        //             $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
+        //             $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
+        //             $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+        //         }
+        //         // print_r($column);
+        //         if ( isset($column['class']) ) {
+        //             $seatMap[$i][$j]['color'] = $busClasses->where('id',$column['class'])->first()?$busClasses->where('id',$column['class'])->first()->color:'';
+        //         }
+        //         if ($column['reserved']) {
+        //             $seatMap[$i][$j]['fare'] = $fare;
+        //         }
+
+        //     }
+        // }
+        // $schedule->bus_class->seat_map = $seatMap;
+        // return $schedule;
+        
+        
+        
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }
