@@ -26900,10 +26900,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 res = _context4.sent;
-                console.log(res.data);
 
                 if (!(res.status == 200)) {
-                  _context4.next = 15;
+                  _context4.next = 14;
                   break;
                 }
 
@@ -26914,14 +26913,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 13;
+                _context4.next = 12;
                 return _this4.fetchFareClasses();
 
-              case 13:
-                _context4.next = 16;
+              case 12:
+                _context4.next = 15;
                 break;
 
-              case 15:
+              case 14:
                 if (res.status === 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
@@ -26934,7 +26933,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 15:
               case "end":
                 return _context4.stop();
             }
@@ -29031,7 +29030,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 14:
-                if (res.status === 422) {
+                if (res.status == 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -29041,9 +29040,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   for (key in res.data.errors) {
                     _loop2(key);
                   }
-
-                  setTimeout(function () {// window.location.reload();
-                  }, 2000);
                 }
 
               case 15:

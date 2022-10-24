@@ -343,15 +343,12 @@ export default {
                 this.loading = false;
                 await this.fetchSurcharges();
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
-                    setTimeout(function () {
-                        // window.location.reload();
-                    }, 2000);
 
                 }
             }
