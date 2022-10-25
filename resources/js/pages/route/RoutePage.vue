@@ -272,9 +272,6 @@ export default {
                 });
                 this.fetchCities();
                 this.loading = false;
-                setTimeout(() => {
-                    // window.location.reload();
-                }, 3000);
             }
             else {
                 this.loading = false;
@@ -295,7 +292,7 @@ export default {
                             icon: "error",
                             timer: 4000
                         });
-                        
+
                     }
                 }
             }

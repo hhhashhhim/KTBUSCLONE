@@ -453,7 +453,7 @@ export default {
                     this.isShowDiv = false;
                 }, 2000);
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
@@ -494,7 +494,7 @@ export default {
                     // window.location.reload();
                 }, 2000);
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
 
                     for (const key in res.data.errors) {
