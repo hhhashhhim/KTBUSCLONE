@@ -79,53 +79,64 @@
       :formID="formID"
     >
       <div class="row">
-        <div class="col-md-5 class form-group">
-          <label for="DiscountName"
-            >Schedule Name <span class="text-danger">*</span></label
-          >
-          <select class="form-control" id="route" v-model="addForm.schedule">
-            <option value="0" selected>Select Schedule</option>
-            <option
-              v-for="(schedule, i) in allSchedules"
-              :value="schedule.id"
-              :key="i"
-            >
-              {{ schedule.name }}
-            </option>
-          </select>
-        </div>
-
-        <div class="col-md-5 class form-group">
+          <div class="col-md-6 form-group">
+              <label for="departureCity">Departure City <span class="text-danger">*</span></label>
+              <select class="form-control" id="departureCity" v-model="addForm.departureCity">
+                  <option value="0" selected>Select Departure City</option>
+                  <option
+                      v-for="(city, i) in cities"
+                      :value="city.id"
+                      :key="i"
+                  >
+                      {{ city.name }}
+                  </option>
+              </select>
+          </div>
+          <div class="col-md-6 form-group"><label for="destinationCity">Destination City<span class="text-danger">*</span></label>
+              <select class="form-control" id="destinationCity" v-model="addForm.destinationCity">
+                  <option value="0" selected>Select Destination City</option>
+                  <option
+                      v-for="(city, i) in cities"
+                      :value="city.id"
+                      :key="i"
+                  >
+                      {{ city.name }}
+                  </option>
+              </select>
+          </div>
+          <div class="col-md-5 class form-group">
           <label for="date">Date <span class="text-danger">*</span></label>
-          <input type="date" class="form-control" v-model="addForm.date" />
+          <input type="date" class="form-control" v-model="addForm.date"  @change="fetchSpecificSchedules()"/>
         </div>
+          <div class="col-md-5 class form-group">
+              <label for="schedulename">Schedule Name <span class="text-danger">*</span></label>
+              <select class="form-control" id="schedulename" v-model="addForm.schedule">
+                  <option value="0" selected>Select Schedule</option>
+                  <option
+                      v-for="(schedule, i) in allSchedules"
+                      :value="schedule.id"
+                      :key="i"
+                  >
+                      {{ schedule.name }} - {{tConvert(schedule.time)}}
+                  </option>
+              </select>
+          </div>
         <div class="col-md-2">
           <label>Action</label>
-          <button @click="fetchScheduleData" class="btn btn-block btn-primary">
-            Get Record
+          <button @click="fetchScheduleData" class="btn btn-block btn-primary" :class="getSchedule ? 'disabled': ''">
+            {{getSchedule ? 'Fetching Schedules...' : 'Get Record' }}
           </button>
         </div>
         <div
           class="col-md-6 d-flex justify-content-center mx-auto mb-3"
           v-if="selectedBookedSeats.length"
         >
-          <!-- <a
-            href="#reschedule-modal"
-            class="btn btn-primary mx-1"
-            data-toggle="modal"
-            >Partial Seats</a
-          > -->
           <a
             href="#reschedule-modal"
             class="btn btn-primary mx-1"
             data-toggle="modal"
             >Shifting ( Reschedule ) Seats</a
           >
-          <!-- <a
-            href="#reschedule-modal"
-            class="btn btn-primary mx-1"
-            data-toggle="modal"
-            ></a> -->
         </div>
         <h1 v-if="loading">Loading.........</h1>
 
@@ -405,6 +416,7 @@ export default {
       allSchedules: [],
       schedule: "",
       loading: false,
+      getSchedule: false,
       showBookingDiv: false,
       selectedSeats: [],
       selectedBookedSeats: [],
@@ -412,23 +424,28 @@ export default {
       allBookings:[],
       bookingDetails:[],
       allSeatClasses:[],
+      cities:[],
       addForm: {
         type: "booked",
         gender: "1",
         customerCNIC: "",
         schedule: 0,
         totalFare:0,
+        destinationCity:0,
+        departureCity:0,
       },
     };
   },
   async created() {
-    const res = await this.callApi("post", "schedule");
+    // const res = await this.callApi("post", "schedule");
     const resBooking = await this.callApi("post", "booking");
     const resClass = await this.callApi("post","fare-class")
-    if (res.status == 200 && resBooking.status == 200 && resClass.status == 200 ) {
-      this.allSchedules = res.data;
+    const resCity = await this.callApi("post","cities")
+    if (/*res.status == 200 &&*/ resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 ) {
+      // this.allSchedules = res.data;
       this.allBookings = resBooking.data;
       this.allSeatClasses = resClass.data;
+      this.cities = resCity.data;
       setTimeout(() => {
         $("#booking-table").dataTable();
       }, 300);
@@ -438,12 +455,37 @@ export default {
   },
 
   methods: {
-    async getCustomer() {
-      const resCnic = await this.callApi("post", "booking/getCNIC", {
-        cnicNumber: this.addForm.customerCNIC,
-      });
-      this.addForm.contact = resCnic.data.contact;
-      this.addForm.customerName = resCnic.data.name;
+      tConvert:function(time) {
+          time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+
+          if (time.length > 1) {
+              time = time.slice(1);
+              time[5] = +time[0] < 12 ? ' AM' : ' PM';
+              time[0] = +time[0] % 12 || 12;
+          }
+          return time.join('');
+      },
+
+    async fetchSpecificSchedules(){
+        this.getSchedule = true;
+        this.showBookingDiv = false;
+        this.allSchedules = {};
+        this.addForm.schedule = 0;
+        const data = {
+            departure_city_id: this.addForm.departureCity,
+            destination_city_id: this.addForm.destinationCity,
+            date: this.addForm.date,
+        }
+        const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
+        if(resFetchSchedule.status == 200) {
+            if (resFetchSchedule.length != 0) {
+                this.getSchedule = false;
+                this.allSchedules = resFetchSchedule.data;
+            } else {
+                this.addForm.schedule = 0;
+                this.showBookingDiv = false;
+            }
+        }
     },
     cnicFormat: function (string) {
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");

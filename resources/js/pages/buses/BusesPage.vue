@@ -166,7 +166,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Chassis Number <span class="text-danger">*</span></label>
+                                    <label for="name">Chassis Number</label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -176,7 +176,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Insurance Number <span class="text-danger">*</span></label>
+                                    <label for="name">Insurance Number</label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -186,7 +186,7 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="name">Route Permit Number <span class="text-danger">*</span></label>
+                                    <label for="name">Route Permit Number</label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -241,7 +241,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Chassis Number <span class="text-danger">*</span></label>
+                        <label for="name">Chassis Number</label>
                         <input
                             type="text"
                             class="form-control"
@@ -251,7 +251,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Insurance Number <span class="text-danger">*</span></label>
+                        <label for="name">Insurance Number</label>
                         <input
                             type="text"
                             class="form-control"
@@ -261,7 +261,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Route Permit Number <span class="text-danger">*</span></label>
+                        <label for="name">Route Permit Number</label>
                         <input
                             type="text"
                             class="form-control"
@@ -386,13 +386,6 @@ export default {
 
         async addBuses() {
             this.validationErrors = [];
-            if (this.data.noOfSeats === "")
-          return swal({
-                title: "Required!",
-                text: "No. Of Seats is required",
-                icon: "error",
-               timer: 2000
-            });
             if (this.data.busNumber === "")
                                 // swal('Required', 'Bus Number is Required', 'error');
               return swal({
@@ -401,30 +394,6 @@ export default {
                     type: 'error',
                    timer: 2000
                 });
-            if (this.data.chassisNumber === "")
-                                // swal('Required', 'Chassis Number is Required', 'error');
-              return swal({
-                    title: "Required",
-                    text: "Chassis Number is required!",
-                   icon: "error",
-                   timer: 2000
-                });
-            if (this.data.insuranceNumber === "")
-                                // swal('Required', 'Insurance Number is Required', 'error');
-              return swal({
-                    title: "Required",
-                    text: "Insurance Number is required",
-                   icon: "error",
-                   timer: 2000
-                });
-            if (this.data.routePermit === "")
-                                // swal('Required', 'Route Permit is Required', 'error');
-          return swal({
-                title: "Required",
-                text: "Route Permit is Required",
-               icon: "error",
-               timer: 2000
-            });
             if (this.data.fare_class === "")
                 return swal({
                     title: "Required",

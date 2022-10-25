@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Booking;
 use App\Http\Controllers\Controller;
 use App\Models\Booking\Booking;
 use App\Models\Customer;
+use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class BookingController extends Controller
     {
         $bookings = Ticket::select('schedule_id','date')->with('schedule:id,name')
         ->where('company_id', $this->company_id)->get()->groupBy(['date','schedule_id']);
-        
+
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
             $bookingWithDetails = $singleBooking->map(function($booking) use ($i){
@@ -34,10 +35,10 @@ class BookingController extends Controller
                 $booking[0]->date = $i;
                 return $booking[0];
             });
-            
+
             $allBooking[]=$bookingWithDetails->first();
         }
-        
+
         return $allBooking;
 
     }
@@ -91,11 +92,20 @@ class BookingController extends Controller
             ]);
         }
         return response()->json("Seats Rescheduled Successfully",200);
-        
+
     }
     public function deleteBooking(Request $request)
     {
         return Ticket::find($request->id)->delete();
+    }
+    public function fetchSpecificSchedule(Request $request)
+    {
+        $routes = RouteFare::where('departure_city_id', $request->departure_city_id )->where('destination_city_id', $request->destination_city_id)->get();
+        $routes_id = [];
+        foreach ($routes as $key => $route){
+            $routes_id[] = $route->route_id;
+        }
+       return Schedule::whereIn('route_id',array_unique($routes_id))->whereDate('start_date', '<=', $request->date)->whereDate('end_date', '>=',$request->date)->get();
     }
 
     public function getCnic(Request  $request)

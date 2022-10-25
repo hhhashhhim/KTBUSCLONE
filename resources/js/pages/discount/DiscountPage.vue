@@ -54,7 +54,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
-                                                        <th>Percentage</th>
+                                                        <th>Quota</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>

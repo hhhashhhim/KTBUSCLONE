@@ -33,17 +33,17 @@ class BusController extends Controller
         $rules = [
             'busNumber' => 'required',
             'fare_class' => 'required|integer',
-            'chassisNumber' => 'required',
-            'insuranceNumber' => 'required',
-            'routePermit' => 'required',
+//            'chassisNumber' => 'required',
+//            'insuranceNumber' => 'required',
+//            'routePermit' => 'required',
         ];
 
         $customMessages = [
             'busNumber.required' => 'Bus Number is Required!',
             'fare_class.required' => 'Fare Class is Required!',
-            'chassisNumber.required' => 'Chassis Number is Required!',
-            'insuranceNumber.required' => 'Insurance Number is Required!',
-            'routePermit.required' => 'Route Permit is Required!',
+//            'chassisNumber.required' => 'Chassis Number is Required!',
+//            'insuranceNumber.required' => 'Insurance Number is Required!',
+//            'routePermit.required' => 'Route Permit is Required!',
 
         ];
         $this->validate($request, $rules, $customMessages);
@@ -64,17 +64,17 @@ class BusController extends Controller
         $rules = [
             'bus_number' => 'required',
             'fare_class_id' => 'required|integer',
-            'chassis_number' => 'required',
-            'insurance_number' => 'required',
-            'route_permit_number' => 'required',
+//            'chassis_number' => 'required',
+//            'insurance_number' => 'required',
+//            'route_permit_number' => 'required',
         ];
 
         $customMessages = [
             'bus_number.required' => 'Bus Number is Required!',
             'fare_class_id.required' => 'Fare Class is Required!',
-            'chassis_number.required' => 'Chassis Number is Required!',
-            'insurance_number.required' => 'Insurance Number is Required!',
-            'route_permit_number.required' => 'Route Permit is Required!',
+//            'chassis_number.required' => 'Chassis Number is Required!',
+//            'insurance_number.required' => 'Insurance Number is Required!',
+//            'route_permit_number.required' => 'Route Permit is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::where('id', $request->id)->update([
