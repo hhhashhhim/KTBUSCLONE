@@ -268,7 +268,7 @@
 
               <div class="form-group text-right">
                 <button class="btn btn-primary mx-1" @click="add">Save</button>
-                <button class="btn btn-secondary mx-1">Reset</button>
+                <button class="btn btn-secondary mx-1" @click="reset">Reset</button>
               </div>
             </div>
           </div>
@@ -426,10 +426,12 @@ export default {
     const resBooking = await this.callApi("post", "booking");
     const resClass = await this.callApi("post","fare-class")
     if (res.status == 200 && resBooking.status == 200 && resClass.status == 200 ) {
+      
       this.allSchedules = res.data;
       this.allBookings = resBooking.data;
       this.allSeatClasses = resClass.data;
       setTimeout(() => {
+        $("#"+this.formID).modal("show");
         $("#booking-table").dataTable();
       }, 300);
     } else {
@@ -641,6 +643,11 @@ export default {
       } else {
         console.log(res);
       }
+    },
+    reset(){
+      this.addForm={};
+      this.schedule = "";
+      this.showBookingDiv = false;
     }
   },
   computed: {
