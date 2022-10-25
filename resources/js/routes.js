@@ -20,7 +20,7 @@ import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
 
 // const url = '/projects/kt/'
-const url = '/kt/'
+const url = '/'
 
 const routes = [
     {
