@@ -26,17 +26,16 @@ class BusClassController extends Controller
 
     public function storeBusClass(Request $request)
     {
-
         $rules = [
             'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
-            'BusClassColor' => 'required',
+//            'BusClassColor' => 'required',
             'noOfRows' => 'required|integer',
             'noOfCols' => 'required|integer',
         ];
 
         $customMessages = [
             'BusClassName.required' => 'Bus Class Name is Required!',
-            'BusClassColor.required' => 'Bus Class Color is Required!',
+//            'BusClassColor.required' => 'Bus Class Color is Required!',
             'name.unique' => 'Bus Class Name is already available!',
             'noOfRows.required' => 'No of Rows of Bus  is Required!',
             'noOfCols.required' => 'No of Cols of Bus  is Required!',
@@ -44,8 +43,8 @@ class BusClassController extends Controller
         $this->validate($request, $rules, $customMessages);
         return BusClass::create([
             'name' => $request->BusClassName,
-            'color' => $request->BusClassColor,
-            'is_active' => $request->isActive??0,
+            'color' => $request->BusClassColor ? '#000000' : $request->BusClassColor,
+            'is_active' => !$request->isActive ? 1 : $request->isActive,
             'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
             'no_of_cols' => $request->noOfCols,
@@ -56,7 +55,7 @@ class BusClassController extends Controller
 
     public function updateBusClass(Request $request)
     {
-    
+
         return BusClass::where('id', $request->id)->update([
             'name' => $request->name,
             'color' => $request->busClassColor,

@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Fare Class</h4>
                             <div class="card-header-action">
@@ -46,10 +46,7 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
-                                                >
+                                                <table class="table table-striped table-hover" id="fare_class_table" >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -248,6 +245,10 @@ export default {
             if (res.status === 200) {
                 this.fareClasses = res.data
             }
+            setTimeout(function(){
+                $("#fare_class_table").DataTable();
+            }, 300);
+
         },
 
         isAlphabet: function (evet) {
@@ -288,7 +289,7 @@ export default {
                 icon: "error",
                 timer: 2000
             });
-                this.loading = true
+                this.loading = true;
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status === 201) {
                swal({
@@ -297,6 +298,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.loading = false;
                 this.loading = false
                 this.data = {
                     FareClassColor : "#000000",
@@ -306,6 +308,8 @@ export default {
 
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -333,7 +337,7 @@ export default {
                     timer: 2000
                 });
 
-                this.loading = true
+                this.loading = true;
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status == 200) {
                swal({
@@ -342,11 +346,13 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.loading = false
+                this.loading = false;
                 await this.fetchFareClasses();
 
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors.percentage.forEach((element) => {
                             this.errorsArray(element, key);

@@ -30,7 +30,7 @@ class SurchargeController extends Controller
     {
 //        dd($request->all());
         $rules = [
-            'name' => ['required', Rule::unique('schedules', 'name')->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('schedules', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 //            'amount' => if($request->type == 'percentage')'required|numeric|min:0|max:100',
         ];
 

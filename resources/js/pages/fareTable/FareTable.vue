@@ -122,8 +122,8 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add">
-                        Save Fare Details
+                    <button type="button" class="btn btn-primary" @click="add"  :class="loading?'disabled':''">
+                        {{ loading ? 'Loading... ' : 'Save Fare Details' }}
                     </button>
                 </template>
             </Add>
@@ -209,9 +209,17 @@ export default {
         },
         async add() {
             this.validationErrors = [];
+            this.loading = true;
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {
-                this.success = "Fare Table Updated Successfully";
+                this.loading = false;
+                swal({
+                    title: "Success",
+                    text: "Fare Table Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                // this.success = "Fare Table Updated Successfully";
                 this.cities = res.data
                 window.scrollTo(0, 0);
                 setTimeout(() => {
@@ -221,6 +229,7 @@ export default {
                 }, 2000);
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

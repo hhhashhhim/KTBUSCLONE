@@ -239,7 +239,7 @@
                 </option>
               </select>
             </div>
-            
+
             <div class="col-md-3 class form-group">
               <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
               <select
@@ -821,7 +821,6 @@ export default {
         name: "",
         StartDate: "",
         EndDate: "",
-        fareClass: "",
         route: "",
         surcharge: 0,
         discount: 0,
@@ -866,7 +865,7 @@ export default {
         "schedule/getEntire",
         this.data
       );
-      
+
       this.dataPreview = resEntire.data;
       this.dataPreview.start_date = this.data.StartDate;
       this.dataPreview.end_date = this.data.EndDate;
@@ -1016,65 +1015,55 @@ export default {
     async addSchedule() {
       this.validationErrors = [];
       if (this.data.name == "")
-        // return this.errorsArray("Schedule Name is Required", "Name");
-        swal({
+        return swal({
             title: "Required!",
             text: "name Field is Required ",
             icon: "error",
             timer: 2000
         });
       if (this.data.StartDate == "")
-        // return this.errorsArray(
-        //   "Departure Date and Time is Required",
-        //   "StartDate"
-        // );
-        swal({
+        return swal({
             title: "Required!",
             text: "Start Date is Required",
             icon: "error",
             timer: 2000
         });
       if (this.data.EndDate == "")
-        // return this.errorsArray("End Date and Time is Required", "EndDate");
-          swal({
+          return swal({
               title: "Required!",
               text: "End Date is Required",
               icon: "error",
               timer: 2000
           });
       if (this.data.busClass == "")
-        // return this.errorsArray("Bus Class is Required", "BusClass");
-          swal({
+          return swal({
               title: "Required!",
               text: "Bus Class is Required",
               icon: "error",
               timer: 2000
           });
       if (this.data.route == "")
-        // return this.errorsArray("Route is Required", "Route");
-          swal({
+          return swal({
               title: "Required!",
               text: "Route is Required",
               icon: "error",
               timer: 2000
           });
-
-      this.loading = true
+      this.loading = true;
       const res = await this.callApi("post", "schedule/store", this.data);
       if (res.status === 201) {
-        // this.success = "Schedule Created Successfully";
-        // swal("Success", "Schedule Created Successfully", "success");
           swal({
               title: "Success",
               text: "Schedule Created Successfully",
               icon: "success",
               timer: 2000
           });
-          this.loading = false
+          this.loading = false;
         await this.fetchSchedule();
       } else {
         if (res.status === 422) {
-          for (const key in res.data.errors) {
+            this.loading = false;
+            for (const key in res.data.errors) {
             res.data.errors.percentage.forEach((element) => {
               this.errorsArray(element, key);
             });
@@ -1089,40 +1078,27 @@ export default {
     async updateSchedule() {
       this.validationErrors = [];
       if (this.dataEdit.schedules.name == "")
-        return this.errorsArray("Schedule Name is Required", "Name");
-        swal({
+        return swal({
             title: "Required!",
             text: "name is Required",
             icon: "error",
             timer: 2000
         });
       if (this.dataEdit.schedules.startDate == "")
-        // return this.errorsArray(
-        //   "Departure Date and Time is Required",
-        //   "StartDate"
-        // );
-          swal({
+          return swal({
               title: "Required!",
               text: "Start Date id Required",
               icon: "error",
               timer: 2000
           });
       if (this.dataEdit.schedules.endDate == "")
-        // return this.errorsArray(
-        //   "End Date and Time is Required",
-        //   "DestinationDateTime"
-        // );
-          swal({
+           return  swal({
               title: "Required!",
               text: "End Date is Required",
               icon: "error",
               timer: 2000
           });
       if (this.dataEdit.schedules.selected_bus_class_id == "0")
-        // return this.errorsArray(
-        //   "Selected Bus Class is Required",
-        //   "Selected Bus Class"
-        // );
           swal({
               title: "Required!",
               text: "Bus Class is Required",
@@ -1130,37 +1106,31 @@ export default {
               timer: 2000
           });
       if (this.dataEdit.schedules.route_id == "0")
-        // return this.errorsArray("Route is Required", "Route");
-          swal({
+         return  swal({
               title: "Required!",
               text: "Route is Required",
               icon: "error",
               timer: 2000
           });
-this.loading = true
+        this.loading = true;
       const resEdit = await this.callApi(
         "post",
         "schedule/update",
         this.dataEdit
       );
       if (resEdit.status === 200) {
-        // this.success = "Schedule Updated Successfully";
-        // swal("Success", "Schedule Updated Successfully", "success");
           swal({
               title: "Success",
               text: "Schedule Updated Succesfully",
               icon: "success",
               timer: 2000
           });
-          this.loading = false
+          this.loading = false;
         await this.fetchSchedule();
-
-        setTimeout(function () {
-          // window.location.reload();
-        }, 2000);
       } else {
         if (resEdit.status === 422) {
-          for (const key in res.data.errors) {
+            this.loading = false;
+              for (const key in res.data.errors) {
             res.data.errors.percentage.forEach((element) => {
               this.errorsArray(element, key);
             });

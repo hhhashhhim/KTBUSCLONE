@@ -257,9 +257,10 @@ export default {
                 terminals: this.addTerminalsOnClick
             }
 
-            this.loading = true
+            this.loading = true;
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
+                this.loading = false;
                 this.routeName = "";
                 this.loop = 1;
                 this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
@@ -271,9 +272,6 @@ export default {
                 });
                 this.fetchCities();
                 this.loading = false;
-                setTimeout(() => {
-                    // window.location.reload();
-                }, 3000);
             }
             else {
                 this.loading = false;
@@ -294,15 +292,19 @@ export default {
                             icon: "error",
                             timer: 4000
                         });
-                        
+
                     }
                 }
             }
         },
         async add() {
             this.validationErrors = [];
+            this.loading = true;
+
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {
+                this.loading = false;
+
                 // this.success = "Fare Table Updated Created Successfully";
                swal({
                     title: "Success",
@@ -322,6 +324,8 @@ export default {
                 }, 3000);
             } else {
                 if (res.status === 422) {
+                    this.loading = false;
+
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

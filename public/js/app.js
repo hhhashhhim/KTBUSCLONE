@@ -24610,7 +24610,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         seatMap: [],
         isActive: 1,
         BusClassName: "",
-        BusClassColor: "#00000"
+        BusClassColor: "#000000"
       },
       dataEdit: {
         BusClassName: "",
@@ -24681,7 +24681,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(res);
                 }
 
-              case 8:
+                setTimeout(function () {
+                  $("#bus_class_table").DataTable();
+                }, 300);
+
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -24797,8 +24801,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
     },
     updateSeatDetail: function updateSeatDetail(rowId, colId) {
-      console.log(rowId, colId);
-
       if (this.editSeatModify["class"] == 0) {
         // swal('required', 'Please Select Seat class', 'error');
         return swal({
@@ -24844,8 +24846,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.validationErrors = [];
       var vm = this;
       console.log(vm.data.noOfRows, vm.data.noOfCols);
-      if (vm.data.noOfRows == "") swal('Required', 'No of Rows Field is Required!', 'error');
-      if (vm.data.noOfCols == "") swal('Required', 'No of Cols Field is Required!', 'error');
+      if (typeof vm.data.noOfRows == 'undefined') return swal({
+        title: "required",
+        text: "No of Rows Field is Required",
+        icon: "error",
+        timer: 2000
+      });
+      if (typeof vm.data.noOfCols == 'undefined') return swal({
+        title: "required",
+        text: "No of Cols is Required",
+        icon: "error",
+        timer: 2000
+      });
 
       if (vm.data.noOfRows <= 15) {
         if (vm.data.noOfCols <= 7) {
@@ -24869,7 +24881,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           this.isShowDiv = true;
           return this.data.seatMap = map;
         } else {
-          // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
           return swal({
             title: "Limited",
             text: "No of Cols must be less then or equal to 7",
@@ -24878,7 +24889,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           });
         }
       } else {
-        // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
         return swal({
           title: "Limited",
           text: "No of Rows must be less then or equal to 15",
@@ -24890,7 +24900,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     editGenerateMap: function editGenerateMap() {
       this.isShowEditDiv = true;
     },
-    // async
     checkBox: function checkBox(e) {
       if (e.target.checked) {
         this.data.isActive = 1;
@@ -24940,7 +24949,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this4.data.noOfRows === "0")) {
+                if (!(typeof _this4.data.noOfRows == 'undefined')) {
                   _context4.next = 7;
                   break;
                 }
@@ -24953,7 +24962,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this4.data.noOfCols === "0")) {
+                if (!(typeof _this4.data.noOfCols == 'undefined')) {
                   _context4.next = 9;
                   break;
                 }
@@ -24967,18 +24976,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
                 _this4.loading = true;
-                _context4.next = 12;
+                console.log(_this4.data);
+                _context4.next = 13;
                 return _this4.callApi("post", "bus_classes/store", _this4.data);
 
-              case 12:
+              case 13:
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 23;
+                  _context4.next = 24;
                   break;
                 }
 
-                // swal('Success', 'Bus Class Added Successfully', 'success');
                 swal({
                   title: "Success",
                   text: "Bus Class Added Successfully",
@@ -24986,20 +24995,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 18;
+                _context4.next = 19;
                 return _this4.fetchBussClasses();
 
-              case 18:
+              case 19:
                 _this4.data = {
-                  busClassColor: "#00000"
+                  busClassColor: "#000000"
                 };
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 24;
+                _context4.next = 25;
                 break;
 
-              case 23:
+              case 24:
                 if (res.status === 422) {
+                  _this4.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -25011,7 +25022,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 24:
+              case 25:
               case "end":
                 return _context4.stop();
             }
@@ -25081,14 +25092,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   return seat;
                 });
-                _context5.next = 12;
+                _this5.loading = true;
+                _context5.next = 13;
                 return _this5.callApi("post", "bus_classes/update", _this5.dataEdit);
 
-              case 12:
+              case 13:
                 res = _context5.sent;
 
                 if (!(res.status === 200)) {
-                  _context5.next = 20;
+                  _context5.next = 21;
                   break;
                 }
 
@@ -25099,15 +25111,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this5.loading = false;
-                _context5.next = 18;
+                _context5.next = 19;
                 return _this5.fetchBussClasses();
 
-              case 18:
-                _context5.next = 21;
+              case 19:
+                _context5.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status === 422) {
+                  _this5.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this5.errorsArray(element, key);
@@ -25119,7 +25133,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context5.stop();
             }
@@ -25453,7 +25467,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 27:
-                if (res.status === 422) {
+                if (res.status == 422) {
                   _this3.loading = false;
 
                   _loop = function _loop(key) {
@@ -25502,14 +25516,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context4.abrupt("return", _this4.errorsArray("Bus Name is Required", "Name"));
 
               case 3:
-                _context4.next = 5;
+                _this4.loading = true;
+                _context4.next = 6;
                 return _this4.callApi("post", "buses/update", _this4.dataEdit);
 
-              case 5:
+              case 6:
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 13;
+                  _context4.next = 15;
                   break;
                 }
 
@@ -25521,18 +25536,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 10;
+                _this4.loading = false;
+                _context4.next = 12;
                 return _this4.fetchBuses();
 
-              case 10:
+              case 12:
                 setTimeout(function () {
                   _this4.success = ""; // window.location.reload();
                 }, 2000);
-                _context4.next = 14;
+                _context4.next = 16;
                 break;
 
-              case 13:
-                if (res.status === 422) {
+              case 15:
+                if (res.status == 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -25544,7 +25562,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 16:
               case "end":
                 return _context4.stop();
             }
@@ -25698,8 +25716,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 setTimeout(function () {
                   $("#city_table").DataTable();
-                }, 50); //Time before execution
-                //Time before execution
+                }, 300);
 
               case 5:
               case "end":
@@ -25741,44 +25758,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 6:
                 res = _context3.sent;
 
-                if (res.status == 200) {
-                  // this.success="City Created Successfully Named as " + res.data.name;
-                  swal({
-                    title: "Success",
-                    text: "City Created Succesfuly Named as  " + res.data.name,
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this3.loading = false; // swal('Success', 'City Added Successfully', 'success');
-                  // await this.fetchCities();
-                  // this.cities.unshift(res.data);
-
-                  _this3.cities.push(res.data);
-
-                  _this3.data.name = "";
-                  setTimeout(function () {
-                    this.success = "";
-                    this.data = "";
-                  }, 300);
-                } else {
-                  if (res.status == 422) {
-                    _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this3.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
-                  }
-
-                  setTimeout(function () {
-                    this.loading = false;
-                  }, 2000);
+                if (!(res.status == 200)) {
+                  _context3.next = 16;
+                  break;
                 }
 
-              case 8:
+                // this.success="City Created Successfully Named as " + res.data.name;
+                swal({
+                  title: "Success",
+                  text: "City Created Succesfuly Named as  " + res.data.name,
+                  icon: "success",
+                  timer: 2000
+                });
+                _this3.loading = false;
+                _context3.next = 12;
+                return _this3.fetchCities();
+
+              case 12:
+                _this3.data.name = "";
+                setTimeout(function () {
+                  this.success = "";
+                  this.data = "";
+                }, 300);
+                _context3.next = 17;
+                break;
+
+              case 16:
+                if (res.status == 422) {
+                  _this3.loading = false;
+
+                  _loop = function _loop(key) {
+                    res.data.errors[key].forEach(function (element) {
+                      _this3.errorsArray(element, key);
+                    });
+                  };
+
+                  for (key in res.data.errors) {
+                    _loop(key);
+                  }
+                }
+
+              case 17:
               case "end":
                 return _context3.stop();
             }
@@ -25823,11 +25843,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 16;
+                  _context4.next = 15;
                   break;
                 }
 
-                // swal('Success', 'City Updated Successfully', 'success');
                 swal({
                   title: "Success",
                   text: "City updated Successfully",
@@ -25839,16 +25858,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this4.fetchCities();
 
               case 12:
-                _this4.dataEdit.name = _this4.dataEdit.company_id = "";
                 setTimeout(function () {
                   _this4.success = "";
                   $('#edit-modal').modal('hide');
                 }, 3000);
-                _context4.next = 18;
+                _context4.next = 17;
                 break;
 
-              case 16:
+              case 15:
                 if (res.status == 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -25864,7 +25884,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.loading = false;
                 }, 3000);
 
-              case 18:
+              case 17:
               case "end":
                 return _context4.stop();
             }
@@ -26035,7 +26055,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         modules: []
       },
       success: false,
-      cities: []
+      companies: []
     };
   },
   created: function created() {
@@ -26075,10 +26095,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 companyRes = _context2.sent;
 
                 if (companyRes.status == 200) {
-                  _this2.cities = companyRes.data;
+                  _this2.companies = companyRes.data;
                   setTimeout(function () {
                     $("#company_table").DataTable();
-                  }, 50);
+                  }, 300);
                 }
 
               case 5:
@@ -26177,9 +26197,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status == 201) {
                   _this3.loading = false;
-                  _this3.success = "Company Created Successfully";
-
-                  _this3.cities.unshift(res.data);
+                  _this3.success = "Company Created Successfully"; // this.companies.unshift(res.data);
 
                   _this3.fetchCompany();
 
@@ -26324,7 +26342,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 companyRes = _context5.sent;
 
                 if (companyRes.status == 200) {
-                  _this5.cities = companyRes.data;
+                  _this5.companies = companyRes.data;
                 }
 
                 _this5.dataEdit.name = "";
@@ -26439,7 +26457,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
-        this.cities.splice(obj.index, 1);
+        this.companies.splice(obj.index, 1);
       }
     }
   }
@@ -26945,7 +26963,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this2.fareClasses = res.data;
                 }
 
-              case 4:
+                setTimeout(function () {
+                  $("#fare_class_table").DataTable();
+                }, 300);
+
+              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -27019,7 +27041,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 18;
+                  _context3.next = 19;
                   break;
                 }
 
@@ -27030,19 +27052,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this3.loading = false;
+                _this3.loading = false;
                 _this3.data = {
                   FareClassColor: "#000000"
                 };
-                _context3.next = 15;
+                _context3.next = 16;
                 return _this3.fetchFareClasses();
 
-              case 15:
+              case 16:
                 window.scrollTo(0, 0);
-                _context3.next = 19;
+                _context3.next = 20;
                 break;
 
-              case 18:
+              case 19:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -27054,7 +27079,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 19:
+              case 20:
               case "end":
                 return _context3.stop();
             }
@@ -27128,6 +27153,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
                 if (res.status === 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -27291,14 +27318,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _this.validationErrors = [];
-                _context.next = 3;
+                _this.loading = true;
+                _context.next = 4;
                 return _this.callApi("post", "fare-table/store", _this.data);
 
-              case 3:
+              case 4:
                 res = _context.sent;
 
                 if (res.status === 200) {
-                  _this.success = "Fare Table Updated Successfully";
+                  _this.loading = false;
+                  swal({
+                    title: "Success",
+                    text: "Fare Table Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  }); // this.success = "Fare Table Updated Successfully";
+
                   _this.cities = res.data;
                   window.scrollTo(0, 0);
                   setTimeout(function () {
@@ -27307,6 +27342,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 } else {
                   if (res.status === 422) {
+                    _this.loading = false;
+
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this.errorsArray(element, key);
@@ -27319,7 +27356,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 5:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -27955,6 +27992,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (res.status === 200) {
+                  _this.loading = false;
                   _this.routeName = "";
                   _this.loop = 1;
                   _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = [];
@@ -27968,8 +28006,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this.fetchCities();
 
                   _this.loading = false;
-                  setTimeout(function () {// window.location.reload();
-                  }, 3000);
                 } else {
                   _this.loading = false;
 
@@ -28015,14 +28051,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this2.validationErrors = [];
-                _context2.next = 3;
+                _this2.loading = true;
+                _context2.next = 4;
                 return _this2.callApi("post", "fare-table/store", _this2.data);
 
-              case 3:
+              case 4:
                 res = _context2.sent;
 
                 if (res.status === 200) {
-                  // this.success = "Fare Table Updated Created Successfully";
+                  _this2.loading = false; // this.success = "Fare Table Updated Created Successfully";
+
                   swal({
                     title: "Success",
                     text: "Fare Table Created Successfully",
@@ -28040,6 +28078,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 3000);
                 } else {
                   if (res.status === 422) {
+                    _this2.loading = false;
+
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
                         _this2.errorsArray(element, key);
@@ -28052,7 +28092,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 5:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -28296,13 +28336,13 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
@@ -28316,8 +28356,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     Delete: _components_Delete_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
-    var _data;
-
     return {
       loading: false,
       schedules: [],
@@ -28350,16 +28388,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       TripDuration: "",
       activeSection: 0,
       editActiveSection: 0,
-      data: (_data = {
+      data: {
         name: "",
         StartDate: "",
         EndDate: "",
-        fareClass: "",
         route: "",
         surcharge: 0,
         discount: 0,
-        busClass: 0
-      }, _defineProperty(_data, "fareClass", 0), _defineProperty(_data, "addTerminalsOnClick", []), _data),
+        busClass: 0,
+        fareClass: 0,
+        addTerminalsOnClick: []
+      },
       dataEdit: {
         schedules: [],
         cities: [],
@@ -28687,58 +28726,84 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context7.prev = _context7.next) {
               case 0:
                 _this7.validationErrors = [];
-                if (_this7.data.name == "") // return this.errorsArray("Schedule Name is Required", "Name");
-                  swal({
-                    title: "Required!",
-                    text: "name Field is Required ",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this7.data.StartDate == "") // return this.errorsArray(
-                  //   "Departure Date and Time is Required",
-                  //   "StartDate"
-                  // );
-                  swal({
-                    title: "Required!",
-                    text: "Start Date is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this7.data.EndDate == "") // return this.errorsArray("End Date and Time is Required", "EndDate");
-                  swal({
-                    title: "Required!",
-                    text: "End Date is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this7.data.busClass == "") // return this.errorsArray("Bus Class is Required", "BusClass");
-                  swal({
-                    title: "Required!",
-                    text: "Bus Class is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this7.data.route == "") // return this.errorsArray("Route is Required", "Route");
-                  swal({
-                    title: "Required!",
-                    text: "Route is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this7.loading = true;
-                _context7.next = 9;
-                return _this7.callApi("post", "schedule/store", _this7.data);
 
-              case 9:
-                res = _context7.sent;
-
-                if (!(res.status === 201)) {
-                  _context7.next = 17;
+                if (!(_this7.data.name == "")) {
+                  _context7.next = 3;
                   break;
                 }
 
-                // this.success = "Schedule Created Successfully";
-                // swal("Success", "Schedule Created Successfully", "success");
+                return _context7.abrupt("return", swal({
+                  title: "Required!",
+                  text: "name Field is Required ",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this7.data.StartDate == "")) {
+                  _context7.next = 5;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Start Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this7.data.EndDate == "")) {
+                  _context7.next = 7;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Required!",
+                  text: "End Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this7.data.busClass == "")) {
+                  _context7.next = 9;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Bus Class is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!(_this7.data.route == "")) {
+                  _context7.next = 11;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Route is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 11:
+                _this7.loading = true;
+                _context7.next = 14;
+                return _this7.callApi("post", "schedule/store", _this7.data);
+
+              case 14:
+                res = _context7.sent;
+
+                if (!(res.status === 201)) {
+                  _context7.next = 22;
+                  break;
+                }
+
                 swal({
                   title: "Success",
                   text: "Schedule Created Successfully",
@@ -28746,15 +28811,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 });
                 _this7.loading = false;
-                _context7.next = 15;
+                _context7.next = 20;
                 return _this7.fetchSchedule();
 
-              case 15:
-                _context7.next = 18;
+              case 20:
+                _context7.next = 23;
                 break;
 
-              case 17:
+              case 22:
                 if (res.status === 422) {
+                  _this7.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this7.errorsArray(element, key);
@@ -28769,7 +28836,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 18:
+              case 23:
               case "end":
                 return _context7.stop();
             }
@@ -28794,66 +28861,72 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                return _context8.abrupt("return", _this8.errorsArray("Schedule Name is Required", "Name"));
-
-              case 3:
-                swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "name is Required",
                   icon: "error",
                   timer: 2000
-                });
-                if (_this8.dataEdit.schedules.startDate == "") // return this.errorsArray(
-                  //   "Departure Date and Time is Required",
-                  //   "StartDate"
-                  // );
-                  swal({
-                    title: "Required!",
-                    text: "Start Date id Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this8.dataEdit.schedules.endDate == "") // return this.errorsArray(
-                  //   "End Date and Time is Required",
-                  //   "DestinationDateTime"
-                  // );
-                  swal({
-                    title: "Required!",
-                    text: "End Date is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this8.dataEdit.schedules.selected_bus_class_id == "0") // return this.errorsArray(
-                  //   "Selected Bus Class is Required",
-                  //   "Selected Bus Class"
-                  // );
-                  swal({
-                    title: "Required!",
-                    text: "Bus Class is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                if (_this8.dataEdit.schedules.route_id == "0") // return this.errorsArray("Route is Required", "Route");
-                  swal({
-                    title: "Required!",
-                    text: "Route is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
-                _this8.loading = true;
-                _context8.next = 11;
-                return _this8.callApi("post", "schedule/update", _this8.dataEdit);
+                }));
 
-              case 11:
-                resEdit = _context8.sent;
-
-                if (!(resEdit.status === 200)) {
-                  _context8.next = 20;
+              case 3:
+                if (!(_this8.dataEdit.schedules.startDate == "")) {
+                  _context8.next = 5;
                   break;
                 }
 
-                // this.success = "Schedule Updated Successfully";
-                // swal("Success", "Schedule Updated Successfully", "success");
+                return _context8.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Start Date id Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this8.dataEdit.schedules.endDate == "")) {
+                  _context8.next = 7;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required!",
+                  text: "End Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                if (_this8.dataEdit.schedules.selected_bus_class_id == "0") swal({
+                  title: "Required!",
+                  text: "Bus Class is Required",
+                  icon: "error",
+                  timer: 2000
+                });
+
+                if (!(_this8.dataEdit.schedules.route_id == "0")) {
+                  _context8.next = 10;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Route is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 10:
+                _this8.loading = true;
+                _context8.next = 13;
+                return _this8.callApi("post", "schedule/update", _this8.dataEdit);
+
+              case 13:
+                resEdit = _context8.sent;
+
+                if (!(resEdit.status === 200)) {
+                  _context8.next = 21;
+                  break;
+                }
+
                 swal({
                   title: "Success",
                   text: "Schedule Updated Succesfully",
@@ -28861,17 +28934,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 });
                 _this8.loading = false;
-                _context8.next = 17;
+                _context8.next = 19;
                 return _this8.fetchSchedule();
 
-              case 17:
-                setTimeout(function () {// window.location.reload();
-                }, 2000);
-                _context8.next = 21;
+              case 19:
+                _context8.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (resEdit.status === 422) {
+                  _this8.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors.percentage.forEach(function (element) {
                       _this8.errorsArray(element, key);
@@ -28883,7 +28956,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context8.stop();
             }
@@ -29225,26 +29298,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 14;
+                  _context3.next = 15;
                   break;
                 }
 
-                // this.success = "Surcharge Created Successfully";
+                _this3.loading = false; // this.success = "Surcharge Created Successfully";
+
                 swal({
                   title: "Success",
                   text: "Surcharge Created Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 12;
+                _context3.next = 13;
                 return _this3.fetchSurcharges();
 
-              case 12:
-                _context3.next = 15;
+              case 13:
+                _context3.next = 16;
                 break;
 
-              case 14:
+              case 15:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -29256,7 +29332,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 15:
+              case 16:
               case "end":
                 return _context3.stop();
             }
@@ -29319,6 +29395,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 13:
                 if (res.status == 422) {
+                  _this4.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
@@ -29509,7 +29587,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     datatableReset: function datatableReset() {
       setTimeout(function () {
         $("#show_terminal").DataTable();
-      }, 50);
+      }, 300);
     },
     applyMaks: function applyMaks(value) {
       console.log(value, _typeof(value));
@@ -29609,7 +29687,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.cities = cities.data;
                 setTimeout(function () {
                   $("#terminal_table").DataTable();
-                }, 50);
+                }, 300);
 
               case 13:
               case "end":
@@ -29739,6 +29817,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 24:
                 if (res.status === 422) {
+                  _this3.loading = false;
+
                   _loop = function _loop(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this3.errorsArray(element, key);
@@ -29799,7 +29879,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.terminalsDetails = getTerminalRes.data;
                 setTimeout(function () {
                   $("#show_terminal").DataTable();
-                }, 500);
+                }, 300);
 
               case 5:
               case "end":
@@ -29900,11 +29980,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   $("#edit-modal").modal("hide"); // window.location.reload();
                 }, 3000);
-                _context6.next = 23;
+                _context6.next = 22;
                 break;
 
               case 21:
                 if (res.status == 422) {
+                  _this6.loading = false;
+
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
                       _this6.errorsArray(element, key);
@@ -29916,10 +29998,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-                setTimeout(function () {// window.location.reload();
-                }, 2000);
-
-              case 23:
+              case 22:
               case "end":
                 return _context6.stop();
             }
@@ -29965,7 +30044,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.terminalsDetails.splice(obj.index, 1);
         setTimeout(function () {
           $("#show_terminal").DataTable();
-        }, 500);
+        }, 300);
       }
     }
   }
@@ -30794,7 +30873,7 @@ var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_11 = {
-  "class": "modal-footer"
+  "class": "modal-footer bg-whitesmoke br"
 };
 
 var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -34147,7 +34226,7 @@ var _hoisted_19 = {
 };
 var _hoisted_20 = {
   "class": "table table-striped table-hover",
-  id: "edit_dis"
+  id: "bus_class_table"
 };
 
 var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
@@ -36365,7 +36444,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-primary"
   }, " Add New Company ", 8
   /* PROPS */
-  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (company, i) {
+  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.companies, function (company, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
@@ -36905,7 +36984,7 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -37034,7 +37113,7 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -37383,7 +37462,7 @@ var _hoisted_4 = {
   "class": "col-12 col-md-12 col-lg-12"
 };
 var _hoisted_5 = {
-  "class": "card card-success"
+  "class": "card card-primary"
 };
 var _hoisted_6 = {
   "class": "card-header d-flex justify-content-between"
@@ -37451,7 +37530,7 @@ var _hoisted_20 = {
 };
 var _hoisted_21 = {
   "class": "table table-striped table-hover",
-  id: "edit_dis"
+  id: "fare_class_table"
 };
 
 var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
@@ -38104,11 +38183,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
-        "class": "btn btn-primary",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-primary", $data.loading ? 'disabled' : '']),
         onClick: _cache[8] || (_cache[8] = function () {
           return $options.add && $options.add.apply($options, arguments);
         })
-      }, " Save Fare Details ")];
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading... ' : 'Save Fare Details'), 3
+      /* TEXT, CLASS */
+      )];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -40719,7 +40800,7 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -40848,7 +40929,7 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -43044,9 +43125,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/projects/kt/'
 
-var url = '/projects/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
