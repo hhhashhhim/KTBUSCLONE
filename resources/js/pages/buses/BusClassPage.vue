@@ -654,7 +654,8 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
-                this.fareClasses.push(resSaveFareClass.data);
+                return await this.fetchBussClasses();
+
             } else {
                 console.log(resSaveFareClass);
             }
@@ -858,7 +859,7 @@ export default {
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 // swal('Success', 'Bus Class Added Successfully', 'success');
-               swal({
+              swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
                     icon: "success",
@@ -866,7 +867,9 @@ export default {
                 });
                 this.loading = false;
                 await this.fetchBussClasses();
-                this.data = "";
+                this.data = {
+                    busClassColor:"#00000"
+                };
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
             } else {

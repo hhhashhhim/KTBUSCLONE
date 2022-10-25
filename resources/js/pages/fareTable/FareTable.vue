@@ -282,7 +282,8 @@ export default {
 
                 this.msg = 2;
                 this.cities = res.data
-                this.loading = false
+                this.loading =false;
+                
                 setTimeout(() => {
                     this.success = "";
                 }, 3000);

@@ -248,7 +248,7 @@
                 <input
                   type="text"
                   readonly
-                  class="form-control col-md-9"
+                  class="form-control col-md-9 font-weight-bold"
                   id="totalFare"
                   v-model="addForm.totalFare"
                 />
@@ -417,6 +417,7 @@ export default {
         gender: "1",
         customerCNIC: "",
         schedule: 0,
+        totalFare:0,
       },
     };
   },
@@ -472,6 +473,7 @@ export default {
     },
     async fetchScheduleData() {
       this.resetingArrays();
+      this.addForm.totalFare=0;
       this.validationErrors = [];
       if (!this.addForm.schedule)
         return this.errorsArray("Schedule Name is Required", "Schedule");
@@ -520,16 +522,18 @@ export default {
           this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
         }
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
-      } else if (
+      }else if (
         !this.schedule.bus_class.seat_map[row][col].type &&
         this.selectedBookedSeats.length == 0
       ) {
         let index = this.selectedSeats.indexOf(seatNo);
         if (index != -1) {
           this.schedule.bus_class.seat_map[row][col].selected = false;
+          this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
           this.selectedSeats.splice(index, 1);
         } else {
           this.schedule.bus_class.seat_map[row][col].selected = true;
+          this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
           this.selectedSeats.push(seatNo);
         }
         this.addForm.selectedSeats = this.selectedSeats;

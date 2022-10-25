@@ -262,18 +262,42 @@ export default {
             if (res.status === 200) {
                 this.loading = false;
                 this.routeName = "";
-                this.loop = 0;
+                this.loop = 1;
                 this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
-                // this.success = "Route Created Successfully";
                swal({
                     title: "Success",
                     text: "Route Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                this.fetchCities();
+                this.loading = false;
                 setTimeout(() => {
                     // window.location.reload();
                 }, 3000);
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+                        
+                    }
+                }
             }
         },
         async add() {

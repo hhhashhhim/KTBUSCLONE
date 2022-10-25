@@ -57,6 +57,7 @@
                               <th>Name</th>
                               <th>Start Date</th>
                               <th>End Date</th>
+                              <th>Time</th>
                               <th>Fare Class</th>
                               <th>Route</th>
                               <th>Bus Class</th>
@@ -70,6 +71,7 @@
                               <td>{{ schedule.name }}</td>
                               <td>{{ schedule.start_date }}</td>
                               <td>{{ schedule.end_date }}</td>
+                              <td>{{ schedule.time }}</td>
                               <td>
                                 {{
                                   schedule.single_bus_class
@@ -179,7 +181,7 @@
             <div class="col-md-6 class form-group">
               <label for="start">Start Date <span class="text-danger">*</span></label>
               <input
-                type="datetime-local"
+                type="date"
                 id="start"
                 class="form-control"
                 v-model="data.StartDate"
@@ -190,7 +192,7 @@
             <div class="col-md-6 class form-group">
               <label for="end">End Date <span class="text-danger">*</span></label>
               <input
-                type="datetime-local"
+                type="date"
                 id="end"
                 class="form-control"
                 v-model="data.EndDate"
@@ -198,21 +200,8 @@
             </div>
 
             <div class="col-md-6 class form-group">
-              <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
-              <select
-                class="form-control"
-                id="busCLass"
-                v-model="data.busClass"
-              >
-                <option value="0" selected>Select Route Bus CLass</option>
-                <option
-                  v-for="(type, i) in busClasses"
-                  :value="type.id"
-                  :key="i"
-                >
-                  {{ type.name }}
-                </option>
-              </select>
+              <label for="busCLass">Time <span class="text-danger">*</span></label>
+              <input type="time" class="form-control" v-model="data.time">
             </div>
           </div>
           <div class="row">
@@ -233,7 +222,7 @@
           :class="activeSection != 'step1' ? 'd-none' : ''"
         >
           <div class="row">
-            <div class="col-md-12 class form-group">
+            <div class="col-md-6 class form-group">
               <label for="DiscountName">Routes <span class="text-danger">*</span></label>
               <select
                 class="form-control"
@@ -247,6 +236,41 @@
                 <option value="" selected>Select Route</option>
                 <option v-for="(route, i) in routes" :value="route.id" :key="i">
                   {{ route.name }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="col-md-3 class form-group">
+              <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
+              <select
+                class="form-control"
+                id="busCLass"
+                v-model="data.busClass"
+              >
+                <option value="0" selected>Select Route Bus CLass</option>
+                <option
+                  v-for="(type, i) in busClasses"
+                  :value="type.id"
+                  :key="i"
+                >
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3 class form-group">
+              <label for="busCLass">Defaul Fare CLass <span class="text-danger">*</span></label>
+              <select
+                class="form-control"
+                id="busCLass"
+                v-model="data.fareClass"
+              >
+                <option value="0" selected>Select Default Fare CLass</option>
+                <option
+                  v-for="(type, i) in fareClasses"
+                  :value="type.id"
+                  :key="i"
+                >
+                  {{ type.name }}
                 </option>
               </select>
             </div>
@@ -335,7 +359,7 @@
                   :value="surcharge.id"
                   :key="i"
                 >
-                  {{ surcharge.name }} - {{ surcharge.percentage }}%
+                  {{ surcharge.name }} - {{ surcharge.amount }} %
                 </option>
               </select>
             </div>
@@ -352,7 +376,7 @@
                   :value="discount.id"
                   :key="i"
                 >
-                  {{ discount.name }} - {{ discount.percentage }}%
+                  {{ discount.name }} - {{ discount.amount }}%
                 </option>
               </select>
             </div>
@@ -404,10 +428,14 @@
                     <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
                   </tr>
                   <tr>
-                    <th class="mr-3">Fare Class</th>
-                    <td>{{ this.dataPreview.fareClass }}</td>
+                    <th>Time</th>
+                    <td> {{ this.dataPreview.time }} </td>
                     <th class="mr-3">Selected Bus Class</th>
                     <td>{{ this.dataPreview.busClass }}</td>
+                  </tr>
+                  <tr>
+                    <th class="mr-3">Default Bus Fare Class</th>
+                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>
                   </tr>
                   <tr>
                     <th class="mr-3">Route</th>
@@ -798,6 +826,7 @@ export default {
         surcharge: 0,
         discount: 0,
         busClass: 0,
+        fareClass: 0,
         addTerminalsOnClick: [],
       },
       dataEdit: {
@@ -831,15 +860,18 @@ export default {
     },
 
     async getEntireForm() {
+      console.log(this.data);
       const resEntire = await this.callApi(
         "post",
         "schedule/getEntire",
         this.data
       );
+      
       this.dataPreview = resEntire.data;
       this.dataPreview.start_date = this.data.StartDate;
       this.dataPreview.end_date = this.data.EndDate;
       this.dataPreview.Name = this.data.name;
+      this.dataPreview.time = this.data.time
     },
 
     tConvert: function (time) {

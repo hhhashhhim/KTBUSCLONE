@@ -89,12 +89,46 @@ class CityController extends Controller
 
     public function cityRoutes(Request $request)
     {
+        $request->validate([
+            'route'=>'required',
+            'cities'=>'required',
+        ],[
+            'route.required'=>'Route Name is Required !!!!'
+        ]);
+        if ( count( $request->cities ) < 2 ) {
+            return response()->json([
+                "errors"=>[
+                    "Cities Error"=>["Please Select At leat 2 Cities !!!"]
+                ]
+            ],422);
+        }
+        foreach ($request['cities'] as $index => $city) {
+            $used_cities[] = $city;
+            foreach ($request['cities'] as $innerIndex => $innerCity) {
+                if (in_array($innerCity, $used_cities)) {
+                    continue;
+                } else {
+                    $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+                    $fareClasses = FareClass::where('company_id',$this->company_id)->count();
+                    //   echo $fare->count()."==";
+                    //   echo $fareClasses."<br>";
+                    //   echo "<br>line end";
+                    
+                    if ( $fareClasses==0 || $fare->count() < $fareClasses) {
+                        return response()->json([
+                            "errors"=>[
+                                "Fare Error"=>["Please Fill the Fare Table Completelly First ( For All Fare Classes ) !!!"]
+                            ]
+                        ],422);
+                    }
+                }
+            }
+        }
         $route = Route::create([
             'name' => $request['route'],
             'company_id' => $this->company_id,
             'added_by' => auth()->user()->id
         ]);
-
         $used_cities = [];//key can't be same
         foreach ($request['cities'] as $index => $city) {
             $used_cities[] = $city;
@@ -103,6 +137,7 @@ class CityController extends Controller
                     continue;
                 } else {
                     $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+
                     if ($fare->count() > 0) {
                         foreach ($fare as $detail) {
                             RouteFare::create([

@@ -298,6 +298,10 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
+                this.loading = false
+                this.data = {
+                    FareClassColor : "#000000",
+                };
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);
 
