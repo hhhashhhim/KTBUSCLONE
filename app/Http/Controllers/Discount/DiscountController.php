@@ -29,7 +29,7 @@ class DiscountController extends Controller
     {
 //        dd($request->all());
         $rules = [
-            'name' => ['required', Rule::unique('discounts', 'name')->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('discounts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 //            'percentage' => 'required|numeric|min:0|max:100',
         ];
 

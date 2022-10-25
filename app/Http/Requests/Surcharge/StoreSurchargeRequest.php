@@ -25,7 +25,7 @@ class StoreSurchargeRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name' => ['required', Rule::unique('schedules', 'name')->whereNull('deleted_at')],
+                'name' => ['required', Rule::unique('schedules', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
         ];
         if ($this->request->get('type') == "percentage"){
             $rules['amount'] = 'required | numeric | min:0 | max:100 ';
