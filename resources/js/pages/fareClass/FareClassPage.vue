@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Fare Class</h4>
                             <div class="card-header-action">
@@ -46,10 +46,7 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
-                                                >
+                                                <table class="table table-striped table-hover" id="fare_class_table" >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -248,6 +245,10 @@ export default {
             if (res.status === 200) {
                 this.fareClasses = res.data
             }
+            setTimeout(function(){
+                $("#fare_class_table").DataTable();
+            }, 300);
+
         },
 
         isAlphabet: function (evet) {

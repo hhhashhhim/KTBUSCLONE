@@ -43,10 +43,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
-                                                >
+                                                <table class="table table-striped table-hover" id="bus_class_table" >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -588,7 +585,7 @@ export default {
                 seatMap: [],
                 isActive: 1,
                 BusClassName: "",
-                BusClassColor: "#00000",
+                BusClassColor: "#000000",
             },
             dataEdit: {
                 BusClassName: "",
@@ -623,6 +620,9 @@ export default {
             } else {
                 console.log(res);
             }
+            setTimeout(function(){
+                $("#bus_class_table").DataTable();
+            }, 300);
         },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
@@ -757,10 +757,20 @@ export default {
             this.validationErrors = [];
             let vm = this;
             console.log(vm.data.noOfRows, vm.data.noOfCols)
-            if ( vm.data.noOfRows == "")
-                swal('Required', 'No of Rows Field is Required!', 'error')
-            if ( vm.data.noOfCols == "" )
-                swal('Required', 'No of Cols Field is Required!', 'error')
+            if (typeof vm.data.noOfRows == 'undefined')
+                return swal({
+                    title: "required",
+                    text: "No of Rows Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if ( typeof vm.data.noOfCols == 'undefined' )
+                return swal({
+                    title: "required",
+                    text: "No of Cols is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (vm.data.noOfRows <= 15) {
                 if (vm.data.noOfCols <= 7) {
                     let arr,
@@ -781,7 +791,6 @@ export default {
                     this.isShowDiv = true;
                     return (this.data.seatMap = map);
                 } else {
-                    // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
                   return swal({
                         title: "Limited",
                         text: "No of Cols must be less then or equal to 7",
@@ -790,7 +799,6 @@ export default {
                     });
                 }
             } else {
-                // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
               return swal({
                     title: "Limited",
                     text: "No of Rows must be less then or equal to 15",
@@ -803,7 +811,6 @@ export default {
             this.isShowEditDiv = true;
         },
 
-        // async
         checkBox: function (e) {
             if (e.target.checked) {
                 this.data.isActive = 1;
@@ -839,16 +846,14 @@ export default {
                     icon: "error",
                    timer: 2000
                 });
-            if (this.data.noOfRows === "0")
-                // swal('Required', 'Row Field is Required', 'error')
+            if (typeof this.data.noOfRows == 'undefined')
               return swal({
                     title: "Required ",
                     text: "Row Field is Required",
                     icon: "error",
                    timer: 2000
                 });
-            if (this.data.noOfCols === "0")
-                // swal('Required', 'Col Field is Required', 'error')
+            if (typeof this.data.noOfCols == 'undefined')
               return swal({
                     title: "Required",
                     text: "Col Field is required",
@@ -856,9 +861,9 @@ export default {
                    timer: 2000
                 });
             this.loading = true;
+            console.log(this.data);
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
-                // swal('Success', 'Bus Class Added Successfully', 'success');
               swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
@@ -868,7 +873,7 @@ export default {
                 this.loading = false;
                 await this.fetchBussClasses();
                 this.data = {
-                    busClassColor:"#00000"
+                    busClassColor:"#000000"
                 };
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);

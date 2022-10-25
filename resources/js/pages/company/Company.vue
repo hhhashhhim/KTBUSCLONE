@@ -40,7 +40,7 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr v-for="(company, i) in cities" :key="i">
+                                                        <tr v-for="(company, i) in companies" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td>{{ company.name }}</td>
                                                             <td>{{ phoneFormat(company.contact) }}</td>
@@ -487,7 +487,7 @@ export default {
                 modules: [],
             },
             success: false,
-            cities: [],
+            companies: [],
         };
     },
     async created() {
@@ -498,10 +498,10 @@ export default {
             this.data.modules = this.dataEdit.modules = this.defaultModules;
             const companyRes = await this.callApi("post", "company");
             if (companyRes.status == 200) {
-                this.cities = companyRes.data;
+                this.companies = companyRes.data;
                 setTimeout(() => {
                     $("#company_table").DataTable();
-                }, 50);
+                }, 300);
             }
         },
         phoneFormat: function (string) {
@@ -525,7 +525,7 @@ export default {
                 return this.errorsArray("Company Email is Required", "Email");
             if (this.data.password == "")
                 return this.errorsArray("Company password is Required", "Contact");
-            this.loading = true
+            this.loading = true;
 
             let logo = "";
             if (this.data.logo) {
@@ -536,7 +536,7 @@ export default {
             if (res.status == 201) {
                 this.loading = false
                 this.success = "Company Created Successfully";
-                this.cities.unshift(res.data);
+                // this.companies.unshift(res.data);
                 this.fetchCompany();
                 this.data.name = this.data.contact = this.data.location = "";
                 this.data.modules = this.defaultModules;
@@ -601,7 +601,7 @@ export default {
                 this.success = "Company Updated Successfully";
                 const companyRes = await this.callApi("post", "company");
                 if (companyRes.status == 200) {
-                    this.cities = companyRes.data;
+                    this.companies = companyRes.data;
                 }
                 this.dataEdit.name = "";
                 this.modules = [
@@ -668,7 +668,7 @@ export default {
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.cities.splice(obj.index, 1);
+                this.companies.splice(obj.index, 1);
             }
         },
     },

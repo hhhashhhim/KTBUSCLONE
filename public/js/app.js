@@ -24605,7 +24605,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         seatMap: [],
         isActive: 1,
         BusClassName: "",
-        BusClassColor: "#00000"
+        BusClassColor: "#000000"
       },
       dataEdit: {
         BusClassName: "",
@@ -24676,7 +24676,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(res);
                 }
 
-              case 8:
+                setTimeout(function () {
+                  $("#bus_class_table").DataTable();
+                }, 300);
+
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -24837,8 +24841,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.validationErrors = [];
       var vm = this;
       console.log(vm.data.noOfRows, vm.data.noOfCols);
-      if (vm.data.noOfRows == "") swal('Required', 'No of Rows Field is Required!', 'error');
-      if (vm.data.noOfCols == "") swal('Required', 'No of Cols Field is Required!', 'error');
+      if (typeof vm.data.noOfRows == 'undefined') return swal({
+        title: "required",
+        text: "No of Rows Field is Required",
+        icon: "error",
+        timer: 2000
+      });
+      if (typeof vm.data.noOfCols == 'undefined') return swal({
+        title: "required",
+        text: "No of Cols is Required",
+        icon: "error",
+        timer: 2000
+      });
 
       if (vm.data.noOfRows <= 15) {
         if (vm.data.noOfCols <= 7) {
@@ -24862,7 +24876,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           this.isShowDiv = true;
           return this.data.seatMap = map;
         } else {
-          // swal('Limited', 'No of Cols must be less then or equal to 7', 'error')
           return swal({
             title: "Limited",
             text: "No of Cols must be less then or equal to 7",
@@ -24871,7 +24884,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           });
         }
       } else {
-        // swal('Limited', 'No of Rows must be less then or equal to 15', 'error')
         return swal({
           title: "Limited",
           text: "No of Rows must be less then or equal to 15",
@@ -24883,7 +24895,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     editGenerateMap: function editGenerateMap() {
       this.isShowEditDiv = true;
     },
-    // async
     checkBox: function checkBox(e) {
       if (e.target.checked) {
         this.data.isActive = 1;
@@ -24933,7 +24944,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this4.data.noOfRows === "0")) {
+                if (!(typeof _this4.data.noOfRows == 'undefined')) {
                   _context4.next = 7;
                   break;
                 }
@@ -24946,7 +24957,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this4.data.noOfCols === "0")) {
+                if (!(typeof _this4.data.noOfCols == 'undefined')) {
                   _context4.next = 9;
                   break;
                 }
@@ -24960,18 +24971,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
                 _this4.loading = true;
-                _context4.next = 12;
+                console.log(_this4.data);
+                _context4.next = 13;
                 return _this4.callApi("post", "bus_classes/store", _this4.data);
 
-              case 12:
+              case 13:
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 23;
+                  _context4.next = 24;
                   break;
                 }
 
-                // swal('Success', 'Bus Class Added Successfully', 'success');
                 swal({
                   title: "Success",
                   text: "Bus Class Added Successfully",
@@ -24979,19 +24990,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 18;
+                _context4.next = 19;
                 return _this4.fetchBussClasses();
 
-              case 18:
+              case 19:
                 _this4.data = {
-                  busClassColor: "#00000"
+                  busClassColor: "#000000"
                 };
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 24;
+                _context4.next = 25;
                 break;
 
-              case 23:
+              case 24:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -25006,7 +25017,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 24:
+              case 25:
               case "end":
                 return _context4.stop();
             }
@@ -25700,8 +25711,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 setTimeout(function () {
                   $("#city_table").DataTable();
-                }, 50); //Time before execution
-                //Time before execution
+                }, 300);
 
               case 5:
               case "end":
@@ -25743,46 +25753,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 6:
                 res = _context3.sent;
 
-                if (res.status == 200) {
-                  // this.success="City Created Successfully Named as " + res.data.name;
-                  swal({
-                    title: "Success",
-                    text: "City Created Succesfuly Named as  " + res.data.name,
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this3.loading = false; // swal('Success', 'City Added Successfully', 'success');
-                  // await this.fetchCities();
-                  // this.cities.unshift(res.data);
-
-                  _this3.cities.push(res.data);
-
-                  _this3.data.name = "";
-                  setTimeout(function () {
-                    this.success = "";
-                    this.data = "";
-                  }, 300);
-                } else {
-                  if (res.status == 422) {
-                    _this3.loading = false;
-
-                    _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this3.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
-                  }
-
-                  setTimeout(function () {
-                    this.loading = false;
-                  }, 2000);
+                if (!(res.status == 200)) {
+                  _context3.next = 16;
+                  break;
                 }
 
-              case 8:
+                // this.success="City Created Successfully Named as " + res.data.name;
+                swal({
+                  title: "Success",
+                  text: "City Created Succesfuly Named as  " + res.data.name,
+                  icon: "success",
+                  timer: 2000
+                });
+                _this3.loading = false;
+                _context3.next = 12;
+                return _this3.fetchCities();
+
+              case 12:
+                _this3.data.name = "";
+                setTimeout(function () {
+                  this.success = "";
+                  this.data = "";
+                }, 300);
+                _context3.next = 17;
+                break;
+
+              case 16:
+                if (res.status == 422) {
+                  _this3.loading = false;
+
+                  _loop = function _loop(key) {
+                    res.data.errors[key].forEach(function (element) {
+                      _this3.errorsArray(element, key);
+                    });
+                  };
+
+                  for (key in res.data.errors) {
+                    _loop(key);
+                  }
+                }
+
+              case 17:
               case "end":
                 return _context3.stop();
             }
@@ -25827,11 +25838,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 16;
+                  _context4.next = 15;
                   break;
                 }
 
-                // swal('Success', 'City Updated Successfully', 'success');
                 swal({
                   title: "Success",
                   text: "City updated Successfully",
@@ -25843,15 +25853,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this4.fetchCities();
 
               case 12:
-                _this4.dataEdit.name = _this4.dataEdit.company_id = "";
                 setTimeout(function () {
                   _this4.success = "";
                   $('#edit-modal').modal('hide');
                 }, 3000);
-                _context4.next = 18;
+                _context4.next = 17;
                 break;
 
-              case 16:
+              case 15:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -25870,7 +25879,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.loading = false;
                 }, 3000);
 
-              case 18:
+              case 17:
               case "end":
                 return _context4.stop();
             }
@@ -26041,7 +26050,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         modules: []
       },
       success: false,
-      cities: []
+      companies: []
     };
   },
   created: function created() {
@@ -26081,10 +26090,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 companyRes = _context2.sent;
 
                 if (companyRes.status == 200) {
-                  _this2.cities = companyRes.data;
+                  _this2.companies = companyRes.data;
                   setTimeout(function () {
                     $("#company_table").DataTable();
-                  }, 50);
+                  }, 300);
                 }
 
               case 5:
@@ -26183,9 +26192,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status == 201) {
                   _this3.loading = false;
-                  _this3.success = "Company Created Successfully";
-
-                  _this3.cities.unshift(res.data);
+                  _this3.success = "Company Created Successfully"; // this.companies.unshift(res.data);
 
                   _this3.fetchCompany();
 
@@ -26330,7 +26337,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 companyRes = _context5.sent;
 
                 if (companyRes.status == 200) {
-                  _this5.cities = companyRes.data;
+                  _this5.companies = companyRes.data;
                 }
 
                 _this5.dataEdit.name = "";
@@ -26445,7 +26452,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
-        this.cities.splice(obj.index, 1);
+        this.companies.splice(obj.index, 1);
       }
     }
   }
@@ -26951,7 +26958,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this2.fareClasses = res.data;
                 }
 
-              case 4:
+                setTimeout(function () {
+                  $("#fare_class_table").DataTable();
+                }, 300);
+
+              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -29571,7 +29582,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     datatableReset: function datatableReset() {
       setTimeout(function () {
         $("#show_terminal").DataTable();
-      }, 50);
+      }, 300);
     },
     applyMaks: function applyMaks(value) {
       console.log(value, _typeof(value));
@@ -29671,7 +29682,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.cities = cities.data;
                 setTimeout(function () {
                   $("#terminal_table").DataTable();
-                }, 50);
+                }, 300);
 
               case 13:
               case "end":
@@ -29863,7 +29874,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.terminalsDetails = getTerminalRes.data;
                 setTimeout(function () {
                   $("#show_terminal").DataTable();
-                }, 500);
+                }, 300);
 
               case 5:
               case "end":
@@ -30028,7 +30039,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.terminalsDetails.splice(obj.index, 1);
         setTimeout(function () {
           $("#show_terminal").DataTable();
-        }, 500);
+        }, 300);
       }
     }
   }
@@ -30857,7 +30868,7 @@ var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_11 = {
-  "class": "modal-footer"
+  "class": "modal-footer bg-whitesmoke br"
 };
 
 var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -31278,7 +31289,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["class"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                <li class=\"dropdown\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <a href=\"#\" class=\"menu-toggle nav-link has-dropdown\"><i class=\"fa fa-user-shield\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            Admin"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <ul class=\"dropdown-menu\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <a href=\"/admin/dashboard\" class=\"nav-link\"><i class=\"fa fa-desktop\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    Dashboard"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            &lt;!&ndash; <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'admin-dashboard' }\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <i class=\"fa fa-desktop\"></i> Dashboard"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </router-link> &ndash;&gt;"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <li class=\"dropdown\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'company' }\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <i class=\"fa fa-building\"></i> Company"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </router-link>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </ul>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <li class=\"dropdown\" v-for=\"(permission,i) in $store.state.permissions\" :key=\"i\">\n                    <router-link class=\"nav-link text-capitalize\" :to=\"{ name:permission.name }\" v-if=\"permission.read==true\">\n                        <i :class=\"'fa '+iconsClass[permission.name]\"></i>{{ permission.name }}\n                    </router-link>\n                </li> ")])])]);
+  , ["class"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                <li class=\"dropdown\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <a href=\"#\" class=\"menu-toggle nav-link has-dropdown\"><i class=\"fa fa-user-shield\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            Admin"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <ul class=\"dropdown-menu\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <a href=\"/admin/dashboard\" class=\"nav-link\"><i class=\"fa fa-desktop\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    Dashboard"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            &lt;!&ndash; <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'admin-dashboard' }\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <i class=\"fa fa-desktop\"></i> Dashboard"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </router-link> &ndash;&gt;"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <li class=\"dropdown\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'company' }\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <i class=\"fa fa-building\"></i> Company"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </router-link>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </ul>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                </li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <li class=\"dropdown\" v-for=\"(permission,i) in $store.state.permissions\" :key=\"i\">\r\n                    <router-link class=\"nav-link text-capitalize\" :to=\"{ name:permission.name }\" v-if=\"permission.read==true\">\r\n                        <i :class=\"'fa '+iconsClass[permission.name]\"></i>{{ permission.name }}\r\n                    </router-link>\r\n                </li> ")])])]);
 }
 
 /***/ }),
@@ -34214,7 +34225,7 @@ var _hoisted_19 = {
 };
 var _hoisted_20 = {
   "class": "table table-striped table-hover",
-  id: "edit_dis"
+  id: "bus_class_table"
 };
 
 var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
@@ -36432,7 +36443,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-primary"
   }, " Add New Company ", 8
   /* PROPS */
-  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (company, i) {
+  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.companies, function (company, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
@@ -36972,7 +36983,7 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -37101,7 +37112,7 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -37450,7 +37461,7 @@ var _hoisted_4 = {
   "class": "col-12 col-md-12 col-lg-12"
 };
 var _hoisted_5 = {
-  "class": "card card-success"
+  "class": "card card-primary"
 };
 var _hoisted_6 = {
   "class": "card-header d-flex justify-content-between"
@@ -37518,7 +37529,7 @@ var _hoisted_20 = {
 };
 var _hoisted_21 = {
   "class": "table table-striped table-hover",
-  id: "edit_dis"
+  id: "fare_class_table"
 };
 
 var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
@@ -40788,7 +40799,7 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -40917,7 +40928,7 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
     "class": "text-danger"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
-  }, "max: 1 Lakh")], -1
+  }, "max: 10K")], -1
   /* HOISTED */
   );
 });
@@ -48623,7 +48634,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-0a8ddc11] {\r\n    background-color: yellow;\n}\n.seat-img img[data-v-0a8ddc11],\r\n.seat-img span[data-v-0a8ddc11] {\r\n    height: 40px;\r\n    width: 40px;\r\n    display: inline-block;\r\n    cursor: pointer;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-0a8ddc11] {\n    background-color: yellow;\n}\n.seat-img img[data-v-0a8ddc11],\n.seat-img span[data-v-0a8ddc11] {\n    height: 40px;\n    width: 40px;\n    display: inline-block;\n    cursor: pointer;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48695,7 +48706,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\r\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\r\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\r\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\r\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\r\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\r\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\r\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\r\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\r\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\r\n.seat-img span[data-v-b6676e8a] {\r\n    height: 40px;\r\n    width: 40px;\r\n    display: inline-block;\r\n    cursor: pointer;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\n.seat-img span[data-v-b6676e8a] {\n    height: 40px;\n    width: 40px;\n    display: inline-block;\n    cursor: pointer;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48743,7 +48754,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\ntable *[data-v-66b5e4b9] {\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\n.fade-leave-active[data-v-66b5e4b9] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\r\ntable *[data-v-66b5e4b9] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\r\n.fade-leave-active[data-v-66b5e4b9] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48767,7 +48778,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-16ba31c5] {\n  background-color: yellow !important;\n}\n.booked_Seat[data-v-16ba31c5] {\n  background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-16ba31c5] {\n  background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-16ba31c5] {\n  background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-16ba31c5] {\n  background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-16ba31c5] {\n  background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-16ba31c5] {\n  background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-16ba31c5] {\n  background-color: rgb(131, 163, 199) !important;\n}\n.seat-img img[data-v-16ba31c5],\n.seat-img span[data-v-16ba31c5] {\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-16ba31c5] {\r\n  background-color: yellow !important;\n}\n.booked_Seat[data-v-16ba31c5] {\r\n  background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-16ba31c5] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-16ba31c5] {\r\n  background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-16ba31c5] {\r\n  background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-16ba31c5] {\r\n  background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-16ba31c5] {\r\n  background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-16ba31c5] {\r\n  background-color: rgb(131, 163, 199) !important;\n}\n.seat-img img[data-v-16ba31c5],\r\n.seat-img span[data-v-16ba31c5] {\r\n  height: 40px;\r\n  width: 40px;\r\n  display: inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

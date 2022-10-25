@@ -25,7 +25,7 @@
                     <slot></slot>
 
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer bg-whitesmoke br">
                     <slot name="button"></slot>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>

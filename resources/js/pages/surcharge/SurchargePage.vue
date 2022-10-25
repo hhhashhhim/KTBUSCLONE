@@ -124,7 +124,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span class="text-muted">max: 1 Lakh</span> </label>
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span class="text-muted">max: 10K</span> </label>
 <!--                        <div class="input-group">-->
                             <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat" placeholder="Enter Flat Amount"
                                    @keypress="isNumber($event)">
@@ -189,7 +189,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 1 Lakh</span></label>
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 10K</span></label>
                         <!--                        <div class="input-group">-->
                         <input type="text" class="form-control" maxlength="5" v-model="dataEdit.amount" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">

@@ -143,19 +143,16 @@ export default {
         },
         async fetchCities() {
             const resCity = await this.callApi("post",'cities');
-            if (resCity.status==200) {
-                this.cities=resCity.data
+            if (resCity.status == 200) {
+                this.cities=resCity.data;
             }
             setTimeout(function(){
                 $("#city_table").DataTable();
-            }, 50); //Time before execution
-             //Time before execution
+            }, 300);
         },
         async add(){
             this.validationErrors = []
             if(this.data.name == "")
-                // return this.errorsArray("City Name is Required","Name");
-            // swal('Required','City Name is Required','error')
               return swal({
                     title: "Required",
                     text: "City Name is required",
@@ -174,10 +171,7 @@ export default {
                 });
 
                 this.loading = false;
-                // swal('Success', 'City Added Successfully', 'success');
-                // await this.fetchCities();
-                // this.cities.unshift(res.data);
-                this.cities.push(res.data);
+                await  this.fetchCities();
                 this.data.name = "";
                 setTimeout(function(){
                     this.success = "";
@@ -193,9 +187,6 @@ export default {
                         });
                     }
                 }
-                setTimeout(function () {
-                  this.loading = false
-                }, 2000);
             }
         },
         edit( city ){
@@ -205,8 +196,6 @@ export default {
         async update(){
             this.validationErrors=[]
             if(this.dataEdit.name=="")
-                // return this.errorsArray("City Name is Required","Name");
-                // swal('Required','City Name is Required','error')
               return swal({
                     title: "Required",
                     text: "city Name is required ",
@@ -216,7 +205,6 @@ export default {
             this.loading = true;
             const resEdit = await this.callApi("post",'cities/update', this.dataEdit);
             if (resEdit.status==200) {
-                // swal('Success', 'City Updated Successfully', 'success');
                swal({
                     title: "Success",
                     text: "City updated Successfully",
@@ -225,7 +213,6 @@ export default {
                 });
                 this.loading = false;
                 await this.fetchCities();
-                this.dataEdit.name = this.dataEdit.company_id ="";
                 setTimeout(() => {
                     this.success=""
                     $('#edit-modal').modal('hide')

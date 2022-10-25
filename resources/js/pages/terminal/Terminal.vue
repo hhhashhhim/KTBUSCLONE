@@ -576,7 +576,7 @@ export default {
         datatableReset : function () {
             setTimeout(() => {
                 $("#show_terminal").DataTable();
-            }, 50);
+            }, 300);
         },
         applyMaks: function (value) {
             console.log(value, typeof value);
@@ -647,7 +647,7 @@ export default {
             this.cities = cities.data;
             setTimeout(() => {
                 $("#terminal_table").DataTable();
-            }, 50);
+            }, 300);
         },
 
         phoneFormat: function phoneFormat(string) {
@@ -747,7 +747,7 @@ export default {
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
-            }, 500);
+            }, 300);
         },
         async update() {
             this.validationErrors = [];
@@ -833,7 +833,7 @@ export default {
                 this.terminalsDetails.splice(obj.index, 1);
                 setTimeout(() => {
                     $("#show_terminal").DataTable();
-                }, 500);
+                }, 300);
             }
         },
     },
