@@ -109,8 +109,8 @@
           <input type="date" class="form-control" v-model="addForm.date"  @change="fetchSpecificSchedules()"/>
         </div>
           <div class="col-md-5 class form-group">
-              <label for="schedulename">Schedule Name <span class="text-danger">*</span></label>
-              <select class="form-control" id="schedulename" v-model="addForm.schedule">
+              <label for="scheduleName">Schedule Name <span class="text-danger">*</span></label>
+              <select class="form-control" id="scheduleName" v-model="addForm.schedule" @change="resetSelectBooking($event)">
                   <option value="0" selected>Select Schedule</option>
                   <option
                       v-for="(schedule, i) in allSchedules"
@@ -127,10 +127,7 @@
             {{getSchedule ? 'Fetching Schedules...' : 'Get Record' }}
           </button>
         </div>
-        <div
-          class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-          v-if="selectedBookedSeats.length"
-        >
+        <div class="col-md-6 d-flex justify-content-center mx-auto mb-3" v-if="selectedBookedSeats.length" >
           <a
             href="#reschedule-modal"
             class="btn btn-primary mx-1"
@@ -456,6 +453,13 @@ export default {
   },
 
   methods: {
+      resetSelectBooking(evt){
+        if(evt.target.value == '0'){
+            this.showBookingDiv = false;
+        }  else{
+            this.showBookingDiv = true;
+        }
+      },
       tConvert:function(time) {
           time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
 
@@ -516,12 +520,37 @@ export default {
     },
     async fetchScheduleData() {
       this.resetingArrays();
-      this.addForm.totalFare=0;
+      this.addForm.totalFare = 0;
       this.validationErrors = [];
-      if (!this.addForm.schedule)
-        return this.errorsArray("Schedule Name is Required", "Schedule");
-      if (!this.addForm.date)
-        return this.errorsArray("Date is Required", "Date");
+
+      if (this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined')
+          return swal({
+              title: "Required",
+              text: "Please any Departure City",
+              icon: "error",
+              timer: 2000
+          });
+          if (this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined')
+          return swal({
+              title: "Required",
+              text: "Please Select Destination City",
+              icon: "error",
+              timer: 2000
+          });
+      if (this.addForm.date == "" || typeof this.addForm.date == 'undefined')
+        return swal({
+              title: "Required",
+              text: "Date is Required",
+              icon: "error",
+              timer: 2000
+          });
+        if (this.addForm.schedule == 0 || typeof this.addForm.schedule == 'undefined')
+            return swal({
+                title: "Required",
+                text: "Please Select any Schedule",
+                icon: "error",
+                timer: 2000
+            });
       this.validationErrors = [];
 
       this.loading = true
@@ -544,7 +573,13 @@ export default {
         !this.schedule.bus_class.seat_map[row][col].type
       ) {
         this.doScroll();
-        return this.errorsArray("Please Select Already Booked Seat", "Oops");
+        // return this.errorsArray("Please Select Already Booked Seat", "Oops");
+          return swal({
+              title: "Ops",
+              text: "Please Select Already Booked Seat",
+              icon: "error",
+              timer: 2000
+          });
       }
       if (
         this.schedule.bus_class.seat_map[row][col].type &&
@@ -583,7 +618,13 @@ export default {
       } else {
         this.fetchScheduleData();
         this.resetingArrays();
-        return this.errorsArray("Invalid Seat Combination", "Oops");
+        // return this.errorsArray("Invalid Seat Combination", "Oops");
+          return swal({
+              title: "Oops",
+              text: "Invalid Seat Combination",
+              icon: "error",
+              timer: 2000
+          });
       }
 
       // setTimeout(() => {

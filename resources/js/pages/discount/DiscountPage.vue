@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Discount</h4>
                             <div class="card-header-action">
@@ -54,7 +54,8 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
-                                                        <th>Quota</th>
+                                                        <th>Percentage</th>
+                                                        <th>Flat Amount</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -64,7 +65,10 @@
                                                     <tr v-for="(discount, i) in discounts" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ discount.name }}</td>
-                                                        <td>{{ discount.amount }}{{discount.type == 'percentage' ? '%' : ''}}</td>
+                                                        <td v-if="discount.percentage">{{ discount.percentage }}{{discount.type == 'percentage' ? '%' : ''}}</td>
+                                                        <td v-else>N/A</td>
+                                                        <td v-if="discount.flat">{{ discount.flat }}</td>
+                                                        <td v-else>N/A</td>
                                                         <td>{{ discount.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ discount.added_by.name }}</td>
                                                         <td>
@@ -190,7 +194,7 @@
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
                         <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.amount" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage" placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -199,26 +203,9 @@
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
                         <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 10K</span></label>
-                        <!--                        <div class="input-group">-->
-                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.amount" placeholder="Enter Flat Amount"
+                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
-                        <!--                            <div class="input-group-append">-->
-                        <!--                                <span class="input-group-text">%</span>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
                     </div>
-<!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="PercentageName">Percentage <span class="text-danger">*</span></label>-->
-<!--                        <div class="input-group">-->
-<!--                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"-->
-<!--                                   @keypress="isNumber($event); numberRange($event)">-->
-<!--                            <div class="input-group-append">-->
-<!--                                <span class="input-group-text">%</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -285,7 +272,9 @@ export default {
                 id: "",
                 name: "",
                 percentage: "",
+                flat: "",
                 is_Active: "",
+                discountPercentageRadio: "",
             },
         };
     },
@@ -334,8 +323,12 @@ export default {
         },
         clearForm:function(){
             this.DiscountName = '';
-            this.PercentageName = '';
+            this.DiscountPercentage = '';
+            this.DiscountFlat = '';
+            this.discountPercentageRadio = "percentage";
             this.isActive = 1;
+            this.showDiscountDivPercentage = true;
+            this.showDiscountDivFlat = false;
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
@@ -364,25 +357,39 @@ export default {
 
         async addDiscount() {
             this.validationErrors = [];
-            if (this.DiscountName === "")
+            if (this.DiscountName == "")
            return swal({
                 title: "Required!",
                 text: "Name Field is Required",
                 icon: "error",
                 timer: 2000
             });
-            // if (this.PercentageName === "")
-            //     swal({
-            //         title: "Required!",
-            //         text: "Percentage Field is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-                this.loading = true;
+            if(this.discountPercentageRadio == "percentage"){
+                if(this.DiscountPercentage == "" || typeof   this.DiscountPercentage == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Percentage Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            if(this.discountPercentageRadio == "flat"){
+                if(this.DiscountFlat == "" || typeof   this.DiscountFlat == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Flat Amount Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            this.loading = true;
             const data = {
                 name: this.DiscountName,
                 type: this.discountPercentageRadio,
-                amount: this.discountPercentageRadio == "percentage" ? this.DiscountPercentage : this.DiscountFlat,
+                percentage: this.DiscountPercentage,
+                flat: this.DiscountFlat,
                 active: this.isActive,
             }
 
@@ -411,6 +418,7 @@ export default {
         },
 
         async updateDiscount() {
+
             this.validationErrors = [];
             if (this.dataEdit.name === "")
                 // return this.errorsArray("Name is Required", "DiscountName");
@@ -420,20 +428,30 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (this.dataEdit.percentage === "")
-            //     // return this.errorsArray("Percentage is Required", "PercentageName");
-            //     swal({
-            //         title: "Required!",
-            //         text: "Percentage Field is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
+            if(this.dataEdit.discountPercentageRadio == "percentage"){
+                if(this.dataEdit.percentage == "" || typeof this.dataEdit.percentage == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Percentage Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            if(this.dataEdit.discountPercentageRadio == "flat"){
+                if(this.dataEdit.flat == "" || typeof this.dataEdit.flat == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Flat Amount Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
                 this.loading = true;
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200) {
                 this.loading = false;
-
-                // this.success = "Discount Updated Successfully";
                 swal({
                     title: "Success!",
                     text: "Discount Updated Successfully",
@@ -468,8 +486,6 @@ export default {
 
         edit(dis) {
             this.dataEdit = dis;
-
-
         },
     },
     computed: {

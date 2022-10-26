@@ -27,7 +27,6 @@ class DiscountController extends Controller
 
     public function storeDiscount(Request $request)
     {
-//        dd($request->all());
         $rules = [
             'name' => ['required', Rule::unique('discounts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 //            'percentage' => 'required|numeric|min:0|max:100',
@@ -44,7 +43,8 @@ class DiscountController extends Controller
         $discount = Discount::create([
             'name' => $request->name,
             'type' => $request->type,
-            'amount' => $request->amount,
+            'percentage' => $request->type == "percentage" ?  $request->percentage : null,
+            'flat' => $request->type == "flat" ? $request->flat : null,
             'company_id' => $this->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
@@ -54,6 +54,7 @@ class DiscountController extends Controller
 
     public function updateDiscount(Request $request)
     {
+        dd($request->all());
         $rules = [
             'name' => 'required',
 //            'percentage' => 'required|numeric|min:0|max:100',
@@ -69,7 +70,8 @@ class DiscountController extends Controller
         return Discount::where('id', $request->id)->update([
             'name' => $request->name,
             'type' => $request->type,
-            'amount' => $request->amount,
+            'percentage' => $request->type == "percentage" ? $request->percentage: null,
+            'flat' => $request->type == "flat" ? $request->flat: null,
             'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
             'updated_by' => Auth::user()->id,
         ]);

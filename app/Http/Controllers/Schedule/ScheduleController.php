@@ -200,11 +200,11 @@ class ScheduleController extends Controller
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
         ->select('id', 'fare_class_id','route_id','bus_class_id')
-        ->with('bus_class:id,seat_map','singleRoute:id,name','singleRoute.fares:id,route_id,departure_city_id,destination_city_id')->first();
+        ->with('bus_class:id,seat_map','route:id,name','route.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
         // Fare Fetching About the Schedule
-        $departure_city_id = $schedule->singleRoute->fares->first()->departure_city_id;
-        $destination_city_id = $schedule->singleRoute->fares->last()->destination_city_id;
+        $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+        $destination_city_id = $schedule->route->fares->last()->destination_city_id;
         $fareForAllClasses =FareTable::where('from_city_id',$departure_city_id)->where('to_city_id',$destination_city_id)
         ->where('company_id',$this->company_id)
         ->get();
@@ -240,7 +240,7 @@ class ScheduleController extends Controller
             }
         }
         $schedule->bus_class->seat_map = $seatMap;
-        unset($schedule->singleRoute);
+        unset($schedule->route);
         return $schedule;
 
 
@@ -250,7 +250,7 @@ class ScheduleController extends Controller
         // $schedule = Schedule::where('id', $request->id)
         // ->where('company_id',$this->company_id)
         // ->select('id', 'fare_class_id')
-        // ->with('bus_class:id,seat_map','singleRoute')->first();
+        // ->with('bus_class:id,seat_map','route')->first();
         // $seatMap = $schedule->bus_class->seat_map;
         // $fareClasses = FareClass::get();
         // for ($i = 0; $i < count($seatMap); $i++) {

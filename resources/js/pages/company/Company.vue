@@ -46,9 +46,9 @@
                                                             <td>{{ phoneFormat(company.contact) }}</td>
                                                             <td>{{ company.location }}</td>
                                                             <td>
-                                                                <img
-                                                                    :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)"
-                                                                    style="width:120px;height:150px;" alt="">
+                                                                <a :href="$store.state.app_url +'uploads/company/logo/'+(company.logo)" target="_blank">
+                                                                <img :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)" style="width:120px;height:150px;" alt="">
+                                                                </a>
                                                             </td>
                                                             <td>
                                                                 <button

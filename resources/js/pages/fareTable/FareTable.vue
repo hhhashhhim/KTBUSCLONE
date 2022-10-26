@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Fare Table</h4>
                             <div class="w-50 d-flex align-items-center">
@@ -23,7 +23,6 @@
                         </div>
                         <div class="card-body">
                             <transition name="fade">
-
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"
                                             @click="error=!error">
@@ -38,9 +37,6 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive" v-if="cities">
                                                 <table class="table table-striped table-hover table-bordered" >
@@ -269,27 +265,39 @@ export default {
             this.data.to = to.id;
         },
         async fetchRecord() {
-            if (!this.data.fare_class) {
-                this.error = true;
-                return
-            }
-            this.loading =true;
+            // if(this.data.fare_class == 0 || typeof this.data.fare_class == 'undefined'){
+            //     return swal({
+            //         title: "Required",
+            //         text: "Please Select Any Fare Class",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            //     this.cities.length = 0;
+            //     this.msg = 1;
+            //
+            // }else {
+                if (!this.data.fare_class) {
+                    this.error = true;
+                    return
+                }
+                this.loading = true;
 
-            const res = await this.callApi("post", "fare-table", {
-                company_id: this.data.company_id, fare_class: this.data.fare_class
-            });
-            if (res.status === 200) {
+                const res = await this.callApi("post", "fare-table", {
+                    company_id: this.data.company_id, fare_class: this.data.fare_class
+                });
+                if (res.status === 200) {
 
-                this.msg = 2;
-                this.cities = res.data
-                this.loading =false;
-                
-                setTimeout(() => {
-                    this.success = "";
-                }, 3000);
-            } else {
-                alert("Something Went Wrong")
-            }
+                    this.msg = 2;
+                    this.cities = res.data
+                    this.loading = false;
+
+                    setTimeout(() => {
+                        this.success = "";
+                    }, 3000);
+                } else {
+                    alert("Something Went Wrong")
+                }
+            // }
         },
 
         deleteModal(terminal, i) {
