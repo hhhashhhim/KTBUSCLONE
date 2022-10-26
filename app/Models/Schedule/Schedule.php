@@ -6,8 +6,10 @@ use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
 use App\Models\Company;
+use App\Models\Discount\Discount;
 use App\Models\FareClass;
 use App\Models\Route\Route;
+use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +23,6 @@ class Schedule extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'seat_map' => 'array',
         'route_city_terminal' => 'array',
     ];
 
@@ -39,30 +40,33 @@ class Schedule extends Model
         return $this->hasOne( Company::class,'id','company_id' );
     }
 
-    public function single_bus()
-    {
-        return $this->hasOne( Bus::class, 'id', 'bus_id' );
-    }
-
     public function bus_class()
     {
-        return $this->hasOne( BusClass::class,'id', 'selected_bus_class_id');
+        return $this->hasOne( BusClass::class,'id', 'bus_class_id');
     }
-    public function single_bus_class()
+    public function fare_class()
     {
-        return $this->hasOne(FareClass::class, 'id', 'bus_class_id');
+        return $this->hasOne(FareClass::class, 'id', 'fare_class_id');
     }
-    public function singleRoute()
+    public function route()
     {
         return $this->hasOne(Route::class, 'id', 'route_id');
     }
-    public function singleCity()
+    public function city()
     {
         return $this->hasOne(City::class, 'id', 'city_id');
     }
-    public function singleTerminal()
+    public function terminal()
     {
         return $this->hasOne(Terminal::class, 'id', 'terminal_id');
+    }
+    public function discount()
+    {
+        return $this->hasOne(Discount::class, 'id', 'discount_id');
+    }
+    public function surcharge()
+    {
+        return $this->hasOne(Surcharge::class, 'id', 'surcharge_id');
     }
 
 }

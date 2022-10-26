@@ -46,7 +46,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $schedule = Schedule::where('id',$request->schedule)
-        ->select('id','selected_bus_class_id','company_id')->with('bus_class')
+        ->select('id','fare_class_id','company_id')->with('bus_class')
         ->first();
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
         $customer = Customer::where('cnic',$cnicFormat)->first();
@@ -64,7 +64,7 @@ class BookingController extends Controller
         foreach ($request->selectedSeats as $i => $seat) {
             Ticket::create([
                 'company_id'=>$schedule->company_id,
-                // 'bus_class_id'=>$schedule->selected_bus_class_id,
+                // 'bus_class_id'=>$schedule->fare_class_id,
                 'seat_no'=>$seat,
                 'booking_no'=>$bookingNo,
                 'date'=>$request->date,

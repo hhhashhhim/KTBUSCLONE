@@ -505,9 +505,7 @@
             </div>
             </transition>
             <!-- Delete Modal -->
-            <Delete :deleteForm="deleteFormID"
-                    confirmationMessage='Are You Sure You want To Delete This terminal ???'
-            />
+            <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???' />
         </div>
     </section>
 </template>
@@ -517,7 +515,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import vueMask from "vue-jquery-mask";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     name: "Terminal",
