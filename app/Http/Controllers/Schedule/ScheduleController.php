@@ -190,7 +190,6 @@ class ScheduleController extends Controller
     public function selected(Request $request)
     {
 
-
         // Getting Already Booked Tickets
         $tickets = Ticket::where('company_id',$this->company_id)->where('schedule_id', $request->id)
         ->whereDate('date', $request->date)->get();
@@ -206,12 +205,11 @@ class ScheduleController extends Controller
         // Fare Fetching About the Schedule
         $departure_city_id = $schedule->route->fares->first()->departure_city_id;
         $destination_city_id = $schedule->route->fares->last()->destination_city_id;
-        $fareForAllClasses =FareTable::where('from_city_id',$departure_city_id)->where('to_city_id',$destination_city_id)
+        $fareForAllClasses = FareTable::where('from_city_id',$departure_city_id)->where('to_city_id',$destination_city_id)
         ->where('company_id',$this->company_id)
         ->get();
 
-        return $schedule->bus_class_id;
-        $fare = (float) $fareForAllClasses->where('fare_class',$schedule->bus_class_id)->first()->fare;
+        $fare = (float) $fareForAllClasses->where('fare_class',$schedule->fare_class_id)->first()->fare;
 
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
