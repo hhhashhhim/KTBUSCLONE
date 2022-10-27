@@ -344,7 +344,8 @@
                                     :value="surcharge.id"
                                     :key="i"
                                 >
-                                    {{ surcharge.name }} - {{ surcharge.amount }} %
+                                    {{ surcharge.name }} -
+                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}
                                 </option>
                             </select>
                         </div>
@@ -361,7 +362,8 @@
                                     :value="discount.id"
                                     :key="i"
                                 >
-                                    {{ discount.name }} - {{ discount.amount }}%
+                                    {{ discount.name }} -
+                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}
                                 </option>
                             </select>
                         </div>
@@ -378,10 +380,7 @@
                         <div class="col-md-6">
                             <button
                                 class="btn btn-success step2 float-right"
-                                @click="                   validateStep('step3');
-                  getEntireForm();
-                "
-                            >
+                                @click=" validateStep('step3'); getEntireForm(); ">
                                 Next<i class="fas fa-arrow-right mr-1 border-dark"></i>
                             </button>
                         </div>
@@ -427,19 +426,13 @@
                                 </tr>
                                 <tr>
                                     <th class="mr-3">Discount</th>
-                                    <td>
-                                        {{
-                                            this.dataPreview.discount != null
-                                                ? this.dataPreview.discount + "%"
-                                                : "N/A"
+                                    <td> {{
+                                            this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
                                         }}
                                     </td>
                                     <th class="mr-3">Surcharge</th>
-                                    <td>
-                                        {{
-                                            this.dataPreview.surcharge != null
-                                                ? this.dataPreview.surcharge + "%"
-                                                : "N/A"
+                                    <td> {{
+                                            this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
                                         }}
                                     </td>
                                 </tr>
@@ -633,18 +626,12 @@
                                     <tr v-for="(city, i) in dataEdit.cities" :key="i">
                                         <td>{{ i + 1 }}</td>
                                         <td>{{ city.name }}</td>
-                                        <td>
-                        <span v-for="item in city.terminal" :key="item.id">
-                          <label class="colorinput mx-3">
-                            <span>
-                              <input
-                                  type="checkbox"
-                                  class="colorinput-input"
-                                  @click="editTerminal($event, city.id)"
-                                  v-bind:checked=" checkedSelectedTerminals(item.id) "
-                                  id="terminal"
-                                  :value="item.id"
-                              />
+                                        <td> <span v-for="item in city.terminal" :key="item.id"> <label
+                                            class="colorinput mx-3"> <span> <input type="checkbox"
+                                                                                   class="colorinput-input"
+                                                                                   @click="editTerminal($event, city.id)"
+                                                                                   v-bind:checked=" checkedSelectedTerminals(item.id) "
+                                                                                   id="terminal" :value="item.id"/>
                               <span class="colorinput-color bg-success"></span>
                             </span>
                           </label>
@@ -696,10 +683,8 @@
                                     v-for="(surcharge, i) in editSurcharges"
                                     :value="surcharge.id"
                                     :key="i"
-                                >
-                                    {{ surcharge.name }} - {{
-                                        surcharge.amount
-                                    }}{{ surcharge.type == 'percentage' ? '%' : '' }}
+                                > {{ surcharge.name }} -
+                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}
                                 </option>
                             </select>
                         </div>
@@ -716,9 +701,8 @@
                                     :value="discount.id"
                                     :key="i"
                                 >
-                                    {{ discount.name }} - {{
-                                        discount.amount
-                                    }}{{ discount.type == 'percentage' ? '%' : '' }}
+                                    {{ discount.name }} -
+                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}
                                 </option>
                             </select>
                         </div>
@@ -858,13 +842,11 @@ export default {
         },
 
         async getEntireForm() {
-            console.log(this.data);
             const resEntire = await this.callApi(
                 "post",
                 "schedule/getEntire",
                 this.data
             );
-
             this.dataPreview = resEntire.data;
             this.dataPreview.start_date = this.data.StartDate;
             this.dataPreview.end_date = this.data.EndDate;
@@ -904,13 +886,13 @@ export default {
             this.isShowEditDiv = true;
         },
 
-        addTerminal(event, id) {
-            const value = event.target.value;
+        addTerminal(event, cityId) {
+            const value = event.target.value
             if (event.target.checked) {
                 const index = this.data.addTerminalsOnClick.indexOf(value);
                 if (index === -1) {
                     this.data.addTerminalsOnClick.push({
-                        city_id: id,
+                        city_id: cityId,
                         terminal_id: parseInt(value),
                         allow: true,
                     });
@@ -920,6 +902,7 @@ export default {
                 this.data.addTerminalsOnClick.splice(index, 1);
             }
         },
+
 
         editTerminal(event, id) {
             if (event.target.checked) {
@@ -983,7 +966,9 @@ export default {
         },
 
         clearForm() {
-            this.data = {};
+            this.data = {
+                addTerminalsOnClick: [],
+            };
             this.data.route = 0;
             this.data.busClass = 0;
             this.data.fareClass = 0;

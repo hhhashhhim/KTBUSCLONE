@@ -54,7 +54,6 @@ class DiscountController extends Controller
 
     public function updateDiscount(Request $request)
     {
-        dd($request->all());
         $rules = [
             'name' => 'required',
 //            'percentage' => 'required|numeric|min:0|max:100',

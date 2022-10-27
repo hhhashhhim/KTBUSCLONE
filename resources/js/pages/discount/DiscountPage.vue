@@ -274,7 +274,6 @@ export default {
                 percentage: "",
                 flat: "",
                 is_Active: "",
-                discountPercentageRadio: "",
             },
         };
     },
@@ -418,18 +417,16 @@ export default {
         },
 
         async updateDiscount() {
-
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                // return this.errorsArray("Name is Required", "DiscountName");
-                swal({
+                return swal({
                     title: "Required!",
                     text: "Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if(this.dataEdit.discountPercentageRadio == "percentage"){
-                if(this.dataEdit.percentage == "" || typeof this.dataEdit.percentage == "undefined"){
+            if(this.dataEdit.type == "percentage" || this.dataEdit.discountPercentageRadio == 'percentage'){
+                if(this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined"){
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -438,8 +435,8 @@ export default {
                     });
                 }
             }
-            if(this.dataEdit.discountPercentageRadio == "flat"){
-                if(this.dataEdit.flat == "" || typeof this.dataEdit.flat == "undefined"){
+            if(this.dataEdit.type == 'flat' || this.dataEdit.discountPercentageRadio == "flat"){
+                if(this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined"){
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",

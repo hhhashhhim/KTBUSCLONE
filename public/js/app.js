@@ -23594,11 +23594,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  created: function created() {
-    console.log('something');
-  }
-});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
 
 /***/ }),
 
@@ -26601,8 +26597,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         name: "",
         percentage: "",
         flat: "",
-        is_Active: "",
-        discountPercentageRadio: ""
+        is_Active: ""
       }
     };
   },
@@ -26849,21 +26844,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this4.validationErrors = [];
-                if (_this4.dataEdit.name === "") // return this.errorsArray("Name is Required", "DiscountName");
-                  swal({
-                    title: "Required!",
-                    text: "Name Field is Required",
-                    icon: "error",
-                    timer: 2000
-                  });
 
-                if (!(_this4.dataEdit.discountPercentageRadio == "percentage")) {
-                  _context4.next = 5;
+                if (!(_this4.dataEdit.name === "")) {
+                  _context4.next = 3;
                   break;
                 }
 
-                if (!(_this4.dataEdit.percentage == "" || typeof _this4.dataEdit.percentage == "undefined")) {
-                  _context4.next = 5;
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Name Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this4.dataEdit.type == "percentage" || _this4.dataEdit.discountPercentageRadio == 'percentage')) {
+                  _context4.next = 6;
+                  break;
+                }
+
+                if (!(_this4.dataEdit.percentage == "" || _this4.dataEdit.percentage == null || typeof _this4.dataEdit.percentage == "undefined")) {
+                  _context4.next = 6;
                   break;
                 }
 
@@ -26874,14 +26875,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
-                if (!(_this4.dataEdit.discountPercentageRadio == "flat")) {
-                  _context4.next = 8;
+              case 6:
+                if (!(_this4.dataEdit.type == 'flat' || _this4.dataEdit.discountPercentageRadio == "flat")) {
+                  _context4.next = 9;
                   break;
                 }
 
-                if (!(_this4.dataEdit.flat == "" || typeof _this4.dataEdit.flat == "undefined")) {
-                  _context4.next = 8;
+                if (!(_this4.dataEdit.flat == "" || _this4.dataEdit.flat == null || typeof _this4.dataEdit.flat == "undefined")) {
+                  _context4.next = 9;
                   break;
                 }
 
@@ -26892,16 +26893,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 8:
+              case 9:
                 _this4.loading = true;
-                _context4.next = 11;
+                _context4.next = 12;
                 return _this4.callApi("post", 'discount/update', _this4.dataEdit);
 
-              case 11:
+              case 12:
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 19;
+                  _context4.next = 20;
                   break;
                 }
 
@@ -26912,14 +26913,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 17;
+                _context4.next = 18;
                 return _this4.fetchDiscount();
 
-              case 17:
-                _context4.next = 21;
+              case 18:
+                _context4.next = 22;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -26937,7 +26938,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 21:
+              case 22:
               case "end":
                 return _context4.stop();
             }
@@ -28664,11 +28665,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                console.log(_this4.data);
-                _context4.next = 3;
+                _context4.next = 2;
                 return _this4.callApi("post", "schedule/getEntire", _this4.data);
 
-              case 3:
+              case 2:
                 resEntire = _context4.sent;
                 _this4.dataPreview = resEntire.data;
                 _this4.dataPreview.start_date = _this4.data.StartDate;
@@ -28676,7 +28676,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.dataPreview.Name = _this4.data.name;
                 _this4.dataPreview.time = _this4.data.time;
 
-              case 9:
+              case 8:
               case "end":
                 return _context4.stop();
             }
@@ -28712,7 +28712,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       this.isShowEditDiv = true;
     },
-    addTerminal: function addTerminal(event, id) {
+    addTerminal: function addTerminal(event, cityId) {
       var value = event.target.value;
 
       if (event.target.checked) {
@@ -28720,7 +28720,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
         if (index === -1) {
           this.data.addTerminalsOnClick.push({
-            city_id: id,
+            city_id: cityId,
             terminal_id: parseInt(value),
             allow: true
           });
@@ -28837,7 +28837,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     clearForm: function clearForm() {
-      this.data = {};
+      this.data = {
+        addTerminalsOnClick: []
+      };
       this.data.route = 0;
       this.data.busClass = 0;
       this.data.fareClass = 0;
@@ -29410,9 +29412,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         id: "",
         name: "",
         percentage: "",
-        is_Active: "",
-        percentageRadio: "",
-        amount: ""
+        is_Active: ""
       }
     };
   },
@@ -29500,7 +29500,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearForm: function clearForm() {
       this.SurchargeName = "";
       this.SurchargePercentage = "";
+      this.percentageRadio = 'percentage';
+      this.SurchargeFlat = "";
       this.isActive = 1;
+      this.showDivFlat = false;
+      this.showDivPercentage = true;
     },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
@@ -29542,62 +29546,84 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                console.log(_this3.percentageRadio);
                 _this3.validationErrors = [];
                 if (_this3.SurchargeName == "") swal({
                   title: "Required!",
                   text: "Name is Required",
                   icon: "error",
                   timer: 2000
-                }); // if (this.percentageRadio == "percentage" || !this.SurchargePercentage)
-                // swal({
-                //     title: "Required!",
-                //     text: "Percentage Field is Required",
-                //     icon: "error",
-                //     timer: 2000
-                // });
-                // if (this.percentageRadio == "flat" || !this.SurchargeFlat)
-                // swal({
-                //     title: "Required!",
-                //     text: "Flat Amount is Required",
-                //     icon: "error",
-                //     timer: 2000
-                // });
+                });
 
+                if (!(_this3.percentageRadio == "percentage")) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                if (!(_this3.SurchargePercentage == "" || typeof _this3.SurchargePercentage == "undefined")) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Percentage Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this3.percentageRadio == "flat")) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                if (!(_this3.SurchargeFlat == "" || typeof _this3.SurchargeFlat == "undefined")) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Flat Amount Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 8:
                 _this3.loading = true;
                 data = {
                   name: _this3.SurchargeName,
                   type: _this3.percentageRadio,
-                  amount: _this3.percentageRadio == "percentage" ? _this3.SurchargePercentage : _this3.SurchargeFlat,
+                  percentage: _this3.SurchargePercentage,
+                  flat: _this3.SurchargeFlat,
                   active: _this3.isActive
                 };
-                _context3.next = 7;
+                _context3.next = 12;
                 return _this3.callApi("post", "surcharge/store", data);
 
-              case 7:
+              case 12:
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 15;
+                  _context3.next = 20;
                   break;
                 }
 
-                _this3.loading = false; // this.success = "Surcharge Created Successfully";
-
+                _this3.loading = false;
                 swal({
                   title: "Success",
                   text: "Surcharge Created Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 13;
+                _context3.next = 18;
                 return _this3.fetchSurcharges();
 
-              case 13:
-                _context3.next = 16;
+              case 18:
+                _context3.next = 21;
                 break;
 
-              case 15:
+              case 20:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -29612,7 +29638,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -29631,34 +29657,61 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this4.validationErrors = [];
-                if (_this4.dataEdit.name === "") // return this.errorsArray("Name is Required", "SurchargeName");
-                  swal({
-                    title: "Required!",
-                    text: "Name Field is Required ",
-                    icon: "error",
-                    timer: 2000
-                  }); // if (this.dataEdit.percentage === "")
-                //     // return this.errorsArray("Percentage is Required", "SurchargePercentage");
-                //     swal({
-                //         title: "Required!",
-                //         text: "Percentage is Required",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
+                if (_this4.dataEdit.name === "") swal({
+                  title: "Required!",
+                  text: "Name Field is Required ",
+                  icon: "error",
+                  timer: 2000
+                });
 
-                _this4.loading = true;
-                _context4.next = 5;
-                return _this4.callApi("post", 'surcharge/update', _this4.dataEdit);
-
-              case 5:
-                res = _context4.sent;
-
-                if (!(res.status === 200)) {
-                  _context4.next = 13;
+                if (!(_this4.dataEdit.type == "percentage" || _this4.dataEdit.percentageRadio == 'percentage')) {
+                  _context4.next = 5;
                   break;
                 }
 
-                // this.success = "Surcharge Updated Successfully";
+                if (!(_this4.dataEdit.percentage == "" || _this4.dataEdit.percentage == null || typeof _this4.dataEdit.percentage == "undefined")) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Percentage Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (!(_this4.dataEdit.type == 'flat' || _this4.dataEdit.percentageRadio == "flat")) {
+                  _context4.next = 8;
+                  break;
+                }
+
+                if (!(_this4.dataEdit.flat == "" || _this4.dataEdit.flat == null || typeof _this4.dataEdit.flat == "undefined")) {
+                  _context4.next = 8;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Flat Amount Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 8:
+                _this4.loading = true;
+                _context4.next = 11;
+                return _this4.callApi("post", 'surcharge/update', _this4.dataEdit);
+
+              case 11:
+                res = _context4.sent;
+
+                if (!(res.status === 200)) {
+                  _context4.next = 19;
+                  break;
+                }
+
                 swal({
                   title: "Success",
                   text: "Surcharge Updated Successfully",
@@ -29666,14 +29719,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 11;
+                _context4.next = 17;
                 return _this4.fetchSurcharges();
 
-              case 11:
-                _context4.next = 14;
+              case 17:
+                _context4.next = 20;
                 break;
 
-              case 13:
+              case 19:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -29688,7 +29741,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 20:
               case "end":
                 return _context4.stop();
             }
@@ -40697,7 +40750,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: surcharge.id,
           key: i
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.amount) + " % ", 9
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat), 9
         /* TEXT, PROPS */
         , _hoisted_75);
       }), 128
@@ -40714,7 +40767,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: discount.id,
           key: i
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.amount) + "% ", 9
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.percentage != null ? discount.percentage + '%' : discount.flat), 9
         /* TEXT, PROPS */
         , _hoisted_79);
       }), 128
@@ -40750,9 +40803,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_97, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_98, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.route), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.discount != null ? _this.dataPreview.discount + "%" : "N/A"), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.discount != null ? _this.dataPreview.discount.type == "percentage" ? _this.dataPreview.discount.percentage != null ? _this.dataPreview.discount.name + "-" + _this.dataPreview.discount.percentage + "%" : "N/A" : _this.dataPreview.discount.flat != null ? _this.dataPreview.discount.name + "-" + _this.dataPreview.discount.flat : "N/A" : "N/A"), 1
       /* TEXT */
-      ), _hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.surcharge != null ? _this.dataPreview.surcharge + "%" : "N/A"), 1
+      ), _hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.surcharge != null ? _this.dataPreview.surcharge.type == "percentage" ? _this.dataPreview.surcharge.percentage != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.percentage + "%" : "N/A" : _this.dataPreview.surcharge.flat != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.flat : "N/A" : "N/A"), 1
       /* TEXT */
       )])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "btn btn-info back2 float-left",
@@ -40950,7 +41003,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: surcharge.id,
           key: i
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.amount) + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.type == 'percentage' ? '%' : ''), 9
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat), 9
         /* TEXT, PROPS */
         , _hoisted_151);
       }), 128
@@ -40967,7 +41020,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: discount.id,
           key: i
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.amount) + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.type == 'percentage' ? '%' : ''), 9
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.percentage != null ? discount.percentage + '%' : discount.flat), 9
         /* TEXT, PROPS */
         , _hoisted_155);
       }), 128
@@ -41109,14 +41162,26 @@ var _hoisted_21 = {
 };
 
 var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Quota"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Added By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Percentage"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Added By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_23 = ["data-target", "onClick"];
+var _hoisted_23 = {
+  key: 0
+};
+var _hoisted_24 = {
+  key: 1
+};
+var _hoisted_25 = {
+  key: 2
+};
+var _hoisted_26 = {
+  key: 3
+};
+var _hoisted_27 = ["data-target", "onClick"];
 
-var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-edit"
   }, null, -1
@@ -41124,10 +41189,10 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["data-target", "onClick"];
+var _hoisted_29 = [_hoisted_28];
+var _hoisted_30 = ["data-target", "onClick"];
 
-var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-trash-alt"
   }, null, -1
@@ -41135,15 +41200,15 @@ var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_28 = [_hoisted_27];
-var _hoisted_29 = {
+var _hoisted_32 = [_hoisted_31];
+var _hoisted_33 = {
   "class": "row"
 };
-var _hoisted_30 = {
+var _hoisted_34 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargeName"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41153,14 +41218,14 @@ var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_32 = {
+var _hoisted_36 = {
   "class": "form-group col-md-3 mt-4 pt-2"
 };
-var _hoisted_33 = {
+var _hoisted_37 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
 
-var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "percentage"
@@ -41169,11 +41234,11 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_35 = {
+var _hoisted_39 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
 
-var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "flat"
@@ -41182,12 +41247,12 @@ var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_37 = {
+var _hoisted_41 = {
   key: 0,
   "class": "form-group col-md-5"
 };
 
-var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Percentage "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41197,11 +41262,11 @@ var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_39 = {
+var _hoisted_43 = {
   "class": "input-group"
 };
 
-var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "input-group-append"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41211,12 +41276,12 @@ var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_41 = {
+var _hoisted_45 = {
   key: 1,
   "class": "form-group col-md-5"
 };
 
-var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Flat Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41228,21 +41293,21 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_43 = {
+var _hoisted_47 = {
   "class": "col-md-12"
 };
 
-var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Status", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_45 = {
+var _hoisted_49 = {
   "class": "form-group d-flex align-items-center"
 };
 
-var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "mt-4",
     "for": "active"
@@ -41251,11 +41316,11 @@ var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_47 = {
+var _hoisted_51 = {
   "class": "colorinput mx-3 mt-3"
 };
 
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "colorinput-color bg-success"
   }, null, -1
@@ -41263,14 +41328,14 @@ var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_49 = {
+var _hoisted_53 = {
   "class": "row"
 };
-var _hoisted_50 = {
+var _hoisted_54 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargeName"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41280,15 +41345,15 @@ var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_52 = {
+var _hoisted_56 = {
   "class": "form-group col-md-3 mt-4 pt-2"
 };
-var _hoisted_53 = {
+var _hoisted_57 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
-var _hoisted_54 = ["checked"];
+var _hoisted_58 = ["checked"];
 
-var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "editPercentage"
@@ -41297,12 +41362,12 @@ var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_56 = {
+var _hoisted_60 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
-var _hoisted_57 = ["checked"];
+var _hoisted_61 = ["checked"];
 
-var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "editFlat"
@@ -41311,12 +41376,12 @@ var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_59 = {
+var _hoisted_63 = {
   key: 0,
   "class": "form-group col-md-5"
 };
 
-var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Percentage "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41326,11 +41391,11 @@ var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_61 = {
+var _hoisted_65 = {
   "class": "input-group"
 };
 
-var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "input-group-append"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41340,12 +41405,12 @@ var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_63 = {
+var _hoisted_67 = {
   key: 1,
   "class": "form-group col-md-5"
 };
 
-var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Flat Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -41357,21 +41422,21 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_65 = {
+var _hoisted_69 = {
   "class": "col-md-12"
 };
 
-var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Status", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_67 = {
+var _hoisted_71 = {
   "class": "form-group d-flex align-items-center"
 };
 
-var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "mt-4",
     "for": "active"
@@ -41380,12 +41445,12 @@ var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_69 = {
+var _hoisted_73 = {
   "class": "colorinput mx-3 mt-3"
 };
-var _hoisted_70 = ["checked"];
+var _hoisted_74 = ["checked"];
 
-var _hoisted_71 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "colorinput-color bg-success"
   }, null, -1
@@ -41434,9 +41499,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.amount) + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.type == 'percentage' ? '%' : ''), 1
+    ), surcharge.percentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.percentage) + "%", 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.is_active == 1 ? 'Active' : 'InActive'), 1
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_24, "N/A")), surcharge.flat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.flat), 1
+    /* TEXT */
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_26, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.is_active == 1 ? 'Active' : 'InActive'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.added_by.name), 1
     /* TEXT */
@@ -41447,18 +41514,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.edit(surcharge);
       },
       "class": "btn btn-primary mx-1"
-    }, _hoisted_25, 8
+    }, _hoisted_29, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "data-target": '#' + $data.deleteFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.deleteModal(surcharge, i);
       },
       "class": "btn btn-danger"
-    }, _hoisted_28, 8
+    }, _hoisted_32, 8
     /* PROPS */
-    , _hoisted_26)])]);
+    , _hoisted_30)])]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -41479,7 +41546,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
@@ -41487,7 +41554,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "percentage",
         name: "percentageAmount",
@@ -41502,7 +41569,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_34]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_38]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "flat",
         name: "flatAmount",
@@ -41516,7 +41583,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_36])]), $data.showDivPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [_hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_40])]), $data.showDivPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "3",
@@ -41530,7 +41597,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargePercentage]]), _hoisted_40])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargePercentage]]), _hoisted_44])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "5",
@@ -41543,7 +41610,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeFlat]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeFlat]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
         value: "1",
         checked: "",
@@ -41553,7 +41620,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 32
       /* HYDRATE_EVENTS */
-      ), _hoisted_48])])])])])];
+      ), _hoisted_52])])])])])];
     }),
     _: 1
     /* STABLE */
@@ -41578,7 +41645,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
@@ -41586,7 +41653,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "editPercentage",
         name: "editPercentageAmount",
@@ -41601,7 +41668,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 8
       /* PROPS */
-      , _hoisted_54), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_55]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , _hoisted_58), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_59]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "editFlat",
         name: "editFlatAmount",
@@ -41616,12 +41683,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 8
       /* PROPS */
-      , _hoisted_57), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_58])]), $data.dataEdit.type == 'percentage' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , _hoisted_61), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_62])]), $data.dataEdit.type == 'percentage' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "3",
         "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
-          return $data.dataEdit.amount = $event;
+          return $data.dataEdit.percentage = $event;
         }),
         placeholder: "Enter Percentage",
         onKeypress: _cache[19] || (_cache[19] = function ($event) {
@@ -41630,12 +41697,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.amount]]), _hoisted_62])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.dataEdit.type == 'flat' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.percentage]]), _hoisted_66])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.dataEdit.type == 'flat' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_67, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "5",
         "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
-          return $data.dataEdit.amount = $event;
+          return $data.dataEdit.flat = $event;
         }),
         placeholder: "Enter Flat Amount",
         onKeypress: _cache[21] || (_cache[21] = function ($event) {
@@ -41643,7 +41710,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.amount]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <div class=\"form-group col-md-6\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <label for=\"SurchargePercentage\">Percentage <span class=\"text-danger\">*</span></label>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <input type=\"text\" class=\"form-control\" maxlength=\"3\" v-model=\"dataEdit.percentage\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                   @keypress=\"isNumber($event)\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.flat]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
         "class": "colorinput-input",
         id: "editCheckBox",
@@ -41653,7 +41720,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         checked: $data.dataEdit.is_active == 1
       }, null, 40
       /* PROPS, HYDRATE_EVENTS */
-      , _hoisted_70), _hoisted_71])])])])])];
+      , _hoisted_74), _hoisted_75])])])])])];
     }),
     _: 1
     /* STABLE */

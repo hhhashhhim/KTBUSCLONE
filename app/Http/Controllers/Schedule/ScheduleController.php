@@ -38,6 +38,7 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
+        dd($request->all());
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',
@@ -155,8 +156,8 @@ class ScheduleController extends Controller
             'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
             'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
             'busClass' => BusClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
-            'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->pluck('amount')->first(),
-            'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->pluck('amount')->first(),
+            'discount' => Discount::where('company_id', $this->company_id)->where('id', $request->discount)->first(),
+            'surcharge' => Surcharge::where('company_id', $this->company_id)->where('id', $request->surcharge)->first(),
         ];
     }
 
