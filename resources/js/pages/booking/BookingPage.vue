@@ -563,7 +563,13 @@ export default {
         this.showBookingDiv = true;
         this.schedule = res.data;
       } else {
-        console.log(res);
+        if (res.status === 422) {
+          for (const key in res.addForm.errors) {
+            res.addForm.errors[key].forEach((element) => {
+              this.errorsArray(element, key);
+            });
+          }
+        }
       }
     },
     selectSeat(row, col, seatNo) {

@@ -231,6 +231,13 @@ class ScheduleController extends Controller
                 if ( isset($column['class']) ) {
                     $class = $fareClasses->where('id',$column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '' ;
+                    if ($class && $class->is_active==0) {
+                        return response()->json([
+                            "errors"=>[
+                                "Fare Error"=>["This Bus Class Includes a Class Which is't Active Please Active That Class First !!!"]
+                            ]
+                        ],422);
+                    }
                     if ($class) {
                         $seatMap[$i][$j]['fare'] = (float) $fareForAllClasses->where('fare_class',$class->id)->first()->fare;
                     }

@@ -23950,7 +23950,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res;
+        var res, _loop, key;
+
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -24028,7 +24029,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.showBookingDiv = true;
                   _this4.schedule = res.data;
                 } else {
-                  console.log(res);
+                  if (res.status === 422) {
+                    _loop = function _loop(key) {
+                      res.addForm.errors[key].forEach(function (element) {
+                        _this4.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.addForm.errors) {
+                      _loop(key);
+                    }
+                  }
                 }
 
               case 17:
@@ -24112,7 +24123,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var res, _loop, key;
+        var res, _loop2, key;
 
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
@@ -24176,14 +24187,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   window.scrollTo(0, 0);
                 } else {
                   if (res.status === 422) {
-                    _loop = function _loop(key) {
+                    _loop2 = function _loop2(key) {
                       res.addForm.errors[key].forEach(function (element) {
                         _this5.errorsArray(element, key);
                       });
                     };
 
                     for (key in res.addForm.errors) {
-                      _loop(key);
+                      _loop2(key);
                     }
                   }
                 }
