@@ -213,7 +213,7 @@ class ScheduleController extends Controller
 
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
-        $fareClasses = FareClass::where('company_id',$this->company_id)->get();
+        $fareClasses = FareClass::where('company_id',$this->company_id)->where('is_active', 1)->get();
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
