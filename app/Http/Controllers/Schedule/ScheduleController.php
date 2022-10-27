@@ -195,25 +195,32 @@ class ScheduleController extends Controller
         ->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
 
-
         // Getting Already Booked Tickets
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
         ->select('id', 'fare_class_id','route_id','bus_class_id')
         ->with('bus_class:id,seat_map','route:id,name','route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-
         // Fare Fetching About the Schedule
         $departure_city_id = $schedule->route->fares->first()->departure_city_id;
         $destination_city_id = $schedule->route->fares->last()->destination_city_id;
         $fareForAllClasses = FareTable::where('from_city_id',$departure_city_id)->where('to_city_id',$destination_city_id)
         ->where('company_id',$this->company_id)
         ->get();
-
+        $fareClasses = FareClass::where('company_id',$this->company_id)->get();
+        if(count($fareClasses) != count($fareForAllClasses)){
+            return response()->json([
+                "errors"=>[
+                    "Fare Error"=>["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
+                ]
+            ],422);
+        }
+//        dd($fareForAllClasses);
+//        dd($fareForAllClasses->where('fare_class',$schedule->fare_class_id)->first(), $schedule->fare_class_id);
         $fare = (float) $fareForAllClasses->where('fare_class',$schedule->fare_class_id)->first()->fare;
 
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
-        $fareClasses = FareClass::where('company_id',$this->company_id)->get();
+
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
