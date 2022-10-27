@@ -54,7 +54,8 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
-                                                        <th>Quota</th>
+                                                        <th>Percentage</th>
+                                                        <th>Amount</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -64,7 +65,10 @@
                                                     <tr v-for="(surcharge, i) in surcharges" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ surcharge.name }}</td>
-                                                        <td>{{ surcharge.amount }}{{surcharge.type == 'percentage' ? '%' : ''}}</td>
+                                                        <td v-if="surcharge.percentage">{{ surcharge.percentage }}%</td>
+                                                        <td v-else>N/A</td>
+                                                        <td v-if="surcharge.flat">{{ surcharge.flat }}</td>
+                                                        <td v-else>N/A</td>
                                                         <td>{{ surcharge.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ surcharge.added_by.name }}</td>
                                                         <td>
@@ -181,7 +185,7 @@
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
                         <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.amount" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage" placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -190,24 +194,9 @@
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
                         <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 10K</span></label>
-                        <!--                        <div class="input-group">-->
-                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.amount" placeholder="Enter Flat Amount"
+                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
-                        <!--                            <div class="input-group-append">-->
-                        <!--                                <span class="input-group-text">%</span>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
                     </div>
-<!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>-->
-<!--                        <div class="input-group">-->
-<!--                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"-->
-<!--                                   @keypress="isNumber($event)">-->
-<!--                            <div class="input-group-append">-->
-<!--                                <span class="input-group-text">%</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -272,8 +261,6 @@ export default {
                 name: "",
                 percentage: "",
                 is_Active: "",
-                percentageRadio: "",
-                amount: "",
             },
         };
     },
@@ -322,7 +309,11 @@ export default {
         clearForm: function () {
                this.SurchargeName = "";
                 this.SurchargePercentage = "";
+                this.percentageRadio = 'percentage';
+                this.SurchargeFlat = "";
                 this.isActive = 1;
+                this.showDivFlat = false;
+                this.showDivPercentage = true;
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
@@ -355,7 +346,6 @@ export default {
         },
 
         async addSurcharge() {
-            console.log(this.percentageRadio)
             this.validationErrors = [];
             if (this.SurchargeName == "")
             swal({
@@ -364,34 +354,39 @@ export default {
                 icon: "error",
                 timer: 2000
             });
-            // if (this.percentageRadio == "percentage" || !this.SurchargePercentage)
-            // swal({
-            //     title: "Required!",
-            //     text: "Percentage Field is Required",
-            //     icon: "error",
-            //     timer: 2000
-            // });
-            // if (this.percentageRadio == "flat" || !this.SurchargeFlat)
-            // swal({
-            //     title: "Required!",
-            //     text: "Flat Amount is Required",
-            //     icon: "error",
-            //     timer: 2000
-            // });
-            this.loading = true;
+            if(this.percentageRadio == "percentage"){
+                if(this.SurchargePercentage == "" || typeof   this.SurchargePercentage == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Percentage Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            if(this.percentageRadio == "flat"){
+                if(this.SurchargeFlat == "" || typeof   this.SurchargeFlat == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Flat Amount Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
 
+            this.loading = true;
             const data = {
                 name: this.SurchargeName,
                 type: this.percentageRadio,
-                amount: this.percentageRadio == "percentage" ? this.SurchargePercentage : this.SurchargeFlat,
+                percentage: this.SurchargePercentage,
+                flat: this.SurchargeFlat,
                 active: this.isActive,
             }
 
             const res = await this.callApi("post", "surcharge/store", data);
             if (res.status == 201) {
                 this.loading = false;
-
-                // this.success = "Surcharge Created Successfully";
                 swal({
                     title: "Success",
                     text: "Surcharge Created Successfully",
@@ -415,25 +410,38 @@ export default {
         async updateSurcharge() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                // return this.errorsArray("Name is Required", "SurchargeName");
             swal({
                 title: "Required!",
                 text: "Name Field is Required ",
                 icon: "error",
                 timer: 2000
             });
-            // if (this.dataEdit.percentage === "")
-            //     // return this.errorsArray("Percentage is Required", "SurchargePercentage");
-            //     swal({
-            //         title: "Required!",
-            //         text: "Percentage is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-                this.loading = true;
+
+            if(this.dataEdit.type == "percentage" || this.dataEdit.percentageRadio == 'percentage'){
+                if(this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Percentage Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            if(this.dataEdit.type == 'flat' || this.dataEdit.percentageRadio == "flat"){
+                if(this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined"){
+                    return swal({
+                        title: "Required!",
+                        text: "Flat Amount Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+
+
+            this.loading = true;
             const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200) {
-                // this.success = "Surcharge Updated Successfully";
                 swal({
                     title: "Success",
                     text: "Surcharge Updated Successfully",

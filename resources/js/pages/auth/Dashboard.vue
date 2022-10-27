@@ -624,8 +624,5 @@
 </template>
 <script>
 export default {
-  created(){
-    console.log( 'something' );
-  },
 };
 </script>
