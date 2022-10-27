@@ -24855,7 +24855,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    addSeatData: function addSeatData(col, row) {
+    addSeatData: function addSeatData() {
       var _this4 = this;
 
       if (this.seatModify["class"] || this.seatModify.type) {
@@ -24867,6 +24867,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           var col = seat[1];
           _this4.data.seatMap[row][col]["class"] = (_this4$seatModify$cla = _this4.seatModify["class"]) !== null && _this4$seatModify$cla !== void 0 ? _this4$seatModify$cla : 0;
           _this4.data.seatMap[row][col].type = (_this4$seatModify$typ = _this4.seatModify.type) !== null && _this4$seatModify$typ !== void 0 ? _this4$seatModify$typ : 0;
+          delete _this4.data.seatMap[row][col].selected;
         });
         return swal({
           title: "Success",

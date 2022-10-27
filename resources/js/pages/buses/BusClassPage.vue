@@ -751,7 +751,7 @@ export default {
         console.log(resSaveFareClass);
       }
     },
-    addSeatData: function (col, row) {
+    addSeatData: function () {
         if (this.seatModify.class || this.seatModify.type) {
 
             this.selectedSeats.map(( seat )=>{
@@ -761,6 +761,8 @@ export default {
                 let col = seat[1];
                 this.data.seatMap[row][col].class = this.seatModify.class ?? 0;
                 this.data.seatMap[row][col].type = this.seatModify.type ?? 0;
+                
+                delete this.data.seatMap[row][col].selected;
                 
             })
 

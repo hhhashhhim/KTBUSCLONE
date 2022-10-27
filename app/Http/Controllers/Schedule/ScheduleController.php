@@ -210,6 +210,7 @@ class ScheduleController extends Controller
         ->where('company_id',$this->company_id)
         ->get();
 
+        return $schedule->bus_class_id;
         $fare = (float) $fareForAllClasses->where('fare_class',$schedule->bus_class_id)->first()->fare;
 
         // Looping Throug the each seat of the bus
