@@ -18,9 +18,10 @@ import FareClass from "./pages/fareClass/FareClassPage";
 import BusesPage from "./pages/buses/BusesPage";
 import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
+import EmployeesPage from "./pages/hrm/employees/EmployeesPage";
 
-const url = '/projects/kt/'
-// const url = '/kt/'
+// const url = '/projects/kt/'
+const url = '/kt/'
 
 const routes = [
     {
@@ -117,6 +118,11 @@ const routes = [
         path: url + "booking",
         component : BookingPage,
         name:"booking-page"
+    },
+    {
+        path: url + "hrm/employees",
+        component : EmployeesPage,
+        name:"employees"
     },
 ]
 const router = createRouter({

@@ -63,9 +63,9 @@ class AuthController extends Controller
         // }
         // $schedule->bus_class->seat_map = $seatMap;
         // return $schedule;
-        
-        
-        
+
+
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

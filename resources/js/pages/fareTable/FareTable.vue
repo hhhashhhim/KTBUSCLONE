@@ -36,7 +36,7 @@
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12 text-center py-5" v-if="loading">
-                                    <div class="spinner-grow text-success" style="width: 6rem; height: 6rem;" role="status">
+                                    <div class="spinner-grow text-primary" style="width: 6rem; height: 6rem;" role="status">
                                         <span class="sr-only">Loading...</span>
                                     </div>
                                 </div>

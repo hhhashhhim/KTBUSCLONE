@@ -69,7 +69,7 @@ class ScheduleController extends Controller
             'discount_id' => $request->discount,
             'bus_class_id' => $request->busClass,
             'fare_class_id' => $request->fareClass,
-            'route_city_terminal' => $request->addTerminalsOnClick,
+            'route_city_terminal' => $request->addTerminalsOnClick ?? [],
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
@@ -78,7 +78,6 @@ class ScheduleController extends Controller
     public function editSchedule(Request $request)
     {
         $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->first();
-
         $dataArr = [];
         foreach ($schedule->route_city_terminal as $key => $item) {
             $dataArr['city'][$key] = $item['city_id'];
@@ -216,12 +215,12 @@ class ScheduleController extends Controller
                 ]
             ],422);
         }
-        
+
         $fare = (float) $fareForAllClasses->where('fare_class',$schedule->fare_class_id)->first()->fare;
 
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
-        
+
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
