@@ -35,7 +35,12 @@
                             </transition>
                             <!-- Table -->
                             <div class="row">
-                                <div class="col-12">
+                                <div class="col-12 text-center py-5" v-if="loading">
+                                    <div class="spinner-grow text-success" style="width: 6rem; height: 6rem;" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="col-12" v-else>
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive" v-if="cities">
@@ -265,17 +270,6 @@ export default {
             this.data.to = to.id;
         },
         async fetchRecord() {
-            // if(this.data.fare_class == 0 || typeof this.data.fare_class == 'undefined'){
-            //     return swal({
-            //         title: "Required",
-            //         text: "Please Select Any Fare Class",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            //     this.cities.length = 0;
-            //     this.msg = 1;
-            //
-            // }else {
                 if (!this.data.fare_class) {
                     this.error = true;
                     return
@@ -289,11 +283,9 @@ export default {
 
                     this.msg = 2;
                     this.cities = res.data
-                    this.loading = false;
-
                     setTimeout(() => {
-                        this.success = "";
-                    }, 3000);
+                        this.loading = false;
+                    }, 500);
                 } else {
                     alert("Something Went Wrong")
                 }

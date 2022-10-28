@@ -23,7 +23,7 @@ class FareClassController extends Controller
 
     protected function index()
     {
-        return FareClass::with('addedBy')->where('is_active', 1)
+        return FareClass::with('addedBy')
         ->where('company_id', $this->company_id)->orderBy('id')
         ->get();
     }

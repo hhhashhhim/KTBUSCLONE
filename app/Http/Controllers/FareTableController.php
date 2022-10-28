@@ -78,7 +78,7 @@ class FareTableController extends Controller
 
     public function getFareClass()
     {
-        return FareClass::where('is_active', 1)->where('company_id', $this->company_id)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
+        return FareClass::where('company_id', $this->company_id)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
     }
 
     public function check(Request $request)
