@@ -11,14 +11,15 @@ import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
 import RoutePage from "./pages/route/RoutePage.vue";
 import CitiesPage from "./pages/city/CitiesPage.vue";
-import DiscountPage from "./pages/discount/DiscountPage";
-import SurchargePage from "./pages/surcharge/SurchargePage";
-import SchedulePage from "./pages/schedule/SchedulePage";
-import FareClass from "./pages/fareClass/FareClassPage";
-import BusesPage from "./pages/buses/BusesPage";
-import BusClassPage from "./pages/buses/BusClassPage";
-import BookingPage from "./pages/booking/BookingPage";
-import EmployeesPage from "./pages/hrm/employees/EmployeesPage";
+import DiscountPage from "./pages/discount/DiscountPage.vue";
+import SurchargePage from "./pages/surcharge/SurchargePage.vue";
+import SchedulePage from "./pages/schedule/SchedulePage.vue";
+import FareClass from "./pages/fareClass/FareClassPage.vue";
+import BusesPage from "./pages/buses/BusesPage.vue";
+import BusClassPage from "./pages/buses/BusClassPage.vue";
+import BookingPage from "./pages/booking/BookingPage.vue";
+import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
+import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 
 // const url = '/projects/kt/'
 const url = '/kt/'
@@ -120,9 +121,14 @@ const routes = [
         name:"booking-page"
     },
     {
-        path: url + "hrm/employees",
+        path: url + "hrm/employee",
         component : EmployeesPage,
         name:"employees"
+    },
+    {
+        path: url + "hrm/leave",
+        component : LeavePage,
+        name:"leaves"
     },
 ]
 const router = createRouter({

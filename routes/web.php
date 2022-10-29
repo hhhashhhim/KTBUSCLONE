@@ -10,6 +10,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Discount\DiscountController;
 use App\Http\Controllers\FareClass\FareClassController;
 use App\Http\Controllers\FareTableController;
+use App\Http\Controllers\Hrm\Employee\EmployeeController;
 use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
@@ -156,6 +157,16 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/reschedule', [BookingController::class, 'reschedule']);
     Route::post('/seat-classes', [BookingController::class, 'seatClasses']);
     Route::post('/fetchSchedule', [BookingController::class, 'fetchSpecificSchedule']);
+
+});
+
+Route::group(['prefix' => 'hrm/employee', [CustomMiddleware::class]], function () {
+    Route::post('/', [EmployeeController::class, 'index']);
+    Route::post('/store', [EmployeeController::class, 'store']);
+    Route::post('/update', [EmployeeController::class, 'update']);
+    Route::post('/delete', [EmployeeController::class, 'delete']);
+    Route::post('/logo-upload', [EmployeeController::class, 'logoUpload']);
+
 
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

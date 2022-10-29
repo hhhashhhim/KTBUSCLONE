@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Employees</h4>
+                            <h4>Leaves</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -13,7 +13,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary" @click="clearForm()"
                                 >
-                                    Add New Employee
+                                    Apply For Leave
                                 </a>
                             </div>
                         </div>
@@ -47,42 +47,34 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Profile</th>
-                                                        <th>Name</th>
-                                                        <th>Contact #</th>
-                                                        <th>Company</th>
-                                                        <th>Department</th>
-                                                        <th>Hiring Date</th>
-                                                        <th>CNIC # </th>
+                                                        <th>Form</th>
+                                                        <th>To</th>
+                                                        <th>Reason</th>
+<!--                                                        <th>Days</th>-->
+                                                        <th>Decision Maker</th>
                                                         <th>Status</th>
-                                                        <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(employee, i) in employees" :key="i">
+                                                    <tr v-for="(leave, i) in leaves" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td> <a :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img" target="_blank">
-                                                            <img :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img" style="width:120px;height:150px;" alt="">
-                                                        </a>
-                                                        </td>
-                                                        <td>{{ employee.name}}</td>
-                                                        <td>{{ phoneFormat(employee.contact)}}</td>
-                                                        <td>{{ employee.company.name}}</td>
-                                                        <td>{{ employee.department}}</td>
-                                                        <td>{{ employee.hiring_date}}</td>
-                                                        <td>{{ cnicFormat(employee.cnic)}}</td>
-                                                        <td><div :class="getStatusClass(employee.status)">{{ getStatusName(employee.status)}}</div></td>
-                                                        <td>{{ employee.added_by.name }}</td>
+                                                        <td>{{ leave.from}}</td>
+                                                        <td>{{ leave.to}}</td>
+                                                        <td>{{ leave.reason}}</td>
+<!--                                                        <td>{{ leave.days}}</td>-->
+                                                        <td>{{ cnicFormat(leave.cnic)}}</td>
+                                                        <td><div :class="getStatusClass(leave.status)">{{ getStatusName(leave.status)}}</div></td>
+                                                        <td>{{ leave.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editEmployee(employee)"
+                                                                    @click="editEmployee(leave)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                             <button :data-target="'#' + deleteFormID"
                                                                     data-toggle="modal"
-                                                                    @click="deleteModal(employee,i)"
+                                                                    @click="deleteModal(leave,i)"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
@@ -466,7 +458,7 @@ export default {
                 paidLeaves: '0',
                 salaryTypeRadio: 'cash'
             },
-            employees : [],
+            leaves : [],
             urlProfile: '',
             urlCNICBack: '',
             urlCNICFront: '',
@@ -483,9 +475,9 @@ export default {
             nameBackEdit: '',
             nameFrontEdit: '',
             loading: false,
-            formID: "employees_form",
-            editFormID: "edit_employees_form",
-            deleteFormID: "delete_employees_form",
+            formID: "leaves_form",
+            editFormID: "edit_leaves_form",
+            deleteFormID: "delete_leaves_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -565,7 +557,7 @@ export default {
         async fetchEmployees() {
             const resEmployeeIndex = await this.callApi("post", 'hrm/employee');
             if (resEmployeeIndex.status == 200) {
-                this.employees = resEmployeeIndex.data
+                this.leaves = resEmployeeIndex.data
 
             } else {
                 console.log(resEmployeeIndex);
@@ -597,7 +589,7 @@ export default {
             }
         },
         clearForm: function () {
-           this.addForm = {};
+            this.addForm = {};
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
@@ -914,7 +906,7 @@ export default {
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.employees.splice(obj.index, 1)
+                this.leaves.splice(obj.index, 1)
                 this.fetchEmployees();
                 // setTimeout(function () {
                 //     $('#employee_table').DataTable();
@@ -925,5 +917,4 @@ export default {
 };
 </script>
 <style scoped>
-
 </style>
