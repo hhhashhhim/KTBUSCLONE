@@ -58,7 +58,7 @@
                                 <i class="fa fa-bus"></i> Buses
                             </router-link>
                         </li>
-                        
+
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'routes-page' }">
                                 <i class="fas fa-route"></i> Routes
@@ -118,7 +118,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'roles' }"
+                            <router-link class="nav-link text-capitalize" :to="{ name:'employees' }"
                                          v-if="checkForSubmenu('employee')">
                                 <i class="fas fa-users"></i> Employees
                             </router-link>

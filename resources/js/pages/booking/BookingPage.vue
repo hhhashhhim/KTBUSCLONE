@@ -3,7 +3,7 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
-          <div class="card card-success">
+          <div class="card card-primary">
             <div class="card-header d-flex justify-content-between">
               <h4>Booking</h4>
               <div class="card-header-action">
@@ -360,7 +360,6 @@
     <Delete :deleteForm="deleteFormID"
       confirmationMessage="Are You Sure You want To Delete This Booking ???"
     />
-
     <PartialSeatPopup :formID="partialSeatFormId" :seats="bookedSeats" />
     <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" />
     <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />

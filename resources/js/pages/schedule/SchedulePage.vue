@@ -3,7 +3,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Schedule</h4>
                             <div class="card-header-action">
@@ -470,33 +470,17 @@
                 :editForm="editFormID"
             >
                 <div class="row mb-3">
-                    <div
-                        class="col-md-4 text-center"
-                        :class="
-              editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary'
-            "
-                    >
+                    <div class="col-md-3 text-center" :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' " >
                         Step 1
                     </div>
-                    <div
-                        class="col-md-4 text-center"
-                        :class="
-              editActiveSection != 'step1'
-                ? ''
-                : 'border p-3  text-light bg-info'
-            "
-                    >
+                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info' ">
                         Step 2
                     </div>
-                    <div
-                        class="col-md-4 text-center"
-                        :class="
-              editActiveSection != 'step2'
-                ? ''
-                : 'border p-3  text-light bg-success'
-            "
-                    >
+                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success' ">
                         Step 3
+                    </div>
+                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning' ">
+                        Step 4
                     </div>
                 </div>
                 <section
@@ -577,7 +561,7 @@
                                 id="busClassEdit"
                                 v-model="dataEdit.schedules.bus_class_id"
                             >
-                                <option value="" selected>Select Bus Class</option>
+                                <option value="0" selected>Select Bus Class</option>
                                 <option
                                     v-for="(type, i) in busClasses"
                                     :value="type.id"
@@ -594,7 +578,7 @@
                                 id="fareClassEdit"
                                 v-model="dataEdit.schedules.fare_class_id"
                             >
-                                <option value="" selected>Select Fare Class</option>
+                                <option value="0" selected>Select Fare Class</option>
                                 <option
                                     v-for="(type, i) in fareClasses"
                                     :value="type.id"
@@ -718,6 +702,79 @@
                         </div>
                         <div class="col-md-6">
                             <button
+                                class="btn btn-success step2 float-right"
+                                @click="editNextSection('step3')"
+                            >
+                                Next<i class="fas fa-arrow-right mr-1"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </section>
+                <section
+                    class="section4"
+                    :class="editActiveSection != 'step3' ? 'd-none' : ''"
+                >
+                    <div class="row my-3 py-2">
+                        <div class="col-md-12 text-center">
+                            <span class="h3 font-weight-bold text-muted"> Review </span>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-12 form-group table-responsive">
+                            <table class="table table-striped table-bordered text-dark">
+                                <tbody>
+                                <tr>
+                                    <th class="mr-3">Name</th>
+                                    <td colspan="3">{{ this.dataPreview.Name }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="mr-3">Start Date</th>
+                                    <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
+                                    <th class="mr-3">End Date</th>
+                                    <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Time</th>
+                                    <td> {{ this.dataPreview.time }}</td>
+                                    <th class="mr-3">Selected Bus Class</th>
+                                    <td>{{ this.dataPreview.busClass }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="mr-3">Default Bus Fare Class</th>
+                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="mr-3">Route</th>
+                                    <td colspan="3">{{ this.dataPreview.route }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="mr-3">Discount</th>
+                                    <td> {{
+                                            this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
+                                        }}
+                                    </td>
+                                    <th class="mr-3">Surcharge</th>
+                                    <td> {{
+                                            this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
+                                        }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button
+                                class="btn btn-info back2 float-left"
+                                @click="editPreviousSection('step2')"
+                            >
+                                <i class="fas fa-arrow-left mr-1"></i> Previous
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button
                                 id="submitFormButton"
                                 class="btn btn-success float-right"
                                 @click="updateSchedule" :class="loading?'disabled':''"
@@ -727,6 +784,8 @@
                         </div>
                     </div>
                 </section>
+
+
             </Edit>
             <!--            Edit Model End-->
             <Delete :deleteForm="deleteFormID"
@@ -1091,6 +1150,7 @@ export default {
             }
             //Step 2
             if (nextBtnValue == 'step2') {
+
                 if (this.data.route == 0)
                     return swal({
                         title: "Required!",
@@ -1098,6 +1158,26 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
+
+                if ( this.data.addTerminalsOnClick.length === 0) {
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select Terminals of Selected Route",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
+                if( this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2 )
+                {
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select at Least 2 Terminals of Selected Route",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
                 if (this.data.busClass == 0)
                     return swal({
                         title: "Required!",
