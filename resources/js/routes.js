@@ -20,8 +20,8 @@ import BusClassPage from "./pages/buses/BusClassPage";
 import BookingPage from "./pages/booking/BookingPage";
 import EmployeesPage from "./pages/hrm/employees/EmployeesPage";
 
-// const url = '/projects/kt/'
-const url = '/kt/'
+const url = '/projects/kt/'
+// const url = '/kt/'
 
 const routes = [
     {

@@ -81,7 +81,7 @@
       <div class="row">
           <div class="col-md-6 form-group">
               <label for="departureCity">Departure City <span class="text-danger">*</span></label>
-              <select class="form-control" id="departureCity" v-model="addForm.departureCity">
+              <select class="form-control" id="departureCity" @change="fetchSpecificSchedules()" v-model="addForm.departureCity">
                   <option value="0" selected>Select Departure City</option>
                   <option
                       v-for="(city, i) in cities"
@@ -93,7 +93,7 @@
               </select>
           </div>
           <div class="col-md-6 form-group"><label for="destinationCity">Destination City<span class="text-danger">*</span></label>
-              <select class="form-control" id="destinationCity" v-model="addForm.destinationCity">
+              <select class="form-control" id="destinationCity" @change="fetchSpecificSchedules()" v-model="addForm.destinationCity">
                   <option value="0" selected>Select Destination City</option>
                   <option
                       v-for="(city, i) in cities"
@@ -518,14 +518,14 @@ export default {
       this.addForm.totalFare = 0;
       this.validationErrors = [];
 
-      if (this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined')
+      if ( this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined' )
           return swal({
               title: "Required",
               text: "Please any Departure City",
               icon: "error",
               timer: 2000
           });
-          if (this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined')
+          if ( this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined' )
           return swal({
               title: "Required",
               text: "Please Select Destination City",
@@ -552,6 +552,8 @@ export default {
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
         date: this.addForm.date,
+        departureCity: this.addForm.departureCity,
+        destinationCity: this.addForm.destinationCity,
       });
       if (res.status == 200) {
         this.loading = false
