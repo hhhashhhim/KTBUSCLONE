@@ -24117,7 +24117,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getClasses: function getClasses(col) {
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
       var selected = col.selected ? "selected" : "";
-      return gender + " " + selected;
+      var partial = col.partial ? "partial" : "";
+      return gender + " " + selected + " " + partial;
     },
     add: function add() {
       var _this5 = this;
@@ -24183,7 +24184,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this5.resetingArrays();
 
-                  _this5.addForm = {};
+                  _this5.addForm = {
+                    type: "booked",
+                    gender: "1",
+                    customerCNIC: "",
+                    schedule: 0,
+                    totalFare: 0,
+                    destinationCity: 0,
+                    departureCity: 0
+                  };
                   window.scrollTo(0, 0);
                 } else {
                   if (res.status === 422) {
@@ -24309,7 +24318,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     reset: function reset() {
-      this.addForm = {};
+      this.addForm = {
+        type: "booked",
+        gender: "1",
+        customerCNIC: "",
+        schedule: 0,
+        totalFare: 0,
+        destinationCity: 0,
+        departureCity: 0
+      };
       this.schedule = "";
       this.showBookingDiv = false;
     }
@@ -33642,8 +33659,7 @@ var _hoisted_54 = {
 
 var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "col-md-3 pt-3 font-weight-bold",
-    "for": "contact"
+    "class": "col-md-3 pt-3 font-weight-bold"
   }, "Gender", -1
   /* HOISTED */
   );
@@ -33655,7 +33671,8 @@ var _hoisted_56 = {
 
 var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "mx-3"
+    "class": "mx-3",
+    "for": "female-booking"
   }, "Female", -1
   /* HOISTED */
   );
@@ -33663,7 +33680,8 @@ var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "mx-3"
+    "class": "mx-3",
+    "for": "male-booking"
   }, "Male", -1
   /* HOISTED */
   );
@@ -33688,7 +33706,8 @@ var _hoisted_61 = {
 
 var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "mx-3"
+    "class": "mx-3",
+    "for": "type-issue"
   }, "Issue", -1
   /* HOISTED */
   );
@@ -33696,7 +33715,8 @@ var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "mx-3"
+    "class": "mx-3",
+    "for": "type-book"
   }, "Book", -1
   /* HOISTED */
   );
@@ -33845,7 +33865,7 @@ var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_83 = ["onClick"];
+var _hoisted_83 = ["onClick", "title"];
 
 var _hoisted_84 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
@@ -34023,7 +34043,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.options
       }, null, 8
       /* PROPS */
-      , ["onKeyup", "modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <input\r\n                  type=\"text\"\r\n                  @keypress=\"phoneFormat($event)\"\r\n                  class=\"form-control col-md-9\"\r\n                  id=\"contact\"\r\n                  v-model=\"addForm.contact\"\r\n                /> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , ["onKeyup", "modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control col-md-9",
         id: "remarks",
@@ -34034,6 +34054,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.remarks]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
+        id: "female-booking",
         "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
           return $data.addForm.gender = $event;
         }),
@@ -34042,6 +34063,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.addForm.gender]]), _hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
+        id: "male-booking",
         "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
           return $data.addForm.gender = $event;
         }),
@@ -34050,6 +34072,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.addForm.gender]]), _hoisted_58])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
+        id: "type-issue",
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.addForm.type = $event;
         }),
@@ -34058,6 +34081,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.addForm.type]]), _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
+        id: "type-book",
         "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
           return $data.addForm.type = $event;
         }),
@@ -34139,17 +34163,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             key: colIndex
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"colIndex==0\">\r\n                                          {{ col }}\r\n                                        </div> "), col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: 0,
-            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow-sm", $options.getClasses(col)]),
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow", $options.getClasses(col)]),
             onClick: function onClick($event) {
               return $options.selectSeat(rowIndex, colIndex, col.seatNo);
             },
             style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
               border: '3px solid ' + col.color + ' !important'
-            })
+            }),
+            title: col.partial ? col.departure_city + ' to ' + col.destination_city : ''
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" data-toggle=\"modal\"\r\n                                            :data-target=\"col.type?'#booking-options-popup':''\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
           /* TEXT */
           ), _hoisted_84, col.type && (col.type == 'booked' || col.type == 'advance booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["fas", col.type == 'booked' ? 'fa-check-double' : 'fa-check'])
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["type-icons fas", col.type == 'booked' ? 'fa-check-double' : 'fa-check'])
           }, null, 2
           /* CLASS */
           )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14
@@ -49122,7 +49147,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\n}\n.image-span[data-v-03b302d9]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\r\n  background-color: #6db131 !important;\n}\n.seat-img[data-v-03b302d9] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after{\r\n  content: \"\";\r\n  position: absolute; \r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-03b302d9] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-03b302d9]{\r\n  position: relative;\r\n  z-index: 10;\n}\r\n\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -17,7 +17,14 @@ class Ticket extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by');
     }
-
+    public function departure_city()
+    {
+        return $this->hasOne( City::class, 'id', 'departure_city_id');
+    }
+    public function destination_city()
+    {
+        return $this->hasOne( City::class, 'id', 'destination_city_id');
+    }
     public function updated_by()
     {
         return $this->hasOne(User::class, 'id', 'updated_by');

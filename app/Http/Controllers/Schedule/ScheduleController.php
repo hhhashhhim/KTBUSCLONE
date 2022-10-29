@@ -191,7 +191,8 @@ class ScheduleController extends Controller
     {
 
         // Getting Already Booked Tickets
-        $tickets = Ticket::where('company_id',$this->company_id)->where('schedule_id', $request->id)
+        $tickets = Ticket::with('departure_city','destination_city')
+        ->where('company_id',$this->company_id)->where('schedule_id', $request->id)
         ->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
 
@@ -218,40 +219,45 @@ class ScheduleController extends Controller
         }
         
         $fare = (float) $fareForAllClasses->where('fare_class',$schedule->fare_class_id)->first()->fare;
-
         // Looping Throug the each seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
         
         for ($i = 0; $i < count($seatMap); $i++) {
-            foreach ($seatMap[$i] as $j => $column) {
+            foreach ( $seatMap[$i] as $j => $column ) {
                 // adding fare to each seat
-                if ($column['reserved']) {
+                if ( $column['reserved'] ) {
                     $seatMap[$i][$j]['fare'] = $fare;
                 }
                 $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
-                if ($result !== false) {
+                if ( $result !== false ) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
+                    $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     $seatMap[$i][$j]['fare'] = 0;
+
+                    if (isset($seatMap[$i][$j]['partial'])) {
+                        $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
+                        $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
+                    }
+                    
                 }
                 // print_r($column);
                 if ( isset($column['class']) ) {
                     $class = $fareClasses->where('id',$column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '' ;
-                    if ($class && $class->is_active==0) {
+                    if ( $class && $class->is_active==0 ) {
                         return response()->json([
                             "errors"=>[
                                 "Fare Error"=>["This Bus Class Includes a Class Which is't Active Please Active That Class First !!!"]
                             ]
                         ],422);
                     }
-                    if ($class) {
+                    if ( $class ) {
                         $seatMap[$i][$j]['fare'] = (float) $fareForAllClasses->where('fare_class',$class->id)->first()->fare;
                     }
 
                 }
-
             }
         }
         $schedule->bus_class->seat_map = $seatMap;
@@ -259,31 +265,6 @@ class ScheduleController extends Controller
         return $schedule;
 
 
-        // $tickets = Ticket::where('company_id',$this->company_id)->where('schedule_id', $request->id)
-        // ->whereDate('date', $request->date)->get();
-        // $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-        // $schedule = Schedule::where('id', $request->id)
-        // ->where('company_id',$this->company_id)
-        // ->select('id', 'fare_class_id')
-        // ->with('bus_class:id,seat_map','route')->first();
-        // $seatMap = $schedule->bus_class->seat_map;
-        // $fareClasses = FareClass::get();
-        // for ($i = 0; $i < count($seatMap); $i++) {
-        //     foreach ($seatMap[$i] as $j => $column) {
-        //         $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
-        //         if ($result !== false) {
-        //             $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
-        //             $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
-        //             $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
-        //         }
-        //         // print_r($column);
-        //         if ( isset($column['class']) ) {
-        //             $seatMap[$i][$j]['color'] = $busClasses->where('id',$column['class'])->first()?$busClasses->where('id',$column['class'])->first()->color:'';
-        //         }
-        //     }
-        // }
-        // $schedule->bus_class->seat_map = $seatMap;
-        // return $schedule;
     }
 
 }
