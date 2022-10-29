@@ -81,7 +81,7 @@
       <div class="row">
           <div class="col-md-6 form-group">
               <label for="departureCity">Departure City <span class="text-danger">*</span></label>
-              <select class="form-control" id="departureCity" v-model="addForm.departureCity">
+              <select class="form-control" id="departureCity" @change="fetchSpecificSchedules()" v-model="addForm.departureCity">
                   <option value="0" selected>Select Departure City</option>
                   <option
                       v-for="(city, i) in cities"
@@ -93,7 +93,7 @@
               </select>
           </div>
           <div class="col-md-6 form-group"><label for="destinationCity">Destination City<span class="text-danger">*</span></label>
-              <select class="form-control" id="destinationCity" v-model="addForm.destinationCity">
+              <select class="form-control" id="destinationCity" @change="fetchSpecificSchedules()" v-model="addForm.destinationCity">
                   <option value="0" selected>Select Destination City</option>
                   <option
                       v-for="(city, i) in cities"
@@ -180,13 +180,7 @@
                   :options="options"
                 >
                 </vue-mask>
-                <!-- <input
-                  type="text"
-                  @keypress="phoneFormat($event)"
-                  class="form-control col-md-9"
-                  id="contact"
-                  v-model="addForm.contact"
-                /> -->
+                
               </div>
               <div class="form-group row">
                 <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
@@ -200,14 +194,14 @@
                 />
               </div>
               <div class="form-group row">
-                <label class="col-md-3 pt-3 font-weight-bold" for="contact"
+                <label class="col-md-3 pt-3 font-weight-bold"
                   >Gender</label
                 >
                 <div class="col-md-9 pt-3">
-                  <input type="radio" v-model="addForm.gender" value="0" />
-                  <label class="mx-3">Female</label>
-                  <input type="radio" v-model="addForm.gender" value="1" />
-                  <label class="mx-3">Male</label>
+                  <input type="radio" id="female-booking" v-model="addForm.gender" value="0" />
+                  <label class="mx-3" for="female-booking">Female</label>
+                  <input type="radio" id="male-booking" v-model="addForm.gender" value="1" />
+                  <label class="mx-3" for="male-booking">Male</label>
                 </div>
               </div>
               <div class="form-group row">
@@ -215,14 +209,15 @@
                   >Issue Or Book</label
                 >
                 <div class="col-md-9 pt-3">
-                  <input type="radio" v-model="addForm.type" value="booked" />
-                  <label class="mx-3">Issue</label>
+                  <input type="radio" id="type-issue" v-model="addForm.type" value="booked" />
+                  <label class="mx-3" for="type-issue">Issue</label>
                   <input
                     type="radio"
+                    id="type-book"
                     v-model="addForm.type"
                     value="advance booking"
                   />
-                  <label class="mx-3">Book</label>
+                  <label class="mx-3" for="type-book">Book</label>
                 </div>
               </div>
               <div class="form-group row">
@@ -331,10 +326,11 @@
                                         </div> -->
                   <div
                     v-if="col.reserved"
-                    class="image-span d-block text-center text-white shadow-sm"
+                    class="image-span d-block text-center text-white shadow"
                     @click="selectSeat(rowIndex, colIndex, col.seatNo)"
                     :class="getClasses(col)"
-                    :style="{border:'3px solid '+col.color+' !important'}"
+                    :style="{border:'3px solid ' + col.color + ' !important'}"
+                    :title="col.partial?col.departure_city + ' to ' + col.destination_city:''"
                   >
                     <!-- data-toggle="modal"
                                             :data-target="col.type?'#booking-options-popup':''" -->
@@ -342,7 +338,7 @@
                     <br />
                     <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                       <i
-                        class="fas"
+                        class="type-icons fas"
                         :class="
                           col.type == 'booked' ? 'fa-check-double' : 'fa-check'
                         "
@@ -364,7 +360,6 @@
     <Delete :deleteForm="deleteFormID"
       confirmationMessage="Are You Sure You want To Delete This Booking ???"
     />
-
     <PartialSeatPopup :formID="partialSeatFormId" :seats="bookedSeats" />
     <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" />
     <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />
@@ -523,14 +518,14 @@ export default {
       this.addForm.totalFare = 0;
       this.validationErrors = [];
 
-      if (this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined')
+      if ( this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined' )
           return swal({
               title: "Required",
               text: "Please any Departure City",
               icon: "error",
               timer: 2000
           });
-          if (this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined')
+          if ( this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined' )
           return swal({
               title: "Required",
               text: "Please Select Destination City",
@@ -557,6 +552,8 @@ export default {
       const res = await this.callApi("post", "schedule/selected", {
         id: this.addForm.schedule,
         date: this.addForm.date,
+        departureCity: this.addForm.departureCity,
+        destinationCity: this.addForm.destinationCity,
       });
       if (res.status == 200) {
         this.loading = false
@@ -648,7 +645,9 @@ export default {
           ? "for-male"
           : "";
       let selected = col.selected ? "selected" : "";
-      return gender + " " + selected;
+      let partial = col.partial ? "partial" : "";
+
+      return gender + " " + selected + " " + partial;
     },
     async add() {
       this.validationErrors = [];
@@ -680,7 +679,15 @@ export default {
         this.success = "Booking Created Successfully";
         this.fetchScheduleData();
         this.resetingArrays();
-        this.addForm={};
+        this.addForm={
+          type: "booked",
+          gender: "1",
+          customerCNIC: "",
+          schedule: 0,
+          totalFare:0,
+          destinationCity:0,
+          departureCity:0,
+        };
         window.scrollTo(0, 0);
       } else {
         if (res.status === 422) {
@@ -733,7 +740,15 @@ export default {
       }
     },
     reset(){
-      this.addForm={};
+      this.addForm={
+        type: "booked",
+        gender: "1",
+        customerCNIC: "",
+        schedule: 0,
+        totalFare:0,
+        destinationCity:0,
+        departureCity:0,
+      };
       this.schedule = "";
       this.showBookingDiv = false;
     }
@@ -758,6 +773,9 @@ export default {
   background-color: #b9dea0;
   border-radius: 10px;
   cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  
 }
 
 .image-span:hover {
@@ -790,6 +808,18 @@ export default {
 
 .selected {
   background-color: #6db131 !important;
+}
+.partial::after{
+  content: "";
+  position: absolute; 
+  top: 0;
+  right: 0;
+  z-index: -1;
+  height: 100%;
+  width: 50%;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .seat-img {
@@ -835,4 +865,9 @@ img {
   padding: 5px;
   color: black;
 }
+.type-icons{
+  position: relative;
+  z-index: 10;
+}
+
 </style>

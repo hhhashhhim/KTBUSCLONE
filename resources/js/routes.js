@@ -21,8 +21,8 @@ import BookingPage from "./pages/booking/BookingPage.vue";
 import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
 import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 
-// const url = '/projects/kt/'
-const url = '/kt/'
+const url = '/projects/kt/'
+// const url = '/kt/'
 
 const routes = [
     {

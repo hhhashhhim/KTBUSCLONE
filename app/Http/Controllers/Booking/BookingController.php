@@ -45,11 +45,27 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        $schedule = Schedule::where('id',$request->schedule)
-        ->select('id','fare_class_id','company_id')->with('bus_class')
-        ->first();
+        
+        $schedule = Schedule::where('id', $request->schedule)
+        ->where('company_id',$this->company_id)
+        ->select('id', 'fare_class_id','route_id','bus_class_id')
+        ->with('bus_class:id,seat_map','route:id,name','route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+
+        $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+        $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+        $isPartial = 0;
+        if ( $request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id ) {
+            $isPartial=1;
+        }
+        // $schedule = Schedule::where('id',$request->schedule)
+        // ->select('id','fare_class_id','company_id')->with('bus_class')
+        // ->first();
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
         $customer = Customer::where('cnic',$cnicFormat)->first();
+
+        // Fare Fetching About the Schedule
+        
+        
         if (!$customer) {
             $customer = Customer::create([
                 'company_id'=>$this->company_id,
@@ -59,13 +75,23 @@ class BookingController extends Controller
                 'contact'=>$request->contact,
             ]);
         }
+
+        
+        // Getting Already Booked Tickets
+       
+        
         $bookingNo = Ticket::latest()->first()->booking_no ?? 0;
         ++$bookingNo;
+        
         foreach ($request->selectedSeats as $i => $seat) {
+
             Ticket::create([
-                'company_id'=>$schedule->company_id,
+                'company_id'=>$this->company_id,
+                'departure_city_id'=>$request->departureCity,
+                'destination_city_id'=>$request->destinationCity,
                 // 'bus_class_id'=>$schedule->fare_class_id,
                 'seat_no'=>$seat,
+                'is_partial'=>$isPartial,
                 'booking_no'=>$bookingNo,
                 'date'=>$request->date,
                 'customer_id'=>$customer->id,
@@ -76,7 +102,9 @@ class BookingController extends Controller
                 'added_by'=>Auth::user()->id,
                 'discount'=>$request->discount,
             ]);
+            
         }
+        
         return "Successfully Boooking Created";
 
     }
