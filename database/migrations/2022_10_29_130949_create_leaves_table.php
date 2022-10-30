@@ -15,6 +15,15 @@ class CreateLeavesTable extends Migration
     {
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
+            $table->integer('applied_by')->nullable();
+            $table->date('from')->nullable();
+            $table->date('to')->nullable();
+            $table->integer('days')->nullable();
+            $table->text('reason')->nullable();
+            $table->enum('status', ['P', 'A', 'R', ])->nullable();
+            $table->integer('company_id')->nullable();
+            $table->integer('added_by')->nullable();
+            $table->softDeletes()->useCurrent();
             $table->timestamps();
         });
     }

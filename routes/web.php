@@ -11,6 +11,7 @@ use App\Http\Controllers\Discount\DiscountController;
 use App\Http\Controllers\FareClass\FareClassController;
 use App\Http\Controllers\FareTableController;
 use App\Http\Controllers\Hrm\Employee\EmployeeController;
+use App\Http\Controllers\Hrm\Leave\LeaveController;
 use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
@@ -166,7 +167,12 @@ Route::group(['prefix' => 'hrm/employee', [CustomMiddleware::class]], function (
     Route::post('/update', [EmployeeController::class, 'update']);
     Route::post('/delete', [EmployeeController::class, 'delete']);
     Route::post('/logo-upload', [EmployeeController::class, 'logoUpload']);
+});
 
-
+Route::group(['prefix' => 'hrm/leave', [CustomMiddleware::class]], function () {
+    Route::post('/', [LeaveController::class, 'index']);
+    Route::post('/store', [LeaveController::class, 'store']);
+    Route::post('/update', [LeaveController::class, 'update']);
+    Route::post('/delete', [LeaveController::class, 'delete']);
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');
