@@ -110,7 +110,7 @@
         </div>
           <div class="col-md-5 class form-group">
               <label for="scheduleName">Schedule Name <span class="text-danger">*</span></label>
-              <select class="form-control" id="scheduleName" v-model="addForm.schedule" @change="resetSelectBooking($event)">
+              <select class="form-control" id="scheduleName" v-model="addForm.schedule">
                   <option value="0" selected>Select Schedule</option>
                   <option
                       v-for="(schedule, i) in allSchedules"
@@ -326,6 +326,10 @@
                   <span class="text-wrap">Over Issue</span>
                 </div>
               </div>
+
+
+              <!-- Seat Map Section -->
+              
               <div
                 class="d-flex justify-content-center seat-img p-0 m-0"
                 v-for="(record, rowIndex) in schedule.bus_class.seat_map"
@@ -383,9 +387,7 @@
     <Delete :deleteForm="deleteFormID"
       confirmationMessage="Are You Sure You want To Delete This Booking ???"
     />
-    <PartialSeatPopup :formID="partialSeatFormId" :seats="bookedSeats" />
     <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" />
-    <ShiftingPopup :formID="shiftingFormId" :seats="bookedSeats" />
     <DetailsModal :formID="detailsFormId" :details="bookingDetails" />
   </section>
 </template>
@@ -393,7 +395,6 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import PartialSeatPopup from "./popup/PartialSeatPopup.vue";
 import Delete from "../../components/Delete.vue";
 import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
@@ -406,7 +407,6 @@ export default {
     Add,
     Edit,
     Delete,
-    PartialSeatPopup,
     ReschedulePopup,
     DetailsModal,
     vueMask,
@@ -456,7 +456,7 @@ export default {
     const resBooking = await this.callApi("post", "booking");
     const resClass = await this.callApi("post","fare-class")
     const resCity = await this.callApi("post","cities")
-    if (/*res.status == 200 &&*/ resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 ) {
+    if (/*res.status == 200 &&*/ resBooking.status == 200 && resClass.status == 200 ) {
       // this.allSchedules = res.data;
       this.allBookings = resBooking.data;
       this.allSeatClasses = resClass.data;
@@ -471,23 +471,23 @@ export default {
   },
 
   methods: {
-      resetSelectBooking(evt){
-        if(evt.target.value == '0'){
-            this.showBookingDiv = false;
-        }  else{
-            this.showBookingDiv = true;
-        }
-      },
-      tConvert:function(time) {
-          time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+    resetSelectBooking(evt){
+      if(evt.target.value == '0'){
+          this.showBookingDiv = false;
+      }  else{
+          this.showBookingDiv = true;
+      }
+    },
+    tConvert:function(time) {
+        time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
 
-          if (time.length > 1) {
-              time = time.slice(1);
-              time[5] = +time[0] < 12 ? ' AM' : ' PM';
-              time[0] = +time[0] % 12 || 12;
-          }
-          return time.join('');
-      },
+        if (time.length > 1) {
+            time = time.slice(1);
+            time[5] = +time[0] < 12 ? ' AM' : ' PM';
+            time[0] = +time[0] % 12 || 12;
+        }
+        return time.join('');
+    },
 
     async fetchSpecificSchedules(){
         this.getSchedule = true;
@@ -624,6 +624,7 @@ export default {
           this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedBookedSeats.push(seatNo);
           this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
+          // console.log(bookedSeats);
         }
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
       }else if (
@@ -652,13 +653,7 @@ export default {
               timer: 2000
           });
       }
-
-      // setTimeout(() => {
-      //   const sum = this.bookedSeats.reduce((sum,seat)=>{
-      //     return parseInt(sum) + parseInt(seat.fare);
-      //   },0)
-      //   console.log(sum);
-      // }, 400);
+      
     },
     getClasses(col) {
       let gender =
