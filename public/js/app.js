@@ -48064,7 +48064,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // const url = '/projects/kt/'
 
-var url = '/kt/';
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
