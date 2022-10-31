@@ -133,7 +133,11 @@ class BookingController extends Controller
         foreach ($routes as $key => $route){
             $routes_id[] = $route->route_id;
         }
-       return Schedule::whereIn('route_id',array_unique($routes_id))->whereDate('start_date', '<=', $request->date)->whereDate('end_date', '>=',$request->date)->get();
+        
+       return Schedule::whereIn('route_id',array_unique($routes_id))
+       ->whereDate('start_date', '<=', $request->date)
+       ->whereDate('end_date', '>=',$request->date)
+       ->get();
     }
 
     public function getCnic(Request  $request)
