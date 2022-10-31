@@ -16,6 +16,7 @@ use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -203,9 +204,15 @@ class ScheduleController extends Controller
 
         $schedule = Schedule::where('id', $request->id)
         ->where('company_id',$this->company_id)
-        ->select('id', 'fare_class_id','route_id','bus_class_id')
+        ->select('id', 'fare_class_id','route_id','bus_class_id','time')
         ->with('bus_class:id,seat_map','route:id,name','route.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
+        $start_datetime = new DateTime(date('Y-m-d H:i:s'));
+        $end_datetime = new DateTime(date('Y-m-d').' '.$schedule->time);
+        $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp())/60;
+        $leavingIn30Min = $diffInMins > 30 ? false : true ;
+
+        // return dd($leavingIn30Min);
         // Fare Fetching About the Schedule
         $route_departure_city_id = $schedule->route->fares->first()->departure_city_id;
         $route_destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -240,7 +247,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['fare'] = $fare;
                 }
                 $result = isset($column['seatNo'])?array_search($column['seatNo'], $ticketSeatNumbers):false;
-                if ( $result !== false ) {
+                if ( $result !== false && $leavingIn30Min != true ) {
 
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
@@ -280,6 +287,12 @@ class ScheduleController extends Controller
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
                     
+                }
+                if ($result !== false) {
+                    
+                }
+                if ( $result !== false && $leavingIn30Min ) {
+                    $seatMap[$i][$j]['over_issue'] = true;
                 }
                 // print_r($column);
                 if ( isset($column['class']) ) {

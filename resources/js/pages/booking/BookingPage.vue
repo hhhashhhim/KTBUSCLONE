@@ -295,7 +295,7 @@
                   <div class="not-for-sale circles mr-1 border shadow"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
-
+                
                 <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                   <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                   <span class="text-wrap">{{ seatClass.name }}</span>
@@ -313,6 +313,17 @@
                     class="fas fa-check-double circles icons-legend shadow mr-1 border"
                   ></div>
                   <span class="text-wrap">Issued</span>
+                </div>
+                
+                <div class="my-2">
+                  <div class="partial-seat circles mr-1 border shadow"></div>
+                  <span class="text-wrap" style="margin-top:-10px;">Partial Seat</span>
+                </div>
+                <div class="my-3">
+                  <div class="circles icons-legend mr-1 border shadow">
+                    <i class="fas fa-people-carry text-danger"></i>
+                  </div>
+                  <span class="text-wrap">Over Issue</span>
                 </div>
               </div>
               <div
@@ -340,10 +351,22 @@
                       <i
                         class="type-icons fas"
                         :class="
-                          col.type == 'booked' ? 'fa-check-double' : 'fa-check'
+                          col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'
                         "
-                      ></i>
+                      >
+                      </i>
+                      <i
+                        class="type-icons fas"
+                        :class="
+                          col.over_issue == true ? 'fa-people-carry' : ''
+                        "
+                      >
+                      </i>
                     </small>
+                    <small v-if="col.over_issue == true">
+                      <i class="type-icons fas fa-people-carry text-danger"></i>
+                    </small>
+
                   </div>
                   <span v-else></span>
                 </div>
@@ -869,5 +892,15 @@ img {
   position: relative;
   z-index: 10;
 }
+.partial-seat{
+  width: 30px;
+  height: 30px;
+  background: linear-gradient( 90deg, white 50%,black 50% ); 
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: content-box;
+  -moz-border-radius: 25px;
+  -webkit-border-radius: 25px;
 
+}
 </style>
