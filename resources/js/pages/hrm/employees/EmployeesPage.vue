@@ -198,11 +198,11 @@
                     <div class="form-group col-md-6 mt-4 pt-3">
                         <label for="salaryType" class="mr-3">Salary Type</label>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" name="salaryType" class="custom-control-input" value="bank" v-model="addForm.salaryTypeRadio" @click="salaryType('bank')">
+                            <input type="radio" id="bank" name="salaryTypeAdd" class="custom-control-input" value="bank" v-model="addForm.RadioSalaryTypeAdd">
                             <label class="custom-control-label" for="bank">Bank</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" checked="" name="salaryType" class="custom-control-input" value="cash" v-model="addForm.salaryTypeRadio" @click="salaryType('cash')">
+                            <input type="radio" id="cash" checked="" name="salaryTypeAdd" class="custom-control-input" value="cash" v-model="addForm.RadioSalaryTypeAdd">
                             <label class="custom-control-label" for="cash">Cash</label>
                         </div>
                     </div>
@@ -359,11 +359,11 @@
                     <div class="form-group col-md-6 mt-4 pt-3">
                         <label for="salaryType" class="mr-3">Salary Type</label>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'" name="salaryTypeEdit" class="custom-control-input" value="bank" v-model="dataEdit.salaryTypeRadioEdit" @click="editSalaryType('bank')">
+                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'" name="salaryTypeEdit" class="custom-control-input" value="bank" v-model="dataEdit.salaryTypeRadioEdit">
                             <label class="custom-control-label" for="bank">Bank</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'" name="salaryTypeEdit" class="custom-control-input" value="cash" v-model="dataEdit.salaryTypeRadioEdit" @click="editSalaryType('cash')">
+                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'" name="salaryTypeEdit" class="custom-control-input" value="cash" v-model="dataEdit.salaryTypeRadioEdit">
                             <label class="custom-control-label" for="cash">Cash</label>
                         </div>
                     </div>
@@ -462,9 +462,10 @@ export default {
             optionsContact: {
                 placeholder: "xxxx-xxxxxxx",
             },
+
             addForm: {
                 paidLeaves: '0',
-                salaryTypeRadio: 'cash'
+                RadioSalaryTypeAdd: 'cash',
             },
             employees : [],
             urlProfile: '',
@@ -490,7 +491,6 @@ export default {
             success: false,
             error: false,
             delId: "",
-            discountPercentageRadio: 'percentage',
             dataEdit: {},
             editImg: {},
         };
@@ -498,13 +498,16 @@ export default {
     async created() {
         await this.fetchEmployees();
     },
+
     methods: {
         phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
+
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
+
         onFileChange: function (e, imgTag) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png)$/i)) {
                 if (imgTag == 'profile') {
@@ -574,6 +577,7 @@ export default {
                 $("#employee_table").DataTable();
             }, 300);
         },
+
         getStatusName: function(value){
             if(value == 'W'){
                 return 'Working';
@@ -585,6 +589,7 @@ export default {
                 return 'Ternimated';
             }
         },
+
         getStatusClass: function(value){
             if(value == 'W'){
                 return 'badge badge-success';
@@ -596,9 +601,14 @@ export default {
                 return 'badge badge-danger';
             }
         },
+
         clearForm: function () {
-           this.addForm = {};
+           this.addForm = {
+               paidLeaves: '0',
+               RadioSalaryTypeAdd: 'cash',
+           };
         },
+
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -723,8 +733,8 @@ export default {
                 ImgEmployeeRecord = logoRes.data ??  "";
             }
             const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", {...this.addForm, ImgEmployeeRecord});
-            console.log(resEmployeeAdd.data)
-            if (resEmployeeAdd.status == 200) {
+            console.log(resEmployeeAdd)
+            if (resEmployeeAdd.status == 201) {
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -733,8 +743,8 @@ export default {
                     timer: 2000
                 });
                 await this.fetchEmployees();
+                this.clearForm();
                 window.scrollTo(0, 0);
-
             } else {
                 if (resEmployeeAdd.status == 422) {
                     this.loading = false;
@@ -869,7 +879,7 @@ export default {
             }
 
             const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {...this.dataEdit, ImgEmployeeRecordEdit});
-            if (resEmployeeUpdate.status === 200) {
+            if (resEmployeeUpdate.status == 200) {
                 this.loading = false;
                 swal({
                     title: "Success!",
@@ -894,7 +904,6 @@ export default {
             }
         },
 
-
         async deleteModal(emp, i) {
             const deletingObj = {
                 url: "hrm/employee/delete",
@@ -907,6 +916,7 @@ export default {
         editEmployee(employ) {
             this.dataEdit = employ;
         },
+
     },
     computed: {
         ...mapGetters(['getDeletingObj'])

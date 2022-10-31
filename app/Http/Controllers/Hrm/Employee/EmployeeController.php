@@ -12,7 +12,15 @@ use function PHPUnit\Framework\isNull;
 class EmployeeController extends Controller
 {
 
+    public $company_id;
 
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            return $next($request);
+        });
+    }
 
     public function index()
     {
@@ -67,7 +75,7 @@ class EmployeeController extends Controller
             'hiring_date' => $request->HiringDate,
             'dob' => $request->EmployeeDob,
             'salary' => $request->EmployeeSalary,
-            'salary_type' => $request->salaryTypeRadio,
+            'salary_type' => $request->RadioSalaryTypeAdd,
             'working_days' => $request->workingDays,
             'paid_leaves' => $request->paidLeaves,
             'blood_group' => $request->bloodGroup,

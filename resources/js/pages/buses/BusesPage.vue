@@ -17,14 +17,11 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-                                                    id="edit_loc"
+                                                    id="buses_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -172,7 +169,6 @@
                                         class="form-control"
                                         placeholder="Enter Chasis Number"
                                         v-model="data.chassisNumber"
-                                        @keypress="isNumber($event)"
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
@@ -182,7 +178,6 @@
                                         class="form-control"
                                         placeholder="Enter Insurance Number"
                                         v-model="data.insuranceNumber"
-                                        @keypress="isNumber($event)"
                                     />
                                 </div>
                                 <div class="form-group col-md-6">
@@ -192,7 +187,6 @@
                                         class="form-control"
                                         placeholder="Enter Route Permit Number"
                                         v-model="data.routePermit"
-                                        @keypress="isNumber($event)"
                                     />
                                 </div>
                             </div>
@@ -352,22 +346,24 @@ export default {
         clearForm:function(){
             this.data = {};
             this.data.fare_class = 0;
-
         },
         async fetchBuses(){
             const res = await this.callApi("post", "buses");
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.buses = res.data;
             } else {
                 console.log(res);
             }
 
             const resFareClass = await this.callApi("post", "bus_classes");
-            if (resFareClass.status === 200) {
+            if (resFareClass.status == 200) {
                 this.fareClasses = resFareClass.data;
             } else {
                 console.log(res);
             }
+            setTimeout(() => {
+                $('#buses_table').DataTable();
+            }, 300);
         },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
@@ -387,7 +383,6 @@ export default {
         async addBuses() {
             this.validationErrors = [];
             if (this.data.busNumber === "")
-                                // swal('Required', 'Bus Number is Required', 'error');
               return swal({
                     title: "Required",
                     text: "Bus Number is required",
@@ -401,12 +396,9 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-                // return this.errorsArray("PLease Select Bus Class", "fare_class");
             this.loadig = true;
             const res = await this.callApi("post", "buses/store", this.data);
             if (res.status === 201) {
-                // this.success = "Bus Created Successfully";
-                // swal('Success', 'Bus Created Successfully', 'success');
               swal({
                     title: "Success",
                     text: "Bus Created Successfully",

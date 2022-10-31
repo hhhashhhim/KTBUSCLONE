@@ -7,6 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Leaves</h4>
                             <div class="card-header-action">
+                                <!--                                v-if="$store.state.user.role.name == 'admin'"-->
                                 <a
                                     href="#"
                                     data-toggle="modal"
@@ -43,32 +44,64 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table dataTables table-striped table-hover" id="leave_table">
-                                                    <thead>
+                                                <table class="table dataTables table-striped table-hover"
+                                                       id="leave_table">
+                                                    <thead class="text-center">
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Form</th>
                                                         <th>To</th>
                                                         <th>Reason</th>
-<!--                                                        <th>Days</th>-->
+                                                        <th>Days</th>
                                                         <th>Decision Maker</th>
                                                         <th>Status</th>
+                                                        <th>Applied By</th>
+                                                        <th v-if="$store.state.user.role.name == 'admin'">Approval</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(leave, i) in leaves" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ leave.from}}</td>
-                                                        <td>{{ leave.to}}</td>
-                                                        <td>{{ leave.reason}}</td>
-<!--                                                        <td>{{ leave.days}}</td>-->
-                                                        <td>{{ cnicFormat(leave.cnic)}}</td>
-                                                        <td><div :class="getStatusClass(leave.status)">{{ getStatusName(leave.status)}}</div></td>
-                                                        <td>{{ leave.added_by.name }}</td>
-                                                        <td>
+                                                        <td>{{ leave.from }}</td>
+                                                        <td>{{ leave.to }}</td>
+                                                        <td>{{ leave.reason }}</td>
+                                                        <td>{{ leave.days }}</td>
+                                                        <td v-if="leave.status == 'P' || leave.decision == null"
+                                                            class="text-center">
+                                                            <div class="badge badge-warning"> Pending</div>
+                                                        </td>
+                                                        <td class="text-center"
+                                                            v-else-if="leave.status == 'A' || leave.decision != null">
+                                                            {{ leave.decision.name }}
+                                                        </td>
+                                                        <td class="text-center" v-else>{{ leave.decision.name }}</td>
+                                                        <td class="text-center">
+                                                            <div :class="getStatusClass(leave.status)">
+                                                                {{ getStatusName(leave.status) }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">{{ leave.added_by.name }}</td>
+                                                        <td v-if="$store.state.user.role.name == 'admin'">
+                                                            <div v-if="leave.status == 'P'">
+                                                                <button @click="approvalLeave('A', leave.id)"
+                                                                        class=" btn btn-sm mr-1 btn-success"><i
+                                                                    class="fas fa-check"></i></button>
+                                                                <button @click="approvalLeave('R', leave.id)"
+                                                                        class=" btn btn-sm btn-danger"><i
+                                                                    class="fas fa-times"></i></button>
+                                                            </div>
+                                                            <div v-else-if="leave.status == 'A'">
+                                                                <div class="badge badge-success">Approved</div>
+                                                            </div>
+                                                            <div v-else="leave.status == 'R'">
+                                                                <div class="badge badge-danger">Rejected</div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center"
+                                                            v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editEmployee(leave)"
+                                                                    @click="editLeave(leave)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
@@ -78,6 +111,11 @@
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
+                                                        </td>
+                                                        <td v-else class="text-center">
+                                                            <div class="badge badge-info text-wrap text-break"> You can
+                                                                Edit/Delete Application
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -107,15 +145,18 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="toDate">To <span class="text-danger">*</span></label>
-                        <input type="date" id="toDate" class="form-control" v-model="addForm.to"/>
+                        <input type="date" id="toDate" :min="minDateFilter()" class="form-control"
+                               v-model="addForm.to"/>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="reason">Reason<span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="" id="reason" cols="50" rows="60" v-model="addForm.reason"></textarea>
+                        <textarea class="form-control" name="" id="reason" cols="50" rows="60"
+                                  v-model="addForm.reason"></textarea>
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addLeave" :class=" loading ? 'disabled' : '' ">
+                    <button type="button" class="btn btn-primary" @click="addLeave"
+                            :class=" loading ? 'disabled' : '' ">
                         {{ loading ? 'Loading...' : 'Apply For Leave' }}
                     </button>
                 </template>
@@ -125,169 +166,31 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Employee Information"
+                heading="Edit Leave Application"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="EmployeeName">Name <span class="text-danger">*</span></label>
-                        <input type="text" id="EmployeeName" class="form-control" v-model="dataEdit.name"/>
+                        <label for="fromDate">From <span class="text-danger">*</span></label>
+                        <input type="date" id="fromDate" class="form-control" v-model="dataEdit.from"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="FatherName">Father Name <span class="text-danger">*</span></label>
-                        <input type="text" id="FatherName" class="form-control" v-model="dataEdit.f_name"/>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="CNIC">CNIC<span class="text-danger">*</span></label>
-                        <vue-mask id="CNIC"
-                                  class="form-control"
-                                  v-model="dataEdit.cnic"
-                                  mask="00000-0000000-0"
-                                  :raw="false"
-                                  :options="options"
-                        >
-                        </vue-mask>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="phone">Contact #<span class="text-danger">*</span></label>
-                        <vue-mask id="phone"
-                                  class="form-control"
-                                  v-model="dataEdit.contact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
-                        </vue-mask>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="dob">Date of Birth<span class="text-danger">*</span></label>
-                        <input type="date" id="dob" class="form-control" v-model="dataEdit.dob">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="refOfHiring">Reference of Hiring</label>
-                        <input type="text" id="refOfHiring" class="form-control" v-model="dataEdit.reference">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="hiringDate">Hiring Date<span class="text-danger">*</span></label>
-                        <input type="date" id="hiringDate" class="form-control" v-model="dataEdit.hiring_date">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="jobDesp">Job Description</label>
-                        <input type="text" id="jobDesp" class="form-control" v-model="dataEdit.job_description">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="emergencyContact">Emergency Contact #</label>
-                        <vue-mask id="emergencyContact"
-                                  class="form-control"
-                                  v-model="dataEdit.emergency_contact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
-                        </vue-mask>
+                        <label for="toDate">To <span class="text-danger">*</span></label>
+                        <input type="date" id="toDateEdit" :min="minDateFilter()" class="form-control"
+                               v-model="dataEdit.to"/>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="address">Address <span class="text-danger">*</span></label>
-                        <textarea type="text" class="form-control" id="address" cols="30" rows="10"
-                                  v-model="dataEdit.address"></textarea>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="department">Department<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="department" v-model="dataEdit.department"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="designation">Designation<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="designation" v-model="dataEdit.designation"/>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="workingDays">Working Days<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="workingDays" v-model="dataEdit.working_days" @keypress="isNumber($event)"/>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paidLeaves" v-model="dataEdit.paid_leaves" @keypress="isNumber($event)"/>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="bloodGroup" v-model="dataEdit.blood_group"/>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label for="salary">Salary<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="salary" v-model="dataEdit.salary"/>
-                    </div>
-                    <div class="form-group col-md-6 mt-4 pt-3">
-                        <label for="salaryType" class="mr-3">Salary Type</label>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'" name="salaryTypeEdit" class="custom-control-input" value="bank" v-model="dataEdit.salaryTypeRadioEdit" @click="editSalaryType('bank')">
-                            <label class="custom-control-label" for="bank">Bank</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'" name="salaryTypeEdit" class="custom-control-input" value="cash" v-model="dataEdit.salaryTypeRadioEdit" @click="editSalaryType('cash')">
-                            <label class="custom-control-label" for="cash">Cash</label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="status">Status<span class="text-danger">*</span></label>
-                        <select class="form-control" id="status" v-model="dataEdit.status">
-                            <option value="0">Select Employee Status</option>
-                            <option value="W">Working</option>
-                            <option value="R">Resigned</option>
-                            <option value="T">Terminated</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture</label>
-                        <div class="border border-dark my-3" style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlProfileEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'profileEdit')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="profilePic">
-                            <label class="custom-file-label overflow-hidden" for="profilePic">{{ nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
-
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Front</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICFrontEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden" for="cincBack">{{
-                                    nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
-
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Back</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICBackEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicBackEdit')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{
-                                    nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
-
+                        <label for="reason">Reason<span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="" id="reason" cols="50" rows="60"
+                                  v-model="dataEdit.reason"></textarea>
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateEmployees"
+                    <button type="button" class="btn btn-primary" @click="updateLeaves"
                             :class="loading?'disabled':''">
-                        {{ loading ? 'Loading...' : 'Update Employees Record' }}
+                        {{ loading ? 'Loading...' : 'Update Leave Record' }}
                     </button>
                 </template>
             </Edit>
@@ -318,7 +221,7 @@ export default {
     data() {
         return {
             addForm: {},
-            leaves : [],
+            leaves: [],
             loading: false,
             formID: "leaves_form",
             editFormID: "edit_leaves_form",
@@ -337,9 +240,9 @@ export default {
 
         async fetchLeaves() {
             const resLeave = await this.callApi("post", 'hrm/leave');
+            console.log(resLeave);
             if (resLeave.status == 200) {
                 this.leaves = resLeave.data
-
             } else {
                 console.log(resLeave);
             }
@@ -347,28 +250,77 @@ export default {
                 $("#leave_table").DataTable();
             }, 300);
         },
-        getStatusName: function(value){
-            if(value == 'W'){
-                return 'Working';
+        async approvalLeave(value, id) {
+            const approvalRes = await this.callApi("post", 'hrm/leave/approval', {status: value, id: id});
+            console.log(approvalRes);
+
+            if (approvalRes.status == 200) {
+                if (approvalRes.data[0].status == 'A') {
+                    swal({
+                        title: "Success!",
+                        text: "Leave Application Approved Successfully",
+                        icon: "success",
+                        timer: 2000
+                    });
+                } else {
+                    swal({
+                        title: "Success!",
+                        text: "Leave Application Rejected Successfully",
+                        icon: "success",
+                        timer: 2000
+                    });
+                }
+                $("#leave_table").DataTable().destroy();
+                await this.fetchLeaves();
+            } else {
+                if (approvalRes.status == 422) {
+                    $("#" + formID).scrollTop(0, 0);
+                    this.loading = false;
+                    for (const key in approvalRes.data.errors) {
+                        approvalRes.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
             }
-            if(value == 'R'){
-                return 'Resigned';
+
+        },
+        minDateFilter: function () {
+            var dtToday = new Date();
+            var month = dtToday.getMonth() + 1;
+            var day = dtToday.getDate();
+            var year = dtToday.getFullYear();
+            if (month < 10)
+                month = '0' + month.toString();
+            if (day < 10)
+                day = '0' + day.toString();
+            return year + '-' + month + '-' + day;
+        },
+
+        getStatusName: function (value) {
+            if (value == 'P') {
+                return 'Pending';
             }
-            if(value == 'T'){
-                return 'Ternimated';
+            if (value == 'A') {
+                return 'Approved';
+            }
+            if (value == 'R') {
+                return 'Rejected';
             }
         },
-        getStatusClass: function(value){
-            if(value == 'W'){
-                return 'badge badge-success';
+
+        getStatusClass: function (value) {
+            if (value == 'P') {
+                return 'badge badge-warning';
             }
-            if(value == 'R'){
-                return 'badge badge-info';
-            }
-            if(value == 'T'){
+            if (value == 'R') {
                 return 'badge badge-danger';
             }
+            if (value == 'A') {
+                return 'badge badge-success';
+            }
         },
+
         clearForm: function () {
             this.addForm = {};
         },
@@ -384,21 +336,21 @@ export default {
 
         async addLeave() {
             this.validationErrors = [];
-            if (this.addForm.from == "" || typeof this.addForm.from == 'undefined' )
+            if (this.addForm.from == "" || typeof this.addForm.from == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "From/Start Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.to == "" || typeof this.addForm.to == 'undefined' )
+            if (this.addForm.to == "" || typeof this.addForm.to == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "To/End Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.reason == "" || typeof this.addForm.reason == 'undefined' )
+            if (this.addForm.reason == "" || typeof this.addForm.reason == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Please Enter Leave Reason ",
@@ -407,8 +359,8 @@ export default {
                 });
             this.loading = true;
             const resLeaveAdd = await this.callApi("post", "hrm/leave/store", this.addForm);
-            console.log(resLeaveAdd.data)
-            if (resLeaveAdd.status == 200) {
+            console.log(resLeaveAdd)
+            if (resLeaveAdd.status == 201) {
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -416,8 +368,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $("#leave_table").DataTable().destroy();
                 await this.fetchLeaves();
-                window.scrollTo(0, 0);
+                this.clearForm();
 
             } else {
                 if (resLeaveAdd.status == 422) {
@@ -431,165 +384,66 @@ export default {
             }
         },
 
-        async updateEmployees() {
+        async updateLeaves() {
             this.validationErrors = [];
-            const config = {
-                headers: {'content-type': 'multipart/form-data'}
-            }
-            let formData = new FormData();
-            if(this.editImg.profile != '') {
-                formData.append('profile', this.editImg.profile);
-            }
-            if(this.editImg.front != '') {
-                formData.append('cnicFront', this.editImg.front);
-            }
-            if(this.editImg.back != '') {
-                formData.append('cnicBack', this.editImg.back);
-            }
-            this.validationErrors = [];
-            if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined' )
+            if (this.dataEdit.from == "" || typeof this.dataEdit.from == 'undefined')
                 return swal({
                     title: "Required!",
-                    text: "Name Field is Required",
+                    text: "From/Start Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.f_name == "" || typeof this.dataEdit.f_name == 'undefined' )
+            if (this.dataEdit.to == "" || typeof this.dataEdit.to == 'undefined')
                 return swal({
                     title: "Required!",
-                    text: "Employee's Father Name Field is Required",
+                    text: "To/End Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == 'undefined' )
+            if (this.dataEdit.reason == "" || typeof this.dataEdit.reason == 'undefined')
                 return swal({
                     title: "Required!",
-                    text: "Employee's CNIC Number is Required",
+                    text: "Please Enter Leave Reason ",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.contact == "" || typeof this.dataEdit.contact == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Contact Number is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.dob == "" || typeof this.dataEdit.dob == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Date of Birth is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.hiring_date == "" || typeof this.dataEdit.hiring_date == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Hiring Date  is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.address == "" || typeof this.dataEdit.address == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Address is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.department == "" || typeof this.dataEdit.department == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Department Name is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.designation == "" || typeof this.dataEdit.designation == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Designation is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.working_days == "" || typeof this.dataEdit.working_days == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Working Days is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.paid_leaves == "" || typeof this.dataEdit.paid_leaves == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.blood_group == "" || typeof this.dataEdit.blood_group == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.salary == "" || typeof this.dataEdit.salary == 'undefined' )
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Salary is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.status == "0")
-                return swal({
-                    title: "Required!",
-                    text: "Please Select Employee Status",
-                    icon: "error",
-                    timer: 2000
-                });
-            // this.loading = true;
-            let ImgEmployeeRecordEdit = "";
-            if (this.editImg.profile || this.editImg.front || this.editImg.back) {
-                const logoRes = await this.callApi("post", "hrm/employee/logo-upload", formData, config);
-                ImgEmployeeRecordEdit = logoRes.data ??  "";
-            }
-
-            const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {...this.dataEdit, ImgEmployeeRecordEdit});
-            if (resEmployeeUpdate.status === 200) {
+            this.loading = true;
+            const resLeaveUpdate = await this.callApi("post", 'hrm/leave/update', this.dataEdit);
+            console.log(resLeaveUpdate);
+            if (resLeaveUpdate.status == 200) {
                 this.loading = false;
                 swal({
                     title: "Success!",
-                    text: "Employee Record Updated Successfully",
+                    text: "Leave Application Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                $("#leave_table").DataTable().destroy();
                 await this.fetchLeaves();
             } else {
-                if (resEmployeeUpdate.status === 422) {
-                    $("#"+formID).scrollTop(0,0);
+                if (resLeaveUpdate.status == 422) {
+                    $("#" + formID).scrollTop(0, 0);
                     this.loading = false;
-                    for (const key in resEmployeeUpdate.data.errors) {
-                        resEmployeeUpdate.data.errors[key].forEach((element) => {
+                    for (const key in resLeaveUpdate.data.errors) {
+                        resLeaveUpdate.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
                 }
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
             }
         },
 
-
         async deleteModal(emp, i) {
             const deletingObj = {
-                url: "hrm/employee/delete",
+                url: "hrm/leave/delete",
                 data: emp,
                 index: i,
             }
             this.$store.commit("setDeleteObj", deletingObj);
         },
 
-        editEmployee(employ) {
-            this.dataEdit = employ;
+        editLeave(leaveEdit) {
+            this.dataEdit = leaveEdit
         },
     },
     computed: {
@@ -599,10 +453,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.leaves.splice(obj.index, 1)
+                $("#leave_table").DataTable().destroy();
                 this.fetchLeaves();
-                // setTimeout(function () {
-                //     $('#leave_table').DataTable();
-                // }, 300);
             }
         }
     }

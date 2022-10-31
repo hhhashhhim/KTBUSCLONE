@@ -174,5 +174,6 @@ Route::group(['prefix' => 'hrm/leave', [CustomMiddleware::class]], function () {
     Route::post('/store', [LeaveController::class, 'store']);
     Route::post('/update', [LeaveController::class, 'update']);
     Route::post('/delete', [LeaveController::class, 'delete']);
+    Route::post('/approval', [LeaveController::class, 'approval']);
 });
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

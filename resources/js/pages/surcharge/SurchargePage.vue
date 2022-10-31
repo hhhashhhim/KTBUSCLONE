@@ -41,14 +41,9 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_dis"
+                                                <table class="table table-striped table-hover" id="surcharge_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -73,11 +68,14 @@
                                                         <td>{{ surcharge.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                               @click="edit(surcharge)" class="btn btn-primary mx-1">
+                                                                    @click="edit(surcharge)"
+                                                                    class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button :data-target="'#' + deleteFormID" data-toggle="modal"
-                                                               @click="deleteModal(surcharge,i)" class="btn btn-danger">
+                                                            <button :data-target="'#' + deleteFormID"
+                                                                    data-toggle="modal"
+                                                                    @click="deleteModal(surcharge,i)"
+                                                                    class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
                                                         </td>
@@ -109,18 +107,22 @@
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input" checked="" value="percentage" v-model="percentageRadio" @click="surchargeApply('percentage')" >
+                            <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
+                                   checked="" value="percentage" v-model="percentageRadio"
+                                   @click="surchargeApply('percentage')">
                             <label class="custom-control-label" for="percentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="flat" name="flatAmount" class="custom-control-input" value="flat" v-model="percentageRadio" @click="surchargeApply('flat')">
+                            <input type="radio" id="flat" name="flatAmount" class="custom-control-input" value="flat"
+                                   v-model="percentageRadio" @click="surchargeApply('flat')">
                             <label class="custom-control-label" for="flat">Flat Amount</label>
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivPercentage">
                         <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
+                                   placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -128,17 +130,12 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span class="text-muted">max: 10K</span> </label>
-<!--                        <div class="input-group">-->
-                            <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat" placeholder="Enter Flat Amount"
-                                   @keypress="isNumber($event)">
-<!--                            <div class="input-group-append">-->
-<!--                                <span class="input-group-text">%</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span
+                            class="text-muted">max: 10K</span> </label>
+                        <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
+                               placeholder="Enter Flat Amount"
+                               @keypress="isNumber($event)">
                     </div>
-
-
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -154,7 +151,9 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addSurcharge" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Surcharge' }} </button>
+                    <button type="button" class="btn btn-primary" @click="addSurcharge" :class="loading?'disabled':''">
+                        {{ loading ? 'Loading...' : 'Save Surcharge' }}
+                    </button>
                 </template>
             </Add>
 
@@ -174,18 +173,24 @@
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editPercentage" name="editPercentageAmount" class="custom-control-input" :checked="dataEdit.type == 'percentage'" value="percentage" v-model="dataEdit.percentageRadio" @click="surchargeApply('editPercentage')" >
+                            <input type="radio" id="editPercentage" name="editPercentageAmount"
+                                   class="custom-control-input" :checked="dataEdit.type == 'percentage'"
+                                   value="percentage" v-model="dataEdit.percentageRadio"
+                                   @click="surchargeApply('editPercentage')">
                             <label class="custom-control-label" for="editPercentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editFlat" name="editFlatAmount" class="custom-control-input" :checked="dataEdit.type == 'flat'" value="flat" v-model="dataEdit.percentageRadio" @click="surchargeApply('editFlat')">
+                            <input type="radio" id="editFlat" name="editFlatAmount" class="custom-control-input"
+                                   :checked="dataEdit.type == 'flat'" value="flat" v-model="dataEdit.percentageRadio"
+                                   @click="surchargeApply('editFlat')">
                             <label class="custom-control-label" for="editFlat">Flat Amount</label>
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
                         <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
+                                   placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -193,8 +198,10 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 10K</span></label>
-                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat" placeholder="Enter Flat Amount"
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span
+                            class="text-muted">max: 10K</span></label>
+                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat"
+                               placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
                     </div>
                     <div class="col-md-12">
@@ -211,13 +218,15 @@
                         </div>
                     </div>
                 </div>
-                    <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="updateSurcharge" :class="loading?'disabled':''"> {{loading ? 'Loading...' : 'Update Surcharge' }} </button>
-                    </template>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateSurcharge"
+                            :class="loading?'disabled':''"> {{ loading ? 'Loading...' : 'Update Surcharge' }}
+                    </button>
+                </template>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete :deleteForm="deleteFormID"
-                confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
+                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
             />
 
         </div>
@@ -240,11 +249,11 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             surcharges: [],
             isActive: 1,
-            showDivPercentage : true,
-            showDivFlat : false,
+            showDivPercentage: true,
+            showDivFlat: false,
             formID: "surcharge_form",
             editFormID: "edit_surcharge_form",
             deleteFormID: "delete_surcharge_form",
@@ -268,7 +277,7 @@ export default {
         await this.fetchSurcharges();
     },
     methods: {
-        numberRange: function(evt) {
+        numberRange: function (evt) {
             const val = parseInt(evt.target.value + evt.key);
             if (!isNaN(val) && val > 100) {
                 evt.preventDefault();
@@ -282,38 +291,42 @@ export default {
 
         },
         surchargeApply(value) {
-            if(value == "percentage"){
+            if (value == "percentage") {
                 this.showDivPercentage = true;
                 this.showDivFlat = false;
             }
-            if(value == "flat"){
+            if (value == "flat") {
                 this.showDivPercentage = false;
                 this.showDivFlat = true;
             }
-            if(value == "editPercentage"){
+            if (value == "editPercentage") {
                 this.dataEdit.type = 'percentage';
             }
-            if(value == "editFlat"){
+            if (value == "editFlat") {
                 this.dataEdit.type = 'flat';
 
             }
         },
-        async fetchSurcharges(){
+        async fetchSurcharges() {
             const res = await this.callApi("post", 'surcharge');
             if (res.status == 200) {
                 this.surcharges = res.data
             } else {
                 console.log(res);
             }
+
+            setTimeout(() => {
+                $("#surcharge_table").DataTable();
+            }, 300);
         },
         clearForm: function () {
-               this.SurchargeName = "";
-                this.SurchargePercentage = "";
-                this.percentageRadio = 'percentage';
-                this.SurchargeFlat = "";
-                this.isActive = 1;
-                this.showDivFlat = false;
-                this.showDivPercentage = true;
+            this.SurchargeName = "";
+            this.SurchargePercentage = "";
+            this.percentageRadio = 'percentage';
+            this.SurchargeFlat = "";
+            this.isActive = 1;
+            this.showDivFlat = false;
+            this.showDivPercentage = true;
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
@@ -348,14 +361,14 @@ export default {
         async addSurcharge() {
             this.validationErrors = [];
             if (this.SurchargeName == "")
-            swal({
-                title: "Required!",
-                text: "Name is Required",
-                icon: "error",
-                timer: 2000
-            });
-            if(this.percentageRadio == "percentage"){
-                if(this.SurchargePercentage == "" || typeof   this.SurchargePercentage == "undefined"){
+                swal({
+                    title: "Required!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.percentageRadio == "percentage") {
+                if (this.SurchargePercentage == "" || typeof this.SurchargePercentage == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -364,8 +377,8 @@ export default {
                     });
                 }
             }
-            if(this.percentageRadio == "flat"){
-                if(this.SurchargeFlat == "" || typeof   this.SurchargeFlat == "undefined"){
+            if (this.percentageRadio == "flat") {
+                if (this.SurchargeFlat == "" || typeof this.SurchargeFlat == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",
@@ -410,15 +423,15 @@ export default {
         async updateSurcharge() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-            swal({
-                title: "Required!",
-                text: "Name Field is Required ",
-                icon: "error",
-                timer: 2000
-            });
+                swal({
+                    title: "Required!",
+                    text: "Name Field is Required ",
+                    icon: "error",
+                    timer: 2000
+                });
 
-            if(this.dataEdit.type == "percentage" || this.dataEdit.percentageRadio == 'percentage'){
-                if(this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined"){
+            if (this.dataEdit.type == "percentage" || this.dataEdit.percentageRadio == 'percentage') {
+                if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -427,8 +440,8 @@ export default {
                     });
                 }
             }
-            if(this.dataEdit.type == 'flat' || this.dataEdit.percentageRadio == "flat"){
-                if(this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined"){
+            if (this.dataEdit.type == 'flat' || this.dataEdit.percentageRadio == "flat") {
+                if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",

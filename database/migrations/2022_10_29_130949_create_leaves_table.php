@@ -19,11 +19,13 @@ class CreateLeavesTable extends Migration
             $table->date('from')->nullable();
             $table->date('to')->nullable();
             $table->integer('days')->nullable();
+            $table->integer('decider_id')->nullable();
             $table->text('reason')->nullable();
             $table->enum('status', ['P', 'A', 'R', ])->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
-            $table->softDeletes()->useCurrent();
+            $table->timestamp('time')->useCurrent();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

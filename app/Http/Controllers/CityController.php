@@ -32,7 +32,6 @@ class CityController extends Controller
 
     public function store(Request $request)
     {
-        // return Rule::unique('cities')->where('company_id', $this->company_id)->whereNull('deleted_at');
         $rules = [
             'name' => ['required', Rule::unique('cities','name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
         ];

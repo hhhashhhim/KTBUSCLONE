@@ -19,6 +19,10 @@ class Leave extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by');
     }
+    public function decision()
+    {
+        return $this->hasOne( User::class, 'id', 'decider_id');
+    }
 
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
