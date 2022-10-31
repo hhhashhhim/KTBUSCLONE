@@ -733,15 +733,15 @@ export default {
                 ImgEmployeeRecord = logoRes.data ??  "";
             }
             const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", {...this.addForm, ImgEmployeeRecord});
-            console.log(resEmployeeAdd)
             if (resEmployeeAdd.status == 201) {
-                this.loading = false;
                 swal({
                     title: "Success",
                     text: "Employee record Successfully Created!",
                     icon: "success",
                     timer: 2000
                 });
+                $("#employee_table").DataTable().destroy();
+                this.loading = false;
                 await this.fetchEmployees();
                 this.clearForm();
                 window.scrollTo(0, 0);
@@ -880,13 +880,14 @@ export default {
 
             const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {...this.dataEdit, ImgEmployeeRecordEdit});
             if (resEmployeeUpdate.status == 200) {
-                this.loading = false;
                 swal({
                     title: "Success!",
                     text: "Employee Record Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                $("#employee_table").DataTable().destroy();
+                this.loading = false;
                 await this.fetchEmployees();
             } else {
                 if (resEmployeeUpdate.status === 422) {
@@ -925,10 +926,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.employees.splice(obj.index, 1)
+                $("#employee_table").DataTable().destroy();
                 this.fetchEmployees();
-                // setTimeout(function () {
-                //     $('#employee_table').DataTable();
-                // }, 300);
             }
         }
     }

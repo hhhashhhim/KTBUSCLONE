@@ -399,18 +399,18 @@ export default {
 
             const res = await this.callApi("post", "surcharge/store", data);
             if (res.status == 201) {
-                this.loading = false;
                 swal({
                     title: "Success",
                     text: "Surcharge Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                $("#surcharge_table").DataTable().destroy();
+                this.loading = false;
                 await this.fetchSurcharges();
             } else {
                 if (res.status === 422) {
                     this.loading = false;
-
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -461,6 +461,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $("#surcharge_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchSurcharges();
             } else {
@@ -500,9 +501,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.surcharges.splice(obj.index, 1)
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+                $("#surcharge_table").DataTable().destroy();
+                this.fetchSurcharges();
             }
         }
     }

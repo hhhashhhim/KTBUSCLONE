@@ -237,14 +237,14 @@
             </tr>
           </div>
           <div class="col-md-2">
-            
+
             <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                 <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                 <span class="text-wrap">{{ seatClass.name }}</span>
             </div>
             <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass">Set Attributes</button>
           </div>
-          
+
         </div>
         <template v-slot:button>
           <button
@@ -761,9 +761,9 @@ export default {
                 let col = seat[1];
                 this.data.seatMap[row][col].class = this.seatModify.class ?? 0;
                 this.data.seatMap[row][col].type = this.seatModify.type ?? 0;
-                
+
                 delete this.data.seatMap[row][col].selected;
-                
+
             })
 
             return swal({
@@ -772,21 +772,21 @@ export default {
                 icon: "success",
                 timer: 2500,
             });
-        
+
         }
         else {
-            
+
             return swal({
                 title: "Required",
                 text: "Please Select Any Field For Seat Modification !!!!",
                 icon: "error",
                 timer: 2000,
             });
-            
+
         }
     },
     selectSeat(row, col) {
-        
+
         let index = this.selectedSeats.indexOf(JSON.stringify([row,col]));
         if (index != -1) {
             this.data.seatMap[row][col].selected = false;
@@ -795,7 +795,7 @@ export default {
             this.data.seatMap[row][col].selected = true;
             this.selectedSeats.push(JSON.stringify([row,col]));
         }
-        
+
     },
     // modifySeatData: function (rowId, colId) {
     //   selectedSeats;
@@ -982,6 +982,7 @@ export default {
           icon: "success",
           timer: 2000,
         });
+          $("#bus_class_table").DataTable().destroy();
         this.loading = false;
         await this.fetchBussClasses();
         this.data = {
@@ -992,7 +993,6 @@ export default {
       } else {
         if (res.status === 422) {
           this.loading = false;
-
           for (const key in res.data.errors) {
             res.data.errors[key].forEach((element) => {
               this.errorsArray(element, key);
@@ -1025,10 +1025,7 @@ export default {
           icon: "error",
           timer: 2000,
         });
-      this.loading = true;
-
       let seatNo = 0;
-
       this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
         for (let i = seat.length - 1; i >= 0; i--) {
           if (seat[i].reserved) {
@@ -1038,7 +1035,6 @@ export default {
         return seat;
       });
       this.loading = true;
-
       const res = await this.callApi(
         "post",
         "bus_classes/update",
@@ -1051,7 +1047,8 @@ export default {
           icon: "success",
           timer: 2000,
         });
-        this.loading = false;
+          $("#bus_class_table").DataTable().destroy();
+          this.loading = false;
         await this.fetchBussClasses();
       } else {
         if (res.status === 422) {
@@ -1086,7 +1083,8 @@ export default {
     getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.busClasses.splice(obj.index, 1);
-        this.fetchBussClasses();
+          $("#bus_class_table").DataTable().destroy();
+          this.fetchBussClasses();
       }
     },
   },

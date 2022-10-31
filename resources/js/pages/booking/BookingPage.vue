@@ -180,7 +180,7 @@
                   :options="options"
                 >
                 </vue-mask>
-                
+
               </div>
               <div class="form-group row">
                 <label class="col-md-3 pt-3 font-weight-bold" for="remarks"
@@ -295,7 +295,7 @@
                   <div class="not-for-sale circles mr-1 border shadow"></div>
                   <span class="text-wrap">Not For Sale</span>
                 </div>
-                
+
                 <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                   <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                   <span class="text-wrap">{{ seatClass.name }}</span>
@@ -314,7 +314,7 @@
                   ></div>
                   <span class="text-wrap">Issued</span>
                 </div>
-                
+
                 <div class="my-2">
                   <div class="partial-seat circles mr-1 border shadow"></div>
                   <span class="text-wrap" style="margin-top:-10px;">Partial Seat</span>
@@ -452,25 +452,26 @@ export default {
     };
   },
   async created() {
-    // const res = await this.callApi("post", "schedule");
-    const resBooking = await this.callApi("post", "booking");
-    const resClass = await this.callApi("post","fare-class")
-    const resCity = await this.callApi("post","cities")
-    if (/*res.status == 200 &&*/ resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 ) {
-      // this.allSchedules = res.data;
-      this.allBookings = resBooking.data;
-      this.allSeatClasses = resClass.data;
-      this.cities = resCity.data;
-      setTimeout(() => {
-        $("#"+this.formID).modal("show");
-        $("#booking-table").dataTable();
-      }, 300);
-    } else {
-      console.log(res);
-    }
+      await this.fetchAllSchedules();
   },
 
   methods: {
+      async fetchAllSchedules(){
+          const resBooking = await this.callApi("post", "booking");
+          const resClass = await this.callApi("post","fare-class")
+          const resCity = await this.callApi("post","cities")
+          if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 ) {
+              this.allBookings = resBooking.data;
+              this.allSeatClasses = resClass.data;
+              this.cities = resCity.data;
+              setTimeout(() => {
+                  $("#"+this.formID).modal("show");
+                  $("#booking-table").dataTable();
+              }, 300);
+          } else {
+              console.log(res);
+          }
+      },
       resetSelectBooking(evt){
         if(evt.target.value == '0'){
             this.showBookingDiv = false;
@@ -753,8 +754,8 @@ export default {
 
       const res = await this.callApi("post", "booking/details",{date,schedule_id});
       if (res.status == 200 ) {
+          $("#"+this.detailsFormId+" table").dataTable().destroy();
         this.bookingDetails = res.data;
-        console.log(this.bookingDetails);
         setTimeout(() => {
           $("#"+this.detailsFormId+" table").dataTable();
         }, 300);
@@ -798,7 +799,7 @@ export default {
   cursor: pointer;
   position: relative;
   isolation: isolate;
-  
+
 }
 
 .image-span:hover {
@@ -834,7 +835,7 @@ export default {
 }
 .partial::after{
   content: "";
-  position: absolute; 
+  position: absolute;
   top: 0;
   right: 0;
   z-index: -1;
@@ -895,7 +896,7 @@ img {
 .partial-seat{
   width: 30px;
   height: 30px;
-  background: linear-gradient( 90deg, white 50%,black 50% ); 
+  background: linear-gradient( 90deg, white 50%,black 50% );
   border-radius: 50%;
   display: inline-block;
   box-sizing: content-box;
