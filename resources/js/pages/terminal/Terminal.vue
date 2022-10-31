@@ -732,6 +732,7 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
+                $("#terminal_table").DataTable().destroy();
                 await this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
@@ -762,6 +763,7 @@ export default {
         },
         async terminalDetail(id) {
             const getTerminalRes = await this.callApi("post", "terminals/getTerminal", {id: id});
+            $("#show_terminal").DataTable().destroy();
             this.terminalsDetails = getTerminalRes.data;
             setTimeout(() => {
                 $("#show_terminal").DataTable();
@@ -813,6 +815,7 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
+                $("#terminal_table").DataTable().destroy();
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");

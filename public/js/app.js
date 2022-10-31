@@ -25860,7 +25860,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 16;
+                  _context3.next = 17;
                   break;
                 }
 
@@ -25871,20 +25871,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#city_table").DataTable().destroy();
                 _this3.loading = false;
-                _context3.next = 12;
+                _context3.next = 13;
                 return _this3.fetchCities();
 
-              case 12:
+              case 13:
                 _this3.data.name = "";
                 setTimeout(function () {
                   this.success = "";
                   this.data = "";
                 }, 300);
-                _context3.next = 17;
+                _context3.next = 18;
                 break;
 
-              case 16:
+              case 17:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -25899,7 +25900,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 18:
               case "end":
                 return _context3.stop();
             }
@@ -25944,7 +25945,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 15;
+                  _context4.next = 16;
                   break;
                 }
 
@@ -25955,18 +25956,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this4.loading = false;
-                _context4.next = 12;
+                $("#city_table").DataTable().destroy();
+                _context4.next = 13;
                 return _this4.fetchCities();
 
-              case 12:
+              case 13:
                 setTimeout(function () {
                   _this4.success = "";
                   $('#edit-modal').modal('hide');
                 }, 3000);
-                _context4.next = 17;
+                _context4.next = 18;
                 break;
 
-              case 15:
+              case 16:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -25985,7 +25987,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.loading = false;
                 }, 3000);
 
-              case 17:
+              case 18:
               case "end":
                 return _context4.stop();
             }
@@ -26024,6 +26026,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.cities.splice(obj.index, 1);
+        $("#city_table").DataTable().destroy();
         this.fetchCities();
       }
     }
@@ -31520,7 +31523,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 200)) {
-                  _context3.next = 24;
+                  _context3.next = 25;
                   break;
                 }
 
@@ -31532,10 +31535,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this3.loading = false;
-                _context3.next = 18;
+                $("#terminal_table").DataTable().destroy();
+                _context3.next = 19;
                 return _this3.fetchTerminals();
 
-              case 18:
+              case 19:
                 _this3.terminals = res.data;
                 _this3.data = {};
                 _this3.data.city_id = 0;
@@ -31544,10 +31548,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   $("#add-modal").modal("hide");
                   empty(_this3.errorsArray); // window.location.reload(
                 }, 2000);
-                _context3.next = 26;
+                _context3.next = 27;
                 break;
 
-              case 24:
+              case 25:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -31566,7 +31570,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this3.errorsArray(res.data.is_main, 'Main Terminal');
                 }
 
-              case 26:
+              case 27:
               case "end":
                 return _context3.stop();
             }
@@ -31608,12 +31612,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 getTerminalRes = _context5.sent;
+                $("#show_terminal").DataTable().destroy();
                 _this5.terminalsDetails = getTerminalRes.data;
                 setTimeout(function () {
                   $("#show_terminal").DataTable();
                 }, 300);
 
-              case 5:
+              case 6:
               case "end":
                 return _context5.stop();
             }
@@ -31693,7 +31698,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (!(res.status === 201)) {
-                  _context6.next = 21;
+                  _context6.next = 22;
                   break;
                 }
 
@@ -31705,17 +31710,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this6.loading = false;
-                _context6.next = 18;
+                $("#terminal_table").DataTable().destroy();
+                _context6.next = 19;
                 return _this6.fetchTerminals();
 
-              case 18:
+              case 19:
                 setTimeout(function () {
                   $("#edit-modal").modal("hide"); // window.location.reload();
                 }, 3000);
-                _context6.next = 22;
+                _context6.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (res.status == 422) {
                   _this6.loading = false;
 
@@ -31730,7 +31736,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context6.stop();
             }

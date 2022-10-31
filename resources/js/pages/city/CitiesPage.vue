@@ -1,8 +1,6 @@
 <template>
-
     <section class="section">
         <div class="section-body">
-
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
@@ -169,7 +167,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-
+                $("#city_table").DataTable().destroy();
                 this.loading = false;
                 await  this.fetchCities();
                 this.data.name = "";
@@ -212,6 +210,7 @@ export default {
                    timer: 2000
                 });
                 this.loading = false;
+                $("#city_table").DataTable().destroy();
                 await this.fetchCities();
                 setTimeout(() => {
                     this.success=""
@@ -248,6 +247,7 @@ export default {
         getDeletingObj(obj){
             if (obj.isDeleted) {
                 this.cities.splice(obj.index,1)
+                $("#city_table").DataTable().destroy();
                 this.fetchCities();
             }
         }
