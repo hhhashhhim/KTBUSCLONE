@@ -112,12 +112,10 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="Logo" accept=".jpg,.jpeg,.png"
-                                @change="uploadLogo($event, 'add')"
-                            />
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input"  id="Logo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'add')">
+                                <label class="custom-file-label" for="logo">{{addLogoName != '' ? addLogoName : 'Choose.jpg, .png, .jpeg Image'}}</label>
+                            </div>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="userName">Name <span class="text-danger">*</span></label>
@@ -269,12 +267,10 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
-                            <input
-                                type="file"
-                                class="form-control"
-                                id="Logo" accept=".jpg,.jpeg,.png"
-                                @change="uploadLogo($event, 'edit')"
-                            />
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'edit')">
+                                <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName : 'Choose.jpg, .png, .jpeg Image' }}</label>
+                            </div>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="userName">User Name</label>
@@ -478,6 +474,8 @@ export default {
                     ],
                 },
             ],
+            addLogoName: '',
+            editLogoName: '',
             dataEdit: {
                 i: "",
                 name: "",
@@ -643,15 +641,18 @@ export default {
             const imageFile = e.target.files[0];
             if (imageFile.name.match(/\.(jpg|jpeg|png)$/i)) {
                 if (name == "add") {
-                  this.data.logo = imageFile;
+                    const addLogo = e.target.files[0];
+                    this.addLogoName = addLogo.name;
+                    this.data.logo = imageFile;
                 }
                 if (name == "edit") {
+                    const editLogo = e.target.files[0];
+                    this.editLogoName = editLogo.name;
                     this.dataEdit.logo = imageFile;
                 }
             } else {
-                // swal('Image Extension', 'Uploaded Image must be .jpg, .jpeg, .png', 'error');
                return swal({
-                    title: "Select Image",
+                    title: "Invalid Format",
                     text: "Uploaded File must be in .jpg, .jpeg, .png",
                     icon: "error",
                    timer: 2000

@@ -42,14 +42,9 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="edit_schedule"
+                                                <table class="table table-striped table-hover" id="schedule_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -869,12 +864,16 @@ export default {
     },
     methods: {
         async fetchSchedule() {
+
             const res = await this.callApi("post", "schedule");
             if (res.status === 200) {
                 this.schedules = res.data;
             } else {
                 console.log(res);
             }
+            setTimeout(() => {
+                $('#schedule_table').DataTable();
+            }, 300);
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
 
@@ -889,6 +888,8 @@ export default {
 
             const resDiscount = await this.callApi("post", "discount/getSelective");
             this.discounts = resDiscount.data;
+
+
         },
 
         async fetchTerminals(event, index) {

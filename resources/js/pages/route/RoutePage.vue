@@ -48,7 +48,7 @@
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-                                                    id="edit_loc"
+                                                    id="route_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -374,6 +374,10 @@ export default {
                 this.cities = cityRes.data.cities;
                 this.routes = cityRes.data.routes;
             }
+
+            setTimeout(() => {
+                $('#route_table').DataTable();
+            }, 300);
         },
         changeInfo(from, to) {
             this.from = from.name;

@@ -124,29 +124,30 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
-                                         v-if="checkForSubmenu('salary')">
-                                <i class="fas fa-hand-holding-usd"></i> Salary
+                            <router-link class="nav-link text-capitalize" :to="{ name:'leaves' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-street-view"></i> Leave Management
                             </router-link>
                         </li>
-                        <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
-                                         v-if="checkForSubmenu('loan')">
-                                <i class="fas fa-money-check-alt"></i> Loan
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
-                                         v-if="checkForSubmenu('leave managment')">
-                                <i class="fas fa-street-view"></i> leave managment
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"
-                                         v-if="checkForSubmenu('attendance')">
-                                <i class="fas fa-file-export"></i> attendance
-                            </router-link>
-                        </li>
+<!--                        <li>-->
+<!--                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"-->
+<!--                                         v-if="checkForSubmenu('salary')">-->
+<!--                                <i class="fas fa-hand-holding-usd"></i> Salary-->
+<!--                            </router-link>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"-->
+<!--                                         v-if="checkForSubmenu('loan')">-->
+<!--                                <i class="fas fa-money-check-alt"></i> Loan-->
+<!--                            </router-link>-->
+<!--                        </li>-->
+<!--                        -->
+<!--                        <li>-->
+<!--                            <router-link class="nav-link text-capitalize" :to="{ name:'users' }"-->
+<!--                                         v-if="checkForSubmenu('attendance')">-->
+<!--                                <i class="fas fa-file-export"></i> attendance-->
+<!--                            </router-link>-->
+<!--                        </li>-->
                     </ul>
                 </li>
                 <!-- <li class="dropdown" v-for="(permission,i) in $store.state.permissions" :key="i">
