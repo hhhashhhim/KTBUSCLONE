@@ -128,6 +128,9 @@ class BookingController extends Controller
     }
     public function fetchSpecificSchedule(Request $request)
     {
+        if (!$request->date) {
+            return "Date is Required";
+        }
         $routes = RouteFare::where('departure_city_id', $request->departure_city_id )->where('destination_city_id', $request->destination_city_id)->get();
         $routes_id = [];
         foreach ($routes as $key => $route){
