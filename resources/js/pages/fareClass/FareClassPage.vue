@@ -298,6 +298,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $("#fare_class_table").DataTable().destroy();
                 this.loading = false;
                 this.loading = false
                 this.data = {
@@ -346,6 +347,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $("#fare_class_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchFareClasses();
 
@@ -383,7 +385,8 @@ export default {
         getDeletingObj(obj){
             if (obj.isDeleted) {
                 this.fareClasses.splice(obj.index,1)
-
+                $("#fare_class_table").DataTable().destroy();
+                this.fetchFareClasses();
             }
         }
     }

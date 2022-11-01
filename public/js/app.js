@@ -23798,43 +23798,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var resBooking, resClass, resCity;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _this.callApi("post", "booking");
+              return _this.fetchAllSchedules();
 
             case 2:
-              resBooking = _context.sent;
-              _context.next = 5;
-              return _this.callApi("post", "fare-class");
-
-            case 5:
-              resClass = _context.sent;
-              _context.next = 8;
-              return _this.callApi("post", "cities");
-
-            case 8:
-              resCity = _context.sent;
-
-              if (
-              /*res.status == 200 &&*/
-              resBooking.status == 200 && resClass.status == 200) {
-                // this.allSchedules = res.data;
-                _this.allBookings = resBooking.data;
-                _this.allSeatClasses = resClass.data;
-                _this.cities = resCity.data;
-                setTimeout(function () {
-                  $("#" + _this.formID).modal("show");
-                  $("#booking-table").dataTable();
-                }, 300);
-              } else {
-                console.log(res);
-              }
-
-            case 10:
             case "end":
               return _context.stop();
           }
@@ -23843,6 +23814,51 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
+    fetchAllSchedules: function fetchAllSchedules() {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var resBooking, resClass, resCity;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return _this2.callApi("post", "booking");
+
+              case 2:
+                resBooking = _context2.sent;
+                _context2.next = 5;
+                return _this2.callApi("post", "fare-class");
+
+              case 5:
+                resClass = _context2.sent;
+                _context2.next = 8;
+                return _this2.callApi("post", "cities");
+
+              case 8:
+                resCity = _context2.sent;
+
+                if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200) {
+                  _this2.allBookings = resBooking.data;
+                  _this2.allSeatClasses = resClass.data;
+                  _this2.cities = resCity.data;
+                  setTimeout(function () {
+                    $("#" + _this2.formID).modal("show");
+                    $("#booking-table").dataTable();
+                  }, 300);
+                } else {
+                  console.log(res);
+                }
+
+              case 10:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
     resetSelectBooking: function resetSelectBooking(evt) {
       if (evt.target.value == '0') {
         this.showBookingDiv = false;
@@ -23862,45 +23878,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return time.join('');
     },
     fetchSpecificSchedules: function fetchSpecificSchedules() {
-      var _this2 = this;
+      var _this3 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var data, resFetchSchedule;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _this2.getSchedule = true;
-                _this2.showBookingDiv = false;
-                _this2.allSchedules = {};
-                _this2.addForm.schedule = 0;
+                _this3.getSchedule = true;
+                _this3.showBookingDiv = false;
+                _this3.allSchedules = {};
+                _this3.addForm.schedule = 0;
                 data = {
-                  departure_city_id: _this2.addForm.departureCity,
-                  destination_city_id: _this2.addForm.destinationCity,
-                  date: _this2.addForm.date
+                  departure_city_id: _this3.addForm.departureCity,
+                  destination_city_id: _this3.addForm.destinationCity,
+                  date: _this3.addForm.date
                 };
-                _context2.next = 7;
-                return _this2.callApi("post", "booking/fetchSchedule", data);
+                _context3.next = 7;
+                return _this3.callApi("post", "booking/fetchSchedule", data);
 
               case 7:
-                resFetchSchedule = _context2.sent;
+                resFetchSchedule = _context3.sent;
 
                 if (resFetchSchedule.status == 200) {
                   if (resFetchSchedule.length != 0) {
-                    _this2.getSchedule = false;
-                    _this2.allSchedules = resFetchSchedule.data;
+                    _this3.getSchedule = false;
+                    _this3.allSchedules = resFetchSchedule.data;
                   } else {
-                    _this2.addForm.schedule = 0;
-                    _this2.showBookingDiv = false;
+                    _this3.addForm.schedule = 0;
+                    _this3.showBookingDiv = false;
                   }
                 }
 
               case 9:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     cnicFormat: function cnicFormat(string) {
@@ -23910,30 +23926,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.replace(/(\d{4})(\d{7})/, "$1-$2");
     },
     getCustomer: function getCustomer() {
-      var _this3 = this;
+      var _this4 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resCnic;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
-                return _this3.callApi("post", "booking/getCNIC", {
-                  cnicNumber: _this3.addForm.customerCNIC
+                _context4.next = 2;
+                return _this4.callApi("post", "booking/getCNIC", {
+                  cnicNumber: _this4.addForm.customerCNIC
                 });
 
               case 2:
-                resCnic = _context3.sent;
-                _this3.addForm.contact = resCnic.data.contact;
-                _this3.addForm.customerName = resCnic.data.name;
+                resCnic = _context4.sent;
+                _this4.addForm.contact = resCnic.data.contact;
+                _this4.addForm.customerName = resCnic.data.name;
 
               case 5:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     isNumber: function isNumber(evt) {
@@ -23947,26 +23963,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     fetchScheduleData: function fetchScheduleData() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var res, _loop, key;
 
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _this4.resetingArrays();
+                _this5.resetingArrays();
 
-                _this4.addForm.totalFare = 0;
-                _this4.validationErrors = [];
+                _this5.addForm.totalFare = 0;
+                _this5.validationErrors = [];
 
-                if (!(_this4.addForm.departureCity == 0 || typeof _this4.addForm.departureCity == 'undefined')) {
-                  _context4.next = 5;
+                if (!(_this5.addForm.departureCity == 0 || typeof _this5.addForm.departureCity == 'undefined')) {
+                  _context5.next = 5;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Please any Departure City",
                   icon: "error",
@@ -23974,12 +23990,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this4.addForm.destinationCity == 0 || typeof _this4.addForm.destinationCity == 'undefined')) {
-                  _context4.next = 7;
+                if (!(_this5.addForm.destinationCity == 0 || typeof _this5.addForm.destinationCity == 'undefined')) {
+                  _context5.next = 7;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Please Select Destination City",
                   icon: "error",
@@ -23987,12 +24003,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this4.addForm.date == "" || typeof _this4.addForm.date == 'undefined')) {
-                  _context4.next = 9;
+                if (!(_this5.addForm.date == "" || typeof _this5.addForm.date == 'undefined')) {
+                  _context5.next = 9;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Date is Required",
                   icon: "error",
@@ -24000,12 +24016,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this4.addForm.schedule == 0 || typeof _this4.addForm.schedule == 'undefined')) {
-                  _context4.next = 11;
+                if (!(_this5.addForm.schedule == 0 || typeof _this5.addForm.schedule == 'undefined')) {
+                  _context5.next = 11;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Please Select any Schedule",
                   icon: "error",
@@ -24013,28 +24029,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                _this4.validationErrors = [];
-                _this4.loading = true;
-                _context4.next = 15;
-                return _this4.callApi("post", "schedule/selected", {
-                  id: _this4.addForm.schedule,
-                  date: _this4.addForm.date,
-                  departureCity: _this4.addForm.departureCity,
-                  destinationCity: _this4.addForm.destinationCity
+                _this5.validationErrors = [];
+                _this5.loading = true;
+                _context5.next = 15;
+                return _this5.callApi("post", "schedule/selected", {
+                  id: _this5.addForm.schedule,
+                  date: _this5.addForm.date,
+                  departureCity: _this5.addForm.departureCity,
+                  destinationCity: _this5.addForm.destinationCity
                 });
 
               case 15:
-                res = _context4.sent;
+                res = _context5.sent;
 
                 if (res.status == 200) {
-                  _this4.loading = false;
-                  _this4.showBookingDiv = true;
-                  _this4.schedule = res.data;
+                  _this5.loading = false;
+                  _this5.showBookingDiv = true;
+                  _this5.schedule = res.data;
                 } else {
                   if (res.status === 422) {
                     _loop = function _loop(key) {
                       res.addForm.errors[key].forEach(function (element) {
-                        _this4.errorsArray(element, key);
+                        _this5.errorsArray(element, key);
                       });
                     };
 
@@ -24046,10 +24062,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 17:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     },
     selectSeat: function selectSeat(row, col, seatNo) {
@@ -24117,70 +24133,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return gender + " " + selected + " " + partial;
     },
     add: function add() {
-      var _this5 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var res, _loop2, key;
 
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _this5.validationErrors = [];
+                _this6.validationErrors = [];
 
-                if (_this5.addForm.schedule) {
-                  _context5.next = 4;
+                if (_this6.addForm.schedule) {
+                  _context6.next = 4;
                   break;
                 }
 
-                _this5.doScroll();
+                _this6.doScroll();
 
-                return _context5.abrupt("return", _this5.errorsArray("Schedule Name is Required", "Schedule"));
+                return _context6.abrupt("return", _this6.errorsArray("Schedule Name is Required", "Schedule"));
 
               case 4:
-                if (_this5.addForm.date) {
-                  _context5.next = 7;
+                if (_this6.addForm.date) {
+                  _context6.next = 7;
                   break;
                 }
 
-                _this5.doScroll();
+                _this6.doScroll();
 
-                return _context5.abrupt("return", _this5.errorsArray("Date is Required", "Date"));
+                return _context6.abrupt("return", _this6.errorsArray("Date is Required", "Date"));
 
               case 7:
-                if (!(!_this5.addForm.customerCNIC || _this5.addForm.customerCNIC.length != 15)) {
-                  _context5.next = 10;
+                if (!(!_this6.addForm.customerCNIC || _this6.addForm.customerCNIC.length != 15)) {
+                  _context6.next = 10;
                   break;
                 }
 
-                _this5.doScroll();
+                _this6.doScroll();
 
-                return _context5.abrupt("return", _this5.errorsArray("CNIC is Required and Should Contain 15 Digits", "CNIC"));
+                return _context6.abrupt("return", _this6.errorsArray("CNIC is Required and Should Contain 15 Digits", "CNIC"));
 
               case 10:
-                if (!(_this5.selectedSeats.length == 0)) {
-                  _context5.next = 12;
+                if (!(_this6.selectedSeats.length == 0)) {
+                  _context6.next = 12;
                   break;
                 }
 
-                return _context5.abrupt("return", _this5.errorsArray("Please Select At Least One Seat", "Seat"));
+                return _context6.abrupt("return", _this6.errorsArray("Please Select At Least One Seat", "Seat"));
 
               case 12:
-                _this5.validationErrors = [];
-                _context5.next = 15;
-                return _this5.callApi("post", "booking/store", _this5.addForm);
+                _this6.validationErrors = [];
+                _context6.next = 15;
+                return _this6.callApi("post", "booking/store", _this6.addForm);
 
               case 15:
-                res = _context5.sent;
+                res = _context6.sent;
 
                 if (res.status === 200) {
-                  _this5.success = "Booking Created Successfully";
+                  _this6.success = "Booking Created Successfully";
 
-                  _this5.fetchScheduleData();
+                  _this6.fetchScheduleData();
 
-                  _this5.resetingArrays();
+                  _this6.resetingArrays();
 
-                  _this5.addForm = {
+                  _this6.addForm = {
                     type: "booked",
                     gender: "1",
                     customerCNIC: "",
@@ -24194,7 +24210,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   if (res.status === 422) {
                     _loop2 = function _loop2(key) {
                       res.addForm.errors[key].forEach(function (element) {
-                        _this5.errorsArray(element, key);
+                        _this6.errorsArray(element, key);
                       });
                     };
 
@@ -24206,23 +24222,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 17:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     doScroll: function doScroll() {
       $("#addBooking").scrollTop(10);
     },
     deleteModal: function deleteModal(surcharge, i) {
-      var _this6 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var deletingObj;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 deletingObj = {
                   url: "/surcharge/delete",
@@ -24230,38 +24246,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this6.$store.commit("setDeleteObj", deletingObj);
+                _this7.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     resetingArrays: function resetingArrays() {
-      var _this7 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var resBooking;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                _this7.selectedSeats = [];
-                _this7.selectedBookedSeats = [];
-                _this7.addForm.selectedSeats = [];
-                _this7.addForm.selectedBookedSeats = [];
-                _this7.bookedSeats = [];
-                _context7.next = 7;
-                return _this7.callApi("post", "booking");
+                _this8.selectedSeats = [];
+                _this8.selectedBookedSeats = [];
+                _this8.addForm.selectedSeats = [];
+                _this8.addForm.selectedBookedSeats = [];
+                _this8.bookedSeats = [];
+                _context8.next = 7;
+                return _this8.callApi("post", "booking");
 
               case 7:
-                resBooking = _context7.sent;
+                resBooking = _context8.sent;
 
                 if (resBooking.status == 200) {
-                  _this7.allBookings = resBooking.data;
+                  _this8.allBookings = resBooking.data;
                   setTimeout(function () {
                     $("#booking-table").dataTable();
                   }, 300);
@@ -24271,35 +24287,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     },
     details: function details(date, schedule_id) {
-      var _this8 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                _context8.next = 2;
-                return _this8.callApi("post", "booking/details", {
+                _context9.next = 2;
+                return _this9.callApi("post", "booking/details", {
                   date: date,
                   schedule_id: schedule_id
                 });
 
               case 2:
-                res = _context8.sent;
+                res = _context9.sent;
 
                 if (res.status == 200) {
-                  _this8.bookingDetails = res.data;
-                  console.log(_this8.bookingDetails);
+                  $("#" + _this9.detailsFormId + " table").dataTable().destroy();
+                  _this9.bookingDetails = res.data;
                   setTimeout(function () {
-                    $("#" + _this8.detailsFormId + " table").dataTable();
+                    $("#" + _this9.detailsFormId + " table").dataTable();
                   }, 300);
                 } else {
                   console.log(res);
@@ -24307,10 +24323,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 4:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8);
+        }, _callee9);
       }))();
     },
     reset: function reset() {
@@ -25255,7 +25271,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 24;
+                  _context4.next = 25;
                   break;
                 }
 
@@ -25265,20 +25281,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#bus_class_table").DataTable().destroy();
                 _this5.loading = false;
-                _context4.next = 19;
+                _context4.next = 20;
                 return _this5.fetchBussClasses();
 
-              case 19:
+              case 20:
                 _this5.data = {
                   busClassColor: "#000000"
                 };
                 _this5.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 25;
+                _context4.next = 26;
                 break;
 
-              case 24:
+              case 25:
                 if (res.status === 422) {
                   _this5.loading = false;
 
@@ -25293,7 +25310,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 25:
+              case 26:
               case "end":
                 return _context4.stop();
             }
@@ -25352,7 +25369,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                _this6.loading = true;
                 seatNo = 0;
                 _this6.dataEdit.seat_map = _this6.dataEdit.seat_map.map(function (seat) {
                   for (var i = seat.length - 1; i >= 0; i--) {
@@ -25364,10 +25380,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   return seat;
                 });
                 _this6.loading = true;
-                _context5.next = 13;
+                _context5.next = 12;
                 return _this6.callApi("post", "bus_classes/update", _this6.dataEdit);
 
-              case 13:
+              case 12:
                 res = _context5.sent;
 
                 if (!(res.status === 200)) {
@@ -25381,6 +25397,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#bus_class_table").DataTable().destroy();
                 _this6.loading = false;
                 _context5.next = 19;
                 return _this6.fetchBussClasses();
@@ -25448,6 +25465,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.busClasses.splice(obj.index, 1);
+        $("#bus_class_table").DataTable().destroy();
         this.fetchBussClasses();
       }
     }
@@ -25662,7 +25680,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 19;
+                  _context3.next = 20;
                   break;
                 }
 
@@ -25672,21 +25690,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $('#buses_table').DataTable().destroy();
                 _this3.loading = false;
                 window.scrollTo(0, 0);
                 _this3.data = {};
-                _context3.next = 16;
+                _context3.next = 17;
                 return _this3.fetchBuses();
 
-              case 16:
+              case 17:
                 setTimeout(function () {
                   // window.location.reload();
                   _this3.isShowDiv = false;
                 }, 2000);
-                _context3.next = 20;
+                _context3.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -25701,7 +25720,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -25744,7 +25763,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 15;
+                  _context4.next = 16;
                   break;
                 }
 
@@ -25756,18 +25775,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $('#buses_table').DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 12;
+                _context4.next = 13;
                 return _this4.fetchBuses();
 
-              case 12:
+              case 13:
                 setTimeout(function () {
                   _this4.success = ""; // window.location.reload();
                 }, 2000);
-                _context4.next = 16;
+                _context4.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -25782,7 +25802,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context4.stop();
             }
@@ -25824,6 +25844,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.buses.splice(obj.index, 1);
+        $('#buses_table').DataTable().destroy();
         this.fetchBuses();
       }
     }
@@ -26957,7 +26978,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 22;
+                  _context3.next = 23;
                   break;
                 }
 
@@ -26968,15 +26989,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 19;
+                $('#discount_table').DataTable().destroy();
+                _context3.next = 20;
                 return _this3.fetchDiscount();
 
-              case 19:
+              case 20:
                 window.scrollTo(0, 0);
-                _context3.next = 23;
+                _context3.next = 24;
                 break;
 
-              case 22:
+              case 23:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -26991,7 +27013,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 23:
+              case 24:
               case "end":
                 return _context3.stop();
             }
@@ -27068,7 +27090,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 20;
+                  _context4.next = 21;
                   break;
                 }
 
@@ -27079,14 +27101,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 18;
+                $('#discount_table').DataTable().destroy();
+                _context4.next = 19;
                 return _this4.fetchDiscount();
 
-              case 18:
-                _context4.next = 22;
+              case 19:
+                _context4.next = 23;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -27104,7 +27127,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 22:
+              case 23:
               case "end":
                 return _context4.stop();
             }
@@ -27146,8 +27169,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.discounts.splice(obj.index, 1);
-        setTimeout(function () {// window.location.reload();
-        }, 2000);
+        $('#discount_table').DataTable().destroy();
+        this.fetchDiscount();
       }
     }
   }
@@ -27342,7 +27365,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 19;
+                  _context3.next = 20;
                   break;
                 }
 
@@ -27352,20 +27375,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#fare_class_table").DataTable().destroy();
                 _this3.loading = false;
                 _this3.loading = false;
                 _this3.data = {
                   FareClassColor: "#000000"
                 };
-                _context3.next = 16;
+                _context3.next = 17;
                 return _this3.fetchFareClasses();
 
-              case 16:
+              case 17:
                 window.scrollTo(0, 0);
-                _context3.next = 20;
+                _context3.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -27380,7 +27404,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -27434,7 +27458,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status == 200)) {
-                  _context4.next = 16;
+                  _context4.next = 17;
                   break;
                 }
 
@@ -27444,15 +27468,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#fare_class_table").DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 14;
+                _context4.next = 15;
                 return _this4.fetchFareClasses();
 
-              case 14:
-                _context4.next = 17;
+              case 15:
+                _context4.next = 18;
                 break;
 
-              case 16:
+              case 17:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -27467,7 +27492,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 18:
               case "end":
                 return _context4.stop();
             }
@@ -27511,6 +27536,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.fareClasses.splice(obj.index, 1);
+        $("#fare_class_table").DataTable().destroy();
+        this.fetchFareClasses();
       }
     }
   }
@@ -28275,20 +28302,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 41:
                 resEmployeeAdd = _context3.sent;
-                console.log(resEmployeeAdd);
 
                 if (!(resEmployeeAdd.status == 201)) {
                   _context3.next = 52;
                   break;
                 }
 
-                _this3.loading = false;
                 swal({
                   title: "Success",
                   text: "Employee record Successfully Created!",
                   icon: "success",
                   timer: 2000
                 });
+                $("#employee_table").DataTable().destroy();
+                _this3.loading = false;
                 _context3.next = 48;
                 return _this3.fetchEmployees();
 
@@ -28561,25 +28588,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEmployeeUpdate = _context4.sent;
 
                 if (!(resEmployeeUpdate.status == 200)) {
-                  _context4.next = 51;
+                  _context4.next = 52;
                   break;
                 }
 
-                _this4.loading = false;
                 swal({
                   title: "Success!",
                   text: "Employee Record Updated Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 49;
+                $("#employee_table").DataTable().destroy();
+                _this4.loading = false;
+                _context4.next = 50;
                 return _this4.fetchEmployees();
 
-              case 49:
-                _context4.next = 53;
+              case 50:
+                _context4.next = 54;
                 break;
 
-              case 51:
+              case 52:
                 if (resEmployeeUpdate.status === 422) {
                   $("#" + formID).scrollTop(0, 0);
                   _this4.loading = false;
@@ -28598,7 +28626,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 53:
+              case 54:
               case "end":
                 return _context4.stop();
             }
@@ -28640,9 +28668,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.employees.splice(obj.index, 1);
-        this.fetchEmployees(); // setTimeout(function () {
-        //     $('#employee_table').DataTable();
-        // }, 300);
+        $("#employee_table").DataTable().destroy();
+        this.fetchEmployees();
       }
     }
   }
@@ -30598,7 +30625,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (!(res.status === 201)) {
-                  _context6.next = 24;
+                  _context6.next = 25;
                   break;
                 }
 
@@ -30608,15 +30635,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $('#schedule_table').DataTable().destroy();
                 _this6.loading = false;
-                _context6.next = 22;
+                _context6.next = 23;
                 return _this6.fetchSchedule();
 
-              case 22:
-                _context6.next = 25;
+              case 23:
+                _context6.next = 26;
                 break;
 
-              case 24:
+              case 25:
                 if (res.status === 422) {
                   _this6.loading = false;
 
@@ -30634,7 +30662,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 25:
+              case 26:
               case "end":
                 return _context6.stop();
             }
@@ -30721,7 +30749,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context7.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context7.next = 21;
+                  _context7.next = 22;
                   break;
                 }
 
@@ -30731,15 +30759,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $('#schedule_table').DataTable().destroy();
                 _this7.loading = false;
-                _context7.next = 19;
+                _context7.next = 20;
                 return _this7.fetchSchedule();
 
-              case 19:
-                _context7.next = 22;
+              case 20:
+                _context7.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (resEdit.status === 422) {
                   _this7.loading = false;
 
@@ -30754,7 +30783,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context7.stop();
             }
@@ -30838,10 +30867,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this10.$store.commit("setDeleteObj", deletingObj);
 
-                setTimeout(function () {// window.location.reload();
-                }, 3000);
-
-              case 4:
+              case 3:
               case "end":
                 return _context10.stop();
             }
@@ -30855,9 +30881,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.discounts.splice(obj.index, 1);
-        this.fetchSchedule(); // setTimeout(function () {
-        //     // window.location.reload();
-        // }, 2000);
+        $('#schedule_table').DataTable().destroy();
+        this.fetchSchedule();
       }
     }
   }
@@ -31126,25 +31151,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 20;
+                  _context3.next = 21;
                   break;
                 }
 
-                _this3.loading = false;
                 swal({
                   title: "Success",
                   text: "Surcharge Created Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context3.next = 18;
+                $("#surcharge_table").DataTable().destroy();
+                _this3.loading = false;
+                _context3.next = 19;
                 return _this3.fetchSurcharges();
 
-              case 18:
-                _context3.next = 21;
+              case 19:
+                _context3.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -31159,7 +31185,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context3.stop();
             }
@@ -31229,7 +31255,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 19;
+                  _context4.next = 20;
                   break;
                 }
 
@@ -31239,15 +31265,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                $("#surcharge_table").DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 17;
+                _context4.next = 18;
                 return _this4.fetchSurcharges();
 
-              case 17:
-                _context4.next = 20;
+              case 18:
+                _context4.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -31262,7 +31289,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context4.stop();
             }
@@ -31304,8 +31331,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.surcharges.splice(obj.index, 1);
-        setTimeout(function () {// window.location.reload();
-        }, 2000);
+        $("#surcharge_table").DataTable().destroy();
+        this.fetchSurcharges();
       }
     }
   }
@@ -31835,7 +31862,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 19:
                 setTimeout(function () {
-                  $("#edit-modal").modal("hide"); // window.location.reload();
+                  $("#edit-modal").modal("hide");
                 }, 3000);
                 _context6.next = 23;
                 break;
@@ -31878,10 +31905,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this7.$store.commit("setDeleteObj", deletingObj); // await this.fetchTerminals();
-                // setTimeout(() => {
-                // }, 3000);
-
+                _this7.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
               case "end":
@@ -31895,10 +31919,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["getDeletingObj"])),
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
-      console.log(obj);
-
       if (obj.isDeleted) {
         this.terminalsDetails.splice(obj.index, 1);
+        $("#show_terminal").DataTable().destroy();
         setTimeout(function () {
           $("#show_terminal").DataTable();
         }, 300);
@@ -48303,9 +48326,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/projects/kt/'
+// const url = '/'
 
-var url = '/projects/kt/'; // const url = '/'
-
+var url = '/kt/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -53773,7 +53797,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after{\r\n  content: \"\";\r\n  position: absolute; \r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-03b302d9] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-03b302d9]{\r\n  position: relative;\r\n  z-index: 10;\n}\n.partial-seat[data-v-03b302d9]{\r\n  width: 30px;\r\n  height: 30px;\r\n  background: linear-gradient( 90deg, white 50%,black 50% ); \r\n  border-radius: 50%;\r\n  display: inline-block;\r\n  box-sizing: content-box;\r\n  -moz-border-radius: 25px;\r\n  -webkit-border-radius: 25px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after{\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-03b302d9] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-03b302d9]{\r\n  position: relative;\r\n  z-index: 10;\n}\n.partial-seat[data-v-03b302d9]{\r\n  width: 30px;\r\n  height: 30px;\r\n  background: linear-gradient( 90deg, white 50%,black 50% );\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n  box-sizing: content-box;\r\n  -moz-border-radius: 25px;\r\n  -webkit-border-radius: 25px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

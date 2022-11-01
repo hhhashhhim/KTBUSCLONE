@@ -402,6 +402,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $('#discount_table').DataTable().destroy();
                 await this.fetchDiscount();
                 window.scrollTo(0, 0);
 
@@ -456,6 +457,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $('#discount_table').DataTable().destroy();
                 await this.fetchDiscount();
             } else {
                 if (res.status === 422) {
@@ -493,9 +495,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.discounts.splice(obj.index, 1)
-                setTimeout(function () {
-                    // window.location.reload();
-                }, 2000);
+                $('#discount_table').DataTable().destroy();
+                this.fetchDiscount();
             }
         }
     }

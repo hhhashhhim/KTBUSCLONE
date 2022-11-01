@@ -819,7 +819,6 @@ export default {
                 await this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
-                    // window.location.reload();
                 }, 3000);
             } else {
                 if (res.status == 422) {
@@ -839,9 +838,6 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-            // await this.fetchTerminals();
-            // setTimeout(() => {
-            // }, 3000);
         }
     },
     computed: {
@@ -849,9 +845,9 @@ export default {
     },
     watch: {
         getDeletingObj(obj) {
-            console.log(obj);
             if (obj.isDeleted) {
                 this.terminalsDetails.splice(obj.index, 1);
+                $("#show_terminal").DataTable().destroy();
                 setTimeout(() => {
                     $("#show_terminal").DataTable();
                 }, 300);

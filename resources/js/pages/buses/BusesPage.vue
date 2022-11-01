@@ -405,7 +405,8 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
-            this.loading = false;
+                $('#buses_table').DataTable().destroy();
+                this.loading = false;
                 window.scrollTo(0, 0);
                 this.data = {};
                 await this.fetchBuses();
@@ -447,6 +448,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
+                $('#buses_table').DataTable().destroy();
                 this.loading = false;
 
                 await this.fetchBuses();
@@ -485,6 +487,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.buses.splice(obj.index, 1);
+                $('#buses_table').DataTable().destroy();
                 this.fetchBuses();
             }
         },

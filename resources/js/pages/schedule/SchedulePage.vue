@@ -1256,6 +1256,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $('#schedule_table').DataTable().destroy();
                 this.loading = false;
                 await this.fetchSchedule();
             } else {
@@ -1323,6 +1324,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                $('#schedule_table').DataTable().destroy();
                 this.loading = false;
                 await this.fetchSchedule();
             } else {
@@ -1365,9 +1367,6 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-            setTimeout(() => {
-                // window.location.reload();
-            }, 3000);
         },
     },
     computed: {
@@ -1378,10 +1377,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.discounts.splice(obj.index, 1);
+                $('#schedule_table').DataTable().destroy();
                 this.fetchSchedule();
-                // setTimeout(function () {
-                //     // window.location.reload();
-                // }, 2000);
             }
         },
     },
