@@ -74,7 +74,7 @@
                                                         <td>{{ employee.name }}</td>
                                                         <td>{{ phoneFormat(employee.contact) }}</td>
                                                         <td>{{ employee.company.name }}</td>
-                                                        <td>{{ employee.department }}</td>
+                                                        <td>{{ employee.department.name }}</td>
                                                         <td>{{ employee.hiring_date }}</td>
                                                         <td>{{ cnicFormat(employee.cnic) }}</td>
                                                         <td>
@@ -197,7 +197,6 @@
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
                         </div>
-<!--                        <input type="text" class="form-control" id="designation" v-model="addForm.EmployeeDesignation"/>-->
                         <select class="form-control" v-model="addForm.EmployeeDesignation" >
                             <option value="0" selected>Select Designation</option>
                             <option v-for="(designation, i) in designations" :key="i" :value="designation.id" >
@@ -425,11 +424,29 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="department">Department<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="department" v-model="dataEdit.department"/>
+                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
+                             data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
+                        </div>
+<!--                        <input type="text" class="form-control" id="department" v-model="dataEdit.department"/>-->
+                        <select class="form-control" v-model="dataEdit.department_id" @change="getDesignation()">
+                            <option value="0" selected>Select Department</option>
+                            <option v-for="(department, i) in departments" :key="i" :value="department.id" >
+                                {{ department.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="designation">Designation<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="designation" v-model="dataEdit.designation"/>
+                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
+                             data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
+                        </div>
+<!--                        <input type="text" class="form-control" id="designation" v-model="dataEdit.designation"/>-->
+                        <select class="form-control" v-model="dataEdit.designation_id" >
+                            <option value="0" selected>Select Designation</option>
+                            <option v-for="(designation, i) in designations" :key="i" :value="designation.id" >
+                                {{ designation.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="workingDays">Working Days<span class="text-danger">*</span></label>
@@ -610,17 +627,21 @@ export default {
 
     methods: {
         async getDesignation(){
-            if(this.addForm.EmployeeDepartment == '0'){
+            if(this.addForm.EmployeeDepartment == '0' || this.dataEdit.department_id == '0'){
                 this.addForm.EmployeeDesignation = 0;
+                this.dataEdit.department_id = 0;
             }
-            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment});
+            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment != '0' ? this.addForm.EmployeeDepartment : this.dataEdit.department_id});
             console.log(resSelectiveDesignation)
             if(resSelectiveDesignation.status == 200){
                 if(resSelectiveDesignation.data.length == 0){
                         this.addForm.EmployeeDesignation = 0;
+                        this.dataEdit.designation_id = 0;
                         this.designations = '';
+                        this.editDesignations = '';
                 }else {
                     this.designations = resSelectiveDesignation.data;
+                    this.editDesignations = resSelectiveDesignation.data;
                 }
             }
         },
@@ -749,7 +770,6 @@ export default {
                 });
             this.loadingDesignation = true;
             const resDesignationStore = await this.callApi("post", 'hrm/designation/store', {department: this.addForm.EmployeeDepartment,name: this.designationName});
-            console.log(resDesignationStore)
             if (resDesignationStore.status == 201) {
                 swal({
                     title: "Success",
@@ -758,7 +778,7 @@ export default {
                     timer: 2000
                 });
                 this.loadingDesignation = false;
-                this.designations.push(...resDesignationStore.data);
+                this.designations.push(resDesignationStore.data);
             } else {
                 this.loadingDesignation = false;
                 if(resDesignationStore.status == 422){
@@ -1154,8 +1174,17 @@ export default {
             this.$store.commit("setDeleteObj", deletingObj);
         },
 
-        editEmployee(employ) {
+        async editEmployee(employ) {
             this.dataEdit = employ;
+            const resEditSelective = await this.callApi("post", 'hrm/designation/selective', {id: employ.department_id});
+            console.log(resEditSelective);
+            if(resEditSelective.status == 200){
+                if(resEditSelective.data.length == 0) {
+                    this.designations = '';
+                    this.dataEdit.designation_id = 0;
+                }
+                this.designations = resEditSelective.data;
+            }
         },
 
     },

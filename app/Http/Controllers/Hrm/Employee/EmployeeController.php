@@ -25,13 +25,12 @@ class EmployeeController extends Controller
     public function index()
     {
 
-        return Employee::with('addedBy', 'company')->where('company_id', $this->company_id)->get();
+        return Employee::with('addedBy', 'company', 'department', 'designation')->where('company_id', $this->company_id)->get();
 
     }
 
     public function store(Request $request)
     {
-        dd($request->all());
         $rules = [
             'EmployeeName' => 'required',
             'EmployeeFatherName' => 'required',

@@ -3,6 +3,8 @@
 namespace App\Models\Hrm\Employee;
 
 use App\Models\Company;
+use App\Models\Hrm\Department\Department;
+use App\Models\Hrm\Designation\Designation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,8 +20,13 @@ class Employee extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by');
     }
-
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
+    }
+    public function department(){
+        return $this->hasOne( Department::class,'id','department_id' );
+    }
+    public function designation(){
+        return $this->hasOne( Designation::class,'id','designation_id' );
     }
 }
