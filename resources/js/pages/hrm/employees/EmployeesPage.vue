@@ -43,7 +43,8 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table dataTables table-striped table-hover" id="employee_table">
+                                                <table class="table dataTables table-striped table-hover"
+                                                       id="employee_table">
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -53,7 +54,7 @@
                                                         <th>Company</th>
                                                         <th>Department</th>
                                                         <th>Hiring Date</th>
-                                                        <th>CNIC # </th>
+                                                        <th>CNIC #</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -62,17 +63,25 @@
                                                     <tbody>
                                                     <tr v-for="(employee, i) in employees" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td> <a :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img" target="_blank">
-                                                            <img :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img" style="width:120px;height:150px;" alt="">
+                                                        <td><a
+                                                            :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                            target="_blank">
+                                                            <img
+                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                                style="width:120px;height:150px;" alt="">
                                                         </a>
                                                         </td>
-                                                        <td>{{ employee.name}}</td>
-                                                        <td>{{ phoneFormat(employee.contact)}}</td>
-                                                        <td>{{ employee.company.name}}</td>
-                                                        <td>{{ employee.department}}</td>
-                                                        <td>{{ employee.hiring_date}}</td>
-                                                        <td>{{ cnicFormat(employee.cnic)}}</td>
-                                                        <td><div :class="getStatusClass(employee.status)">{{ getStatusName(employee.status)}}</div></td>
+                                                        <td>{{ employee.name }}</td>
+                                                        <td>{{ phoneFormat(employee.contact) }}</td>
+                                                        <td>{{ employee.company.name }}</td>
+                                                        <td>{{ employee.department }}</td>
+                                                        <td>{{ employee.hiring_date }}</td>
+                                                        <td>{{ cnicFormat(employee.cnic) }}</td>
+                                                        <td>
+                                                            <div :class="getStatusClass(employee.status)">
+                                                                {{ getStatusName(employee.status) }}
+                                                            </div>
+                                                        </td>
                                                         <td>{{ employee.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
@@ -173,19 +182,38 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="department">Department<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="department" v-model="addForm.EmployeeDepartment"/>
+                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
+                             data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
+                        </div>
+                        <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
+                            <option value="0" selected>Select Department</option>
+                            <option v-for="(department, i) in departments" :key="i" :value="department.id" >
+                                {{ department.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="designation">Designation<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="designation" v-model="addForm.EmployeeDesignation"/>
+                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
+                             data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
+                        </div>
+<!--                        <input type="text" class="form-control" id="designation" v-model="addForm.EmployeeDesignation"/>-->
+                        <select class="form-control" v-model="addForm.EmployeeDesignation" >
+                            <option value="0" selected>Select Designation</option>
+                            <option v-for="(designation, i) in designations" :key="i" :value="designation.id" >
+                                {{ designation.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="workingDays">Working Days<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="workingDays" v-model="addForm.workingDays" @keypress="isNumber($event)"/>
+                        <input type="text" class="form-control" id="workingDays" maxlength="3"
+                               v-model="addForm.workingDays" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paidLeaves" v-model="addForm.paidLeaves" @keypress="isNumber($event)"/>
+                        <input type="text" class="form-control" id="paidLeaves" maxlength="3"
+                               v-model="addForm.paidLeaves" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
@@ -198,24 +226,29 @@
                     <div class="form-group col-md-6 mt-4 pt-3">
                         <label for="salaryType" class="mr-3">Salary Type</label>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" name="salaryTypeAdd" class="custom-control-input" value="bank" v-model="addForm.RadioSalaryTypeAdd">
+                            <input type="radio" id="bank" name="salaryTypeAdd" class="custom-control-input" value="bank"
+                                   v-model="addForm.RadioSalaryTypeAdd">
                             <label class="custom-control-label" for="bank">Bank</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" checked="" name="salaryTypeAdd" class="custom-control-input" value="cash" v-model="addForm.RadioSalaryTypeAdd">
+                            <input type="radio" id="cash" checked="" name="salaryTypeAdd" class="custom-control-input"
+                                   value="cash" v-model="addForm.RadioSalaryTypeAdd">
                             <label class="custom-control-label" for="cash">Cash</label>
                         </div>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="salary">Employee Picture</label>
-                        <div class="border border-dark my-3" style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlProfile" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                        <div class="border border-dark my-3"
+                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
+                            <img v-if="urlProfile" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlProfile" alt="">
                         </div>
                         <div class="custom-file">
                             <input type="file" @change="onFileChange($event, 'profile')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="profilePic">
-                            <label class="custom-file-label overflow-hidden" for="profilePic">{{ nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
+                            <label class="custom-file-label overflow-hidden" for="profilePic">{{
+                                    nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
 
@@ -224,7 +257,8 @@
                         <label for="salary">Upload CNIC Front</label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFront" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                            <img v-if="urlCNICFront" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlCNICFront" alt="">
                         </div>
                         <div class="custom-file">
@@ -240,7 +274,8 @@
                         <label for="salary">Upload CNIC Back</label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBack" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                            <img v-if="urlCNICBack" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlCNICBack" alt="">
                         </div>
                         <div class="custom-file">
@@ -259,9 +294,65 @@
                     </button>
                 </template>
             </Add>
-
-
             <!-- Add Modal End -->
+            <!--            Add NEW Department-->
+            <div class="modal fade" id="addDepartment" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Department</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="form-group col-md-12">
+                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <input type="text" id="name" class="form-control" v-model="departmentName"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" @click="addDepartment()" :class="loadingDepart ? 'disabled' : '' ">
+                                {{ loadingDepart ? 'Loading...' : ' Add Department' }}
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--            End Add New Department-->
+            <!--            Add NEW Designation-->
+            <div class="modal fade" id="addDesignation" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Designation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="form-group col-md-12">
+                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <input type="text" id="name" class="form-control" v-model="designationName"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" @click="addDesignation()" :class="loadingDesignation ? 'disabled' : '' ">
+                                {{ loadingDesignation ? 'Loading...' : ' Add Designation' }}
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--            End Add New Department-->
             <!--            Edit Model-->
             <Edit
                 heading="Edit Employee Information"
@@ -342,11 +433,13 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="workingDays">Working Days<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="workingDays" v-model="dataEdit.working_days" @keypress="isNumber($event)"/>
+                        <input type="text" class="form-control" id="workingDays" v-model="dataEdit.working_days"
+                               @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paidLeaves" v-model="dataEdit.paid_leaves" @keypress="isNumber($event)"/>
+                        <input type="text" class="form-control" id="paidLeaves" v-model="dataEdit.paid_leaves"
+                               @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
@@ -359,11 +452,15 @@
                     <div class="form-group col-md-6 mt-4 pt-3">
                         <label for="salaryType" class="mr-3">Salary Type</label>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'" name="salaryTypeEdit" class="custom-control-input" value="bank" v-model="dataEdit.salaryTypeRadioEdit">
+                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'"
+                                   name="salaryTypeEdit" class="custom-control-input" value="bank"
+                                   v-model="dataEdit.salaryTypeRadioEdit">
                             <label class="custom-control-label" for="bank">Bank</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'" name="salaryTypeEdit" class="custom-control-input" value="cash" v-model="dataEdit.salaryTypeRadioEdit">
+                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'"
+                                   name="salaryTypeEdit" class="custom-control-input" value="cash"
+                                   v-model="dataEdit.salaryTypeRadioEdit">
                             <label class="custom-control-label" for="cash">Cash</label>
                         </div>
                     </div>
@@ -378,14 +475,17 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="salary">Employee Picture</label>
-                        <div class="border border-dark my-3" style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                        <div class="border border-dark my-3"
+                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
+                            <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlProfileEdit" alt="">
                         </div>
                         <div class="custom-file">
                             <input type="file" @change="onFileChange($event, 'profileEdit')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="profilePic">
-                            <label class="custom-file-label overflow-hidden" for="profilePic">{{ nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image'
+                            <label class="custom-file-label overflow-hidden" for="profilePic">{{
+                                    nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
 
@@ -394,11 +494,13 @@
                         <label for="salary">Upload CNIC Front</label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlCNICFrontEdit" alt="">
                         </div>
                         <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')" accept=".png, .jpg, .jpeg"
+                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')"
+                                   accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="cincBack">
                             <label class="custom-file-label overflow-hidden" for="cincBack">{{
                                     nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'
@@ -410,7 +512,8 @@
                         <label for="salary">Upload CNIC Back</label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "  style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
+                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "
+                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
                                  :src="urlCNICBackEdit" alt="">
                         </div>
                         <div class="custom-file">
@@ -467,16 +570,20 @@ export default {
                 paidLeaves: '0',
                 RadioSalaryTypeAdd: 'cash',
             },
-            employees : [],
+            departmentName: '',
+            designationName: '',
+            employees: [],
+            departments: [],
+            designations: [],
             urlProfile: '',
             urlCNICBack: '',
             urlCNICFront: '',
             urlProfileEdit: '',
             urlCNICBackEdit: '',
             urlCNICFrontEdit: '',
-            back:'',
-            front:'',
-            profile:'',
+            back: '',
+            front: '',
+            profile: '',
             nameProfile: '',
             nameBack: '',
             nameFront: '',
@@ -484,6 +591,8 @@ export default {
             nameBackEdit: '',
             nameFrontEdit: '',
             loading: false,
+            loadingDepart: false,
+            loadingDesignation: false,
             formID: "employees_form",
             editFormID: "edit_employees_form",
             deleteFormID: "delete_employees_form",
@@ -500,14 +609,27 @@ export default {
     },
 
     methods: {
+        async getDesignation(){
+            if(this.addForm.EmployeeDepartment == '0'){
+                this.addForm.EmployeeDesignation = 0;
+            }
+            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment});
+            console.log(resSelectiveDesignation)
+            if(resSelectiveDesignation.status == 200){
+                if(resSelectiveDesignation.data.length == 0){
+                        this.addForm.EmployeeDesignation = 0;
+                        this.designations = '';
+                }else {
+                    this.designations = resSelectiveDesignation.data;
+                }
+            }
+        },
         phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
-
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
-
         onFileChange: function (e, imgTag) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png)$/i)) {
                 if (imgTag == 'profile') {
@@ -564,6 +686,99 @@ export default {
                 this.nameBack = '';
             }
         },
+        clearDepartmentForm() {
+            this.departmentName = '';
+        },
+        clearDesignationForm() {
+            this.designationName = '';
+        },
+        async addDepartment(){
+            if(this.departmentName == '' || typeof this.departmentName == 'undefined')
+                return swal({
+                    title: "Required!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loadingDepart = true;
+            const resDepartmentStore = await this.callApi("post", 'hrm/department/store', {name: this.departmentName});
+            if (resDepartmentStore.status == 201) {
+                swal({
+                    title: "Success",
+                    text: "Department Name Added Successfully!",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loadingDepart = false;
+                this.departmentName == '';
+                this.departments.push(resDepartmentStore.data);
+            } else {
+                this.loadingDepart = false;
+                if(resDepartmentStore.status == 422){
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resDepartmentStore.data.errors) {
+                        resDepartmentStore.data.errors[key].forEach((element) => {
+                            errorContent += ((++count) + " - " + element +  "\n" );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+        },
+        async addDesignation(){
+            if(this.addForm.EmployeeDepartment == '0')
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Department First",
+                    icon: "error",
+                    timer: 2000
+                });
+            if(this.designationName == '' || typeof this.designationName == 'undefined')
+                return swal({
+                    title: "Required!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loadingDesignation = true;
+            const resDesignationStore = await this.callApi("post", 'hrm/designation/store', {department: this.addForm.EmployeeDepartment,name: this.designationName});
+            console.log(resDesignationStore)
+            if (resDesignationStore.status == 201) {
+                swal({
+                    title: "Success",
+                    text: "Designation Successfully Added Against Selected Department",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loadingDesignation = false;
+                this.designations.push(...resDesignationStore.data);
+            } else {
+                this.loadingDesignation = false;
+                if(resDesignationStore.status == 422){
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resDesignationStore.data.errors) {
+                        resDesignationStore.data.errors[key].forEach((element) => {
+                            errorContent += ((++count) + " - " + element +  "\n" );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+        },
 
         async fetchEmployees() {
             const resEmployeeIndex = await this.callApi("post", 'hrm/employee');
@@ -573,40 +788,59 @@ export default {
             } else {
                 console.log(resEmployeeIndex);
             }
+            const resFetchDepartment = await this.callApi("post", 'hrm/department');
+            if (resFetchDepartment.status == 200) {
+                this.departments = resFetchDepartment.data
+
+            } else {
+                console.log(resFetchDepartment);
+            }
+            //
+            // const resFetchDesignation = await this.callApi("post", 'hrm/designation');
+            // if (resFetchDesignation.status == 200) {
+            //     this.designations = resFetchDesignation.data
+            //
+            // } else {
+            //     console.log(resFetchDesignation);
+            // }
+
             setTimeout(function () {
                 $("#employee_table").DataTable();
             }, 300);
         },
 
-        getStatusName: function(value){
-            if(value == 'W'){
+        getStatusName: function (value) {
+            if (value == 'W') {
                 return 'Working';
             }
-            if(value == 'R'){
+            if (value == 'R') {
                 return 'Resigned';
             }
-            if(value == 'T'){
+            if (value == 'T') {
                 return 'Ternimated';
             }
         },
 
-        getStatusClass: function(value){
-            if(value == 'W'){
+        getStatusClass: function (value) {
+            if (value == 'W') {
                 return 'badge badge-success';
             }
-            if(value == 'R'){
+            if (value == 'R') {
                 return 'badge badge-info';
             }
-            if(value == 'T'){
+            if (value == 'T') {
                 return 'badge badge-danger';
             }
         },
 
         clearForm: function () {
-           this.addForm = {
-               paidLeaves: '0',
-               RadioSalaryTypeAdd: 'cash',
-           };
+            this.loading = false;
+            this.addForm = {
+                paidLeaves: '0',
+                EmployeeDepartment: 0,
+                EmployeeDesignation: 0,
+                RadioSalaryTypeAdd: 'cash',
+            };
         },
 
         isNumber: function (evt) {
@@ -624,102 +858,102 @@ export default {
                 headers: {'content-type': 'multipart/form-data'}
             }
             let formData = new FormData();
-            if(this.profile != '') {
+            if (this.profile != '') {
                 formData.append('profile', this.profile);
             }
-            if(this.front != '') {
+            if (this.front != '') {
                 formData.append('cnicFront', this.front);
             }
-            if(this.back != '') {
+            if (this.back != '') {
                 formData.append('cnicBack', this.back);
             }
 
             this.validationErrors = [];
-            if (this.addForm.EmployeeName == "" || typeof this.addForm.EmployeeName == 'undefined' )
+            if (this.addForm.EmployeeName == "" || typeof this.addForm.EmployeeName == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeFatherName == "" || typeof this.addForm.EmployeeFatherName == 'undefined' )
+            if (this.addForm.EmployeeFatherName == "" || typeof this.addForm.EmployeeFatherName == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Father Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeCNIC == "" || typeof this.addForm.EmployeeCNIC == 'undefined' )
+            if (this.addForm.EmployeeCNIC == "" || typeof this.addForm.EmployeeCNIC == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's CNIC Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeContact == "" || typeof this.addForm.EmployeeContact == 'undefined' )
+            if (this.addForm.EmployeeContact == "" || typeof this.addForm.EmployeeContact == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Contact Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDob == "" || typeof this.addForm.EmployeeDob == 'undefined' )
+            if (this.addForm.EmployeeDob == "" || typeof this.addForm.EmployeeDob == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Date of Birth is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.HiringDate == "" || typeof this.addForm.HiringDate == 'undefined' )
+            if (this.addForm.HiringDate == "" || typeof this.addForm.HiringDate == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Hiring Date  is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeAddress == "" || typeof this.addForm.EmployeeAddress == 'undefined' )
+            if (this.addForm.EmployeeAddress == "" || typeof this.addForm.EmployeeAddress == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Address is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDepartment == "" || typeof this.addForm.EmployeeDepartment == 'undefined' )
+            if (this.addForm.EmployeeDepartment == "0")
                 return swal({
                     title: "Required!",
-                    text: "Employee's Department Name is Required",
+                    text: "Please Select Employee's Department",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDesignation == "" || typeof this.addForm.EmployeeDesignation == 'undefined' )
+            if (this.addForm.EmployeeDesignation == "" || typeof this.addForm.EmployeeDesignation == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.workingDays == "" || typeof this.addForm.workingDays == 'undefined' )
+            if (this.addForm.workingDays == "" || typeof this.addForm.workingDays == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Working Days is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.paidLeaves == "" || typeof this.addForm.paidLeaves == 'undefined' )
+            if (this.addForm.paidLeaves == "" || typeof this.addForm.paidLeaves == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.bloodGroup == "" || typeof this.addForm.bloodGroup == 'undefined' )
+            if (this.addForm.bloodGroup == "" || typeof this.addForm.bloodGroup == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeSalary == "" || typeof this.addForm.EmployeeSalary == 'undefined' )
+            if (this.addForm.EmployeeSalary == "" || typeof this.addForm.EmployeeSalary == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Salary is Required",
@@ -730,9 +964,12 @@ export default {
             let ImgEmployeeRecord = "";
             if (this.profile || this.front || this.back) {
                 const logoRes = await this.callApi("post", "hrm/employee/logo-upload", formData, config);
-                ImgEmployeeRecord = logoRes.data ??  "";
+                ImgEmployeeRecord = logoRes.data ?? "";
             }
-            const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", {...this.addForm, ImgEmployeeRecord});
+            const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", {
+                ...this.addForm,
+                ImgEmployeeRecord
+            });
             if (resEmployeeAdd.status == 201) {
                 swal({
                     title: "Success",
@@ -763,101 +1000,101 @@ export default {
                 headers: {'content-type': 'multipart/form-data'}
             }
             let formData = new FormData();
-            if(this.editImg.profile != '') {
+            if (this.editImg.profile != '') {
                 formData.append('profile', this.editImg.profile);
             }
-            if(this.editImg.front != '') {
+            if (this.editImg.front != '') {
                 formData.append('cnicFront', this.editImg.front);
             }
-            if(this.editImg.back != '') {
+            if (this.editImg.back != '') {
                 formData.append('cnicBack', this.editImg.back);
             }
             this.validationErrors = [];
-            if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined' )
+            if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.f_name == "" || typeof this.dataEdit.f_name == 'undefined' )
+            if (this.dataEdit.f_name == "" || typeof this.dataEdit.f_name == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Father Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == 'undefined' )
+            if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's CNIC Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.contact == "" || typeof this.dataEdit.contact == 'undefined' )
+            if (this.dataEdit.contact == "" || typeof this.dataEdit.contact == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Contact Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.dob == "" || typeof this.dataEdit.dob == 'undefined' )
+            if (this.dataEdit.dob == "" || typeof this.dataEdit.dob == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Date of Birth is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.hiring_date == "" || typeof this.dataEdit.hiring_date == 'undefined' )
+            if (this.dataEdit.hiring_date == "" || typeof this.dataEdit.hiring_date == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Hiring Date  is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.address == "" || typeof this.dataEdit.address == 'undefined' )
+            if (this.dataEdit.address == "" || typeof this.dataEdit.address == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Address is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.department == "" || typeof this.dataEdit.department == 'undefined' )
+            if (this.dataEdit.department == "" || typeof this.dataEdit.department == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Department Name is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.designation == "" || typeof this.dataEdit.designation == 'undefined' )
+            if (this.dataEdit.designation == "" || typeof this.dataEdit.designation == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.working_days == "" || typeof this.dataEdit.working_days == 'undefined' )
+            if (this.dataEdit.working_days == "" || typeof this.dataEdit.working_days == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Working Days is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.paid_leaves == "" || typeof this.dataEdit.paid_leaves == 'undefined' )
+            if (this.dataEdit.paid_leaves == "" || typeof this.dataEdit.paid_leaves == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.blood_group == "" || typeof this.dataEdit.blood_group == 'undefined' )
+            if (this.dataEdit.blood_group == "" || typeof this.dataEdit.blood_group == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.salary == "" || typeof this.dataEdit.salary == 'undefined' )
+            if (this.dataEdit.salary == "" || typeof this.dataEdit.salary == 'undefined')
                 return swal({
                     title: "Required!",
                     text: "Employee's Salary is Required",
@@ -875,10 +1112,13 @@ export default {
             let ImgEmployeeRecordEdit = "";
             if (this.editImg.profile || this.editImg.front || this.editImg.back) {
                 const logoRes = await this.callApi("post", "hrm/employee/logo-upload", formData, config);
-                ImgEmployeeRecordEdit = logoRes.data ??  "";
+                ImgEmployeeRecordEdit = logoRes.data ?? "";
             }
 
-            const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {...this.dataEdit, ImgEmployeeRecordEdit});
+            const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {
+                ...this.dataEdit,
+                ImgEmployeeRecordEdit
+            });
             if (resEmployeeUpdate.status == 200) {
                 swal({
                     title: "Success!",
@@ -891,7 +1131,7 @@ export default {
                 await this.fetchEmployees();
             } else {
                 if (resEmployeeUpdate.status === 422) {
-                    $("#"+formID).scrollTop(0,0);
+                    $("#" + formID).scrollTop(0, 0);
                     this.loading = false;
                     for (const key in resEmployeeUpdate.data.errors) {
                         resEmployeeUpdate.data.errors[key].forEach((element) => {

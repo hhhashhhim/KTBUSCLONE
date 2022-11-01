@@ -20,9 +20,12 @@ import BusClassPage from "./pages/buses/BusClassPage.vue";
 import BookingPage from "./pages/booking/BookingPage.vue";
 import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
 import LeavePage from "./pages/hrm/leave/LeavePage.vue";
+import DepartmentPage from "./pages/hrm/department/DepartmentPage.vue";
+import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
 
 // const url = '/projects/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 const routes = [
     {
@@ -129,6 +132,16 @@ const routes = [
         path: url + "hrm/leave",
         component : LeavePage,
         name:"leaves"
+    },
+    {
+        path: url + "hrm/department",
+        component : DepartmentPage,
+        name:"departments"
+    },
+    {
+        path: url + "hrm/designation",
+        component : DesignationPage,
+        name:"designations"
     },
 ]
 const router = createRouter({

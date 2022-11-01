@@ -7,9 +7,9 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Leaves</h4>
                             <div class="card-header-action">
-                                <!--                                v-if="$store.state.user.role.name == 'admin'"-->
                                 <a
                                     href="#"
+                                    v-if="$store.state.user.role.name == 'admin'"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
                                     class="btn btn-primary" @click="clearForm()"
@@ -211,7 +211,7 @@ import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 
 export default {
-    name: "EmployeesPage",
+    name: "LeavePage",
     components: {
         Add,
         Edit,

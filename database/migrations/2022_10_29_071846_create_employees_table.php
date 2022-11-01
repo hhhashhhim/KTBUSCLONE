@@ -30,8 +30,8 @@ class CreateEmployeesTable extends Migration
             $table->string('blood_group', 10)->nullable();
             $table->string('emergency_contact')->nullable();
             $table->string('job_description')->nullable();
-            $table->string('department')->nullable();
-            $table->string('designation')->nullable();
+            $table->integer('department_id')->nullable();
+            $table->integer('designation_id')->nullable();
             $table->string('profile_Img')->nullable();
             $table->string('cnic_back_img')->nullable();
             $table->string('cnic_front_img')->nullable();

@@ -10,6 +10,8 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Discount\DiscountController;
 use App\Http\Controllers\FareClass\FareClassController;
 use App\Http\Controllers\FareTableController;
+use App\Http\Controllers\Hrm\Department\DepartmentController;
+use App\Http\Controllers\Hrm\Designation\DesignationController;
 use App\Http\Controllers\Hrm\Employee\EmployeeController;
 use App\Http\Controllers\Hrm\Leave\LeaveController;
 use App\Http\Controllers\Schedule\ScheduleController;
@@ -176,4 +178,20 @@ Route::group(['prefix' => 'hrm/leave', [CustomMiddleware::class]], function () {
     Route::post('/delete', [LeaveController::class, 'delete']);
     Route::post('/approval', [LeaveController::class, 'approval']);
 });
+
+Route::group(['prefix' => 'hrm/department', [CustomMiddleware::class]], function () {
+    Route::post('/', [DepartmentController::class, 'index']);
+    Route::post('/store', [DepartmentController::class, 'store']);
+    Route::post('/update', [DepartmentController::class, 'update']);
+    Route::post('/delete', [DepartmentController::class, 'delete']);
+});
+
+Route::group(['prefix' => 'hrm/designation', [CustomMiddleware::class]], function () {
+    Route::post('/', [DesignationController::class, 'index']);
+    Route::post('/store', [DesignationController::class, 'store']);
+    Route::post('/update', [DesignationController::class, 'update']);
+    Route::post('/delete', [DesignationController::class, 'delete']);
+    Route::post('/selective', [DesignationController::class, 'selective']);
+});
+
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

@@ -160,7 +160,6 @@ export default {
             this.loading = true
             const res = await this.callApi("post",'cities/store',this.data);
             if (res.status == 200) {
-                // this.success="City Created Successfully Named as " + res.data.name;
                swal({
                     title: "Success",
                     text: "City Created Succesfuly Named as  " + res.data.name,
@@ -218,10 +217,10 @@ export default {
                 }, 3000);
             }
             else{
-                if (res.status == 422) {
+                if (resEdit.status == 422) {
                     this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resEdit.data.errors) {
+                        resEdit.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
