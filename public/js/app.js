@@ -28559,7 +28559,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       designationName: '',
       employees: [],
       departments: [],
+      editDepartments: [],
       designations: [],
+      editDesignations: [],
       urlProfile: '',
       urlCNICBack: '',
       urlCNICFront: '',
@@ -28618,14 +28620,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (_this2.addForm.EmployeeDepartment == '0' || _this2.dataEdit.department_id == '0') {
+                if (_this2.addForm.EmployeeDepartment == '0') {
                   _this2.addForm.EmployeeDesignation = 0;
-                  _this2.dataEdit.department_id = 0;
+                  _this2.designations = '';
                 }
 
                 _context2.next = 3;
                 return _this2.callApi("post", 'hrm/designation/selective', {
-                  id: _this2.addForm.EmployeeDepartment != '0' ? _this2.addForm.EmployeeDepartment : _this2.dataEdit.department_id
+                  id: _this2.addForm.EmployeeDepartment
                 });
 
               case 3:
@@ -28635,12 +28637,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (resSelectiveDesignation.status == 200) {
                   if (resSelectiveDesignation.data.length == 0) {
                     _this2.addForm.EmployeeDesignation = 0;
-                    _this2.dataEdit.designation_id = 0;
-                    _this2.designations = '';
-                    _this2.editDesignations = '';
+                    _this2.addForm.EmployeeDesignation = 0;
                   } else {
                     _this2.designations = resSelectiveDesignation.data;
-                    _this2.editDesignations = resSelectiveDesignation.data;
                   }
                 }
 
@@ -28650,6 +28649,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             }
           }
         }, _callee2);
+      }))();
+    },
+    getEditDesignation: function getEditDesignation() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var resSelectiveDesignation;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (_this3.dataEdit.department_id == '0') {
+                  _this3.dataEdit.designation_id = 0;
+                  _this3.editDesignations = '';
+                }
+
+                _context3.next = 3;
+                return _this3.callApi("post", 'hrm/designation/selective', {
+                  id: _this3.dataEdit.department_id
+                });
+
+              case 3:
+                resSelectiveDesignation = _context3.sent;
+                console.log(resSelectiveDesignation);
+
+                if (resSelectiveDesignation.status == 200) {
+                  if (resSelectiveDesignation.data.length == 0) {
+                    _this3.dataEdit.designation_id = 0;
+                    _this3.editDesignations = '';
+                  } else {
+                    _this3.editDesignations = resSelectiveDesignation.data;
+                  }
+                }
+
+              case 6:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
       }))();
     },
     phoneFormat: function phoneFormat(string) {
@@ -28724,20 +28763,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.designationName = '';
     },
     addDepartment: function addDepartment() {
-      var _this3 = this;
+      var _this4 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resDepartmentStore;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(_this3.departmentName == '' || typeof _this3.departmentName == 'undefined')) {
-                  _context3.next = 2;
+                if (!(_this4.departmentName == '' || typeof _this4.departmentName == 'undefined')) {
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "Required!",
                   text: "Name is Required",
                   icon: "error",
@@ -28745,14 +28784,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this3.loadingDepart = true;
-                _context3.next = 5;
-                return _this3.callApi("post", 'hrm/department/store', {
-                  name: _this3.departmentName
+                _this4.loadingDepart = true;
+                _context4.next = 5;
+                return _this4.callApi("post", 'hrm/department/store', {
+                  name: _this4.departmentName
                 });
 
               case 5:
-                resDepartmentStore = _context3.sent;
+                resDepartmentStore = _context4.sent;
 
                 if (resDepartmentStore.status == 201) {
                   swal({
@@ -28761,12 +28800,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this3.loadingDepart = false;
-                  _this3.departmentName == '';
+                  _this4.loadingDepart = false;
+                  _this4.departmentName == '';
 
-                  _this3.departments.push(resDepartmentStore.data);
+                  if (_this4.departments.indexOf(resDepartmentStore.data) === -1) {
+                    _this4.departments.push(resDepartmentStore.data);
+                  }
+
+                  if (_this4.editDepartments.indexOf(resDepartmentStore.data) === -1) {
+                    _this4.editDepartments.push(resDepartmentStore.data);
+                  }
                 } else {
-                  _this3.loadingDepart = false;
+                  _this4.loadingDepart = false;
 
                   if (resDepartmentStore.status == 422) {
                     (function () {
@@ -28790,27 +28835,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     addDesignation: function addDesignation() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resDesignationStore;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(_this4.addForm.EmployeeDepartment == '0')) {
-                  _context4.next = 2;
+                if (!(_this5.addForm.EmployeeDepartment == '0' && _this5.dataEdit.department_id == '0')) {
+                  _context5.next = 2;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Department First",
                   icon: "error",
@@ -28818,12 +28863,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this4.designationName == '' || typeof _this4.designationName == 'undefined')) {
-                  _context4.next = 4;
+                if (!(_this5.designationName == '' || typeof _this5.designationName == 'undefined')) {
+                  _context5.next = 4;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required!",
                   text: "Name is Required",
                   icon: "error",
@@ -28831,28 +28876,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                _this4.loadingDesignation = true;
-                _context4.next = 7;
-                return _this4.callApi("post", 'hrm/designation/store', {
-                  department: _this4.addForm.EmployeeDepartment,
-                  name: _this4.designationName
+                _this5.loadingDesignation = true;
+                _context5.next = 7;
+                return _this5.callApi("post", 'hrm/designation/store', {
+                  department: _this5.addForm.EmployeeDepartment ? _this5.addForm.EmployeeDepartment : _this5.dataEdit.department_id,
+                  name: _this5.designationName
                 });
 
               case 7:
-                resDesignationStore = _context4.sent;
+                resDesignationStore = _context5.sent;
 
                 if (resDesignationStore.status == 201) {
+                  _this5.designations = '';
+                  _this5.editDesignations = '';
                   swal({
                     title: "Success",
                     text: "Designation Successfully Added Against Selected Department",
                     icon: "success",
                     timer: 2000
                   });
-                  _this4.loadingDesignation = false;
+                  _this5.loadingDesignation = false;
 
-                  _this4.designations.push(resDesignationStore.data);
+                  if (_this5.designations.indexOf(resDesignationStore.data) === -1) {
+                    _this5.designations.push(resDesignationStore.data);
+                  }
+
+                  if (_this5.editDesignations.indexOf(resDesignationStore.data) === -1) {
+                    _this5.editDesignations.push(resDesignationStore.data);
+                  }
                 } else {
-                  _this4.loadingDesignation = false;
+                  _this5.loadingDesignation = false;
 
                   if (resDesignationStore.status == 422) {
                     (function () {
@@ -28876,52 +28929,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     },
     fetchEmployees: function fetchEmployees() {
-      var _this5 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var resEmployeeIndex, resFetchDepartment;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context5.next = 2;
-                return _this5.callApi("post", 'hrm/employee');
+                _context6.next = 2;
+                return _this6.callApi("post", 'hrm/employee');
 
               case 2:
-                resEmployeeIndex = _context5.sent;
+                resEmployeeIndex = _context6.sent;
 
                 if (resEmployeeIndex.status == 200) {
-                  _this5.employees = resEmployeeIndex.data;
+                  _this6.employees = resEmployeeIndex.data;
                 } else {
                   console.log(resEmployeeIndex);
                 }
 
-                _context5.next = 6;
-                return _this5.callApi("post", 'hrm/department');
+                _context6.next = 6;
+                return _this6.callApi("post", 'hrm/department');
 
               case 6:
-                resFetchDepartment = _context5.sent;
+                resFetchDepartment = _context6.sent;
 
                 if (resFetchDepartment.status == 200) {
-                  _this5.departments = resFetchDepartment.data;
+                  _this6.departments = resFetchDepartment.data;
+                  _this6.editDepartments = resFetchDepartment.data;
                 } else {
                   console.log(resFetchDepartment);
-                } //
-                // const resFetchDesignation = await this.callApi("post", 'hrm/designation');
-                // if (resFetchDesignation.status == 200) {
-                //     this.designations = resFetchDesignation.data
-                //
-                // } else {
-                //     console.log(resFetchDesignation);
-                // }
-
+                }
 
                 setTimeout(function () {
                   $("#employee_table").DataTable();
@@ -28929,10 +28975,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     getStatusName: function getStatusName(value) {
@@ -28969,6 +29015,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         EmployeeDesignation: 0,
         RadioSalaryTypeAdd: 'cash'
       };
+      this.designations = '';
+      this.nameBack = '';
+      this.urlCNICBack = '';
+      this.nameFront = '';
+      this.urlCNICFront = '';
+      this.nameProfile = '';
+      this.urlProfile = '';
     },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
@@ -28981,14 +29034,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     addEmployee: function addEmployee() {
-      var _this6 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var config, formData, ImgEmployeeRecord, _logoRes$data, logoRes, resEmployeeAdd, _loop, key;
 
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 config = {
                   headers: {
@@ -28997,26 +29050,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
                 formData = new FormData();
 
-                if (_this6.profile != '') {
-                  formData.append('profile', _this6.profile);
+                if (_this7.profile != '') {
+                  formData.append('profile', _this7.profile);
                 }
 
-                if (_this6.front != '') {
-                  formData.append('cnicFront', _this6.front);
+                if (_this7.front != '') {
+                  formData.append('cnicFront', _this7.front);
                 }
 
-                if (_this6.back != '') {
-                  formData.append('cnicBack', _this6.back);
+                if (_this7.back != '') {
+                  formData.append('cnicBack', _this7.back);
                 }
 
-                _this6.validationErrors = [];
+                _this7.validationErrors = [];
 
-                if (!(_this6.addForm.EmployeeName == "" || typeof _this6.addForm.EmployeeName == 'undefined')) {
-                  _context6.next = 8;
+                if (!(_this7.addForm.EmployeeName == "" || typeof _this7.addForm.EmployeeName == 'undefined')) {
+                  _context7.next = 8;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Name Field is Required",
                   icon: "error",
@@ -29024,12 +29077,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this6.addForm.EmployeeFatherName == "" || typeof _this6.addForm.EmployeeFatherName == 'undefined')) {
-                  _context6.next = 10;
+                if (!(_this7.addForm.EmployeeFatherName == "" || typeof _this7.addForm.EmployeeFatherName == 'undefined')) {
+                  _context7.next = 10;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Father Name Field is Required",
                   icon: "error",
@@ -29037,12 +29090,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(_this6.addForm.EmployeeCNIC == "" || typeof _this6.addForm.EmployeeCNIC == 'undefined')) {
-                  _context6.next = 12;
+                if (!(_this7.addForm.EmployeeCNIC == "" || typeof _this7.addForm.EmployeeCNIC == 'undefined')) {
+                  _context7.next = 12;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's CNIC Number is Required",
                   icon: "error",
@@ -29050,12 +29103,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(_this6.addForm.EmployeeContact == "" || typeof _this6.addForm.EmployeeContact == 'undefined')) {
-                  _context6.next = 14;
+                if (!(_this7.addForm.EmployeeContact == "" || typeof _this7.addForm.EmployeeContact == 'undefined')) {
+                  _context7.next = 14;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Contact Number is Required",
                   icon: "error",
@@ -29063,12 +29116,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 14:
-                if (!(_this6.addForm.EmployeeDob == "" || typeof _this6.addForm.EmployeeDob == 'undefined')) {
-                  _context6.next = 16;
+                if (!(_this7.addForm.EmployeeDob == "" || typeof _this7.addForm.EmployeeDob == 'undefined')) {
+                  _context7.next = 16;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Date of Birth is Required",
                   icon: "error",
@@ -29076,12 +29129,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 16:
-                if (!(_this6.addForm.HiringDate == "" || typeof _this6.addForm.HiringDate == 'undefined')) {
-                  _context6.next = 18;
+                if (!(_this7.addForm.HiringDate == "" || typeof _this7.addForm.HiringDate == 'undefined')) {
+                  _context7.next = 18;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Hiring Date  is Required",
                   icon: "error",
@@ -29089,12 +29142,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 18:
-                if (!(_this6.addForm.EmployeeAddress == "" || typeof _this6.addForm.EmployeeAddress == 'undefined')) {
-                  _context6.next = 20;
+                if (!(_this7.addForm.EmployeeAddress == "" || typeof _this7.addForm.EmployeeAddress == 'undefined')) {
+                  _context7.next = 20;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Address is Required",
                   icon: "error",
@@ -29102,12 +29155,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 20:
-                if (!(_this6.addForm.EmployeeDepartment == "0")) {
-                  _context6.next = 22;
+                if (!(_this7.addForm.EmployeeDepartment == "0")) {
+                  _context7.next = 22;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Employee's Department",
                   icon: "error",
@@ -29115,12 +29168,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 22:
-                if (!(_this6.addForm.EmployeeDesignation == "" || typeof _this6.addForm.EmployeeDesignation == 'undefined')) {
-                  _context6.next = 24;
+                if (!(_this7.addForm.EmployeeDesignation == "" || typeof _this7.addForm.EmployeeDesignation == 'undefined')) {
+                  _context7.next = 24;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Designation is Required",
                   icon: "error",
@@ -29128,12 +29181,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 24:
-                if (!(_this6.addForm.workingDays == "" || typeof _this6.addForm.workingDays == 'undefined')) {
-                  _context6.next = 26;
+                if (!(_this7.addForm.workingDays == "" || typeof _this7.addForm.workingDays == 'undefined')) {
+                  _context7.next = 26;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Working Days is Required",
                   icon: "error",
@@ -29141,12 +29194,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 26:
-                if (!(_this6.addForm.paidLeaves == "" || typeof _this6.addForm.paidLeaves == 'undefined')) {
-                  _context6.next = 28;
+                if (!(_this7.addForm.paidLeaves == "" || typeof _this7.addForm.paidLeaves == 'undefined')) {
+                  _context7.next = 28;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Paid Leaves is Required",
                   icon: "error",
@@ -29154,12 +29207,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 28:
-                if (!(_this6.addForm.bloodGroup == "" || typeof _this6.addForm.bloodGroup == 'undefined')) {
-                  _context6.next = 30;
+                if (!(_this7.addForm.bloodGroup == "" || typeof _this7.addForm.bloodGroup == 'undefined')) {
+                  _context7.next = 30;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Paid Leaves is Required",
                   icon: "error",
@@ -29167,12 +29220,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 30:
-                if (!(_this6.addForm.EmployeeSalary == "" || typeof _this6.addForm.EmployeeSalary == 'undefined')) {
-                  _context6.next = 32;
+                if (!(_this7.addForm.EmployeeSalary == "" || typeof _this7.addForm.EmployeeSalary == 'undefined')) {
+                  _context7.next = 32;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Salary is Required",
                   icon: "error",
@@ -29180,32 +29233,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 32:
-                _this6.loading = true;
+                _this7.loading = true;
                 ImgEmployeeRecord = "";
 
-                if (!(_this6.profile || _this6.front || _this6.back)) {
-                  _context6.next = 39;
+                if (!(_this7.profile || _this7.front || _this7.back)) {
+                  _context7.next = 39;
                   break;
                 }
 
-                _context6.next = 37;
-                return _this6.callApi("post", "hrm/employee/logo-upload", formData, config);
+                _context7.next = 37;
+                return _this7.callApi("post", "hrm/employee/logo-upload", formData, config);
 
               case 37:
-                logoRes = _context6.sent;
+                logoRes = _context7.sent;
                 ImgEmployeeRecord = (_logoRes$data = logoRes.data) !== null && _logoRes$data !== void 0 ? _logoRes$data : "";
 
               case 39:
-                _context6.next = 41;
-                return _this6.callApi("post", "hrm/employee/store", _objectSpread(_objectSpread({}, _this6.addForm), {}, {
+                _context7.next = 41;
+                return _this7.callApi("post", "hrm/employee/store", _objectSpread(_objectSpread({}, _this7.addForm), {}, {
                   ImgEmployeeRecord: ImgEmployeeRecord
                 }));
 
               case 41:
-                resEmployeeAdd = _context6.sent;
+                resEmployeeAdd = _context7.sent;
 
                 if (!(resEmployeeAdd.status == 201)) {
-                  _context6.next = 52;
+                  _context7.next = 52;
                   break;
                 }
 
@@ -29216,24 +29269,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#employee_table").DataTable().destroy();
-                _this6.loading = false;
-                _context6.next = 48;
-                return _this6.fetchEmployees();
+                _this7.loading = false;
+                _context7.next = 48;
+                return _this7.fetchEmployees();
 
               case 48:
-                _this6.clearForm();
+                _this7.clearForm();
 
                 window.scrollTo(0, 0);
-                _context6.next = 53;
+                _context7.next = 53;
                 break;
 
               case 52:
                 if (resEmployeeAdd.status == 422) {
-                  _this6.loading = false;
+                  _this7.loading = false;
 
                   _loop = function _loop(key) {
                     resEmployeeAdd.data.errors[key].forEach(function (element) {
-                      _this6.errorsArray(element, key);
+                      _this7.errorsArray(element, key);
                     });
                   };
 
@@ -29244,23 +29297,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 53:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     updateEmployees: function updateEmployees() {
-      var _this7 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var config, formData, ImgEmployeeRecordEdit, _logoRes$data2, logoRes, resEmployeeUpdate, _loop2, key;
 
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                _this7.validationErrors = [];
+                _this8.validationErrors = [];
                 config = {
                   headers: {
                     'content-type': 'multipart/form-data'
@@ -29268,26 +29321,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
                 formData = new FormData();
 
-                if (_this7.editImg.profile != '') {
-                  formData.append('profile', _this7.editImg.profile);
+                if (_this8.editImg.profile != '') {
+                  formData.append('profile', _this8.editImg.profile);
                 }
 
-                if (_this7.editImg.front != '') {
-                  formData.append('cnicFront', _this7.editImg.front);
+                if (_this8.editImg.front != '') {
+                  formData.append('cnicFront', _this8.editImg.front);
                 }
 
-                if (_this7.editImg.back != '') {
-                  formData.append('cnicBack', _this7.editImg.back);
+                if (_this8.editImg.back != '') {
+                  formData.append('cnicBack', _this8.editImg.back);
                 }
 
-                _this7.validationErrors = [];
+                _this8.validationErrors = [];
 
-                if (!(_this7.dataEdit.name == "" || typeof _this7.dataEdit.name == 'undefined')) {
-                  _context7.next = 9;
+                if (!(_this8.dataEdit.name == "" || typeof _this8.dataEdit.name == 'undefined')) {
+                  _context8.next = 9;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Name Field is Required",
                   icon: "error",
@@ -29295,12 +29348,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this7.dataEdit.f_name == "" || typeof _this7.dataEdit.f_name == 'undefined')) {
-                  _context7.next = 11;
+                if (!(_this8.dataEdit.f_name == "" || typeof _this8.dataEdit.f_name == 'undefined')) {
+                  _context8.next = 11;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Father Name Field is Required",
                   icon: "error",
@@ -29308,12 +29361,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                if (!(_this7.dataEdit.cnic == "" || typeof _this7.dataEdit.cnic == 'undefined')) {
-                  _context7.next = 13;
+                if (!(_this8.dataEdit.cnic == "" || typeof _this8.dataEdit.cnic == 'undefined')) {
+                  _context8.next = 13;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's CNIC Number is Required",
                   icon: "error",
@@ -29321,12 +29374,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 13:
-                if (!(_this7.dataEdit.contact == "" || typeof _this7.dataEdit.contact == 'undefined')) {
-                  _context7.next = 15;
+                if (!(_this8.dataEdit.contact == "" || typeof _this8.dataEdit.contact == 'undefined')) {
+                  _context8.next = 15;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Contact Number is Required",
                   icon: "error",
@@ -29334,12 +29387,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 15:
-                if (!(_this7.dataEdit.dob == "" || typeof _this7.dataEdit.dob == 'undefined')) {
-                  _context7.next = 17;
+                if (!(_this8.dataEdit.dob == "" || typeof _this8.dataEdit.dob == 'undefined')) {
+                  _context8.next = 17;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Date of Birth is Required",
                   icon: "error",
@@ -29347,12 +29400,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 17:
-                if (!(_this7.dataEdit.hiring_date == "" || typeof _this7.dataEdit.hiring_date == 'undefined')) {
-                  _context7.next = 19;
+                if (!(_this8.dataEdit.hiring_date == "" || typeof _this8.dataEdit.hiring_date == 'undefined')) {
+                  _context8.next = 19;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Hiring Date  is Required",
                   icon: "error",
@@ -29360,12 +29413,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 19:
-                if (!(_this7.dataEdit.address == "" || typeof _this7.dataEdit.address == 'undefined')) {
-                  _context7.next = 21;
+                if (!(_this8.dataEdit.address == "" || typeof _this8.dataEdit.address == 'undefined')) {
+                  _context8.next = 21;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Address is Required",
                   icon: "error",
@@ -29373,12 +29426,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 21:
-                if (!(_this7.dataEdit.department == "" || typeof _this7.dataEdit.department == 'undefined')) {
-                  _context7.next = 23;
+                if (!(_this8.dataEdit.department == "" || typeof _this8.dataEdit.department == 'undefined')) {
+                  _context8.next = 23;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Department Name is Required",
                   icon: "error",
@@ -29386,12 +29439,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 23:
-                if (!(_this7.dataEdit.designation == "" || typeof _this7.dataEdit.designation == 'undefined')) {
-                  _context7.next = 25;
+                if (!(_this8.dataEdit.designation == "" || typeof _this8.dataEdit.designation == 'undefined')) {
+                  _context8.next = 25;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Designation is Required",
                   icon: "error",
@@ -29399,12 +29452,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 25:
-                if (!(_this7.dataEdit.working_days == "" || typeof _this7.dataEdit.working_days == 'undefined')) {
-                  _context7.next = 27;
+                if (!(_this8.dataEdit.working_days == "" || typeof _this8.dataEdit.working_days == 'undefined')) {
+                  _context8.next = 27;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Working Days is Required",
                   icon: "error",
@@ -29412,12 +29465,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 27:
-                if (!(_this7.dataEdit.paid_leaves == "" || typeof _this7.dataEdit.paid_leaves == 'undefined')) {
-                  _context7.next = 29;
+                if (!(_this8.dataEdit.paid_leaves == "" || typeof _this8.dataEdit.paid_leaves == 'undefined')) {
+                  _context8.next = 29;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Paid Leaves is Required",
                   icon: "error",
@@ -29425,12 +29478,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 29:
-                if (!(_this7.dataEdit.blood_group == "" || typeof _this7.dataEdit.blood_group == 'undefined')) {
-                  _context7.next = 31;
+                if (!(_this8.dataEdit.blood_group == "" || typeof _this8.dataEdit.blood_group == 'undefined')) {
+                  _context8.next = 31;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Paid Leaves is Required",
                   icon: "error",
@@ -29438,12 +29491,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 31:
-                if (!(_this7.dataEdit.salary == "" || typeof _this7.dataEdit.salary == 'undefined')) {
-                  _context7.next = 33;
+                if (!(_this8.dataEdit.salary == "" || typeof _this8.dataEdit.salary == 'undefined')) {
+                  _context8.next = 33;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Employee's Salary is Required",
                   icon: "error",
@@ -29451,12 +29504,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 33:
-                if (!(_this7.dataEdit.status == "0")) {
-                  _context7.next = 35;
+                if (!(_this8.dataEdit.status == "0")) {
+                  _context8.next = 35;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Employee Status",
                   icon: "error",
@@ -29467,29 +29520,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // this.loading = true;
                 ImgEmployeeRecordEdit = "";
 
-                if (!(_this7.editImg.profile || _this7.editImg.front || _this7.editImg.back)) {
-                  _context7.next = 41;
+                if (!(_this8.editImg.profile || _this8.editImg.front || _this8.editImg.back)) {
+                  _context8.next = 41;
                   break;
                 }
 
-                _context7.next = 39;
-                return _this7.callApi("post", "hrm/employee/logo-upload", formData, config);
+                _context8.next = 39;
+                return _this8.callApi("post", "hrm/employee/logo-upload", formData, config);
 
               case 39:
-                logoRes = _context7.sent;
+                logoRes = _context8.sent;
                 ImgEmployeeRecordEdit = (_logoRes$data2 = logoRes.data) !== null && _logoRes$data2 !== void 0 ? _logoRes$data2 : "";
 
               case 41:
-                _context7.next = 43;
-                return _this7.callApi("post", 'hrm/employee/update', _objectSpread(_objectSpread({}, _this7.dataEdit), {}, {
+                _context8.next = 43;
+                return _this8.callApi("post", 'hrm/employee/update', _objectSpread(_objectSpread({}, _this8.dataEdit), {}, {
                   ImgEmployeeRecordEdit: ImgEmployeeRecordEdit
                 }));
 
               case 43:
-                resEmployeeUpdate = _context7.sent;
+                resEmployeeUpdate = _context8.sent;
 
                 if (!(resEmployeeUpdate.status == 200)) {
-                  _context7.next = 52;
+                  _context8.next = 52;
                   break;
                 }
 
@@ -29500,22 +29553,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#employee_table").DataTable().destroy();
-                _this7.loading = false;
-                _context7.next = 50;
-                return _this7.fetchEmployees();
+                _this8.loading = false;
+                _context8.next = 50;
+                return _this8.fetchEmployees();
 
               case 50:
-                _context7.next = 54;
+                _context8.next = 54;
                 break;
 
               case 52:
                 if (resEmployeeUpdate.status === 422) {
                   $("#" + formID).scrollTop(0, 0);
-                  _this7.loading = false;
+                  _this8.loading = false;
 
                   _loop2 = function _loop2(key) {
                     resEmployeeUpdate.data.errors[key].forEach(function (element) {
-                      _this7.errorsArray(element, key);
+                      _this8.errorsArray(element, key);
                     });
                   };
 
@@ -29529,20 +29582,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 54:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     },
     deleteModal: function deleteModal(emp, i) {
-      var _this8 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var deletingObj;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 deletingObj = {
                   url: "hrm/employee/delete",
@@ -29550,50 +29603,50 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this8.$store.commit("setDeleteObj", deletingObj);
+                _this9.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        }, _callee8);
-      }))();
-    },
-    editEmployee: function editEmployee(employ) {
-      var _this9 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var resEditSelective;
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                _this9.dataEdit = employ;
-                _context9.next = 3;
-                return _this9.callApi("post", 'hrm/designation/selective', {
-                  id: employ.department_id
-                });
-
-              case 3:
-                resEditSelective = _context9.sent;
-                console.log(resEditSelective);
-
-                if (resEditSelective.status == 200) {
-                  if (resEditSelective.data.length == 0) {
-                    _this9.designations = '';
-                    _this9.dataEdit.designation_id = 0;
-                  }
-
-                  _this9.designations = resEditSelective.data;
-                }
-
-              case 6:
               case "end":
                 return _context9.stop();
             }
           }
         }, _callee9);
+      }))();
+    },
+    editEmployee: function editEmployee(employ) {
+      var _this10 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        var resEditSelective;
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                _this10.dataEdit = employ;
+                _context10.next = 3;
+                return _this10.callApi("post", 'hrm/designation/selective', {
+                  id: employ.department_id
+                });
+
+              case 3:
+                resEditSelective = _context10.sent;
+                console.log(resEditSelective);
+
+                if (resEditSelective.status == 200) {
+                  if (resEditSelective.data.length == 0) {
+                    _this10.editDesignations = '';
+                    _this10.dataEdit.designation_id = 0;
+                  }
+
+                  _this10.editDesignations = resEditSelective.data;
+                }
+
+              case 6:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee10);
       }))();
     }
   },
@@ -43839,8 +43892,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
       src: _ctx.$store.state.app_url + 'uploads/hrm/employee/profile/' + employee.profile_Img,
       style: {
-        "width": "120px",
-        "height": "150px"
+        "width": "90px",
+        "height": "100px"
       },
       alt: ""
     }, null, 8
@@ -44381,15 +44434,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[43] || (_cache[43] = function ($event) {
           return $options.clearDepartmentForm();
         })
-      }, " Add New "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <input type=\"text\" class=\"form-control\" id=\"department\" v-model=\"dataEdit.department\"/>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      }, " Add New "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         "onUpdate:modelValue": _cache[44] || (_cache[44] = function ($event) {
           return $data.dataEdit.department_id = $event;
         }),
         onChange: _cache[45] || (_cache[45] = function ($event) {
-          return $options.getDesignation();
+          return $options.getEditDesignation();
         })
-      }, [_hoisted_134, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.departments, function (department, i) {
+      }, [_hoisted_134, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editDepartments, function (department, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: department.id
@@ -44410,12 +44463,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[46] || (_cache[46] = function ($event) {
           return $options.clearDesignationForm();
         })
-      }, " Add New "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <input type=\"text\" class=\"form-control\" id=\"designation\" v-model=\"dataEdit.designation\"/>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      }, " Add New "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         "onUpdate:modelValue": _cache[47] || (_cache[47] = function ($event) {
           return $data.dataEdit.designation_id = $event;
         })
-      }, [_hoisted_138, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.designations, function (designation, i) {
+      }, [_hoisted_138, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editDesignations, function (designation, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: designation.id

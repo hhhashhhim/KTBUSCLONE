@@ -68,7 +68,7 @@
                                                             target="_blank">
                                                             <img
                                                                 :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
-                                                                style="width:120px;height:150px;" alt="">
+                                                                style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
                                                         <td>{{ employee.name }}</td>
@@ -427,10 +427,9 @@
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
                         </div>
-<!--                        <input type="text" class="form-control" id="department" v-model="dataEdit.department"/>-->
-                        <select class="form-control" v-model="dataEdit.department_id" @change="getDesignation()">
+                        <select class="form-control" v-model="dataEdit.department_id" @change="getEditDesignation()">
                             <option value="0" selected>Select Department</option>
-                            <option v-for="(department, i) in departments" :key="i" :value="department.id" >
+                            <option v-for="(department, i) in editDepartments" :key="i" :value="department.id" >
                                 {{ department.name }}
                             </option>
                         </select>
@@ -440,10 +439,9 @@
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
                         </div>
-<!--                        <input type="text" class="form-control" id="designation" v-model="dataEdit.designation"/>-->
                         <select class="form-control" v-model="dataEdit.designation_id" >
                             <option value="0" selected>Select Designation</option>
-                            <option v-for="(designation, i) in designations" :key="i" :value="designation.id" >
+                            <option v-for="(designation, i) in editDesignations" :key="i" :value="designation.id" >
                                 {{ designation.name }}
                             </option>
                         </select>
@@ -501,11 +499,8 @@
                         <div class="custom-file">
                             <input type="file" @change="onFileChange($event, 'profileEdit')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="profilePic">
-                            <label class="custom-file-label overflow-hidden" for="profilePic">{{
-                                    nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
+                            <label class="custom-file-label overflow-hidden" for="profilePic">{{ nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image' }}</label>
                         </div>
-
                     </div>
                     <div class="form-group col-md-4">
                         <label for="salary">Upload CNIC Front</label>
@@ -519,9 +514,7 @@
                             <input type="file" @change="onFileChange($event, 'cnicFrontEdit')"
                                    accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden" for="cincBack">{{
-                                    nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
+                            <label class="custom-file-label overflow-hidden" for="cincBack">{{nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>
                         </div>
 
                     </div>
@@ -536,9 +529,7 @@
                         <div class="custom-file">
                             <input type="file" @change="onFileChange($event, 'cnicBackEdit')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{
-                                    nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
+                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{ nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>
                         </div>
 
                     </div>
@@ -591,7 +582,9 @@ export default {
             designationName: '',
             employees: [],
             departments: [],
+            editDepartments: [],
             designations: [],
+            editDesignations: [],
             urlProfile: '',
             urlCNICBack: '',
             urlCNICFront: '',
@@ -627,20 +620,33 @@ export default {
 
     methods: {
         async getDesignation(){
-            if(this.addForm.EmployeeDepartment == '0' || this.dataEdit.department_id == '0'){
+            if(this.addForm.EmployeeDepartment == '0'){
                 this.addForm.EmployeeDesignation = 0;
-                this.dataEdit.department_id = 0;
+                this.designations = '';
             }
-            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment != '0' ? this.addForm.EmployeeDepartment : this.dataEdit.department_id});
+            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment});
             console.log(resSelectiveDesignation)
             if(resSelectiveDesignation.status == 200){
                 if(resSelectiveDesignation.data.length == 0){
                         this.addForm.EmployeeDesignation = 0;
-                        this.dataEdit.designation_id = 0;
-                        this.designations = '';
-                        this.editDesignations = '';
+                        this.addForm.EmployeeDesignation = 0;
                 }else {
                     this.designations = resSelectiveDesignation.data;
+                }
+            }
+        },
+        async getEditDesignation(){
+            if( this.dataEdit.department_id == '0'){
+                this.dataEdit.designation_id = 0;
+                this.editDesignations = '';
+            }
+            const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.dataEdit.department_id});
+            console.log(resSelectiveDesignation)
+            if(resSelectiveDesignation.status == 200){
+                if(resSelectiveDesignation.data.length == 0){
+                        this.dataEdit.designation_id = 0;
+                        this.editDesignations = '';
+                }else {
                     this.editDesignations = resSelectiveDesignation.data;
                 }
             }
@@ -732,7 +738,12 @@ export default {
                 });
                 this.loadingDepart = false;
                 this.departmentName == '';
-                this.departments.push(resDepartmentStore.data);
+                if(this.departments.indexOf(resDepartmentStore.data) === -1){
+                    this.departments.push(resDepartmentStore.data);
+                }
+                if(this.editDepartments.indexOf(resDepartmentStore.data) === -1){
+                    this.editDepartments.push(resDepartmentStore.data);
+                }
             } else {
                 this.loadingDepart = false;
                 if(resDepartmentStore.status == 422){
@@ -754,7 +765,7 @@ export default {
             }
         },
         async addDesignation(){
-            if(this.addForm.EmployeeDepartment == '0')
+            if(this.addForm.EmployeeDepartment == '0' && this.dataEdit.department_id == '0')
                 return swal({
                     title: "Required!",
                     text: "Please Select Department First",
@@ -769,8 +780,10 @@ export default {
                     timer: 2000
                 });
             this.loadingDesignation = true;
-            const resDesignationStore = await this.callApi("post", 'hrm/designation/store', {department: this.addForm.EmployeeDepartment,name: this.designationName});
+            const resDesignationStore = await this.callApi("post", 'hrm/designation/store', {department: this.addForm.EmployeeDepartment ? this.addForm.EmployeeDepartment : this.dataEdit.department_id,name: this.designationName});
             if (resDesignationStore.status == 201) {
+                this.designations = '';
+                this.editDesignations = '';
                 swal({
                     title: "Success",
                     text: "Designation Successfully Added Against Selected Department",
@@ -778,7 +791,12 @@ export default {
                     timer: 2000
                 });
                 this.loadingDesignation = false;
-                this.designations.push(resDesignationStore.data);
+                if(this.designations.indexOf(resDesignationStore.data) === -1){
+                    this.designations.push(resDesignationStore.data);
+                }
+                if(this.editDesignations.indexOf(resDesignationStore.data) === -1){
+                    this.editDesignations.push(resDesignationStore.data);
+                }
             } else {
                 this.loadingDesignation = false;
                 if(resDesignationStore.status == 422){
@@ -811,18 +829,11 @@ export default {
             const resFetchDepartment = await this.callApi("post", 'hrm/department');
             if (resFetchDepartment.status == 200) {
                 this.departments = resFetchDepartment.data
+                this.editDepartments = resFetchDepartment.data
 
             } else {
                 console.log(resFetchDepartment);
             }
-            //
-            // const resFetchDesignation = await this.callApi("post", 'hrm/designation');
-            // if (resFetchDesignation.status == 200) {
-            //     this.designations = resFetchDesignation.data
-            //
-            // } else {
-            //     console.log(resFetchDesignation);
-            // }
 
             setTimeout(function () {
                 $("#employee_table").DataTable();
@@ -861,6 +872,13 @@ export default {
                 EmployeeDesignation: 0,
                 RadioSalaryTypeAdd: 'cash',
             };
+            this.designations = '';
+            this.nameBack = '';
+            this.urlCNICBack = '';
+            this.nameFront = '';
+            this.urlCNICFront = '';
+            this.nameProfile = '';
+            this.urlProfile = '';
         },
 
         isNumber: function (evt) {
@@ -1180,10 +1198,10 @@ export default {
             console.log(resEditSelective);
             if(resEditSelective.status == 200){
                 if(resEditSelective.data.length == 0) {
-                    this.designations = '';
+                    this.editDesignations = '';
                     this.dataEdit.designation_id = 0;
                 }
-                this.designations = resEditSelective.data;
+                this.editDesignations = resEditSelective.data;
             }
         },
 
