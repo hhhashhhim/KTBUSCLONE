@@ -148,6 +148,7 @@
                 </label>
                 <vue-mask
                   v-on:keyup.enter="getCustomer"
+                  v-on:blur="getCustomer"
                   class="form-control col-md-9"
                   v-model="addForm.customerCNIC"
                   mask="00000-0000000-0"
@@ -329,7 +330,7 @@
 
 
               <!-- Seat Map Section -->
-              
+
               <div
                 class="d-flex justify-content-center seat-img p-0 m-0"
                 v-for="(record, rowIndex) in schedule.bus_class.seat_map"
@@ -654,7 +655,7 @@ export default {
               timer: 2000
           });
       }
-      
+
     },
     getClasses(col) {
       let gender =

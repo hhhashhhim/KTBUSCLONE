@@ -226,7 +226,6 @@ export default {
             },
             dataEdit: {
                 FareClassName: '',
-                is_Active: '',
             },
         };
     },
@@ -267,9 +266,9 @@ export default {
         },
         editCheckBox: function (e) {
             if (e.target.checked) {
-                this.dataEdit.is_Active = 1;
+                this.dataEdit.is_active = 1;
             } else {
-                this.dataEdit.is_Active = 0;
+                this.dataEdit.is_active = 0;
             }
         },
 
@@ -299,9 +298,10 @@ export default {
                     timer: 2000
                 });
                 $("#fare_class_table").DataTable().destroy();
-                this.loading = false;
                 this.loading = false
                 this.data = {
+                    isActive:1,
+                    FareClassName:"",
                     FareClassColor : "#000000",
                 };
                 await this.fetchFareClasses();

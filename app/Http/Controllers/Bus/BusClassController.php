@@ -55,14 +55,13 @@ class BusClassController extends Controller
 
     public function updateBusClass(Request $request)
     {
-
         return BusClass::where('id', $request->id)->update([
             'name' => $request->name,
             'color' => $request->busClassColor,
             'seat_map' => $request->seat_map,
             'no_of_rows' => $request->no_of_rows,
             'no_of_cols' => $request->no_of_cols,
-            'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
+            'is_active' => $request->is_active,
         ]);
     }
 

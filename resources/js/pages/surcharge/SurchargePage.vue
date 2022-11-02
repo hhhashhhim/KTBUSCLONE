@@ -269,7 +269,6 @@ export default {
                 id: "",
                 name: "",
                 percentage: "",
-                is_Active: "",
             },
         };
     },
@@ -352,9 +351,9 @@ export default {
         },
         editCheckBox: function (e) {
             if (e.target.checked) {
-                this.dataEdit.is_Active = 1;
+                this.dataEdit.is_active = 1;
             } else {
-                this.dataEdit.is_Active = 0;
+                this.dataEdit.is_active = 0;
             }
         },
 
@@ -405,6 +404,13 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.SurchargeName = '';
+                this.percentageRadio = 'percentage';
+                this.SurchargePercentage = '';
+                this.SurchargeFlat = '';
+                this.showDivFlat = false;
+                this.showDivPercentage = true;
+                this.isActive = 1;
                 $("#surcharge_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchSurcharges();
@@ -467,7 +473,6 @@ export default {
             } else {
                 if (res.status == 422) {
                     this.loading = false;
-
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

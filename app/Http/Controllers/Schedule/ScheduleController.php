@@ -39,7 +39,6 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
-        dd($request->all());
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',
@@ -224,8 +223,8 @@ class ScheduleController extends Controller
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute,$lastFare->destination_city_id);
-        
-        
+
+
         $fareClasses = FareClass::where('company_id',$this->company_id)->get();
         // return ( $fareForAllClasses );
         if(count($fareClasses) != count($fareForAllClasses)){
@@ -272,24 +271,24 @@ class ScheduleController extends Controller
                             array_search($request->destinationCity, $allFaresOfRoute) > array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute) &&
                             array_search($request->destinationCity, $allFaresOfRoute) > array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute)
                         );
-                        
-                        
+
+
                         if ( $before || $after ) {
 
                             // removing partial tag for that seats which fullfill the conditions
                             unset( $seatMap[$i][$j]['partial'] );
                             unset( $seatMap[$i][$j]['type'] );
                             unset( $seatMap[$i][$j]['gender'] );
-                            
+
                         }
-                        
+
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
-                    
+
                 }
                 if ($result !== false) {
-                    
+
                 }
                 if ( $result !== false && $leavingIn30Min ) {
                     $seatMap[$i][$j]['over_issue'] = true;

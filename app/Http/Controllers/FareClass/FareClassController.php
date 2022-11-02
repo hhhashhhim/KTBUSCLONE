@@ -65,7 +65,7 @@ class FareClassController extends Controller
         return FareClass::where('id', $request->id)->update([
             'name' => $request->name,
             'color' => $request->color,
-            'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
+            'is_active' => $request->is_active,
             'updated_by' => Auth::user()->id,
         ]);
     }

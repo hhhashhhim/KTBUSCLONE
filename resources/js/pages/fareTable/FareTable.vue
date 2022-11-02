@@ -16,8 +16,8 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord" :class="loading?'disabled':''">
-                                    {{loading ? 'Loading...' : 'Fetch Record' }}
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord" :class="loadingTable?'disabled':''">
+                                    {{loadingTable ? 'Loading...' : 'Fetch Record' }}
                                 </button>
                             </div>
                         </div>
@@ -168,6 +168,7 @@ export default {
     data() {
         return {
             loading : false,
+            loadingTable : false,
             date: null,
             options: {
                 placeholder: 'HH:MM',
@@ -274,7 +275,7 @@ export default {
                     this.error = true;
                     return
                 }
-                this.loading = true;
+                this.loadingTable = true;
 
                 const res = await this.callApi("post", "fare-table", {
                     company_id: this.data.company_id, fare_class: this.data.fare_class
@@ -284,7 +285,7 @@ export default {
                     this.msg = 2;
                     this.cities = res.data
                     setTimeout(() => {
-                        this.loading = false;
+                        this.loadingTable = false;
                     }, 500);
                 } else {
                     alert("Something Went Wrong")

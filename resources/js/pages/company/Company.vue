@@ -533,9 +533,9 @@ export default {
             const res = await this.callApi("post", "company/store", { ...this.data,  logo });
             if (res.status == 201) {
                 this.loading = false
+                $("#company_table").DataTable().destroy();
                 this.success = "Company Created Successfully";
-                // this.companies.unshift(res.data);
-                this.fetchCompany();
+                await this.fetchCompany();
                 this.data.name = this.data.contact = this.data.location = "";
                 this.data.modules = this.defaultModules;
                 this.data = "";
@@ -596,17 +596,21 @@ export default {
             const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
 
             if (res.status == 200) {
+
+                $("#company_table").DataTable().destroy();
                 this.success = "Company Updated Successfully";
                 const companyRes = await this.callApi("post", "company");
                 if (companyRes.status == 200) {
                     this.companies = companyRes.data;
                 }
+                $("#company_table").DataTable();
                 this.dataEdit.name = "";
                 this.modules = [
                     {hrm: false},
                     {accounts: false},
                     {booking: false},
                 ];
+
                 setTimeout(() => {
                     this.success = "";
                     $("#edit-modal").modal("hide");

@@ -24876,7 +24876,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       dataEdit: {
         BusClassName: "",
-        is_Active: "",
         noOfRows: "",
         no_of_cols: "",
         seatMap: []
@@ -25063,18 +25062,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.selectedSeats.push(JSON.stringify([row, col]));
       }
     },
-    // modifySeatData: function (rowId, colId) {
-    //   selectedSeats;
-    //   this.seatModify = {
-    //     class: this.data.seatMap[rowId][colId].class ?? 0,
-    //     type: this.data.seatMap[rowId][colId].type ?? 0,
-    //   };
-    //   this.updateSeatValue = {
-    //     modalRowId: rowId,
-    //     modalColId: colId,
-    //   };
-    //   console.log(this.updateSeatValue);
-    // },
     getSeatDetails: function getSeatDetails(rowId, colId) {
       var _this$dataEdit$seat_m, _this$dataEdit$seat_m2;
 
@@ -25089,7 +25076,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     updateSeatDetail: function updateSeatDetail(rowId, colId) {
       if (this.editSeatModify["class"] == 0) {
-        // swal('required', 'Please Select Seat class', 'error');
         return swal({
           title: "required",
           text: "Please Select Seat Class",
@@ -25196,9 +25182,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     editCheckBox: function editCheckBox(e) {
       if (e.target.checked) {
-        this.dataEdit.is_Active = 1;
+        this.dataEdit.is_active = 1;
       } else {
-        this.dataEdit.is_Active = 0;
+        this.dataEdit.is_active = 0;
       }
     },
     addBusClass: function addBusClass() {
@@ -25318,7 +25304,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4);
       }))();
     },
-    updateFareClass: function updateFareClass() {
+    updateBusClass: function updateBusClass() {
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
@@ -25534,7 +25520,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       data: {
         noOfSeats: "",
         busNumber: "",
-        fare_class: "",
+        fare_class: 0,
         chassisNumber: "",
         insuranceNumber: "",
         routePermit: ""
@@ -25680,7 +25666,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 20;
+                  _context3.next = 21;
                   break;
                 }
 
@@ -25694,18 +25680,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.loading = false;
                 window.scrollTo(0, 0);
                 _this3.data = {};
-                _context3.next = 17;
+                _this3.data.fare_class = 0;
+                _context3.next = 18;
                 return _this3.fetchBuses();
 
-              case 17:
+              case 18:
                 setTimeout(function () {
                   // window.location.reload();
                   _this3.isShowDiv = false;
                 }, 2000);
-                _context3.next = 21;
+                _context3.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -25720,7 +25707,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context3.stop();
             }
@@ -25763,12 +25750,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 16;
+                  _context4.next = 15;
                   break;
                 }
 
-                // this.success = "Bus Record Updated Successfully";
-                // swal('Success', 'Bus Record Updated Successfully', 'success');
                 swal({
                   title: "Success",
                   text: "Bus Record updated Successfully",
@@ -25781,13 +25766,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this4.fetchBuses();
 
               case 13:
-                setTimeout(function () {
-                  _this4.success = ""; // window.location.reload();
-                }, 2000);
-                _context4.next = 17;
+                _context4.next = 16;
                 break;
 
-              case 16:
+              case 15:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -25802,7 +25784,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 16:
               case "end":
                 return _context4.stop();
             }
@@ -26440,37 +26422,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 23:
                 res = _context3.sent;
 
-                if (res.status == 201) {
+                if (!(res.status == 201)) {
+                  _context3.next = 37;
+                  break;
+                }
+
+                _this3.loading = false;
+                $("#company_table").DataTable().destroy();
+                _this3.success = "Company Created Successfully";
+                _context3.next = 30;
+                return _this3.fetchCompany();
+
+              case 30:
+                _this3.data.name = _this3.data.contact = _this3.data.location = "";
+                _this3.data.modules = _this3.defaultModules;
+                _this3.data = "";
+                window.scrollTo(0, 0);
+                setTimeout(function () {
+                  _this3.success = "";
+                  $("#add-modal").modal("hide");
+                }, 2000);
+                _context3.next = 38;
+                break;
+
+              case 37:
+                if (res.status == 422) {
                   _this3.loading = false;
-                  _this3.success = "Company Created Successfully"; // this.companies.unshift(res.data);
 
-                  _this3.fetchCompany();
+                  _loop = function _loop(key) {
+                    res.data.errors[key].forEach(function (element) {
+                      _this3.errorsArray(element, key);
+                    });
+                  };
 
-                  _this3.data.name = _this3.data.contact = _this3.data.location = "";
-                  _this3.data.modules = _this3.defaultModules;
-                  _this3.data = "";
-                  window.scrollTo(0, 0);
-                  setTimeout(function () {
-                    _this3.success = "";
-                    $("#add-modal").modal("hide");
-                  }, 2000);
-                } else {
-                  if (res.status == 422) {
-                    _this3.loading = false;
-
-                    _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this3.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
+                  for (key in res.data.errors) {
+                    _loop(key);
                   }
                 }
 
-              case 25:
+              case 38:
               case "end":
                 return _context3.stop();
             }
@@ -26575,21 +26565,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 26;
+                  _context5.next = 28;
                   break;
                 }
 
+                $("#company_table").DataTable().destroy();
                 _this5.success = "Company Updated Successfully";
-                _context5.next = 19;
+                _context5.next = 20;
                 return _this5.callApi("post", "company");
 
-              case 19:
+              case 20:
                 companyRes = _context5.sent;
 
                 if (companyRes.status == 200) {
                   _this5.companies = companyRes.data;
                 }
 
+                $("#company_table").DataTable();
                 _this5.dataEdit.name = "";
                 _this5.modules = [{
                   hrm: false
@@ -26602,10 +26594,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this5.success = "";
                   $("#edit-modal").modal("hide");
                 }, 3000);
-                _context5.next = 27;
+                _context5.next = 29;
                 break;
 
-              case 26:
+              case 28:
                 if (res.status == 422) {
                   _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
@@ -26618,7 +26610,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 27:
+              case 29:
               case "end":
                 return _context5.stop();
             }
@@ -26778,8 +26770,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         id: "",
         name: "",
         percentage: "",
-        flat: "",
-        is_Active: ""
+        flat: ""
       }
     };
   },
@@ -26896,9 +26887,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     editCheckBox: function editCheckBox(e) {
       if (e.target.checked) {
-        this.dataEdit.is_Active = 1;
+        this.dataEdit.is_active = 1;
       } else {
-        this.dataEdit.is_Active = 0;
+        this.dataEdit.is_active = 0;
       }
     },
     addDiscount: function addDiscount() {
@@ -26977,7 +26968,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 23;
+                  _context3.next = 30;
                   break;
                 }
 
@@ -26988,16 +26979,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                _this3.DiscountName = '';
+                _this3.discountPercentageRadio = 'percentage';
+                _this3.DiscountFlat = '';
+                _this3.DiscountPercentage = '';
+                _this3.isActive = 1;
+                _this3.showDiscountDivPercentage = true;
+                _this3.showDiscountDivFlat = false;
                 $('#discount_table').DataTable().destroy();
-                _context3.next = 20;
+                _context3.next = 27;
                 return _this3.fetchDiscount();
 
-              case 20:
+              case 27:
                 window.scrollTo(0, 0);
-                _context3.next = 24;
+                _context3.next = 31;
                 break;
 
-              case 23:
+              case 30:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -27012,7 +27010,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 24:
+              case 31:
               case "end":
                 return _context3.stop();
             }
@@ -27237,8 +27235,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         FareClassColor: "#000000"
       },
       dataEdit: {
-        FareClassName: '',
-        is_Active: ''
+        FareClassName: ''
       }
     };
   },
@@ -27313,9 +27310,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     editCheckBox: function editCheckBox(e) {
       if (e.target.checked) {
-        this.dataEdit.is_Active = 1;
+        this.dataEdit.is_active = 1;
       } else {
-        this.dataEdit.is_Active = 0;
+        this.dataEdit.is_active = 0;
       }
     },
     addFareClass: function addFareClass() {
@@ -27364,7 +27361,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 20;
+                  _context3.next = 19;
                   break;
                 }
 
@@ -27376,19 +27373,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#fare_class_table").DataTable().destroy();
                 _this3.loading = false;
-                _this3.loading = false;
                 _this3.data = {
+                  isActive: 1,
+                  FareClassName: "",
                   FareClassColor: "#000000"
                 };
-                _context3.next = 17;
+                _context3.next = 16;
                 return _this3.fetchFareClasses();
 
-              case 17:
+              case 16:
                 window.scrollTo(0, 0);
-                _context3.next = 21;
+                _context3.next = 20;
                 break;
 
-              case 20:
+              case 19:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -27403,7 +27401,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 20:
               case "end":
                 return _context3.stop();
             }
@@ -27594,6 +27592,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       loading: false,
+      loadingTable: false,
       date: null,
       options: {
         placeholder: 'HH:MM'
@@ -27780,7 +27779,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context4.abrupt("return");
 
               case 3:
-                _this4.loading = true;
+                _this4.loadingTable = true;
                 _context4.next = 6;
                 return _this4.callApi("post", "fare-table", {
                   company_id: _this4.data.company_id,
@@ -27794,7 +27793,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.msg = 2;
                   _this4.cities = res.data;
                   setTimeout(function () {
-                    _this4.loading = false;
+                    _this4.loadingTable = false;
                   }, 500);
                 } else {
                   alert("Something Went Wrong");
@@ -30580,48 +30579,56 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 4:
                 res = _context.sent;
 
-                if (res.status === 200) {
-                  _this.loading = false;
-                  _this.routeName = "";
-                  _this.loop = 1;
-                  _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = [];
-                  swal({
-                    title: "Success",
-                    text: "Route Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-
-                  _this.fetchCities();
-
-                  _this.loading = false;
-                } else {
-                  _this.loading = false;
-
-                  if (res.status == 422) {
-                    (function () {
-                      var errorContent = "";
-                      var count = 0;
-
-                      for (var key in res.data.errors) {
-                        res.data.errors[key].forEach(function (element) {
-                          errorContent += ++count + " - " + //creating serial no.
-                          element + // main error
-                          "\n" // creating new line
-                          ;
-                        });
-                        swal({
-                          title: "Error",
-                          text: errorContent,
-                          icon: "error",
-                          timer: 4000
-                        });
-                      }
-                    })();
-                  }
+                if (!(res.status === 200)) {
+                  _context.next = 17;
+                  break;
                 }
 
-              case 6:
+                _this.loading = false;
+                $('#route_table').DataTable().destroy();
+                _this.routeName = "";
+                _this.loop = 1;
+                _this.routeDetails = _this.addCities = _this.addTerminalsOnClick = [];
+                swal({
+                  title: "Success",
+                  text: "Route Created Successfully",
+                  icon: "success",
+                  timer: 2000
+                });
+                _context.next = 14;
+                return _this.fetchCities();
+
+              case 14:
+                _this.loading = false;
+                _context.next = 19;
+                break;
+
+              case 17:
+                _this.loading = false;
+
+                if (res.status == 422) {
+                  (function () {
+                    var errorContent = "";
+                    var count = 0;
+
+                    for (var key in res.data.errors) {
+                      res.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                      });
+                    }
+                  })();
+                }
+
+              case 19:
               case "end":
                 return _context.stop();
             }
@@ -31560,7 +31567,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (!(res.status === 201)) {
-                  _context6.next = 25;
+                  _context6.next = 26;
                   break;
                 }
 
@@ -31570,16 +31577,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+
+                _this6.clearForm();
+
                 $('#schedule_table').DataTable().destroy();
                 _this6.loading = false;
-                _context6.next = 23;
+                _context6.next = 24;
                 return _this6.fetchSchedule();
 
-              case 23:
-                _context6.next = 26;
+              case 24:
+                _context6.next = 27;
                 break;
 
-              case 25:
+              case 26:
                 if (res.status === 422) {
                   _this6.loading = false;
 
@@ -31597,7 +31607,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 26:
+              case 27:
               case "end":
                 return _context6.stop();
             }
@@ -31888,8 +31898,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       dataEdit: {
         id: "",
         name: "",
-        percentage: "",
-        is_Active: ""
+        percentage: ""
       }
     };
   },
@@ -32012,9 +32021,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     editCheckBox: function editCheckBox(e) {
       if (e.target.checked) {
-        this.dataEdit.is_Active = 1;
+        this.dataEdit.is_active = 1;
       } else {
-        this.dataEdit.is_Active = 0;
+        this.dataEdit.is_active = 0;
       }
     },
     addSurcharge: function addSurcharge() {
@@ -32086,7 +32095,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 21;
+                  _context3.next = 28;
                   break;
                 }
 
@@ -32096,16 +32105,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                _this3.SurchargeName = '';
+                _this3.percentageRadio = 'percentage';
+                _this3.SurchargePercentage = '';
+                _this3.SurchargeFlat = '';
+                _this3.showDivFlat = false;
+                _this3.showDivPercentage = true;
+                _this3.isActive = 1;
                 $("#surcharge_table").DataTable().destroy();
                 _this3.loading = false;
-                _context3.next = 19;
+                _context3.next = 26;
                 return _this3.fetchSurcharges();
 
-              case 19:
-                _context3.next = 22;
+              case 26:
+                _context3.next = 29;
                 break;
 
-              case 21:
+              case 28:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -32120,7 +32136,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 29:
               case "end":
                 return _context3.stop();
             }
@@ -37384,6 +37400,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT, CLASS */
       )]), $data.selectedBookedSeats.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_39, _hoisted_41)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("h1", _hoisted_42, "Loading.........")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showBookingDiv ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
         onKeyup: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)($options.getCustomer, ["enter"]),
+        onBlur: $options.getCustomer,
         "class": "form-control col-md-9",
         modelValue: $data.addForm.customerCNIC,
         "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
@@ -37394,7 +37411,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.options
       }, null, 8
       /* PROPS */
-      , ["onKeyup", "modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , ["onKeyup", "onBlur", "modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control col-md-9",
         id: "fullName",
@@ -37533,7 +37550,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(record, function (col, colIndex) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: colIndex
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"colIndex==0\">\r\n                                          {{ col }}\r\n                                        </div> "), col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"colIndex==0\">\n                                          {{ col }}\n                                        </div> "), col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: 0,
             "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow", $options.getClasses(col)]),
             onClick: function onClick($event) {
@@ -37543,7 +37560,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               border: '3px solid ' + col.color + ' !important'
             }),
             title: col.partial ? col.departure_city + ' to ' + col.destination_city : ''
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" data-toggle=\"modal\"\r\n                                            :data-target=\"col.type?'#booking-options-popup':''\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" data-toggle=\"modal\"\n                                            :data-target=\"col.type?'#booking-options-popup':''\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
           /* TEXT */
           ), _hoisted_86, col.type && (col.type == 'booked' || col.type == 'advance booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_87, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
             "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["type-icons fas", col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'])
@@ -39038,7 +39055,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-primary", $data.loading ? 'disabled' : '']),
         onClick: _cache[25] || (_cache[25] = function () {
-          return $options.updateFareClass && $options.updateFareClass.apply($options, arguments);
+          return $options.updateBusClass && $options.updateBusClass.apply($options, arguments);
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Loading..." : "Update Bus Class"), 3
       /* TEXT, CLASS */
@@ -39525,11 +39542,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_18, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.chassis_number), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.chassis_number ? bus.chassis_number : "N/A"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.insurance_number), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.insurance_number ? bus.insurance_number : "N/A"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.route_permit_number), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.route_permit_number ? bus.route_permit_number : "N/A"), 1
     /* TEXT */
     ), bus.added_by ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.added_by.name), 1
     /* TEXT */
@@ -41283,7 +41300,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountPercentage]]), _hoisted_43])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDiscountDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountPercentage]]), _hoisted_43])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDiscountDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "5",
@@ -41296,7 +41313,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountFlat]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <div class=\"form-group col-md-6\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <label for=\"PercentageName\">Percentage <span class=\"text-danger\">*</span></label>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <input type=\"text\" class=\"form-control\" maxlength=\"3\" v-model=\"PercentageName\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                   @keypress=\"isNumber($event)\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountFlat]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
         value: "1",
         checked: "",
@@ -42114,12 +42131,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ))], 512
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.data.fare_class]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-primary mt-4 ml-2", $data.loading ? 'disabled' : '']),
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-primary mt-4 ml-2", $data.loadingTable ? 'disabled' : '']),
     type: "button",
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.fetchRecord && $options.fetchRecord.apply($options, arguments);
     })
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Fetch Record'), 3
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Fetch Record'), 3
   /* TEXT, CLASS */
   )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
     name: "fade"
@@ -55671,7 +55688,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after{\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-03b302d9] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-03b302d9]{\r\n  position: relative;\r\n  z-index: 10;\n}\n.partial-seat[data-v-03b302d9]{\r\n  width: 30px;\r\n  height: 30px;\r\n  background: linear-gradient( 90deg, white 50%,black 50% );\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n  box-sizing: content-box;\r\n  -moz-border-radius: 25px;\r\n  -webkit-border-radius: 25px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\n  background-color: #b9dea0;\n  border-radius: 10px;\n  cursor: pointer;\n  position: relative;\n  isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\n  background-color: #6db131;\n}\n.economy[data-v-03b302d9] {\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\n  border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\n  border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\n  background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-03b302d9] {\n  background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after{\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: -1;\n  height: 100%;\n  width: 50%;\n  border-top-right-radius: 10px;\n  border-bottom-right-radius: 10px;\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-03b302d9] {\n  height: 55px;\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\n.seat-img span[data-v-03b302d9] {\n  height: 50px;\n  width: 50px;\n  display: inline-block;\n  cursor: pointer !important;\n  margin: 5px;\n}\nimg[data-v-03b302d9] {\n  cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\n  width: 30px;\n  height: 30px;\n  border-radius: 50px;\n  display: inline-block;\n  box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\n  position: relative;\n  bottom: 12px;\n  color: rgb(62, 61, 61);\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\n  position: relative;\n  top: -10px;\n  padding: 5px;\n  color: black;\n}\n.type-icons[data-v-03b302d9]{\n  position: relative;\n  z-index: 10;\n}\n.partial-seat[data-v-03b302d9]{\n  width: 30px;\n  height: 30px;\n  background: linear-gradient( 90deg, white 50%,black 50% );\n  border-radius: 50%;\n  display: inline-block;\n  box-sizing: content-box;\n  -moz-border-radius: 25px;\n  -webkit-border-radius: 25px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

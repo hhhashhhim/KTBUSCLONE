@@ -1256,6 +1256,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.clearForm();
                 $('#schedule_table').DataTable().destroy();
                 this.loading = false;
                 await this.fetchSchedule();

@@ -126,24 +126,10 @@
                     </div>
                     <div class="form-group col-md-5" v-if="showDiscountDivFlat">
                         <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span class="text-muted">max: 10K</span> </label>
-                        <!--                        <div class="input-group">-->
                         <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
-                        <!--                            <div class="input-group-append">-->
-                        <!--                                <span class="input-group-text">%</span>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
+
                     </div>
-<!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="PercentageName">Percentage <span class="text-danger">*</span></label>-->
-<!--                        <div class="input-group">-->
-<!--                            <input type="text" class="form-control" maxlength="3" v-model="PercentageName"-->
-<!--                                   @keypress="isNumber($event)">-->
-<!--                            <div class="input-group-append">-->
-<!--                                <span class="input-group-text">%</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
                     <div class="col-md-12">
                         <h5>Status</h5>
                         <div class="form-group d-flex align-items-center ">
@@ -270,7 +256,6 @@ export default {
                 name: "",
                 percentage: "",
                 flat: "",
-                is_Active: "",
             },
         };
     },
@@ -349,9 +334,9 @@ export default {
         },
         editCheckBox: function (e) {
             if (e.target.checked) {
-                this.dataEdit.is_Active = 1;
+                this.dataEdit.is_active = 1;
             } else {
-                this.dataEdit.is_Active = 0;
+                this.dataEdit.is_active = 0;
             }
         },
 
@@ -402,6 +387,14 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.DiscountName = '';
+                this.discountPercentageRadio = 'percentage';
+                this.DiscountFlat = '';
+                this.DiscountPercentage = '';
+                this.isActive = 1;
+                this.showDiscountDivPercentage = true;
+                this.showDiscountDivFlat = false;
+
                 $('#discount_table').DataTable().destroy();
                 await this.fetchDiscount();
                 window.scrollTo(0, 0);

@@ -261,6 +261,7 @@ export default {
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
                 this.loading = false;
+                $('#route_table').DataTable().destroy();
                 this.routeName = "";
                 this.loop = 1;
                 this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
@@ -270,7 +271,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.fetchCities();
+                await this.fetchCities();
                 this.loading = false;
             }
             else {

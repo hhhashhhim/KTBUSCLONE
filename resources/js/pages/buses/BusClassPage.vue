@@ -528,7 +528,7 @@
           <button
             type="button"
             class="btn btn-primary"
-            @click="updateFareClass"
+            @click="updateBusClass"
             :class="loading ? 'disabled' : ''"
           >
             {{ loading ? "Loading..." : "Update Bus Class" }}
@@ -673,7 +673,6 @@ export default {
       },
       dataEdit: {
         BusClassName: "",
-        is_Active: "",
         noOfRows: "",
         no_of_cols: "",
         seatMap: [],
@@ -797,18 +796,6 @@ export default {
         }
 
     },
-    // modifySeatData: function (rowId, colId) {
-    //   selectedSeats;
-    //   this.seatModify = {
-    //     class: this.data.seatMap[rowId][colId].class ?? 0,
-    //     type: this.data.seatMap[rowId][colId].type ?? 0,
-    //   };
-    //   this.updateSeatValue = {
-    //     modalRowId: rowId,
-    //     modalColId: colId,
-    //   };
-    //   console.log(this.updateSeatValue);
-    // },
     getSeatDetails: function (rowId, colId) {
       this.editSeatModify = {
         class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
@@ -822,7 +809,6 @@ export default {
 
     updateSeatDetail: function (rowId, colId) {
       if (this.editSeatModify.class == 0) {
-        // swal('required', 'Please Select Seat class', 'error');
         return swal({
           title: "required",
           text: "Please Select Seat Class",
@@ -932,9 +918,9 @@ export default {
     },
     editCheckBox: function (e) {
       if (e.target.checked) {
-        this.dataEdit.is_Active = 1;
+        this.dataEdit.is_active = 1;
       } else {
-        this.dataEdit.is_Active = 0;
+        this.dataEdit.is_active = 0;
       }
     },
 
@@ -1002,7 +988,7 @@ export default {
       }
     },
 
-    async updateFareClass() {
+    async updateBusClass() {
       this.validationErrors = [];
       if (this.dataEdit.BusClassName === "")
         return swal({
@@ -1047,8 +1033,8 @@ export default {
           icon: "success",
           timer: 2000,
         });
-          $("#bus_class_table").DataTable().destroy();
-          this.loading = false;
+        $("#bus_class_table").DataTable().destroy();
+         this.loading = false;
         await this.fetchBussClasses();
       } else {
         if (res.status === 422) {

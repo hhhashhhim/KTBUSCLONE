@@ -45,7 +45,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $schedule = Schedule::where('id', $request->schedule)
         ->where('company_id',$this->company_id)
         ->select('id', 'fare_class_id','route_id','bus_class_id')
@@ -64,8 +64,8 @@ class BookingController extends Controller
         $customer = Customer::where('cnic',$cnicFormat)->first();
 
         // Fare Fetching About the Schedule
-        
-        
+
+
         if (!$customer) {
             $customer = Customer::create([
                 'company_id'=>$this->company_id,
@@ -76,13 +76,13 @@ class BookingController extends Controller
             ]);
         }
 
-        
+
         // Getting Already Booked Tickets
-       
-        
+
+
         $bookingNo = Ticket::latest()->first()->booking_no ?? 0;
         ++$bookingNo;
-        
+
         foreach ($request->selectedSeats as $i => $seat) {
 
             Ticket::create([
@@ -102,9 +102,9 @@ class BookingController extends Controller
                 'added_by'=>Auth::user()->id,
                 'discount'=>$request->discount,
             ]);
-            
+
         }
-        
+
         return "Successfully Boooking Created";
 
     }
@@ -136,7 +136,7 @@ class BookingController extends Controller
         foreach ($routes as $key => $route){
             $routes_id[] = $route->route_id;
         }
-        
+
        return Schedule::whereIn('route_id',array_unique($routes_id))
        ->whereDate('start_date', '<=', $request->date)
        ->whereDate('end_date', '>=',$request->date)

@@ -41,9 +41,9 @@
                                                         <td v-if="bus.bus_class">{{ bus.bus_class.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>{{ bus.bus_number }}</td>
-                                                        <td>{{ bus.chassis_number }}</td>
-                                                        <td>{{ bus.insurance_number }}</td>
-                                                        <td>{{ bus.route_permit_number }}</td>
+                                                        <td>{{ bus.chassis_number ? bus.chassis_number : "N/A" }}</td>
+                                                        <td>{{ bus.insurance_number ? bus.insurance_number : "N/A" }}</td>
+                                                        <td>{{ bus.route_permit_number ? bus.route_permit_number : "N/A" }}</td>
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
@@ -317,7 +317,7 @@ export default {
             data: {
                 noOfSeats: "",
                 busNumber: "",
-                fare_class: "",
+                fare_class: 0,
                 chassisNumber: "",
                 insuranceNumber: "",
                 routePermit: "",
@@ -409,6 +409,7 @@ export default {
                 this.loading = false;
                 window.scrollTo(0, 0);
                 this.data = {};
+                this.data.fare_class = 0;
                 await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
@@ -440,8 +441,6 @@ export default {
 
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
-                // this.success = "Bus Record Updated Successfully";
-                // swal('Success', 'Bus Record Updated Successfully', 'success');
                swal({
                     title: "Success",
                     text: "Bus Record updated Successfully",
@@ -450,12 +449,7 @@ export default {
                 });
                 $('#buses_table').DataTable().destroy();
                 this.loading = false;
-
                 await this.fetchBuses();
-                setTimeout(() => {
-                    this.success = "";
-                    // window.location.reload();
-                }, 2000);
             } else {
                 if (res.status == 422) {
                     this.loading = false;

@@ -29,15 +29,11 @@ class DiscountController extends Controller
     {
         $rules = [
             'name' => ['required', Rule::unique('discounts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
-//            'percentage' => 'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Discount Name is Required!',
             'name.unique' => 'Discount Name not be Repeated!',
-//            'percentage.required' => 'Discount percentage is Required!',
-//            'percentage.min' => 'Discount percentage never be less then 0',
-//            'percentage.max' => 'Discount percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         $discount = Discount::create([
@@ -56,14 +52,10 @@ class DiscountController extends Controller
     {
         $rules = [
             'name' => 'required',
-//            'percentage' => 'required|numeric|min:0|max:100',
         ];
 
         $customMessages = [
             'name.required' => 'Discount Name is Required!',
-//            'percentage.required' => 'Discount percentage is Required!',
-//            'percentage.min' => 'Discount percentage never be less then 0',
-//            'percentage.max' => 'Discount percentage never be greater then 100',
         ];
         $this->validate($request, $rules, $customMessages);
         return Discount::where('id', $request->id)->update([
@@ -71,7 +63,7 @@ class DiscountController extends Controller
             'type' => $request->type,
             'percentage' => $request->type == "percentage" ? $request->percentage: null,
             'flat' => $request->type == "flat" ? $request->flat: null,
-            'is_active' => !isset($request->is_Active) ? 0 : $request->is_Active,
+            'is_active' => $request->is_active,
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -82,6 +74,6 @@ class DiscountController extends Controller
     }
     public function selectiveDiscount()
     {
-        return Discount::where('company_id', $this->company_id)->where('is_active', 1)->get();
+        return Discount::where('company_id', $this->company_id)/*->where('is_active', 1)*/->get();
     }
 }

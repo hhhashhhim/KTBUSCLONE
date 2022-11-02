@@ -63,7 +63,7 @@ class SurchargeController extends Controller
             'type' => $request->type,
             'percentage' => $request->type == "percentage" ? $request->percentage: null,
             'flat' => $request->type == "flat" ? $request->flat : null,
-            'is_active'=> !isset($request->is_Active) ? 0 : $request->is_Active,
+            'is_active'=> $request->is_active,
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -75,6 +75,6 @@ class SurchargeController extends Controller
 
     public function selectiveSurcharge()
     {
-        return Surcharge::where('company_id', $this->company_id)->where('is_active', 1)->get();
+        return Surcharge::where('company_id', $this->company_id)/*->where('is_active', 1)*/->get();
     }
 }
