@@ -271,6 +271,7 @@ export default {
             }
             setTimeout(function () {
                 $("#designation_table").DataTable();
+                $("#show_designation").DataTable();
             }, 300);
         },
         clearForm: function () {
@@ -314,6 +315,7 @@ export default {
                 });
                 this.clearForm();
                 $("#designation_table").DataTable().destroy();
+                $("#show_designation").DataTable().destroy();
                 await this.fetchDesignations();
             } else {
                 if (resDesignationAdd.status == 422) {
@@ -354,6 +356,7 @@ export default {
                     timer: 2000
                 });
                 $("#designation_table").DataTable().destroy();
+                $("#show_designation").DataTable().destroy();
                 await this.fetchDesignations();
             } else {
                 if (resDepartmentEdit.status == 422) {
@@ -386,8 +389,9 @@ export default {
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.designations.splice(obj.index, 1)
+                this.departmentsDetails.splice(obj.index, 1)
                 $("#designation_table").DataTable().destroy();
+                $("#show_designation").DataTable().destroy();
                 this.fetchDesignations();
             }
         }

@@ -28263,6 +28263,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 setTimeout(function () {
                   $("#designation_table").DataTable();
+                  $("#show_designation").DataTable();
                 }, 300);
 
               case 11:
@@ -28354,7 +28355,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDesignationAdd = _context4.sent;
 
                 if (!(resDesignationAdd.status == 201)) {
-                  _context4.next = 18;
+                  _context4.next = 19;
                   break;
                 }
 
@@ -28369,14 +28370,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.clearForm();
 
                 $("#designation_table").DataTable().destroy();
-                _context4.next = 16;
+                $("#show_designation").DataTable().destroy();
+                _context4.next = 17;
                 return _this4.fetchDesignations();
 
-              case 16:
-                _context4.next = 19;
+              case 17:
+                _context4.next = 20;
                 break;
 
-              case 18:
+              case 19:
                 if (resDesignationAdd.status == 422) {
                   _this4.loading = false;
 
@@ -28391,7 +28393,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 19:
+              case 20:
               case "end":
                 return _context4.stop();
             }
@@ -28445,7 +28447,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDepartmentEdit = _context5.sent;
 
                 if (!(resDepartmentEdit.status == 200)) {
-                  _context5.next = 17;
+                  _context5.next = 18;
                   break;
                 }
 
@@ -28457,14 +28459,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#designation_table").DataTable().destroy();
-                _context5.next = 15;
+                $("#show_designation").DataTable().destroy();
+                _context5.next = 16;
                 return _this5.fetchDesignations();
 
-              case 15:
-                _context5.next = 18;
+              case 16:
+                _context5.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (resDepartmentEdit.status == 422) {
                   _this5.loading = false;
 
@@ -28479,7 +28482,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context5.stop();
             }
@@ -28520,8 +28523,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
-        this.designations.splice(obj.index, 1);
+        this.departmentsDetails.splice(obj.index, 1);
         $("#designation_table").DataTable().destroy();
+        $("#show_designation").DataTable().destroy();
         this.fetchDesignations();
       }
     }
