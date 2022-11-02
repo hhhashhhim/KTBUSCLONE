@@ -3,6 +3,7 @@
 namespace App\Models\Hrm\Department;
 
 use App\Models\Company;
+use App\Models\Hrm\Designation\Designation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,11 @@ class Department extends Model
 
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
+    }
+
+
+    public function designation(){
+        return $this->hasMany(Designation::class, 'department_id', 'id');
     }
 
 

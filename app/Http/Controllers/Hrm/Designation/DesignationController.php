@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Hrm\Designation;
 
 use App\Http\Controllers\Controller;
+use App\Models\Hrm\Department\Department;
 use App\Models\Hrm\Designation\Designation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,12 @@ class DesignationController extends Controller
 
     public function index()
     {
-        return Designation::with('addedBy', 'company', 'department')->where('company_id', $this->company_id)->get();
+        return Department::withCount('designation')->with('addedBy')->where('company_id', $this->company_id)->get();
+    }
+
+    public function edit(Request $request)
+    {
+        return Designation::with('addedBy')->where('department_id', $request->id)->where('company_id', $this->company_id)->get();
     }
 
     public function store(Request $request)
@@ -66,6 +72,7 @@ class DesignationController extends Controller
     {
         return Designation::find($request->id)->delete();
     }
+
     public function selective(Request $request)
     {
         return Designation::where('department_id', $request->id)->get();

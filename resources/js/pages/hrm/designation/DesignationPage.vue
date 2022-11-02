@@ -49,7 +49,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Department Name</th>
-                                                        <th>Name</th>
+                                                        <th>No. Of Designations</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -57,20 +57,17 @@
                                                     <tbody>
                                                     <tr v-for="(designation, i) in designations" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ designation.department.name }}</td>
                                                         <td>{{ designation.name }}</td>
+                                                        <td>{{ designation.designation_count }}</td>
                                                         <td>{{ designation.added_by.name }}</td>
                                                         <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editDesignation(designation)"
-                                                                    class="btn btn-primary mx-1">
-                                                                <i class="far fa-edit"></i>
-                                                            </button>
-                                                            <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(designation,i)"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
+                                                            <button
+                                                                data-target="#detail-modal"
+                                                                data-toggle="modal"
+                                                                @click="designationDetail(designation.id)"
+                                                                class="btn btn-info mx-2"
+                                                            >
+                                                                <i class="far fa-eye"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -121,7 +118,62 @@
                 </template>
             </Add>
 
-
+            <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Designation Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body m-1 p-1">
+                            <div class="card-body my-0 py-0">
+                                <!-- Table -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table class="table table-striped table-hover" id="show_designation">
+                                            <thead>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Name</th>
+                                                <th>Added By</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="(single, i) in departmentsDetails" :key="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td>{{ single.name }}</td>
+                                                <td>{{ single.added_by.name }}</td>
+                                                <td>
+                                                    <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            @click="editDesignation(single)"
+                                                            class="btn btn-primary mx-1">
+                                                        <i class="far fa-edit"></i>
+                                                    </button>
+                                                    <button :data-target="'#' + deleteFormID"
+                                                            data-toggle="modal"
+                                                            @click="deleteModal(single,i)"
+                                                            class="btn btn-danger">
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- END TABLE -->
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
@@ -133,7 +185,7 @@
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
                         <label for="departmentName">Department<span class="text-danger">*</span></label>
-                        <select class="form-control" v-model="dataEdit.department_id" >
+                        <select class="form-control" v-model="dataEdit.department_id" disabled>
                             <option value="0" selected>Select Department</option>
                             <option
                                 v-for="(department, i) in departments"
@@ -184,6 +236,7 @@ export default {
         return {
             addForm: {},
             designations: [],
+            departmentsDetails: [],
             departments: [],
             loading: false,
             formID: "designation_form",
@@ -203,7 +256,7 @@ export default {
 
         async fetchDesignations() {
             const resDesig = await this.callApi("post", 'hrm/designation');
-            console.log(resDesig);
+            console.log(resDesig.data);
             if (resDesig.status == 200) {
                 this.designations = resDesig.data
             } else {
@@ -225,7 +278,14 @@ export default {
                 department: 0,
             };
         },
-
+        async designationDetail(id) {
+            const getDepartmentRes = await this.callApi("post", "hrm/designation/edit", {id: id});
+            $("#show_designation").DataTable().destroy();
+            this.departmentsDetails = getDepartmentRes.data;
+            setTimeout(() => {
+                $("#show_designation").DataTable();
+            }, 300);
+        },
         async addDesignation() {
             this.validationErrors = [];
             if (this.addForm.department == "0")
