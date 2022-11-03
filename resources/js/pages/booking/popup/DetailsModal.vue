@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <BasicPopup
-      :heading="'Reschedule Seats'"
+      :heading="'View Booking Details'"
       :errors="this.validationErrors"
       :success="success"
       :formID="formID"

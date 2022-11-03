@@ -233,7 +233,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="add">
+                    <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
                         {{ loading ? 'Loading...' : 'Add New Terminal' }}
                     </button>
                 </template>
@@ -426,7 +426,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="update">
+                    <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                         {{ loading ? 'Loading...' : 'Update Terminal' }}
                     </button>
                 </template>

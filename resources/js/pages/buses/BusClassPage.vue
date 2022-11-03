@@ -251,7 +251,7 @@
             type="button"
             class="btn btn-primary"
             @click="addBusClass"
-            :class="loading ? 'disabled' : ''"
+            :disabled="loading"
           >
             {{ loading ? "Loading..." : "Add Bus Class" }}
           </button>
@@ -270,7 +270,7 @@
         <div class="modal-dialog modal-xl modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-body">
-              <div class="card card-success">
+              <div class="card card-primary">
                 <div class="card-header d-flex justify-content-between">
                   <h4 class="modal-title">Seat Detail</h4>
                   <button
@@ -321,12 +321,12 @@
                     <div class="col-md-12">
                       <button
                         type="button"
-                        class="btn btn-block btn-success"
+                        class="btn btn-block btn-primary"
                         @click="
                           addSeatData()
                         "
                         data-dismiss="modal"
-                        :class="loading ? 'disabled' : ''"
+                        :disabled="loading"
                       >
                         {{ loading ? "Loading..." : "Add Seat Detail" }}
                       </button>
@@ -381,7 +381,7 @@
                 type="button"
                 class="btn btn-primary"
                 @click="saveFareClass()"
-                :class="loading ? 'disabled' : ''"
+                :disabled="loading"
               >
                 {{ loading ? "Loading..." : "Save Fare Class" }}
               </button>
@@ -529,7 +529,7 @@
             type="button"
             class="btn btn-primary"
             @click="updateBusClass"
-            :class="loading ? 'disabled' : ''"
+            :disabled="loading"
           >
             {{ loading ? "Loading..." : "Update Bus Class" }}
           </button>

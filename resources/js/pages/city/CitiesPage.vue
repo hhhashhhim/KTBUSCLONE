@@ -69,7 +69,7 @@
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="add">{{ loading ? 'Loading...': 'Add New City' }}</button>
+                    <button type="button" class="btn btn-primary" :disabled="loading" @click="add">{{ loading ? 'Loading...': 'Add New City' }}</button>
                 </template>
             </Add>
 
@@ -86,7 +86,7 @@
                 </div>
 
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :class="loading?'disabled':''" @click="update">{{ loading ? 'Loading...': 'Update City' }}</button>
+                    <button type="button" class="btn btn-primary" :disabled="loading" @click="update">{{ loading ? 'Loading...': 'Update City' }}</button>
                 </template>
             </Edit>
 

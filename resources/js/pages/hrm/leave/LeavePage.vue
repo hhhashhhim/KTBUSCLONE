@@ -189,7 +189,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateLeaves"
-                            :class="loading?'disabled':''">
+                            :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Leave Record' }}
                     </button>
                 </template>

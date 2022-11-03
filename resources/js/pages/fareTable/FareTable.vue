@@ -16,7 +16,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord" :class="loadingTable?'disabled':''">
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord" :disabled="loadingTable">
                                     {{loadingTable ? 'Loading...' : 'Fetch Record' }}
                                 </button>
                             </div>
@@ -123,7 +123,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add"  :class="loading?'disabled':''">
+                    <button type="button" class="btn btn-primary" @click="add" :disabled="loading">
                         {{ loading ? 'Loading... ' : 'Save Fare Details' }}
                     </button>
                 </template>

@@ -123,7 +123,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateDepartment"
-                            :class="loading?'disabled':''">
+                            :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Department' }}
                     </button>
                 </template>

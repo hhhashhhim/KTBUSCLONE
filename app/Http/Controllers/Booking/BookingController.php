@@ -35,12 +35,9 @@ class BookingController extends Controller
                 $booking[0]->date = $i;
                 return $booking[0];
             });
-
             $allBooking[]=$bookingWithDetails->first();
         }
-
         return $allBooking;
-
     }
 
     public function store(Request $request)
@@ -153,11 +150,12 @@ class BookingController extends Controller
         $bookings = Ticket::with('addedBy','customer')->where('company_id', $this->company_id)
         ->whereDate('date',$request->date)
         ->where('schedule_id',$request->schedule_id)
-        ->get()->groupBy('booking_no');
-        $allBooking = $bookings->map(function($booking){
-            $booking[0]->count=$booking->count();
-            return $booking[0];
-        });
-        return $allBooking;
+        ->get();
+        return $bookings;
+//        $allBooking = $bookings->map(function($booking){
+//            $booking[0]->count=$booking->count();
+//            return $booking[0];
+//        });
+//        return $allBooking;
     }
 }

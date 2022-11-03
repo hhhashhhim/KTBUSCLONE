@@ -288,7 +288,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addEmployee" :class="loading?'disabled':''">
+                    <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
                         {{ loading ? 'Loading...' : 'Add Employee' }}
                     </button>
                 </template>
@@ -314,7 +314,7 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addDepartment()" :class="loadingDepart ? 'disabled' : '' ">
+                            <button type="button" class="btn btn-primary" @click="addDepartment()" :disabled="loadingDepart">
                                 {{ loadingDepart ? 'Loading...' : ' Add Department' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -343,7 +343,7 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addDesignation()" :class="loadingDesignation ? 'disabled' : '' ">
+                            <button type="button" class="btn btn-primary" @click="addDesignation()" :disabled="loadingDesignation">
                                 {{ loadingDesignation ? 'Loading...' : ' Add Designation' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -536,7 +536,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateEmployees"
-                            :class="loading?'disabled':''">
+                            :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Employees Record' }}
                     </button>
                 </template>
