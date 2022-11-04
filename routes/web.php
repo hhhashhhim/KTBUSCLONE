@@ -20,6 +20,7 @@ use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Route::get('send', function () {
+//
+//    $details = [
+//        'title' => 'Mail from ItSolutionStuff.com',
+//        'body' => 'This is for testing email using smtp'
+//    ];
+//
+//    Mail::to('faizanmanni@gmail.com')->send(new \App\Mail\MyTestMail($details));
+//    dd("Email is Sent.");
+//});
 
 Route::post("/login", [AuthController::class, 'login']);
 Route::post("/double-check", [AuthController::class, 'doubleCheck']);

@@ -58,6 +58,8 @@ class BookingController extends Controller
         // ->select('id','fare_class_id','company_id')->with('bus_class')
         // ->first();
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
+        $phoneFormat = str_replace('-', '', $request->contact);
+
         $customer = Customer::where('cnic',$cnicFormat)->first();
 
         // Fare Fetching About the Schedule
@@ -69,7 +71,7 @@ class BookingController extends Controller
                 'added_by'=>Auth::user()->id,
                 'name'=>$request->customerName,
                 'cnic'=>$cnicFormat,
-                'contact'=>$request->contact,
+                'contact'=>$phoneFormat,
             ]);
         }
 

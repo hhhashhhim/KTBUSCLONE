@@ -224,7 +224,7 @@
               <td v-for="(col, colIndex) in record" :key="colIndex">
                 <img
                   v-if="col.reserved"
-                  :class="col.selected ? 'selected' : '' "
+                  :class="col.selected ? 'selected' + getBorderSelected() : '' "
                   @click="selectSeat(rowIndex, colIndex)"
                   :src="
                     $store.state.app_url +
@@ -237,7 +237,6 @@
             </tr>
           </div>
           <div class="col-md-2">
-
             <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                 <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                 <span class="text-wrap">{{ seatClass.name }}</span>
@@ -322,9 +321,7 @@
                       <button
                         type="button"
                         class="btn btn-block btn-primary"
-                        @click="
-                          addSeatData()
-                        "
+                        @click="addSeatData()"
                         data-dismiss="modal"
                         :disabled="loading"
                       >
@@ -730,6 +727,9 @@ export default {
         event.preventDefault();
       }
     },
+      getBorderSelected : function () {
+
+      },
     async saveFareClass() {
       this.loading = true;
       const resSaveFareClass = await this.callApi(
@@ -760,11 +760,10 @@ export default {
                 let col = seat[1];
                 this.data.seatMap[row][col].class = this.seatModify.class ?? 0;
                 this.data.seatMap[row][col].type = this.seatModify.type ?? 0;
-
                 delete this.data.seatMap[row][col].selected;
 
             })
-
+            // this.getBorderSelected(this)
             return swal({
                 title: "Success",
                 text: "Seats Modified Successfully !!!!",

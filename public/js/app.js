@@ -23264,9 +23264,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     isDeleted: true
                   });
 
-                  _this.$store.commit("setDeleteObj", deletingObj);
+                  _this.$store.commit("setDeleteObj", deletingObj); // this.success = "Record Deleted !!!";
 
-                  _this.success = "Record Deleted !!!";
+
+                  swal({
+                    title: "Success",
+                    text: "Record Deleted !!! ",
+                    icon: "success",
+                    timer: 2000
+                  });
                   setTimeout(function () {
                     _this.success = "";
                     $("#delete-modal").modal("hide");
@@ -23745,7 +23751,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "SurchargePage",
+  name: "BookingPage",
   components: {
     Add: _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     Edit: _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -24095,7 +24101,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         } else {
           this.schedule.bus_class.seat_map[row][col].selected = true;
           this.selectedBookedSeats.push(seatNo);
-          this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]); // console.log(bookedSeats);
+          this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
         }
 
         this.addForm.selectedBookedSeats = this.selectedBookedSeats;
@@ -24240,7 +24246,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context7.prev = _context7.next) {
               case 0:
                 deletingObj = {
-                  url: "/surcharge/delete",
+                  url: "booking/delete",
                   data: surcharge,
                   index: i
                 };
@@ -24310,10 +24316,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 resBookingDetail = _context9.sent;
-                console.log(resBookingDetail);
 
                 if (resBookingDetail.status === 200) {
-                  $("#" + _this9.detailsFormId + " table").dataTable().destroy();
                   _this9.bookingDetails = resBookingDetail.data;
                   setTimeout(function () {
                     $("#" + _this9.detailsFormId + " table").dataTable();
@@ -24322,7 +24326,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(resBookingDetail);
                 }
 
-              case 5:
+              case 4:
               case "end":
                 return _context9.stop();
             }
@@ -24374,13 +24378,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "DetailsModal",
-  props: ["formID", "details"],
+  props: ["formID", "details", "deleteFormID"],
   components: {
     BasicPopup: _components_BasicPopup_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   methods: {
     cnicFormat: function cnicFormat(string) {
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
+    },
+    phoneFormat: function phoneFormat(string) {
+      return string.replace(/(\d{4})(\d{7})/, "$1-$2");
     }
   }
 });
@@ -24978,6 +24985,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         event.preventDefault();
       }
     },
+    getBorderSelected: function getBorderSelected() {},
     saveFareClass: function saveFareClass() {
       var _this3 = this;
 
@@ -25036,7 +25044,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           _this4.data.seatMap[row][col]["class"] = (_this4$seatModify$cla = _this4.seatModify["class"]) !== null && _this4$seatModify$cla !== void 0 ? _this4$seatModify$cla : 0;
           _this4.data.seatMap[row][col].type = (_this4$seatModify$typ = _this4.seatModify.type) !== null && _this4$seatModify$typ !== void 0 ? _this4$seatModify$typ : 0;
           delete _this4.data.seatMap[row][col].selected;
-        });
+        }); // this.getBorderSelected(this)
+
         return swal({
           title: "Success",
           text: "Seats Modified Successfully !!!!",
@@ -37547,10 +37556,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , ["formID", "seats"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DetailsModal, {
     formID: $data.detailsFormId,
-    details: $data.bookingDetails
+    details: $data.bookingDetails,
+    deleteFormID: $data.deleteFormID
   }, null, 8
   /* PROPS */
-  , ["formID", "details"])]);
+  , ["formID", "details", "deleteFormID"])]);
 }
 
 /***/ }),
@@ -37582,10 +37592,19 @@ var _hoisted_4 = {
   id: "booking-table"
 };
 
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Customer Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cell Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Ticket Booked By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No. of Tickets"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Action</th> ")])], -1
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Customer Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Remarks"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cell Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Ticket Booked By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
 /* HOISTED */
 );
 
+var _hoisted_6 = ["data-target", "onClick"];
+
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "far fa-trash-alt"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_8 = [_hoisted_7];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_BasicPopup = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("BasicPopup");
 
@@ -37601,19 +37620,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: i
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(i)), 1
         /* TEXT */
-        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.customer ? booking.customer.name : "N/A"), 1
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.customer.name), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.remarks != null ? booking.remarks : "N/A"), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.phoneFormat(booking.customer.contact)), 1
         /* TEXT */
         ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cnicFormat(booking.customer.cnic)), 1
         /* TEXT */
-        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.customer.contact), 1
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.seat_no), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.added_by.name), 1
         /* TEXT */
         ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.date), 1
         /* TEXT */
-        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.added_by ? booking.added_by.name : "N/A"), 1
-        /* TEXT */
-        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(booking.count), 1
-        /* TEXT */
-        )]);
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          "data-target": '#' + $props.deleteFormID,
+          "data-toggle": "modal",
+          onClick: function onClick($event) {
+            return _ctx.deleteModal(booking, parseInt(i));
+          },
+          "class": "text-light btn btn-danger"
+        }, _hoisted_8, 8
+        /* PROPS */
+        , _hoisted_6)])]);
       }), 128
       /* KEYED_FRAGMENT */
       ))])])])])];
@@ -38902,7 +38932,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             key: colIndex
           }, [col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
             key: 0,
-            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(col.selected ? 'selected' : ''),
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(col.selected ? 'selected' + $options.getBorderSelected() : ''),
             onClick: function onClick($event) {
               return $options.selectSeat(rowIndex, colIndex);
             },

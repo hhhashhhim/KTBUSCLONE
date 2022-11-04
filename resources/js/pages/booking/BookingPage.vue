@@ -1,4 +1,3 @@
-+
 <template>
     <section class="section">
         <div class="section-body">
@@ -712,7 +711,7 @@
                 confirmationMessage="Are You Sure You want To Delete This Booking ???"
         />
         <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats"/>
-        <DetailsModal :formID="detailsFormId" :details="bookingDetails"/>
+        <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
     </section>
 </template>
 
@@ -726,7 +725,7 @@ import ReschedulePopup from "./popup/ReschedulePopup.vue";
 import DetailsModal from "./popup/DetailsModal.vue";
 
 export default {
-    name: "SurchargePage",
+    name: "BookingPage",
     components: {
         Add,
         Edit,
@@ -949,7 +948,6 @@ export default {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
-                    // console.log(bookedSeats);
                 }
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
             } else if (
@@ -1050,7 +1048,7 @@ export default {
         },
         async deleteModal(surcharge, i) {
             const deletingObj = {
-                url: "/surcharge/delete",
+                url: "booking/delete",
                 data: surcharge,
                 index: i,
             };
@@ -1076,12 +1074,10 @@ export default {
         async details(date, schedule_id) {
 
             const resBookingDetail = await this.callApi("post", "booking/details", {date, schedule_id});
-            console.log(resBookingDetail)
             if (resBookingDetail.status === 200) {
-                $("#" + this.detailsFormId + " table").dataTable().destroy();
                 this.bookingDetails = resBookingDetail.data;
                 setTimeout(() => {
-                    $("#" + this.detailsFormId + " table").dataTable();
+                $("#" + this.detailsFormId + " table").dataTable();
                 }, 300);
             } else {
                 console.log(resBookingDetail);
