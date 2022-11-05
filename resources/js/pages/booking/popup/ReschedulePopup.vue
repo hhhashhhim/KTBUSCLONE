@@ -14,7 +14,7 @@
           <select
             class="form-control"
             id="departureCity"
-            @change="fetchSpecificSchedules()"
+            @change="fetchSpecificSchedules(); getDestinationCity()"
             v-model="addForm.departureCity"
           >
             <option value="0" selected>Select Departure City</option>
@@ -34,7 +34,7 @@
             v-model="addForm.destinationCity"
           >
             <option value="0" selected>Select Destination City</option>
-            <option v-for="(city, i) in cities" :value="city.id" :key="i">
+            <option v-for="(city, i) in specificCities" :value="city.id" :key="i">
               {{ city.name }}
             </option>
           </select>
@@ -245,6 +245,7 @@ export default {
       schedule: "",
       success: false,
       validationErrors: [],
+        specificCities: [],
       loading: false,
       selectedSeats: [],
       cities: [],
@@ -262,6 +263,14 @@ export default {
       }
       return time.join("");
     },
+      async getDestinationCity() {
+          if (this.addForm.departureCity == '0') {
+              this.addForm.destinationCity = 0;
+          } else {
+              const resDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.addForm.departureCity});
+              this.specificCities = resDepartureCity.data;
+          }
+      },
     async fetchSpecificSchedules() {
       this.getSchedule = true;
       this.showBookingDiv = false;

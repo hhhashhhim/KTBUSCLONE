@@ -224,7 +224,7 @@
               <td v-for="(col, colIndex) in record" :key="colIndex">
                 <img
                   v-if="col.reserved"
-                  :class="col.selected ? 'selected' + getBorderSelected() : '' "
+                  :class="col.selected ? 'selected' : ''"
                   @click="selectSeat(rowIndex, colIndex)"
                   :src="
                     $store.state.app_url +

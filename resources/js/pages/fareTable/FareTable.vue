@@ -99,7 +99,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="fare">Fare</label>
+                        <label for="fare">Fare <sapn class="text-danger">*</sapn></label>
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">

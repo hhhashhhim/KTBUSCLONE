@@ -183,7 +183,7 @@
                     <div class="form-group col-md-6">
                         <label for="department">Department<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
+                             data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
                             <option value="0" selected>Select Department</option>
@@ -195,7 +195,7 @@
                     <div class="form-group col-md-6">
                         <label for="designation">Designation<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
+                             data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDesignation" >
                             <option value="0" selected>Select Designation</option>
@@ -295,7 +295,7 @@
             </Add>
             <!-- Add Modal End -->
             <!--            Add NEW Department-->
-            <div class="modal fade" id="addDepartment" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -324,7 +324,7 @@
             </div>
             <!--            End Add New Department-->
             <!--            Add NEW Designation-->
-            <div class="modal fade" id="addDesignation" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="addDesignationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -765,7 +765,7 @@ export default {
             }
         },
         async addDesignation(){
-            if(this.addForm.EmployeeDepartment == '0' && this.dataEdit.department_id == '0')
+            if(this.addForm.EmployeeDepartment == '0' || this.dataEdit.department_id == '0')
                 return swal({
                     title: "Required!",
                     text: "Please Select Department First",
