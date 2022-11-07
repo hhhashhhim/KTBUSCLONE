@@ -6,11 +6,6 @@
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Booking</h4>
-                            <!--                            <div class="card-header-action">-->
-                            <!--                                <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary" >-->
-                            <!--                                    Add Booking-->
-                            <!--                                </a>-->
-                            <!--                            </div>-->
                         </div>
                         <!--Booking panel-->
                         <div class="card-body">
@@ -59,13 +54,7 @@
                                                     <select class="form-control" id="scheduleName"
                                                             v-model="addForm.schedule">
                                                         <option value="0" selected>Select Schedule</option>
-                                                        <option
-                                                            v-for="(schedule, i) in allSchedules"
-                                                            :value="schedule.id"
-                                                            :key="i"
-                                                        >
-                                                            {{ schedule.name }} - {{ tConvert(schedule.time) }}
-                                                        </option>
+                                                        <option v-for="(schedule, i) in allSchedules" :value="schedule.id" :key="i" >{{ schedule.finalTime }} - {{ schedule.name}}</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
@@ -490,7 +479,12 @@ export default {
                 this.addForm.destinationCity = 0;
             } else {
                 const resDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.addForm.departureCity});
-                this.specificCities = resDepartureCity.data;
+                if(resDepartureCity.length == 0){
+                    this.addForm.destinationCity = 0
+                }else {
+                    this.addForm.destinationCity = 0;
+                    this.specificCities = resDepartureCity.data;
+                }
             }
         },
         async fetchAllSchedules() {

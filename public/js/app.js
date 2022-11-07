@@ -23857,7 +23857,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 resDepartureCity = _context2.sent;
-                _this2.specificCities = resDepartureCity.data;
+
+                if (resDepartureCity.length == 0) {
+                  _this2.addForm.destinationCity = 0;
+                } else {
+                  _this2.addForm.destinationCity = 0;
+                  _this2.specificCities = resDepartureCity.data;
+                }
 
               case 8:
               case "end":
@@ -27741,11 +27747,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _this.validationErrors = [];
+
+                if (!(_this.data.fare == '' || typeof _this.data.fare == 'undefined')) {
+                  _context.next = 3;
+                  break;
+                }
+
+                return _context.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Fare is Required!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this.data.time_difference == '' || typeof _this.data.time_difference == 'undefined')) {
+                  _context.next = 5;
+                  break;
+                }
+
+                return _context.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Travel Time is Required!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
                 _this.loading = true;
-                _context.next = 4;
+                _context.next = 8;
                 return _this.callApi("post", "fare-table/store", _this.data);
 
-              case 4:
+              case 8:
                 res = _context.sent;
 
                 if (res.status === 200) {
@@ -27779,7 +27812,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 6:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -36808,7 +36841,7 @@ var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "password",
   "class": "control-label"
-}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\n                            Forgot Password?\n                          </a>\n                        </div> ")], -1
+}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\r\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\r\n                            Forgot Password?\r\n                          </a>\r\n                        </div> ")], -1
 /* HOISTED */
 );
 
@@ -36924,7 +36957,7 @@ var _hoisted_5 = {
 var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "card-header d-flex justify-content-between"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Booking"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"card-header-action\">"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#' + formID\" class=\"btn btn-primary\" >"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    Add Booking"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </a>"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>")], -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Booking")], -1
   /* HOISTED */
   );
 });
@@ -37415,7 +37448,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: schedule.id,
       key: i
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.tConvert(schedule.time)), 9
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.finalTime) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name), 9
     /* TEXT, PROPS */
     , _hoisted_27);
   }), 128
@@ -42167,7 +42200,9 @@ var _hoisted_36 = {
 var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "time_difference"
-  }, "Travel Time ( e.g HH:MM )", -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Travel Time ( e.g HH:MM ) "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
   /* HOISTED */
   );
 });
@@ -50299,9 +50334,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // const url = '/projects/kt/'
+// const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -55801,7 +55836,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4399e1a0] {\n  background-color: #b9dea0;\n  border-radius: 10px;\n  cursor: pointer;\n  position: relative;\n  isolation: isolate;\n}\n.image-span[data-v-4399e1a0]:hover {\n  background-color: #6db131;\n}\n.economy[data-v-4399e1a0] {\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4399e1a0] {\n  border: 3px solid orangered !important;\n}\n.executive[data-v-4399e1a0] {\n  border: 3px solid gold !important;\n}\n.for-female[data-v-4399e1a0] {\n  background-color: hotpink !important;\n}\n.for-male[data-v-4399e1a0] {\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4399e1a0] {\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4399e1a0] {\n  background-color: #6db131 !important;\n}\n.partial[data-v-4399e1a0]::after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: -1;\n  height: 100%;\n  width: 50%;\n  border-top-right-radius: 10px;\n  border-bottom-right-radius: 10px;\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4399e1a0] {\n  height: 55px;\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4399e1a0],\n.seat-img span[data-v-4399e1a0] {\n  height: 50px;\n  width: 50px;\n  display: inline-block;\n  cursor: pointer !important;\n  margin: 5px;\n}\nimg[data-v-4399e1a0] {\n  cursor: pointer !important;\n}\n.circles[data-v-4399e1a0] {\n  width: 30px;\n  height: 30px;\n  border-radius: 50px;\n  display: inline-block;\n  box-sizing: content-box;\n}\n.icons-legend[data-v-4399e1a0] {\n  position: relative;\n  bottom: 12px;\n  color: rgb(62, 61, 61);\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.circles + span[data-v-4399e1a0] {\n  position: relative;\n  top: -10px;\n  padding: 5px;\n  color: black;\n}\n.type-icons[data-v-4399e1a0] {\n  position: relative;\n  z-index: 10;\n}\n.partial-seat[data-v-4399e1a0] {\n  width: 30px;\n  height: 30px;\n  background: linear-gradient(90deg, white 50%, black 50%);\n  border-radius: 50%;\n  display: inline-block;\n  box-sizing: content-box;\n  -moz-border-radius: 25px;\n  -webkit-border-radius: 25px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4399e1a0] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-4399e1a0]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-4399e1a0] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4399e1a0] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-4399e1a0] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-4399e1a0] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-4399e1a0] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4399e1a0] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4399e1a0] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-4399e1a0]::after {\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4399e1a0] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4399e1a0],\r\n.seat-img span[data-v-4399e1a0] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-4399e1a0] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-4399e1a0] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-4399e1a0] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-4399e1a0] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-4399e1a0] {\r\n  position: relative;\r\n  z-index: 10;\n}\n.partial-seat[data-v-4399e1a0] {\r\n  width: 30px;\r\n  height: 30px;\r\n  background: linear-gradient(90deg, white 50%, black 50%);\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n  box-sizing: content-box;\r\n  -moz-border-radius: 25px;\r\n  -webkit-border-radius: 25px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55825,7 +55860,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected[data-v-0a8ddc11] {\n  background-color: rgba(109, 177, 49, 0.637) !important;\n}\n.seat-img img[data-v-0a8ddc11],\n.seat-img span[data-v-0a8ddc11] {\n  height: 40px;\n  width: 40px;\n  display: inline-block;\n  cursor: pointer;\n}\n.circles[data-v-0a8ddc11] {\n  width: 30px;\n  height: 30px;\n  border-radius: 50px;\n  display: inline-block;\n  box-sizing: content-box;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected[data-v-0a8ddc11] {\r\n  background-color: rgba(109, 177, 49, 0.637) !important;\n}\n.seat-img img[data-v-0a8ddc11],\r\n.seat-img span[data-v-0a8ddc11] {\r\n  height: 40px;\r\n  width: 40px;\r\n  display: inline-block;\r\n  cursor: pointer;\n}\n.circles[data-v-0a8ddc11] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\r\n\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55849,7 +55884,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c]{\n    width: 90px !important;\n    display:inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c]{\r\n    width: 90px !important;\r\n    display:inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55873,7 +55908,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-946b5df6],\ntable *[data-v-946b5df6] {\n    font-size: 10px;\n}\n.modal-cell[data-v-946b5df6] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-946b5df6] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-946b5df6] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-946b5df6] {\n    width: 35%;\n}\n.fade-enter-active[data-v-946b5df6],\n.fade-leave-active[data-v-946b5df6] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-946b5df6], .fade-leave-to[data-v-946b5df6] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-946b5df6], tr[data-v-946b5df6], th[data-v-946b5df6], td[data-v-946b5df6], option[data-v-946b5df6], select[data-v-946b5df6], label[data-v-946b5df6], button[data-v-946b5df6], a[data-v-946b5df6], div[data-v-946b5df6], p[data-v-946b5df6] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-946b5df6] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-946b5df6],\r\ntable *[data-v-946b5df6] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-946b5df6] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-946b5df6] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-946b5df6] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-946b5df6] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-946b5df6],\r\n.fade-leave-active[data-v-946b5df6] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-946b5df6], .fade-leave-to[data-v-946b5df6] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-946b5df6], tr[data-v-946b5df6], th[data-v-946b5df6], td[data-v-946b5df6], option[data-v-946b5df6], select[data-v-946b5df6], label[data-v-946b5df6], button[data-v-946b5df6], a[data-v-946b5df6], div[data-v-946b5df6], p[data-v-946b5df6] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-946b5df6] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55897,7 +55932,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\n.seat-img span[data-v-b6676e8a] {\n    height: 40px;\n    width: 40px;\n    display: inline-block;\n    cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\r\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\r\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\r\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\r\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\r\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\r\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\r\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\r\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\r\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\r\n.seat-img span[data-v-b6676e8a] {\r\n    height: 40px;\r\n    width: 40px;\r\n    display: inline-block;\r\n    cursor: pointer;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55945,7 +55980,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\ntable *[data-v-66b5e4b9] {\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\n.fade-leave-active[data-v-66b5e4b9] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\r\ntable *[data-v-66b5e4b9] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\r\n.fade-leave-active[data-v-66b5e4b9] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -55969,7 +56004,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-57b22b22],\ntable *[data-v-57b22b22] {\n    font-size: 10px;\n}\n.modal-cell[data-v-57b22b22] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-57b22b22] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-57b22b22] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-57b22b22] {\n    width: 35%;\n}\n.fade-enter-active[data-v-57b22b22],\n.fade-leave-active[data-v-57b22b22] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-57b22b22], .fade-leave-to[data-v-57b22b22] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-57b22b22], tr[data-v-57b22b22], th[data-v-57b22b22], td[data-v-57b22b22], option[data-v-57b22b22], select[data-v-57b22b22], label[data-v-57b22b22], button[data-v-57b22b22], a[data-v-57b22b22], div[data-v-57b22b22], p[data-v-57b22b22] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-57b22b22] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-57b22b22],\r\ntable *[data-v-57b22b22] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-57b22b22] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-57b22b22] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-57b22b22] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-57b22b22] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-57b22b22],\r\n.fade-leave-active[data-v-57b22b22] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-57b22b22], .fade-leave-to[data-v-57b22b22] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-57b22b22], tr[data-v-57b22b22], th[data-v-57b22b22], td[data-v-57b22b22], option[data-v-57b22b22], select[data-v-57b22b22], label[data-v-57b22b22], button[data-v-57b22b22], a[data-v-57b22b22], div[data-v-57b22b22], p[data-v-57b22b22] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-57b22b22] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
