@@ -133,7 +133,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addRoute" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Route' }}
+                    <button type="button" class="btn btn-primary" @click="addRoute" :disabled="loading" >{{loading ? 'Loading...' : 'Save Route' }}
                     </button>
                 </template>
             </Add>

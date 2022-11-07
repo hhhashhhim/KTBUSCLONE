@@ -59,14 +59,6 @@
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
-                                                                <!--                                  <a-->
-                                                                <!--                                    href="#delete-modal"-->
-                                                                <!--                                    data-toggle="modal"-->
-                                                                <!--                                    @click="deleteModal(company, i)"-->
-                                                                <!--                                    class="btn btn-danger"-->
-                                                                <!--                                  >-->
-                                                                <!--                                    <i class="far fa-trash-alt"></i>-->
-                                                                <!--                                  </a>-->
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -229,7 +221,7 @@
                         <button
                             type="button"
                             class="btn btn-primary"
-                            :class="loading?'disabled':''"
+                            :disabled="loading"
                             @click="add"
                         >
                             {{ loading ? "Loading...." : "Add company" }}
@@ -380,12 +372,8 @@
                         </tbody>
                     </table>
                     <template v-slot:button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            @click="update"
-                        >
-                            Update company
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update" >
+                            {{ loading ? 'Loading...' : 'Update company' }}
                         </button>
                     </template>
                 </Edit>
@@ -587,6 +575,7 @@ export default {
             if (this.dataEdit.name == "")
                 return this.errorsArray("Company Name is Required", "Name");
 
+            this.loading = true;
             let logo = "";
             if (this.dataEdit.logo) {
                 const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
@@ -596,7 +585,7 @@ export default {
             const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
 
             if (res.status == 200) {
-
+                this.loading = true;
                 $("#company_table").DataTable().destroy();
                 this.success = "Company Updated Successfully";
                 const companyRes = await this.callApi("post", "company");

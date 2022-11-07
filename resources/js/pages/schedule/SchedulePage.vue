@@ -238,7 +238,7 @@
                             </select>
                         </div>
                         <div class="col-md-3 class form-group">
-                            <label for="busCLass">Defaul Fare CLass <span class="text-danger">*</span></label>
+                            <label for="busCLass">Default Fare CLass <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
                                 id="busCLass"
@@ -448,8 +448,7 @@
                             <button
                                 id="submitFormButton"
                                 class="btn btn-success float-right"
-                                @click="addSchedule()" :class="loading?'disabled':''"
-                            > {{ loading ? 'Loading...' : 'Save Schedule' }}
+                                @click="addSchedule()" :disabled="loading" > {{ loading ? 'Loading...' : 'Save Schedule' }}
                             </button>
                         </div>
                     </div>
@@ -458,26 +457,26 @@
 
             <!-- Add Modal End -->
             <!--            Edit Model-->
-            <Edit
-                heading="Edit Schedule"
-                :errors="this.validationErrors"
-                :success="success"
-                :editForm="editFormID"
-            >
+            <Edit heading="Edit Schedule" :errors="this.validationErrors" :success="success" :editForm="editFormID" >
                 <div class="row mb-3">
-                    <div class="col-md-3 text-center" :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' " >
+                    <div class="col-md-3 text-center"
+                         :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' ">
                         Step 1
                     </div>
-                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info' ">
+                    <div class="col-md-3 text-center"
+                         :class=" editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info' ">
                         Step 2
                     </div>
-                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success' ">
+                    <div class="col-md-3 text-center"
+                         :class=" editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success' ">
                         Step 3
                     </div>
-                    <div class="col-md-3 text-center" :class=" editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning' ">
+                    <div class="col-md-3 text-center"
+                         :class=" editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning' ">
                         Step 4
                     </div>
                 </div>
+
                 <section
                     class="section1"
                     :class="editActiveSection != 0 ? 'd-none' : ''"
@@ -605,15 +604,13 @@
                                     <tr v-for="(city, i) in dataEdit.cities" :key="i">
                                         <td>{{ i + 1 }}</td>
                                         <td>{{ city.name }}</td>
-                                        <td> <span v-for="item in city.terminal" :key="item.id"> <label
-                                            class="colorinput mx-3"> <span> <input type="checkbox"
-                                                                                   class="colorinput-input"
-                                                                                   @click="editTerminal($event, city.id)"
-                                                                                   v-bind:checked=" checkedSelectedTerminals(item.id) "
-                                                                                   id="terminal" :value="item.id"/>
-                              <span class="colorinput-color bg-success"></span>
-                            </span>
-                          </label>
+                                        <td>
+                                            <span v-for="item in city.terminal" :key="item.id">
+                                            <label class="colorinput mx-3">
+                                                <span> <input type="checkbox" class="colorinput-input" @click="editTerminal($event, city.id)" v-bind:checked=" checkedSelectedTerminals(item.id) " id="terminal" :value="item.id"/>
+                                                    <span class="colorinput-color bg-success"></span>
+                                                </span>
+                    </label>
                           <label class="checkbox-inputs" for="terminal">{{
                                   item.name
                               }}</label>
@@ -706,6 +703,7 @@
 
                     </div>
                 </section>
+
                 <section
                     class="section4"
                     :class="editActiveSection != 'step3' ? 'd-none' : ''"
@@ -772,15 +770,13 @@
                             <button
                                 id="submitFormButton"
                                 class="btn btn-success float-right"
-                                @click="updateSchedule" :class="loading?'disabled':''"
+                                @click="updateSchedule" :disabled="loading"
                             >
                                 {{ loading ? 'Loading...' : 'Update Schedule' }}
                             </button>
                         </div>
                     </div>
                 </section>
-
-
             </Edit>
             <!--            Edit Model End-->
             <Delete :deleteForm="deleteFormID"
@@ -816,13 +812,9 @@ export default {
             deleteFormID: "delete_schedule_form",
             validationErrors: [],
             value: [],
-            editClasses: [],
             editDiscounts: [],
             editSurcharges: [],
-            editRouteClasses: [],
-            editBuses: [],
             editTerminals: [],
-            editCities: [],
             editRoutes: [],
             success: false,
             error: false,
@@ -888,8 +880,6 @@ export default {
 
             const resDiscount = await this.callApi("post", "discount/getSelective");
             this.discounts = resDiscount.data;
-
-
         },
 
         async fetchTerminals(event, index) {
@@ -963,7 +953,6 @@ export default {
             }
         },
 
-
         editTerminal(event, id) {
             if (event.target.checked) {
                 const value = event.target.value;
@@ -975,7 +964,6 @@ export default {
                 });
 
                 this.dataEdit.updated_route_city_terminal = this.dataEdit.compare_array;
-                console.log(this.dataEdit.updated_route_city_terminal);
             }
         },
 
@@ -1014,13 +1002,6 @@ export default {
                     });
                     this.cities = resRouteEdit.dataEdit;
                     this.terminals = resRouteEdit.dataEdit;
-
-                    const resRouteFareClass = await this.callApi(
-                        "post",
-                        "schedule/getRouteFare",
-                        {id: this.data.route}
-                    );
-                    this.routeClasses = resRouteFareClass.data;
                 }
             }
         },
@@ -1114,6 +1095,7 @@ export default {
         editPreviousSection(prvBtn) {
             this.editActiveSection = prvBtn;
         },
+
         validateStep(nextBtnValue) {
             //Step 1
             if (nextBtnValue == 'step1') {
@@ -1160,7 +1142,7 @@ export default {
                         timer: 2000
                     });
 
-                if ( this.data.addTerminalsOnClick.length === 0) {
+                if (this.data.addTerminalsOnClick.length === 0) {
                     return swal({
                         title: "Required!",
                         text: "Please Select Terminals of Selected Route",
@@ -1169,8 +1151,7 @@ export default {
                     });
                 }
 
-                if( this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2 )
-                {
+                if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
                     return swal({
                         title: "Required!",
                         text: "Please Select at Least 2 Terminals of Selected Route",
@@ -1325,7 +1306,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                $('#schedule_table').DataTable().destroy();
+                $("#schedule_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchSchedule();
             } else {
@@ -1342,7 +1323,6 @@ export default {
 
         async edit(schedule_id) {
             const resEditSchedule = await this.callApi("post", "schedule/edit", schedule_id);
-            console.log(resEditSchedule.data);
             this.dataEdit.schedules = resEditSchedule.data.schedules;
             this.dataEdit.compare_array = resEditSchedule.data.compare_array;
             this.dataEdit.cities = resEditSchedule.data.cities;
@@ -1350,18 +1330,12 @@ export default {
 
         async genericData() {
             const resCommon = await this.callApi("post", "schedule/genericCommon");
-            this.editClasses = resCommon.data.class;
             this.editDiscounts = resCommon.data.discount;
             this.editSurcharges = resCommon.data.surcharge;
-            this.editRouteClasses = resCommon.data.routeClass;
-            this.editBuses = resCommon.data.bus;
-            this.editTerminals = resCommon.data.terminal;
-            this.editCities = resCommon.data.city;
             this.editRoutes = resCommon.data.route;
         },
 
         async deleteSchedule(schVal, i) {
-            console.log(schVal, i);
             const deletingObj = {
                 url: "schedule/delete",
                 data: schVal,
@@ -1385,43 +1359,3 @@ export default {
     },
 };
 </script>
-<style scoped>
-.selected-row {
-    background-color: yellow !important;
-}
-
-.booked_Seat {
-    background-color: rgb(255, 0, 0) !important;
-}
-
-.notForSale {
-    background-color: rgb(140, 109, 109) !important;
-}
-
-.reservedForFemale {
-    background-color: rgb(250, 185, 250) !important;
-}
-
-.economy {
-    background-color: rgb(250, 97, 64) !important;
-}
-
-.exective {
-    background-color: rgb(64, 250, 81) !important;
-}
-
-.business {
-    background-color: rgb(31, 126, 91) !important;
-}
-
-.anyElseClass {
-    background-color: rgb(131, 163, 199) !important;
-}
-
-.seat-img img,
-.seat-img span {
-    height: 40px;
-    width: 40px;
-    display: inline-block;
-}
-</style>

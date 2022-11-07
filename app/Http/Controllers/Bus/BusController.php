@@ -31,7 +31,7 @@ class BusController extends Controller
     public function storeBus(Request $request)
     {
         $rules = [
-            'busNumber' => 'required',
+            'busNumber' => ['required', Rule::unique('buses','bus_number')->where('company_id', $this->company_id)->whereNull('deleted_at')],
             'fare_class' => 'required|integer',
 //            'chassisNumber' => 'required',
 //            'insuranceNumber' => 'required',
@@ -40,11 +40,8 @@ class BusController extends Controller
 
         $customMessages = [
             'busNumber.required' => 'Bus Number is Required!',
+            'busNumber.unique' => 'Bus Number is already exist!',
             'fare_class.required' => 'Fare Class is Required!',
-//            'chassisNumber.required' => 'Chassis Number is Required!',
-//            'insuranceNumber.required' => 'Insurance Number is Required!',
-//            'routePermit.required' => 'Route Permit is Required!',
-
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::create([
@@ -62,19 +59,14 @@ class BusController extends Controller
     {
 
         $rules = [
-            'bus_number' => 'required',
+            'bus_number' => ['required', Rule::unique('buses','bus_number')->where('company_id', $this->company_id)->whereNull('deleted_at')],
             'fare_class_id' => 'required|integer',
-//            'chassis_number' => 'required',
-//            'insurance_number' => 'required',
-//            'route_permit_number' => 'required',
         ];
 
         $customMessages = [
             'bus_number.required' => 'Bus Number is Required!',
+            'bus_number.unique' => 'Bus Number is already exist!',
             'fare_class_id.required' => 'Fare Class is Required!',
-//            'chassis_number.required' => 'Chassis Number is Required!',
-//            'insurance_number.required' => 'Insurance Number is Required!',
-//            'route_permit_number.required' => 'Route Permit is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::where('id', $request->id)->update([

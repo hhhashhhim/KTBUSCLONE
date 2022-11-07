@@ -109,7 +109,7 @@ class CityController extends Controller
                 } else {
                     $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
                     $fareClasses = FareClass::where('company_id',$this->company_id)->count();
-                    
+
                     if ( $fareClasses==0 || $fare->count() < $fareClasses) {
                         return response()->json([
                             "errors"=>[

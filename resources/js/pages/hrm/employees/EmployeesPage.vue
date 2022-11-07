@@ -183,7 +183,7 @@
                     <div class="form-group col-md-6">
                         <label for="department">Department<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
+                             data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
                             <option value="0" selected>Select Department</option>
@@ -195,7 +195,7 @@
                     <div class="form-group col-md-6">
                         <label for="designation">Designation<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
+                             data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDesignation" >
                             <option value="0" selected>Select Designation</option>
@@ -288,14 +288,14 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addEmployee" :class="loading?'disabled':''">
+                    <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
                         {{ loading ? 'Loading...' : 'Add Employee' }}
                     </button>
                 </template>
             </Add>
             <!-- Add Modal End -->
             <!--            Add NEW Department-->
-            <div class="modal fade" id="addDepartment" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -314,7 +314,7 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addDepartment()" :class="loadingDepart ? 'disabled' : '' ">
+                            <button type="button" class="btn btn-primary" @click="addDepartment()" :disabled="loadingDepart">
                                 {{ loadingDepart ? 'Loading...' : ' Add Department' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -324,7 +324,7 @@
             </div>
             <!--            End Add New Department-->
             <!--            Add NEW Designation-->
-            <div class="modal fade" id="addDesignation" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="addDesignationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -343,7 +343,7 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addDesignation()" :class="loadingDesignation ? 'disabled' : '' ">
+                            <button type="button" class="btn btn-primary" @click="addDesignation()" :disabled="loadingDesignation">
                                 {{ loadingDesignation ? 'Loading...' : ' Add Designation' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -536,7 +536,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateEmployees"
-                            :class="loading?'disabled':''">
+                            :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Employees Record' }}
                     </button>
                 </template>
@@ -765,7 +765,7 @@ export default {
             }
         },
         async addDesignation(){
-            if(this.addForm.EmployeeDepartment == '0' && this.dataEdit.department_id == '0')
+            if(this.addForm.EmployeeDepartment == '0' || this.dataEdit.department_id == '0')
                 return swal({
                     title: "Required!",
                     text: "Please Select Department First",

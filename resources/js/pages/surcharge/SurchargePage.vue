@@ -151,7 +151,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addSurcharge" :class="loading?'disabled':''">
+                    <button type="button" class="btn btn-primary" @click="addSurcharge" :disabled="loading" >
                         {{ loading ? 'Loading...' : 'Save Surcharge' }}
                     </button>
                 </template>
@@ -220,7 +220,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateSurcharge"
-                            :class="loading?'disabled':''"> {{ loading ? 'Loading...' : 'Update Surcharge' }}
+                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Surcharge' }}
                     </button>
                 </template>
             </Edit>

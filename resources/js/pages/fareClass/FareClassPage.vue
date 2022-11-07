@@ -141,7 +141,7 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="addFareClass" :class="loading?'disabled':''" >{{loading ? 'Loading...' :  'Add Fare Class' }}
+                        @click="addFareClass" :disabled="loading" >{{loading ? 'Loading...' :  'Add Fare Class' }}
                     </button>
                 </template>
             </Add>
@@ -181,7 +181,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="updateFareClass" :class="loading?'disabled':''"> {{loading ? 'Loading...' : 'Update Fare Class' }} </button>
+                        <button type="button" class="btn btn-primary" @click="updateFareClass" :disabled="loading"> {{loading ? 'Loading...' : 'Update Fare Class' }} </button>
                 </template>
             </Edit>
             <!--            Edit MOdel End-->

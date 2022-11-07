@@ -114,7 +114,13 @@ export default {
                     isDeleted: true,
                 };
                 this.$store.commit("setDeleteObj", deletingObj);
-                this.success = "Record Deleted !!!";
+                // this.success = "Record Deleted !!!";
+                swal({
+                    title: "Success",
+                    text: "Record Deleted !!! ",
+                    icon: "success",
+                    timer: 2000
+                });
                 setTimeout(() => {
                     this.success = "";
                     $("#delete-modal").modal("hide");

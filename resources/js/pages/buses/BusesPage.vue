@@ -191,7 +191,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" @click="addBuses" :class="loading?'disabled':''">
+                                <button type="button" class="btn btn-primary" @click="addBuses" :disabled="loading">
                                     {{loading ? 'Loading...' : 'Add Bus' }}</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
@@ -269,7 +269,7 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="updateBus" :class="loading?'disabled':''"
+                        @click="updateBus" :disabled="loading"
                     >
                         {{ loading ? 'Loading...' : 'Update Bus' }}
                     </button>
@@ -378,7 +378,6 @@ export default {
                 return true;
             }
         },
-
 
         async addBuses() {
             this.validationErrors = [];

@@ -203,7 +203,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateDesignation"
-                            :class="loading?'disabled':''">
+                            :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Designation' }}
                     </button>
                 </template>
@@ -270,7 +270,13 @@ export default {
                 console.log(resDepart);
             }
             setTimeout(function () {
-                $("#designation_table").DataTable();
+                $("#designation_table").DataTable({
+
+
+
+
+
+                });
                 $("#show_designation").DataTable();
             }, 300);
         },

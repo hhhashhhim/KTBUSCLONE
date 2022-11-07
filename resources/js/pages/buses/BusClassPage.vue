@@ -224,7 +224,7 @@
               <td v-for="(col, colIndex) in record" :key="colIndex">
                 <img
                   v-if="col.reserved"
-                  :class="col.selected ? 'selected' : '' "
+                  :class="col.selected ? 'selected' : ''"
                   @click="selectSeat(rowIndex, colIndex)"
                   :src="
                     $store.state.app_url +
@@ -237,7 +237,6 @@
             </tr>
           </div>
           <div class="col-md-2">
-
             <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
                 <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                 <span class="text-wrap">{{ seatClass.name }}</span>
@@ -251,7 +250,7 @@
             type="button"
             class="btn btn-primary"
             @click="addBusClass"
-            :class="loading ? 'disabled' : ''"
+            :disabled="loading"
           >
             {{ loading ? "Loading..." : "Add Bus Class" }}
           </button>
@@ -270,7 +269,7 @@
         <div class="modal-dialog modal-xl modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-body">
-              <div class="card card-success">
+              <div class="card card-primary">
                 <div class="card-header d-flex justify-content-between">
                   <h4 class="modal-title">Seat Detail</h4>
                   <button
@@ -321,12 +320,10 @@
                     <div class="col-md-12">
                       <button
                         type="button"
-                        class="btn btn-block btn-success"
-                        @click="
-                          addSeatData()
-                        "
+                        class="btn btn-block btn-primary"
+                        @click="addSeatData()"
                         data-dismiss="modal"
-                        :class="loading ? 'disabled' : ''"
+                        :disabled="loading"
                       >
                         {{ loading ? "Loading..." : "Add Seat Detail" }}
                       </button>
@@ -381,7 +378,7 @@
                 type="button"
                 class="btn btn-primary"
                 @click="saveFareClass()"
-                :class="loading ? 'disabled' : ''"
+                :disabled="loading"
               >
                 {{ loading ? "Loading..." : "Save Fare Class" }}
               </button>
@@ -529,7 +526,7 @@
             type="button"
             class="btn btn-primary"
             @click="updateBusClass"
-            :class="loading ? 'disabled' : ''"
+            :disabled="loading"
           >
             {{ loading ? "Loading..." : "Update Bus Class" }}
           </button>
@@ -730,6 +727,9 @@ export default {
         event.preventDefault();
       }
     },
+      getBorderSelected : function () {
+
+      },
     async saveFareClass() {
       this.loading = true;
       const resSaveFareClass = await this.callApi(
@@ -760,11 +760,10 @@ export default {
                 let col = seat[1];
                 this.data.seatMap[row][col].class = this.seatModify.class ?? 0;
                 this.data.seatMap[row][col].type = this.seatModify.type ?? 0;
-
                 delete this.data.seatMap[row][col].selected;
 
             })
-
+            // this.getBorderSelected(this)
             return swal({
                 title: "Success",
                 text: "Seats Modified Successfully !!!!",

@@ -145,7 +145,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addDiscount" :class="loading?'disabled':''">{{loading ? 'Loading...' : 'Save Discount' }}
+                    <button type="button" class="btn btn-primary" @click="addDiscount" :disabled="loading">{{loading ? 'Loading...' : 'Save Discount' }}
                     </button>
                 </template>
             </Add>
@@ -204,7 +204,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateDiscount" :class="loading?'disabled':''">
+                    <button type="button" class="btn btn-primary" @click="updateDiscount" :disabled="loading">
                         {{ loading ? 'Loading...' : 'Update Discount' }}
                     </button>
                 </template>
@@ -478,6 +478,7 @@ export default {
         },
 
         edit(dis) {
+
             this.dataEdit = dis;
         },
     },
