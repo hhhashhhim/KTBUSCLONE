@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Booking;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking\Booking;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
@@ -25,9 +26,8 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Ticket::select('schedule_id','date')->with('schedule:id,name')
+        $bookings = Ticket::select('schedule_id','date')->with('schedule:id,name')->whereDate('date', date("Y-m-d"))
         ->where('company_id', $this->company_id)->get()->groupBy(['date','schedule_id']);
-
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
             $bookingWithDetails = $singleBooking->map(function($booking) use ($i){
@@ -140,6 +140,11 @@ class BookingController extends Controller
        ->whereDate('start_date', '<=', $request->date)
        ->whereDate('end_date', '>=',$request->date)
        ->get();
+    }
+    public function fetchSpecificDestination(Request $request)
+    {
+        $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id',$this->company_id)->pluck('destination_city_id')->toArray();
+        return City::whereIn('id', array_unique($depart_city))->where('company_id', $this->company_id)->get(['id', 'name']);
     }
 
     public function getCnic(Request  $request)

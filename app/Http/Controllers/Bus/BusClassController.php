@@ -26,7 +26,8 @@ class BusClassController extends Controller
 
     public function storeBusClass(Request $request)
     {
-            dd($request->all());
+//        dd($request->all());
+
         $rules = [
             'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 //            'BusClassColor' => 'required',
@@ -44,7 +45,7 @@ class BusClassController extends Controller
         $this->validate($request, $rules, $customMessages);
         return BusClass::create([
             'name' => $request->BusClassName,
-            'color' => $request->BusClassColor ? '#000000' : $request->BusClassColor,
+            'color' => !$request->BusClassColor ? '#000000' : $request->BusClassColor,
             'is_active' => !$request->isActive ? 1 : $request->isActive,
             'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
