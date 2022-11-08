@@ -135,34 +135,43 @@ class BookingController extends Controller
             return "Date is Required";
         }
         $routes = RouteFare::where('departure_city_id', $request->departure_city_id)->where('destination_city_id', $request->destination_city_id)->get();
-        $time_fateTable = FareTable::where('from_city_id', $request->departure_city_id)->where('to_city_id', $request->destination_city_id)->where('company_id', $this->company_id)->select('time_difference', 'from_city_id', 'to_city_id')->first();
         $routes_id = [];
         foreach ($routes as $key => $route) {
             $routes_id[] = $route->route_id;
         }
-
         $allSchedules = Schedule::whereIn('route_id', array_unique($routes_id))
             ->whereDate('start_date', '<=', $request->date)
             ->whereDate('end_date', '>=', $request->date)
             ->get();
         foreach ($allSchedules as $key => $single) {
-            $allSchedules[$key]->finalTime = self::scheduleTime($single, $request->date, $time_fateTable, $request->all(), $routes_id);
+            $route_depart = RouteFare::where('route_id', $single->route_id)->first()->departure_city_id;
+            if ($route_depart == $request->departure_city_id) {
+                $allSchedules[$key]->finalTime = date("m/d/Y", strtotime($request->date)) . ' ' . date("h:i A", strtotime($single->time));
+            } else {
+                $time_diff = FareTable::where('from_city_id', $route_depart)->where('to_city_id', $request->departure_city_id)->pluck('time_difference')->first();
+                $allSchedules[$key]->finalTime = self::scheduleTime($single->time, $time_diff, $request->date);
+            }
         }
         return $allSchedules;
+//
+//        $ids = [];
+//        foreach ($allSchedules as $key => $schedule) {
+//            $scheduleFinalDate = date("Y-m-d", strtotime($schedule->finalTime));
+//            if ($request->date < $scheduleFinalDate) {
+//                $ids[] = $key;
+//            }
+//        }
+//        foreach ($ids as $item) {
+//            unset($allSchedules[$item]);
+//        }
+//        return $allSchedules;
     }
 
 
-    public static function scheduleTime($timeSchedule, $date, $timeDiff, $req, $routeId)
+    public static function scheduleTime($first_time, $second_time, $req_date)
     {
-//        dd($timeDiff->from_city_id, $date, $req['destination_city_id'], array_unique($routeId)[0]);
-        if ($req['destination_city_id'] == $timeDiff->from_city_id) {
-//            dd('12456879');
-            return date("Y-m-d", strtotime($date)) . ' ' . date("H:i:s", strtotime($timeSchedule->time));
-        } else {
-            $dateTime = date("Y-m-d", strtotime($date)) . ' ' . date("H:i:s", strtotime($timeSchedule->time));
-            $helo = explode(":", $timeDiff->time_difference);
-            return date("m/d/Y h:i A", strtotime($dateTime) + ($helo[0] * 60 * 60) + ($helo[1] * 60));
-        }
+        $dateTime = date("Y-m-d", strtotime($req_date)) . ' ' . date("H:i", strtotime($first_time));
+        return date("m/d/Y h:i A", strtotime($dateTime) + (explode(":", $second_time)[0] * 60 * 60) + (explode(":", $second_time)[1] * 60));
     }
 
     public function fetchSpecificDestination(Request $request)

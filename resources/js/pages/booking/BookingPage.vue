@@ -72,6 +72,14 @@
                                                         data-toggle="modal"
                                                     >Shifting ( Reschedule ) Seats</a>
                                                 </div>
+                                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
+                                                     v-if="selectedBookedOverIssueSeats.length">
+                                                    <a
+                                                        href="#overissue_model"
+                                                        class="btn btn-primary mx-1"
+                                                        data-toggle="modal"
+                                                    >Over Issue Seats</a>
+                                                </div>
                                                 <h1 v-if="loading">Loading.........</h1>
 
                                                 <div class="col-md-12 row" v-if="showBookingDiv">
@@ -392,6 +400,7 @@
                 confirmationMessage="Are You Sure You want To Delete This Booking ???"
         />
         <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats"/>
+        <OverIssuePopup :formID="overissueFormId" :seats="bookedSeats"/>
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
     </section>
 </template>
@@ -403,6 +412,7 @@ import Delete from "../../components/Delete.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 import ReschedulePopup from "./popup/ReschedulePopup.vue";
+import OverIssuePopup from "./popup/OverIssuePopup.vue";
 import DetailsModal from "./popup/DetailsModal.vue";
 
 export default {
@@ -412,6 +422,7 @@ export default {
         Edit,
         Delete,
         ReschedulePopup,
+        OverIssuePopup,
         DetailsModal,
         vueMask,
     },
@@ -421,6 +432,7 @@ export default {
                 placeholder: "xxxxx-xxxxxxx-x",
             },
             rescheduleFormId: "reschedule-modal",
+            overissueFormId: "overissue_model",
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
             detailsFormId: "details-modal",
@@ -439,6 +451,8 @@ export default {
             showBookingDiv: false,
             selectedSeats: [],
             selectedBookedSeats: [],
+            selectedOverIssueSeats: [],
+            selectedBookedOverIssueSeats: [],
             bookedSeats: [],
             allBookings: [],
             bookingDetails: [],
@@ -627,12 +641,9 @@ export default {
             }
         },
         selectSeat(row, col, seatNo) {
+            console.log(this.schedule.bus_class.seat_map[row][col], this.selectedOverIssueSeats, this.selectedOverIssueSeats)
             this.validationErrors = [];
-            if (
-                this.addForm.oldBookings == 1 &&
-                !this.schedule.bus_class.seat_map[row][col].type
-            ) {
-                this.doScroll();
+            if ( this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
                     title: "Ops",
                     text: "Please Select Already Booked Seat",
@@ -640,10 +651,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (
-                this.schedule.bus_class.seat_map[row][col].type &&
-                this.selectedSeats.length == 0
-            ) {
+            if ( this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0 ) {
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -659,10 +667,7 @@ export default {
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
                 }
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
-            } else if (
-                !this.schedule.bus_class.seat_map[row][col].type &&
-                this.selectedBookedSeats.length == 0
-            ) {
+            } else if ( !this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0 ) {
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -674,10 +679,9 @@ export default {
                     this.selectedSeats.push(seatNo);
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
-            } else {
+            }else {
                 this.fetchScheduleData();
                 this.resetingArrays();
-                // return this.errorsArray("Invalid Seat Combination", "Oops");
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -685,6 +689,48 @@ export default {
                     timer: 2000
                 });
             }
+            if(this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0){
+                let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
+                if (index != -1) {
+                    this.schedule.bus_class.seat_map[row][col].selected = false;
+                    this.selectedBookedOverIssueSeats.splice(index, 1);
+                    this.bookedSeats = this.bookedSeats.filter((seat) => {
+                        if (seat.seatNo != seatNo) {
+                            return seat;
+                        }
+                    });
+                }
+                else {
+                    this.schedule.bus_class.seat_map[row][col].selected = true;
+                    this.selectedBookedOverIssueSeats.push(seatNo);
+                    this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
+                }
+                this.addForm.selectedBookedOverIssueSeats = this.selectedBookedOverIssueSeats;
+
+            }else if(!this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedBookedOverIssueSeats.length == 0){
+                let index = this.selectedOverIssueSeats.indexOf(seatNo);
+                if (index != -1) {
+                    this.schedule.bus_class.seat_map[row][col].selected = false;
+                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
+                    this.selectedOverIssueSeats.splice(index, 1);
+                } else {
+                    this.schedule.bus_class.seat_map[row][col].selected = true;
+                    this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
+                    this.selectedOverIssueSeats.push(seatNo);
+                }
+                this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
+            }
+            else {
+                this.fetchScheduleData();
+                this.resetingArrays();
+                return swal({
+                    title: "Oops",
+                    text: "Invalid Seat Combination",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // Array for over issue
 
         },
         getClasses(col) {
@@ -766,8 +812,12 @@ export default {
         async resetingArrays() {
             this.selectedSeats = [];
             this.selectedBookedSeats = [];
+            this.selectedOverIssueSeats = [];
+            this.selectedBookedOverIssueSeats = [];
             this.addForm.selectedSeats = [];
             this.addForm.selectedBookedSeats = [];
+            this.addForm.selectedOverIssueSeats = [];
+            this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
             let resBooking = await this.callApi("post", "booking");
             if (resBooking.status == 200) {
