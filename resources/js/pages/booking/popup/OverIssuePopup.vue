@@ -169,19 +169,12 @@ import BasicPopup from "../../../components/BasicPopup.vue";
 
 export default {
   name: "OverIssuePopup",
-  props: ["formID", "seats"],
+  props: ["formID", "seat_no"],
   components: {
     BasicPopup,
   },
   async created() {
-    const resCity = await this.callApi("post", "cities");
-    const res = await this.callApi("post", "schedule");
-    if (res.status == 200 && resCity.status == 200) {
-      this.allSchedules = res.data;
-      this.cities = resCity.data;
-    } else {
-      console.log(res);
-    }
+
   },
   data() {
     return {

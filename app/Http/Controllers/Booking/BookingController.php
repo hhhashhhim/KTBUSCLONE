@@ -25,9 +25,10 @@ class BookingController extends Controller
         });
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $bookings = Ticket::select('schedule_id', 'date')->with('schedule:id,name')->whereDate('date', date("Y-m-d"))
+
+        $bookings = Ticket::select('schedule_id', 'date')->with('schedule:id,name')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', $this->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
@@ -79,9 +80,13 @@ class BookingController extends Controller
 
         // Getting Already Booked Tickets
 
-
-        $bookingNo = Ticket::latest()->first()->booking_no ?? 0;
-        ++$bookingNo;
+        if ($request->date == date('Y-m-d')) {
+            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        } else {
+            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        }
 
         foreach ($request->selectedSeats as $i => $seat) {
 
@@ -179,6 +184,12 @@ class BookingController extends Controller
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', $this->company_id)->pluck('destination_city_id')->toArray();
         return City::whereIn('id', array_unique($depart_city))->where('company_id', $this->company_id)->get(['id', 'name']);
     }
+    public function fetchSpecificOverIssueSeat(Request $request)
+    {
+        dd($request->all());
+        $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', $this->company_id)->pluck('destination_city_id')->toArray();
+        return City::whereIn('id', array_unique($depart_city))->where('company_id', $this->company_id)->get(['id', 'name']);
+    }
 
     public function getCnic(Request $request)
     {
@@ -188,11 +199,10 @@ class BookingController extends Controller
 
     public function detailTicket(Request $request)
     {
-        $bookings = Ticket::with('addedBy', 'customer')->where('company_id', $this->company_id)
+        return Ticket::with('addedBy', 'customer')->where('company_id', $this->company_id)
             ->whereDate('date', $request->date)
             ->where('schedule_id', $request->schedule_id)
             ->get();
-        return $bookings;
 //        $allBooking = $bookings->map(function($booking){
 //            $booking[0]->count=$booking->count();
 //            return $booking[0];

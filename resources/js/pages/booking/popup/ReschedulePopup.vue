@@ -215,7 +215,7 @@ import BasicPopup from "../../../components/BasicPopup.vue";
 
 export default {
   name: "ReschedulePopup",
-  props: ["formID", "seats"],
+  props: ["formID", "seats", "formData"],
   components: {
     BasicPopup,
   },

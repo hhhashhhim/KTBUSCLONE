@@ -14,9 +14,9 @@
                 </li>
                 <li class="dropdown" v-if="checkPermission('admin')">
 
-                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-user-shield"></i>
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
-                            Admin
+                            Ticketing
                         </span>
                     </a>
                     <ul class="dropdown-menu">

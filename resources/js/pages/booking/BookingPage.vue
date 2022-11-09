@@ -54,7 +54,10 @@
                                                     <select class="form-control" id="scheduleName"
                                                             v-model="addForm.schedule">
                                                         <option value="0" selected>Select Schedule</option>
-                                                        <option v-for="(schedule, i) in allSchedules" :value="schedule.id" :key="i" >{{ schedule.finalTime }} - {{ schedule.name}}</option>
+                                                        <option v-for="(schedule, i) in allSchedules"
+                                                                :value="schedule.id" :key="i">{{ schedule.finalTime }} -
+                                                            {{ schedule.name }}
+                                                        </option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
@@ -78,6 +81,7 @@
                                                         href="#overissue_model"
                                                         class="btn btn-primary mx-1"
                                                         data-toggle="modal"
+                                                        @click="getSelctiveOverissueSeat()"
                                                     >Over Issue Seats</a>
                                                 </div>
                                                 <h1 v-if="loading">Loading.........</h1>
@@ -295,6 +299,12 @@
                                                                     </div>
                                                                     <span class="text-wrap">Over Issue</span>
                                                                 </div>
+                                                                <div class="my-3">
+                                                                    <div class="circles icons-legend mr-1 border shadow bg-secondary">
+                                                                        <i class="far fa-hand-paper text-dark"></i>
+                                                                    </div>
+                                                                    <span class="text-wrap">Available for Over Issue</span>
+                                                                </div>
                                                             </div>
 
 
@@ -316,16 +326,17 @@
                                                                     >
                                                                         <small>{{ col.seatNo }} </small>
                                                                         <br/>
-                                                                        <small
-                                                                            v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
+                                                                        <small v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
                                                                             <i class="type-icons fas"
                                                                                :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
                                                                             </i>
-                                                                            <i class="type-icons fas"
-                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>
+<!--                                                                            <i class="type-icons fas"-->
+<!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
                                                                         </small>
                                                                         <small v-if="col.over_issue == true">
-                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>
+<!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
+                                                                            <i class="type-icons far fa-hand-paper">
+                                                                            </i>
                                                                         </small>
                                                                     </div>
                                                                     <span v-else></span>
@@ -350,6 +361,16 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
+                                            <div class="row mb-4">
+                                                <div class="col-md-8 ">
+                                                    <input type="date" class="form-control" v-model="filterDate">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button class="btn btn-block btn-lg btn-primary"
+                                                            @click="getFilterRecord()">Filter
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
@@ -399,8 +420,8 @@
         <Delete :deleteForm="deleteFormID"
                 confirmationMessage="Are You Sure You want To Delete This Booking ???"
         />
-        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats"/>
-        <OverIssuePopup :formID="overissueFormId" :seats="bookedSeats"/>
+        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="addForm"/>
+        <OverIssuePopup :formID="overissueFormId" :seat_no="bookedOverIssueSeats"/>
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
     </section>
 </template>
@@ -454,10 +475,12 @@ export default {
             selectedOverIssueSeats: [],
             selectedBookedOverIssueSeats: [],
             bookedSeats: [],
+            bookedOverIssueSeats: [],
             allBookings: [],
             bookingDetails: [],
             allSeatClasses: [],
             specificCities: [],
+            filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
@@ -477,6 +500,25 @@ export default {
 
     methods: {
 
+        async getFilterRecord() {
+            this.allBookings = [];
+            const table = $("#booking_table").DataTable();
+            table.destroy()
+            const resDateFilter = await this.callApi("post", "booking", {date: this.filterDate});
+            if(resDateFilter.status == 200) {
+                if(resDateFilter.data.length != 0) {
+                    this.allBookings = resDateFilter.data;
+                    setTimeout(() => {
+                        $("#booking_table").DataTable();
+                    }, 300);
+                }else{
+                    setTimeout(() => {
+                        $("#booking_table").DataTable();
+                    }, 300);
+                }
+            }
+        },
+
         minDateFilter: function () {
             var dtToday = new Date();
             var month = dtToday.getMonth() + 1;
@@ -493,9 +535,9 @@ export default {
                 this.addForm.destinationCity = 0;
             } else {
                 const resDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.addForm.departureCity});
-                if(resDepartureCity.length == 0){
+                if (resDepartureCity.length == 0) {
                     this.addForm.destinationCity = 0
-                }else {
+                } else {
                     this.addForm.destinationCity = 0;
                     this.specificCities = resDepartureCity.data;
                 }
@@ -506,13 +548,12 @@ export default {
             const resClass = await this.callApi("post", "fare-class")
             const resCity = await this.callApi("post", "cities")
             if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200) {
-
                 this.allBookings = resBooking.data;
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
                 setTimeout(() => {
                     // $("#" + this.formID).modal("show");
-                    $("#booking_table").dataTable();
+                    $("#booking_table").DataTable();
                 }, 300);
             } else {
                 console.log(res);
@@ -546,7 +587,6 @@ export default {
                 destination_city_id: this.addForm.destinationCity,
                 date: this.addForm.date,
             }
-            console.log(data);
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
             if (resFetchSchedule.status == 200) {
                 if (resFetchSchedule.length != 0) {
@@ -641,9 +681,8 @@ export default {
             }
         },
         selectSeat(row, col, seatNo) {
-            console.log(this.schedule.bus_class.seat_map[row][col], this.selectedOverIssueSeats, this.selectedOverIssueSeats)
             this.validationErrors = [];
-            if ( this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
+            if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
                     title: "Ops",
                     text: "Please Select Already Booked Seat",
@@ -651,7 +690,7 @@ export default {
                     timer: 2000
                 });
             }
-            if ( this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0 ) {
+            if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -666,8 +705,9 @@ export default {
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
                 }
+
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
-            } else if ( !this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0 ) {
+            } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -679,7 +719,7 @@ export default {
                     this.selectedSeats.push(seatNo);
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
-            }else {
+            } else {
                 this.fetchScheduleData();
                 this.resetingArrays();
                 return swal({
@@ -689,25 +729,26 @@ export default {
                     timer: 2000
                 });
             }
-            if(this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0){
+
+            /*Over Issue Seats*/
+            if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedBookedOverIssueSeats.splice(index, 1);
-                    this.bookedSeats = this.bookedSeats.filter((seat) => {
+                    this.bookedOverIssueSeats = this.bookedOverIssueSeats.filter((seat) => {
                         if (seat.seatNo != seatNo) {
                             return seat;
                         }
                     });
-                }
-                else {
+                } else {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedBookedOverIssueSeats.push(seatNo);
-                    this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
+                    this.bookedOverIssueSeats.push(this.schedule.bus_class.seat_map[row][col]);
                 }
                 this.addForm.selectedBookedOverIssueSeats = this.selectedBookedOverIssueSeats;
 
-            }else if(!this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedBookedOverIssueSeats.length == 0){
+            } else if (!this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedBookedOverIssueSeats.length == 0) {
                 let index = this.selectedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -719,8 +760,7 @@ export default {
                     this.selectedOverIssueSeats.push(seatNo);
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
-            }
-            else {
+            } else {
                 this.fetchScheduleData();
                 this.resetingArrays();
                 return swal({
@@ -730,20 +770,16 @@ export default {
                     timer: 2000
                 });
             }
-            // Array for over issue
+
 
         },
         getClasses(col) {
-            let gender =
-                col.gender != undefined && col.gender == 0
-                    ? "for-female"
-                    : col.gender && col.gender == 1
-                        ? "for-male"
-                        : "";
+            let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
+            let over = col.over_issue ? "bg-secondary" : "";
+            return gender + " " + selected + " " + partial + " " + over;
 
-            return gender + " " + selected + " " + partial;
         },
         async add() {
             this.validationErrors = [];
@@ -776,9 +812,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.fetchScheduleData();
-                this.resetingArrays();
+
                 this.addForm = {
+                    date: new Date().toISOString().substr(0, 10),
                     type: "booked",
                     gender: "1",
                     customerCNIC: "",
@@ -787,7 +823,18 @@ export default {
                     destinationCity: 0,
                     departureCity: 0,
                 };
+                this.showBookingDiv = false;
+                this.allSchedules = '';
+                this.selectedBookedSeats = '';
+                this.selectedBookedOverIssueSeats = '';
+                this.showBookingDiv = false;
+                $("#booking_table").DataTable().destroy();
+                setTimeout(() => {
+                    $("#booking_table").DataTable();
+                }, 300);
                 window.scrollTo(0, 0);
+                this.fetchScheduleData();
+                this.resetingArrays();
             } else {
                 if (res.status === 422) {
                     for (const key in res.addForm.errors) {
@@ -819,24 +866,25 @@ export default {
             this.addForm.selectedOverIssueSeats = [];
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
+            this.bookedOverIssueSeats = [];
             let resBooking = await this.callApi("post", "booking");
             if (resBooking.status == 200) {
                 this.allBookings = resBooking.data
-                $("#booking_table").dataTable().destroy();
+                $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
-                    $("#booking_table").dataTable();
+                    $("#booking_table").DataTable();
                 }, 300);
             } else {
                 console.log(res);
             }
         },
         async details(date, schedule_id) {
-
+            $("#" + this.detailsFormId + " table").DataTable().destroy();
             const resBookingDetail = await this.callApi("post", "booking/details", {date, schedule_id});
             if (resBookingDetail.status === 200) {
                 this.bookingDetails = resBookingDetail.data;
                 setTimeout(() => {
-                    $("#" + this.detailsFormId + " table").dataTable();
+                    $("#" + this.detailsFormId + " table").DataTable();
                 }, 300);
             } else {
                 console.log(resBookingDetail);
@@ -844,6 +892,7 @@ export default {
         },
         reset() {
             this.addForm = {
+                date: new Date().toISOString().substr(0, 10),
                 type: "booked",
                 gender: "1",
                 customerCNIC: "",
@@ -852,8 +901,10 @@ export default {
                 destinationCity: 0,
                 departureCity: 0,
             };
-            this.schedule = "";
             this.showBookingDiv = false;
+            this.allSchedules = '';
+            this.selectedBookedSeats = '';
+            this.selectedBookedOverIssueSeats = '';
         }
     },
     computed: {
