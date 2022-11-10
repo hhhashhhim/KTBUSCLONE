@@ -103,7 +103,7 @@
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="time_difference">Travel Time ( e.g HH:MM )</label>
+                        <label for="time_difference">Travel Time ( e.g HH:MM ) <span class="text-danger">*</span></label>
                         <vue-mask
                             class="form-control"
                             v-model="data.time_difference"
@@ -211,6 +211,20 @@ export default {
         },
         async add() {
             this.validationErrors = [];
+            if(this.data.fare == '' || typeof this.data.fare == 'undefined')
+                return swal({
+                    title: "Required!",
+                    text: "Fare is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
+            if(this.data.time_difference == '' || typeof this.data.time_difference == 'undefined')
+                return swal({
+                    title: "Required!",
+                    text: "Travel Time is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
             this.loading = true;
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status === 200) {

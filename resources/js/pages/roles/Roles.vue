@@ -1,31 +1,25 @@
 <template>
-
     <section class="section">
         <div class="section-body">
-
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-success">
+                    <div class="card card-primary">
                         <div class="card-header">
                             <h4>Roles</h4>
                             <div class="card-header-action">
-                                <a href="#add-modal" data-toggle="modal" :data-target="'#'+formID" class="btn btn-success">
+                                <a href="#add-modal" data-toggle="modal" :data-target="'#'+formID" class="btn btn-primary">
                                     Add New
                                 </a>
                             </div>
                         </div>
                         <div class="card-body">
-
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header">
-                                            <h4></h4>
-                                        </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" id="edit_loc">
+                                                <table class="table table-striped table-hover" id="role_table">
                                                     <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
@@ -43,9 +37,9 @@
                                                                 <router-link :to="{name: 'role.permission', params: { id:role.id }}" class="btn btn-success">
                                                                     <i class="fas fa-user-shield"></i>
                                                                 </router-link>
-                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-primary mx-1">
-                                                                    <i class="far fa-edit"></i>
-                                                                </a>
+<!--                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-primary mx-1">-->
+<!--                                                                    <i class="far fa-edit"></i>-->
+<!--                                                                </a>-->
 <!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">-->
 <!--                                                                    <i class="far fa-trash-alt"></i>-->
 <!--                                                                </a>-->
@@ -136,18 +130,27 @@ export default {
         }
     },
     async created(){
-        const res = await this.callApi("post",'role',{name:this.data.name});
-        if (res.status==200) {
-            this.roles=res.data
-        }
-        else{
-            console.log(res);
-        }
+
+        await this.fetchRoles();
+
     },
     methods:{
+        async fetchRoles(){
+            const res = await this.callApi("post",'role',{name:this.data.name});
+            if (res.status==200) {
+                this.roles=res.data
+            }
+            else{
+                console.log(res);
+            }
+            setTimeout(() => {
+               $("#role_table").DataTable();
+            }, 300);
+        },
         async add(){
             this.validationErrors=[]
             if(this.data.name=="") return this.errorsArray("Role Name is Required","Name");
+            $("#role_table").DataTable().destroy();
             const res = await this.callApi("post",'role/store',this.data);
             if (res.status==200) {
                 this.success="Role Created Successfully";
@@ -156,6 +159,9 @@ export default {
                 setTimeout(() => {
                     this.success=""
                 }, 3000);
+                setTimeout(() => {
+                    $("#role_table").DataTable();
+                }, 300);
             }
             else{
                 if (res.status==422) {
@@ -174,6 +180,7 @@ export default {
 
             this.validationErrors=[]
             if(this.dataEdit.name=="") return this.errorsArray("Role Name is Required","Name");
+            $("#role_table").DataTable().destroy();
             const res = await this.callApi("post",'role/update',this.dataEdit);
             if (res.status==201) {
                 this.success="Role Updated Successfully";
@@ -185,6 +192,9 @@ export default {
                 setTimeout(() => {
                     this.success=""
                 }, 3000);
+                setTimeout(() => {
+                    $("#role_table").DataTable();
+                }, 300);
             }
             else{
                 if (res.status==422) {
@@ -213,6 +223,9 @@ export default {
             console.log(obj);
             if (obj.isDeleted) {
                 this.roles.splice(obj.index,1)
+                setTimeout(() => {
+                    $("#role_table").DataTable();
+                }, 300);
             }
         }
     }

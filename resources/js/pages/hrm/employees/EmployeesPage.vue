@@ -53,6 +53,7 @@
                                                         <th>Contact #</th>
                                                         <th>Company</th>
                                                         <th>Department</th>
+                                                        <th>Designation</th>
                                                         <th>Hiring Date</th>
                                                         <th>CNIC #</th>
                                                         <th>Status</th>
@@ -75,6 +76,7 @@
                                                         <td>{{ phoneFormat(employee.contact) }}</td>
                                                         <td>{{ employee.company.name }}</td>
                                                         <td>{{ employee.department.name }}</td>
+                                                        <td>{{ employee.designation.name }}</td>
                                                         <td>{{ employee.hiring_date }}</td>
                                                         <td>{{ cnicFormat(employee.cnic) }}</td>
                                                         <td>

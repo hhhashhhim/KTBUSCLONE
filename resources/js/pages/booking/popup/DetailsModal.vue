@@ -19,12 +19,11 @@
                             <th>Seat No</th>
                             <th>Ticket Booked By</th>
                             <th>Booking Date</th>
-                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="(booking, i) in details" :key="i">
-                            <td>{{ parseInt(i) }}</td>
+                            <td>{{ parseInt(i) + 1 }}</td>
                             <td>{{ booking.customer.name }}</td>
                             <td>{{ booking.remarks != null ? booking.remarks : "N/A" }}</td>
                             <td>{{ phoneFormat(booking.customer.contact) }}</td>
@@ -32,11 +31,6 @@
                             <td>{{ booking.seat_no}}</td>
                             <td>{{ booking.added_by.name }}</td>
                             <td>{{ booking.date }}</td>
-                            <td>
-                                <button :data-target="'#'+ deleteFormID" data-toggle="modal" @click="deleteModal(booking,parseInt(i))" class=" text-light btn btn-danger">
-                                <i class="far fa-trash-alt"></i>
-                            </button>
-                            </td>
                         </tr>
                         </tbody>
                     </table>

@@ -98,8 +98,7 @@
                                                                 <div class="badge badge-danger">Rejected</div>
                                                             </div>
                                                         </td>
-                                                        <td class="text-center"
-                                                            v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
+                                                        <td class="text-center" v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editLeave(leave)"
                                                                     class="btn btn-primary mx-1">
@@ -113,7 +112,7 @@
                                                             </button>
                                                         </td>
                                                         <td v-else class="text-center">
-                                                            <div class="badge badge-info text-wrap text-break"> You can
+                                                            <div class="badge badge-info text-wrap text-break"> You can not
                                                                 Edit/Delete Application
                                                             </div>
                                                         </td>

@@ -3,7 +3,7 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
-          <div class="card card-success">
+          <div class="card card-primary">
             <div class="card-header">
               <h4>Users</h4>
               <div class="card-header-action">
@@ -11,7 +11,7 @@
                   href="#add-modal"
                   data-toggle="modal"
                   :data-target="'#'+formID"
-                  class="btn btn-success"
+                  class="btn btn-primary"
                 >
                   Add New
                 </a>
@@ -29,7 +29,7 @@
                       <div class="table-responsive">
                         <table
                           class="table table-striped table-hover"
-                          id="edit_loc"
+                          id="users_table"
                         >
                           <thead>
                             <tr>
@@ -266,12 +266,18 @@ export default {
     };
   },
   async created() {
-    const userRes = await this.callApi("post", "user", {});
-    this.users = userRes.data;
-    const roleRes = await this.callApi("post", "company/roles", {id:this.data.company_id});
-    this.roles = roleRes.data;
+      await this.fetchUsers();
   },
   methods: {
+      async fetchUsers(){
+          const userRes = await this.callApi("post", "user", {});
+          this.users = userRes.data;
+          const roleRes = await this.callApi("post", "company/roles", {id:this.data.company_id});
+          this.roles = roleRes.data;
+          setTimeout(() => {
+              $("#users_table").DataTable();
+          }, 300);
+      },
     async add() {
       this.validationErrors = [];
 
@@ -283,7 +289,7 @@ export default {
         return this.errorsArray("User Password is Required", "Password");
       if (this.data.role == "")
         return this.errorsArray("User Role is Required", "Role");
-
+        $("#users_table").DataTable().destroy();
       const res = await this.callApi("post", "user/store", this.data);
       if (res.status == 200) {
         this.success = "User Created Successfully";
@@ -293,6 +299,9 @@ export default {
           this.success = "";
 
         }, 3000);
+        setTimeout(() => {
+            $("#users_table").DataTable();
+        }, 300);
       } else {
         if (res.status == 422) {
           for (const key in res.data.errors) {
@@ -313,7 +322,8 @@ export default {
       this.validationErrors = [];
       if (this.dataEdit.name == "")
       return this.errorsArray("User Name is Required", "Name");
-      const res = await this.callApi("post", "user/update", this.dataEdit);
+        $("#users_table").DataTable().destroy();
+        const res = await this.callApi("post", "user/update", this.dataEdit);
       if (res.status == 201) {
         this.success = "User Updated Successfully";
         this.dataEdit = "";
@@ -322,6 +332,9 @@ export default {
         setTimeout(() => {
           this.success = "";
           $("#edit-modal").modal("hide");
+        }, 3000);
+        setTimeout(() => {
+            $("#users_table").DataTable();
         }, 3000);
       }
       else {
