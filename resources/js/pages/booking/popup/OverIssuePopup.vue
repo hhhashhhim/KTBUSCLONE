@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <BasicPopup
-      :heading="'Re-Booking Over-Issued Seats'"
+      :heading="''"
       :errors="this.validationErrors"
       :success="success"
       :formID="formID"
