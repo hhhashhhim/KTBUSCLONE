@@ -10,8 +10,10 @@ use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Ticket;
+use App\Models\TicketsOverIssue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -184,11 +186,91 @@ class BookingController extends Controller
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', $this->company_id)->pluck('destination_city_id')->toArray();
         return City::whereIn('id', array_unique($depart_city))->where('company_id', $this->company_id)->get(['id', 'name']);
     }
+
     public function fetchSpecificOverIssueSeat(Request $request)
     {
-        dd($request->all());
-        $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', $this->company_id)->pluck('destination_city_id')->toArray();
-        return City::whereIn('id', array_unique($depart_city))->where('company_id', $this->company_id)->get(['id', 'name']);
+
+        $ticket = Ticket::where(["company_id" => $this->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
+        $customer = Customer::where(["company_id" => $this->company_id, "id" => $ticket->customer_id])->first();
+        $ticket = json_decode(json_encode($ticket), true);
+        $fare = ["fare" => $request->seat_fare, "seat_no" => $request->seat_no];
+        $ticket = array_merge($ticket, $fare);
+        $customer = json_decode(json_encode($customer), true);
+        return [
+            'ticket' => $ticket,
+            'customer' => $customer,
+        ];
+    }
+    public function overIssueAddNew(Request $request)
+    {
+        $schedule = Schedule::where('id', $request->schedule_id)
+            ->where('company_id', $this->company_id)
+            ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')
+            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+
+        $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+        $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+        $isPartial = 0;
+        if ($request->departure_city != $departure_city_id || $request->destination_city != $destination_city_id) {
+            $isPartial = 1;
+        }
+
+        $oldBooking = Ticket::where('company_id', $this->company_id)->where('date', $request->date)->where('schedule_id', $request->schedule_id)->where('departure_city_id', $request->departure_city)->where('destination_city_id', $request->destination_city)->first();
+        $cnicFormat = strpos($request->cnic, '-') ? str_replace('-', '', $request->cnic) : $request->cnic;
+        $phoneFormat = strpos($request->contact, '-') ?  str_replace('-', '', $request->contact) : $request->contact;
+        $old_customer = Customer::where('cnic', $cnicFormat)->first();
+        if (!$old_customer) {
+            $new_customer = Customer::create([
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+                'name' => $request->name,
+                'cnic' => $cnicFormat,
+                'contact' => $phoneFormat,
+            ]);
+        }
+
+        if ($request->date == date('Y-m-d')) {
+            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        } else {
+            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        }
+
+//        foreach ($request->selectedSeats as $i => $seat) {
+
+           $new_ticket = Ticket::create([
+                'company_id' => $this->company_id,
+                'departure_city_id' => $oldBooking->departure_city_id,
+                'destination_city_id' => $oldBooking->destination_city_id,
+                // 'bus_class_id'=>$schedule->fare_class_id,
+                'seat_no' => $oldBooking->seat_no,
+                'is_partial' => $isPartial,
+                'booking_no' => $bookingNo,
+                'date' => $request->date,
+                'customer_id' => isset($old_customer) ? $old_customer->id : $new_customer->id,
+                'schedule_id' => !isset($request->schedule_id) ? $oldBooking->schedule_id : $request->schedule_id,
+                'remarks' => $request->remarks,
+                'gender' => $request->gender,
+                'type' => $oldBooking->type,
+                'added_by' => Auth::user()->id,
+                'discount' => $oldBooking->discount,
+            ]);
+
+//        }
+
+//        Log for over Issue
+             return TicketsOverIssue::create([
+                'company_id' => $this->company_id,
+                'old_customer_id' => $oldBooking->customer_id,
+                'new_customer_id' => isset($new_customer) ?  $new_customer->id : null,
+                'schedule_id' => !isset($request->schedule_id) ? $oldBooking->schedule_id : $request->schedule_id,
+                'seat_no' => !isset($request->seat_no) ? $oldBooking->seat_no : $request->seat_no,
+                'old_booking_no' => $oldBooking->id,
+                'new_booking_no' => $new_ticket->id,
+                'added_by' => Auth::user()->id,
+            ]);
+
     }
 
     public function getCnic(Request $request)

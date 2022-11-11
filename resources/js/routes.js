@@ -23,8 +23,9 @@ import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 import DepartmentPage from "./pages/hrm/department/DepartmentPage.vue";
 import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
 
-const url = '/kt/'
-// const url = '/'
+// const url = '/projects/kt/'
+// const url = '/kt/'
+const url = '/'
 
 const routes = [
     {
