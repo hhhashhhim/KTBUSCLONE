@@ -13,7 +13,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary" @click="clearForm()"
                                 >
-                                    Add Fare Class
+                                    Add Fare Classadf
                                 </a>
                             </div>
                         </div>

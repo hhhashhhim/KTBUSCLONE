@@ -52,7 +52,7 @@
                                                             }}
                                                         </th>
                                                     </tr>
-                                                    <tr>
+                                                    <tr v-else>
                                                         <th></th>
                                                         <th v-for="(city,i) in cities" :key="i"> {{ city.name }}</th>
                                                     </tr>
