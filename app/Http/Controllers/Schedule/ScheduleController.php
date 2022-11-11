@@ -261,7 +261,6 @@ class ScheduleController extends Controller
 
 
                         if ($before || $after) {
-
                             // removing partial tag for that seats which fullfill the conditions
                             unset($seatMap[$i][$j]['partial']);
                             unset($seatMap[$i][$j]['type']);
@@ -275,6 +274,8 @@ class ScheduleController extends Controller
                 }
                 if ($result !== false && $leavingIn30Min) {
                     $seatMap[$i][$j]['over_issue'] = true;
+                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
+                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
                 }
                 // print_r($column);
                 if (isset($column['class'])) {

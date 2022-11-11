@@ -265,15 +265,12 @@
                                                                         class="not-for-sale circles mr-1 border shadow"></div>
                                                                     <span class="text-wrap">Not For Sale</span>
                                                                 </div>
-
                                                                 <div class="my-2"
                                                                      v-for="(seatClass,i) in allSeatClasses" :key="i">
                                                                     <div class="circles mr-1 border shadow"
                                                                          :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                                                                     <span class="text-wrap">{{ seatClass.name }}</span>
                                                                 </div>
-
-
                                                                 <div class="my-3">
                                                                     <div
                                                                         class="circles icons-legend mr-1 border shadow">
@@ -287,7 +284,6 @@
                                                                     ></div>
                                                                     <span class="text-wrap">Issued</span>
                                                                 </div>
-
                                                                 <div class="my-2">
                                                                     <div
                                                                         class="partial-seat circles mr-1 border shadow"></div>
@@ -302,7 +298,7 @@
                                                                 </div>
                                                                 <div class="my-3">
                                                                     <div
-                                                                        class="circles icons-legend mr-1 border shadow bg-secondary">
+                                                                        class="circles icons-legend mr-1 border shadow">
                                                                         <i class="far fa-hand-paper text-dark"></i>
                                                                     </div>
                                                                     <span
@@ -338,7 +334,7 @@
                                                                         </small>
                                                                         <small v-if="col.over_issue == true">
                                                                             <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
-                                                                            <i class="type-icons far fa-hand-paper">
+                                                                            <i class="type-icons far fa-hand-paper text-dark">
                                                                             </i>
                                                                         </small>
                                                                     </div>
@@ -826,7 +822,6 @@ export default {
                     timer: 2000
                 });
             this.validationErrors = [];
-
             this.loading = true
             const res = await this.callApi("post", "schedule/selected", {
                 id: this.addForm.schedule,
@@ -834,6 +829,7 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
+            console.log(res.data);
             if (res.status == 200) {
                 this.loading = false
                 this.showBookingDiv = true;
@@ -946,6 +942,8 @@ export default {
                 seat_no: seatNo,
                 schedule_id: this.addForm.schedule,
                 seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
+                departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
+                destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
             });
             if (resOverIssue.status == 200) {
                 this.addFormOverIssue.ticket = resOverIssue.data.ticket;
@@ -990,12 +988,23 @@ export default {
                 this.addFormOverIssue.customer = '';
 
 
+
             }
+
+            if(resOverIssue.status == 422 && resOverIssue.data.message){
+                 swal({
+                    title: "Error",
+                    text: resOverIssue.data.message,
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
             if (resOverIssue.status == 422) {
                 let errorContent = "";
                 let count = 0;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
+                for (const key in resOverIssue.data.errors) {
+                    resOverIssue.data.errors[key].forEach((element) => {
                         errorContent += (
                             (++count) + " - " + //creating serial no.
                             element + // main error
@@ -1017,7 +1026,7 @@ export default {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
-            let over = col.over_issue ? "bg-secondary" : "";
+            let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
 
@@ -1052,7 +1061,8 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-
+                this.fetchScheduleData();
+                this.resetingArrays();
                 this.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
@@ -1065,18 +1075,14 @@ export default {
                 };
                 this.showBookingDiv = false;
                 this.allSchedules = '';
-                this.selectedBookedSeats = '';
-                this.selectedBookedOverIssueSeats = '';
-                this.showBookingDiv = false;
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
                 window.scrollTo(0, 0);
-                this.fetchScheduleData();
-                this.resetingArrays();
+
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     for (const key in res.addForm.errors) {
                         res.addForm.errors[key].forEach((element) => {
                             this.errorsArray(element, key);

@@ -112,7 +112,7 @@ class BookingController extends Controller
 
         }
 
-        return "Successfully Boooking Created";
+        return "Successfully Booking Created";
 
     }
 
@@ -189,8 +189,7 @@ class BookingController extends Controller
 
     public function fetchSpecificOverIssueSeat(Request $request)
     {
-
-        $ticket = Ticket::where(["company_id" => $this->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
+        $ticket = Ticket::where(["company_id" => $this->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id, "destination_city_id" => $request->destinationCity, "departure_city_id" => $request->departureCity])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
         $customer = Customer::where(["company_id" => $this->company_id, "id" => $ticket->customer_id])->first();
         $ticket = json_decode(json_encode($ticket), true);
         $fare = ["fare" => $request->seat_fare, "seat_no" => $request->seat_no];
@@ -219,27 +218,35 @@ class BookingController extends Controller
         $cnicFormat = strpos($request->cnic, '-') ? str_replace('-', '', $request->cnic) : $request->cnic;
         $phoneFormat = strpos($request->contact, '-') ?  str_replace('-', '', $request->contact) : $request->contact;
         $old_customer = Customer::where('cnic', $cnicFormat)->first();
-        if (!$old_customer) {
-            $new_customer = Customer::create([
-                'company_id' => $this->company_id,
-                'added_by' => Auth::user()->id,
-                'name' => $request->name,
-                'cnic' => $cnicFormat,
-                'contact' => $phoneFormat,
-            ]);
-        }
+        if($old_customer->id == $oldBooking->customer_id){
+            return response()->json([
+                "errors" => [
+                    "message" => ["This Seat already booked against this customer"]
+                ]
+//                'message' => ["This Seat already booked against this customer"],
+            ], 422);
+        }else {
+            if (!$old_customer) {
+                $new_customer = Customer::create([
+                    'company_id' => $this->company_id,
+                    'added_by' => Auth::user()->id,
+                    'name' => $request->name,
+                    'cnic' => $cnicFormat,
+                    'contact' => $phoneFormat,
+                ]);
+            }
 
-        if ($request->date == date('Y-m-d')) {
-            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-            ++$bookingNo;
-        } else {
-            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-            ++$bookingNo;
-        }
+            if ($request->date == date('Y-m-d')) {
+                $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                ++$bookingNo;
+            } else {
+                $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                ++$bookingNo;
+            }
 
 //        foreach ($request->selectedSeats as $i => $seat) {
 
-           $new_ticket = Ticket::create([
+            $new_ticket = Ticket::create([
                 'company_id' => $this->company_id,
                 'departure_city_id' => $oldBooking->departure_city_id,
                 'destination_city_id' => $oldBooking->destination_city_id,
@@ -260,17 +267,17 @@ class BookingController extends Controller
 //        }
 
 //        Log for over Issue
-             return TicketsOverIssue::create([
+            return TicketsOverIssue::create([
                 'company_id' => $this->company_id,
                 'old_customer_id' => $oldBooking->customer_id,
-                'new_customer_id' => isset($new_customer) ?  $new_customer->id : null,
+                'new_customer_id' => isset($new_customer) ? $new_customer->id : null,
                 'schedule_id' => !isset($request->schedule_id) ? $oldBooking->schedule_id : $request->schedule_id,
                 'seat_no' => !isset($request->seat_no) ? $oldBooking->seat_no : $request->seat_no,
                 'old_booking_no' => $oldBooking->id,
                 'new_booking_no' => $new_ticket->id,
                 'added_by' => Auth::user()->id,
             ]);
-
+        }
     }
 
     public function getCnic(Request $request)

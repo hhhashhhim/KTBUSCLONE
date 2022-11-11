@@ -1,8 +1,8 @@
 /node_modules
 /vendor
 /storage
-.env
-.env.backup
+/.env
+/.env.backup
 .env.dusk.local
 .phpunit.result.cache
 docker-compose.override.yml
@@ -12,4 +12,4 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-resources/js/routes.js
+/resources/js/routes.js

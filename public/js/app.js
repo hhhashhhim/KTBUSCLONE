@@ -24192,6 +24192,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 15:
                 res = _context7.sent;
+                console.log(res.data);
 
                 if (res.status == 200) {
                   _this7.loading = false;
@@ -24211,7 +24212,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 18:
               case "end":
                 return _context7.stop();
             }
@@ -24382,7 +24383,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   date: _this8.addForm.date,
                   seat_no: seatNo,
                   schedule_id: _this8.addForm.schedule,
-                  seat_fare: _this8.schedule.bus_class.seat_map[row][col].fare
+                  seat_fare: _this8.schedule.bus_class.seat_map[row][col].fare,
+                  departureCity: _this8.schedule.bus_class.seat_map[row][col].departure_city,
+                  destinationCity: _this8.schedule.bus_class.seat_map[row][col].destination_city
                 });
 
               case 36:
@@ -24451,13 +24454,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this9.addFormOverIssue.customer = '';
                 }
 
+                if (resOverIssue.status == 422 && resOverIssue.data.message) {
+                  swal({
+                    title: "Error",
+                    text: resOverIssue.data.message,
+                    icon: "error",
+                    timer: 4000
+                  });
+                }
+
                 if (resOverIssue.status == 422) {
                   (function () {
                     var errorContent = "";
                     var count = 0;
 
-                    for (var key in res.data.errors) {
-                      res.data.errors[key].forEach(function (element) {
+                    for (var key in resOverIssue.data.errors) {
+                      resOverIssue.data.errors[key].forEach(function (element) {
                         errorContent += ++count + " - " + //creating serial no.
                         element + // main error
                         "\n" // creating new line
@@ -24473,7 +24485,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 9:
+              case 10:
               case "end":
                 return _context9.stop();
             }
@@ -24485,7 +24497,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
       var selected = col.selected ? "selected" : "";
       var partial = col.partial ? "partial" : "";
-      var over = col.over_issue ? "bg-secondary" : "";
+      var over = col.over_issue && col.partial ? "bg-secondary" : "";
       return gender + " " + selected + " " + partial + " " + over;
     },
     add: function add() {
@@ -24547,6 +24559,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
+
+                  _this10.fetchScheduleData();
+
+                  _this10.resetingArrays();
+
                   _this10.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
@@ -24559,20 +24576,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   };
                   _this10.showBookingDiv = false;
                   _this10.allSchedules = '';
-                  _this10.selectedBookedSeats = '';
-                  _this10.selectedBookedOverIssueSeats = '';
-                  _this10.showBookingDiv = false;
                   $("#booking_table").DataTable().destroy();
                   setTimeout(function () {
                     $("#booking_table").DataTable();
                   }, 300);
                   window.scrollTo(0, 0);
-
-                  _this10.fetchScheduleData();
-
-                  _this10.resetingArrays();
                 } else {
-                  if (res.status === 422) {
+                  if (res.status == 422) {
                     _loop2 = function _loop2(key) {
                       res.addForm.errors[key].forEach(function (element) {
                         _this10.errorsArray(element, key);
@@ -38154,7 +38164,7 @@ var _hoisted_72 = {
   "class": "text-wrap"
 };
 
-var _hoisted_73 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-check\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Booked</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"fas fa-check-double circles icons-legend shadow mr-1 border\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Issued</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"partial-seat circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" style=\"margin-top:-10px;\" data-v-03b302d9>Partial Seat</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-people-carry text-danger\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Over Issue</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow bg-secondary\" data-v-03b302d9><i class=\"far fa-hand-paper text-dark\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Available for Over Issue</span></div>", 5);
+var _hoisted_73 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-check\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Booked</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"fas fa-check-double circles icons-legend shadow mr-1 border\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Issued</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"partial-seat circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" style=\"margin-top:-10px;\" data-v-03b302d9>Partial Seat</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-people-carry text-danger\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Over Issue</span></div><div class=\"my-3\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"far fa-hand-paper text-dark\" data-v-03b302d9></i></div><span class=\"text-wrap\" data-v-03b302d9>Available for Over Issue</span></div>", 5);
 
 var _hoisted_78 = ["onClick", "title"];
 
@@ -38173,7 +38183,7 @@ var _hoisted_81 = {
 
 var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "type-icons far fa-hand-paper"
+    "class": "type-icons far fa-hand-paper text-dark"
   }, null, -1
   /* HOISTED */
   );
@@ -51786,9 +51796,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // const url = '/projects/kt/'
-// const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
