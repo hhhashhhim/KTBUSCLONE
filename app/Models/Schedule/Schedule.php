@@ -68,5 +68,9 @@ class Schedule extends Model
     {
         return $this->hasOne(Surcharge::class, 'id', 'surcharge_id');
     }
+    public function scheduleDetail()
+    {
+        return $this->hasMany(ScheduleDetail::class, 'schedule_id', 'id');
+    }
 
 }

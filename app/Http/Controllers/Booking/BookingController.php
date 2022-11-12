@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
 use App\Models\TicketsOverIssue;
 use Illuminate\Http\Request;
@@ -141,37 +142,13 @@ class BookingController extends Controller
         if (!$request->date) {
             return "Date is Required";
         }
-        $routes = RouteFare::where('departure_city_id', $request->departure_city_id)->where('destination_city_id', $request->destination_city_id)->get();
-        $routes_id = [];
-        foreach ($routes as $key => $route) {
-            $routes_id[] = $route->route_id;
-        }
-        $allSchedules = Schedule::whereIn('route_id', array_unique($routes_id))
-            ->whereDate('start_date', '<=', $request->date)
-            ->whereDate('end_date', '>=', $request->date)
-            ->get();
+        $allSchedules =  ScheduleDetail::with('schedule')->where(['departure_id'=> $request->departure_city_id, 'destination_id'=> $request->destination_city_id, 'departure_date'=> $request->date] )->get();
         foreach ($allSchedules as $key => $single) {
-            $route_depart = RouteFare::where('route_id', $single->route_id)->first()->departure_city_id;
-            if ($route_depart == $request->departure_city_id) {
-                $allSchedules[$key]->finalTime = date("m/d/Y", strtotime($request->date)) . ' ' . date("h:i A", strtotime($single->time));
-            } else {
-                $time_diff = FareTable::where('from_city_id', $route_depart)->where('to_city_id', $request->departure_city_id)->pluck('time_difference')->first();
-                $allSchedules[$key]->finalTime = self::scheduleTime($single->time, $time_diff, $request->date);
-            }
+            $single->departure_date = date("m/d/Y", strtotime($single->departure_date));
+            $single->departure_time = date("h:i A", strtotime($single->departure_time));
         }
-        return $allSchedules;
-//
-//        $ids = [];
-//        foreach ($allSchedules as $key => $schedule) {
-//            $scheduleFinalDate = date("Y-m-d", strtotime($schedule->finalTime));
-//            if ($request->date < $scheduleFinalDate) {
-//                $ids[] = $key;
-//            }
-//        }
-//        foreach ($ids as $item) {
-//            unset($allSchedules[$item]);
-//        }
-//        return $allSchedules;
+        return  $allSchedules;
+
     }
 
 

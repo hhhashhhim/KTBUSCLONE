@@ -9,6 +9,7 @@ use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;

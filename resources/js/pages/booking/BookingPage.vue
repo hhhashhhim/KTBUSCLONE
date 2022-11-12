@@ -55,8 +55,7 @@
                                                             v-model="addForm.schedule">
                                                         <option value="0" selected>Select Schedule</option>
                                                         <option v-for="(schedule, i) in allSchedules"
-                                                                :value="schedule.id" :key="i">{{ schedule.finalTime }} -
-                                                            {{ schedule.name }}
+                                                                :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
                                                         </option>
                                                     </select>
                                                 </div>
@@ -637,6 +636,9 @@ export default {
     },
 
     methods: {
+        scheduleDropdown: function (schedule) {
+            return schedule.departure_date + ' ' + schedule.departure_time + ' -' + schedule.schedule.name;
+        },
         sameDataAsMain: function () {
             this.sameDataMain = {
                 departure: this.addForm.departureCity,
@@ -716,16 +718,7 @@ export default {
             }
         },
 
-        tConvert: function (time) {
-            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
 
-            if (time.length > 1) {
-                time = time.slice(1);
-                time[5] = +time[0] < 12 ? ' AM' : ' PM';
-                time[0] = +time[0] % 12 || 12;
-            }
-            return time.join('');
-        },
 
         async fetchSpecificSchedules() {
             this.getSchedule = true;
@@ -738,6 +731,7 @@ export default {
                 date: this.addForm.date,
             }
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
+            console.log(resFetchSchedule.data)
             if (resFetchSchedule.status == 200) {
                 if (resFetchSchedule.length != 0) {
                     this.getSchedule = false;
@@ -1079,7 +1073,7 @@ export default {
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
 
             } else {
                 if (res.status == 422) {

@@ -12,6 +12,7 @@ use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -59,7 +60,7 @@ class ScheduleController extends Controller
             'busClass.required' => 'Bus Class is Required',
         ];
         $this->validate($request, $rules, $customMessages);
-        return Schedule::create([
+        $schedule = Schedule::create([
             'name' => $request->name,
             'start_date' => $request->StartDate,
             'end_date' => $request->EndDate,
@@ -73,27 +74,50 @@ class ScheduleController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
+        $routeDetails = RouteFare::where('route_id', 1)->get()->groupBy('fare_class_id')->first();
+        foreach ($routeDetails as $key => $detail) {
+            $fareTableTime = FareTable::where(['from_city_id' => $detail->departure_city_id, 'to_city_id' => $detail->destination_city_id])->first()->time_difference;
+            $timeDiff = explode(':', $fareTableTime);
+            if($routeDetails[0]->departure_city_id == $detail->departure_city_id)
+            {
+                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")));
+            }
+            else
+            {
+                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")) + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60)));
+            }
+            ScheduleDetail::create([
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+                'schedule_id' => $schedule->id,
+                'departure_id' => $detail->departure_city_id,
+                'destination_id' => $detail->destination_city_id,
+                'departure_time' => date('H:i',strtotime($departureTime)),
+                'departure_date' => date('Y-m-d',strtotime($departureTime)),
+            ]);
+        }
+        return $schedule;
     }
 
     public function editSchedule(Request $request)
     {
         $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->first();
         $dataArr = [];
-         if(!is_null($schedule->route_city_terminal)) {
-             foreach ($schedule->route_city_terminal as $key => $item) {
-                 $dataArr['city'][$key] = $item['city_id'];
-                 $dataArr['terminal'][$key] = $item['terminal_id'];
-             }
-             $cities_id = array_unique($dataArr['city']);
-             $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', $this->company_id)->get();
-             return [
-                 'cities' => $city,
-                 'schedules' => $schedule,
-                 'compare_array' => $schedule->route_city_terminal,
-             ];
-         }else{
-             return response()->json(['message'=> 'Please Select Terminals while Adding Schedule'], 422);
-         }
+        if (!is_null($schedule->route_city_terminal)) {
+            foreach ($schedule->route_city_terminal as $key => $item) {
+                $dataArr['city'][$key] = $item['city_id'];
+                $dataArr['terminal'][$key] = $item['terminal_id'];
+            }
+            $cities_id = array_unique($dataArr['city']);
+            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', $this->company_id)->get();
+            return [
+                'cities' => $city,
+                'schedules' => $schedule,
+                'compare_array' => $schedule->route_city_terminal,
+            ];
+        } else {
+            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
+        }
 
 
     }
@@ -111,7 +135,7 @@ class ScheduleController extends Controller
             'surcharge_id' => $req['surcharge_id'],
             'discount_id' => $req['discount_id'],
             'route_city_terminal' => !isset($request->updated_route_city_terminal) ? $existSchedule->route_city_terminal : $request->updated_route_city_terminal,
-             'fare_class_id' => $req['fare_class_id'],
+            'fare_class_id' => $req['fare_class_id'],
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -187,28 +211,28 @@ class ScheduleController extends Controller
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
 
         // Getting Already Booked Tickets
+        $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', $this->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->with('schedule','schedule.bus_class:id,seat_map', 'schedule.route:id,name', 'schedule.route.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
-        $schedule = Schedule::where('id', $request->id)
-            ->where('company_id', $this->company_id)
-            ->select('id', 'fare_class_id', 'route_id', 'bus_class_id', 'time')
-            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-
+//        $schedule = Schedule::where('id', $request->id)
+//            ->where('company_id', $this->company_id)
+//            ->select('id', 'fare_class_id', 'route_id', 'bus_class_id', 'time')
+//            ->with('scheduleDetail','bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
         $start_datetime = new DateTime(date('Y-m-d H:i:s'));
-        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $schedule->time);
+        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
         $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp()) / 60;
         $leavingIn30Min = $diffInMins > 30 ? false : true;
-
         // return dd($leavingIn30Min);
         // Fare Fetching About the Schedule
-        $route_departure_city_id = $schedule->route->fares->first()->departure_city_id;
-        $route_destination_city_id = $schedule->route->fares->last()->destination_city_id;
+        $route_departure_city_id = $scheduleDetail->schedule->route->fares->first()->departure_city_id;
+        $route_destination_city_id = $scheduleDetail->schedule->route->fares->last()->destination_city_id;
+//        dd($route_destination_city_id);
         $fareForAllClasses = FareTable::where('from_city_id', $route_departure_city_id)->where('to_city_id', $route_destination_city_id)
             ->where('company_id', $this->company_id)
             ->get()->unique('fare_class');
 
         // getting cities sequence for checking which city will be after other one
-        $lastFare = $schedule->route->fares->last();
-        $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+        $lastFare = $scheduleDetail->schedule->route->fares->last();
+        $allFaresOfRoute = $scheduleDetail->schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
 
 
@@ -222,9 +246,9 @@ class ScheduleController extends Controller
             ], 422);
         }
 
-        $fare = (float)$fareForAllClasses->where('fare_class', $schedule->fare_class_id)->first()->fare;
+        $fare = (float)$fareForAllClasses->where('fare_class', $scheduleDetail->schedule->fare_class_id)->first()->fare;
         // Looping Throug the each seat of the bus
-        $seatMap = $schedule->bus_class->seat_map;
+        $seatMap = $scheduleDetail->schedule->bus_class->seat_map;
 
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
@@ -277,7 +301,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
                     $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
                 }
-                // print_r($column);
+//                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
@@ -295,9 +319,9 @@ class ScheduleController extends Controller
                 }
             }
         }
-        $schedule->bus_class->seat_map = $seatMap;
-        unset($schedule->route);
-        return $schedule;
+        $scheduleDetail->schedule->bus_class->seat_map = $seatMap;
+        unset($scheduleDetail->schedule->route);
+        return $scheduleDetail->schedule;
 
 
     }
