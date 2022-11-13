@@ -206,7 +206,7 @@
                 >
                     <div class="row">
                         <div class="col-md-6 class form-group">
-                            <label for="DiscountName">Routes <span class="text-danger">*</span></label>
+                            <label for="route">Routes <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
                                 id="route"
