@@ -637,7 +637,7 @@ export default {
 
     methods: {
         scheduleDropdown: function (schedule) {
-            return schedule.departure_date + ' ' + schedule.departure_time + ' -' + schedule.schedule.name;
+            return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
         sameDataAsMain: function () {
             this.sameDataMain = {
@@ -731,7 +731,6 @@ export default {
                 date: this.addForm.date,
             }
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
-            console.log(resFetchSchedule.data)
             if (resFetchSchedule.status == 200) {
                 if (resFetchSchedule.length != 0) {
                     this.getSchedule = false;
@@ -930,18 +929,19 @@ export default {
                     timer: 2000
                 });
             }
-
-            const resOverIssue = await this.callApi("post", "booking/overIssue", {
-                date: this.addForm.date,
-                seat_no: seatNo,
-                schedule_id: this.addForm.schedule,
-                seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
-                departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
-                destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
-            });
-            if (resOverIssue.status == 200) {
-                this.addFormOverIssue.ticket = resOverIssue.data.ticket;
-                this.addFormOverIssue.customer = resOverIssue.data.customer;
+            if(this.schedule.bus_class.seat_map[row][col].over_issue) {
+                const resOverIssue = await this.callApi("post", "booking/overIssue", {
+                    date: this.addForm.date,
+                    seat_no: seatNo,
+                    schedule_id: this.addForm.schedule,
+                    seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
+                    departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
+                    destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
+                });
+                if (resOverIssue.status == 200) {
+                    this.addFormOverIssue.ticket = resOverIssue.data.ticket;
+                    this.addFormOverIssue.customer = resOverIssue.data.customer;
+                }
             }
         },
 

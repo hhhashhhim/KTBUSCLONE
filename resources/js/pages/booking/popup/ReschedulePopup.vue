@@ -64,8 +64,7 @@
                             v-for="(schedule, i) in allSchedules"
                             :value="schedule.id"
                             :key="i"
-                        >{{ schedule.finalTime }} -
-                            {{ schedule.name }}
+                        >{{ scheduleDropdown(schedule) }}
                         </option>
                     </select>
                 </div>
@@ -251,11 +250,8 @@ export default {
         };
     },
     methods: {
-        sameDataAsMain: function () {
-            // this.addForm.schedule =
-            // this.addForm.date =
-            // this.addForm.destinationCity =
-            // this.addForm.departureCity =
+        scheduleDropdown: function (schedule) {
+            return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
         async fetchData() {
             const resCity = await this.callApi("post", "cities");
