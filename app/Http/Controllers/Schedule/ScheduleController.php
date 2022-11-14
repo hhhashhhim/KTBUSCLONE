@@ -76,7 +76,6 @@ class ScheduleController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-<<<<<<< HEAD
         $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
         $lastDepId =  $routeDetails[0]->departure_city_id;
         $totalTime = strtotime(date("$schedule->start_date $schedule->time"));
@@ -94,33 +93,6 @@ class ScheduleController extends Controller
                 $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
                 $departureTime = date("Y-m-d H:i", $totalTime);
                 $lastDepId = $detail->departure_city_id;
-=======
-        //busi execi eco
-        $startingValue = 0;
-        $routeDetails = RouteFare::where('route_id', $request->route)->get()->groupBy('fare_class_id')->first();
-        foreach ($routeDetails as $key => $detail) {
-            //Departure always must be starting city
-
-            $fareTableTime = FareTable::where(['from_city_id' => $detail->departure_city_id, 'to_city_id' => $detail->destination_city_id])->first()->time_difference;
-            $timeDiff = explode(':', $fareTableTime);
-            if ($key == 0) {
-                $startingValue = $timeDiff;
-            }
-
-            if ($routeDetails[0]->departure_city_id == $detail->departure_city_id) {
-                //I need to add this time in else condition in sum
-
-//                selected line?
-                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")));
-            } else {
-                if ($key == 1) {
-                    $startingValue = $startingValue;
-                }else{
-
-                }
-                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")) + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60)));
-
->>>>>>> 8229feab4064d8778120c1a956bb3ea843a34bb6
             }
 
             ScheduleDetail::create([
