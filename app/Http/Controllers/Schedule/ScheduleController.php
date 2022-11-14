@@ -40,6 +40,8 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
+//        $routeDetails = RouteFare::where('route_id', 1)->get()->groupBy('fare_class_id')->first();
+//        return $fareTableTime = FareTable::where(['from_city_id' => 4, 'to_city_id' => 3])->first()->time_difference;
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',
@@ -74,17 +76,23 @@ class ScheduleController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        $routeDetails = RouteFare::where('route_id', 1)->get()->groupBy('fare_class_id')->first();
+        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
+        $lastDepId =  $routeDetails[0]->departure_city_id;
+        $totalTime = strtotime(date("$schedule->start_date $schedule->time"));
+
         foreach ($routeDetails as $key => $detail) {
-            $fareTableTime = FareTable::where(['from_city_id' => $detail->departure_city_id, 'to_city_id' => $detail->destination_city_id])->first()->time_difference;
-            $timeDiff = explode(':', $fareTableTime);
-            if($routeDetails[0]->departure_city_id == $detail->departure_city_id)
+
+            if($lastDepId == $detail->departure_city_id)
             {
-                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")));
+                $departureTime = date("Y-m-d H:i", $totalTime);
             }
             else
             {
-                $departureTime = date("Y-m-d H:i", strtotime(date("$schedule->start_date $schedule->time")) + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60)));
+                $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference;
+                $timeDiff = explode(':', $fareTableTime);
+                $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
+                $departureTime = date("Y-m-d H:i", $totalTime);
+                $lastDepId = $detail->departure_city_id;
             }
             ScheduleDetail::create([
                 'company_id' => $this->company_id,
