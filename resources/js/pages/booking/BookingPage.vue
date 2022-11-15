@@ -7,407 +7,399 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Booking</h4>
                         </div>
-                        <!--Booking panel-->
                         <div class="card-body">
-                            <!-- Table -->
                             <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-2 form-group">
-                                                    <label for="departureCity">Departure City <span class="text-danger">*</span></label>
-                                                    <select class="form-control" id="departureCity"
-                                                            @change="fetchSpecificSchedules(); getDestinationCity()"
-                                                            v-model="addForm.departureCity">
-                                                        <option value="0" selected>Select Departure City</option>
-                                                        <option
-                                                            v-for="(city, i) in cities"
-                                                            :value="city.id"
-                                                            :key="i"
-                                                        >
-                                                            {{ city.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2 form-group"><label for="destinationCity">Destination
-                                                    City<span class="text-danger">*</span></label>
-                                                    <select class="form-control" id="destinationCity"
-                                                            @change="fetchSpecificSchedules()"
-                                                            v-model="addForm.destinationCity">
-                                                        <option value="0" selected>Select Destination City</option>
-                                                        <option v-for="(city, i) in specificCities" :value="city.id"
-                                                                :key="i">
-                                                            {{ city.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2 class form-group">
-                                                    <label for="date">Date <span class="text-danger">*</span></label>
-                                                    <input type="date" :min="minDateFilter()" class="form-control"
-                                                           v-model="addForm.date"
-                                                           @change="fetchSpecificSchedules()"/>
-                                                </div>
-                                                <div class="col-md-4 class form-group">
-                                                    <label for="scheduleName">Schedule Name <span
-                                                        class="text-danger">*</span></label>
-                                                    <select class="form-control" id="scheduleName"
-                                                            v-model="addForm.schedule">
-                                                        <option value="0" selected>Select Schedule</option>
-                                                        <option v-for="(schedule, i) in allSchedules"
-                                                                :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label>Action</label>
-                                                    <button @click="fetchScheduleData" class="btn btn-block btn-primary"
-                                                            :class="getSchedule ? 'disabled': ''">
-                                                        {{ getSchedule ? 'Fetching Schedules...' : 'Get Record' }}
-                                                    </button>
-                                                </div>
-                                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-                                                     v-if="selectedBookedSeats.length">
-                                                    <a
-                                                        @click="sameDataAsMain()"
-                                                        href="#reschedule-modal"
-                                                        class="btn btn-primary mx-1"
-                                                        data-toggle="modal"
-                                                    >Shifting ( Reschedule ) Seats</a>
-                                                </div>
-                                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-                                                     v-if="selectedBookedOverIssueSeats.length">
-                                                    <a
-                                                        href="#overIssue_model"
-                                                        class="btn btn-primary mx-1"
-                                                        data-toggle="modal"
-                                                    >Over Issue Seats</a>
-                                                </div>
-                                                <h1 v-if="loading">Loading.........</h1>
-
-                                                <div class="col-md-12 row" v-if="showBookingDiv">
-                                                    <div class="col-md-6">
-                                                        <div class="card p-4">
-                                                            <div class="form-group row">
-                                                                <label
-                                                                    class="col-md-3 pt-3 font-weight-bold"
-                                                                    for="customer-cnic"
-                                                                >CNIC <span class="text-danger">*</span>
-                                                                </label>
-                                                                <vue-mask
-                                                                    v-on:keyup.enter="getCustomer"
-                                                                    v-on:blur="getCustomer"
-                                                                    class="form-control col-md-9"
-                                                                    v-model="addForm.customerCNIC"
-                                                                    mask="00000-0000000-0"
-                                                                    :raw="false"
-                                                                    :options="options"
-                                                                >
-                                                                </vue-mask>
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="fullName"
-                                                                >Full Name</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    class="form-control col-md-9"
-                                                                    id="fullName"
-                                                                    v-model="addForm.customerName"
-                                                                />
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="contact"
-                                                                >Contact</label
-                                                                >
-                                                                <vue-mask
-                                                                    v-on:keyup.enter="getCustomer"
-                                                                    class="form-control col-md-9"
-                                                                    v-model="addForm.contact"
-                                                                    mask="0000-0000000"
-                                                                    :raw="false"
-                                                                    :options="options"
-                                                                >
-                                                                </vue-mask>
-
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="remarks"
-                                                                >Remarks</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    class="form-control col-md-9"
-                                                                    id="remarks"
-                                                                    v-model="addForm.remarks"
-                                                                />
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                >Gender</label
-                                                                >
-                                                                <div class="col-md-9 pt-3">
-                                                                    <input type="radio" id="female-booking"
-                                                                           v-model="addForm.gender" value="0"/>
-                                                                    <label class="mx-3"
-                                                                           for="female-booking">Female</label>
-                                                                    <input type="radio" id="male-booking"
-                                                                           v-model="addForm.gender" value="1"/>
-                                                                    <label class="mx-3" for="male-booking">Male</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="contact"
-                                                                >Issue Or Book</label
-                                                                >
-                                                                <div class="col-md-9 pt-3">
-                                                                    <input type="radio" id="type-issue"
-                                                                           v-model="addForm.type" value="booked"/>
-                                                                    <label class="mx-3" for="type-issue">Issue</label>
-                                                                    <input
-                                                                        type="radio"
-                                                                        id="type-book"
-                                                                        v-model="addForm.type"
-                                                                        value="advance booking"
-                                                                    />
-                                                                    <label class="mx-3" for="type-book">Book</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="seatNo"
-                                                                >Seat No.</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    readonly
-                                                                    class="form-control col-md-9"
-                                                                    id="seatNo"
-                                                                    v-model="addForm.selectedSeats"
-                                                                />
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="totalFare"
-                                                                >Total Seats</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    readonly
-                                                                    class="form-control col-md-9"
-                                                                    id="totalNoSeats"
-                                                                    v-model="selectedSeats.length"
-                                                                />
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="totalFare"
-                                                                >Total Fare</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    readonly
-                                                                    class="form-control col-md-9 font-weight-bold"
-                                                                    id="totalFare"
-                                                                    v-model="addForm.totalFare"
-                                                                />
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                                       for="discount"
-                                                                >Discount ( % )</label
-                                                                >
-                                                                <input
-                                                                    type="text"
-                                                                    readonly
-                                                                    class="form-control col-md-9"
-                                                                    id="discount"
-                                                                    v-model="addForm.discount"
-                                                                />
-                                                            </div>
-
-                                                            <div class="form-group text-right">
-                                                                <button class="btn btn-primary mx-1" @click="add">
-                                                                    Generate Ticket
-                                                                </button>
-                                                                <button class="btn btn-secondary mx-1" @click="reset">
-                                                                    Reset
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <div class="card p-4">
-                                                            <div class="col-md-12 mb-2 d-flex flex-wrap">
-                                                                <div class="my-2">
-                                                                    <div
-                                                                        class="selected circles mr-1 border shadow"></div>
-                                                                    <span class="text-wrap">Selected</span>
-                                                                </div>
-                                                                <div class="my-2">
-                                                                    <div
-                                                                        class="for-female circles mr-1 border shadow"></div>
-                                                                    <span class="text-wrap">For Female</span>
-                                                                </div>
-                                                                <div class="my-2">
-                                                                    <div
-                                                                        class="for-male circles mr-1 border shadow"></div>
-                                                                    <span class="text-wrap">For Male</span>
-                                                                </div>
-                                                                <div class="my-2">
-                                                                    <div
-                                                                        class="not-for-sale circles mr-1 border shadow"></div>
-                                                                    <span class="text-wrap">Not For Sale</span>
-                                                                </div>
-                                                                <div class="my-2"
-                                                                     v-for="(seatClass,i) in allSeatClasses" :key="i">
-                                                                    <div class="circles mr-1 border shadow"
-                                                                         :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
-                                                                    <span class="text-wrap">{{ seatClass.name }}</span>
-                                                                </div>
-                                                                <div class="my-3">
-                                                                    <div
-                                                                        class="circles icons-legend mr-1 border shadow">
-                                                                        <i class="fas fa-check"></i>
-                                                                    </div>
-                                                                    <span class="text-wrap">Booked</span>
-                                                                </div>
-                                                                <div class="my-3">
-                                                                    <div
-                                                                        class="fas fa-check-double circles icons-legend shadow mr-1 border"
-                                                                    ></div>
-                                                                    <span class="text-wrap">Issued</span>
-                                                                </div>
-                                                                <div class="my-2">
-                                                                    <div
-                                                                        class="partial-seat circles mr-1 border shadow"></div>
-                                                                    <span class="text-wrap" style="margin-top:-10px;">Partial Seat</span>
-                                                                </div>
-                                                                <div class="my-3">
-                                                                    <div
-                                                                        class="circles icons-legend mr-1 border shadow">
-                                                                        <i class="fas fa-people-carry text-danger"></i>
-                                                                    </div>
-                                                                    <span class="text-wrap">Over Issue</span>
-                                                                </div>
-                                                                <div class="my-3">
-                                                                    <div
-                                                                        class="circles icons-legend mr-1 border shadow">
-                                                                        <i class="far fa-hand-paper text-dark"></i>
-                                                                    </div>
-                                                                    <span
-                                                                        class="text-wrap">Available for Over Issue</span>
-                                                                </div>
-                                                            </div>
-
-
-                                                            <!-- Seat Map Section -->
-
-                                                            <div
-                                                                class="d-flex justify-content-center seat-img p-0 m-0"
-                                                                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                                                :key="rowIndex"
-                                                            >
-                                                                <div v-for="(col, colIndex) in record" :key="colIndex">
-                                                                    <div
-                                                                        v-if="col.reserved"
-                                                                        class="image-span d-block text-center text-white shadow"
-                                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo)"
-                                                                        :class="getClasses(col)"
-                                                                        :style="{border:'3px solid ' + col.color + ' !important'}"
-                                                                        :title="col.partial? col.departure_city + ' to ' + col.destination_city:''">
-                                                                        <small>{{ col.seatNo }} </small>
-                                                                        <br/>
-                                                                        <small
-                                                                            v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
-                                                                            <i class="type-icons fas"
-                                                                               :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
-                                                                            </i>
-                                                                            <!--                                                                            <i class="type-icons fas"-->
-                                                                            <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
-                                                                        </small>
-                                                                        <small v-if="col.over_issue == true">
-                                                                            <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
-                                                                            <i class="type-icons far fa-hand-paper text-dark">
-                                                                            </i>
-                                                                        </small>
-                                                                    </div>
-                                                                    <span v-else></span>
-                                                                </div>
-                                                            </div>
-                                                            <tr></tr>
-                                                            <!-- schedule -->
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="col-md-2 form-group">
+                                    <label for="departureCity">Departure City <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="departureCity"
+                                            @change="fetchSpecificSchedules(); getDestinationCity()"
+                                            v-model="addForm.departureCity">
+                                        <option value="0" selected>Select Departure City</option>
+                                        <option
+                                            v-for="(city, i) in cities"
+                                            :value="city.id"
+                                            :key="i"
+                                        >
+                                            {{ city.name }}
+                                        </option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-                        <!--End Panel-->
-                        <!--Booking Preview-->
-                        <div class="card-body">
-                            <!-- Table -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="row mb-4">
-                                                <div class="col-md-8 ">
-                                                    <input type="date" class="form-control" v-model="filterDate">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <button class="btn btn-block btn-lg btn-primary"
-                                                            @click="getFilterRecord()">Filter
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="booking_table"
+                                <div class="col-md-2 form-group"><label for="destinationCity">Destination
+                                    City<span class="text-danger">*</span></label>
+                                    <select class="form-control" id="destinationCity"
+                                            @change="fetchSpecificSchedules()"
+                                            v-model="addForm.destinationCity">
+                                        <option value="0" selected>Select Destination City</option>
+                                        <option v-for="(city, i) in specificCities" :value="city.id"
+                                                :key="i">
+                                            {{ city.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 class form-group">
+                                    <label for="date">Date <span class="text-danger">*</span></label>
+                                    <input type="date" :min="minDateFilter()" class="form-control"
+                                           v-model="addForm.date"
+                                           @change="fetchSpecificSchedules()"/>
+                                </div>
+                                <div class="col-md-4 class form-group">
+                                    <label for="scheduleName">Schedule Name <span
+                                        class="text-danger">*</span></label>
+                                    <select class="form-control" id="scheduleName" @change="fetchScheduleData()"
+                                            v-model="addForm.schedule">
+                                        <option value="0" selected>Select Schedule</option>
+                                        <option v-for="(schedule, i) in allSchedules"
+                                                :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label>Action</label>
+                                    <button @click="fetchScheduleData" class="btn btn-block btn-primary"
+                                            :class="getSchedule ? 'disabled': ''">
+                                        {{ getSchedule ? 'Fetching Schedules...' : 'Refresh' }}
+                                    </button>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
+                                     v-if="selectedBookedSeats.length">
+                                    <a
+                                        @click="sameDataAsMain()"
+                                        href="#reschedule-modal"
+                                        class="btn btn-primary mx-1"
+                                        data-toggle="modal"
+                                    >Shifting ( Reschedule ) Seats</a>
+                                </div>
+                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
+                                     v-if="selectedBookedOverIssueSeats.length">
+                                    <a
+                                        href="#overIssue_model"
+                                        class="btn btn-primary mx-1"
+                                        data-toggle="modal"
+                                    >Over Issue Seats</a>
+                                </div>
+                                <h1 v-if="loading">Loading.........</h1>
+
+                                <div class="col-md-12 row" v-if="showBookingDiv">
+                                    <div class="col-md-6">
+                                        <div class="card p-4">
+                                            <div class="form-group row">
+                                                <label
+                                                    class="col-md-3 pt-3 font-weight-bold"
+                                                    for="customer-cnic"
+                                                >CNIC <span class="text-danger">*</span>
+                                                </label>
+                                                <vue-mask
+                                                    v-on:keyup.enter="getCustomer"
+                                                    v-on:blur="getCustomer"
+                                                    class="form-control col-md-9"
+                                                    v-model="addForm.customerCNIC"
+                                                    mask="00000-0000000-0"
+                                                    :raw="false"
+                                                    :options="options"
                                                 >
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Date</th>
-                                                        <th>Schedule Name</th>
-                                                        <th>No. Of Bookings</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr v-for="(booking, i) in allBookings" :key="i">
-                                                        <td>{{ parseInt(i) + 1 }}</td>
-                                                        <td>{{ booking.date }}</td>
-                                                        <td>{{ booking.schedule.name }}</td>
-                                                        <td>{{ booking.count }}</td>
-                                                        <td>
-                                                            <a
-                                                                :href="'#'+detailsFormId"
-                                                                data-toggle="modal"
-                                                                @click="details(booking.date,booking.schedule.id)"
-                                                                class="btn btn-primary mx-1"
-                                                            >
-                                                                <i class="far fa-eye"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
+                                                </vue-mask>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="fullName"
+                                                >Full Name</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control col-md-9"
+                                                    id="fullName"
+                                                    v-model="addForm.customerName"
+                                                />
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="contact"
+                                                >Contact</label
+                                                >
+                                                <vue-mask
+                                                    v-on:keyup.enter="getCustomer"
+                                                    class="form-control col-md-9"
+                                                    v-model="addForm.contact"
+                                                    mask="0000-0000000"
+                                                    :raw="false"
+                                                    :options="options"
+                                                >
+                                                </vue-mask>
+
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="remarks"
+                                                >Remarks</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control col-md-9"
+                                                    id="remarks"
+                                                    v-model="addForm.remarks"
+                                                />
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                >Gender</label
+                                                >
+                                                <div class="col-md-9 pt-3">
+                                                    <input type="radio" id="female-booking"
+                                                           v-model="addForm.gender" value="0"/>
+                                                    <label class="mx-3"
+                                                           for="female-booking">Female</label>
+                                                    <input type="radio" id="male-booking"
+                                                           v-model="addForm.gender" value="1"/>
+                                                    <label class="mx-3" for="male-booking">Male</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="contact"
+                                                >Issue Or Book</label
+                                                >
+                                                <div class="col-md-9 pt-3">
+                                                    <input type="radio" id="type-issue"
+                                                           v-model="addForm.type" value="booked"/>
+                                                    <label class="mx-3" for="type-issue">Issue</label>
+                                                    <input
+                                                        type="radio"
+                                                        id="type-book"
+                                                        v-model="addForm.type"
+                                                        value="advance booking"
+                                                    />
+                                                    <label class="mx-3" for="type-book">Book</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="seatNo"
+                                                >Seat No.</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    readonly
+                                                    class="form-control col-md-9"
+                                                    id="seatNo"
+                                                    v-model="addForm.selectedSeats"
+                                                />
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="totalFare"
+                                                >Total Seats</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    readonly
+                                                    class="form-control col-md-9"
+                                                    id="totalNoSeats"
+                                                    v-model="selectedSeats.length"
+                                                />
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="totalFare"
+                                                >Total Fare</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    readonly
+                                                    class="form-control col-md-9 font-weight-bold"
+                                                    id="totalFare"
+                                                    v-model="addForm.totalFare"
+                                                />
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-md-3 pt-3 font-weight-bold"
+                                                       for="discount"
+                                                >Discount ( % )</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    readonly
+                                                    class="form-control col-md-9"
+                                                    id="discount"
+                                                    v-model="addForm.discount"
+                                                />
+                                            </div>
+
+                                            <div class="form-group text-right">
+                                                <button class="btn btn-primary mx-1" @click="add">
+                                                    Generate Ticket
+                                                </button>
+                                                <button class="btn btn-secondary mx-1" @click="reset">
+                                                    Reset
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="card p-4">
+                                            <!-- Seat Map Section -->
+                                            <div
+                                                class="d-flex justify-content-center seat-img p-0 m-0"
+                                                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
+                                                :key="rowIndex"
+                                            >
+                                                <div v-for="(col, colIndex) in record" :key="colIndex">
+                                                    <div
+                                                        v-if="col.reserved"
+                                                        class="image-span d-block text-center text-white shadow"
+                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                                                        :class="getClasses(col)"
+                                                        :style="{border:'3px solid ' + col.color + ' !important'}"
+                                                        :title="col.partial? col.departure_city + ' to ' + col.destination_city:''">
+                                                        <small>{{ col.seatNo }} </small>
+                                                        <br/>
+                                                        <small
+                                                            v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
+                                                            <i class="type-icons fas"
+                                                               :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
+                                                            </i>
+                                                            <!--                                                                            <i class="type-icons fas"-->
+                                                            <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
+                                                        </small>
+                                                        <small v-if="col.over_issue == true">
+                                                            <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
+                                                            <i class="type-icons far fa-hand-paper text-dark">
+                                                            </i>
+                                                        </small>
+                                                    </div>
+                                                    <span v-else></span>
+                                                </div>
+                                            </div>
+                                            <tr></tr>
+                                            <!-- schedule -->
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <div class="card p-4">
+                                            <div class="col-md-12 mb-2 d-flex flex-wrap">
+                                                <div class="my-2">
+                                                    <div
+                                                        class="selected circles mr-1 border shadow"></div>
+                                                    <span class="text-wrap">Selected</span>
+                                                </div>
+                                                <div class="my-2">
+                                                    <div
+                                                        class="for-female circles mr-1 border shadow"></div>
+                                                    <span class="text-wrap">For Female</span>
+                                                </div>
+                                                <div class="my-2">
+                                                    <div
+                                                        class="for-male circles mr-1 border shadow"></div>
+                                                    <span class="text-wrap">For Male</span>
+                                                </div>
+                                                <div class="my-2">
+                                                    <div
+                                                        class="not-for-sale circles mr-1 border shadow"></div>
+                                                    <span class="text-wrap">Not For Sale</span>
+                                                </div>
+                                                <div class="my-2"
+                                                     v-for="(seatClass,i) in allSeatClasses" :key="i">
+                                                    <div class="circles mr-1 border shadow"
+                                                         :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                                                    <span class="text-wrap">{{ seatClass.name }}</span>
+                                                </div>
+                                                <div class="my-3">
+                                                    <div
+                                                        class="circles icons-legend mr-1 border shadow">
+                                                        <i class="fas fa-check"></i>
+                                                    </div>
+                                                    <span class="text-wrap">Booked</span>
+                                                </div>
+                                                <div class="my-3">
+                                                    <div
+                                                        class="fas fa-check-double circles icons-legend shadow mr-1 border"
+                                                    ></div>
+                                                    <span class="text-wrap">Issued</span>
+                                                </div>
+                                                <div class="my-2">
+                                                    <div
+                                                        class="partial-seat circles mr-1 border shadow"></div>
+                                                    <span class="text-wrap"
+                                                          style="margin-top:-10px;">Partial Seat</span>
+                                                </div>
+                                                <div class="my-3">
+                                                    <div
+                                                        class="circles icons-legend mr-1 border shadow">
+                                                        <i class="fas fa-people-carry text-danger"></i>
+                                                    </div>
+                                                    <span class="text-wrap">Over Issue</span>
+                                                </div>
+                                                <div class="my-3">
+                                                    <div
+                                                        class="circles icons-legend mr-1 border shadow">
+                                                        <i class="far fa-hand-paper text-dark"></i>
+                                                    </div>
+                                                    <span
+                                                        class="text-wrap">Available for Over Issue</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!--Booking Preview-->
+                        <!--                        <div class="card-body">-->
+                        <!--                            &lt;!&ndash; Table &ndash;&gt;-->
+                        <!--                            <div class="row">-->
+                        <!--                                <div class="col-12">-->
+                        <!--                                    <div class="card">-->
+                        <!--                                        <div class="card-body">-->
+                        <!--                                            <div class="row mb-4">-->
+                        <!--                                                <div class="col-md-8 ">-->
+                        <!--                                                    <input type="date" class="form-control" v-model="filterDate">-->
+                        <!--                                                </div>-->
+                        <!--                                                <div class="col-md-4">-->
+                        <!--                                                    <button class="btn btn-block btn-lg btn-primary"-->
+                        <!--                                                            @click="getFilterRecord()">Filter-->
+                        <!--                                                    </button>-->
+                        <!--                                                </div>-->
+                        <!--                                            </div>-->
+                        <!--                                            <div class="table-responsive">-->
+                        <!--                                                <table-->
+                        <!--                                                    class="table table-striped table-hover"-->
+                        <!--                                                    id="booking_table"-->
+                        <!--                                                >-->
+                        <!--                                                    <thead>-->
+                        <!--                                                    <tr>-->
+                        <!--                                                        <th>Sr No.</th>-->
+                        <!--                                                        <th>Date</th>-->
+                        <!--                                                        <th>Schedule Name</th>-->
+                        <!--                                                        <th>No. Of Bookings</th>-->
+                        <!--                                                        <th>Action</th>-->
+                        <!--                                                    </tr>-->
+                        <!--                                                    </thead>-->
+                        <!--                                                    <tbody>-->
+                        <!--                                                    <tr v-for="(booking, i) in allBookings" :key="i">-->
+                        <!--                                                        <td>{{ parseInt(i) + 1 }}</td>-->
+                        <!--                                                        <td>{{ booking.date }}</td>-->
+                        <!--                                                        <td>{{ booking.schedule.name }}</td>-->
+                        <!--                                                        <td>{{ booking.count }}</td>-->
+                        <!--                                                        <td>-->
+                        <!--                                                            <a-->
+                        <!--                                                                :href="'#'+detailsFormId"-->
+                        <!--                                                                data-toggle="modal"-->
+                        <!--                                                                @click="details(booking.date,booking.schedule.id)"-->
+                        <!--                                                                class="btn btn-primary mx-1"-->
+                        <!--                                                            >-->
+                        <!--                                                                <i class="far fa-eye"></i>-->
+                        <!--                                                            </a>-->
+                        <!--                                                        </td>-->
+                        <!--                                                    </tr>-->
+                        <!--                                                    </tbody>-->
+                        <!--                                                </table>-->
+                        <!--                                            </div>-->
+                        <!--                                        </div>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
                         <!-- END TABLE -->
                     </div>
                 </div>
@@ -719,7 +711,6 @@ export default {
         },
 
 
-
         async fetchSpecificSchedules() {
             this.getSchedule = true;
             this.showBookingDiv = false;
@@ -740,6 +731,7 @@ export default {
                     this.showBookingDiv = false;
                 }
             }
+            this.fetchScheduleData();
         },
 
         cnicFormat: function (string) {
@@ -782,6 +774,9 @@ export default {
         },
 
         async fetchScheduleData() {
+            if (this.addForm.schedule == 0) {
+                this.showBookingDiv = false;
+            }
             this.resetingArrays();
             this.addForm.totalFare = 0;
             this.validationErrors = [];
@@ -929,7 +924,7 @@ export default {
                     timer: 2000
                 });
             }
-            if(this.schedule.bus_class.seat_map[row][col].over_issue) {
+            if (this.schedule.bus_class.seat_map[row][col].over_issue) {
                 const resOverIssue = await this.callApi("post", "booking/overIssue", {
                     date: this.addForm.date,
                     seat_no: seatNo,
@@ -982,11 +977,10 @@ export default {
                 this.addFormOverIssue.customer = '';
 
 
-
             }
 
-            if(resOverIssue.status == 422 && resOverIssue.data.message){
-                 swal({
+            if (resOverIssue.status == 422 && resOverIssue.data.message) {
+                swal({
                     title: "Error",
                     text: resOverIssue.data.message,
                     icon: "error",

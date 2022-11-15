@@ -151,13 +151,6 @@ class BookingController extends Controller
 
     }
 
-
-    public static function scheduleTime($first_time, $second_time, $req_date)
-    {
-        $dateTime = date("Y-m-d", strtotime($req_date)) . ' ' . date("H:i", strtotime($first_time));
-        return date("m/d/Y h:i A", strtotime($dateTime) + (explode(":", $second_time)[0] * 60 * 60) + (explode(":", $second_time)[1] * 60));
-    }
-
     public function fetchSpecificDestination(Request $request)
     {
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', $this->company_id)->pluck('destination_city_id')->toArray();

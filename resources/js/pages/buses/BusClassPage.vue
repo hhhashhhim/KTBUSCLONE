@@ -1086,7 +1086,7 @@ export default {
 </script>
 <style scoped>
 .selected {
-    background-color: rgba(109, 177, 49, 0.637) !important;
+    background-color: rgba(131, 164, 31, 0.64) !important;
 }
 
 .seat-img img,

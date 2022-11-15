@@ -41,7 +41,7 @@ class ScheduleController extends Controller
     public function storeSchedule(Request $request)
     {
 //        $routeDetails = RouteFare::where('route_id', 1)->get()->groupBy('fare_class_id')->first();
-//        return $fareTableTime = FareTable::where(['from_city_id' => 4, 'to_city_id' => 3])->first()->time_difference;
+                            //        return $fareTableTime = FareTable::where(['from_city_id' => 4, 'to_city_id' => 3])->first()->time_difference;
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',

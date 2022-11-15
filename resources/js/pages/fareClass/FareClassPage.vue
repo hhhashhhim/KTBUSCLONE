@@ -7,13 +7,8 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Fare Class</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
-                                >
-                                    Add Fare Classadf
+                                <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary" @click="clearForm()">
+                                    Add Fare Class
                                 </a>
                             </div>
                         </div>
