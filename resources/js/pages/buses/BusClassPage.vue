@@ -63,13 +63,7 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ busClass.name }}</td>
                                                         <td>
-                                                            <div
-                                                                style="
-                                    border-radius: 50%;
-                                    height: 50px;
-                                    width: 50px;
-                                  "
-                                                                :style="{ backgroundColor: busClass.color }"
+                                                            <div style=" border-radius: 50%; height: 50px; width: 50px; " :style="{ backgroundColor: busClass.color }"
                                                             ></div>
                                                         </td>
                                                         <td>
@@ -1086,7 +1080,7 @@ export default {
 </script>
 <style scoped>
 .selected {
-    background-color: rgba(131, 164, 31, 0.64) !important;
+    background-color: rgba(127, 164, 31, 0.64) !important;
 }
 
 .seat-img img,

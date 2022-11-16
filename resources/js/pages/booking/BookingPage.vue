@@ -3,14 +3,15 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-primary">
-                        <div class="card-header d-flex justify-content-between">
-                            <h4>Booking</h4>
-                        </div>
+                    <div class="card card-primary mb-0">
+                        <!--                        <div class="card-header d-flex justify-content-between">-->
+                        <!--                            <h4>Booking</h4>-->
+                        <!--                        </div>-->
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-2 form-group">
-                                    <label for="departureCity">Departure City <span class="text-danger">*</span></label>
+                            <div class="row border-bottom mb-1">
+                                <div class="col-md-2  mb-2">
+                                    <label for="departureCity" class="mb-0">Departure City <span
+                                        class="text-danger">*</span></label>
                                     <select class="form-control" id="departureCity"
                                             @change="fetchSpecificSchedules(); getDestinationCity()"
                                             v-model="addForm.departureCity">
@@ -24,7 +25,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 form-group"><label for="destinationCity">Destination
+                                <div class="col-md-2  mb-2"><label for="destinationCity" class="mb-0">Destination
                                     City<span class="text-danger">*</span></label>
                                     <select class="form-control" id="destinationCity"
                                             @change="fetchSpecificSchedules()"
@@ -36,14 +37,14 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 class form-group">
-                                    <label for="date">Date <span class="text-danger">*</span></label>
+                                <div class="col-md-2 class  mb-2">
+                                    <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
                                     <input type="date" :min="minDateFilter()" class="form-control"
                                            v-model="addForm.date"
                                            @change="fetchSpecificSchedules()"/>
                                 </div>
-                                <div class="col-md-4 class form-group">
-                                    <label for="scheduleName">Schedule Name <span
+                                <div class="col-md-4 class  mb-2">
+                                    <label for="scheduleName" class="mb-0">Schedule Name <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="scheduleName" @change="fetchScheduleData()"
                                             v-model="addForm.schedule">
@@ -53,177 +54,177 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
-                                    <label>Action</label>
-                                    <button @click="fetchScheduleData" class="btn btn-block btn-primary"
+                                <div class="col-md-2 mb-2">
+                                    <label class="mb-0">Action</label>
+                                    <button @click="fetchScheduleData" class="btn btn-block btn-danger"
                                             :class="getSchedule ? 'disabled': ''">
-                                        {{ getSchedule ? 'Fetching Schedules...' : 'Refresh' }}
+                                        {{ getSchedule ? 'Loading...' : 'Refresh' }}
                                     </button>
                                 </div>
-                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-                                     v-if="selectedBookedSeats.length">
-                                    <a
-                                        @click="sameDataAsMain()"
-                                        href="#reschedule-modal"
-                                        class="btn btn-primary mx-1"
-                                        data-toggle="modal"
-                                    >Shifting ( Reschedule ) Seats</a>
-                                </div>
-                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"
-                                     v-if="selectedBookedOverIssueSeats.length">
-                                    <a
-                                        href="#overIssue_model"
-                                        class="btn btn-primary mx-1"
-                                        data-toggle="modal"
-                                    >Over Issue Seats</a>
-                                </div>
+                            </div>
+                            <div class="row">
+<!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+<!--                                     v-if="selectedBookedSeats.length">-->
+<!--                                    <a-->
+<!--                                        @click="sameDataAsMain()"-->
+<!--                                        href="#reschedule-modal"-->
+<!--                                        class="btn btn-primary mx-1"-->
+<!--                                        data-toggle="modal"-->
+<!--                                    >Shifting ( Reschedule ) Seats</a>-->
+<!--                                </div>-->
+<!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+<!--                                     v-if="selectedBookedOverIssueSeats.length">-->
+<!--                                    <a-->
+<!--                                        href="#overIssue_model"-->
+<!--                                        class="btn btn-primary mx-1"-->
+<!--                                        data-toggle="modal"-->
+<!--                                    >Over Issue Seats</a>-->
+<!--                                </div>-->
                                 <h1 v-if="loading">Loading.........</h1>
 
                                 <div class="col-md-12 row" v-if="showBookingDiv">
-                                    <div class="col-md-6">
-                                        <div class="card p-4">
-                                            <div class="form-group row">
-                                                <label
-                                                    class="col-md-3 pt-3 font-weight-bold"
-                                                    for="customer-cnic"
-                                                >CNIC <span class="text-danger">*</span>
-                                                </label>
-                                                <vue-mask
-                                                    v-on:keyup.enter="getCustomer"
-                                                    v-on:blur="getCustomer"
-                                                    class="form-control col-md-9"
-                                                    v-model="addForm.customerCNIC"
-                                                    mask="00000-0000000-0"
-                                                    :raw="false"
-                                                    :options="options"
-                                                >
-                                                </vue-mask>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="fullName"
-                                                >Full Name</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    class="form-control col-md-9"
-                                                    id="fullName"
-                                                    v-model="addForm.customerName"
-                                                />
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="contact"
-                                                >Contact</label
-                                                >
-                                                <vue-mask
-                                                    v-on:keyup.enter="getCustomer"
-                                                    class="form-control col-md-9"
-                                                    v-model="addForm.contact"
-                                                    mask="0000-0000000"
-                                                    :raw="false"
-                                                    :options="options"
-                                                >
-                                                </vue-mask>
-
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="remarks"
-                                                >Remarks</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    class="form-control col-md-9"
-                                                    id="remarks"
-                                                    v-model="addForm.remarks"
-                                                />
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                >Gender</label
-                                                >
-                                                <div class="col-md-9 pt-3">
-                                                    <input type="radio" id="female-booking"
-                                                           v-model="addForm.gender" value="0"/>
-                                                    <label class="mx-3"
-                                                           for="female-booking">Female</label>
-                                                    <input type="radio" id="male-booking"
-                                                           v-model="addForm.gender" value="1"/>
-                                                    <label class="mx-3" for="male-booking">Male</label>
+                                    <div class="col-md-6 px-1">
+                                        <div class="px-3 pt-2">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>CNIC <span class="text-danger">*</span></label>
+                                                        <vue-mask
+                                                            v-on:keyup.enter="getCustomer"
+                                                            v-on:blur="getCustomer"
+                                                            class="form-control"
+                                                            v-model="addForm.customerCNIC"
+                                                            mask="00000-0000000-0"
+                                                            :raw="false"
+                                                            :options="options"
+                                                        >
+                                                        </vue-mask>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Full Name</label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            id="fullName"
+                                                            v-model="addForm.customerName"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="contact"
-                                                >Issue Or Book</label
-                                                >
-                                                <div class="col-md-9 pt-3">
-                                                    <input type="radio" id="type-issue"
-                                                           v-model="addForm.type" value="booked"/>
-                                                    <label class="mx-3" for="type-issue">Issue</label>
-                                                    <input
-                                                        type="radio"
-                                                        id="type-book"
-                                                        v-model="addForm.type"
-                                                        value="advance booking"
-                                                    />
-                                                    <label class="mx-3" for="type-book">Book</label>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Contact</label>
+                                                        <vue-mask
+                                                            v-on:keyup.enter="getCustomer"
+                                                            class="form-control"
+                                                            v-model="addForm.contact"
+                                                            mask="0000-0000000"
+                                                            :raw="false"
+                                                            :options="options"
+                                                        >
+                                                        </vue-mask>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Remarks</label>
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            id="remarks"
+                                                            v-model="addForm.remarks"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="seatNo"
-                                                >Seat No.</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    readonly
-                                                    class="form-control col-md-9"
-                                                    id="seatNo"
-                                                    v-model="addForm.selectedSeats"
-                                                />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Gender</label>
+                                                        <div class="col-md-12 px-1 pt-3">
+                                                            <input type="radio" id="female-booking"
+                                                                   v-model="addForm.gender" value="0"/>
+                                                            <label class="mx-2"
+                                                                   for="female-booking">Female</label>
+                                                            <input type="radio" id="male-booking"
+                                                                   v-model="addForm.gender" value="1"/>
+                                                            <label class="mx-2" for="male-booking">Male</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Issue Or Book </label>
+                                                        <div class="col-md-12 px-1 pt-3">
+                                                            <input type="radio" id="type-issue"
+                                                                   v-model="addForm.type" value="booked"/>
+                                                            <label class="mx-3" for="type-issue">Issue</label>
+                                                            <input
+                                                                type="radio"
+                                                                id="type-book"
+                                                                v-model="addForm.type"
+                                                                value="advance booking"
+                                                            />
+                                                            <label class="mx-3" for="type-book">Book</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="totalFare"
-                                                >Total Seats</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    readonly
-                                                    class="form-control col-md-9"
-                                                    id="totalNoSeats"
-                                                    v-model="selectedSeats.length"
-                                                />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Seat No.</label>
+                                                        <input
+                                                            type="text"
+                                                            readonly
+                                                            class="form-control"
+                                                            id="seatNo"
+                                                            v-model="addForm.selectedSeats"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Total Seats</label>
+                                                        <input
+                                                            type="text"
+                                                            readonly
+                                                            class="form-control"
+                                                            id="totalNoSeats"
+                                                            v-model="selectedSeats.length"
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="totalFare"
-                                                >Total Fare</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    readonly
-                                                    class="form-control col-md-9 font-weight-bold"
-                                                    id="totalFare"
-                                                    v-model="addForm.totalFare"
-                                                />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Total Fare</label>
+                                                        <input
+                                                            type="text"
+                                                            readonly
+                                                            class="form-control font-weight-bold"
+                                                            id="totalFare"
+                                                            v-model="addForm.totalFare"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Discount ( % )</label>
+                                                        <input
+                                                            type="text"
+                                                            readonly
+                                                            class="form-control"
+                                                            id="discount"
+                                                            v-model="addForm.discount"
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-md-3 pt-3 font-weight-bold"
-                                                       for="discount"
-                                                >Discount ( % )</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    readonly
-                                                    class="form-control col-md-9"
-                                                    id="discount"
-                                                    v-model="addForm.discount"
-                                                />
-                                            </div>
-
                                             <div class="form-group text-right">
                                                 <button class="btn btn-primary mx-1" @click="add">
                                                     Generate Ticket
@@ -235,108 +236,108 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <div class="card p-4">
-                                            <!-- Seat Map Section -->
-                                            <div
-                                                class="d-flex justify-content-center seat-img p-0 m-0"
-                                                v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                                :key="rowIndex"
-                                            >
-                                                <div v-for="(col, colIndex) in record" :key="colIndex">
-                                                    <div
-                                                        v-if="col.reserved"
-                                                        class="image-span d-block text-center text-white shadow"
-                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo)"
-                                                        :class="getClasses(col)"
-                                                        :style="{border:'3px solid ' + col.color + ' !important'}"
-                                                        :title="col.partial? col.departure_city + ' to ' + col.destination_city:''">
-                                                        <small>{{ col.seatNo }} </small>
-                                                        <br/>
-                                                        <small
-                                                            v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
-                                                            <i class="type-icons fas"
-                                                               :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
-                                                            </i>
-                                                            <!--                                                                            <i class="type-icons fas"-->
-                                                            <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
-                                                        </small>
-                                                        <small v-if="col.over_issue == true">
-                                                            <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
-                                                            <i class="type-icons far fa-hand-paper text-dark">
-                                                            </i>
-                                                        </small>
-                                                    </div>
-                                                    <span v-else></span>
+                                    <div class="col-md-4 px-1 ">
+                                        <div
+                                            class="d-flex justify-content-center seat-img p-0 m-0"
+                                            v-for="(record, rowIndex) in schedule.bus_class.seat_map"
+                                            :key="rowIndex"
+                                        >
+                                            <div v-for="(col, colIndex) in record" :key="colIndex">
+                                                <div
+                                                    v-if="col.reserved"
+                                                    class="image-span d-block text-center text-white shadow"
+                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                                                    :class="getClasses(col)"
+                                                    :style="{border:'2px solid ' + col.color + ' !important'}"
+                                                    :title="col.partial? col.departure_city + ' to ' + col.destination_city:''">
+                                                    <small>{{ col.seatNo }} </small>
+                                                    <br/>
+                                                    <small
+                                                        v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
+                                                        <i class="type-icons fas"
+                                                           :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
+                                                        </i>
+                                                        <!--                                                                            <i class="type-icons fas"-->
+                                                        <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
+                                                    </small>
+                                                    <small v-if="col.over_issue == true">
+                                                        <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
+                                                        <i class="type-icons far fa-hand-paper text-dark">
+                                                        </i>
+                                                    </small>
                                                 </div>
+                                                <span v-else></span>
                                             </div>
-                                            <tr></tr>
-                                            <!-- schedule -->
                                         </div>
                                     </div>
 
-                                    <div class="col-md-2">
-                                        <div class="card p-4">
-                                            <div class="col-md-12 mb-2 d-flex flex-wrap">
-                                                <div class="my-2">
-                                                    <div
-                                                        class="selected circles mr-1 border shadow"></div>
-                                                    <span class="text-wrap">Selected</span>
+                                    <div class="col-md-2 px-1 " style="overflow-x: hidden; overflow-y: auto;">
+                                        <div class="">
+                                            <div class="col-md-12 mb-2 px-0 d-flex flex-wrap">
+                                                <div class="border-bottom w-100">
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="selected circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Selected</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-female circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Female</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-male circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Male</span>
+                                                    </div>
                                                 </div>
-                                                <div class="my-2">
-                                                    <div
-                                                        class="for-female circles mr-1 border shadow"></div>
-                                                    <span class="text-wrap">For Female</span>
+                                                <div class="border-bottom w-100">
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="not-for-sale circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Not For Sale</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="circles icons-legend mr-1 border shadow">
+                                                            <i class="fas fa-check"></i>
+                                                        </div>
+                                                        <span class="text-wrap mrn">Booked</span>
+                                                    </div>
+                                                    <div class="my-2">
+                                                        <div
+                                                            class="fas fa-check-double circles icons-legend shadow mr-1 border"
+                                                        ></div>
+                                                        <span class="text-wrap mrn">Issued</span>
+                                                    </div>
+                                                    <div class="my-2">
+                                                        <div
+                                                            class="partial-seat circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap mrn"
+                                                              style="margin-top:-10px;">Partial Seat</span>
+                                                    </div>
+                                                    <div class="my-2">
+                                                        <div
+                                                            class="circles icons-legend mr-1 border shadow">
+                                                            <i class="fas fa-people-carry text-danger"></i>
+                                                        </div>
+                                                        <span class="text-wrap mrn">Over Issue</span>
+                                                    </div>
+                                                    <div class="my-2">
+                                                        <div
+                                                            class="circles icons-legend mr-1 border shadow">
+                                                            <i class="far fa-hand-paper text-dark"></i>
+                                                        </div>
+                                                        <span
+                                                            class="text-wrap mrn">Over Issue</span>
+                                                    </div>
                                                 </div>
-                                                <div class="my-2">
-                                                    <div
-                                                        class="for-male circles mr-1 border shadow"></div>
-                                                    <span class="text-wrap">For Male</span>
-                                                </div>
-                                                <div class="my-2">
-                                                    <div
-                                                        class="not-for-sale circles mr-1 border shadow"></div>
-                                                    <span class="text-wrap">Not For Sale</span>
-                                                </div>
-                                                <div class="my-2"
+
+                                                <div class="my-1"
                                                      v-for="(seatClass,i) in allSeatClasses" :key="i">
                                                     <div class="circles mr-1 border shadow"
                                                          :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                                                     <span class="text-wrap">{{ seatClass.name }}</span>
-                                                </div>
-                                                <div class="my-3">
-                                                    <div
-                                                        class="circles icons-legend mr-1 border shadow">
-                                                        <i class="fas fa-check"></i>
-                                                    </div>
-                                                    <span class="text-wrap">Booked</span>
-                                                </div>
-                                                <div class="my-3">
-                                                    <div
-                                                        class="fas fa-check-double circles icons-legend shadow mr-1 border"
-                                                    ></div>
-                                                    <span class="text-wrap">Issued</span>
-                                                </div>
-                                                <div class="my-2">
-                                                    <div
-                                                        class="partial-seat circles mr-1 border shadow"></div>
-                                                    <span class="text-wrap"
-                                                          style="margin-top:-10px;">Partial Seat</span>
-                                                </div>
-                                                <div class="my-3">
-                                                    <div
-                                                        class="circles icons-legend mr-1 border shadow">
-                                                        <i class="fas fa-people-carry text-danger"></i>
-                                                    </div>
-                                                    <span class="text-wrap">Over Issue</span>
-                                                </div>
-                                                <div class="my-3">
-                                                    <div
-                                                        class="circles icons-legend mr-1 border shadow">
-                                                        <i class="far fa-hand-paper text-dark"></i>
-                                                    </div>
-                                                    <span
-                                                        class="text-wrap">Available for Over Issue</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -429,7 +430,6 @@
                                         >CNIC <span class="text-danger">*</span>
                                         </label>
                                         <vue-mask
-                                            v-on:keyup.enter="getCustomer"
                                             v-on:blur="getCustomer"
                                             class="form-control col-md-9"
                                             v-model="addFormOverIssue.customer.cnic"
@@ -524,7 +524,7 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
-                            <button class="btn btn-primary mx-1" @click="addOverIssueTicket()"> Generate Ticket</button>
+                            <button class="btn btn-primary mx-1" v-on:keypress.enter="addOverIssueTicket()"> Generate Ticket</button>
                         </div>
                     </div>
                 </div>
@@ -631,14 +631,14 @@ export default {
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
-        sameDataAsMain: function () {
-            this.sameDataMain = {
-                departure: this.addForm.departureCity,
-                destination: this.addForm.destinationCity,
-                date: this.addForm.date,
-                schedule: this.addForm.schedule,
-            }
-        },
+        // sameDataAsMain: function () {
+        //     this.sameDataMain = {
+        //         departure: this.addForm.departureCity,
+        //         destination: this.addForm.destinationCity,
+        //         date: this.addForm.date,
+        //         schedule: this.addForm.schedule,
+        //     }
+        // },
 
         async getFilterRecord() {
             this.allBookings = [];
@@ -780,36 +780,6 @@ export default {
             this.resetingArrays();
             this.addForm.totalFare = 0;
             this.validationErrors = [];
-
-            if (this.addForm.departureCity == 0 || typeof this.addForm.departureCity == 'undefined')
-                return swal({
-                    title: "Required",
-                    text: "Please any Departure City",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.addForm.destinationCity == 0 || typeof this.addForm.destinationCity == 'undefined')
-                return swal({
-                    title: "Required",
-                    text: "Please Select Destination City",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.addForm.date == "" || typeof this.addForm.date == 'undefined')
-                return swal({
-                    title: "Required",
-                    text: "Date is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.addForm.schedule == 0 || typeof this.addForm.schedule == 'undefined')
-                return swal({
-                    title: "Required",
-                    text: "Please Select any Schedule",
-                    icon: "error",
-                    timer: 2000
-                });
-            this.validationErrors = [];
             this.loading = true
             const res = await this.callApi("post", "schedule/selected", {
                 id: this.addForm.schedule,
@@ -831,6 +801,25 @@ export default {
                     }
                 }
             }
+        },
+        altKeyShortcut: function () {
+            if(this.selectedSeats.length == 0){
+                swal({
+                    title: "Oops",
+                    text: "Please Select Any Seat ",
+                    icon: "error",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+            }else{
+                $(document).on('keydown', function ( e ) {
+                    // You may replace `m` with whatever key you want
+                    if (e.metaKey || e.altKey )  {
+                        $("#exampleModal").modal('show');
+                    }
+                });
+            }
+
         },
 
         async selectSeat(row, col, seatNo) {
@@ -941,6 +930,7 @@ export default {
         },
 
         async addOverIssueTicket() {
+            window.print();
             if (this.addFormOverIssue.customer.cnic == '' || this.addFormOverIssue.customer.cnic == 'undefined') {
                 swal({
                     title: "Required",
@@ -1163,7 +1153,7 @@ export default {
 </script>
 <style scoped>
 .image-span {
-    background-color: #b9dea0;
+    background-color: #a2a3a7;
     border-radius: 10px;
     cursor: pointer;
     position: relative;
@@ -1222,11 +1212,11 @@ export default {
 
 .seat-img .image-span,
 .seat-img span {
-    height: 50px;
-    width: 50px;
+    height: 45px;
+    width: 45px;
     display: inline-block;
     cursor: pointer !important;
-    margin: 5px;
+    margin: 2px;
 }
 
 img {
@@ -1234,8 +1224,8 @@ img {
 }
 
 .circles {
-    width: 30px;
-    height: 30px;
+    width: 15px;
+    height: 15px;
     -moz-border-radius: 25px;
     -webkit-border-radius: 25px;
     border-radius: 50px;
@@ -1254,7 +1244,7 @@ img {
 
 .circles + span {
     position: relative;
-    top: -10px;
+    top: -4px;
     padding: 5px;
     color: black;
 }
@@ -1265,8 +1255,8 @@ img {
 }
 
 .partial-seat {
-    width: 30px;
-    height: 30px;
+    width: 15px;
+    height: 15px;
     background: linear-gradient(90deg, white 50%, black 50%);
     border-radius: 50%;
     display: inline-block;
@@ -1274,5 +1264,9 @@ img {
     -moz-border-radius: 25px;
     -webkit-border-radius: 25px;
 
+}
+
+.mrn {
+    top: -10px !important;
 }
 </style>
