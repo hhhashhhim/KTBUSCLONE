@@ -13,7 +13,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
