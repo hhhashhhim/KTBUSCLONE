@@ -214,6 +214,8 @@
                             <td v-for="(col, colIndex) in record" :key="colIndex"
                             >
                                 <img
+                                    :data-toggle="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? 'modal' : ''"
+                                    :data-target="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? '#addSeatNumber' : ''"
                                     v-if="col.reserved"
                                     :class="col.selected ? 'selected' : ''"
                                     :style=" col.class ? checkClass(col.class) : '' "
@@ -265,11 +267,11 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Seat Number <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" v-model="addSeatNO">
+                                <input type="text" class="form-control" v-model="setSeatNumber.addSeatNO">
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="assignSeatNumber()">Assign Seat
+                            <button type="button" class="btn btn-primary" @click="assignSeatNumber(setSeatNumber.rowId, setSeatNumber.colId)">Assign Seat
                                 Number
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -680,6 +682,8 @@ export default {
             updateSeatValue: [],
             editSingleSeat: [],
             allSeatClasses: [],
+            setSeatNumber: [],
+            totalSeat: 0,
             delId: "",
             addData: {},
             data: {
@@ -803,25 +807,39 @@ export default {
 
             }
         },
-        assignSeatNumber: function () {
-
+        assignSeatNumber: function (rowId, colId) {
+            if(this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined'){
+                return swal({
+                    title: "Required !",
+                    text: "Please Enter Seat Number",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            this.data.seatMap[rowId][colId].seatNo =  this.setSeatNumber.addSeatNO
+            swal({
+                title: "Success",
+                text: "Successfully Added Seat Number",
+                icon: "success",
+                timer: 2000,
+            });
         },
         selectSeat(row, col) {
             console.log(this.selectedSeats);
             console.log(this.data.seatMap[row][col].reserved);
-
-            let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
-            if (index != -1) {
-                this.data.seatMap[row][col].selected = false;
-                this.selectedSeats.splice(index, 1);
-            } else {
-                if (this.data.seatMap[row][col].reserved && !this.data.seatMap[row][col].seatNo) {
-                    $("#addSeatNumber").modal("show");
+                let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
+                if (index != -1) {
+                    this.data.seatMap[row][col].selected = false;
+                    this.selectedSeats.splice(index, 1);
+                } else {
+                    this.data.seatMap[row][col].selected = true;
+                    this.selectedSeats.push(JSON.stringify([row, col]));
                 }
-                this.data.seatMap[row][col].selected = true;
-                this.selectedSeats.push(JSON.stringify([row, col]));
-            }
-
+            this.setSeatNumber = {
+                rowId: row,
+                colId: col,
+            };
+            // }
         },
         checkClass(colorCode) {
             for (let i = 0; i < this.allSeatClasses.length; i++) {
@@ -829,7 +847,8 @@ export default {
                     return "border: 3px solid " + this.allSeatClasses[i].color;
                 }
             }
-        },
+        }
+        ,
         getSeatDetails: function (rowId, colId) {
             this.editSeatModify = {
                 class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
@@ -839,7 +858,8 @@ export default {
                 rowId: rowId,
                 colId: colId,
             };
-        },
+        }
+        ,
 
         updateSeatDetail: function (rowId, colId) {
             if (this.editSeatModify.class == 0) {
@@ -861,17 +881,20 @@ export default {
                     "Seat Class Update Successfully to Seat Number " +
                     singleSeatDetails.seatNo;
             }
-        },
+        }
+        ,
 
         changeStatus: function (row, col) {
             if (this.data.seatMap[row][col].reserved) {
                 this.data.seatMap[row][col] = {
                     reserved: false,
                 };
+                this.totalSeat = this.totalSeat - 1;
             } else {
                 this.data.seatMap[row][col] = {
                     reserved: true,
                 };
+                this.totalSeat = this.totalSeat + 1;
             }
         },
         changeEditStatus: function (row, col) {
@@ -884,7 +907,8 @@ export default {
                     reserved: true,
                 };
             }
-        },
+        }
+        ,
         addFormGenerateMap: function () {
             this.validationErrors = [];
             let vm = this;
@@ -937,10 +961,12 @@ export default {
                     timer: 2000,
                 });
             }
-        },
+        }
+        ,
         editGenerateMap: function () {
             this.isShowEditDiv = true;
-        },
+        }
+        ,
 
         checkBox: function (e) {
             if (e.target.checked) {
@@ -948,14 +974,16 @@ export default {
             } else {
                 this.data.isActive = 0;
             }
-        },
+        }
+        ,
         editCheckBox: function (e) {
             if (e.target.checked) {
                 this.dataEdit.is_active = 1;
             } else {
                 this.dataEdit.is_active = 0;
             }
-        },
+        }
+        ,
 
         async addBusClass() {
             this.validationErrors = [];
@@ -1018,7 +1046,8 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
 
         async updateBusClass() {
             this.validationErrors = [];
@@ -1079,7 +1108,8 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
 
         async deleteModal(fare_class, i) {
             const deletingObj = {
@@ -1088,11 +1118,13 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-        },
+        }
+        ,
 
         edit(bus_class) {
             this.dataEdit = {...bus_class, busClassColor: bus_class.color};
-        },
+        }
+        ,
     },
     async created() {
         await this.fetchBussClasses();

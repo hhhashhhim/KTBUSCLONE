@@ -25923,6 +25923,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       updateSeatValue: [],
       editSingleSeat: [],
       allSeatClasses: [],
+      setSeatNumber: [],
+      totalSeat: 0,
       delId: "",
       addData: {},
       data: {
@@ -26097,7 +26099,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         });
       }
     },
-    assignSeatNumber: function assignSeatNumber() {},
+    assignSeatNumber: function assignSeatNumber(rowId, colId) {
+      if (this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined') {
+        return swal({
+          title: "Required !",
+          text: "Please Enter Seat Number",
+          icon: "error",
+          timer: 2000
+        });
+      }
+
+      this.data.seatMap[rowId][colId].seatNo = this.setSeatNumber.addSeatNO;
+      swal({
+        title: "Success",
+        text: "Successfully Added Seat Number",
+        icon: "success",
+        timer: 2000
+      });
+    },
     selectSeat: function selectSeat(row, col) {
       console.log(this.selectedSeats);
       console.log(this.data.seatMap[row][col].reserved);
@@ -26107,13 +26126,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.data.seatMap[row][col].selected = false;
         this.selectedSeats.splice(index, 1);
       } else {
-        if (this.data.seatMap[row][col].reserved && !this.data.seatMap[row][col].seatNo) {
-          $("#addSeatNumber").modal("show");
-        }
-
         this.data.seatMap[row][col].selected = true;
         this.selectedSeats.push(JSON.stringify([row, col]));
       }
+
+      this.setSeatNumber = {
+        rowId: row,
+        colId: col
+      }; // }
     },
     checkClass: function checkClass(colorCode) {
       for (var i = 0; i < this.allSeatClasses.length; i++) {
@@ -26158,10 +26178,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.data.seatMap[row][col] = {
           reserved: false
         };
+        this.totalSeat = this.totalSeat - 1;
       } else {
         this.data.seatMap[row][col] = {
           reserved: true
         };
+        this.totalSeat = this.totalSeat + 1;
       }
     },
     changeEditStatus: function changeEditStatus(row, col) {
@@ -40576,7 +40598,7 @@ var _hoisted_47 = {
     "border-spacing": "5px"
   }
 };
-var _hoisted_48 = ["onClick", "src"];
+var _hoisted_48 = ["data-toggle", "data-target", "onClick", "src"];
 var _hoisted_49 = {
   key: 1
 };
@@ -41060,6 +41082,8 @@ var _hoisted_140 = {
   "class": "col-md-12"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _this = this;
+
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
 
   var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
@@ -41246,6 +41270,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             key: colIndex
           }, [col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
             key: 0,
+            "data-toggle": _this.data.seatMap[rowIndex][colIndex].reserved && !_this.data.seatMap[rowIndex][colIndex].seatNo ? 'modal' : '',
+            "data-target": _this.data.seatMap[rowIndex][colIndex].reserved && !_this.data.seatMap[rowIndex][colIndex].seatNo ? '#addSeatNumber' : '',
             "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(col.selected ? 'selected' : ''),
             style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(col["class"] ? $options.checkClass(col["class"]) : ''),
             onClick: function onClick($event) {
@@ -41295,15 +41321,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "text",
     "class": "form-control",
     "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
-      return $data.addSeatNO = $event;
+      return $data.setSeatNumber.addSeatNO = $event;
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addSeatNO]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.setSeatNumber.addSeatNO]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
     onClick: _cache[13] || (_cache[13] = function ($event) {
-      return $options.assignSeatNumber();
+      return $options.assignSeatNumber($data.setSeatNumber.rowId, $data.setSeatNumber.colId);
     })
   }, "Assign Seat Number "), _hoisted_61])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal End "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Modal for modify bus class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_70, [_hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "float-right badge badge-primary mx-0 mb-1",
