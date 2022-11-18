@@ -206,6 +206,15 @@ class ScheduleController extends Controller
         ];
     }
 
+    public function extend(Request $request){
+        $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->first();
+        $schedule->update([
+            'end_date' => date("Y-m-d",strtotime(date("Y-m-d",strtotime($schedule->end_date)) . "+".(int)$request->extended_days."days")),
+            'extended_days'  => (int)$request->extended_days,
+        ]);
+        return $schedule;
+    }
+
     public function selected(Request $request)
     {
 

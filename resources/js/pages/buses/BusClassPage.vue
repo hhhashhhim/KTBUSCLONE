@@ -63,14 +63,16 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ busClass.name }}</td>
                                                         <td>
-                                                            <div style=" border-radius: 50%; height: 50px; width: 50px; " :style="{ backgroundColor: busClass.color }"
+                                                            <div
+                                                                style=" border-radius: 50%; height: 50px; width: 50px; "
+                                                                :style="{ backgroundColor: busClass.color }"
                                                             ></div>
                                                         </td>
                                                         <td>
                                                             {{
-                                                            busClass.is_active == 1
-                                                            ? "Active"
-                                                            : "InActive"
+                                                                busClass.is_active == 1
+                                                                    ? "Active"
+                                                                    : "InActive"
                                                             }}
                                                         </td>
                                                         <td>{{ busClass.added_by.name }}</td>
@@ -200,12 +202,7 @@
                             >
                                 <img
                                     @click="changeStatus(rowIndex, colIndex)"
-                                    :src="
-                    $store.state.app_url +
-                    'assets/img/buses/available_seat_img.gif'
-                  "
-                                    alt=""
-                                />
+                                    :src=" $store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
                             </td>
                         </tr>
                     </div>
@@ -215,10 +212,11 @@
                             v-for="(record, rowIndex) in data.seatMap"
                             :key="rowIndex">
                             <td v-for="(col, colIndex) in record" :key="colIndex"
-                                :style=" col.class ? checkClass(col.class) : '' ">
+                            >
                                 <img
                                     v-if="col.reserved"
                                     :class="col.selected ? 'selected' : ''"
+                                    :style=" col.class ? checkClass(col.class) : '' "
                                     @click="selectSeat(rowIndex, colIndex)"
                                     :src="
                     $store.state.app_url +
@@ -232,10 +230,13 @@
                     </div>
                     <div class="col-md-2">
                         <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
-                            <div class="circles mr-1 border shadow" :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                            <div class="circles mr-1 border shadow"
+                                 :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass">Set Attributes</button>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
+                                @click="resetAttributes()">Set Attributes
+                        </button>
                     </div>
 
                 </div>
@@ -250,6 +251,32 @@
                     </button>
                 </template>
             </Add>
+
+            <div class="modal fade" id="addSeatNumber" tabindex="-1" aria-labelledby="addSeatNumberLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addSeatNumberLabel">Add Seat Number</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Seat Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" v-model="addSeatNO">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" @click="assignSeatNumber()">Assign Seat
+                                Number
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Add Modal End -->
             <!--                    Modal for modify bus class-->
@@ -399,7 +426,7 @@
                         <label for="SurchargeName"
                         >Name <span class="text-danger">*</span></label
                         >
-                        <input type="text" class="form-control" v-model="dataEdit.name" />
+                        <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="color">Color<span class="text-danger">*</span></label>
@@ -466,7 +493,7 @@
                 </div>
                 <div class="row mx-1 mainRow">
                     <!--v-if="isShowEditDiv-->
-                    <div class="form-group col-md-6 border py-3">
+                    <div class="form-group col-md-5 border py-3">
                         <tr
                             class="seat-img p-0 m-0"
                             v-for="(record, rowIndex) in dataEdit.seat_map"
@@ -475,20 +502,15 @@
                             <td
                                 v-for="(col, colIndex) in record"
                                 :key="colIndex"
-                                :class="col.reserved ? 'selected-row border' : ''"
+                                :class="col.reserved ? 'selected border' : ''"
                             >
                                 <img
                                     @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src="
-                    $store.state.app_url +
-                    'assets/img/buses/available_seat_img.gif'
-                  "
-                                    alt=""
-                                />
+                                    :src=" $store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
                             </td>
                         </tr>
                     </div>
-                    <div class="form-group col-md-6 border py-3">
+                    <div class="form-group col-md-5 border py-3" style="border-spacing: 5px;">
                         <tr
                             class="seat-img p-0 m-0"
                             v-for="(record, rowIndex) in dataEdit.seat_map"
@@ -497,7 +519,7 @@
                             <td
                                 v-for="(col, colIndex) in record"
                                 :key="colIndex"
-                                :class="col.reserved ? 'selected-row border' : ''"
+                                :class="col.reserved ? 'selected border' : ''"
                             >
                                 <img
                                     data-toggle="modal"
@@ -513,6 +535,16 @@
                                 <span v-else></span>
                             </td>
                         </tr>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
+                            <div class="circles mr-1 border shadow"
+                                 :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                            <span class="text-wrap">{{ seatClass.name }}</span>
+                        </div>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
+                                @click="resetAttributes()">Set Attributes
+                        </button>
                     </div>
                 </div>
                 <template v-slot:button>
@@ -587,14 +619,8 @@
                                             <button
                                                 type="button"
                                                 class="btn btn-block btn-success"
-                                                @click="
-                          updateSeatDetail(
-                            editSingleSeat.rowId,
-                            editSingleSeat.colId
-                          )
-                        "
-                                                data-dismiss="modal"
-                                            >
+                                                @click=" updateSeatDetail( editSingleSeat.rowId, editSingleSeat.colId ) "
+                                                data-dismiss="modal">
                                                 Update Seat Data
                                             </button>
                                         </div>
@@ -606,6 +632,7 @@
                 </div>
             </div>
             <!--End Modal-->
+
             <!--            Edit MOdel End-->
             <Delete
                 :deleteForm="deleteFormID"
@@ -618,7 +645,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     name: "BusClassPage",
@@ -644,6 +671,7 @@ export default {
                 type: 0,
             },
             success: false,
+            addSeatNO: '',
             loading: false,
             error: false,
             isShowDiv: false,
@@ -651,7 +679,7 @@ export default {
             BusClassName: "",
             updateSeatValue: [],
             editSingleSeat: [],
-            allSeatClasses:[],
+            allSeatClasses: [],
             delId: "",
             addData: {},
             data: {
@@ -671,10 +699,12 @@ export default {
             selectedSeats: [],
         };
     },
-    async created() {
-        await this.fetchBussClasses();
-    },
     methods: {
+        resetAttributes: function () {
+            this.seatModify.class = 0;
+            this.seatModify.type = 0;
+
+        },
         clearForm: function () {
             this.data = {};
             this.isShowDiv = false;
@@ -684,8 +714,8 @@ export default {
         },
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
-            const resClass = await this.callApi("post","fare-class")
-            if ( resBusClass.status === 200 && resClass.status==200 ) {
+            const resClass = await this.callApi("post", "fare-class")
+            if (resBusClass.status === 200 && resClass.status == 200) {
                 this.busClasses = resBusClass.data;
                 this.allSeatClasses = resClass.data;
 
@@ -721,9 +751,6 @@ export default {
                 event.preventDefault();
             }
         },
-        getBorderSelected : function () {
-
-        },
         async saveFareClass() {
             this.loading = true;
             const resSaveFareClass = await this.callApi(
@@ -745,9 +772,8 @@ export default {
             }
         },
         addSeatData: function () {
-            if (this.seatModify.class || this.seatModify.type) {
-
-                this.selectedSeats.map(( seat )=>{
+            if (this.seatModify.class != 0 || this.seatModify.type != 0) {
+                this.selectedSeats.map((seat) => {
 
                     seat = JSON.parse(seat);
                     let row = seat[0];
@@ -766,8 +792,7 @@ export default {
                     timer: 2500,
                 });
 
-            }
-            else {
+            } else {
 
                 return swal({
                     title: "Required",
@@ -778,23 +803,30 @@ export default {
 
             }
         },
-        selectSeat(row, col) {
+        assignSeatNumber: function () {
 
-            let index = this.selectedSeats.indexOf(JSON.stringify([row,col]));
+        },
+        selectSeat(row, col) {
+            console.log(this.selectedSeats);
+            console.log(this.data.seatMap[row][col].reserved);
+
+            let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
             if (index != -1) {
                 this.data.seatMap[row][col].selected = false;
                 this.selectedSeats.splice(index, 1);
             } else {
+                if (this.data.seatMap[row][col].reserved && !this.data.seatMap[row][col].seatNo) {
+                    $("#addSeatNumber").modal("show");
+                }
                 this.data.seatMap[row][col].selected = true;
-                this.selectedSeats.push(JSON.stringify([row,col]));
+                this.selectedSeats.push(JSON.stringify([row, col]));
             }
 
         },
-        checkClass(colorCode){
+        checkClass(colorCode) {
             for (let i = 0; i < this.allSeatClasses.length; i++) {
-                if(colorCode == this.allSeatClasses[i].id)
-                {
-                    return "border: 1px solid "+this.allSeatClasses[i].color;
+                if (colorCode == this.allSeatClasses[i].id) {
+                    return "border: 3px solid " + this.allSeatClasses[i].color;
                 }
             }
         },
@@ -856,7 +888,6 @@ export default {
         addFormGenerateMap: function () {
             this.validationErrors = [];
             let vm = this;
-            console.log(vm.data.noOfRows, vm.data.noOfCols);
             if (typeof vm.data.noOfRows == "undefined")
                 return swal({
                     title: "required",
@@ -928,15 +959,15 @@ export default {
 
         async addBusClass() {
             this.validationErrors = [];
-            let seatNo = 0;
-            this.data.seatMap = this.data.seatMap.map((seat) => {
-                for (let i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i].reserved) {
-                        seat[i]["seatNo"] = ++seatNo;
-                    }
-                }
-                return seat;
-            });
+            // let seatNo = 0;
+            // this.data.seatMap = this.data.seatMap.map((seat) => {
+            //     for (let i = seat.length - 1; i >= 0; i--) {
+            //         if (seat[i].reserved) {
+            //             seat[i]["seatNo"] = ++seatNo;
+            //         }
+            //     }
+            //     return seat;
+            // });
 
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
@@ -961,7 +992,6 @@ export default {
                     timer: 2000,
                 });
             this.loading = true;
-            console.log(this.data);
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status === 201) {
                 swal({
@@ -1061,8 +1091,11 @@ export default {
         },
 
         edit(bus_class) {
-            this.dataEdit = { ...bus_class, busClassColor: bus_class.color };
+            this.dataEdit = {...bus_class, busClassColor: bus_class.color};
         },
+    },
+    async created() {
+        await this.fetchBussClasses();
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),

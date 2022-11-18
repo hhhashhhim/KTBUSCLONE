@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Booking\AllBookingController;
 use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Bus\BusClassController;
 use App\Http\Controllers\Bus\BusController;
@@ -143,6 +144,8 @@ Route::group(['prefix' => 'schedule', [CustomMiddleware::class]], function () {
     Route::post('/getRouteFare', [ScheduleController::class, 'getRouteFareClass']);
     Route::post('/genericCommon', [ScheduleController::class, 'genericCommon']);
     Route::post('/selected', [ScheduleController::class, 'selected']);
+    Route::post('/extend', [ScheduleController::class, 'extend']);
+    Route::post('/extendedGet', [ScheduleController::class, 'extendedGet']);
 
 });
 Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
@@ -176,6 +179,13 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/overIssueAdd', [BookingController::class, 'overIssueAddNew']);
 
 });
+
+Route::group(['prefix' => 'allBooking', [CustomMiddleware::class]], function () {
+    Route::post('/routes', [AllBookingController::class, 'routes']);
+    Route::post('/terminals', [AllBookingController::class, 'terminals']);
+    Route::post('/buses', [AllBookingController::class, 'buses']);
+});
+
 
 Route::group(['prefix' => 'hrm/employee', [CustomMiddleware::class]], function () {
     Route::post('/', [EmployeeController::class, 'index']);

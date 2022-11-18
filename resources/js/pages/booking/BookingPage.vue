@@ -63,23 +63,23 @@
                                 </div>
                             </div>
                             <div class="row">
-<!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-<!--                                     v-if="selectedBookedSeats.length">-->
-<!--                                    <a-->
-<!--                                        @click="sameDataAsMain()"-->
-<!--                                        href="#reschedule-modal"-->
-<!--                                        class="btn btn-primary mx-1"-->
-<!--                                        data-toggle="modal"-->
-<!--                                    >Shifting ( Reschedule ) Seats</a>-->
-<!--                                </div>-->
-<!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-<!--                                     v-if="selectedBookedOverIssueSeats.length">-->
-<!--                                    <a-->
-<!--                                        href="#overIssue_model"-->
-<!--                                        class="btn btn-primary mx-1"-->
-<!--                                        data-toggle="modal"-->
-<!--                                    >Over Issue Seats</a>-->
-<!--                                </div>-->
+                                <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+                                <!--                                     v-if="selectedBookedSeats.length">-->
+                                <!--                                    <a-->
+                                <!--                                        @click="sameDataAsMain()"-->
+                                <!--                                        href="#reschedule-modal"-->
+                                <!--                                        class="btn btn-primary mx-1"-->
+                                <!--                                        data-toggle="modal"-->
+                                <!--                                    >Shifting ( Reschedule ) Seats</a>-->
+                                <!--                                </div>-->
+                                <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+                                <!--                                     v-if="selectedBookedOverIssueSeats.length">-->
+                                <!--                                    <a-->
+                                <!--                                        href="#overIssue_model"-->
+                                <!--                                        class="btn btn-primary mx-1"-->
+                                <!--                                        data-toggle="modal"-->
+                                <!--                                    >Over Issue Seats</a>-->
+                                <!--                                </div>-->
                                 <h1 v-if="loading">Loading.........</h1>
 
                                 <div class="col-md-12 row" v-if="showBookingDiv">
@@ -88,9 +88,9 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>CNIC <span class="text-danger">*</span></label>
+                                                        <label>CNIC <span class="text-danger">*</span></label> <span
+                                                        class="text-danger">{{ getCustomermessage }}</span>
                                                         <vue-mask
-                                                            v-on:keyup.enter="getCustomer"
                                                             v-on:blur="getCustomer"
                                                             class="form-control"
                                                             v-model="addForm.customerCNIC"
@@ -118,7 +118,7 @@
                                                     <div class="form-group">
                                                         <label>Contact</label>
                                                         <vue-mask
-                                                            v-on:keyup.enter="getCustomer"
+                                                            v-on:blur="getCustomer"
                                                             class="form-control"
                                                             v-model="addForm.contact"
                                                             mask="0000-0000000"
@@ -226,7 +226,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group text-right">
-                                                <button class="btn btn-primary mx-1" @click="add">
+                                                <button class="btn btn-primary mx-1" @click="add"
+                                                        v-on:keydown.enter="add">
                                                     Generate Ticket
                                                 </button>
                                                 <button class="btn btn-secondary mx-1" @click="reset">
@@ -457,6 +458,7 @@
                                         >Contact</label
                                         >
                                         <vue-mask
+                                            v-on:blur="getCustomer"
                                             class="form-control col-md-9"
                                             v-model="addFormOverIssue.customer.contact"
                                             mask="0000-0000000"
@@ -524,12 +526,100 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
-                            <button class="btn btn-primary mx-1" v-on:keypress.enter="addOverIssueTicket()"> Generate Ticket</button>
+                            <button class="btn btn-primary mx-1" @click="addOverIssueTicket()"> Generate
+                                Ticket
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!--        modal for details-->
+        <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="seatAllDetailsModalLabel">Seat Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <!--                        loop for number of seats-->
+                        <div class="card-body"> <!--v-for="(city, i) in cities"-->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body p-3">
+                                            <!--                                            seat Details-->
+                                            <!--                                            <div class="row mb-1">-->
+                                            <!--                                                <div class="col-md-12">-->
+                                            <!--                                                    <div class="d-flex justify-content-between">-->
+                                            <!--                                                    <p class="mb-0 font-weight-bold ">Seat : </p><p class="mb-0">1</p>-->
+                                            <!--                                                    <p class="mb-0 font-weight-bold ">Date :</p><p class="mb-0">Schedule Date</p>-->
+                                            <!--                                                    <p class="mb-0 font-weight-bold ">Bus Class :</p><p class="mb-0">Economy</p>-->
+                                            <!--                                                    <p class="mb-0 font-weight-bold ">Route : </p><p class="mb-0">Islamabad- Karachi</p>-->
+                                            <!--                                                    <p class="mb-0 font-weight-bold ">Schedule : </p><p class="mb-0">Schedule Name</p>-->
+                                            <!--                                                    </div>-->
+                                            <!--                                                </div>-->
+
+                                            <!--                                            </div>-->
+                                            <!--                                            Progress Bar-->
+                                            <div class="row my-1">
+                                                <div class="col-md-3">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold ">Seat : </p>
+                                                        <p class="mb-0">1</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                    <p class="mb-0 font-weight-bold ">Date :</p>
+                                                        <p class="mb-0">Schedule Date</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold ">Bus Class :</p>
+                                                        <p class="mb-0">Economy</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold ">Schedule : </p>
+                                                        <p class="mb-0">Schedule Name</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="progress my-2" style="height: 30px;">
+                                                            <div class="progress-bar" role="progressbar" style="width: 50%; margin: auto;"
+                                                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                                                Faisalabad - Multan
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <p class="mb-0">Lahore</p>
+                                                        <p class="mb-0">Faisalabad</p>
+                                                        <p class="mb-0">Toba</p>
+                                                        <p class="mb-0">Multan</p>
+                                                        <p class="mb-0">Karachi </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--                                            Buttons-->
+                                            <div class="row mt-1">
+                                                <div class="col-md-12 text-right">
+                                                    <button type="button" class="btn btn-primary">Reschedule</button>
+                                                    <button type="button" class="btn btn-warning ml-2">Over Issue
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger ml-2">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--        modal for seat details end-->
         <!--End Over Issue Model-->
         <!--            DELETE MODAL-->
         <Delete :deleteForm="deleteFormID"
@@ -569,6 +659,7 @@ export default {
             },
             rescheduleFormId: "reschedule-modal",
             // overissueFormId: "overIssue_model",
+            getCustomermessage: '',
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
             detailsFormId: "details-modal",
@@ -625,21 +716,34 @@ export default {
     },
     async created() {
         await this.fetchAllSchedules();
+        window.addEventListener('keydown', this.enter);
+        window.addEventListener('keydown', this.altM);
     },
 
     methods: {
+        enter: function (e) {
+            console.log(e);
+            if (e.key == "Enter") {
+                alert('gdshfdsdhguger');
+            }
+        },
+        altM: function (e) {
+            if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
+                if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
+                    $('#seatAllDetailsModal').modal('show');
+                } else {
+                    swal({
+                        title: "OOPS!!",
+                        text: "Please Select Already Booked Seat",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
+            }
+        },
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
-        // sameDataAsMain: function () {
-        //     this.sameDataMain = {
-        //         departure: this.addForm.departureCity,
-        //         destination: this.addForm.destinationCity,
-        //         date: this.addForm.date,
-        //         schedule: this.addForm.schedule,
-        //     }
-        // },
-
         async getFilterRecord() {
             this.allBookings = [];
             const table = $("#booking_table").DataTable();
@@ -710,7 +814,6 @@ export default {
             }
         },
 
-
         async fetchSpecificSchedules() {
             this.getSchedule = true;
             this.showBookingDiv = false;
@@ -742,7 +845,7 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
 
-        async getCustomer() {
+        async getCustomer(flag) {
             if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
                 const resCnic = await this.callApi("post", "booking/getCNIC", {
                     cnicNumber: this.addForm.customerCNIC,
@@ -787,7 +890,6 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            console.log(res.data);
             if (res.status == 200) {
                 this.loading = false
                 this.showBookingDiv = true;
@@ -802,28 +904,8 @@ export default {
                 }
             }
         },
-        altKeyShortcut: function () {
-            if(this.selectedSeats.length == 0){
-                swal({
-                    title: "Oops",
-                    text: "Please Select Any Seat ",
-                    icon: "error",
-                    timer: 2000
-                });
-                this.fetchScheduleData();
-            }else{
-                $(document).on('keydown', function ( e ) {
-                    // You may replace `m` with whatever key you want
-                    if (e.metaKey || e.altKey )  {
-                        $("#exampleModal").modal('show');
-                    }
-                });
-            }
-
-        },
-
         async selectSeat(row, col, seatNo) {
-            console.log(this.selectedSeats, this.schedule.bus_class.seat_map[row][col], seatNo, this.selectedBookedSeats)
+            console.log(this.schedule.bus_class.seat_map[row][col])
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({

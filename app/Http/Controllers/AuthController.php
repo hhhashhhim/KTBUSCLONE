@@ -23,7 +23,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

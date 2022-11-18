@@ -81,14 +81,18 @@
                                                             }}
                                                         </td>
                                                         <td>
+                                                            <button class="btn btn-info btn-sm mr-1"
+                                                                    @click="addDays(schedule)"
+                                                                    data-target="#addDaysModal" data-toggle="modal"><i
+                                                                class="fas fa-plus"></i></button>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click=" edit(schedule); genericData(); "
-                                                                    class="btn btn-primary mr-1"><i
+                                                                    class="btn btn-primary mr-1 btn-sm"><i
                                                                 class="far fa-edit"></i></button>
                                                             <button :data-target="'#' + deleteFormID"
                                                                     data-toggle="modal"
                                                                     @click="deleteSchedule(schedule, i)"
-                                                                    class="btn btn-danger"><i
+                                                                    class="btn btn-danger btn-sm"><i
                                                                 class="far fa-trash-alt"></i></button>
                                                         </td>
                                                     </tr>
@@ -100,6 +104,41 @@
                                 </div>
                             </div>
                             <!-- END TABLE -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="addDaysModal" tabindex="-1" aria-labelledby="addDaysModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content ">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addDaysModalLabel">Extend Schedule</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>No. of Days (e.g: DD)</label>
+                                        <vue-mask
+                                            class="form-control"
+                                            v-model="extendDate.extended_days"
+                                            mask="00"
+                                            :raw="false"
+                                            :options="options">
+                                        </vue-mask>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" @click="extendedDate()">Extend Schedule
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -448,7 +487,9 @@
                             <button
                                 id="submitFormButton"
                                 class="btn btn-success float-right"
-                                @click="addSchedule()" :disabled="loading" > {{ loading ? 'Loading...' : 'Save Schedule' }}
+                                @click="addSchedule()" :disabled="loading"> {{
+                                    loading ? 'Loading...' : 'Save Schedule'
+                                }}
                             </button>
                         </div>
                     </div>
@@ -457,7 +498,7 @@
 
             <!-- Add Modal End -->
             <!--            Edit Model-->
-            <Edit heading="Edit Schedule" :errors="this.validationErrors" :success="success" :editForm="editFormID" >
+            <Edit heading="Edit Schedule" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row mb-3">
                     <div class="col-md-3 text-center"
                          :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' ">
@@ -607,7 +648,10 @@
                                         <td>
                                             <span v-for="item in city.terminal" :key="item.id">
                                             <label class="colorinput mx-3">
-                                                <span> <input type="checkbox" class="colorinput-input" @click="editTerminal($event, city.id)" v-bind:checked=" checkedSelectedTerminals(item.id) " id="terminal" :value="item.id"/>
+                                                <span> <input type="checkbox" class="colorinput-input"
+                                                              @click="editTerminal($event, city.id)"
+                                                              v-bind:checked=" checkedSelectedTerminals(item.id) "
+                                                              id="terminal" :value="item.id"/>
                                                     <span class="colorinput-color bg-success"></span>
                                                 </span>
                     </label>
@@ -790,6 +834,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
+import vueMask from 'vue-jquery-mask';
 import {mapGetters} from "vuex";
 
 export default {
@@ -798,9 +843,13 @@ export default {
         Add,
         Edit,
         Delete,
+        vueMask,
     },
     data() {
         return {
+            options: {
+                placeholder: '00',
+            },
             loading: false,
             schedules: [],
             fareClasses: [],
@@ -828,6 +877,7 @@ export default {
             buses: "",
             addTerminalId: "",
             TripDuration: "",
+            extendDate: "",
             activeSection: 0,
             editActiveSection: 0,
             data: {
@@ -855,6 +905,22 @@ export default {
         await this.fetchSchedule();
     },
     methods: {
+        async addDays(sche) {
+            this.extendDate = sche;
+        },
+        async extendedDate() {
+            const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
+            console.log(resExtend);
+            if(resExtend.status == 200){
+                swal({
+                    title: "Success",
+                    text: "Schedule Extended successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchSchedule();
+            }
+        },
         async fetchSchedule() {
 
             const res = await this.callApi("post", "schedule");

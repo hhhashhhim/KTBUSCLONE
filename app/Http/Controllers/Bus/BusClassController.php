@@ -26,8 +26,7 @@ class BusClassController extends Controller
 
     public function storeBusClass(Request $request)
     {
-//        dd($request->all());
-
+        dd($request->all());
         $rules = [
             'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 //            'BusClassColor' => 'required',

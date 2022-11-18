@@ -200,7 +200,7 @@
                              data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDesignation" >
-                            <option value="0" selected>Select Designation</option>
+                            <option value="0">Select Designation</option>
                             <option v-for="(designation, i) in designations" :key="i" :value="designation.id" >
                                 {{ designation.name }}
                             </option>
@@ -430,7 +430,7 @@
                              data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
                         </div>
                         <select class="form-control" v-model="dataEdit.department_id" @change="getEditDesignation()">
-                            <option value="0" selected>Select Department</option>
+                            <option value="0">Select Department</option>
                             <option v-for="(department, i) in editDepartments" :key="i" :value="department.id" >
                                 {{ department.name }}
                             </option>
