@@ -82,4 +82,5 @@ class AuthController extends Controller
             return response()->json([], 403);
         }
     }
+
 }
