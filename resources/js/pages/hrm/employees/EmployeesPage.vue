@@ -48,7 +48,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Profile</th>
+<!--                                                        <th>Profile</th>-->
                                                         <th>Name</th>
                                                         <th>Contact #</th>
                                                         <th>Company</th>
@@ -64,14 +64,14 @@
                                                     <tbody>
                                                     <tr v-for="(employee, i) in employees" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td><a
-                                                            :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
-                                                            target="_blank">
-                                                            <img
-                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
-                                                                style="width:90px;height:100px;" alt="">
-                                                        </a>
-                                                        </td>
+<!--                                                        <td><a-->
+<!--                                                            :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"-->
+<!--                                                            target="_blank">-->
+<!--                                                            <img-->
+<!--                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"-->
+<!--                                                                style="width:90px;height:100px;" alt="">-->
+<!--                                                        </a>-->
+<!--                                                        </td>-->
                                                         <td>{{ employee.name }}</td>
                                                         <td>{{ phoneFormat(employee.contact) }}</td>
                                                         <td>{{ employee.company.name }}</td>
@@ -238,57 +238,56 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlProfile" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlProfile" alt="">
-                        </div>
+                    <div class="form-group col-md-12">
+                        <label for="salary">Attachments</label>
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlProfile" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlProfile" alt="">-->
+<!--                        </div>-->
                         <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'profile')" accept=".png, .jpg, .jpeg"
+                            <input type="file" @change="onFileChange($event, 'profile')"
                                    class="custom-file-input" id="profilePic">
                             <label class="custom-file-label overflow-hidden" for="profilePic">{{
                                 nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
-
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Front</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFront" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICFront" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFront')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden" for="cincBack">{{
-                                nameFront != '' ? nameFront : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="salary">Upload CNIC Front</label>-->
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlCNICFront" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlCNICFront" alt="">-->
+<!--                        </div>-->
+<!--                        <div class="custom-file">-->
+<!--                            <input type="file" @change="onFileChange($event, 'cnicFront')" accept=".png, .jpg, .jpeg"-->
+<!--                                   class="custom-file-input" id="cincBack">-->
+<!--                            <label class="custom-file-label overflow-hidden" for="cincBack">{{-->
+<!--                                nameFront != '' ? nameFront : 'Choose.jpg, .png, .jpeg Image'-->
+<!--                                }}</label>-->
+<!--                        </div>-->
 
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Back</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBack" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICBack" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicBack')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{
-                                nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="salary">Upload CNIC Back</label>-->
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlCNICBack" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlCNICBack" alt="">-->
+<!--                        </div>-->
+<!--                        <div class="custom-file">-->
+<!--                            <input type="file" @change="onFileChange($event, 'cnicBack')" accept=".png, .jpg, .jpeg"-->
+<!--                                   class="custom-file-input" id="cnicBack`">-->
+<!--                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{-->
+<!--                                nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'-->
+<!--                                }}</label>-->
+<!--                        </div>-->
 
-                    </div>
+<!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
@@ -491,51 +490,51 @@
                             <option value="T">Terminated</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlProfileEdit" alt="">
-                        </div>
+                    <div class="form-group col-md-12">
+                        <label for="salary">Attachments</label> <span class="text-right"><a :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ dataEdit.profile_Img" download>Download this Attatchment</a></span>
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlProfileEdit" alt="">-->
+<!--                        </div>-->
                         <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'profileEdit')" accept=".png, .jpg, .jpeg"
+                            <input type="file" @change="onFileChange($event, 'profileEdit')"
                                    class="custom-file-input" id="profilePic">
                             <label class="custom-file-label overflow-hidden" for="profilePic">{{ nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image' }}</label>
                         </div>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Front</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICFrontEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')"
-                                   accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden" for="cincBack">{{nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>
-                        </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="salary">Upload CNIC Front</label>-->
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlCNICFrontEdit" alt="">-->
+<!--                        </div>-->
+<!--                        <div class="custom-file">-->
+<!--                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')"-->
+<!--                                   accept=".png, .jpg, .jpeg"-->
+<!--                                   class="custom-file-input" id="cincBack">-->
+<!--                            <label class="custom-file-label overflow-hidden" for="cincBack">{{nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>-->
+<!--                        </div>-->
 
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Back</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICBackEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicBackEdit')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{ nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>
-                        </div>
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="salary">Upload CNIC Back</label>-->
+<!--                        <div class="border border-dark my-3"-->
+<!--                             style="height: 250px;  width: 250px; background-color: #d9d9d9">-->
+<!--                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "-->
+<!--                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"-->
+<!--                                 :src="urlCNICBackEdit" alt="">-->
+<!--                        </div>-->
+<!--                        <div class="custom-file">-->
+<!--                            <input type="file" @change="onFileChange($event, 'cnicBackEdit')" accept=".png, .jpg, .jpeg"-->
+<!--                                   class="custom-file-input" id="cnicBack`">-->
+<!--                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{ nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image'}}</label>-->
+<!--                        </div>-->
 
-                    </div>
+<!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateEmployees"
@@ -661,7 +660,7 @@ export default {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
         onFileChange: function (e, imgTag) {
-            if (e.target.files[0].name.match(/\.(jpg|jpeg|png)$/i)) {
+            if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
                 if (imgTag == 'profile') {
                     const profile = e.target.files[0];
                     this.nameProfile = profile.name;
@@ -703,7 +702,7 @@ export default {
             } else {
                 return swal({
                     title: "Invalid Format",
-                    text: "Uploaded File must be in .jpg, .jpeg, .png",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png .pdf .docx. doc",
                     icon: "error",
                     timer: 2000
                 });
