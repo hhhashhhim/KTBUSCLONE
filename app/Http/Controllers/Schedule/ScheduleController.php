@@ -76,9 +76,9 @@ class ScheduleController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();        
+        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
         $days = $this->getDays($schedule->start_date,$schedule->end_date);
-        
+
         for($i=0; $i<=$days; $i++)
         {
             $lastDepId =  $routeDetails[0]->departure_city_id;
@@ -109,7 +109,7 @@ class ScheduleController extends Controller
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
                 ]);
             }
-            
+
         }
         return $schedule;
     }
@@ -219,9 +219,9 @@ class ScheduleController extends Controller
             'end_date' => date("Y-m-d",strtotime(date("Y-m-d",strtotime($schedule->end_date)) . "+".(int)$request->extended_days."days")),
             'extended_days'  => (int)$request->extended_days,
         ]);
-        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();        
+        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
         $days = $this->getDays($lastEndDate,$schedule->end_date);
-        
+
         for($i=0; $i<=$days; $i++)
         {
             $lastDepId =  $routeDetails[0]->departure_city_id;
@@ -252,9 +252,9 @@ class ScheduleController extends Controller
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
                 ]);
             }
-            
+
         };
-        
+
         return $schedule;
     }
 
