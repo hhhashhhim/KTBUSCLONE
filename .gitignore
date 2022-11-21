@@ -1,8 +1,11 @@
 /node_modules
 /vendor
 /storage
-/.env
-/.env.backup
+.env
+.env.backup
+.env.*.php
+.env.php
+.env-production
 .env.dusk.local
 .phpunit.result.cache
 docker-compose.override.yml
