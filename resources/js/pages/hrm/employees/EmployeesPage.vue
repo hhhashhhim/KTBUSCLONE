@@ -237,6 +237,7 @@
                             <label class="custom-control-label" for="cash">Cash</label>
                         </div>
                     </div>
+
                     <div class="form-group col-md-4">
                         <label for="salary">Employee Picture</label>
                         <div class="border border-dark my-3"
@@ -249,7 +250,7 @@
                             <input type="file" @change="onFileChange($event, 'profile')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="profilePic">
                             <label class="custom-file-label overflow-hidden" for="profilePic">{{
-                                    nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
+                                nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
 
@@ -266,7 +267,7 @@
                             <input type="file" @change="onFileChange($event, 'cnicFront')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="cincBack">
                             <label class="custom-file-label overflow-hidden" for="cincBack">{{
-                                    nameFront != '' ? nameFront : 'Choose.jpg, .png, .jpeg Image'
+                                nameFront != '' ? nameFront : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
 
@@ -283,7 +284,7 @@
                             <input type="file" @change="onFileChange($event, 'cnicBack')" accept=".png, .jpg, .jpeg"
                                    class="custom-file-input" id="cnicBack`">
                             <label class="custom-file-label overflow-hidden" for="cnicBack">{{
-                                    nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'
+                                nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
 

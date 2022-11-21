@@ -88,10 +88,9 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>CNIC <span class="text-danger">*</span></label> <span
-                                                        class="text-danger">{{ getCustomermessage }}</span>
+                                                        <label>CNIC <span class="text-danger">*</span></label>
                                                         <vue-mask
-                                                            v-on:blur="getCustomer"
+                                                            v-on:blur="getCustomer('addFormCNIC')"
                                                             class="form-control"
                                                             v-model="addForm.customerCNIC"
                                                             mask="00000-0000000-0"
@@ -118,7 +117,7 @@
                                                     <div class="form-group">
                                                         <label>Contact</label>
                                                         <vue-mask
-                                                            v-on:blur="getCustomer"
+                                                            v-on:blur="getCustomer('addFormContact')"
                                                             class="form-control"
                                                             v-model="addForm.contact"
                                                             mask="0000-0000000"
@@ -845,7 +844,7 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
 
-        async getCustomer(flag) {
+        async getCustomer() {
             if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
                 const resCnic = await this.callApi("post", "booking/getCNIC", {
                     cnicNumber: this.addForm.customerCNIC,
