@@ -110,7 +110,7 @@ class ScheduleController extends Controller
                 ]);
             }
             
-        };
+        }
         return $schedule;
     }
 
