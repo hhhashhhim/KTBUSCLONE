@@ -122,7 +122,7 @@
                                                             v-model="addForm.contact"
                                                             mask="0000-0000000"
                                                             :raw="false"
-                                                            :options="options"
+                                                            :options="optionsPhone"
                                                         >
                                                         </vue-mask>
                                                     </div>
@@ -430,7 +430,7 @@
                                         >CNIC <span class="text-danger">*</span>
                                         </label>
                                         <vue-mask
-                                            v-on:blur="getCustomer"
+                                            v-on:blur="getCustomer('overIssueCNIC')"
                                             class="form-control col-md-9"
                                             v-model="addFormOverIssue.customer.cnic"
                                             mask="00000-0000000-0"
@@ -457,12 +457,12 @@
                                         >Contact</label
                                         >
                                         <vue-mask
-                                            v-on:blur="getCustomer"
+                                            v-on:blur="getCustomer('overIssueContact')"
                                             class="form-control col-md-9"
                                             v-model="addFormOverIssue.customer.contact"
                                             mask="0000-0000000"
                                             :raw="false"
-                                            :options="options"
+                                            :options="optionsPhone"
                                         >
                                         </vue-mask>
 
@@ -572,7 +572,7 @@
                                                         <p class="mb-0">1</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                    <p class="mb-0 font-weight-bold ">Date :</p>
+                                                        <p class="mb-0 font-weight-bold ">Date :</p>
                                                         <p class="mb-0">Schedule Date</p>
                                                     </div>
                                                     <div class="d-flex">
@@ -586,9 +586,10 @@
                                                 </div>
                                                 <div class="col-md-9">
                                                     <div class="progress my-2" style="height: 30px;">
-                                                            <div class="progress-bar" role="progressbar" style="width: 50%; margin: auto;"
-                                                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                                                                Faisalabad - Multan
+                                                        <div class="progress-bar" role="progressbar"
+                                                             style="width: 50%; margin: auto;"
+                                                             aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                                            Faisalabad - Multan
                                                         </div>
                                                     </div>
                                                     <div class="d-flex justify-content-between">
@@ -655,6 +656,9 @@ export default {
         return {
             options: {
                 placeholder: "xxxxx-xxxxxxx-x",
+            },
+            optionsPhone: {
+                placeholder: "xxxx-xxxxxxx",
             },
             rescheduleFormId: "reschedule-modal",
             // overissueFormId: "overIssue_model",
@@ -844,20 +848,49 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
 
-        async getCustomer() {
-            if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
-                const resCnic = await this.callApi("post", "booking/getCNIC", {
-                    cnicNumber: this.addForm.customerCNIC,
-                });
-                this.addForm.contact = resCnic.data.contact;
-                this.addForm.customerName = resCnic.data.name;
+        async getCustomer(flag) {
+            if (flag == 'addFormCNIC') {
+                if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
+                    const resCnic = await this.callApi("post", "booking/getCNIC", {
+                        cnicNumber: this.addForm.customerCNIC,
+                        status: flag,
+
+                    });
+                    this.addForm.contact = resCnic.data.contact;
+                    this.addForm.customerName = resCnic.data.name;
+                }
             }
-            if (this.addFormOverIssue.customer.cnic != '' && this.addFormOverIssue.customer.cnic != 'undefined') {
-                const resCnic = await this.callApi("post", "booking/getCNIC", {
-                    cnicNumber: this.addFormOverIssue.customer.cnic,
-                });
-                this.addFormOverIssue.customer.name = resCnic.data.name;
-                this.addFormOverIssue.customer.contact = resCnic.data.contact;
+            if (flag == 'overIssueCNIC') {
+                if (this.addFormOverIssue.customer.cnic != '' && this.addFormOverIssue.customer.cnic != 'undefined') {
+                    const resCnic = await this.callApi("post", "booking/getCNIC", {
+                        cnicNumber: this.addFormOverIssue.customer.cnic,
+                        status: flag,
+
+                    });
+                    this.addFormOverIssue.customer.name = resCnic.data.name;
+                    this.addFormOverIssue.customer.contact = resCnic.data.contact;
+                }
+            }
+            if (flag == 'addFormContact') {
+                if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
+                    const resCnic = await this.callApi("post", "booking/getCNIC", {
+                        phoneNumber: this.addForm.contact,
+                        status: flag,
+                    });
+                    this.addForm.customerCNIC = resCnic.data.cnic;
+                    this.addForm.customerName = resCnic.data.name;
+                }
+            }
+            if (flag == 'overIssueContact') {
+                if (this.addFormOverIssue.customer.contact != '' && this.addFormOverIssue.customer.contact != 'undefined') {
+                    const resCnic = await this.callApi("post", "booking/getCNIC", {
+                        phoneNumber: this.addFormOverIssue.customer.contact,
+                        status: flag,
+                    });
+                    this.addFormOverIssue.customer.name = resCnic.data.name;
+                    this.addFormOverIssue.customer.cnic = resCnic.data.cnic;
+                }
+
             }
         },
 
@@ -873,7 +906,8 @@ export default {
             } else {
                 return true;
             }
-        },
+        }
+        ,
 
         async fetchScheduleData() {
             if (this.addForm.schedule == 0) {
@@ -902,7 +936,8 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
         async selectSeat(row, col, seatNo) {
             console.log(this.schedule.bus_class.seat_map[row][col])
             this.validationErrors = [];
@@ -1008,7 +1043,8 @@ export default {
                     this.addFormOverIssue.customer = resOverIssue.data.customer;
                 }
             }
-        },
+        }
+        ,
 
         async addOverIssueTicket() {
             window.print();
@@ -1079,7 +1115,8 @@ export default {
 
                 }
             }
-        },
+        }
+        ,
 
         getClasses(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
@@ -1087,7 +1124,8 @@ export default {
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
-        },
+        }
+        ,
 
         async add() {
             this.validationErrors = [];
@@ -1149,11 +1187,13 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
 
         doScroll: function () {
             $("#addBooking").scrollTop(10);
-        },
+        }
+        ,
 
         async deleteModal(surcharge, i) {
             const deletingObj = {
@@ -1162,7 +1202,8 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-        },
+        }
+        ,
 
         async resetingArrays() {
             this.selectedSeats = [];
@@ -1185,7 +1226,8 @@ export default {
             } else {
                 console.log(res);
             }
-        },
+        }
+        ,
 
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
@@ -1198,7 +1240,8 @@ export default {
             } else {
                 console.log(resBookingDetail);
             }
-        },
+        }
+        ,
 
         reset() {
             this.addForm = {
@@ -1218,8 +1261,10 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(["getDeletingObj"]),
-    },
+        ...
+            mapGetters(["getDeletingObj"]),
+    }
+    ,
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
@@ -1228,9 +1273,12 @@ export default {
                     window.location.reload();
                 }, 2000);
             }
-        },
-    },
-};
+        }
+        ,
+    }
+    ,
+}
+;
 </script>
 <style scoped>
 .image-span {

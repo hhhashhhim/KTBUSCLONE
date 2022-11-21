@@ -252,8 +252,22 @@ class BookingController extends Controller
 
     public function getCnic(Request $request)
     {
-        $cnicFormat = str_replace('-', '', $request['cnicNumber']);
-        return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
+            if($request->status == 'addFormCNIC') {
+                $cnicFormat = str_replace('-', '', $request['cnicNumber']);
+                return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
+            }
+            if($request->status == 'addFormContact') {
+                 $phoneFormat = str_replace('-', '', $request['phoneNumber']);
+                return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
+            }
+            if($request->status == 'overIssueCNIC') {
+                $cnicFormat = str_replace('-', '', $request['cnicNumber']);
+                return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
+            }
+            if($request->status == 'overIssueContact') {
+                 $phoneFormat = str_replace('-', '', $request['phoneNumber']);
+                return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
+            }
     }
 
     public function detailTicket(Request $request)
