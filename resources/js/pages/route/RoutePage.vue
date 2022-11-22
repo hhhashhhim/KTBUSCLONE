@@ -92,9 +92,14 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-12">
-                        <label for="name">Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" v-model="routeName"/>
+                    <div class="form-group col-md-6">
+                        <label for="name">Route Start Point <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="routeStartName"/>
+                    </div>
+                    
+                    <div class="form-group col-md-6">
+                        <label for="name">Route End Point <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
 
                     <div class="col-md-12">
@@ -226,7 +231,8 @@ export default {
             error: false,
             icon: ' <i class="fa fa-bus"></i> ',
             loop: 1,
-            routeName: '',
+            routeStartName: '',
+            routeEndName: '',
             routeDetails: [],
             th: [],
             classFareName: ''
@@ -252,7 +258,8 @@ export default {
         },
         async addRoute() {
             const data = {
-                route: this.routeName,
+                routeStart: this.routeStartName,
+                routeEnd: this.routeEndName,
                 cities: this.addCities,
                 terminals: this.addTerminalsOnClick
             }

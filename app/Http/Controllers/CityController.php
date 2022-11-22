@@ -89,7 +89,8 @@ class CityController extends Controller
     public function cityRoutes(Request $request)
     {
         $request->validate([
-            'route'=>'required',
+            'routeStart'=>'required',
+            'routeEnd'=>'required',
             'cities'=>'required',
         ],[
             'route.required'=>'Route Name is Required !!!!'
@@ -121,7 +122,7 @@ class CityController extends Controller
             }
         }
         $route = Route::create([
-            'name' => $request['route'],
+            'name' => $request['routeStart'].'-'.$request['routeEnd'],
             'company_id' => $this->company_id,
             'added_by' => auth()->user()->id
         ]);
@@ -129,6 +130,37 @@ class CityController extends Controller
         foreach ($request['cities'] as $index => $city) {
             $used_cities[] = $city;
             foreach ($request['cities'] as $innerIndex => $innerCity) {
+                if (in_array($innerCity, $used_cities)) {
+                    continue;
+                } else {
+                    $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+
+                    if ($fare->count() > 0) {
+                        foreach ($fare as $detail) {
+                            RouteFare::create([
+                                'route_id' => $route->id,
+                                'fare_id' => $detail->id,
+                                'fare_class_id' => $detail->fare_class,
+                                'departure_city_id' => $used_cities[$index],
+                                'destination_city_id' => $innerCity,
+                                'company_id' => $this->company_id,
+                                'added_by' => auth()->user()->id
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+        // Reverse Route
+        $route = Route::create([
+            'name' => $request['routeEnd'].'-'.$request['routeStart'],
+            'company_id' => $this->company_id,
+            'added_by' => auth()->user()->id
+        ]);
+        $used_cities = [];//key can't be same
+        foreach (array_reverse($request['cities']) as $index => $city) {
+            $used_cities[] = $city;
+            foreach (array_reverse($request['cities']) as $innerIndex => $innerCity) {
                 if (in_array($innerCity, $used_cities)) {
                     continue;
                 } else {
