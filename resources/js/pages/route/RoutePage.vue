@@ -96,14 +96,14 @@
                         <label for="name">Route Start Point <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeStartName"/>
                     </div>
-                    
+
                     <div class="form-group col-md-6">
                         <label for="name">Route End Point <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
 
                     <div class="col-md-12">
-                        <h5>Select Terminals</h5>
+                        <h5>Select Cities</h5>
                         <br/>
                     </div>
                     <div class="form-group col-md-12 d-flex align-items-center">

@@ -89,11 +89,11 @@
                                                                     @click=" edit(schedule); genericData(); "
                                                                     class="btn btn-primary mr-1 btn-sm"><i
                                                                 class="far fa-edit"></i></button>
-                                                            <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteSchedule(schedule, i)"
-                                                                    class="btn btn-danger btn-sm"><i
-                                                                class="far fa-trash-alt"></i></button>
+<!--                                                            <button :data-target="'#' + deleteFormID"-->
+<!--                                                                    data-toggle="modal"-->
+<!--                                                                    @click="deleteSchedule(schedule, i)"-->
+<!--                                                                    class="btn btn-danger btn-sm"><i-->
+<!--                                                                class="far fa-trash-alt"></i></button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

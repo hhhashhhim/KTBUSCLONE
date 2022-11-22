@@ -87,14 +87,14 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button
-                                                                :data-target="'#' + deleteFormID"
-                                                                data-toggle="modal"
-                                                                @click="deleteModal(busClass, i)"
-                                                                class="btn btn-danger"
-                                                            >
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
+<!--                                                            <button-->
+<!--                                                                :data-target="'#' + deleteFormID"-->
+<!--                                                                data-toggle="modal"-->
+<!--                                                                @click="deleteModal(busClass, i)"-->
+<!--                                                                class="btn btn-danger"-->
+<!--                                                            >-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -570,7 +570,7 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="card card-success">
+                            <div class="card card-primary">
                                 <div class="card-header d-flex justify-content-between">
                                     <h4 class="modal-title">Edit Seat Detail</h4>
                                     <button
@@ -618,7 +618,7 @@
                                         <div class="col-md-12">
                                             <button
                                                 type="button"
-                                                class="btn btn-block btn-success"
+                                                class="btn btn-block btn-primary"
                                                 @click=" updateSeatDetail( editSingleSeat.rowId, editSingleSeat.colId ) "
                                                 data-dismiss="modal">
                                                 Update Seat Data

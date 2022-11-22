@@ -73,10 +73,10 @@
                                                                @click="edit(fareClass)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button :data-target="'#' + deleteFormID " data-toggle="modal"
-                                                               @click="deleteModal(fareClass,i)" class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
+<!--                                                            <button :data-target="'#' + deleteFormID " data-toggle="modal"-->
+<!--                                                               @click="deleteModal(fareClass,i)" class="btn btn-danger">-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

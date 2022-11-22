@@ -83,6 +83,7 @@
                                 <h1 v-if="loading">Loading.........</h1>
 
                                 <div class="col-md-12 row" v-if="showBookingDiv">
+
                                     <div class="col-md-6 px-1">
                                         <div class="px-3 pt-2">
                                             <div class="row">
@@ -102,7 +103,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Full Name</label>
+                                                        <label>Full Name  <span class="text-danger">*</span></label>
                                                         <input
                                                             type="text"
                                                             class="form-control"
@@ -115,7 +116,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Contact</label>
+                                                        <label>Contact  <span class="text-danger">*</span></label>
                                                         <vue-mask
                                                             v-on:blur="getCustomer('addFormContact')"
                                                             class="form-control"
@@ -224,9 +225,11 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <!--                                                >-->
                                             <div class="form-group text-right">
-                                                <button class="btn btn-primary mx-1" @click="add"
-                                                        v-on:keydown.enter="add">
+                                                <button class="btn btn-primary mx-1"
+                                                        v-on:click="add()"
+                                                   v-on:keyup.enter="add()">
                                                     Generate Ticket
                                                 </button>
                                                 <button class="btn btn-secondary mx-1" @click="reset">
@@ -236,7 +239,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 px-1 ">
+                                    <div class="col-md-4 px-1  overflow-auto" style="max-height: 530px !important;">
                                         <div
                                             class="d-flex justify-content-center seat-img p-0 m-0"
                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map"
@@ -249,7 +252,7 @@
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo)"
                                                     :class="getClasses(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                    :title="col.partial? col.departure_city + ' to ' + col.destination_city:''">
+                                                    :title="col.departure_city + ' to ' + col.destination_city">
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
                                                     <small
@@ -525,6 +528,7 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
+                            <button class="btb btn-info mx-1"> Add ELT</button>
                             <button class="btn btn-primary mx-1" @click="addOverIssueTicket()"> Generate
                                 Ticket
                             </button>
@@ -604,7 +608,9 @@
                                             <!--                                            Buttons-->
                                             <div class="row mt-1">
                                                 <div class="col-md-12 text-right">
-                                                    <button type="button" class="btn btn-primary">Reschedule</button>
+<!--                                                    v-if="selectedBookedOverIssueSeats.length"-->
+<!--                                                    v-if="selectedBookedSeats.length"-->
+                                                    <button type="button" class="btn btn-primary" >Reschedule</button>
                                                     <button type="button" class="btn btn-warning ml-2">Over Issue
                                                     </button>
                                                     <button type="button" class="btn btn-danger ml-2">Cancel</button>
@@ -615,6 +621,25 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addELTModelLabel">ADD NEW CARGO</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Add Cargo</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -727,7 +752,7 @@ export default {
         enter: function (e) {
             console.log(e);
             if (e.key == "Enter") {
-                alert('gdshfdsdhguger');
+                this.add();
             }
         },
         altM: function (e) {
@@ -861,7 +886,7 @@ export default {
                 }
             }
             if (flag == 'overIssueCNIC') {
-                if (this.addFormOverIssue.customer.cnic != '' && this.addFormOverIssue.customer.cnic != 'undefined') {
+                if (this.addFormOverIssue.customer.cnic == '' && this.addFormOverIssue.customer.cnic == 'undefined') {
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         cnicNumber: this.addFormOverIssue.customer.cnic,
                         status: flag,
@@ -871,7 +896,7 @@ export default {
                     this.addFormOverIssue.customer.contact = resCnic.data.contact;
                 }
             }
-            if (flag == 'addFormContact') {
+            if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         phoneNumber: this.addForm.contact,
@@ -881,7 +906,7 @@ export default {
                     this.addForm.customerName = resCnic.data.name;
                 }
             }
-            if (flag == 'overIssueContact') {
+            if (flag == 'overIssueContact' && this.addFormOverIssue.customer.name == '' && this.addFormOverIssue.customer.cnic == '') {
                 if (this.addFormOverIssue.customer.contact != '' && this.addFormOverIssue.customer.contact != 'undefined') {
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         phoneNumber: this.addFormOverIssue.customer.contact,
@@ -906,8 +931,7 @@ export default {
             } else {
                 return true;
             }
-        }
-        ,
+        },
 
         async fetchScheduleData() {
             if (this.addForm.schedule == 0) {
@@ -936,8 +960,7 @@ export default {
                     }
                 }
             }
-        }
-        ,
+        },
         async selectSeat(row, col, seatNo) {
             console.log(this.schedule.bus_class.seat_map[row][col])
             this.validationErrors = [];
@@ -1043,11 +1066,9 @@ export default {
                     this.addFormOverIssue.customer = resOverIssue.data.customer;
                 }
             }
-        }
-        ,
+        },
 
         async addOverIssueTicket() {
-            window.print();
             if (this.addFormOverIssue.customer.cnic == '' || this.addFormOverIssue.customer.cnic == 'undefined') {
                 swal({
                     title: "Required",
@@ -1115,8 +1136,7 @@ export default {
 
                 }
             }
-        }
-        ,
+        },
 
         getClasses(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
@@ -1124,30 +1144,83 @@ export default {
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
-        }
-        ,
-
+        },
+        adddELT() {
+            if(this.selectedSeats.length == 0){
+                 return swal({
+                    title: "Required!!",
+                    text: "Please Select Any Seat First!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }else{
+                $("#addELTModel").modal("show");
+            }
+        },
         async add() {
-            this.validationErrors = [];
             if (!this.addForm.schedule) {
-                return this.errorsArray("Schedule Name is Required", "Schedule");
+                // return this.errorsArray("Schedule Name is Required", "Schedule");
+                return swal({
+                    title: "Required!",
+                    text: "Schedule Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             }
             if (!this.addForm.date) {
-                return this.errorsArray("Date is Required", "Date");
+                // return this.errorsArray("Date is Required", "Date");
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             }
-            if (
-                !this.addForm.customerCNIC ||
-                this.addForm.customerCNIC.length != 15
-            ) {
-                return this.errorsArray(
-                    "CNIC is Required and Should Contain 15 Digits",
-                    "CNIC"
-                );
+            if (!this.addForm.customerCNIC || this.addForm.customerCNIC.length != 15) {
+                // return this.errorsArray(
+                //     "CNIC is Required and Should Contain 15 Digits",
+                //     "CNIC"
+                // );
+                return swal({
+                    title: "Required!",
+                    text: "CNIC is Required and Should Contain 15 Digits",
+                    icon: "error",
+                    timer: 2000
+                });
             }
-            if (this.selectedSeats.length == 0)
-                return this.errorsArray("Please Select At Least One Seat", "Seat");
-
-            this.validationErrors = [];
+            if (!this.addForm.customerName || typeof  this.addForm.customerName == 'undefined') {
+                // return this.errorsArray(
+                //     "CNIC is Required and Should Contain 15 Digits",
+                //     "CNIC"
+                // );
+                return swal({
+                    title: "Required!",
+                    text: "Customer Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.contact || typeof this.addForm.contact == 'undefined') {
+                // return this.errorsArray(
+                //     "CNIC is Required and Should Contain 15 Digits",
+                //     "CNIC"
+                // );
+                return swal({
+                    title: "Required!",
+                    text: "Customer Contact Number is required,",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.selectedSeats.length == 0) {
+                // return this.errorsArray("Please Select At Least One Seat", "Seat");
+                return swal({
+                    title: "required!",
+                    text: "Please Select At Least One Seat",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
 
             const res = await this.callApi("post", "booking/store", this.addForm);
             if (res.status === 200) {

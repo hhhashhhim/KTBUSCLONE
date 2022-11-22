@@ -55,14 +55,14 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button
-                                                                :data-target="'#' + deleteFormID"
-                                                                data-toggle="modal"
-                                                                @click="deleteBus(bus, i)"
-                                                                class="btn btn-danger"
-                                                            >
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
+<!--                                                            <button-->
+<!--                                                                :data-target="'#' + deleteFormID"-->
+<!--                                                                data-toggle="modal"-->
+<!--                                                                @click="deleteBus(bus, i)"-->
+<!--                                                                class="btn btn-danger"-->
+<!--                                                            >-->
+<!--                                                                <i class="far fa-trash-alt"></i>-->
+<!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
