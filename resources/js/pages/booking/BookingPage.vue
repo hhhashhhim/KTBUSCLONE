@@ -103,7 +103,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Full Name  <span class="text-danger">*</span></label>
+                                                        <label>Full Name <span class="text-danger">*</span></label>
                                                         <input
                                                             type="text"
                                                             class="form-control"
@@ -116,7 +116,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Contact  <span class="text-danger">*</span></label>
+                                                        <label>Contact <span class="text-danger">*</span></label>
                                                         <vue-mask
                                                             v-on:blur="getCustomer('addFormContact')"
                                                             class="form-control"
@@ -229,7 +229,7 @@
                                             <div class="form-group text-right">
                                                 <button class="btn btn-primary mx-1"
                                                         v-on:click="add()"
-                                                   v-on:keyup.enter="add()">
+                                                        v-on:keyup.enter="add()">
                                                     Generate Ticket
                                                 </button>
                                                 <button class="btn btn-secondary mx-1" @click="reset">
@@ -577,7 +577,7 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold ">Date :</p>
-                                                        <p class="mb-0">Schedule Date</p>
+                                                        <p class="mb-0">{{ this.addForm.date }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold ">Bus Class :</p>
@@ -606,18 +606,22 @@
                                                 </div>
                                             </div>
                                             <!--                                            Buttons-->
-                                            <div class="row mt-1">
-                                                <div class="col-md-12 text-right">
-<!--                                                    v-if="selectedBookedOverIssueSeats.length"-->
-<!--                                                    v-if="selectedBookedSeats.length"-->
-                                                    <button type="button" class="btn btn-primary" >Reschedule</button>
-                                                    <button type="button" class="btn btn-warning ml-2">Over Issue
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger ml-2">Cancel</button>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
+                                    <div class="row mt-1">
+                                        <div class="col-md-12 text-right">
+                                            <!--                                                    v-if="selectedBookedOverIssueSeats.length"-->
+                                            <!--                                                    v-if="selectedBookedSeats.length"-->
+                                            <button type="button" class="btn btn-info" data-toggle="modal"
+                                                    data-target="#addELTModel">Add ELT
+                                            </button>
+                                            <button type="button" class="btn btn-primary ml-2">Reschedule</button>
+                                            <button type="button" class="btn btn-warning ml-2">Over Issue
+                                            </button>
+                                            <button type="button" class="btn btn-danger ml-2">Cancel</button>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -625,6 +629,17 @@
                 </div>
             </div>
         </div>
+
+
+        <!--        modal for seat details end-->
+        <!--End Over Issue Model-->
+        <!--            DELETE MODAL-->
+        <Delete :deleteForm="deleteFormID"
+                confirmationMessage="Are You Sure You want To Delete This Booking ???"
+        />
+        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>
+        <!--        <OverIssuePopup :formID="overissueFormId" :seat_no="bookedOverIssueSeats"/>-->
+        <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
         <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -635,7 +650,30 @@
                         </button>
                     </div>
                     <div class="modal-body">
-
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullName"
+                                        v-model="addForm.customerName"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullName"
+                                        v-model="addForm.customerName"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary">Add Cargo</button>
@@ -644,15 +682,6 @@
                 </div>
             </div>
         </div>
-        <!--        modal for seat details end-->
-        <!--End Over Issue Model-->
-        <!--            DELETE MODAL-->
-        <Delete :deleteForm="deleteFormID"
-                confirmationMessage="Are You Sure You want To Delete This Booking ???"
-        />
-        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>
-        <!--        <OverIssuePopup :formID="overissueFormId" :seat_no="bookedOverIssueSeats"/>-->
-        <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
     </section>
 </template>
 
@@ -961,8 +990,9 @@ export default {
                 }
             }
         },
+
         async selectSeat(row, col, seatNo) {
-            console.log(this.schedule.bus_class.seat_map[row][col])
+            console.log(this.schedule.bus_class.seat_map[row][col].fare, this.addForm.totalFare)
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -993,11 +1023,11 @@ export default {
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
+                    this.addForm.totalFare = this.addForm.totalFare - this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.splice(index, 1);
                 } else {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
+                    this.addForm.totalFare = this.addForm.totalFare + this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.push(seatNo);
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
@@ -1146,14 +1176,14 @@ export default {
             return gender + " " + selected + " " + partial + " " + over;
         },
         adddELT() {
-            if(this.selectedSeats.length == 0){
-                 return swal({
+            if (this.selectedSeats.length == 0) {
+                return swal({
                     title: "Required!!",
                     text: "Please Select Any Seat First!",
                     icon: "error",
                     timer: 2000
                 });
-            }else{
+            } else {
                 $("#addELTModel").modal("show");
             }
         },
@@ -1188,7 +1218,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (!this.addForm.customerName || typeof  this.addForm.customerName == 'undefined') {
+            if (!this.addForm.customerName || typeof this.addForm.customerName == 'undefined') {
                 // return this.errorsArray(
                 //     "CNIC is Required and Should Contain 15 Digits",
                 //     "CNIC"
