@@ -681,6 +681,7 @@ export default {
             editSingleSeat: [],
             allSeatClasses: [],
             setSeatNumber: [],
+            uniqueSeatNumber: [],
             totalSeat: 0,
             delId: "",
             addData: {},
@@ -806,7 +807,8 @@ export default {
             }
         },
         assignSeatNumber: function (rowId, colId) {
-            console.log(this.data.seatMap);
+
+            
             if(this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined'){
                 return swal({
                     title: "Required !",
@@ -815,7 +817,19 @@ export default {
                     timer: 2000,
                 });
             }
-            this.data.seatMap[rowId][colId].seatNo =  this.setSeatNumber.addSeatNO
+            // Check seat number should be unique
+            if(this.uniqueSeatNumber.includes(this.setSeatNumber.addSeatNO.toLowerCase())){
+                return swal({
+                    title: "Required !",
+                    text: "This seat number already taken",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+
+            this.uniqueSeatNumber.push(this.setSeatNumber.addSeatNO);
+            this.data.seatMap[rowId][colId].seatNo =  this.setSeatNumber.addSeatNO;
+
             swal({
                 title: "Success",
                 text: "Successfully Added Seat Number",
@@ -825,7 +839,6 @@ export default {
 
         },
         selectSeat(row, col) {
-            console.log(this.selectedSeats);
             console.log(this.data.seatMap[row][col].reserved);
                 let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
                 if (index != -1) {
