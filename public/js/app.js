@@ -30032,7 +30032,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
     },
     onFileChange: function onFileChange(e, imgTag) {
-      if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|)$/i)) {
+      if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
         if (imgTag == 'profile') {
           var profile = e.target.files[0];
           this.nameProfile = profile.name;
@@ -30074,10 +30074,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           this.urlCNICBackEdit = URL.createObjectURL(_back);
           this.editImg.back = _back;
         }
+
+        if (imgTag == 'attachments') {
+          var attachment = e.target.files[0];
+          this.attachments = attachment.name;
+        }
+
+        if (imgTag == 'attachmentsEdit') {
+          var attachmentsEditRes = e.target.files[0];
+          this.attachmentsEdit = attachmentsEditRes.name;
+        }
       } else {
         return swal({
           title: "Invalid Format",
-          text: "Uploaded File must be in .jpg, .jpeg, .png",
+          text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
           icon: "error",
           timer: 2000
         });
@@ -30356,6 +30366,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.urlCNICFront = '';
       this.nameProfile = '';
       this.urlProfile = '';
+      this.attachments = '';
+      this.attachmentsEdit = '';
     },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
@@ -46066,7 +46078,7 @@ var _hoisted_91 = {
 };
 
 var _hoisted_92 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "for": "salary"
+  "for": "attachments"
 }, "Upload Attachments", -1
 /* HOISTED */
 );
@@ -46995,7 +47007,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* HYDRATE_EVENTS */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_90, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.nameBack != '' ? $data.nameBack : 'Choose.jpg, .png, .jpeg Image'), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "file",
         onChange: _cache[28] || (_cache[28] = function ($event) {
           return $options.onFileChange($event, 'attachments');
@@ -47007,7 +47019,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* HYDRATE_EVENTS */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.attachments != '' ? $data.attachments : 'Choose .pdf, .docx, .doc File'), 1
       /* TEXT */
-      )])])])])];
+      )])])])];
     }),
     _: 1
     /* STABLE */
