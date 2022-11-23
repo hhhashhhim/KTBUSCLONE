@@ -234,7 +234,9 @@
                                  :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
+                        <button class="btn btn-primary" 
+                        :data-toggle="checkAllSeatAssign ? 'modal' : ''" 
+                        :data-target="checkAllSeatAssign ? '#setSeatClass' : ''"
                                 @click="resetAttributes()">Set Attributes
                         </button>
                     </div>
@@ -519,12 +521,13 @@
                             <td
                                 v-for="(col, colIndex) in record"
                                 :key="colIndex"
-                                :class="col.reserved ? 'selected border' : ''"
                             >
+                                <small  class="font-weight-bold position-absolute text-dark" style="font-size: 10px !important"  v-if="col.reserved">{{col.seatNo ?? 'N/A'}}</small>
                                 <img
                                     data-toggle="modal"
                                     data-target="#setEditSeatClass"
                                     @click="getSeatDetails(rowIndex, colIndex)"
+                                    :style=" col.class ? checkClass(col.class) : '' "
                                     v-if="col.reserved"
                                     :src="
                     $store.state.app_url +
@@ -542,9 +545,9 @@
                                  :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
+                        <!-- <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
                                 @click="resetAttributes()">Set Attributes
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 <template v-slot:button>
@@ -671,6 +674,7 @@ export default {
                 type: 0,
             },
             success: false,
+            checkAllSeatAssign: false,
             addSeatNO: '',
             loading: false,
             error: false,
@@ -703,7 +707,29 @@ export default {
         };
     },
     methods: {
-        resetAttributes: function () {
+        resetAttributes: function () {  
+            let b = 0;
+            this.data.seatMap.map((seat) => {
+                for (let i = seat.length - 1; i >= 0; i--) {
+                    if (seat[i].seatNo == undefined && seat[i].reserved == true) {
+                        b = 1;
+                    }
+                }
+            });
+
+            if(b==1)
+            {
+                this.checkAllSeatAssign = false;
+                return swal({
+                    title: "Required !",
+                    text: "Please assign all seat number first",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+
+            this.checkAllSeatAssign = true;
+            
             this.seatModify.class = 0;
             this.seatModify.type = 0;
 
@@ -839,7 +865,6 @@ export default {
 
         },
         selectSeat(row, col) {
-            console.log(this.data.seatMap[row][col].reserved);
                 let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
                 if (index != -1) {
                     this.data.seatMap[row][col].selected = false;
@@ -923,6 +948,7 @@ export default {
         }
         ,
         addFormGenerateMap: function () {
+            this.uniqueSeatNumber = [];
             this.validationErrors = [];
             let vm = this;
             if (typeof vm.data.noOfRows == "undefined")
@@ -1000,15 +1026,26 @@ export default {
 
         async addBusClass() {
             this.validationErrors = [];
-            // let seatNo = 0;
-            // this.data.seatMap = this.data.seatMap.map((seat) => {
-            //     for (let i = seat.length - 1; i >= 0; i--) {
-            //         if (seat[i].reserved) {
-            //             seat[i]["seatNo"] = ++seatNo;
-            //         }
-            //     }
-            //     return seat;
-            // });
+
+            // validation for assign all class 
+            let b = 0;
+            this.data.seatMap.map((seat) => {
+                for (let i = seat.length - 1; i >= 0; i--) {
+                    if (seat[i].class == undefined && seat[i].reserved == true) {
+                        b = 1;
+                    }
+                }
+            });
+
+            if(b==1)
+            {
+                return swal({
+                    title: "Required !",
+                    text: "Please assign seat class first",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
 
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
