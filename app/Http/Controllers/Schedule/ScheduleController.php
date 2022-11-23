@@ -280,7 +280,7 @@ class ScheduleController extends Controller
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
         $start_datetime = new DateTime(date('Y-m-d H:i:s'));
-        $end_datetime = new DateTime($scheduleDetail->departure_date . ' ' . $scheduleDetail->departure_time);
+        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
         $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp()) / 60;
         $leavingIn30Min = $diffInMins > 30 ? false : true;
         // return dd($leavingIn30Min);

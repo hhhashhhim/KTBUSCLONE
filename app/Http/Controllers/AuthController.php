@@ -12,17 +12,34 @@ use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use stdClass;
+use Illuminate\Http\Response;
+
 
 class AuthController extends Controller
 {
 
     public function index(Request $request)
     {
+
+//        $data = [
+//            'title' => 'Ticket',
+//            'date' => date('m/d/Y')
+//        ];
+//
+//        $pdf = PDF::loadView('pdf/pdf', $data);
+//
+//        $output = $pdf->output();
+//
+//        return new Response($output, 200, [
+//            'Content-Type' => 'application/pdf',
+//        ]);
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }
@@ -31,6 +48,7 @@ class AuthController extends Controller
         }
         return view('admin.index');
     }
+
 
     public function checkForPermission($user, $request)
     {

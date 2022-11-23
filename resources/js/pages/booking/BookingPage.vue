@@ -252,7 +252,7 @@
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo)"
                                                     :class="getClasses(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                    :title="col.departure_city + ' to ' + col.destination_city">
+                                                    :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
                                                     <small
@@ -992,7 +992,6 @@ export default {
         },
 
         async selectSeat(row, col, seatNo) {
-            console.log(this.schedule.bus_class.seat_map[row][col].fare, this.addForm.totalFare)
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1003,35 +1002,47 @@ export default {
                 });
             }
             if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
+                console.log("step1")
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
+                    console.log("step2")
                     this.schedule.bus_class.seat_map[row][col].selected = false;
+                    this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                     this.selectedBookedSeats.splice(index, 1);
+                    console.log( this.addForm.totalFare);
                     this.bookedSeats = this.bookedSeats.filter((seat) => {
                         if (seat.seatNo != seatNo) {
                             return seat;
                         }
                     });
                 } else {
+                    console.log("step3")
                     this.schedule.bus_class.seat_map[row][col].selected = true;
+                    this.addForm.totalFare +=  parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
                 }
 
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
             } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
+                console.log("step4")
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
+                    console.log("step5")
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare = this.addForm.totalFare - this.schedule.bus_class.seat_map[row][col].fare;
+                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.splice(index, 1);
                 } else {
+                    console.log("step6")
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare = this.addForm.totalFare + this.schedule.bus_class.seat_map[row][col].fare;
+                    this.addForm.totalFare +=  this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.push(seatNo);
+
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
             } else {
+                console.log("step7")
+
                 this.fetchScheduleData();
                 this.resetingArrays();
                 return swal({
@@ -1041,6 +1052,8 @@ export default {
                     timer: 2000
                 });
             }
+
+            console.log(this.schedule.bus_class.seat_map[row][col].fare, this.addForm.totalFare)
 
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {

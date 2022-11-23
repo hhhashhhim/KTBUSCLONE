@@ -30,7 +30,6 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-
         $bookings = Ticket::select('schedule_id', 'date')->with('schedule:id,name')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', $this->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
@@ -170,6 +169,7 @@ class BookingController extends Controller
             'customer' => $customer,
         ];
     }
+
     public function overIssueAddNew(Request $request)
     {
         $schedule = Schedule::where('id', $request->schedule_id)
