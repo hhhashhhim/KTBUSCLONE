@@ -92,7 +92,7 @@ class BookingController extends Controller
 
         foreach ($request->selectedSeats as $i => $seat) {
 
-            Ticket::create([
+            $ticket = Ticket::create([
                 'company_id' => $this->company_id,
                 'departure_city_id' => $request->departureCity,
                 'destination_city_id' => $request->destinationCity,
@@ -112,9 +112,12 @@ class BookingController extends Controller
 
         }
 
-        return "Successfully Booking Created";
+        dd('done');
 
     }
+
+
+
 
     public function reschedule(Request $request)
     {
@@ -141,12 +144,12 @@ class BookingController extends Controller
         if (!$request->date) {
             return "Date is Required";
         }
-        $allSchedules =  ScheduleDetail::with('schedule')->where(['departure_id'=> $request->departure_city_id, 'destination_id'=> $request->destination_city_id, 'departure_date'=> $request->date] )->get();
+        $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
         foreach ($allSchedules as $key => $single) {
             $single->departure_date = date("m/d/Y", strtotime($single->departure_date));
             $single->departure_time = date("h:i A", strtotime($single->departure_time));
         }
-        return  $allSchedules;
+        return $allSchedules;
 
     }
 
@@ -186,16 +189,16 @@ class BookingController extends Controller
 
         $oldBooking = Ticket::where('company_id', $this->company_id)->where('date', $request->date)->where('schedule_id', $request->schedule_id)->where('departure_city_id', $request->departure_city)->where('destination_city_id', $request->destination_city)->first();
         $cnicFormat = strpos($request->cnic, '-') ? str_replace('-', '', $request->cnic) : $request->cnic;
-        $phoneFormat = strpos($request->contact, '-') ?  str_replace('-', '', $request->contact) : $request->contact;
+        $phoneFormat = strpos($request->contact, '-') ? str_replace('-', '', $request->contact) : $request->contact;
         $old_customer = Customer::where('cnic', $cnicFormat)->first();
-        if($old_customer->id == $oldBooking->customer_id){
+        if ($old_customer->id == $oldBooking->customer_id) {
             return response()->json([
                 "errors" => [
                     "message" => ["This Seat already booked against this customer"]
                 ]
 //                'message' => ["This Seat already booked against this customer"],
             ], 422);
-        }else {
+        } else {
             if (!$old_customer) {
                 $new_customer = Customer::create([
                     'company_id' => $this->company_id,
@@ -252,22 +255,22 @@ class BookingController extends Controller
 
     public function getCnic(Request $request)
     {
-            if($request->status == 'addFormCNIC') {
-                $cnicFormat = str_replace('-', '', $request['cnicNumber']);
-                return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
-            }
-            if($request->status == 'addFormContact') {
-                 $phoneFormat = str_replace('-', '', $request['phoneNumber']);
-                return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
-            }
-            if($request->status == 'overIssueCNIC') {
-                $cnicFormat = str_replace('-', '', $request['cnicNumber']);
-                return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
-            }
-            if($request->status == 'overIssueContact') {
-                 $phoneFormat = str_replace('-', '', $request['phoneNumber']);
-                return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
-            }
+        if ($request->status == 'addFormCNIC') {
+            $cnicFormat = str_replace('-', '', $request['cnicNumber']);
+            return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
+        }
+        if ($request->status == 'addFormContact') {
+            $phoneFormat = str_replace('-', '', $request['phoneNumber']);
+            return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
+        }
+        if ($request->status == 'overIssueCNIC') {
+            $cnicFormat = str_replace('-', '', $request['cnicNumber']);
+            return Customer::where('company_id', $this->company_id)->where('cnic', $cnicFormat)->first();
+        }
+        if ($request->status == 'overIssueContact') {
+            $phoneFormat = str_replace('-', '', $request['phoneNumber']);
+            return Customer::where('company_id', $this->company_id)->where('contact', $phoneFormat)->first();
+        }
     }
 
     public function detailTicket(Request $request)
@@ -282,4 +285,8 @@ class BookingController extends Controller
 //        });
 //        return $allBooking;
     }
+
+
+
+
 }
