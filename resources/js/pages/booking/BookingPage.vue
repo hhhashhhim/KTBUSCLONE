@@ -1004,7 +1004,6 @@ export default {
         },
 
         async selectSeat(row, col, seatNo) {
-            console.log(this.schedule);
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1090,11 +1089,11 @@ export default {
                 let index = this.selectedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
+                    // this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.splice(index, 1);
                 } else {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
+                    // this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.push(seatNo);
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
