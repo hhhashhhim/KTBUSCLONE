@@ -12,6 +12,7 @@ use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
 use App\Models\TicketsOverIssue;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -111,12 +112,19 @@ class BookingController extends Controller
             ]);
 
         }
+        return "Successfully Booking Created";
+//        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
+//        $pdf = PDF::loadView('pdf/pdf', $data);
+//        return $pdf->stream();
+//            $output = $pdf->output();
+//
+//        return new Response($output, 200, [
+//            'Content-Type' => 'application/pdf',
+//        ]);
 
-        dd('done');
+//        dd('done');
 
     }
-
-
 
 
     public function reschedule(Request $request)
@@ -287,6 +295,26 @@ class BookingController extends Controller
     }
 
 
+    public function advanceData(Request $request)
+    {
 
+//        dd($request->seatNO);
+        $customerId = Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->pluck('customer_id');
+        $checkId = 0;
+        foreach ($customerId as $single) {
+            if ($single != $customerId[0]) {
+                $checkId = 1;
+            }
+        }
+        if($checkId == 1) {
+            return response()->json([
+                "errors" => [
+                    "Customer" => ["Selected Seats are not belongs to same Customers!!!"]
+                ]
+            ], 422);
 
+        }else{
+                dd('alright');
+        }
+    }
 }
