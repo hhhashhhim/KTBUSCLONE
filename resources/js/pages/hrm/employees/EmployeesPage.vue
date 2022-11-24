@@ -288,18 +288,18 @@
                                     nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
-                        <div class="form-group col-md-12">
-                            <label for="salary">Upload Attachments</label>
-                            <div class="custom-file">
-                                <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
-                                       class="custom-file-input" id="attachments">
-                                <label class="custom-file-label overflow-hidden"
-                                       for="attachments">{{ attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File' }}</label>
-                            </div>
-
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="attachments">Upload Attachments</label>
+                        <div class="custom-file">
+                            <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
+                                   class="custom-file-input" id="attachments">
+                            <label class="custom-file-label overflow-hidden"
+                                   for="attachments">{{ attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File' }}</label>
                         </div>
 
                     </div>
+                    
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
@@ -561,9 +561,10 @@
                             <label class="custom-file-label overflow-hidden"
                                    for="attachmentsEdit">{{ attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File' }}</label>
                         </div>
-
+    
                     </div>
                 </div>
+                
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateEmployees"
                             :disabled="loading">
@@ -689,7 +690,7 @@ export default {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
         onFileChange: function (e, imgTag) {
-            if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|)$/i)) {
+            if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
                 if (imgTag == 'profile') {
                     const profile = e.target.files[0];
                     this.nameProfile = profile.name;
@@ -728,10 +729,18 @@ export default {
                     this.urlCNICBackEdit = URL.createObjectURL(back);
                     this.editImg.back = back;
                 }
+                if (imgTag == 'attachments') {
+                    const attachment = e.target.files[0];
+                    this.attachments = attachment.name;
+                }
+                if (imgTag == 'attachmentsEdit') {
+                    const attachmentsEditRes = e.target.files[0];
+                    this.attachmentsEdit = attachmentsEditRes.name;
+                }
             } else {
                 return swal({
                     title: "Invalid Format",
-                    text: "Uploaded File must be in .jpg, .jpeg, .png",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
                     icon: "error",
                     timer: 2000
                 });
@@ -913,6 +922,8 @@ export default {
             this.urlCNICFront = '';
             this.nameProfile = '';
             this.urlProfile = '';
+            this.attachments = '';
+            this.attachmentsEdit = '';
         },
 
         isNumber: function (evt) {
