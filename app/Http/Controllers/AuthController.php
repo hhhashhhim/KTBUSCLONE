@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use stdClass;
 use Illuminate\Http\Response;
 use TCPDF;
@@ -98,7 +99,8 @@ class AuthController extends Controller
 //        $pdf->Output('closing_report.pdf', 'I');
 //
 //    }
-
+         return QrCode::size(50)->generate('ItSolutionStuff.com');
+//
 //            $data = [
 //                'title' => 'Ticket',
 //                'date' => date('m/d/Y')
