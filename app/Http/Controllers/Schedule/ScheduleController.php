@@ -260,7 +260,7 @@ class ScheduleController extends Controller
 
     public function selected(Request $request)
     {
-
+        
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
@@ -277,7 +277,8 @@ class ScheduleController extends Controller
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', $this->company_id)
             ->select('id', 'fare_class_id', 'route_id', 'bus_class_id', 'time')
-            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+            ->first();
 
         $start_datetime = new DateTime(date('Y-m-d H:i:s'));
         $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
@@ -285,10 +286,11 @@ class ScheduleController extends Controller
         $leavingIn30Min = $diffInMins > 30 ? false : true;
         // return dd($leavingIn30Min);
         // Fare Fetching About the Schedule
-        $route_departure_city_id = $schedule->route->fares->first()->departure_city_id;
-        $route_destination_city_id = $schedule->route->fares->last()->destination_city_id;
+        
+        // $route_departure_city_id = $schedule->route->fares->first()->departure_city_id;
+        // $route_destination_city_id = $schedule->route->fares->last()->destination_city_id;
 //        dd($route_destination_city_id);
-        $fareForAllClasses = FareTable::where('from_city_id', $route_departure_city_id)->where('to_city_id', $route_destination_city_id)
+        $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', $this->company_id)
             ->get()->unique('fare_class');
 

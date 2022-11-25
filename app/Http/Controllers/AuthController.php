@@ -99,7 +99,7 @@ class AuthController extends Controller
 //        $pdf->Output('closing_report.pdf', 'I');
 //
 //    }
-         return QrCode::size(50)->generate('ItSolutionStuff.com');
+        //  QrCode::size(50)->generate('ItSolutionStuff.com');
 //
 //            $data = [
 //                'title' => 'Ticket',

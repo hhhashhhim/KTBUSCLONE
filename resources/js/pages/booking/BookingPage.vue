@@ -1053,10 +1053,11 @@ export default {
                 });
             }
 
-            console.log(this.schedule.bus_class.seat_map[row][col].fare, this.addForm.totalFare)
+            
 
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
+
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
@@ -1077,11 +1078,11 @@ export default {
                 let index = this.selectedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
+                    // this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.splice(index, 1);
                 } else {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
+                    // this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.push(seatNo);
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
