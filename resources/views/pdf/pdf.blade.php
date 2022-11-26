@@ -1,3 +1,4 @@
+@foreach($data as $key => $single)
 <!DOCTYPE html>
 <html>
 <head>
@@ -72,6 +73,8 @@
     <title>Print Ticket</title>
 </head>
 <body>
+{{--{{dd($data)}}--}}
+
 <div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
     <div class="companyAddress">
@@ -89,11 +92,11 @@
         </div>
         <div>
             <p class="font-weight-bold float-left">Name :</p>
-            <p class="float-right">Malik ajay </p>
+            <p class="float-right">{{ $data[$key]['customer']->name }}</p>
         </div>
         <div class="clear-both">
             <p class="font-weight-bold float-left">Seat No :</p>
-            <p class="float-right">1</p>
+            <p class="float-right">{{ $data[$key]->seat_no }}</p>
         </div>
         <div class="clear-both">
             <p class="font-weight-bold float-left">Bus No :</p>
@@ -103,20 +106,20 @@
         <p style="width:100%;  text-align: center; margin:0">.......................................................................................................</p>
 
         <div>
-            <p class="font-weight-bold float-left">From : &nbsp; <span>City Name</span></p>
-            <p class="font-weight-bold float-right">To : &nbsp; <span>Malik ajay</span> </p>
+            <p class="font-weight-bold float-left">From : &nbsp; <span>{{$data[$key]['departure_city']->name}}</span></p>
+            <p class="font-weight-bold float-right">To : &nbsp; <span>{{ $data[$key]['destination_city']->name }}</span> </p>
         </div>
         <div class="clear-both">
             <p class="font-weight-bold float-left">Departure Date :</p>
-            <p class="float-right">22/11/2022</p>
+            <p class="float-right">{{date('d/m/Y', strtotime($data[$key]->date))}}</p>
         </div>
         <div class="clear-both">
             <p class="font-weight-bold float-left">Departure Time :</p>
-            <p class="float-right">21:45 PM </p>
+            <p class="float-right">{{ date('H:i A', strtotime($data[$key]['schedule']->time))}} </p>
         </div>
         <div class="clear-both">
             <p class="font-weight-bold float-left">Booking Date :</p>
-            <p class="float-right">22/11/2022 11:32</p>
+            <p class="float-right">{{ date('d/m/Y H:i', strtotime($data[$key]->created_at)) }}</p>
         </div>
         <div class="clear-both"></div>
         <p style="width:100%;  text-align: center; margin:0">.......................................................................................................</p>
@@ -146,36 +149,34 @@
     <p style="width:100%;  text-align: center; margin:0">.......................................................................................................</p>
 
     <div style="width:100%">
-        <p style="margin-bottom: 0" class="font-weight-bold float-left">Seat # : &nbsp;<span>1 &nbsp;&nbsp;&nbsp;</span></p>
+        <p style="margin-bottom: 0" class="font-weight-bold float-left">Seat # : &nbsp;<span>{{ $data[$key]->seat_no }}</span></p>
         <p style="margin-bottom: 0" class="font-weight-bold float-right">Bus No : &nbsp;<span>Bus#&nbsp;&nbsp; </span></p>
     </div>
     <div style="width:100%" class="clear-both">
-        <p style="margin-bottom: 0" class="font-weight-bold float-left" >From : <span>Rawalpindi</span></p>
-        <p style="margin-bottom: 0" class="font-weight-bold float-right">To :  <span>Faisalabad</span></p>
+        <p style="margin-bottom: 0" class="font-weight-bold float-left" >From : <span>{{$data[$key]['departure_city']->name}}</span></p>
+        <p style="margin-bottom: 0" class="font-weight-bold float-right">To :  <span>{{$data[$key]['destination_city']->name}}</span></p>
     </div>
 
     <div class="clear-both">
         <p style="margin-bottom: 0" class="font-weight-bold float-left" >Departure Date :</p>
-        <p style="margin-bottom: 0" class="font-weight-bold float-right">22/11/2022</p>
+        <p style="margin-bottom: 0" class="font-weight-bold float-right">{{date('d/m/Y', strtotime($data[$key]->date))}}</p>
     </div>
     <div class="clear-both"></div>
     <p style="width:100%;  text-align: center; margin:0">.......................................................................................................</p>
     <div>
         <p class="font-weight-bold float-left" style="margin-bottom: 0">Ticket Holder Name :</p>
-        <p class="float-right" style="margin-bottom: 0">Malik ajay </p>
+        <p class="float-right" style="margin-bottom: 0">{{ $data[$key]['customer']->name }}</p>
     </div>
     <div class="clear-both">
         <p class="font-weight-bold float-left" style="margin-bottom: 0">CNIC Number :</p>
-        <p class="float-right" style="margin-bottom: 0">3320216516699 </p>
+        <p class="float-right" style="margin-bottom: 0">{{$data[$key]['customer']->cnic}}</p>
     </div>
     <div class="clear-both">
         <p style="margin-bottom: 0" class="font-weight-bold float-left">Contact # : </p>
-        <p style="margin-bottom: 0" class="float-right">03157053558</p>
+        <p style="margin-bottom: 0" class="float-right">{{$data[$key]['customer']->contact}}</p>
     </div>
 
 </div>
-
-
 <script type="text/javascript">
     $(document).ready(function () {
         window.print();
@@ -184,3 +185,4 @@
 </script>
 </body>
 </html>
+@endforeach

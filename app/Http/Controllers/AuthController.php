@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use stdClass;
 use Illuminate\Http\Response;
@@ -28,91 +29,29 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-//        //    CAsh Closing start
-//
-//        $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-//     // set document information
-//     $pdf->SetCreator(PDF_CREATOR);
-//     $pdf->SetAuthor('GCH');
-//     $pdf->SetTitle('Journal Voucher');
-//     $pdf->SetSubject('Accounts');
-//
-//
-//     // set default header data
-//     // $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 005', PDF_HEADER_STRING);
-//
-//     // set header and footer fonts
-//     $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-//     $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-//
-//     // set default monospaced font
-//     $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-//
-//     // set margins
-//     $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-//     $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-//     $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-//
-//     // set auto page breaks
-//     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-//
-//     // set image scale factor
-//     $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-//
-//     // add a page
-//     $pdf->AddPage();
-//
-//         $pdf->setJPEGQuality(75);
-//     $pdf->SetFillColor(255, 255, 127);
-//     $pdf->Ln(-5);
-//
-//     $pdf->SetFont('times', 'B', 18);
-//
-//     $pdf->Cell(0, 0, 'KAINAT TRAVELS', 0, 1, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->SetFont('times', '', 16);
-//
-//     $pdf->Cell(0, 0, 'Main Pirwadhai Mor Peshawar ', 0, 1, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->Cell(0, 0, 'Road Rawalpindi', 0, 1, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->SetFont('times', 'B', 16);
-//     $pdf->Ln(2);
-//     $pdf->Cell(55, 0, ' ', 0, 0, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->Cell(30, 0, 'UAN(24/7) : ', 0, 0, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->SetFont('times', '', 15);
-//     $pdf->Cell(20, 0, ' 03-111-777-333', 0, 1, 'L', 0, '', 0,false, 'T', 'M');
-//
-//     $pdf->Ln(2);
-//     $pdf->Cell(55, 0, ' ', 0, 0, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->SetFont('times', 'B', 16);
-//     $pdf->Cell(30, 0, 'Phone :', 0, 0, 'C', 0, '', 0,false, 'T', 'M');
-//     $pdf->SetFont('times', '', 15);
-//     $pdf->Cell(20, 0, ' 03108886286', 0, 1, 'L', 0, '', 0,false, 'T', 'M');
-//
-//     $pdf->Ln(2);
-//     $pdf->Cell(20, 0, ' 03108886286', 0, 1, 'L', 0, '', 0,false, 'T', 'M');
-//
-//
-//
-//
-//
-//
-//
-//        $pdf->Output('closing_report.pdf', 'I');
-//
-//    }
-        //  QrCode::size(50)->generate('ItSolutionStuff.com');
-//
+//        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
+//         $qr = QrCode::size(100)->format('png')->style('round')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
+
+//        $image = \QrCode::format('png')->size(100)->errorCorrection('H')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
+////        $output_file = '/img/qr-code/img-' . time() . '.png';
+//        $imageProfile = pathinfo($image->getClientOriginalName() , PATHINFO_FILENAME) . "_" . time() . '.' .  $image->extension();
+//         $image->move(public_path('uploads/QR/Booking'), $imageProfile);
+// return 'Done';
 //            $data = [
 //                'title' => 'Ticket',
 //                'date' => date('m/d/Y')
 //            ];
 //
-//            $pdf = PDF::loadView('pdf/pdf', $data);
+//            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket]);
 //
 //            $output = $pdf->output();
 //
 //        return new Response($output, 200, [
 //            'Content-Type' => 'application/pdf',
 //        ]);
+
+
+//        Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id',1)->whereIn('seat_no', [1,2,3])->where('schedule_id', 1)->where('date','2022-11-24')->get()->groupBy('seat_no')->dd();
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
@@ -174,67 +113,4 @@ class AuthController extends Controller
             return response()->json([], 403);
         }
     }
-
-}
-
-include('public/tcpdf/tcpdf.php');
-
-class MYPDF extends TCPDF
-{
-
-    //Page header
-
-    public function Header()
-    {
-
-        // // Logo
-
-        // $image_file = K_PATH_IMAGES.'';
-        // $this->Image($image_file, 5, 10, 15, '', '', '', 'T', false, 0,'R', false, false, 0, false, false, false);
-        // // Set font
-        // $this->SetFont('helvetica', '', 18);
-        // $this->Ln(15);
-        // // Title
-        // $this->SetFont('helvetica', '', 18);
-        // $this->Cell(0, 0, ' GATWALA COMMERCIAL HUB ', 0, false, 'L', 0, '', 0, false, 'M', 'M');
-        // $this->Cell(0, 0, ' Image ', 0, false, 'R', 0, '', 0, false, 'M', 'M');
-        // $this->Ln(4);
-        // $tbl = <<< EOD
-        // <hr>
-        // EOD;
-        // $this->writeHTML($tbl, true, false, false, false, '');
-    }
-
-    // Page footer
-    public function Footer()
-    {
-        // Position at 15 mm from bottom
-
-        // $this->Ln(-40);
-
-        // // Set font
-        // $this->SetFont('helvetica', '', 8);
-        // // Page number
-        // $line = '_____________________';
-        // $buyerSign='CEO';
-        // $CompanyName='Cheque Prepaid & Documents';
-        // $buyerName='Zeeshan Shah';
-        // $OwnerName='Checked By Ail Asadullah';
-
-        // $this->SetFont('', 'B', 10);
-        // $this->Cell(0, 1,$line, 0, false, 'L', 0, '', 0, false, 'T',);
-        // $this->Cell(0, 1, $line, 0, false, 'R', 0, '', 0, false, 'T');
-        // $this->Ln();
-        // $this->Ln();
-        // $this->SetFont('', '', 12);
-        // $this->Cell(0, 1,$buyerSign, 0, false, 'L', 0, '', 0, false, 'T',);
-        // $this->Cell(0, 1, $CompanyName, 0, false, 'R', 0, '', 0, false, 'T');
-        // $this->Ln();
-        // $this->Cell(0, 1,'Name :'.$buyerName, 0, false, 'L', 0, '', 0, false, 'T',);
-        // $this->Cell(0, 1,$OwnerName, 0, false, 'R', 0, '', 0, false, 'T');
-        // $this->Ln();
-
-
-    }
-
 }

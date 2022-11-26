@@ -299,7 +299,7 @@
                         </div>
 
                     </div>
-                    
+
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
@@ -561,10 +561,10 @@
                             <label class="custom-file-label overflow-hidden"
                                    for="attachmentsEdit">{{ attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File' }}</label>
                         </div>
-    
+
                     </div>
                 </div>
-                
+
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateEmployees"
                             :disabled="loading">
@@ -950,6 +950,10 @@ export default {
             if (this.back != '') {
                 formData.append('cnicBack', this.back);
             }
+            if (this.attachments != '') {
+                formData.append('attachment', this.attachments);
+            }
+
 
             this.validationErrors = [];
             if (this.addForm.EmployeeName == "" || typeof this.addForm.EmployeeName == 'undefined')
@@ -1091,6 +1095,9 @@ export default {
             }
             if (this.editImg.back != '') {
                 formData.append('cnicBack', this.editImg.back);
+            }
+            if (this.attachmentsEdit != '') {
+                formData.append('attachmentEdit', this.attachmentsEdit);
             }
             this.validationErrors = [];
             if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')

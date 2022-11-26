@@ -222,7 +222,6 @@ export default {
     },
     async created() {
         this.fetchData();
-        this.sameDataAsMain();
     },
     data() {
         return {

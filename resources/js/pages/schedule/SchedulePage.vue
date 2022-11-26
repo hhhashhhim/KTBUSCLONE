@@ -53,7 +53,7 @@
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
                                                         <th>Time</th>
-                                                        <th>Fare Class</th>
+<!--                                                        <th>Fare Class</th>-->
                                                         <th>Route</th>
                                                         <th>Bus Class</th>
                                                         <th>Added By</th>
@@ -67,10 +67,10 @@
                                                         <td>{{ schedule.start_date }}</td>
                                                         <td>{{ schedule.end_date }}</td>
                                                         <td>{{ tConvert(schedule.time) }}</td>
-                                                        <td> {{
-                                                                schedule.fare_class ? schedule.fare_class.name : "N/A"
-                                                            }}
-                                                        </td>
+<!--                                                        <td> {{-->
+<!--                                                                schedule.fare_class ? schedule.fare_class.name : "N/A"-->
+<!--                                                            }}-->
+<!--                                                        </td>-->
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
                                                                 schedule.bus_class ? schedule.bus_class.name : "N/A"
@@ -244,7 +244,7 @@
                     :class="activeSection != 'step1' ? 'd-none' : ''"
                 >
                     <div class="row">
-                        <div class="col-md-6 class form-group">
+                        <div class="col-md-8 class form-group">
                             <label for="route">Routes <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
@@ -259,7 +259,7 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3 class form-group">
+                        <div class="col-md-4 class form-group">
                             <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
@@ -276,23 +276,23 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3 class form-group">
-                            <label for="busCLass">Default Fare CLass <span class="text-danger">*</span></label>
-                            <select
-                                class="form-control"
-                                id="busCLass"
-                                v-model="data.fareClass"
-                            >
-                                <option value="0" selected>Select Default Fare CLass</option>
-                                <option
-                                    v-for="(type, i) in fareClasses"
-                                    :value="type.id"
-                                    :key="i"
-                                >
-                                    {{ type.name }}
-                                </option>
-                            </select>
-                        </div>
+<!--                        <div class="col-md-3 class form-group">-->
+<!--                            <label for="busCLass">Default Fare CLass <span class="text-danger">*</span></label>-->
+<!--                            <select-->
+<!--                                class="form-control"-->
+<!--                                id="busCLass"-->
+<!--                                v-model="data.fareClass"-->
+<!--                            >-->
+<!--                                <option value="0" selected>Select Default Fare CLass</option>-->
+<!--                                <option-->
+<!--                                    v-for="(type, i) in fareClasses"-->
+<!--                                    :value="type.id"-->
+<!--                                    :key="i"-->
+<!--                                >-->
+<!--                                    {{ type.name }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                        </div>-->
                     </div>
                     <div
                         class="row d-flex justify-content-center"
@@ -450,10 +450,10 @@
                                     <th class="mr-3">Selected Bus Class</th>
                                     <td>{{ this.dataPreview.busClass }}</td>
                                 </tr>
-                                <tr>
-                                    <th class="mr-3">Default Bus Fare Class</th>
-                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>
-                                </tr>
+<!--                                <tr>-->
+<!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
+<!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
+<!--                                </tr>-->
                                 <tr>
                                     <th class="mr-3">Route</th>
                                     <td colspan="3">{{ this.dataPreview.route }}</td>
@@ -572,7 +572,7 @@
 
                 <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">
                     <div class="row">
-                        <div class="col-md-6 class form-group">
+                        <div class="col-md-8 class form-group">
                             <label for="DiscountName">Routes <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
@@ -589,7 +589,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3 class form-group">
+                        <div class="col-md-4 class form-group">
                             <label for="busClassEdit">Bus Class <span class="text-danger">*</span></label>
                             <select
                                 class="form-control"
@@ -606,23 +606,23 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-3 class form-group">
-                            <label for="fareClassEdit">Fare Class <span class="text-danger">*</span></label>
-                            <select
-                                class="form-control"
-                                id="fareClassEdit"
-                                v-model="dataEdit.schedules.fare_class_id"
-                            >
-                                <option value="0" selected>Select Fare Class</option>
-                                <option
-                                    v-for="(type, i) in fareClasses"
-                                    :value="type.id"
-                                    :key="i"
-                                >
-                                    {{ type.name }}
-                                </option>
-                            </select>
-                        </div>
+<!--                        <div class="col-md-3 class form-group">-->
+<!--                            <label for="fareClassEdit">Fare Class <span class="text-danger">*</span></label>-->
+<!--                            <select-->
+<!--                                class="form-control"-->
+<!--                                id="fareClassEdit"-->
+<!--                                v-model="dataEdit.schedules.fare_class_id"-->
+<!--                            >-->
+<!--                                <option value="0" selected>Select Fare Class</option>-->
+<!--                                <option-->
+<!--                                    v-for="(type, i) in fareClasses"-->
+<!--                                    :value="type.id"-->
+<!--                                    :key="i"-->
+<!--                                >-->
+<!--                                    {{ type.name }}-->
+<!--                                </option>-->
+<!--                            </select>-->
+<!--                        </div>-->
                     </div>
                     <div
                         class="row d-flex justify-content-center"
@@ -777,10 +777,10 @@
                                     <th class="mr-3">Selected Bus Class</th>
                                     <td>{{ this.dataPreview.busClass }}</td>
                                 </tr>
-                                <tr>
-                                    <th class="mr-3">Default Bus Fare Class</th>
-                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>
-                                </tr>
+<!--                                <tr>-->
+<!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
+<!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
+<!--                                </tr>-->
                                 <tr>
                                     <th class="mr-3">Route</th>
                                     <td colspan="3">{{ this.dataPreview.route }}</td>
@@ -1078,7 +1078,7 @@ export default {
             };
             this.data.route = 0;
             this.data.busClass = 0;
-            this.data.fareClass = 0;
+            // this.data.fareClass = 0;
             this.data.discount = 0;
             this.data.surcharge = 0;
             this.stepTwoAddSchedule = false;
@@ -1136,14 +1136,14 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
-                if (this.dataEdit.schedules.fare_class_id == 0)
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Fare Class",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.dataEdit.schedules.route_id != 0 && this.dataEdit.schedules.bus_class_id != 0 && this.dataEdit.schedules.fare_class_id != 0) {
+                // if (this.dataEdit.schedules.fare_class_id == 0)
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select Fare Class",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                if (this.dataEdit.schedules.route_id != 0 && this.dataEdit.schedules.bus_class_id != 0 /*&& this.dataEdit.schedules.fare_class_id != 0*/) {
                     this.editActiveSection = nextBtn;
                 }
             }
@@ -1233,14 +1233,14 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
-                if (this.data.fareClass == 0)
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Fare Class",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.data.route != 0 && this.data.busClass != 0 && this.data.fareClass != 0) {
+                // if (this.data.fareClass == 0)
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select Fare Class",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
                     this.activeSection = nextBtnValue;
                 }
             }
