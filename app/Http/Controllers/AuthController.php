@@ -50,6 +50,9 @@ class AuthController extends Controller
 //            'Content-Type' => 'application/pdf',
 //        ]);
 
+
+//        Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id',1)->whereIn('seat_no', [1,2,3])->where('schedule_id', 1)->where('date','2022-11-24')->get()->groupBy('seat_no')->dd();
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

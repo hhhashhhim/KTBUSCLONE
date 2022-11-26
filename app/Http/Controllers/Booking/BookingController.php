@@ -297,24 +297,25 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-
-//        dd($request->seatNO);
-        $customerId = Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->pluck('customer_id');
-        $checkId = 0;
-        foreach ($customerId as $single) {
-            if ($single != $customerId[0]) {
-                $checkId = 1;
-            }
-        }
-        if($checkId == 1) {
-            return response()->json([
-                "errors" => [
-                    "Customer" => ["Selected Seats are not belongs to same Customers!!!"]
-                ]
-            ], 422);
-
-        }else{
-                dd('alright');
-        }
+        //dd($request->seatNO);
+//        $customerId = Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->pluck('customer_id');
+//        $checkId = 0;
+//        foreach ($customerId as $single) {
+//            if ($single != $customerId[0]) {
+//                $checkId = 1;
+//            }
+//        }
+//        if($checkId == 1) {
+//            return response()->json([
+//                "errors" => [
+//                    "Customer" => ["Selected Seats are not belongs to same Customers!!!"]
+//                ]
+//            ], 422);
+//
+//        }else{
+//            return Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get();
+//            dd($request->all(), $detailData);
+            return Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id',$this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date',$request->date)->get()->groupBy('seat_no');
+//        }
     }
 }

@@ -31,6 +31,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+
         $rules = [
             'EmployeeName' => 'required',
             'EmployeeFatherName' => 'required',
@@ -169,7 +170,17 @@ class EmployeeController extends Controller
         if ($request->cnicFront != 'undefined') {
             $finalArray['front'] = $this->image($request->cnicFront, 'cnicfront');
         } else {
-            $finalArray['font'] = null;
+            $finalArray['front'] = null;
+        }
+        if ($request->attachmentEdit != 'undefined') {
+            $finalArray['attachmentEdit'] = $this->image($request->attachmentEdit, 'attachmentEdit');
+        } else {
+            $finalArray['attachmentEdit'] = null;
+        }
+        if ($request->attachment != 'undefined') {
+            $finalArray['attachment'] = $this->image($request->attachment, 'attachment');
+        } else {
+            $finalArray['attachment'] = null;
         }
         return response($finalArray, 200);
     }
@@ -191,6 +202,18 @@ class EmployeeController extends Controller
             $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
                 . "_" . time() . '.' . $image->extension();
             $image->move(public_path('uploads/hrm/employee/cnicfront/'), $imageFront);
+            return $imageFront;
+        }
+        if ($flag == 'attachment') {
+            $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+                . "_" . time() . '.' . $image->extension();
+            $image->move(public_path('uploads/hrm/employee/attachment/'), $imageFront);
+            return $imageFront;
+        }
+        if ($flag == 'attachmentEdit') {
+            $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
+                . "_" . time() . '.' . $image->extension();
+            $image->move(public_path('uploads/hrm/employee/attachmentEdit/'), $imageFront);
             return $imageFront;
         }
     }

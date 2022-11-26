@@ -65,20 +65,20 @@
                             <div class="row">
                                 <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
                                 <!--                                     v-if="selectedBookedSeats.length">-->
-<!--                                                                    <a-->
-<!--                                                                        @click="sameDataAsMain()"-->
-<!--                                                                        class="btn btn-primary mx-1"-->
-<!--                                                                        href="#reschedule_modal"-->
-<!--                                                                        data-toggle="modal"-->
-<!--                                                                    >Shifting ( Reschedule ) Seats</a>-->
+                                <!--                                                                    <a-->
+                                <!--                                                                        @click="sameDataAsMain()"-->
+                                <!--                                                                        class="btn btn-primary mx-1"-->
+                                <!--                                                                        href="#reschedule_modal"-->
+                                <!--                                                                        data-toggle="modal"-->
+                                <!--                                                                    >Shifting ( Reschedule ) Seats</a>-->
                                 <!--                                </div>-->
                                 <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-<!--                                                                     v-if="selectedBookedOverIssueSeats.length">-->
-<!--                                                                    <a-->
-<!--                                                                        class="btn btn-primary mx-1"-->
-<!--                                                                        href="#overIssue_model"-->
-<!--                                                                        data-toggle="modal"-->
-<!--                                                                    >Over Issue Seats</a>-->
+                                <!--                                                                     v-if="selectedBookedOverIssueSeats.length">-->
+                                <!--                                                                    <a-->
+                                <!--                                                                        class="btn btn-primary mx-1"-->
+                                <!--                                                                        href="#overIssue_model"-->
+                                <!--                                                                        data-toggle="modal"-->
+                                <!--                                                                    >Over Issue Seats</a>-->
                                 <!--                                </div>-->
                                 <h1 v-if="loading">Loading.........</h1>
 
@@ -347,68 +347,51 @@
                                 </div>
                             </div>
                         </div>
-                        <!--Booking Preview-->
-                        <!--                        <div class="card-body">-->
-                        <!--                            &lt;!&ndash; Table &ndash;&gt;-->
-                        <!--                            <div class="row">-->
-                        <!--                                <div class="col-12">-->
-                        <!--                                    <div class="card">-->
-                        <!--                                        <div class="card-body">-->
-                        <!--                                            <div class="row mb-4">-->
-                        <!--                                                <div class="col-md-8 ">-->
-                        <!--                                                    <input type="date" class="form-control" v-model="filterDate">-->
-                        <!--                                                </div>-->
-                        <!--                                                <div class="col-md-4">-->
-                        <!--                                                    <button class="btn btn-block btn-lg btn-primary"-->
-                        <!--                                                            @click="getFilterRecord()">Filter-->
-                        <!--                                                    </button>-->
-                        <!--                                                </div>-->
-                        <!--                                            </div>-->
-                        <!--                                            <div class="table-responsive">-->
-                        <!--                                                <table-->
-                        <!--                                                    class="table table-striped table-hover"-->
-                        <!--                                                    id="booking_table"-->
-                        <!--                                                >-->
-                        <!--                                                    <thead>-->
-                        <!--                                                    <tr>-->
-                        <!--                                                        <th>Sr No.</th>-->
-                        <!--                                                        <th>Date</th>-->
-                        <!--                                                        <th>Schedule Name</th>-->
-                        <!--                                                        <th>No. Of Bookings</th>-->
-                        <!--                                                        <th>Action</th>-->
-                        <!--                                                    </tr>-->
-                        <!--                                                    </thead>-->
-                        <!--                                                    <tbody>-->
-                        <!--                                                    <tr v-for="(booking, i) in allBookings" :key="i">-->
-                        <!--                                                        <td>{{ parseInt(i) + 1 }}</td>-->
-                        <!--                                                        <td>{{ booking.date }}</td>-->
-                        <!--                                                        <td>{{ booking.schedule.name }}</td>-->
-                        <!--                                                        <td>{{ booking.count }}</td>-->
-                        <!--                                                        <td>-->
-                        <!--                                                            <a-->
-                        <!--                                                                :href="'#'+detailsFormId"-->
-                        <!--                                                                data-toggle="modal"-->
-                        <!--                                                                @click="details(booking.date,booking.schedule.id)"-->
-                        <!--                                                                class="btn btn-primary mx-1"-->
-                        <!--                                                            >-->
-                        <!--                                                                <i class="far fa-eye"></i>-->
-                        <!--                                                            </a>-->
-                        <!--                                                        </td>-->
-                        <!--                                                    </tr>-->
-                        <!--                                                    </tbody>-->
-                        <!--                                                </table>-->
-                        <!--                                            </div>-->
-                        <!--                                        </div>-->
-                        <!--                                    </div>-->
-                        <!--                                </div>-->
-                        <!--                            </div>-->
-                        <!--                        </div>-->
-                        <!-- END TABLE -->
                     </div>
                 </div>
             </div>
         </div>
-
+        <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addELTModelLabel">ADD NEW CARGO</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullName"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group"
+                                >
+                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullName"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Add Cargo</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!--Over Issue Model-->
         <div class="modal fade" id="overIssue_model" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -527,7 +510,6 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
-                            <button class="btb btn-info mx-1"> Add ELT</button>
                             <button class="btn btn-primary mx-1" @click="addOverIssueTicket()"> Generate
                                 Ticket
                             </button>
@@ -536,6 +518,8 @@
                 </div>
             </div>
         </div>
+
+        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>
         <!--        modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
              aria-hidden="true">
@@ -549,63 +533,70 @@
                     </div>
                     <div class="modal-body p-0">
                         <!--                        loop for number of seats-->
-                        <div class="card-body" >
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card" v-for="(single, i) in selectedBookedSeats">
-                                        <div class="card-body p-3">
+                                    <div class="card" v-for="(singleItems, i) in selectedSeatDataBackEnd">
+                                        <div class="card-body p-3" v-for="(innerItem, j) in singleItems">
                                             <div class="row my-1">
-                                                <div class="col-md-3">
+                                                <div class="col-md-6">
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold ">Seat : </p>
-                                                        <p class="mb-0">1</p>
+                                                        <p class="mb-0 font-weight-bold mr-3">Seat :</p>
+                                                        <p class="mb-0">{{innerItem.seat_no}}</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold ">Date :</p>
-                                                        <p class="mb-0">{{ this.addForm.date }}</p>
+                                                        <p class="mb-0 font-weight-bold mr-3">Date :</p>
+                                                        <p class="mb-0">{{ innerItem.date }}</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold ">Bus Class :</p>
-                                                        <p class="mb-0">Economy</p>
+                                                        <p class="mb-0 font-weight-bold mr-3"> Bus Class :</p>
+                                                        <p class="mb-0">{{ innerItem.schedule.bus_class.name }}</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold ">Schedule : </p>
-                                                        <p class="mb-0">Schedule Name</p>
+                                                        <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
+                                                        <p class="mb-0">{{ innerItem.schedule.name}}</p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-9">
-                                                    <div class="progress my-2" style="height: 30px;">
-                                                        <div class="progress-bar" role="progressbar"
-                                                             style="width: 50%; margin: auto;"
-                                                             aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                                                            Faisalabad - Multan
-                                                        </div>
+                                                <div class="col-md-6">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Name : </p>
+                                                        <p class="mb-0">{{innerItem.customer.name}}</p>
                                                     </div>
-                                                    <div class="d-flex justify-content-between">
-                                                        <p class="mb-0">Lahore</p>
-                                                        <p class="mb-0">Faisalabad</p>
-                                                        <p class="mb-0">Toba</p>
-                                                        <p class="mb-0">Multan</p>
-                                                        <p class="mb-0">Karachi </p>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Cnic :</p>
+                                                        <p class="mb-0">{{ innerItem.customer.cnic }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
+                                                        <p class="mb-0">{{ innerItem.departure_city.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
+                                                        <p class="mb-0">{{ innerItem.destination_city.name}}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!--                                            Buttons-->
+                                            <div class="row mt-3">
+                                                <div class="col-md-12 text-right">
+<!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
+                                                    <!--                                                    v-if="selectedBookedSeats.length"-->
+                                                    <button type="button" class="btn btn-info" data-toggle="modal"
+                                                            data-target="#addELTModel">Add ELT
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary ml-2" href="#reschedule_modal"
+                                                            data-toggle="modal">Reschedule
+                                                    </button>
+                                                    <button type="button" class="btn btn-warning ml-2" href="#overIssue_model"
+                                                            data-toggle="modal">Over Issue
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger ml-2" @click="cancleBooking(innerItem.seat_no)">Cancel</button>
+                                                </div>
+                                            </div>
+                                            <div v-if="typeof innerItem[j + 1] !== 'undefined'">
+                                                <hr></div>
                                         </div>
                                     </div>
-                                    <div class="row mt-1">
-                                        <div class="col-md-12 text-right">
-                                            <!--                                                    v-if="selectedBookedOverIssueSeats.length"-->
-                                            <!--                                                    v-if="selectedBookedSeats.length"-->
-                                            <button type="button" class="btn btn-info" data-toggle="modal"
-                                                    data-target="#addELTModel">Add ELT
-                                            </button>
-                                            <button type="button" class="btn btn-primary ml-2" href="#reschedule_modal" data-toggle="modal">Reschedule</button>
-                                            <button type="button" class="btn btn-warning ml-2" href="#overIssue_model"  data-toggle="modal">Over Issue </button>
-                                            <button type="button" class="btn btn-danger ml-2">Cancel</button>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
@@ -613,55 +604,11 @@
                 </div>
             </div>
         </div>
-        <!--        modal for seat details end-->
-        <!--End Over Issue Model-->
-        <Delete :deleteForm="deleteFormID" confirmationMessage="Are You Sure You want To Delete This Booking ???" />
-        <!--            DELETE MODAL-->
-        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>
+        <!--Modal for seat details end-->
 
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
 
-        <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addELTModelLabel">ADD NEW CARGO</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Full Name <span class="text-danger">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="fullName"
-                                    />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group"
-                                >
-                                    <label>Full Name <span class="text-danger">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="fullName"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Add Cargo</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </section>
 </template>
 
@@ -724,6 +671,7 @@ export default {
             bookingDetails: [],
             allSeatClasses: [],
             specificCities: [],
+            selectedSeatDataBackEnd: [],
             filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
             addForm: {
@@ -770,12 +718,16 @@ export default {
                     console.log(this.selectedBookedSeats)
                     console.log(this.selectedBookedOverIssueSeats)
                     const dataSeats = {
-                        seatNO : (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
-                        scheduleId : this.addForm.schedule,
-                        date : this.addForm.date,
+                        seatNO: (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
+                        scheduleId: this.addForm.schedule,
+                        date: this.addForm.date,
                     }
-                    const  resSeatData =   await this.callApi("post", "booking/advance", dataSeats);
+                    const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
                     console.log(resSeatData);
+                    if (resSeatData.status == 200) {
+                        this.selectedSeatDataBackEnd = resSeatData.data;
+                        $('#seatAllDetailsModal').modal('show');
+                    }
                     if (resSeatData.status == 422) {
                         let errorContent = "";
                         let count = 0;
@@ -796,10 +748,6 @@ export default {
 
                         }
                     }
-
-
-
-                    $('#seatAllDetailsModal').modal('show');
                 } else {
                     swal({
                         title: "OOPS!!",
@@ -988,12 +936,15 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
+            if (res.status == 500) {
+                this.showBookingDiv = false;
+            }
             if (res.status == 200) {
                 this.loading = false
                 this.showBookingDiv = true;
                 this.schedule = res.data;
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     for (const key in res.addForm.errors) {
                         res.addForm.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -1004,6 +955,8 @@ export default {
         },
 
         async selectSeat(row, col, seatNo) {
+            console.log(this.selectedSeats)
+            console.log(this.schedule.bus_class.seat_map[row][col])
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1014,25 +967,22 @@ export default {
                 });
             }
             if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
-
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
 
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                     this.selectedBookedSeats.splice(index, 1);
-
                     this.bookedSeats = this.bookedSeats.filter((seat) => {
                         if (seat.seatNo != seatNo) {
                             return seat;
                         }
                     });
+                    this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                 } else {
-
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare +=  parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
+                    this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                 }
 
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
@@ -1042,19 +992,17 @@ export default {
                 if (index != -1) {
 
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.splice(index, 1);
+                    this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                 } else {
 
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    this.addForm.totalFare +=  this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedSeats.push(seatNo);
+                    this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
 
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
             } else {
-
-
                 this.fetchScheduleData();
                 this.resetingArrays();
                 return swal({
@@ -1064,7 +1012,6 @@ export default {
                     timer: 2000
                 });
             }
-
 
 
             /*Over Issue Seats*/
@@ -1122,7 +1069,6 @@ export default {
                 }
             }
         },
-
 
 
         async addOverIssueTicket() {
@@ -1332,8 +1278,7 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-        }
-        ,
+        },
 
         async resetingArrays() {
             this.selectedSeats = [];
