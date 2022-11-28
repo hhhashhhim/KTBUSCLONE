@@ -318,6 +318,7 @@ class ScheduleController extends Controller
 
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
+                
                 // adding fare to each seat
                 if ($column['reserved']) {
                     $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
