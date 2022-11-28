@@ -38,7 +38,7 @@ class FleetMaintenancePartController extends Controller
             'name.unique' => 'Part Name Already Registred !',
         ];
         $this->validate($request, $rules, $customMessages);
-        
+
         return MaintenancePart::create([
             'name' => $request->name,
             'added_by' => Auth::user()->id,
