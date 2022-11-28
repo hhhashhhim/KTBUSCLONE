@@ -148,7 +148,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="dropdown" v-if="checkPermission('hrm')">
+                <!-- <li class="dropdown" v-if="checkPermission('hrm')">
 
                     <a href="#" class="menu-toggle nav-link has-dropdown">
                         <i class="fas fa-sitemap"></i>
@@ -163,14 +163,8 @@
                                 <i class="fas fa-users"></i> Maintenance Parts
                             </router-link>
                         </li>
-                        <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'leaves' }"
-                                         v-if="checkForSubmenu('employee')">
-                                <i class="fas fa-street-view"></i> Leave Management
-                            </router-link>
-                        </li>
                     </ul>
-                </li>
+                </li> -->
 
             </ul>
         </aside>
