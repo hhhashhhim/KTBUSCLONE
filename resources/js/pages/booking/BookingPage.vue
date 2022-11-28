@@ -144,15 +144,20 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label>Gender</label>
-                                                        <div class="col-md-12 px-1 pt-3">
-                                                            <input type="radio" id="female-booking"
-                                                                   v-model="addForm.gender" value="0"/>
-                                                            <label class="mx-2"
-                                                                   for="female-booking">Female</label>
-                                                            <input type="radio" id="male-booking"
-                                                                   v-model="addForm.gender" value="1"/>
-                                                            <label class="mx-2" for="male-booking">Male</label>
-                                                        </div>
+                                                        <label class="colorinput">
+                                                        <input name="color" type="checkbox" value="primary" class="colorinput-input">
+                                                        <span class="colorinput-color bg-primary">Female</span>
+                                                    </label>
+
+<!--                                                        <div class="col-md-12 px-1 pt-3">-->
+<!--                                                            <input type="radio" id="female-booking"-->
+<!--                                                                   v-model="addForm.gender" value="0"/>-->
+<!--                                                            <label class="mx-2"-->
+<!--                                                                   for="female-booking">Female</label>-->
+<!--                                                            <input type="radio" id="male-booking"-->
+<!--                                                                   v-model="addForm.gender" value="1"/>-->
+<!--                                                            <label class="mx-2" for="male-booking">Male</label>-->
+<!--                                                        </div>-->
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">

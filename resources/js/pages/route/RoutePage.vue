@@ -101,15 +101,18 @@
                         <label for="name">Route End Point <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
-
-                    <div class="col-md-12">
-                        <h5>Select Cities</h5>
-                        <br/>
+                    <div class="col-md-12 d-flex align-items-center">
+                        <div class="col-md-6">
+                            <h5>Select Cities</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="reverseSeats" class="text-dark mr-3">Reverse Route</label>
+                            <label class="colorinput">
+                                <input name="color" type="checkbox" id="reverseSeats" class="colorinput-input"  :checked="this.reverseRoute == 1"   @change="checkBox($event)">
+                                <span class="colorinput-color bg-primary"></span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="form-group col-md-12 d-flex align-items-center">
-
-                    </div>
-
                     <div class="form-group col-md-12 d-flex align-items-center">
                         <table class="table table-striped">
                             <thead>
@@ -233,6 +236,7 @@ export default {
             loop: 1,
             routeStartName: '',
             routeEndName: '',
+            reverseRoute: 1,
             routeDetails: [],
             th: [],
             classFareName: ''
@@ -244,6 +248,7 @@ export default {
     methods: {
         clearForm: function () {
           this.data = {};
+          this.reverseRoute = 1;
         },
         fareClassValue(data, className) {
             const dataTwo = data;
@@ -261,6 +266,7 @@ export default {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
                 cities: this.addCities,
+                revereRoute : this.reverseRoute,
                 terminals: this.addTerminalsOnClick
             }
 
@@ -269,9 +275,11 @@ export default {
             if (res.status === 200) {
                 this.loading = false;
                 $('#route_table').DataTable().destroy();
-                this.routeName = "";
+                this.routeStartName = "";
+                this.routeEndName = "";
                 this.loop = 1;
-                this.routeDetails = this.addCities = this.addTerminalsOnClick = [];
+                this.addCities = 0;
+                this.routeDetails =  [];
                swal({
                     title: "Success",
                     text: "Route Created Successfully",
@@ -303,6 +311,13 @@ export default {
 
                     }
                 }
+            }
+        },
+        checkBox: function (e) {
+            if (e.target.checked) {
+                this.reverseRoute = 1;
+            } else {
+                this.reverseRoute = 0;
             }
         },
         async add() {
