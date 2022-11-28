@@ -152,40 +152,23 @@
                                 <button class="btn btn-primary btn-block" @click="rescheduleSeats">Reschedule Seats
                                 </button>
                             </div>
-                            <div
-                                class="d-flex justify-content-center seat-img p-0 m-0"
+                            <div class="d-flex justify-content-center seat-img p-0 m-0"
                                 v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                :key="rowIndex"
-                            >
+                                :key="rowIndex" >
                                 <div v-for="(col, colIndex) in record" :key="colIndex">
                                     <div
                                         v-if="col.reserved"
                                         class="image-span d-block text-center text-white shadow"
                                         @click="col.type?bookingError():selectSeat(rowIndex, colIndex, col.seatNo)"
                                         :class="getClasses(col)"
-                                        :style="{
-                      border: '3px solid ' + col.color + ' !important',
-                    }"
-                                        :title="
-                      col.partial
-                        ? col.departure_city + ' to ' + col.destination_city
-                        : ''
-                    "
-                                    >
+                                        :style="{ border: '3px solid ' + col.color + ' !important',  }" :title=" col.partial ? col.departure_city + ' to ' + col.destination_city : '' ">
                                         <small>{{ col.seatNo }} </small>
                                         <br/>
                                         <small
-                                            v-if="
-                        col.type &&
-                        (col.type == 'booked' || col.type == 'advance booking')
-                      "
-                                        >
+                                            v-if=" col.type && (col.type == 'booked' || col.type == 'advance booking') " >
                                             <i
                                                 class="type-icons fas"
-                                                :class="
-                          col.type == 'booked' && col.over_issue != true
-                            ? 'fa-check-double'
-                            : 'fa-check'
+                                                :class=" col.type == 'booked' && col.over_issue != true ? 'fa-check-double': 'fa-check'
                         "
                                             >
                                             </i>
@@ -252,6 +235,7 @@ export default {
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
+
         async fetchData() {
             const resCity = await this.callApi("post", "cities");
             const res = await this.callApi("post", "schedule");
@@ -262,6 +246,7 @@ export default {
                 console.log(res);
             }
         },
+
         tConvert: function (time) {
             time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
             if (time.length > 1) {
@@ -271,6 +256,7 @@ export default {
             }
             return time.join("");
         },
+
         async getDestinationCity() {
             this.specificCities = [];
             if (this.addForm.departureCity == '0') {
@@ -285,6 +271,7 @@ export default {
                 }
             }
         },
+
         minDateFilter: function () {
             var dtToday = new Date();
             var month = dtToday.getMonth() + 1;
@@ -296,6 +283,7 @@ export default {
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
         },
+
         async fetchSpecificSchedules() {
             this.getSchedule = true;
             this.showBookingDiv = false;
@@ -317,12 +305,15 @@ export default {
                 }
             }
         },
+
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
+
         phoneFormat: function (string) {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
+
         async getCustomer() {
             const resCnic = await this.callApi("post", "booking/getCNIC", {
                 cnicNumber: this.addForm.customerCNIC,
@@ -330,6 +321,7 @@ export default {
             this.addForm.contact = resCnic.data.contact;
             this.addForm.customerName = resCnic.data.name;
         },
+
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -343,6 +335,7 @@ export default {
                 return true;
             }
         },
+
         resetSelectBooking(evt) {
             if (evt.target.value == "0") {
                 this.showBookingDiv = false;
@@ -350,6 +343,7 @@ export default {
                 this.showBookingDiv = true;
             }
         },
+
         async rescheduleSeats() {
             this.validationErrors = [];
             if (!this.addForm.schedule) {
@@ -381,6 +375,7 @@ export default {
                 }
             }
         },
+
         async fetchScheduleData() {
             this.validationErrors = [];
             if (

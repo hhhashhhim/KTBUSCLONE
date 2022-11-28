@@ -23969,7 +23969,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       optionsPhone: {
         placeholder: "xxxx-xxxxxxx"
       },
-      rescheduleFormId: "reschedule_modal",
+      // rescheduleFormId: "reschedule_modal",
       // overissueFormId: "overIssue_model",
       getCustomermessage: '',
       shiftingFormId: "shifting-modal",
@@ -23985,10 +23985,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       error: false,
       delId: "",
       allSchedules: [],
+      allReSchedules: [],
       schedule: "",
       loading: false,
       getSchedule: false,
+      getReSchedule: false,
       showBookingDiv: false,
+      showReBookingDiv: false,
       selectedSeats: [],
       selectedBookedSeats: [],
       selectedOverIssueSeats: [],
@@ -23999,6 +24002,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       bookingDetails: [],
       allSeatClasses: [],
       specificCities: [],
+      reSpecificCities: [],
       selectedSeatDataBackEnd: [],
       filterDate: new Date().toISOString().substr(0, 10),
       cities: [],
@@ -24009,6 +24013,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         customerCNIC: "",
         schedule: 0,
         totalFare: 0,
+        destinationCity: 0,
+        departureCity: 0
+      },
+      reSchedule: {
+        schedule: 0,
         destinationCity: 0,
         departureCity: 0
       },
@@ -24231,35 +24240,78 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4);
       }))();
     },
-    fetchAllSchedules: function fetchAllSchedules() {
+    getReDestinationCity: function getReDestinationCity() {
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var resBooking, resClass, resCity;
+        var resReDepartureCity;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _context5.next = 2;
-                return _this5.callApi("post", "booking");
+                if (!(_this5.reSchedule.departureCity == '0')) {
+                  _context5.next = 4;
+                  break;
+                }
+
+                _this5.reSchedule.destinationCity = 0;
+                _context5.next = 9;
+                break;
+
+              case 4:
+                _context5.next = 6;
+                return _this5.callApi("post", "booking/getDestination", {
+                  id: _this5.reSchedule.departureCity
+                });
+
+              case 6:
+                resReDepartureCity = _context5.sent;
+                console.log(resReDepartureCity);
+
+                if (resReDepartureCity.length == 0) {
+                  _this5.reSchedule.destinationCity = 0;
+                } else {
+                  _this5.reSchedule.destinationCity = 0;
+                  _this5.reSpecificCities = resReDepartureCity.data;
+                }
+
+              case 9:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }))();
+    },
+    fetchAllSchedules: function fetchAllSchedules() {
+      var _this6 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var resBooking, resClass, resCity;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return _this6.callApi("post", "booking");
 
               case 2:
-                resBooking = _context5.sent;
-                _context5.next = 5;
-                return _this5.callApi("post", "fare-class");
+                resBooking = _context6.sent;
+                _context6.next = 5;
+                return _this6.callApi("post", "fare-class");
 
               case 5:
-                resClass = _context5.sent;
-                _context5.next = 8;
-                return _this5.callApi("post", "cities");
+                resClass = _context6.sent;
+                _context6.next = 8;
+                return _this6.callApi("post", "cities");
 
               case 8:
-                resCity = _context5.sent;
+                resCity = _context6.sent;
 
                 if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200) {
-                  _this5.allBookings = resBooking.data;
-                  _this5.allSeatClasses = resClass.data;
-                  _this5.cities = resCity.data;
+                  _this6.allBookings = resBooking.data;
+                  _this6.allSeatClasses = resClass.data;
+                  _this6.cities = resCity.data;
                   setTimeout(function () {
                     // $("#" + this.formID).modal("show");
                     $("#booking_table").DataTable();
@@ -24270,10 +24322,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 10:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     resetSelectBooking: function resetSelectBooking(evt) {
@@ -24284,47 +24336,91 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     fetchSpecificSchedules: function fetchSpecificSchedules() {
-      var _this6 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var data, resFetchSchedule;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this6.getSchedule = true;
-                _this6.showBookingDiv = false;
-                _this6.allSchedules = {};
-                _this6.addForm.schedule = 0;
+                _this7.getSchedule = true;
+                _this7.showBookingDiv = false;
+                _this7.allSchedules = {};
+                _this7.addForm.schedule = 0;
                 data = {
-                  departure_city_id: _this6.addForm.departureCity,
-                  destination_city_id: _this6.addForm.destinationCity,
-                  date: _this6.addForm.date
+                  departure_city_id: _this7.addForm.departureCity,
+                  destination_city_id: _this7.addForm.destinationCity,
+                  date: _this7.addForm.date
                 };
-                _context6.next = 7;
-                return _this6.callApi("post", "booking/fetchSchedule", data);
+                _context7.next = 7;
+                return _this7.callApi("post", "booking/fetchSchedule", data);
 
               case 7:
-                resFetchSchedule = _context6.sent;
+                resFetchSchedule = _context7.sent;
 
                 if (resFetchSchedule.status == 200) {
                   if (resFetchSchedule.length != 0) {
-                    _this6.getSchedule = false;
-                    _this6.allSchedules = resFetchSchedule.data;
+                    _this7.getSchedule = false;
+                    _this7.allSchedules = resFetchSchedule.data;
                   } else {
-                    _this6.addForm.schedule = 0;
-                    _this6.showBookingDiv = false;
+                    _this7.addForm.schedule = 0;
+                    _this7.showBookingDiv = false;
                   }
                 }
 
-                _this6.fetchScheduleData();
+                _this7.fetchScheduleData();
 
               case 10:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
+      }))();
+    },
+    fetchReSpecificSchedules: function fetchReSpecificSchedules() {
+      var _this8 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var data, resFetchSchedule;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                _this8.getReSchedule = true;
+                _this8.showReBookingDiv = false;
+                _this8.allReSchedules = {};
+                _this8.reSchedule.schedule = 0;
+                data = {
+                  departure_city_id: _this8.reSchedule.departureCity,
+                  destination_city_id: _this8.reSchedule.destinationCity,
+                  date: _this8.reSchedule.date
+                };
+                _context8.next = 7;
+                return _this8.callApi("post", "booking/fetchSchedule", data);
+
+              case 7:
+                resFetchSchedule = _context8.sent;
+
+                if (resFetchSchedule.status == 200) {
+                  if (resFetchSchedule.length != 0) {
+                    _this8.getReSchedule = false;
+                    _this8.allReSchedules = resFetchSchedule.data;
+                  } else {
+                    _this8.reSchedule.schedule = 0;
+                    _this8.showReBookingDiv = false;
+                  }
+                }
+
+                _this8.fetchScheduleData();
+
+              case 10:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8);
       }))();
     },
     cnicFormat: function cnicFormat(string) {
@@ -24334,108 +24430,108 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.replace(/(\d{4})(\d{7})/, "$1-$2");
     },
     getCustomer: function getCustomer(flag) {
-      var _this7 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var resCnic, _resCnic, _resCnic2, _resCnic3;
 
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 if (!(flag == 'addFormCNIC')) {
-                  _context7.next = 7;
+                  _context9.next = 7;
                   break;
                 }
 
-                if (!(_this7.addForm.customerCNIC != '' && _this7.addForm.customerCNIC != 'undefined')) {
-                  _context7.next = 7;
+                if (!(_this9.addForm.customerCNIC != '' && _this9.addForm.customerCNIC != 'undefined')) {
+                  _context9.next = 7;
                   break;
                 }
 
-                _context7.next = 4;
-                return _this7.callApi("post", "booking/getCNIC", {
-                  cnicNumber: _this7.addForm.customerCNIC,
+                _context9.next = 4;
+                return _this9.callApi("post", "booking/getCNIC", {
+                  cnicNumber: _this9.addForm.customerCNIC,
                   status: flag
                 });
 
               case 4:
-                resCnic = _context7.sent;
-                _this7.addForm.contact = resCnic.data.contact;
-                _this7.addForm.customerName = resCnic.data.name;
+                resCnic = _context9.sent;
+                _this9.addForm.contact = resCnic.data.contact;
+                _this9.addForm.customerName = resCnic.data.name;
 
               case 7:
                 if (!(flag == 'overIssueCNIC')) {
-                  _context7.next = 14;
+                  _context9.next = 14;
                   break;
                 }
 
-                if (!(_this7.addFormOverIssue.customer.cnic == '' && _this7.addFormOverIssue.customer.cnic == 'undefined')) {
-                  _context7.next = 14;
+                if (!(_this9.addFormOverIssue.customer.cnic == '' && _this9.addFormOverIssue.customer.cnic == 'undefined')) {
+                  _context9.next = 14;
                   break;
                 }
 
-                _context7.next = 11;
-                return _this7.callApi("post", "booking/getCNIC", {
-                  cnicNumber: _this7.addFormOverIssue.customer.cnic,
+                _context9.next = 11;
+                return _this9.callApi("post", "booking/getCNIC", {
+                  cnicNumber: _this9.addFormOverIssue.customer.cnic,
                   status: flag
                 });
 
               case 11:
-                _resCnic = _context7.sent;
-                _this7.addFormOverIssue.customer.name = _resCnic.data.name;
-                _this7.addFormOverIssue.customer.contact = _resCnic.data.contact;
+                _resCnic = _context9.sent;
+                _this9.addFormOverIssue.customer.name = _resCnic.data.name;
+                _this9.addFormOverIssue.customer.contact = _resCnic.data.contact;
 
               case 14:
-                if (!(flag == 'addFormContact' && _this7.addForm.customerCNIC == '' && _this7.addForm.customerName == '')) {
-                  _context7.next = 21;
+                if (!(flag == 'addFormContact' && _this9.addForm.customerCNIC == '' && _this9.addForm.customerName == '')) {
+                  _context9.next = 21;
                   break;
                 }
 
-                if (!(_this7.addForm.contact != '' && _this7.addForm.contact != 'undefined')) {
-                  _context7.next = 21;
+                if (!(_this9.addForm.contact != '' && _this9.addForm.contact != 'undefined')) {
+                  _context9.next = 21;
                   break;
                 }
 
-                _context7.next = 18;
-                return _this7.callApi("post", "booking/getCNIC", {
-                  phoneNumber: _this7.addForm.contact,
+                _context9.next = 18;
+                return _this9.callApi("post", "booking/getCNIC", {
+                  phoneNumber: _this9.addForm.contact,
                   status: flag
                 });
 
               case 18:
-                _resCnic2 = _context7.sent;
-                _this7.addForm.customerCNIC = _resCnic2.data.cnic;
-                _this7.addForm.customerName = _resCnic2.data.name;
+                _resCnic2 = _context9.sent;
+                _this9.addForm.customerCNIC = _resCnic2.data.cnic;
+                _this9.addForm.customerName = _resCnic2.data.name;
 
               case 21:
-                if (!(flag == 'overIssueContact' && _this7.addFormOverIssue.customer.name == '' && _this7.addFormOverIssue.customer.cnic == '')) {
-                  _context7.next = 28;
+                if (!(flag == 'overIssueContact' && _this9.addFormOverIssue.customer.name == '' && _this9.addFormOverIssue.customer.cnic == '')) {
+                  _context9.next = 28;
                   break;
                 }
 
-                if (!(_this7.addFormOverIssue.customer.contact != '' && _this7.addFormOverIssue.customer.contact != 'undefined')) {
-                  _context7.next = 28;
+                if (!(_this9.addFormOverIssue.customer.contact != '' && _this9.addFormOverIssue.customer.contact != 'undefined')) {
+                  _context9.next = 28;
                   break;
                 }
 
-                _context7.next = 25;
-                return _this7.callApi("post", "booking/getCNIC", {
-                  phoneNumber: _this7.addFormOverIssue.customer.contact,
+                _context9.next = 25;
+                return _this9.callApi("post", "booking/getCNIC", {
+                  phoneNumber: _this9.addFormOverIssue.customer.contact,
                   status: flag
                 });
 
               case 25:
-                _resCnic3 = _context7.sent;
-                _this7.addFormOverIssue.customer.name = _resCnic3.data.name;
-                _this7.addFormOverIssue.customer.cnic = _resCnic3.data.cnic;
+                _resCnic3 = _context9.sent;
+                _this9.addFormOverIssue.customer.name = _resCnic3.data.name;
+                _this9.addFormOverIssue.customer.cnic = _resCnic3.data.cnic;
 
               case 28:
               case "end":
-                return _context7.stop();
+                return _context9.stop();
             }
           }
-        }, _callee7);
+        }, _callee9);
       }))();
     },
     isNumber: function isNumber(evt) {
@@ -24449,48 +24545,48 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     fetchScheduleData: function fetchScheduleData() {
-      var _this8 = this;
+      var _this10 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         var res, _loop, key;
 
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                if (_this8.addForm.schedule == 0) {
-                  _this8.showBookingDiv = false;
+                if (_this10.addForm.schedule == 0) {
+                  _this10.showBookingDiv = false;
                 }
 
-                _this8.resetingArrays();
+                _this10.resetingArrays();
 
-                _this8.addForm.totalFare = 0;
-                _this8.validationErrors = [];
-                _this8.loading = true;
-                _context8.next = 7;
-                return _this8.callApi("post", "schedule/selected", {
-                  id: _this8.addForm.schedule,
-                  date: _this8.addForm.date,
-                  departureCity: _this8.addForm.departureCity,
-                  destinationCity: _this8.addForm.destinationCity
+                _this10.addForm.totalFare = 0;
+                _this10.validationErrors = [];
+                _this10.loading = true;
+                _context10.next = 7;
+                return _this10.callApi("post", "schedule/selected", {
+                  id: _this10.addForm.schedule,
+                  date: _this10.addForm.date,
+                  departureCity: _this10.addForm.departureCity,
+                  destinationCity: _this10.addForm.destinationCity
                 });
 
               case 7:
-                res = _context8.sent;
+                res = _context10.sent;
 
                 if (res.status == 500) {
-                  _this8.showBookingDiv = false;
+                  _this10.showBookingDiv = false;
                 }
 
                 if (res.status == 200) {
-                  _this8.loading = false;
-                  _this8.showBookingDiv = true;
-                  _this8.schedule = res.data;
+                  _this10.loading = false;
+                  _this10.showBookingDiv = true;
+                  _this10.schedule = res.data;
                 } else {
                   if (res.status == 422) {
                     _loop = function _loop(key) {
                       res.addForm.errors[key].forEach(function (element) {
-                        _this8.errorsArray(element, key);
+                        _this10.errorsArray(element, key);
                       });
                     };
 
@@ -24502,32 +24598,91 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 10:
               case "end":
-                return _context8.stop();
+                return _context10.stop();
             }
           }
-        }, _callee8);
+        }, _callee10);
+      }))();
+    },
+    fetchReScheduleData: function fetchReScheduleData() {
+      var _this11 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        var res, _loop2, key;
+
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                if (_this11.reSchedule.schedule == 0) {
+                  _this11.showReBookingDiv = false;
+                }
+
+                _this11.resetingArrays();
+
+                _this11.validationErrors = [];
+                _this11.loading = true;
+                _context11.next = 6;
+                return _this11.callApi("post", "schedule/selected", {
+                  id: _this11.reSchedule.schedule,
+                  date: _this11.reSchedule.date,
+                  departureCity: _this11.reSchedule.departureCity,
+                  destinationCity: _this11.reSchedule.destinationCity
+                });
+
+              case 6:
+                res = _context11.sent;
+
+                if (res.status == 500) {
+                  _this11.showReBookingDiv = false;
+                }
+
+                if (res.status == 200) {
+                  _this11.loading = false;
+                  _this11.showReBookingDiv = true;
+                  _this11.schedule = res.data;
+                } else {
+                  if (res.status == 422) {
+                    _loop2 = function _loop2(key) {
+                      res.addForm.errors[key].forEach(function (element) {
+                        _this11.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.addForm.errors) {
+                      _loop2(key);
+                    }
+                  }
+                }
+
+              case 9:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11);
       }))();
     },
     selectSeat: function selectSeat(row, col, seatNo) {
-      var _this9 = this;
+      var _this12 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var index, _index, _index2, _index3, resOverIssue;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+        var index, _index, _index2, _index3;
 
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context12.prev = _context12.next) {
               case 0:
-                console.log(_this9.selectedSeats);
-                console.log(_this9.schedule.bus_class.seat_map[row][col]);
-                _this9.validationErrors = [];
+                console.log(_this12.selectedSeats);
+                console.log(_this12.schedule.bus_class.seat_map[row][col]);
+                _this12.validationErrors = [];
 
-                if (!(_this9.addForm.oldBookings == 1 && !_this9.schedule.bus_class.seat_map[row][col].type)) {
-                  _context9.next = 5;
+                if (!(_this12.addForm.oldBookings == 1 && !_this12.schedule.bus_class.seat_map[row][col].type)) {
+                  _context12.next = 5;
                   break;
                 }
 
-                return _context9.abrupt("return", swal({
+                return _context12.abrupt("return", swal({
                   title: "Ops",
                   text: "Please Select Already Booked Seat",
                   icon: "error",
@@ -24535,70 +24690,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this9.schedule.bus_class.seat_map[row][col].type && _this9.selectedSeats.length == 0)) {
-                  _context9.next = 11;
+                if (!(_this12.schedule.bus_class.seat_map[row][col].type && _this12.selectedSeats.length == 0)) {
+                  _context12.next = 11;
                   break;
                 }
 
-                index = _this9.selectedBookedSeats.indexOf(seatNo);
+                index = _this12.selectedBookedSeats.indexOf(seatNo);
 
                 if (index != -1) {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this9.selectedBookedSeats.splice(index, 1);
+                  _this12.selectedBookedSeats.splice(index, 1);
 
-                  _this9.bookedSeats = _this9.bookedSeats.filter(function (seat) {
+                  _this12.bookedSeats = _this12.bookedSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
                     }
                   });
-                  _this9.addForm.totalFare -= parseFloat(_this9.schedule.bus_class.seat_map[row][col].fare);
+                  _this12.addForm.totalFare -= parseFloat(_this12.schedule.bus_class.seat_map[row][col].fare);
                 } else {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this9.selectedBookedSeats.push(seatNo);
+                  _this12.selectedBookedSeats.push(seatNo);
 
-                  _this9.bookedSeats.push(_this9.schedule.bus_class.seat_map[row][col]);
+                  _this12.bookedSeats.push(_this12.schedule.bus_class.seat_map[row][col]);
 
-                  _this9.addForm.totalFare += parseFloat(_this9.schedule.bus_class.seat_map[row][col].fare);
+                  _this12.addForm.totalFare += parseFloat(_this12.schedule.bus_class.seat_map[row][col].fare);
                 }
 
-                _this9.addForm.selectedBookedSeats = _this9.selectedBookedSeats;
-                _context9.next = 20;
+                _this12.addForm.selectedBookedSeats = _this12.selectedBookedSeats;
+                _context12.next = 20;
                 break;
 
               case 11:
-                if (!(!_this9.schedule.bus_class.seat_map[row][col].type && _this9.selectedBookedSeats.length == 0)) {
-                  _context9.next = 17;
+                if (!(!_this12.schedule.bus_class.seat_map[row][col].type && _this12.selectedBookedSeats.length == 0)) {
+                  _context12.next = 17;
                   break;
                 }
 
-                _index = _this9.selectedSeats.indexOf(seatNo);
+                _index = _this12.selectedSeats.indexOf(seatNo);
 
                 if (_index != -1) {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this9.selectedSeats.splice(_index, 1);
+                  _this12.selectedSeats.splice(_index, 1);
 
-                  _this9.addForm.totalFare -= _this9.schedule.bus_class.seat_map[row][col].fare;
+                  _this12.addForm.totalFare -= _this12.schedule.bus_class.seat_map[row][col].fare;
                 } else {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this9.selectedSeats.push(seatNo);
+                  _this12.selectedSeats.push(seatNo);
 
-                  _this9.addForm.totalFare += _this9.schedule.bus_class.seat_map[row][col].fare;
+                  _this12.addForm.totalFare += _this12.schedule.bus_class.seat_map[row][col].fare;
                 }
 
-                _this9.addForm.selectedSeats = _this9.selectedSeats;
-                _context9.next = 20;
+                _this12.addForm.selectedSeats = _this12.selectedSeats;
+                _context12.next = 20;
                 break;
 
               case 17:
-                _this9.fetchScheduleData();
+                _this12.fetchScheduleData();
 
-                _this9.resetingArrays();
+                _this12.resetingArrays();
 
-                return _context9.abrupt("return", swal({
+                return _context12.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",
                   icon: "error",
@@ -24606,63 +24761,63 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 20:
-                if (!(_this9.schedule.bus_class.seat_map[row][col].over_issue && _this9.selectedOverIssueSeats.length == 0)) {
-                  _context9.next = 26;
+                if (!(_this12.schedule.bus_class.seat_map[row][col].over_issue && _this12.selectedOverIssueSeats.length == 0)) {
+                  _context12.next = 26;
                   break;
                 }
 
-                _index2 = _this9.selectedBookedOverIssueSeats.indexOf(seatNo);
+                _index2 = _this12.selectedBookedOverIssueSeats.indexOf(seatNo);
 
                 if (_index2 != -1) {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this9.selectedBookedOverIssueSeats.splice(_index2, 1);
+                  _this12.selectedBookedOverIssueSeats.splice(_index2, 1);
 
-                  _this9.bookedOverIssueSeats = _this9.bookedOverIssueSeats.filter(function (seat) {
+                  _this12.bookedOverIssueSeats = _this12.bookedOverIssueSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
                     }
                   });
                 } else {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this9.selectedBookedOverIssueSeats.push(seatNo);
+                  _this12.selectedBookedOverIssueSeats.push(seatNo);
 
-                  _this9.bookedOverIssueSeats.push(_this9.schedule.bus_class.seat_map[row][col]);
+                  _this12.bookedOverIssueSeats.push(_this12.schedule.bus_class.seat_map[row][col]);
                 }
 
-                _this9.addForm.selectedBookedOverIssueSeats = _this9.selectedBookedOverIssueSeats;
-                _context9.next = 35;
+                _this12.addForm.selectedBookedOverIssueSeats = _this12.selectedBookedOverIssueSeats;
+                _context12.next = 35;
                 break;
 
               case 26:
-                if (!(!_this9.schedule.bus_class.seat_map[row][col].over_issue && _this9.selectedBookedOverIssueSeats.length == 0)) {
-                  _context9.next = 32;
+                if (!(!_this12.schedule.bus_class.seat_map[row][col].over_issue && _this12.selectedBookedOverIssueSeats.length == 0)) {
+                  _context12.next = 32;
                   break;
                 }
 
-                _index3 = _this9.selectedOverIssueSeats.indexOf(seatNo);
+                _index3 = _this12.selectedOverIssueSeats.indexOf(seatNo);
 
                 if (_index3 != -1) {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = false; // this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = false; // this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
 
-                  _this9.selectedOverIssueSeats.splice(_index3, 1);
+                  _this12.selectedOverIssueSeats.splice(_index3, 1);
                 } else {
-                  _this9.schedule.bus_class.seat_map[row][col].selected = true; // this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
+                  _this12.schedule.bus_class.seat_map[row][col].selected = true; // this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
 
-                  _this9.selectedOverIssueSeats.push(seatNo);
+                  _this12.selectedOverIssueSeats.push(seatNo);
                 }
 
-                _this9.addForm.selectedOverIssueSeats = _this9.selectedOverIssueSeats;
-                _context9.next = 35;
+                _this12.addForm.selectedOverIssueSeats = _this12.selectedOverIssueSeats;
+                _context12.next = 35;
                 break;
 
               case 32:
-                _this9.fetchScheduleData();
+                _this12.fetchScheduleData();
 
-                _this9.resetingArrays();
+                _this12.resetingArrays();
 
-                return _context9.abrupt("return", swal({
+                return _context12.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",
                   icon: "error",
@@ -24670,47 +24825,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 35:
-                if (!_this9.schedule.bus_class.seat_map[row][col].over_issue) {
-                  _context9.next = 40;
-                  break;
-                }
-
-                _context9.next = 38;
-                return _this9.callApi("post", "booking/overIssue", {
-                  date: _this9.addForm.date,
-                  seat_no: seatNo,
-                  schedule_id: _this9.addForm.schedule,
-                  seat_fare: _this9.schedule.bus_class.seat_map[row][col].fare,
-                  departureCity: _this9.schedule.bus_class.seat_map[row][col].departure_city,
-                  destinationCity: _this9.schedule.bus_class.seat_map[row][col].destination_city
-                });
-
-              case 38:
-                resOverIssue = _context9.sent;
-
-                if (resOverIssue.status == 200) {
-                  _this9.addFormOverIssue.ticket = resOverIssue.data.ticket;
-                  _this9.addFormOverIssue.customer = resOverIssue.data.customer;
-                }
-
-              case 40:
               case "end":
-                return _context9.stop();
+                return _context12.stop();
             }
           }
-        }, _callee9);
+        }, _callee12);
       }))();
     },
     addOverIssueTicket: function addOverIssueTicket() {
-      var _this10 = this;
+      var _this13 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
         var dataNewTicket, resOverIssue;
-        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                if (_this10.addFormOverIssue.customer.cnic == '' || _this10.addFormOverIssue.customer.cnic == 'undefined') {
+                if (_this13.addFormOverIssue.customer.cnic == '' || _this13.addFormOverIssue.customer.cnic == 'undefined') {
                   swal({
                     title: "Required",
                     text: "CNIC is Required",
@@ -24720,23 +24851,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 dataNewTicket = {
-                  departure_city: _this10.addForm.departureCity,
-                  destination_city: _this10.addForm.destinationCity,
-                  date: _this10.addForm.date,
-                  schedule_id: _this10.addForm.schedule,
-                  cnic: _this10.addFormOverIssue.customer.cnic,
-                  name: _this10.addFormOverIssue.customer.name,
-                  contact: _this10.addFormOverIssue.customer.contact,
-                  remarks: _this10.addFormOverIssue.ticket.remarks,
-                  gender: _this10.addFormOverIssue.gender,
-                  seat_no: _this10.addFormOverIssue.ticket.seat_no,
-                  fare: _this10.addFormOverIssue.ticket.fare
+                  departure_city: _this13.addForm.departureCity,
+                  destination_city: _this13.addForm.destinationCity,
+                  date: _this13.addForm.date,
+                  schedule_id: _this13.addForm.schedule,
+                  cnic: _this13.addFormOverIssue.customer.cnic,
+                  name: _this13.addFormOverIssue.customer.name,
+                  contact: _this13.addFormOverIssue.customer.contact,
+                  remarks: _this13.addFormOverIssue.ticket.remarks,
+                  gender: _this13.addFormOverIssue.gender,
+                  seat_no: _this13.addFormOverIssue.ticket.seat_no // fare: this.addFormOverIssue.ticket.fare,
+
                 };
-                _context10.next = 4;
-                return _this10.callApi("post", "booking/overIssueAdd", dataNewTicket);
+                _context13.next = 4;
+                return _this13.callApi("post", "booking/overIssueAdd", dataNewTicket);
 
               case 4:
-                resOverIssue = _context10.sent;
+                resOverIssue = _context13.sent;
 
                 if (resOverIssue.status == 201) {
                   swal({
@@ -24745,8 +24876,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this10.addFormOverIssue.ticket = '';
-                  _this10.addFormOverIssue.customer = '';
+                  _this13.addFormOverIssue.ticket = '';
+                  _this13.addFormOverIssue.customer = '';
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -24782,10 +24913,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 8:
               case "end":
-                return _context10.stop();
+                return _context13.stop();
             }
           }
-        }, _callee10);
+        }, _callee13);
       }))();
     },
     getClasses: function getClasses(col) {
@@ -24808,21 +24939,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     add: function add() {
-      var _this11 = this;
+      var _this14 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var res, _loop2, key;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
+        var res, _loop3, key;
 
-        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+        return _regeneratorRuntime().wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context11.prev = _context11.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                if (_this11.addForm.schedule) {
-                  _context11.next = 2;
+                if (_this14.addForm.schedule) {
+                  _context14.next = 2;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "Required!",
                   text: "Schedule Name is Required",
                   icon: "error",
@@ -24830,12 +24961,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (_this11.addForm.date) {
-                  _context11.next = 4;
+                if (_this14.addForm.date) {
+                  _context14.next = 4;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "Required!",
                   text: "Date is Required",
                   icon: "error",
@@ -24843,12 +24974,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(!_this11.addForm.customerCNIC || _this11.addForm.customerCNIC.length != 15)) {
-                  _context11.next = 6;
+                if (!(!_this14.addForm.customerCNIC || _this14.addForm.customerCNIC.length != 15)) {
+                  _context14.next = 6;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "Required!",
                   text: "CNIC is Required and Should Contain 15 Digits",
                   icon: "error",
@@ -24856,12 +24987,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(!_this11.addForm.customerName || typeof _this11.addForm.customerName == 'undefined')) {
-                  _context11.next = 8;
+                if (!(!_this14.addForm.customerName || typeof _this14.addForm.customerName == 'undefined')) {
+                  _context14.next = 8;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "Required!",
                   text: "Customer Name is Required",
                   icon: "error",
@@ -24869,12 +25000,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(!_this11.addForm.contact || typeof _this11.addForm.contact == 'undefined')) {
-                  _context11.next = 10;
+                if (!(!_this14.addForm.contact || typeof _this14.addForm.contact == 'undefined')) {
+                  _context14.next = 10;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "Required!",
                   text: "Customer Contact Number is required,",
                   icon: "error",
@@ -24882,12 +25013,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(_this11.selectedSeats.length == 0)) {
-                  _context11.next = 12;
+                if (!(_this14.selectedSeats.length == 0)) {
+                  _context14.next = 12;
                   break;
                 }
 
-                return _context11.abrupt("return", swal({
+                return _context14.abrupt("return", swal({
                   title: "required!",
                   text: "Please Select At Least One Seat",
                   icon: "error",
@@ -24895,11 +25026,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                _context11.next = 14;
-                return _this11.callApi("post", "booking/store", _this11.addForm);
+                _context14.next = 14;
+                return _this14.callApi("post", "booking/store", _this14.addForm);
 
               case 14:
-                res = _context11.sent;
+                res = _context14.sent;
 
                 if (res.status === 200) {
                   // this.success = "Booking Created Successfully";
@@ -24910,11 +25041,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this11.fetchScheduleData();
+                  _this14.fetchScheduleData();
 
-                  _this11.resetingArrays();
+                  _this14.resetingArrays();
 
-                  _this11.addForm = {
+                  _this14.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
                     gender: "1",
@@ -24924,45 +25055,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     destinationCity: 0,
                     departureCity: 0
                   };
-                  _this11.showBookingDiv = false;
-                  _this11.allSchedules = '';
+                  _this14.showBookingDiv = false;
+                  _this14.allSchedules = '';
                   $("#booking_table").DataTable().destroy();
                   setTimeout(function () {
                     $("#booking_table").DataTable();
                   }, 300); // window.scrollTo(0, 0);
                 } else {
                   if (res.status == 422) {
-                    _loop2 = function _loop2(key) {
+                    _loop3 = function _loop3(key) {
                       res.addForm.errors[key].forEach(function (element) {
-                        _this11.errorsArray(element, key);
+                        _this14.errorsArray(element, key);
                       });
                     };
 
                     for (key in res.addForm.errors) {
-                      _loop2(key);
+                      _loop3(key);
                     }
                   }
                 }
 
               case 16:
               case "end":
-                return _context11.stop();
+                return _context14.stop();
             }
           }
-        }, _callee11);
+        }, _callee14);
       }))();
     },
     doScroll: function doScroll() {
       $("#addBooking").scrollTop(10);
     },
     deleteModal: function deleteModal(surcharge, i) {
-      var _this12 = this;
+      var _this15 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
         var deletingObj;
-        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+        return _regeneratorRuntime().wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
                 deletingObj = {
                   url: "booking/delete",
@@ -24970,43 +25101,120 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this12.$store.commit("setDeleteObj", deletingObj);
+                _this15.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
               case "end":
-                return _context12.stop();
+                return _context15.stop();
             }
           }
-        }, _callee12);
+        }, _callee15);
+      }))();
+    },
+    rescheduleSeats: function rescheduleSeats() {
+      var _this16 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
+        var res, _loop4, key;
+
+        return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
+              case 0:
+                _this16.validationErrors = [];
+
+                if (_this16.addForm.schedule) {
+                  _context16.next = 4;
+                  break;
+                }
+
+                _this16.doScroll();
+
+                return _context16.abrupt("return", _this16.errorsArray("Schedule Name is Required", "Schedule"));
+
+              case 4:
+                if (_this16.addForm.date) {
+                  _context16.next = 7;
+                  break;
+                }
+
+                _this16.doScroll();
+
+                return _context16.abrupt("return", _this16.errorsArray("Date is Required", "Date"));
+
+              case 7:
+                if (!(_this16.selectedSeats.length == 0)) {
+                  _context16.next = 9;
+                  break;
+                }
+
+                return _context16.abrupt("return", _this16.errorsArray("Please Select At Least One Seat", "Seat"));
+
+              case 9:
+                _this16.validationErrors = [];
+                _context16.next = 12;
+                return _this16.callApi("post", "booking/reschedule", _objectSpread(_objectSpread({}, _this16.addForm), {}, {
+                  bookingSeats: _this16.seats
+                }));
+
+              case 12:
+                res = _context16.sent;
+
+                if (res.status == 200) {
+                  _this16.success = "Seats Rescheduled Successfully";
+
+                  _this16.fetchScheduleData();
+
+                  window.scrollTo(0, 0);
+                } else {
+                  if (res.status === 422) {
+                    _loop4 = function _loop4(key) {
+                      res.addForm.errors[key].forEach(function (element) {
+                        _this16.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.addForm.errors) {
+                      _loop4(key);
+                    }
+                  }
+                }
+
+              case 14:
+              case "end":
+                return _context16.stop();
+            }
+          }
+        }, _callee16);
       }))();
     },
     resetingArrays: function resetingArrays() {
-      var _this13 = this;
+      var _this17 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee17() {
         var resBooking;
-        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+        return _regeneratorRuntime().wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
-                _this13.selectedSeats = [];
-                _this13.selectedBookedSeats = [];
-                _this13.selectedOverIssueSeats = [];
-                _this13.selectedBookedOverIssueSeats = [];
-                _this13.addForm.selectedSeats = [];
-                _this13.addForm.selectedBookedSeats = [];
-                _this13.addForm.selectedOverIssueSeats = [];
-                _this13.addForm.selectedBookedOverIssueSeats = [];
-                _this13.bookedSeats = [];
-                _this13.bookedOverIssueSeats = [];
-                _context13.next = 12;
-                return _this13.callApi("post", "booking");
+                _this17.selectedSeats = [];
+                _this17.selectedBookedSeats = [];
+                _this17.selectedOverIssueSeats = [];
+                _this17.selectedBookedOverIssueSeats = [];
+                _this17.addForm.selectedSeats = [];
+                _this17.addForm.selectedBookedSeats = [];
+                _this17.addForm.selectedOverIssueSeats = [];
+                _this17.addForm.selectedBookedOverIssueSeats = [];
+                _this17.bookedSeats = [];
+                _this17.bookedOverIssueSeats = [];
+                _context17.next = 12;
+                return _this17.callApi("post", "booking");
 
               case 12:
-                resBooking = _context13.sent;
+                resBooking = _context17.sent;
 
                 if (resBooking.status == 200) {
-                  _this13.allBookings = resBooking.data;
+                  _this17.allBookings = resBooking.data;
                   $("#booking_table").DataTable().destroy();
                   setTimeout(function () {
                     $("#booking_table").DataTable();
@@ -25017,35 +25225,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 14:
               case "end":
-                return _context13.stop();
+                return _context17.stop();
             }
           }
-        }, _callee13);
+        }, _callee17);
       }))();
     },
     details: function details(date, schedule_id) {
-      var _this14 = this;
+      var _this18 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
         var resBookingDetail;
-        return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+        return _regeneratorRuntime().wrap(function _callee18$(_context18) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context18.prev = _context18.next) {
               case 0:
-                $("#" + _this14.detailsFormId + " table").DataTable().destroy();
-                _context14.next = 3;
-                return _this14.callApi("post", "booking/details", {
+                $("#" + _this18.detailsFormId + " table").DataTable().destroy();
+                _context18.next = 3;
+                return _this18.callApi("post", "booking/details", {
                   date: date,
                   schedule_id: schedule_id
                 });
 
               case 3:
-                resBookingDetail = _context14.sent;
+                resBookingDetail = _context18.sent;
 
                 if (resBookingDetail.status === 200) {
-                  _this14.bookingDetails = resBookingDetail.data;
+                  _this18.bookingDetails = resBookingDetail.data;
                   setTimeout(function () {
-                    $("#" + _this14.detailsFormId + " table").DataTable();
+                    $("#" + _this18.detailsFormId + " table").DataTable();
                   }, 300);
                 } else {
                   console.log(resBookingDetail);
@@ -25053,10 +25261,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context14.stop();
+                return _context18.stop();
             }
           }
-        }, _callee14);
+        }, _callee18);
       }))();
     },
     reset: function reset() {
@@ -25074,6 +25282,107 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.allSchedules = '';
       this.selectedBookedSeats = '';
       this.selectedBookedOverIssueSeats = '';
+    },
+    cancelBooking: function cancelBooking(date, schedule, customer, departure, destination, seatNo) {
+      var _this19 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
+        var data, resCancelBooking;
+        return _regeneratorRuntime().wrap(function _callee19$(_context19) {
+          while (1) {
+            switch (_context19.prev = _context19.next) {
+              case 0:
+                data = {
+                  date: date,
+                  schedule_id: schedule,
+                  customer_id: customer,
+                  departure_id: departure,
+                  destination_id: destination,
+                  seat_no: seatNo
+                };
+                _context19.next = 3;
+                return _this19.callApi("post", "booking/canceling", data);
+
+              case 3:
+                resCancelBooking = _context19.sent;
+
+                if (resCancelBooking.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Booking Canceled Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+
+                  _this19.fetchScheduleData();
+                }
+
+              case 5:
+              case "end":
+                return _context19.stop();
+            }
+          }
+        }, _callee19);
+      }))();
+    },
+    OverIssueBooking: function OverIssueBooking(date, schedule, departure, destination, seatNo) {
+      var _this20 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee20() {
+        var data, resOverIssueBooking;
+        return _regeneratorRuntime().wrap(function _callee20$(_context20) {
+          while (1) {
+            switch (_context20.prev = _context20.next) {
+              case 0:
+                _this20.addFormOverIssue.customer = '';
+                _this20.addFormOverIssue.ticket = '';
+                data = {
+                  date: date,
+                  schedule_id: schedule,
+                  departure_id: departure,
+                  destination_id: destination,
+                  seat_no: seatNo
+                };
+                _context20.next = 5;
+                return _this20.callApi("post", "booking/overIssue", data);
+
+              case 5:
+                resOverIssueBooking = _context20.sent;
+
+                if (resOverIssueBooking.status == 200) {
+                  _this20.addFormOverIssue.ticket = resOverIssueBooking.data.ticket;
+                  _this20.addFormOverIssue.customer = resOverIssueBooking.data.customer;
+                  $("#overIssue_model").modal('show');
+                }
+
+              case 7:
+              case "end":
+                return _context20.stop();
+            }
+          }
+        }, _callee20);
+      }))();
+    },
+    reschedulBooking: function reschedulBooking(date, schedule, departure, destination, seatNo) {
+      var _this21 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee21() {
+        return _regeneratorRuntime().wrap(function _callee21$(_context21) {
+          while (1) {
+            switch (_context21.prev = _context21.next) {
+              case 0:
+                _this21.reSchedule.departureCity = 0;
+                _this21.reSchedule.destinationCity = 0;
+                _this21.reSchedule.schedule = 0;
+                $("#reschedule_modal").modal('show');
+
+              case 4:
+              case "end":
+                return _context21.stop();
+            }
+          }
+        }, _callee21);
+      }))();
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["getDeletingObj"])),
@@ -39250,36 +39559,206 @@ var _hoisted_110 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_111 = {
-  "class": "form-group row"
+  "class": "form-group text-right"
+};
+var _hoisted_112 = {
+  "class": "modal fade",
+  id: "reschedule_modal",
+  tabindex: "-1",
+  "aria-labelledby": "reschedule_modalLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_113 = {
+  "class": "modal-dialog modal-xl modal-dialog-scrollable"
+};
+var _hoisted_114 = {
+  "class": "modal-content"
 };
 
-var _hoisted_112 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "col-md-3 pt-3 font-weight-bold",
-    "for": "totalFare"
-  }, "Total Fare", -1
+var _hoisted_115 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal-header"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "reschedule_modalLabel"
+  }, "Reschedule Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_113 = {
-  "class": "form-group text-right"
+var _hoisted_116 = {
+  "class": "modal-body"
 };
-var _hoisted_114 = {
+var _hoisted_117 = {
+  "class": "row border-bottom mb-1"
+};
+var _hoisted_118 = {
+  "class": "col-md-2 mb-2"
+};
+
+var _hoisted_119 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "departureCity",
+    "class": "mb-0"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Departure City "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_120 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "0",
+    selected: ""
+  }, "Select Departure City", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_121 = ["value"];
+var _hoisted_122 = {
+  "class": "col-md-2 mb-2"
+};
+
+var _hoisted_123 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "destinationCity",
+    "class": "mb-0"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Destination City"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_124 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "0",
+    selected: ""
+  }, "Select Destination City", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_125 = ["value"];
+var _hoisted_126 = {
+  "class": "col-md-2 class mb-2"
+};
+
+var _hoisted_127 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "date",
+    "class": "mb-0"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_128 = ["min"];
+var _hoisted_129 = {
+  "class": "col-md-4 class mb-2"
+};
+
+var _hoisted_130 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "scheduleName",
+    "class": "mb-0"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Schedule Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_131 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "0",
+    selected: ""
+  }, "Select Schedule", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_132 = ["value"];
+var _hoisted_133 = {
+  "class": "col-md-2 mb-2"
+};
+
+var _hoisted_134 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "mb-0"
+  }, "Action", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_135 = {
+  "class": "row"
+};
+var _hoisted_136 = {
+  key: 0
+};
+var _hoisted_137 = {
+  key: 1,
+  "class": "col-md-12 row"
+};
+var _hoisted_138 = {
+  "class": "col-md-12 mx-auto"
+};
+var _hoisted_139 = ["onClick", "title"];
+
+var _hoisted_140 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_141 = {
+  key: 0
+};
+var _hoisted_142 = {
+  key: 1
+};
+
+var _hoisted_143 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "type-icons far fa-hand-paper text-dark"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_144 = {
+  key: 1
+};
+var _hoisted_145 = {
+  "class": "modal-footer"
+};
+var _hoisted_146 = {
   "class": "modal fade",
   id: "seatAllDetailsModal",
   tabindex: "-1",
   "aria-labelledby": "seatAllDetailsModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_115 = {
+var _hoisted_147 = {
   "class": "modal-dialog modal-xl modal-dialog-scrollable"
 };
-var _hoisted_116 = {
+var _hoisted_148 = {
   "class": "modal-content"
 };
 
-var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_149 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -39297,35 +39776,35 @@ var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_118 = {
+var _hoisted_150 = {
   "class": "modal-body p-0"
 };
-var _hoisted_119 = {
+var _hoisted_151 = {
   "class": "card-body"
 };
-var _hoisted_120 = {
+var _hoisted_152 = {
   "class": "row"
 };
-var _hoisted_121 = {
+var _hoisted_153 = {
   "class": "col-12"
 };
-var _hoisted_122 = {
+var _hoisted_154 = {
   "class": "card"
 };
-var _hoisted_123 = {
+var _hoisted_155 = {
   "class": "card-body p-3"
 };
-var _hoisted_124 = {
+var _hoisted_156 = {
   "class": "row my-1"
 };
-var _hoisted_125 = {
-  "class": "col-md-6"
+var _hoisted_157 = {
+  "class": "col-md-4"
 };
-var _hoisted_126 = {
+var _hoisted_158 = {
   "class": "d-flex"
 };
 
-var _hoisted_127 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_159 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Seat :", -1
@@ -39333,14 +39812,14 @@ var _hoisted_127 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_128 = {
+var _hoisted_160 = {
   "class": "mb-0"
 };
-var _hoisted_129 = {
+var _hoisted_161 = {
   "class": "d-flex"
 };
 
-var _hoisted_130 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_162 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Date :", -1
@@ -39348,14 +39827,14 @@ var _hoisted_130 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_131 = {
+var _hoisted_163 = {
   "class": "mb-0"
 };
-var _hoisted_132 = {
+var _hoisted_164 = {
   "class": "d-flex"
 };
 
-var _hoisted_133 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_165 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, " Bus Class :", -1
@@ -39363,14 +39842,14 @@ var _hoisted_133 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_134 = {
+var _hoisted_166 = {
   "class": "mb-0"
 };
-var _hoisted_135 = {
+var _hoisted_167 = {
   "class": "d-flex"
 };
 
-var _hoisted_136 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_168 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Schedule : ", -1
@@ -39378,17 +39857,17 @@ var _hoisted_136 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_137 = {
+var _hoisted_169 = {
   "class": "mb-0"
 };
-var _hoisted_138 = {
-  "class": "col-md-6"
+var _hoisted_170 = {
+  "class": "col-md-4"
 };
-var _hoisted_139 = {
+var _hoisted_171 = {
   "class": "d-flex"
 };
 
-var _hoisted_140 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_172 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Customer Name : ", -1
@@ -39396,14 +39875,14 @@ var _hoisted_140 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_141 = {
+var _hoisted_173 = {
   "class": "mb-0"
 };
-var _hoisted_142 = {
+var _hoisted_174 = {
   "class": "d-flex"
 };
 
-var _hoisted_143 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_175 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Customer Cnic :", -1
@@ -39411,14 +39890,14 @@ var _hoisted_143 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_144 = {
+var _hoisted_176 = {
   "class": "mb-0"
 };
-var _hoisted_145 = {
+var _hoisted_177 = {
   "class": "d-flex"
 };
 
-var _hoisted_146 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_178 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, " Departure City :", -1
@@ -39426,14 +39905,14 @@ var _hoisted_146 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_147 = {
+var _hoisted_179 = {
   "class": "mb-0"
 };
-var _hoisted_148 = {
+var _hoisted_180 = {
   "class": "d-flex"
 };
 
-var _hoisted_149 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_181 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Destination City : ", -1
@@ -39441,27 +39920,61 @@ var _hoisted_149 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_150 = {
+var _hoisted_182 = {
   "class": "mb-0"
 };
+var _hoisted_183 = {
+  "class": "col-md-4"
+};
+var _hoisted_184 = {
+  "class": "d-flex"
+};
 
-var _hoisted_151 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row mt-3\" data-v-03b302d9><div class=\"col-md-12 text-right\" data-v-03b302d9><!--                                                                                                        v-if=&quot;selectedBookedOverIssueSeats.length&quot;--><!--                                                    v-if=&quot;selectedBookedSeats.length&quot;--><button type=\"button\" class=\"btn btn-info\" data-toggle=\"modal\" data-target=\"#addELTModel\" data-v-03b302d9>Add ELT </button><button type=\"button\" class=\"btn btn-primary ml-2\" href=\"#reschedule_modal\" data-toggle=\"modal\" data-v-03b302d9>Reschedule </button><button type=\"button\" class=\"btn btn-warning ml-2\" href=\"#overIssue_model\" data-toggle=\"modal\" data-v-03b302d9>Over Issue </button><button type=\"button\" class=\"btn btn-danger ml-2\" data-v-03b302d9>Cancel</button></div></div>", 1);
+var _hoisted_185 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    "class": "mb-0 font-weight-bold mr-3"
+  }, "Customer Phone : ", -1
+  /* HOISTED */
+  );
+});
 
-var _hoisted_152 = {
+var _hoisted_186 = {
+  "class": "mb-0"
+};
+var _hoisted_187 = {
+  "class": "row mt-3"
+};
+var _hoisted_188 = {
+  "class": "col-md-12 text-right"
+};
+
+var _hoisted_189 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-info",
+    "data-toggle": "modal",
+    "data-target": "#addELTModel"
+  }, "Add ELT ", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_190 = ["onClick"];
+var _hoisted_191 = ["onClick"];
+var _hoisted_192 = ["onClick"];
+var _hoisted_193 = {
   key: 0
 };
 
-var _hoisted_153 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_194 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("hr", null, null, -1
   /* HOISTED */
   );
 });
 
-var _hoisted_154 = [_hoisted_153];
+var _hoisted_195 = [_hoisted_194];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
-
-  var _component_ReschedulePopup = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("ReschedulePopup");
 
   var _component_DetailsModal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("DetailsModal");
 
@@ -39729,7 +40242,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), _hoisted_85, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Over Issue Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_87, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [_hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [_hoisted_95, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+  ))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Add Cargo "), _hoisted_85, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Over Issue Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_87, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [_hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [_hoisted_95, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
     onBlur: _cache[26] || (_cache[26] = function ($event) {
       return $options.getCustomer('overIssueCNIC');
     }),
@@ -39805,46 +40318,172 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addFormOverIssue.ticket.seat_no]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [_hoisted_112, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
-    readonly: "",
-    "class": "form-control col-md-9 font-weight-bold",
-    id: "totalFare",
-    "onUpdate:modelValue": _cache[35] || (_cache[35] = function ($event) {
-      return $data.addFormOverIssue.ticket.fare = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addFormOverIssue.ticket.fare]])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addFormOverIssue.ticket.seat_no]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    <div class=\"form-group row\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                        <label class=\"col-md-3 pt-3 font-weight-bold\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                               for=\"totalFare\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                        >Total Fare</label"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                        >"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                        <input"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            type=\"text\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            readonly"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            class=\"form-control col-md-9 font-weight-bold\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            id=\"totalFare\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            v-model=\"addFormOverIssue.ticket.fare\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                        />"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    </div>")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary mx-1",
-    onClick: _cache[36] || (_cache[36] = function ($event) {
+    onClick: _cache[35] || (_cache[35] = function ($event) {
       return $options.addOverIssueTicket();
     })
-  }, " Generate Ticket ")])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ReschedulePopup, {
-    formID: $data.rescheduleFormId,
-    seats: $data.bookedSeats,
-    formData: $data.sameDataMain
-  }, null, 8
-  /* PROPS */
-  , ["formID", "seats", "formData"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        modal for details"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_115, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [_hoisted_117, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_119, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedSeatDataBackEnd, function (singleItems, i) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_122, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(singleItems, function (innerItem, j) {
-      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_128, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.seat_no), 1
+  }, " Generate Ticket ")])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Model Reschedule       "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [_hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "class": "form-control",
+    id: "departureCity",
+    onChange: _cache[36] || (_cache[36] = function ($event) {
+      $options.fetchReSpecificSchedules();
+      $options.getReDestinationCity();
+    }),
+    "onUpdate:modelValue": _cache[37] || (_cache[37] = function ($event) {
+      return $data.reSchedule.departureCity = $event;
+    })
+  }, [_hoisted_120, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (city, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      value: city.id,
+      key: i
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_121);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.reSchedule.departureCity]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [_hoisted_123, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "class": "form-control",
+    id: "destinationCity",
+    onChange: _cache[38] || (_cache[38] = function ($event) {
+      return $options.fetchReSpecificSchedules();
+    }),
+    "onUpdate:modelValue": _cache[39] || (_cache[39] = function ($event) {
+      return $data.reSchedule.destinationCity = $event;
+    })
+  }, [_hoisted_124, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.reSpecificCities, function (city, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      value: city.id,
+      key: i
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_125);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.reSchedule.destinationCity]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "date",
+    min: $options.minDateFilter(),
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[40] || (_cache[40] = function ($event) {
+      return $data.reSchedule.date = $event;
+    }),
+    onChange: _cache[41] || (_cache[41] = function ($event) {
+      return $options.fetchReSpecificSchedules();
+    })
+  }, null, 40
+  /* PROPS, HYDRATE_EVENTS */
+  , _hoisted_128), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.reSchedule.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [_hoisted_130, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "class": "form-control",
+    id: "scheduleName",
+    onChange: _cache[42] || (_cache[42] = function ($event) {
+      return $options.fetchReSpecificSchedules();
+    }),
+    "onUpdate:modelValue": _cache[43] || (_cache[43] = function ($event) {
+      return $data.reSchedule.schedule = $event;
+    })
+  }, [_hoisted_131, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allReSchedules, function (schedule, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      value: schedule.schedule_id,
+      key: i
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scheduleDropdown(schedule)), 9
+    /* TEXT, PROPS */
+    , _hoisted_132);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.reSchedule.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_133, [_hoisted_134, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[44] || (_cache[44] = function () {
+      return $options.fetchReScheduleData && $options.fetchReScheduleData.apply($options, arguments);
+    }),
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn btn-block btn-danger", $data.getReSchedule ? 'disabled' : ''])
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.getReSchedule ? 'Loading...' : 'Refresh'), 3
+  /* TEXT, CLASS */
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <div class=\"col-md-6 d-flex justify-content-center mx-auto mb-3\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                     v-if=\"selectedBookedSeats.length\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    <a"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        @click=\"sameDataAsMain()\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        class=\"btn btn-primary mx-1\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        href=\"#reschedule_modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    >Shifting ( Reschedule ) Seats</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <div class=\"col-md-6 d-flex justify-content-center mx-auto mb-3\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                     v-if=\"selectedBookedOverIssueSeats.length\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    <a"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        class=\"btn btn-primary mx-1\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        href=\"#overIssue_model\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                        data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    >Over Issue Seats</a>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </div>"), $data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("h1", _hoisted_136, "Loading.........")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showReBookingDiv ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_137, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_138, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.bus_class.seat_map, function (record, rowIndex) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      "class": "d-flex justify-content-center seat-img p-0 m-0",
+      key: rowIndex
+    }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(record, function (col, colIndex) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        key: colIndex
+      }, [col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        key: 0,
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow", $options.getClasses(col)]),
+        onClick: function onClick($event) {
+          return $options.selectSeat(rowIndex, colIndex, col.seatNo);
+        },
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+          border: '2px solid ' + col.color + ' !important'
+        }),
+        title: col.partial ? col.departure_city + ' to ' + col.destination_city : ''
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [_hoisted_130, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.date), 1
+      ), _hoisted_140, col.type && (col.type == 'booked' || col.type == 'advance booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_141, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["type-icons fas", col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'])
+      }, null, 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                            <i class=\"type-icons fas\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                               :class=\"col.over_issue == true ? 'fa-people-carry' : ''\"> </i>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), col.over_issue == true ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_142, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                            <i class=\"type-icons fas fa-people-carry text-danger\"></i>"), _hoisted_143])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14
+      /* CLASS, STYLE, PROPS */
+      , _hoisted_139)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_144))]);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_145, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "btn btn-primary btn-block",
+    onClick: _cache[45] || (_cache[45] = function () {
+      return $options.rescheduleSeats && $options.rescheduleSeats.apply($options, arguments);
+    })
+  }, "Reschedule Seats ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        <ReschedulePopup :formID=\"rescheduleFormId\" :seats=\"bookedSeats\" :formData=\"sameDataMain\"/>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        modal for details"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_146, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_147, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_148, [_hoisted_149, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_150, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_151, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_152, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedSeatDataBackEnd, function (singleItems, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_154, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(singleItems, function (innerItem, j) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_155, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_156, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_157, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_158, [_hoisted_159, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_160, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.seat_no), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [_hoisted_133, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_134, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.bus_class.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_161, [_hoisted_162, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_163, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.date), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, [_hoisted_136, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_137, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_164, [_hoisted_165, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_166, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.bus_class.name), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_138, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_139, [_hoisted_140, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_141, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.customer.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_167, [_hoisted_168, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_169, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_142, [_hoisted_143, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_144, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.customer.cnic), 1
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_170, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_171, [_hoisted_172, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_173, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.customer.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_145, [_hoisted_146, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_147, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.departure_city.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_174, [_hoisted_175, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_176, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cnicFormat(innerItem.customer.cnic)), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_148, [_hoisted_149, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_150, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.destination_city.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_177, [_hoisted_178, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_179, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.departure_city.name), 1
       /* TEXT */
-      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            Buttons"), _hoisted_151, typeof innerItem[j + 1] !== 'undefined' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_152, _hoisted_154)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_180, [_hoisted_181, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_182, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.destination_city.name), 1
+      /* TEXT */
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_183, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_184, [_hoisted_185, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_186, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.phoneFormat(innerItem.customer.contact)), 1
+      /* TEXT */
+      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            Buttons"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_187, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_188, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                                        v-if=\"selectedBookedOverIssueSeats.length\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    v-if=\"selectedBookedSeats.length\""), _hoisted_189, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    href=\"#reschedule_modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-primary ml-2",
+        onClick: function onClick($event) {
+          return $options.reschedulBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);
+        }
+      }, "Reschedule ", 8
+      /* PROPS */
+      , _hoisted_190), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-warning ml-2",
+        onClick: function onClick($event) {
+          return $options.OverIssueBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);
+        }
+      }, " Over Issue ", 8
+      /* PROPS */
+      , _hoisted_191), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-danger ml-2",
+        onClick: function onClick($event) {
+          return $options.cancelBooking(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);
+        }
+      }, " Cancel ", 8
+      /* PROPS */
+      , _hoisted_192)])]), typeof innerItem[j + 1] !== 'undefined' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_193, _hoisted_195)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
     }), 256
     /* UNKEYED_FRAGMENT */
     ))]);

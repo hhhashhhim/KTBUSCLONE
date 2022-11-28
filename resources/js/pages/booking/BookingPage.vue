@@ -351,6 +351,7 @@
                 </div>
             </div>
         </div>
+        <!--        Add Cargo -->
         <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -493,19 +494,19 @@
                                             v-model="addFormOverIssue.ticket.seat_no"
                                         />
                                     </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                               for="totalFare"
-                                        >Total Fare</label
-                                        >
-                                        <input
-                                            type="text"
-                                            readonly
-                                            class="form-control col-md-9 font-weight-bold"
-                                            id="totalFare"
-                                            v-model="addFormOverIssue.ticket.fare"
-                                        />
-                                    </div>
+                                    <!--                                    <div class="form-group row">-->
+                                    <!--                                        <label class="col-md-3 pt-3 font-weight-bold"-->
+                                    <!--                                               for="totalFare"-->
+                                    <!--                                        >Total Fare</label-->
+                                    <!--                                        >-->
+                                    <!--                                        <input-->
+                                    <!--                                            type="text"-->
+                                    <!--                                            readonly-->
+                                    <!--                                            class="form-control col-md-9 font-weight-bold"-->
+                                    <!--                                            id="totalFare"-->
+                                    <!--                                            v-model="addFormOverIssue.ticket.fare"-->
+                                    <!--                                        />-->
+                                    <!--                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -519,7 +520,138 @@
             </div>
         </div>
 
-        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>
+        <!-- Model Reschedule       -->
+        <div class="modal fade" id="reschedule_modal" tabindex="-1" aria-labelledby="reschedule_modalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reschedule_modalLabel">Reschedule Seats</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row border-bottom mb-1">
+                            <div class="col-md-2  mb-2">
+                                <label for="departureCity" class="mb-0">Departure City <span
+                                    class="text-danger">*</span></label>
+                                <select class="form-control" id="departureCity"
+                                        @change="fetchReSpecificSchedules(); getReDestinationCity()"
+                                        v-model="reSchedule.departureCity">
+                                    <option value="0" selected>Select Departure City</option>
+                                    <option
+                                        v-for="(city, i) in cities"
+                                        :value="city.id"
+                                        :key="i"
+                                    >
+                                        {{ city.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2  mb-2"><label for="destinationCity" class="mb-0">Destination
+                                City<span class="text-danger">*</span></label>
+                                <select class="form-control" id="destinationCity"
+                                        @change="fetchReSpecificSchedules()"
+                                        v-model="reSchedule.destinationCity">
+                                    <option value="0" selected>Select Destination City</option>
+                                    <option v-for="(city, i) in reSpecificCities" :value="city.id"
+                                            :key="i">
+                                        {{ city.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 class  mb-2">
+                                <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
+                                <input type="date" :min="minDateFilter()" class="form-control"
+                                       v-model="reSchedule.date"
+                                       @change="fetchReSpecificSchedules()"/>
+                            </div>
+                            <div class="col-md-4 class  mb-2">
+                                <label for="scheduleName" class="mb-0">Schedule Name <span
+                                    class="text-danger">*</span></label>
+                                <select class="form-control" id="scheduleName" @change="fetchReSpecificSchedules()"
+                                        v-model="reSchedule.schedule">
+                                    <option value="0" selected>Select Schedule</option>
+                                    <option v-for="(schedule, i) in allReSchedules"
+                                            :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-2">
+                                <label class="mb-0">Action</label>
+                                <button @click="fetchReScheduleData" class="btn btn-block btn-danger"
+                                        :class="getReSchedule ? 'disabled': ''">
+                                    {{ getReSchedule ? 'Loading...' : 'Refresh' }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+                            <!--                                     v-if="selectedBookedSeats.length">-->
+                            <!--                                                                    <a-->
+                            <!--                                                                        @click="sameDataAsMain()"-->
+                            <!--                                                                        class="btn btn-primary mx-1"-->
+                            <!--                                                                        href="#reschedule_modal"-->
+                            <!--                                                                        data-toggle="modal"-->
+                            <!--                                                                    >Shifting ( Reschedule ) Seats</a>-->
+                            <!--                                </div>-->
+                            <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
+                            <!--                                                                     v-if="selectedBookedOverIssueSeats.length">-->
+                            <!--                                                                    <a-->
+                            <!--                                                                        class="btn btn-primary mx-1"-->
+                            <!--                                                                        href="#overIssue_model"-->
+                            <!--                                                                        data-toggle="modal"-->
+                            <!--                                                                    >Over Issue Seats</a>-->
+                            <!--                                </div>-->
+                            <h1 v-if="loading">Loading.........</h1>
+
+                            <div class="col-md-12 row" v-if="showReBookingDiv">
+                                <div class="col-md-12 mx-auto">
+                                    <div class="d-flex justify-content-center seat-img p-0 m-0"
+                                         v-for="(record, rowIndex) in schedule.bus_class.seat_map"
+                                         :key="rowIndex"
+                                    >
+                                        <div v-for="(col, colIndex) in record" :key="colIndex">
+                                            <div
+                                                v-if="col.reserved"
+                                                class="image-span d-block text-center text-white shadow"
+                                                @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                                                :class="getClasses(col)"
+                                                :style="{border:'2px solid ' + col.color + ' !important'}"
+                                                :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
+                                                <small>{{ col.seatNo }} </small>
+                                                <br/>
+                                                <small
+                                                    v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
+                                                    <i class="type-icons fas"
+                                                       :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
+                                                    </i>
+                                                    <!--                                                                            <i class="type-icons fas"-->
+                                                    <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
+                                                </small>
+                                                <small v-if="col.over_issue == true">
+                                                    <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
+                                                    <i class="type-icons far fa-hand-paper text-dark">
+                                                    </i>
+                                                </small>
+                                            </div>
+                                            <span v-else></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary btn-block" @click="rescheduleSeats">Reschedule Seats </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
+
         <!--        modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
              aria-hidden="true">
@@ -539,10 +671,10 @@
                                     <div class="card" v-for="(singleItems, i) in selectedSeatDataBackEnd">
                                         <div class="card-body p-3" v-for="(innerItem, j) in singleItems">
                                             <div class="row my-1">
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Seat :</p>
-                                                        <p class="mb-0">{{innerItem.seat_no}}</p>
+                                                        <p class="mb-0">{{ innerItem.seat_no }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Date :</p>
@@ -554,17 +686,17 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
-                                                        <p class="mb-0">{{ innerItem.schedule.name}}</p>
+                                                        <p class="mb-0">{{ innerItem.schedule.name }}</p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Name : </p>
-                                                        <p class="mb-0">{{innerItem.customer.name}}</p>
+                                                        <p class="mb-0">{{ innerItem.customer.name }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Cnic :</p>
-                                                        <p class="mb-0">{{ innerItem.customer.cnic }}</p>
+                                                        <p class="mb-0">{{ cnicFormat(innerItem.customer.cnic) }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
@@ -572,29 +704,43 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
-                                                        <p class="mb-0">{{ innerItem.destination_city.name}}</p>
+                                                        <p class="mb-0">{{ innerItem.destination_city.name }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
+                                                        <p class="mb-0">
+                                                            {{ phoneFormat(innerItem.customer.contact) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!--                                            Buttons-->
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
-<!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
+                                                    <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
                                                     <!--                                                    v-if="selectedBookedSeats.length"-->
                                                     <button type="button" class="btn btn-info" data-toggle="modal"
                                                             data-target="#addELTModel">Add ELT
                                                     </button>
-                                                    <button type="button" class="btn btn-primary ml-2" href="#reschedule_modal"
-                                                            data-toggle="modal">Reschedule
+<!--                                                    href="#reschedule_modal"-->
+<!--                                                    data-toggle="modal"-->
+                                                    <button type="button" class="btn btn-primary ml-2" @click="reschedulBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
+                                                           >Reschedule
                                                     </button>
-                                                    <button type="button" class="btn btn-warning ml-2" href="#overIssue_model"
-                                                            data-toggle="modal">Over Issue
+                                                    <button type="button" class="btn btn-warning ml-2"
+                                                            @click="OverIssueBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
+                                                        Over Issue
                                                     </button>
-                                                    <button type="button" class="btn btn-danger ml-2" @click="cancleBooking(innerItem.seat_no)">Cancel</button>
+                                                    <button type="button" class="btn btn-danger ml-2"
+                                                            @click="cancelBooking(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
+                                                        Cancel
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div v-if="typeof innerItem[j + 1] !== 'undefined'">
-                                                <hr></div>
+                                                <hr>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -604,6 +750,7 @@
                 </div>
             </div>
         </div>
+
         <!--Modal for seat details end-->
 
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
@@ -641,7 +788,7 @@ export default {
             optionsPhone: {
                 placeholder: "xxxx-xxxxxxx",
             },
-            rescheduleFormId: "reschedule_modal",
+            // rescheduleFormId: "reschedule_modal",
             // overissueFormId: "overIssue_model",
             getCustomermessage: '',
             shiftingFormId: "shifting-modal",
@@ -657,10 +804,13 @@ export default {
             error: false,
             delId: "",
             allSchedules: [],
+            allReSchedules: [],
             schedule: "",
             loading: false,
             getSchedule: false,
+            getReSchedule: false,
             showBookingDiv: false,
+            showReBookingDiv: false,
             selectedSeats: [],
             selectedBookedSeats: [],
             selectedOverIssueSeats: [],
@@ -671,6 +821,7 @@ export default {
             bookingDetails: [],
             allSeatClasses: [],
             specificCities: [],
+            reSpecificCities: [],
             selectedSeatDataBackEnd: [],
             filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
@@ -681,6 +832,11 @@ export default {
                 customerCNIC: "",
                 schedule: 0,
                 totalFare: 0,
+                destinationCity: 0,
+                departureCity: 0,
+            },
+            reSchedule: {
+                schedule: 0,
                 destinationCity: 0,
                 departureCity: 0,
             },
@@ -712,6 +868,7 @@ export default {
                 this.add();
             }
         },
+
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
                 if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
@@ -758,9 +915,11 @@ export default {
                 }
             }
         },
+
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
+
         async getFilterRecord() {
             this.allBookings = [];
             const table = $("#booking_table").DataTable();
@@ -802,6 +961,21 @@ export default {
                 } else {
                     this.addForm.destinationCity = 0;
                     this.specificCities = resDepartureCity.data;
+                }
+            }
+        },
+
+        async getReDestinationCity() {
+            if (this.reSchedule.departureCity == '0') {
+                this.reSchedule.destinationCity = 0;
+            } else {
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.reSchedule.departureCity});
+                console.log(resReDepartureCity)
+                if (resReDepartureCity.length == 0) {
+                    this.reSchedule.destinationCity = 0
+                } else {
+                    this.reSchedule.destinationCity = 0;
+                    this.reSpecificCities = resReDepartureCity.data;
                 }
             }
         },
@@ -849,6 +1023,29 @@ export default {
                 } else {
                     this.addForm.schedule = 0;
                     this.showBookingDiv = false;
+                }
+            }
+            this.fetchScheduleData();
+        },
+
+        async fetchReSpecificSchedules() {
+            this.getReSchedule = true;
+            this.showReBookingDiv = false;
+            this.allReSchedules = {};
+            this.reSchedule.schedule = 0;
+            const data = {
+                departure_city_id: this.reSchedule.departureCity,
+                destination_city_id: this.reSchedule.destinationCity,
+                date: this.reSchedule.date,
+            }
+            const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
+            if (resFetchSchedule.status == 200) {
+                if (resFetchSchedule.length != 0) {
+                    this.getReSchedule = false;
+                    this.allReSchedules = resFetchSchedule.data;
+                } else {
+                    this.reSchedule.schedule = 0;
+                    this.showReBookingDiv = false;
                 }
             }
             this.fetchScheduleData();
@@ -942,6 +1139,37 @@ export default {
             if (res.status == 200) {
                 this.loading = false
                 this.showBookingDiv = true;
+                this.schedule = res.data;
+            } else {
+                if (res.status == 422) {
+                    for (const key in res.addForm.errors) {
+                        res.addForm.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
+
+        async fetchReScheduleData() {
+            if (this.reSchedule.schedule == 0) {
+                this.showReBookingDiv = false;
+            }
+            this.resetingArrays();
+            this.validationErrors = [];
+            this.loading = true
+            const res = await this.callApi("post", "schedule/selected", {
+                id: this.reSchedule.schedule,
+                date: this.reSchedule.date,
+                departureCity: this.reSchedule.departureCity,
+                destinationCity: this.reSchedule.destinationCity,
+            });
+            if (res.status == 500) {
+                this.showReBookingDiv = false;
+            }
+            if (res.status == 200) {
+                this.loading = false
+                this.showReBookingDiv = true;
                 this.schedule = res.data;
             } else {
                 if (res.status == 422) {
@@ -1054,22 +1282,21 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.schedule.bus_class.seat_map[row][col].over_issue) {
-                const resOverIssue = await this.callApi("post", "booking/overIssue", {
-                    date: this.addForm.date,
-                    seat_no: seatNo,
-                    schedule_id: this.addForm.schedule,
-                    seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
-                    departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
-                    destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
-                });
-                if (resOverIssue.status == 200) {
-                    this.addFormOverIssue.ticket = resOverIssue.data.ticket;
-                    this.addFormOverIssue.customer = resOverIssue.data.customer;
-                }
-            }
+            // if (this.schedule.bus_class.seat_map[row][col].over_issue) {
+            //     const resOverIssue = await this.callApi("post", "booking/overIssue", {
+            //         date: this.addForm.date,
+            //         seat_no: seatNo,
+            //         schedule_id: this.addForm.schedule,
+            //         seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
+            //         departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
+            //         destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
+            //     });
+            //     if (resOverIssue.status == 200) {
+            //         this.addFormOverIssue.ticket = resOverIssue.data.ticket;
+            //         this.addFormOverIssue.customer = resOverIssue.data.customer;
+            //     }
+            // }
         },
-
 
         async addOverIssueTicket() {
             if (this.addFormOverIssue.customer.cnic == '' || this.addFormOverIssue.customer.cnic == 'undefined') {
@@ -1091,7 +1318,7 @@ export default {
                 remarks: this.addFormOverIssue.ticket.remarks,
                 gender: this.addFormOverIssue.gender,
                 seat_no: this.addFormOverIssue.ticket.seat_no,
-                fare: this.addFormOverIssue.ticket.fare,
+                // fare: this.addFormOverIssue.ticket.fare,
 
             };
 
@@ -1148,6 +1375,7 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
+
         adddELT() {
             if (this.selectedSeats.length == 0) {
                 return swal({
@@ -1160,6 +1388,7 @@ export default {
                 $("#addELTModel").modal("show");
             }
         },
+
         async add() {
             if (!this.addForm.schedule) {
                 // return this.errorsArray("Schedule Name is Required", "Schedule");
@@ -1263,13 +1492,11 @@ export default {
                     }
                 }
             }
-        }
-        ,
+        },
 
         doScroll: function () {
             $("#addBooking").scrollTop(10);
-        }
-        ,
+        },
 
         async deleteModal(surcharge, i) {
             const deletingObj = {
@@ -1278,6 +1505,38 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
+        },
+
+        async rescheduleSeats() {
+            this.validationErrors = [];
+            if (!this.addForm.schedule) {
+                this.doScroll();
+                return this.errorsArray("Schedule Name is Required", "Schedule");
+            }
+            if (!this.addForm.date) {
+                this.doScroll();
+                return this.errorsArray("Date is Required", "Date");
+            }
+            if (this.selectedSeats.length == 0)
+                return this.errorsArray("Please Select At Least One Seat", "Seat");
+            this.validationErrors = [];
+            const res = await this.callApi("post", "booking/reschedule", {
+                ...this.addForm,
+                bookingSeats: this.seats,
+            });
+            if (res.status == 200) {
+                this.success = "Seats Rescheduled Successfully";
+                this.fetchScheduleData();
+                window.scrollTo(0, 0);
+            } else {
+                if (res.status === 422) {
+                    for (const key in res.addForm.errors) {
+                        res.addForm.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
         },
 
         async resetingArrays() {
@@ -1301,8 +1560,7 @@ export default {
             } else {
                 console.log(res);
             }
-        }
-        ,
+        },
 
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
@@ -1315,8 +1573,7 @@ export default {
             } else {
                 console.log(resBookingDetail);
             }
-        }
-        ,
+        },
 
         reset() {
             this.addForm = {
@@ -1333,7 +1590,57 @@ export default {
             this.allSchedules = '';
             this.selectedBookedSeats = '';
             this.selectedBookedOverIssueSeats = '';
-        }
+        },
+
+        async cancelBooking(date, schedule, customer, departure, destination, seatNo) {
+            const data = {
+                date: date,
+                schedule_id: schedule,
+                customer_id: customer,
+                departure_id: departure,
+                destination_id: destination,
+                seat_no: seatNo,
+            }
+
+            const resCancelBooking = await this.callApi("post", "booking/canceling", data);
+            if (resCancelBooking.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Booking Canceled Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+            }
+        },
+
+        async OverIssueBooking(date, schedule, departure, destination, seatNo) {
+            this.addFormOverIssue.customer = '';
+            this.addFormOverIssue.ticket = '';
+
+            const data = {
+                date: date,
+                schedule_id: schedule,
+                departure_id: departure,
+                destination_id: destination,
+                seat_no: seatNo,
+            }
+
+            const resOverIssueBooking = await this.callApi("post", "booking/overIssue", data);
+            if (resOverIssueBooking.status == 200) {
+                this.addFormOverIssue.ticket = resOverIssueBooking.data.ticket;
+                this.addFormOverIssue.customer = resOverIssueBooking.data.customer;
+                $("#overIssue_model").modal('show');
+            }
+        },
+
+        async reschedulBooking(date, schedule, departure, destination, seatNo) {
+                this.reSchedule.departureCity = 0;
+                this.reSchedule.destinationCity = 0;
+                this.reSchedule.schedule = 0;
+                $("#reschedule_modal").modal('show');
+        },
+
     },
     computed: {
         ...
@@ -1352,8 +1659,7 @@ export default {
         ,
     }
     ,
-}
-;
+};
 </script>
 <style scoped>
 .image-span {

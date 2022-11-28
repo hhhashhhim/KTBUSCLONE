@@ -178,6 +178,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/overIssue', [BookingController::class, 'fetchSpecificOverIssueSeat']);
     Route::post('/overIssueAdd', [BookingController::class, 'overIssueAddNew']);
     Route::post('/advance', [BookingController::class, 'advanceData']);
+    Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
 //pdf
     Route::post('/details', [BookingController::class, 'pdf']);
 
