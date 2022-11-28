@@ -4,9 +4,6 @@
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary mb-0">
-                        <!--                        <div class="card-header d-flex justify-content-between">-->
-                        <!--                            <h4>Booking</h4>-->
-                        <!--                        </div>-->
                         <div class="card-body">
                             <div class="row border-bottom mb-1">
                                 <div class="col-md-2  mb-2">
@@ -143,38 +140,24 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Gender</label>
+                                                        <label class=" mr-3">Female : </label>
                                                         <label class="colorinput">
-                                                        <input name="color" type="checkbox" value="primary" class="colorinput-input">
-                                                        <span class="colorinput-color bg-primary">Female</span>
-                                                    </label>
-
-<!--                                                        <div class="col-md-12 px-1 pt-3">-->
-<!--                                                            <input type="radio" id="female-booking"-->
-<!--                                                                   v-model="addForm.gender" value="0"/>-->
-<!--                                                            <label class="mx-2"-->
-<!--                                                                   for="female-booking">Female</label>-->
-<!--                                                            <input type="radio" id="male-booking"-->
-<!--                                                                   v-model="addForm.gender" value="1"/>-->
-<!--                                                            <label class="mx-2" for="male-booking">Male</label>-->
-<!--                                                        </div>-->
+                                                            <input name="gender" type="checkbox" value="0"
+                                                                   class="colorinput-input"
+                                                                   @click="changeGender($event)">
+                                                            <span class="colorinput-color bg-primary"></span>
+                                                        </label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Issue Or Book </label>
-                                                        <div class="col-md-12 px-1 pt-3">
-                                                            <input type="radio" id="type-issue"
-                                                                   v-model="addForm.type" value="booked"/>
-                                                            <label class="mx-3" for="type-issue">Issue</label>
-                                                            <input
-                                                                type="radio"
-                                                                id="type-book"
-                                                                v-model="addForm.type"
-                                                                value="advance booking"
-                                                            />
-                                                            <label class="mx-3" for="type-book">Book</label>
-                                                        </div>
+                                                        <label class="mr-3">Advanced Booked : </label>
+                                                        <label class="colorinput">
+                                                            <input name="bookingType" type="checkbox"
+                                                                   value="advance booking" class="colorinput-input"
+                                                                   @click="changeType($event)">
+                                                            <span class="colorinput-color bg-primary"></span>
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -219,18 +202,18 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Discount ( % )</label>
+                                                        <label>Discount <span
+                                                            class="ml-3 text-muted">(Flat Amount)</span></label>
                                                         <input
-                                                            type="text"
-                                                            readonly
+                                                            type="text" @keypress="isNumber($event)"
                                                             class="form-control"
-                                                            id="discount"
+                                                            readonly
+                                                            id="fareDiscount"
                                                             v-model="addForm.discount"
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!--                                                >-->
                                             <div class="form-group text-right">
                                                 <button class="btn btn-primary mx-1"
                                                         v-on:click="add()"
@@ -265,11 +248,8 @@
                                                         <i class="type-icons fas"
                                                            :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
                                                         </i>
-                                                        <!--                                                                            <i class="type-icons fas"-->
-                                                        <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
                                                     </small>
                                                     <small v-if="col.over_issue == true">
-                                                        <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
                                                         <i class="type-icons far fa-hand-paper text-dark">
                                                         </i>
                                                     </small>
@@ -649,7 +629,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary btn-block" @click="rescheduleSeats">Reschedule Seats </button>
+                        <button class="btn btn-primary btn-block" @click="rescheduleSeats">Reschedule Seats</button>
                     </div>
                 </div>
             </div>
@@ -728,10 +708,11 @@
                                                     <button type="button" class="btn btn-info" data-toggle="modal"
                                                             data-target="#addELTModel">Add ELT
                                                     </button>
-<!--                                                    href="#reschedule_modal"-->
-<!--                                                    data-toggle="modal"-->
-                                                    <button type="button" class="btn btn-primary ml-2" @click="reschedulBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
-                                                           >Reschedule
+                                                    <!--                                                    href="#reschedule_modal"-->
+                                                    <!--                                                    data-toggle="modal"-->
+                                                    <button type="button" class="btn btn-primary ml-2"
+                                                            @click="reschedulBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
+                                                    >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
                                                             @click="OverIssueBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
@@ -864,16 +845,36 @@ export default {
         await this.fetchAllSchedules();
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
+        window.addEventListener('keydown', this.altD);
     },
 
     methods: {
+        changeGender: function (e) {
+            if (e.target.checked) {
+                this.addForm.gender = 0;
+            } else {
+                this.addForm.gender = 1;
+            }
+        },
+        changeType: function (e) {
+            if (e.target.checked) {
+                this.addForm.type = 'advance booking';
+            } else {
+                this.addForm.type = 'booked';
+            }
+        },
         enter: function (e) {
-            console.log(e);
             if (e.key == "Enter") {
                 this.add();
             }
         },
-
+        altD: function (e) {
+            if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'x')) {
+                $("#fareDiscount").attr('readonly', function (_, attr) {
+                    return !attr
+                });
+            }
+        },
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
                 if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
@@ -1130,6 +1131,7 @@ export default {
             }
             this.resetingArrays();
             this.addForm.totalFare = 0;
+            this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true
             const res = await this.callApi("post", "schedule/selected", {
@@ -1640,10 +1642,10 @@ export default {
         },
 
         async reschedulBooking(date, schedule, departure, destination, seatNo) {
-                this.reSchedule.departureCity = 0;
-                this.reSchedule.destinationCity = 0;
-                this.reSchedule.schedule = 0;
-                $("#reschedule_modal").modal('show');
+            this.reSchedule.departureCity = 0;
+            this.reSchedule.destinationCity = 0;
+            this.reSchedule.schedule = 0;
+            $("#reschedule_modal").modal('show');
         },
 
     },

@@ -47,7 +47,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-
+        dd($request->all());
         $schedule = Schedule::where('id', $request->schedule)
             ->where('company_id', $this->company_id)
             ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')

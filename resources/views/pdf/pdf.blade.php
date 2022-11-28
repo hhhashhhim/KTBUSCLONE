@@ -1,3 +1,4 @@
+{{dd($data->tickets)}}
 @foreach($data as $key => $single)
 <!DOCTYPE html>
 <html>

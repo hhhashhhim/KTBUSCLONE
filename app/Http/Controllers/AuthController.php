@@ -2,26 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\City;
-use App\Models\CityToCity;
-use App\Models\FareClass;
-use App\Models\FareTable;
-use App\Models\Route\Route;
-use App\Models\Route\RouteFare;
-use App\Models\Schedule\Schedule;
-use App\Models\Schedule\ScheduleDetail;
+use App\Models\Customer;
 use App\Models\Ticket;
-use App\Models\User;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use stdClass;
 use Illuminate\Http\Response;
-use TCPDF;
 
 
 class AuthController extends Controller
@@ -29,7 +17,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-//        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
+//        $ticket = Customer::with('tickets')->where('id', 1)->first();
 //         $qr = QrCode::size(100)->format('png')->style('round')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
 
 //        $image = \QrCode::format('png')->size(100)->errorCorrection('H')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
