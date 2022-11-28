@@ -23,6 +23,7 @@ import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
 import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 import DepartmentPage from "./pages/hrm/department/DepartmentPage.vue";
 import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
+import MaintenancePartPage from "./pages/maintenance/part/PartPage.vue";
 
 // const url = '/projects/kt/'
 const url = '/kt/'
@@ -148,6 +149,11 @@ const routes = [
         path: url + "hrm/designation",
         component : DesignationPage,
         name:"designations"
+    },
+    {
+        path: url + "fleet/maintenance/part",
+        component : MaintenancePartPage,
+        name:"parts"
     },
 ]
 const router = createRouter({

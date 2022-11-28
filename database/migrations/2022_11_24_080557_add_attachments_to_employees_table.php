@@ -14,7 +14,7 @@ class AddAttachmentsToEmployeesTable extends Migration
     public function up()
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->string('attachments')->after('profile')->nullable();
+            $table->string('attachments')->after('profile_img')->nullable();
         });
     }
 
