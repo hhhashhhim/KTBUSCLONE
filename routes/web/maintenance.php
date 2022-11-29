@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Mail;
 
 
 Route::group(['prefix' => 'fleet/maintenance/part', 'middleware', [CustomMiddleware::class]], function () {
-    Route::post('/', [RoleController::class, 'index']);
+    Route::post('/', [FleetMaintenancePartController::class, 'index']);
     Route::post('/store', [FleetMaintenancePartController::class, 'store']);
-    Route::post('/update', [RoleController::class, 'update']);
-    Route::post('/delete', [RoleController::class, 'delete']);
-    Route::post('/get', [RoleController::class, 'role']);
+    Route::post('/update', [FleetMaintenancePartController::class, 'update']);
+    Route::post('/delete', [FleetMaintenancePartController::class, 'delete']);
+    Route::post('/get', [FleetMaintenancePartController::class, 'role']);
 });
 

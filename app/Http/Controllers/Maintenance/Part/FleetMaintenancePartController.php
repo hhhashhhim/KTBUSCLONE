@@ -23,7 +23,7 @@ class FleetMaintenancePartController extends Controller
 
     public function index()
     {
-            return Department::with('addedBy', 'company')->where('company_id', $this->company_id)->get();
+        return MaintenancePart::with('addedBy', 'company')->where('company_id', $this->company_id)->get();
     }
 
     public function store(Request $request)
@@ -50,24 +50,19 @@ class FleetMaintenancePartController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
 
         ];
 
         $customMessages = [
-            'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Department Name Already Registred !',
+            'name.required' => 'Part Name is Required!',
+            'name.unique' => 'Part Name Already Registred !',
         ];
         $this->validate($request, $rules, $customMessages);
-        return Department::where('id', $request->id)->update([
+        return MaintenancePart::where('id', $request->id)->update([
             'name' => $request->name,
         ]);
 
 
-    }
-
-    public function delete(Request $request)
-    {
-        return Department::find($request->id)->delete();
     }
 }

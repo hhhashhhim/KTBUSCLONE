@@ -44,7 +44,7 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table dataTables table-striped table-hover"
-                                                       id="department_table">
+                                                       id="part_table">
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -54,21 +54,15 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(department, i) in departments" :key="i">
+                                                    <tr v-for="(part, i) in parts" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ department.name }}</td>
-                                                        <td>{{ department.added_by.name }}</td>
+                                                        <td>{{ part.name }}</td>
+                                                        <td>{{ part.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editdepartment(department)"
+                                                                    @click="editpart(part)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
-                                                            </button>
-                                                            <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(department,i)"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -110,7 +104,7 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Department"
+                heading="Edit Part"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
@@ -122,16 +116,14 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateDepartment"
+                    <button type="button" class="btn btn-primary" @click="updatePart"
                             :disabled="loading">
-                        {{ loading ? 'Loading...' : 'Update Department' }}
+                        {{ loading ? 'Loading...' : 'Update Part' }}
                     </button>
                 </template>
             </Edit>
             <!--            Edit modal End-->
-            <Delete :deleteForm="deleteFormID"
-                    confirmationMessage='Are You Sure You want To Delete This Department ???'
-            />
+         
 
         </div>
     </section>
@@ -140,26 +132,23 @@
 <script>
 import Add from "../../../components/Add.vue";
 import Edit from "../../../components/Edit.vue";
-import Delete from "../../../components/Delete.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 
 export default {
-    name: "DepartmentPage",
+    name: "PartPage",
     components: {
         Add,
         Edit,
-        Delete,
         vueMask,
     },
     data() {
         return {
             addForm: {},
-            departments: [],
+            parts: [],
             loading: false,
             formID: "part_form",
             editFormID: "edit_department_form",
-            deleteFormID: "delete_department_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -168,20 +157,20 @@ export default {
         };
     },
     async created() {
-        await this.fetchDepartments();
+        await this.fetchParts();
     },
     methods: {
 
-        async fetchDepartments() {
-            const resDepart = await this.callApi("post", 'hrm/department');
-            console.log(resDepart);
-            if (resDepart.status == 200) {
-                this.departments = resDepart.data
+        async fetchParts() {
+            const resPart = await this.callApi("post", 'fleet/maintenance/part');
+            console.log(resPart);
+            if (resPart.status == 200) {
+                this.parts = resPart.data
             } else {
-                console.log(resDepart);
+                console.log(resPart);
             }
             setTimeout(function () {
-                $("#department_table").DataTable();
+                $("#part_table").DataTable();
             }, 300);
         },
         clearForm: function () {
@@ -203,13 +192,13 @@ export default {
                 this.loading = false;
                 swal({
                     title: "Success",
-                    text: "Department Added Successfully!",
+                    text: "Part Added Successfully!",
                     icon: "success",
                     timer: 2000
                 });
                 this.clearForm();
-                $("#department_table").DataTable().destroy();
-                await this.fetchDepartments();
+                $("#part_table").DataTable().destroy();
+                await this.fetchParts();
             } else {
                 if (resPartAdd.status == 422) {
                     this.loading = false;
@@ -222,7 +211,7 @@ export default {
             }
         },
 
-        async updateDepartment() {
+        async updatePart() {
             this.validationErrors = [];
             if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
                 return swal({
@@ -232,22 +221,22 @@ export default {
                     timer: 2000
                 });
             this.loading = true;
-            const resDepartmentEdit = await this.callApi("post", 'hrm/department/update', this.dataEdit);
-            if (resDepartmentEdit.status == 200) {
+            const resPartEdit = await this.callApi("post", 'fleet/maintenance/part/update', this.dataEdit);
+            if (resPartEdit.status == 200) {
                 this.loading = false;
                 swal({
                     title: "Success!",
-                    text: "Department Name Updated Successfully",
+                    text: "Part Name Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                $("#department_table").DataTable().destroy();
-                await this.fetchDepartments();
+                $("#part_table").DataTable().destroy();
+                await this.fetchParts();
             } else {
-                if (resDepartmentEdit.status == 422) {
+                if (resPartEdit.status == 422) {
                     this.loading = false;
-                    for (const key in resDepartmentEdit.data.errors) {
-                        resDepartmentEdit.data.errors[key].forEach((element) => {
+                    for (const key in resPartEdit.data.errors) {
+                        resPartEdit.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
@@ -255,17 +244,8 @@ export default {
             }
         },
 
-        async deleteModal(depart, i) {
-            const deletingObj = {
-                url: "hrm/department/delete",
-                data: depart,
-                index: i,
-            }
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-
-        editdepartment(departEdit) {
-            this.dataEdit = departEdit
+        editpart(partEdit) {
+            this.dataEdit = partEdit
         },
     },
     computed: {
@@ -276,7 +256,7 @@ export default {
             if (obj.isDeleted) {
                 this.departments.splice(obj.index, 1)
                 $("#department_table").DataTable().destroy();
-                this.fetchDepartments();
+                this.fetchParts();
             }
         }
     }
