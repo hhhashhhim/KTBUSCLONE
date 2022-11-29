@@ -86,7 +86,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>CNIC <span class="text-danger">*</span></label>
+                                                        <label>CNIC <span class="text-danger" v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                         <vue-mask
                                                             v-on:blur="getCustomer('addFormCNIC')"
                                                             class="form-control"
@@ -188,7 +188,7 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>Total Fare</label>
                                                         <input
@@ -200,16 +200,27 @@
                                                         />
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>Discount <span
                                                             class="ml-3 text-muted">(Flat Amount)</span></label>
                                                         <input
                                                             type="text" @keypress="isNumber($event)"
+                                                            @keyup="calculateTotal()"
                                                             class="form-control"
                                                             readonly
                                                             id="fareDiscount"
                                                             v-model="addForm.discount"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Total Recieveable </label>
+                                                        <input  type="text"
+                                                            class="form-control"
+                                                            readonly
+                                                            v-model="addForm.totalAmount"
                                                         />
                                                     </div>
                                                 </div>
@@ -820,6 +831,8 @@ export default {
                 totalFare: 0,
                 destinationCity: 0,
                 departureCity: 0,
+                totalAmount: 0,
+                discount:0,
             },
             reSchedule: {
                 schedule: 0,
@@ -1110,7 +1123,20 @@ export default {
 
             }
         },
-
+        calculateTotal:function () {
+            if(this.addForm.discount > this.addForm.totalFare ){
+                this.addForm.discount = 0;
+                this.addForm.totalAmount = parseFloat(this.addForm.totalFare);
+                return swal({
+                    title: "Ops",
+                    text: "Discount Can't be more then Amount Recieveable",
+                    icon: "error",
+                    timer: 2000
+                });
+            }else{
+                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - ( this.addForm.discount ? parseFloat(this.addForm.discount)  : 0 )
+            }
+        },
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -1415,18 +1441,19 @@ export default {
                     timer: 2000
                 });
             }
-            if (!this.addForm.customerCNIC || this.addForm.customerCNIC.length != 15) {
+            if ((!this.addForm.customerCNIC || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
                 // return this.errorsArray(
                 //     "CNIC is Required and Should Contain 15 Digits",
                 //     "CNIC"
                 // );
                 return swal({
                     title: "Required!",
-                    text: "CNIC is Required and Should Contain 15 Digits",
+                    text: "CNIC is Required and Should Contain 13 Digits",
                     icon: "error",
                     timer: 2000
                 });
             }
+
             if (!this.addForm.customerName || typeof this.addForm.customerName == 'undefined') {
                 // return this.errorsArray(
                 //     "CNIC is Required and Should Contain 15 Digits",

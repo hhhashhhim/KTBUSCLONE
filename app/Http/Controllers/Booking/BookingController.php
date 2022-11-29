@@ -47,7 +47,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+//        dd($request->all());
         $schedule = Schedule::where('id', $request->schedule)
             ->where('company_id', $this->company_id)
             ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')
@@ -75,7 +75,7 @@ class BookingController extends Controller
                 'company_id' => $this->company_id,
                 'added_by' => Auth::user()->id,
                 'name' => $request->customerName,
-                'cnic' => $cnicFormat,
+                'cnic' => is_null($request->customerCNIC) ? 0 : $cnicFormat,
                 'contact' => $phoneFormat,
             ]);
         }
