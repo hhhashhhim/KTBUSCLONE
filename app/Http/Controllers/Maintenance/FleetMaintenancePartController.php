@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Maintenance\Part;
+namespace App\Http\Controllers\Maintenance;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hrm\Department\Department;
-use App\Models\Maintenance\Part\MaintenancePart;
+use App\Models\Maintenance\MaintenancePart;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
