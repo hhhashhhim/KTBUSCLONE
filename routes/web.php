@@ -59,7 +59,7 @@ Route::get("/logout", [AuthController::class, 'logout'])->middleware([CustomMidd
 
 
 require_once('web/maintenance.php');
-
+//role Routes
 Route::group(['prefix' => 'role', 'middleware', [CustomMiddleware::class]], function () {
     Route::post('/', [RoleController::class, 'index']);
     Route::post('store', [RoleController::class, 'store']);
@@ -67,6 +67,7 @@ Route::group(['prefix' => 'role', 'middleware', [CustomMiddleware::class]], func
     Route::post('delete', [RoleController::class, 'delete']);
     Route::post('/get', [RoleController::class, 'role']);
 });
+//company Routes
 Route::group(['prefix' => 'company', 'middleware', [CustomMiddleware::class]], function () {
     Route::post('/', [CompanyController::class, 'index']);
     Route::post('store', [CompanyController::class, 'store']);
@@ -77,6 +78,7 @@ Route::group(['prefix' => 'company', 'middleware', [CustomMiddleware::class]], f
     Route::post('/roles', [CompanyController::class, 'company_roles']);
     Route::post('/get', [CompanyController::class, 'company']);
 });
+//users Routes
 Route::group(['prefix' => 'user', [CustomMiddleware::class]], function () {
     Route::post('/', [UserController::class, 'index']);
     Route::post('store', [UserController::class, 'store']);
@@ -84,6 +86,7 @@ Route::group(['prefix' => 'user', [CustomMiddleware::class]], function () {
     Route::post('delete', [UserController::class, 'delete']);
     Route::post('permissions', [UserController::class, 'permissions']);
 });
+//Terminals Route
 Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('/', [TerminalController::class, 'index']);
     Route::post('/getTerminal', [TerminalController::class, 'getTerminal']);
@@ -92,7 +95,7 @@ Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('delete', [TerminalController::class, 'delete']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
 });
-
+//cities Route
 Route::group(['prefix' => 'cities', [CustomMiddleware::class]], function () {
     Route::post('/', [CityController::class, 'index']);
     Route::post('store', [CityController::class, 'store']);
@@ -103,23 +106,23 @@ Route::group(['prefix' => 'cities', [CustomMiddleware::class]], function () {
     Route::post('/routes/list', [CityController::class, 'city_routes_list']);
     Route::post('/routes/details', [CityController::class, 'city_routes_details']);
 });
-
+// FareTable Route
 Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () {
-
     Route::post('/', [FareTableController::class, 'record']);
     Route::post('/store', [FareTableController::class, 'store']);
     Route::post('/fare_class/get', [FareTableController::class, 'getFareClass']);
     Route::post('/check', [FareTableController::class, 'check']);
 });
 
+//fare Class  Route
 Route::group(['prefix' => 'fare-class', [CustomMiddleware::class]], function () {
-
     Route::post('/', [FareClassController::class, 'index']);
     Route::post('/store', [FareClassController::class, 'storeFareClass']);
     Route::post('/update', [FareClassController::class, 'updateFareClass']);
     Route::post('/delete', [FareClassController::class, 'deleteFareClass']);
 });
 
+// Discount Route
 Route::group(['prefix' => 'discount', [CustomMiddleware::class]], function () {
     Route::post('/', [DiscountController::class, 'index']);
     Route::post('/store', [DiscountController::class, 'storeDiscount']);
@@ -230,7 +233,6 @@ Route::group(['prefix' => 'hrm/designation', [CustomMiddleware::class]], functio
 Route::group(['prefix' => 'settings/tickets', [CustomMiddleware::class]], function () {
     Route::post('/', [TicketsTemplateController::class, 'index']);
     Route::post('/store', [TicketsTemplateController::class, 'store']);
-    Route::post('/edit', [TicketsTemplateController::class, 'edit']);
     Route::post('/update', [TicketsTemplateController::class, 'update']);
     Route::post('/delete', [TicketsTemplateController::class, 'delete']);
     Route::post('/terminals', [TicketsTemplateController::class, 'allTerminals']);

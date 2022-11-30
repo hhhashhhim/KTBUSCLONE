@@ -738,12 +738,6 @@ export default {
                     this.attachmentsEdit = attachmentsEditRes.name;
                 }
             } else {
-                return swal({
-                    title: "Invalid Format",
-                    text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
-                    icon: "error",
-                    timer: 2000
-                });
                 e.target.value = '';
                 this.nameProfile = '';
                 this.nameProfileEdit = '';
@@ -751,6 +745,12 @@ export default {
                 this.nameFront = '';
                 this.nameBackEdit = '';
                 this.nameBack = '';
+                return swal({
+                    title: "Invalid Format",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
+                    icon: "error",
+                    timer: 2000
+                });
             }
         },
         clearDepartmentForm() {

@@ -25,7 +25,7 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table dataTables table-striped table-hover"
-                                                       id="ticket_termplates">
+                                                       id="ticket_templates">
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -35,19 +35,34 @@
                                                         <th>Phone #</th>
                                                         <th>Terms & Condition</th>
                                                         <th>status</th>
-<!--                                                        <th>Action</th>-->
+                                                        <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(template, i) in templates" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ template.terminal_id != null ? (template.terminal.name)  : 'N/A'}}</td>
+                                                        <td v-if="template.terminal_id != null">
+                                                            {{ template.terminal.city.name }} -
+                                                            {{ template.terminal.name }}
+                                                        </td>
+                                                        <td v-else>N/A</td>
                                                         <td>{{ template.address }}</td>
                                                         <td>{{ uanFormat(template.uan) }}</td>
                                                         <td>{{ phoneFormat(template.phone) }}</td>
                                                         <td>{{ template.terms_condition }}</td>
-                                                        <td v-if="template.status == 1"><div class="badge badge-success">Active</div></td>
-                                                        <td v-else><div class="badge badge-danger">InActive</div></td>
+                                                        <td v-if="template.status == 1">
+                                                            <div class="badge badge-success">Active</div>
+                                                        </td>
+                                                        <td v-else>
+                                                            <div class="badge badge-danger">InActive</div>
+                                                        </td>
+                                                        <td>
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(template)"
+                                                                    class=" text-light btn btn-primary mx-1">
+                                                                <i class="far fa-edit"></i>
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -80,7 +95,7 @@
                                 v-for="(terminal, i) in terminals"
                                 :value="terminal.id"
                                 :key="i"
-                            >{{terminal.city.name }} - {{ terminal.name }}
+                            >{{ terminal.city.name }} - {{ terminal.name }}
                             </option>
                         </select>
 
@@ -113,7 +128,7 @@
                         <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
                                   @keypress="countWords(this.addForm.address.length, 'address', 45)"
                                   v-model="addForm.address"></textarea>
-                        <span class="text-danger">Length : {{ this.countAddresssLength }}/45</span>
+                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>
 
                     </div>
                     <div class="form-group col-md-12">
@@ -137,7 +152,69 @@
                 :success="success"
                 :editForm="editFormID"
             >
+                <div class="row mt-3">
+                    <div class="form-group col-md-12">
+                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="dataEdit.terminal_id">
+                            <option value="0" selected>Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="uanNumber">UAN Number <span class="text-danger">*</span></label>
+                        <vue-mask id="uanNumber"
+                                  class="form-control"
+                                  v-model="dataEdit.uan"
+                                  mask="00-000-000-000"
+                                  :raw="false"
+                                  :options="optionsUan"
+                        >
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>
 
+                        <vue-mask id="phoneNumber"
+                                  class="form-control"
+                                  v-model="dataEdit.phone"
+                                  mask="0000-0000000"
+                                  :raw="false"
+                                  :options="optionsPhone"
+                        >
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="address">Address<span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
+                                  v-model="dataEdit.address"></textarea>
+
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="refOfHiring">Terms & Condition <span class="text-danger">*</span></label>
+                        <textarea id="refOfHiring" class="form-control" spellcheck="false"
+                                  maxlength="140"
+                                  v-model="dataEdit.terms_condition"></textarea>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status"
+                                v-model="dataEdit.status">
+                            <option value="1">Active</option>
+                            <option value="0">In Active</option>
+                        </select>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateTemplate()" :disabled="loadingEdit">
+                        {{ loadingEdit ? 'Loading...' : 'Update Template' }}
+                    </button>
+                </template>
             </Edit>
             <!--            Edit modal End-->
 
@@ -169,13 +246,15 @@ export default {
                 placeholder: "xxxx-xxxxxxx",
             },
             countWordsLength: 0,
-            countAddresssLength: 0,
+            countAddressLength: 0,
             templates: [],
             terminals: [],
             addForm: {
-                terminal:0,
+                terminal: 0,
             },
+            dataEdit: {},
             loading: false,
+            loadingEdit: false,
             validationErrors: [],
             formID: "ticket_template",
             editFormID: "edit_ticket_template",
@@ -187,6 +266,16 @@ export default {
     },
 
     methods: {
+        clearForm:function(){
+            this.addForm.terminal = 0;
+            this.addForm.termsCondition = '';
+            this.addForm.address = '';
+            this.addForm.phoneNumber = '';
+            this.addForm.uanNumber = '';
+            this.countWordsLength = 0;
+            this.countAddressLength = 0
+
+        },
         uanFormat: function (string) {
             return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
         },
@@ -199,7 +288,7 @@ export default {
                 this.countWordsLength = count;
             }
             if (flag == 'address' && maxvalue == 45) {
-                this.countAddresssLength = count;
+                this.countAddressLength = count;
             }
             // swal({
             //     title: "OOPs !!!",
@@ -210,23 +299,23 @@ export default {
 
         },
         async fetchTemplates() {
-            $("#ticket_termplates").DataTable().destroy();
+            $("#ticket_templates").DataTable().destroy();
             const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
-            if(resAllTerminals.status == 200){
+            if (resAllTerminals.status == 200) {
                 this.terminals = resAllTerminals.data
-            }else{
+            } else {
                 console.log(resAllTerminals);
             }
             const resTicketTemplate = await this.callApi("post", 'settings/tickets');
 
-            if(resTicketTemplate.status == 200){
+            if (resTicketTemplate.status == 200) {
                 this.templates = resTicketTemplate.data;
             }
             if (resTicketTemplate.status == 422) {
                 console.log(resTicketTemplate)
             }
-            setTimeout(function(){
-                $("#ticket_termplates").DataTable();
+            setTimeout(function () {
+                $("#ticket_templates").DataTable();
             }, 300);
 
         },
@@ -275,7 +364,7 @@ export default {
             }
             this.loading = true;
             const resAddTemplate = await this.callApi("post", 'settings/tickets/store', this.addForm);
-            if(resAddTemplate.status == 201){
+            if (resAddTemplate.status == 201) {
                 this.loading = false;
                 swal({
                     title: "Success !!",
@@ -283,16 +372,11 @@ export default {
                     icon: "success",
                     timer: 2000,
                 });
-                this.addForm.terminal = 0;
-                this.addForm.termsCondition == '';
-                this.addForm.address == '' ;
-                this.addForm.phoneNumber == '';
-                this.addForm.uanNumber == '';
-                this.countWordsLength =  0;
-                this.countAddresssLength = 0
+                this.clearForm();
                 this.fetchTemplates();
             }
-            if(resAddTemplate.status == 422){
+            if (resAddTemplate.status == 422) {
+                this.loading = false;
                 let errorContent = "";
                 let count = 0;
                 for (const key in resAddTemplate.data.errors) {
@@ -314,6 +398,87 @@ export default {
             }
 
         },
+
+        async edit(template) {
+            console.log(template)
+            this.dataEdit = template;
+        },
+
+        async updateTemplate(){
+            if (this.dataEdit.terminal_id == '0') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Please Select any Terminal",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.uan == '' || typeof this.dataEdit.uan == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "UAN Number is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.phone == '' || typeof this.dataEdit.phone == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Phone Number is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.address == '' || typeof this.dataEdit.address == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Address is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.terms_condition == '' || typeof this.dataEdit.terms_condition == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Terms &Condition is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            this.loadingEdit = true;
+            const resEditTemplate = await this.callApi("post", 'settings/tickets/update', this.dataEdit);
+            if(resEditTemplate.status == 200){
+                this.loadingEdit = false;
+                swal({
+                    title: "Success",
+                    text: "Template Update Successfully ",
+                    icon: "success",
+                    timer: 4000
+                });
+                this.fetchTemplates();
+            }
+            if(resEditTemplate.status == 422){
+                this.loadingEdit = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resEditTemplate.data.errors) {
+                    resEditTemplate.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+        }
 
     },
     // computed: {

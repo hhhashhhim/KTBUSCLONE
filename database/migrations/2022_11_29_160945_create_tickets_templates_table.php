@@ -23,6 +23,8 @@ class CreateTicketsTemplatesTable extends Migration
             $table->string('terms_condition')->nullable();
             $table->string('status')->nullable();
             $table->integer('added_by')->nullable();
+            $table->integer('updated_by')->nullable();
+            $table->timestamp('time')->usecurrent();
             $table->softDeletes();
             $table->timestamps();
         });

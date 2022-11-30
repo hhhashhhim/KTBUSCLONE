@@ -102,7 +102,7 @@
 import Add from '../../components/Add.vue';
 import Edit from '../../components/Edit.vue';
 import Delete from '../../components/Delete.vue';
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 
 export default {
     name:"city",
@@ -186,8 +186,7 @@ export default {
             }
         },
         edit( city ){
-            let newCity = city
-            this.dataEdit = newCity;
+            this.dataEdit = city;
         },
         async update(){
             this.validationErrors=[]

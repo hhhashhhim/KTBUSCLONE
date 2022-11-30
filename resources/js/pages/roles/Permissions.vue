@@ -3,7 +3,7 @@
     <div class="section-body">
       <div class="row">
         <div class="col-12 col-md-12 col-lg-12">
-          <div class="card card-success">
+          <div class="card card-primary">
             <div class="card-header">
               <h4>Permissions</h4>
             </div>
@@ -13,7 +13,7 @@
                   <div class="card">
                     <div class="card-header d-flex justify-content-between">
                       <h4>{{ role.name }} of {{ role.company?role.company.name:"Not Found" }}</h4>
-                      <button class="btn btn-success" @click="save">SAVE</button>
+                      <button class="btn btn-primary" @click="save">SAVE</button>
                     </div>
                     <div class="card-body">
 
@@ -25,7 +25,7 @@
                           </button>
                           {{ success }}
                       </div>
-                      
+
                       <div class="table-responsive">
                         <table
                           class="table table-striped table-hover"
@@ -42,7 +42,7 @@
                             <template v-for="(moduleName,i) in permissions" :key="i">
                             <tr>
                               <td>{{ i+1 }}</td>
-                              <td> 
+                              <td>
                                 <div class="text-capitalize">
                                   {{ moduleName.name }}
                                 </div>
@@ -57,7 +57,7 @@
                                           class="colorinput-input"
                                           v-model="moduleName.allow"
                                     />
-                                    <span class="colorinput-color bg-success"></span>
+                                    <span class="colorinput-color bg-primary"></span>
                                   </span>
                                 </label>
                               </td>
@@ -74,7 +74,7 @@
                                           class="colorinput-input"
                                           v-model="menus.allow"
                                     />
-                                    <span class="colorinput-color bg-success"></span>
+                                    <span class="colorinput-color bg-primary"></span>
                                     <span style="position:relative;left:5px;top:-10px;" class="text-capitalize"> {{ menus.name }} </span>
                                   </span>
                                 </label>
@@ -111,7 +111,7 @@ export default {
     const res = await this.callApi("post", "role/get", { id: this.$route.params.id });
     if (res.status == 200) {
       this.role = res.data.role;
-      this.permissions = res.data.permissions; 
+      this.permissions = res.data.permissions;
     } else {
       console.log(res);
     }

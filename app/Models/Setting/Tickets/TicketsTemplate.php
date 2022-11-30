@@ -19,6 +19,10 @@ class TicketsTemplate extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by');
     }
+    public function updatedBy()
+    {
+        return $this->hasOne( User::class, 'id', 'updated_by');
+    }
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
     }

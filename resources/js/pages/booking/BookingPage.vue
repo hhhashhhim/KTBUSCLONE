@@ -60,25 +60,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-                                <!--                                     v-if="selectedBookedSeats.length">-->
-                                <!--                                                                    <a-->
-                                <!--                                                                        @click="sameDataAsMain()"-->
-                                <!--                                                                        class="btn btn-primary mx-1"-->
-                                <!--                                                                        href="#reschedule_modal"-->
-                                <!--                                                                        data-toggle="modal"-->
-                                <!--                                                                    >Shifting ( Reschedule ) Seats</a>-->
-                                <!--                                </div>-->
-                                <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-                                <!--                                                                     v-if="selectedBookedOverIssueSeats.length">-->
-                                <!--                                                                    <a-->
-                                <!--                                                                        class="btn btn-primary mx-1"-->
-                                <!--                                                                        href="#overIssue_model"-->
-                                <!--                                                                        data-toggle="modal"-->
-                                <!--                                                                    >Over Issue Seats</a>-->
-                                <!--                                </div>-->
                                 <h1 v-if="loading">Loading.........</h1>
-
                                 <div class="col-md-12 row" v-if="showBookingDiv">
 
                                     <div class="col-md-6 px-1">
@@ -202,8 +184,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label>Discount <span
-                                                            class="ml-3 text-muted">(Flat Amount)</span></label>
+                                                        <label>Discount <span class="ml-2 text-muted">(Flat Amount)</span></label>
                                                         <input
                                                             type="text" @keypress="isNumber($event)"
                                                             @keyup="calculateTotal()"
@@ -1155,6 +1136,7 @@ export default {
             if (this.addForm.schedule == 0) {
                 this.showBookingDiv = false;
             }
+            this.showBookingDiv = false;
             this.resetingArrays();
             this.addForm.totalFare = 0;
             this.addForm.discount = '';
@@ -1297,11 +1279,9 @@ export default {
                 let index = this.selectedOverIssueSeats.indexOf(seatNo);
                 if (index != -1) {
                     this.schedule.bus_class.seat_map[row][col].selected = false;
-                    // this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.splice(index, 1);
                 } else {
                     this.schedule.bus_class.seat_map[row][col].selected = true;
-                    // this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
                     this.selectedOverIssueSeats.push(seatNo);
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
