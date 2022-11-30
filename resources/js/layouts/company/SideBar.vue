@@ -165,6 +165,21 @@
                         </li>
                     </ul>
                 </li> -->
+                <li class="dropdown" v-if="checkPermission('hrm')">
+
+                    <a href="#" class="menu-toggle nav-link has-dropdown">
+                        <i class="material-icons">settings</i>
+                        <span>Setting</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'ticketSettings' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i> Ticket Format
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
 
             </ul>
         </aside>

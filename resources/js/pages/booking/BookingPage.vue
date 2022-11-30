@@ -1315,20 +1315,6 @@ export default {
                     timer: 2000
                 });
             }
-            // if (this.schedule.bus_class.seat_map[row][col].over_issue) {
-            //     const resOverIssue = await this.callApi("post", "booking/overIssue", {
-            //         date: this.addForm.date,
-            //         seat_no: seatNo,
-            //         schedule_id: this.addForm.schedule,
-            //         seat_fare: this.schedule.bus_class.seat_map[row][col].fare,
-            //         departureCity: this.schedule.bus_class.seat_map[row][col].departure_city,
-            //         destinationCity: this.schedule.bus_class.seat_map[row][col].destination_city,
-            //     });
-            //     if (resOverIssue.status == 200) {
-            //         this.addFormOverIssue.ticket = resOverIssue.data.ticket;
-            //         this.addFormOverIssue.customer = resOverIssue.data.customer;
-            //     }
-            // }
         },
 
         async addOverIssueTicket() {
@@ -1351,8 +1337,6 @@ export default {
                 remarks: this.addFormOverIssue.ticket.remarks,
                 gender: this.addFormOverIssue.gender,
                 seat_no: this.addFormOverIssue.ticket.seat_no,
-                // fare: this.addFormOverIssue.ticket.fare,
-
             };
 
             const resOverIssue = await this.callApi("post", "booking/overIssueAdd", dataNewTicket);
@@ -1424,7 +1408,6 @@ export default {
 
         async add() {
             if (!this.addForm.schedule) {
-                // return this.errorsArray("Schedule Name is Required", "Schedule");
                 return swal({
                     title: "Required!",
                     text: "Schedule Name is Required",
@@ -1433,7 +1416,6 @@ export default {
                 });
             }
             if (!this.addForm.date) {
-                // return this.errorsArray("Date is Required", "Date");
                 return swal({
                     title: "Required!",
                     text: "Date is Required",
@@ -1442,10 +1424,6 @@ export default {
                 });
             }
             if ((!this.addForm.customerCNIC || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
-                // return this.errorsArray(
-                //     "CNIC is Required and Should Contain 15 Digits",
-                //     "CNIC"
-                // );
                 return swal({
                     title: "Required!",
                     text: "CNIC is Required and Should Contain 13 Digits",
@@ -1455,10 +1433,6 @@ export default {
             }
 
             if (!this.addForm.customerName || typeof this.addForm.customerName == 'undefined') {
-                // return this.errorsArray(
-                //     "CNIC is Required and Should Contain 15 Digits",
-                //     "CNIC"
-                // );
                 return swal({
                     title: "Required!",
                     text: "Customer Name is Required",
@@ -1467,10 +1441,6 @@ export default {
                 });
             }
             if (!this.addForm.contact || typeof this.addForm.contact == 'undefined') {
-                // return this.errorsArray(
-                //     "CNIC is Required and Should Contain 15 Digits",
-                //     "CNIC"
-                // );
                 return swal({
                     title: "Required!",
                     text: "Customer Contact Number is required,",
@@ -1479,7 +1449,6 @@ export default {
                 });
             }
             if (this.selectedSeats.length == 0) {
-                // return this.errorsArray("Please Select At Least One Seat", "Seat");
                 return swal({
                     title: "required!",
                     text: "Please Select At Least One Seat",
@@ -1490,7 +1459,6 @@ export default {
 
             const res = await this.callApi("post", "booking/store", this.addForm);
             if (res.status === 200) {
-                // this.success = "Booking Created Successfully";
                 swal({
                     title: "Success",
                     text: "Booking Created Successfully",

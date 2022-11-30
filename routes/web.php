@@ -16,6 +16,7 @@ use App\Http\Controllers\Hrm\Designation\DesignationController;
 use App\Http\Controllers\Hrm\Employee\EmployeeController;
 use App\Http\Controllers\Hrm\Leave\LeaveController;
 use App\Http\Controllers\Schedule\ScheduleController;
+use App\Http\Controllers\Setting\Tickets\TicketsTemplateController;
 use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
@@ -224,6 +225,15 @@ Route::group(['prefix' => 'hrm/designation', [CustomMiddleware::class]], functio
     Route::post('/update', [DesignationController::class, 'update']);
     Route::post('/delete', [DesignationController::class, 'delete']);
     Route::post('/selective', [DesignationController::class, 'selective']);
+});
+
+Route::group(['prefix' => 'settings/tickets', [CustomMiddleware::class]], function () {
+    Route::post('/', [TicketsTemplateController::class, 'index']);
+    Route::post('/store', [TicketsTemplateController::class, 'store']);
+    Route::post('/edit', [TicketsTemplateController::class, 'edit']);
+    Route::post('/update', [TicketsTemplateController::class, 'update']);
+    Route::post('/delete', [TicketsTemplateController::class, 'delete']);
+    Route::post('/terminals', [TicketsTemplateController::class, 'allTerminals']);
 });
 
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

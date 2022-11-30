@@ -108,7 +108,8 @@
                         <div class="col-md-6">
                             <label for="reverseSeats" class="text-dark mr-3">Reverse Route</label>
                             <label class="colorinput">
-                                <input name="color" type="checkbox" id="reverseSeats" class="colorinput-input"  :checked="this.reverseRoute == 1"   @change="checkBox($event)">
+                                <input name="color" type="checkbox" id="reverseSeats" class="colorinput-input"
+                                       :checked="this.reverseRoute == 1" @change="checkBox($event)">
                                 <span class="colorinput-color bg-primary"></span>
                             </label>
                         </div>
@@ -124,7 +125,7 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="fetchTerminals($event , index)">
+                                    <select class="form-control rounded-0" id="selectCities" @change="fetchTerminals($event , index)">
                                         <option value="0" selected>Select City</option>
                                         <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                             {{ city.name }}
@@ -141,7 +142,8 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addRoute" :disabled="loading" >{{loading ? 'Loading...' : 'Save Route' }}
+                    <button type="button" class="btn btn-primary" @click="addRoute" :disabled="loading">
+                        {{ loading ? 'Loading...' : 'Save Route' }}
                     </button>
                 </template>
             </Add>
@@ -159,31 +161,31 @@
                         </div>
                         <div class="modal-body">
                             <table class="table table-striped">
-                                            <thead>
-                                            <tr>
+                                <thead>
+                                <tr>
 
-                                                <th>City From</th>
-                                                <th>City To</th>
-                                                <th v-for="(heading,i) in th" :key="i">
-                                                    {{ heading.name }}
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <template v-for="(item,j) in routeDetails" :key="j">
-                                                <tr v-for="(single, i) in item" :key="i">
+                                    <th>City From</th>
+                                    <th>City To</th>
+                                    <th v-for="(heading,i) in th" :key="i">
+                                        {{ heading.name }}
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(item,j) in routeDetails" :key="j">
+                                    <tr v-for="(single, i) in item" :key="i">
 
-                                                    <td> {{ single.departure_city }}</td>
-                                                    <td> {{ single.destination_city }}</td>
-                                                    <td v-for="(row, k) in th" :key="k">
-                                                        {{
-                                                            fareClassValue(single, row.name)
-                                                        }}
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                            </tbody>
-                                        </table>
+                                        <td> {{ single.departure_city }}</td>
+                                        <td> {{ single.destination_city }}</td>
+                                        <td v-for="(row, k) in th" :key="k">
+                                            {{
+                                                fareClassValue(single, row.name)
+                                            }}
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -215,7 +217,7 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             cities: [],
             validationErrors: [],
             city: 0,
@@ -247,8 +249,11 @@ export default {
     },
     methods: {
         clearForm: function () {
-          this.data = {};
-          this.reverseRoute = 1;
+            this.data = {};
+            this.reverseRoute = 1;
+            this.loop = 1;
+            this.addCities = 0;
+            $("select#selectCities").prop('selectedIndex', 0);
         },
         fareClassValue(data, className) {
             const dataTwo = data;
@@ -266,7 +271,7 @@ export default {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
                 cities: this.addCities,
-                revereRoute : this.reverseRoute,
+                revereRoute: this.reverseRoute,
                 terminals: this.addTerminalsOnClick
             }
 
@@ -279,17 +284,16 @@ export default {
                 this.routeEndName = "";
                 this.loop = 1;
                 this.addCities = 0;
-                this.routeDetails =  [];
-               swal({
+                this.cities = 0;
+                this.routeDetails = [];
+                swal({
                     title: "Success",
                     text: "Route Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
                 await this.fetchCities();
-                this.loading = false;
-            }
-            else {
+            } else {
                 this.loading = false;
                 if (res.status == 422) {
                     let errorContent = "";
@@ -329,7 +333,7 @@ export default {
                 this.loading = false;
 
                 // this.success = "Fare Table Updated Created Successfully";
-               swal({
+                swal({
                     title: "Success",
                     text: "Fare Table Created Successfully",
                     icon: "success",
@@ -340,8 +344,7 @@ export default {
 
                 this.cities = res.data;
                 window.scrollTo(0, 0);
-                this.
-                setTimeout(() => {
+                this.setTimeout(() => {
                     this.success = "";
                     $("#add-modal").modal("hide");
                 }, 3000);
@@ -377,19 +380,18 @@ export default {
         },
         async fetchTerminals(event, index) {
             const value = event.target.value;
-
             const indexI = this.addCities.indexOf(value);
             if (indexI === -1) {
                 this.addCities.push(value);
             }
 
-            const terminalRes = await this.callApi("post", "cities/terminals", {
-                id: value
-            });
-            if (terminalRes.status === 200) {
-                this.terminals[index] = terminalRes.data;
-
-            }
+            // const terminalRes = await this.callApi("post", "cities/terminals", {
+            //     id: value
+            // });
+            // if (terminalRes.status === 200) {
+            //     this.terminals[index] = terminalRes.data;
+            //
+            // }
         },
         async fetchCities() {
             const cityRes = await this.callApi("post", "cities/routes/list");

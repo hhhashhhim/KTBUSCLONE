@@ -33,28 +33,13 @@ class AuthController extends Controller
 //        $ticket = Customer::with('tickets','tickets.schedule','tickets.customer','tickets.company','tickets.destination_city','tickets.departure_city','tickets.addedBy',)->where('id', 1)->first();
 
         $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
-//         $qr = QrCode::size(100)->format('png')->style('round')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
+            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket]);
 
-//        $image = \QrCode::format('png')->size(100)->errorCorrection('H')->generate('1 - Test User - 03157053558 - 3320216516699 - 11/22/2022 11:32:38 AM');
-////        $output_file = '/img/qr-code/img-' . time() . '.png';
-//        $imageProfile = pathinfo($image->getClientOriginalName() , PATHINFO_FILENAME) . "_" . time() . '.' .  $image->extension();
-//         $image->move(public_path('uploads/QR/Booking'), $imageProfile);
-// return 'Done';
-//            $data = [
-//                'title' => 'Ticket',
-//                'date' => date('m/d/Y')
-//            ];
-//
-//            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket]);
-//
-//            $output = $pdf->output();
-//
-//        return new Response($output, 200, [
-//            'Content-Type' => 'application/pdf',
-//        ]);
+            $output = $pdf->output();
 
-
-//        Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id',1)->whereIn('seat_no', [1,2,3])->where('schedule_id', 1)->where('date','2022-11-24')->get()->groupBy('seat_no')->dd();
+        return new Response($output, 200, [
+            'Content-Type' => 'application/pdf',
+        ]);
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
