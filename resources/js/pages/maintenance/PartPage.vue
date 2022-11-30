@@ -130,8 +130,8 @@
 </template>
 
 <script>
-import Add from "../../../components/Add.vue";
-import Edit from "../../../components/Edit.vue";
+import Add from "../../components/Add.vue";
+import Edit from "../../components/Edit.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 

@@ -23,8 +23,9 @@ import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
 import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 import DepartmentPage from "./pages/hrm/department/DepartmentPage.vue";
 import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
-import MaintenancePartPage from "./pages/maintenance/part/PartPage.vue";
 import TicketSettingPage from "./pages/settings/tickets/TicketSettingsPage.vue";
+import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
+import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
 
 // const url = '/projects/kt/'
 const url = '/kt/'
@@ -155,6 +156,11 @@ const routes = [
         path: url + "fleet/maintenance/part",
         component : MaintenancePartPage,
         name:"parts"
+    },
+    {
+        path: url + "fleet/maintenance/link",
+        component : MaintenanceLinkPage,
+        name:"maintenance-link"
     },
     {
         path: url + "settings/tickets",
