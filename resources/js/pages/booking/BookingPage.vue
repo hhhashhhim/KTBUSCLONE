@@ -68,7 +68,8 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>CNIC <span class="text-danger" v-if="this.addForm.type != 'advance booking'">*</span></label>
+                                                        <label>CNIC <span class="text-danger"
+                                                                          v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                         <vue-mask
                                                             v-on:blur="getCustomer('addFormCNIC')"
                                                             class="form-control"
@@ -184,7 +185,8 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label>Discount <span class="ml-2 text-muted">(Flat Amount)</span></label>
+                                                        <label>Discount <span
+                                                            class="ml-2 text-muted">(Flat Amount)</span></label>
                                                         <input
                                                             type="text" @keypress="isNumber($event)"
                                                             @keyup="calculateTotal()"
@@ -198,10 +200,10 @@
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>Total Recieveable </label>
-                                                        <input  type="text"
-                                                            class="form-control"
-                                                            readonly
-                                                            v-model="addForm.totalAmount"
+                                                        <input type="text"
+                                                               class="form-control"
+                                                               readonly
+                                                               v-model="addForm.totalAmount"
                                                         />
                                                     </div>
                                                 </div>
@@ -229,7 +231,7 @@
                                                 <div
                                                     v-if="col.reserved"
                                                     class="image-span d-block text-center text-white shadow"
-                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo)"
+                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
                                                     :class="getClasses(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
                                                     :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
@@ -329,7 +331,7 @@
             </div>
         </div>
         <!--        Add Cargo -->
-        <div class="modal fade" id="addELTModel" tabindex="-1" aria-labelledby="addELTModelLabel" aria-hidden="true">
+        <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -627,6 +629,47 @@
             </div>
         </div>
 
+        <!--    Model Cancel -->
+        <div class="modal fade" id="cancelModel" tabindex="-1" aria-labelledby="cancelModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModelLabel">Cancel Ticket</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="cancel_percentage">Percentage <span
+                                class="text-muted ml-2">(Optional)</span></label>
+                            <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
+                                <option value="first">Select Cancellation Percentage</option>
+                                <option value="0">0%</option>
+                                <option value="10">10%</option>
+                                <option value="20">20%</option>
+                                <option value="30">30%</option>
+                                <option value="40">40%</option>
+                                <option value="50">50%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="caceling_remakrs">Remarks <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
+                                   placeholder="Reason for canceling a seat">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"
+                                @click="cancelBooking(cancelData.dataDate, cancelData.dataSchedule, cancelData.dataCustomer, cancelData.dataDeparture, cancelData.dataDestination, cancelData.dataSeat_no, cancelData.percentage, cancelData.reason)">
+                            Cancel Ticket
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
 
         <!--        modal for details-->
@@ -710,8 +753,7 @@
                                                             @click="OverIssueBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
                                                         Over Issue
                                                     </button>
-                                                    <button type="button" class="btn btn-danger ml-2"
-                                                            @click="cancelBooking(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
+                                                    <button type="button" class="btn btn-danger ml-2" data-toggle="modal" data-target="#cancelModel" @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
                                                         Cancel
                                                     </button>
                                                 </div>
@@ -774,6 +816,7 @@ export default {
             detailsFormId: "details-modal",
             customers: [],
             sameDataMain: [],
+            cancelData:[],
             isActive: 1,
             formID: "addBooking",
             deleteFormID: "delete_addBooking",
@@ -783,6 +826,7 @@ export default {
             delId: "",
             allSchedules: [],
             allReSchedules: [],
+            cancel: [],
             schedule: "",
             loading: false,
             getSchedule: false,
@@ -790,6 +834,7 @@ export default {
             showBookingDiv: false,
             showReBookingDiv: false,
             selectedSeats: [],
+            selectedSeatsFare: [],
             selectedBookedSeats: [],
             selectedOverIssueSeats: [],
             selectedBookedOverIssueSeats: [],
@@ -813,7 +858,7 @@ export default {
                 destinationCity: 0,
                 departureCity: 0,
                 totalAmount: 0,
-                discount:0,
+                discount: 0,
             },
             reSchedule: {
                 schedule: 0,
@@ -1104,8 +1149,9 @@ export default {
 
             }
         },
-        calculateTotal:function () {
-            if(this.addForm.discount > this.addForm.totalFare ){
+
+        calculateTotal: function () {
+            if (this.addForm.discount > this.addForm.totalFare) {
                 this.addForm.discount = 0;
                 this.addForm.totalAmount = parseFloat(this.addForm.totalFare);
                 return swal({
@@ -1114,10 +1160,11 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            }else{
-                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - ( this.addForm.discount ? parseFloat(this.addForm.discount)  : 0 )
+            } else {
+                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : 0)
             }
         },
+
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -1197,7 +1244,7 @@ export default {
             }
         },
 
-        async selectSeat(row, col, seatNo) {
+        async selectSeat(row, col, seatNo, fare) {
             console.log(this.selectedSeats)
             console.log(this.schedule.bus_class.seat_map[row][col])
             this.validationErrors = [];
@@ -1212,7 +1259,6 @@ export default {
             if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
-
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedBookedSeats.splice(index, 1);
                     this.bookedSeats = this.bookedSeats.filter((seat) => {
@@ -1236,15 +1282,18 @@ export default {
 
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedSeats.splice(index, 1);
+                    this.selectedSeatsFare.splice(index, 1);
                     this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                 } else {
 
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedSeats.push(seatNo);
+                    this.selectedSeatsFare.push(fare);
                     this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
 
                 }
                 this.addForm.selectedSeats = this.selectedSeats;
+                this.addForm.selectedSeatsFare = this.selectedSeatsFare;
             } else {
                 this.fetchScheduleData();
                 this.resetingArrays();
@@ -1574,7 +1623,17 @@ export default {
             this.selectedBookedOverIssueSeats = '';
         },
 
-        async cancelBooking(date, schedule, customer, departure, destination, seatNo) {
+        passDataToCancelModel:function (date, schedule, customer, departure, destination, seatNo){
+            this.cancelData = {
+                dataDate : date,
+                dataSchedule : schedule,
+                dataCustomer : customer,
+                dataDeparture : departure,
+                dataDestination : destination,
+                dataSeat_no : seatNo,
+            }
+        },
+        async cancelBooking(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1582,18 +1641,20 @@ export default {
                 departure_id: departure,
                 destination_id: destination,
                 seat_no: seatNo,
+                percentage: percentage,
+                remarks :reason,
             }
-
-            const resCancelBooking = await this.callApi("post", "booking/canceling", data);
-            if (resCancelBooking.status == 200) {
-                swal({
-                    title: "Success",
-                    text: "Booking Canceled Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-                this.fetchScheduleData();
-            }
+            console.log(data);
+            // const resCancelBooking = await this.callApi("post", "booking/canceling", data);
+            // if (resCancelBooking.status == 200) {
+            //     swal({
+            //         title: "Success",
+            //         text: "Booking Canceled Successfully",
+            //         icon: "success",
+            //         timer: 2000
+            //     });
+            //     this.fetchScheduleData();
+            // }
         },
 
         async OverIssueBooking(date, schedule, departure, destination, seatNo) {

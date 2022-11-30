@@ -15,10 +15,9 @@ class AddColumnToTicketsTable extends Migration
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->integer('total_fare')->after('seat_no')->nullable();
-            $table->integer('total_receivable')->after('discount')->nullable();
-            DB::statement("ALTER TABLE `tickets` CHANGE `status` `type` ENUM('booked','advance booking','cancel', 'over_issue', 'reschedule') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL");
-            $table->integer('seat_fare')->after('total_fare')->nullable();
+
+            $table->string('type')->after('is_partial')->nullable();
+//            $table->integer('seat_fare')->after('total_fare')->nullable();
         });
     }
 
@@ -30,7 +29,8 @@ class AddColumnToTicketsTable extends Migration
     public function down()
     {
 //        Schema::table('tickets', function (Blueprint $table) {
-//          $table->dropColumn('type');
+//          $table->dropColumn('total_receivable');
+//          $table->dropColumn('total_fare');
 //        });
     }
 }
