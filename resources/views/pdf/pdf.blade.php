@@ -1,4 +1,4 @@
-{{--{{dd($data->tickets)}}--}}
+{{--{{dd($data, $data_terms)}}--}}
 @foreach($data as $key => $single)
     <!DOCTYPE html>
 <html>
@@ -76,9 +76,9 @@
 <div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <span>Main Pirwadhai Mor Peshawar Road Rawalpindi</span>
-        <div><span><b>UAN(24/7):</b>  03-111-777-333</span></div>
-        <div><span><b>Phone:</b>  03108886286</span></div>
+        <span>{{$data_terms->address}}</span>
+        <div><span><b>UAN(24/7):</b>{{$data_terms->uan}}</span></div>
+        <div><span><b>Phone:</b>{{$data_terms->phone}}</span></div>
     </div>
     <div class="custinfo" id="custinfo">
         <div id="barcode-area">
@@ -128,8 +128,8 @@
     .......................................................................................................</p>
 <div>
     <div style="text-align: center;">
-        <h4 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h4>
-        <h5><b>Refreshment,WIFI upto 350MB And MOD is ComplimentaryRefreshment,WIFI Bus will not drop passenger without Company TerminalBus will not drop</b></h5>
+        <h5 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h5>
+        <h5>{{$data_terms->terms_condition}}</h5>
         <h4><b>&copy; Rights Reserved By Kainat Travels</b></h4>
     </div>
 </div>

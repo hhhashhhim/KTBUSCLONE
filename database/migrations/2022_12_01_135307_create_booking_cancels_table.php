@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTicketsOverIssuesTable extends Migration
+class CreateBookingCancelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateTicketsOverIssuesTable extends Migration
      */
     public function up()
     {
-        Schema::create('tickets_over_issues', function (Blueprint $table) {
+        Schema::create('booking_cancels', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id')->nullable();
             $table->integer('ticket_id')->nullable();
@@ -27,13 +27,8 @@ class CreateTicketsOverIssuesTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('tickets_over_issues');
+        Schema::dropIfExists('booking_cancels');
     }
 }

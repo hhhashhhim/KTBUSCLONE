@@ -40,8 +40,6 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
-//        $routeDetails = RouteFare::where('route_id', 1)->get()->groupBy('fare_class_id')->first();
-                            //        return $fareTableTime = FareTable::where(['from_city_id' => 4, 'to_city_id' => 3])->first()->time_difference;$fare
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',
@@ -318,7 +316,7 @@ class ScheduleController extends Controller
 
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
-                
+
                 // adding fare to each seat
                 if ($column['reserved']) {
                     $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;

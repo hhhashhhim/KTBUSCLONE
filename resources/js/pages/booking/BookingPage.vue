@@ -374,133 +374,47 @@
         </div>
 
         <!--Over Issue Model-->
-        <div class="modal fade" id="overIssue_model" tabindex="-1" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="overIssue_model" tabindex="1" aria-labelledby="exampleModalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Re-Booking Over-Issued Seats</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Over-Issued Seats</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body pb-0">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="card card-primary p-4">
-                                    <div class="form-group row">
-                                        <label
-                                            class="col-md-3 pt-3 font-weight-bold"
-                                            for="customer-cnic"
-                                        >CNIC <span class="text-danger">*</span>
-                                        </label>
-                                        <vue-mask
-                                            v-on:blur="getCustomer('overIssueCNIC')"
-                                            class="form-control col-md-9"
-                                            v-model="addFormOverIssue.customer.cnic"
-                                            mask="00000-0000000-0"
-                                            :raw="false"
-                                            :options="options"
-                                        >
-                                        </vue-mask>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                               for="fullName"
-                                        >Full Name</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="form-control col-md-9"
-                                            id="fullName"
-                                            v-model="addFormOverIssue.customer.name"
-                                        />
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                               for="contact"
-                                        >Contact</label
-                                        >
-                                        <vue-mask
-                                            v-on:blur="getCustomer('overIssueContact')"
-                                            class="form-control col-md-9"
-                                            v-model="addFormOverIssue.customer.contact"
-                                            mask="0000-0000000"
-                                            :raw="false"
-                                            :options="optionsPhone"
-                                        >
-                                        </vue-mask>
-
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                               for="remarks"
-                                        >Remarks</label
-                                        >
-                                        <input
-                                            type="text"
-                                            class="form-control col-md-9"
-                                            id="remarks"
-                                            v-model="addFormOverIssue.ticket.remarks"
-                                        />
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                        >Gender</label
-                                        >
-                                        <div class="col-md-9 pt-3">
-                                            <input type="radio" id="female-booking_over_Issue"
-                                                   :checked="addFormOverIssue.ticket.gender == 0"
-                                                   v-model="addFormOverIssue.gender" value="0"/>
-                                            <label class="mx-3"
-                                                   for="female-booking_over_Issue">Female</label>
-                                            <input type="radio" id="male-booking_over_Issue"
-                                                   :checked="addFormOverIssue.ticket.gender == 1"
-                                                   v-model="addFormOverIssue.gender" value="1"/>
-                                            <label class="mx-3" for="male-booking_over_Issue">Male</label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-md-3 pt-3 font-weight-bold"
-                                               for="seatNo"
-                                        >Seat No.</label
-                                        >
-                                        <input
-                                            type="text"
-                                            readonly
-                                            class="form-control col-md-9"
-                                            id="seatNo"
-                                            v-model="addFormOverIssue.ticket.seat_no"
-                                        />
-                                    </div>
-                                    <!--                                    <div class="form-group row">-->
-                                    <!--                                        <label class="col-md-3 pt-3 font-weight-bold"-->
-                                    <!--                                               for="totalFare"-->
-                                    <!--                                        >Total Fare</label-->
-                                    <!--                                        >-->
-                                    <!--                                        <input-->
-                                    <!--                                            type="text"-->
-                                    <!--                                            readonly-->
-                                    <!--                                            class="form-control col-md-9 font-weight-bold"-->
-                                    <!--                                            id="totalFare"-->
-                                    <!--                                            v-model="addFormOverIssue.ticket.fare"-->
-                                    <!--                                        />-->
-                                    <!--                                    </div>-->
-                                </div>
-                            </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="over_issue_percentage">Percentage <span
+                                class="text-muted ml-2">(Optional)</span></label>
+                            <select id="over_issue_percentage" class="form-control" v-model="overIssueData.percentage">
+                                <option value="first">Select Over-Issue Percentage</option>
+                                <option value="0">0%</option>
+                                <option value="10">10%</option>
+                                <option value="20">20%</option>
+                                <option value="30">30%</option>
+                                <option value="40">40%</option>
+                                <option value="50">50%</option>
+                            </select>
                         </div>
-                        <div class="form-group text-right">
-                            <button class="btn btn-primary mx-1" @click="addOverIssueTicket()"> Generate
-                                Ticket
-                            </button>
+                        <div class="form-group">
+                            <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="over_issue_remarks" v-model="overIssueData.reason"
+                                   placeholder="Reason for over-issue a seat">
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary mx-1" @click="addOverIssueTicket(overIssueData.dataDate, overIssueData.dataSchedule, overIssueData.dataCustomer, overIssueData.dataDeparture, overIssueData.dataDestination, overIssueData.dataSeat_no, overIssueData.percentage, overIssueData.reason)"> Over-Issue Ticket
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Model Reschedule       -->
-        <div class="modal fade" id="reschedule_modal" tabindex="-1" aria-labelledby="reschedule_modalLabel"
+        <div class="modal fade" id="reschedule_modal" tabindex="2" aria-labelledby="reschedule_modalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
@@ -630,8 +544,8 @@
         </div>
 
         <!--    Model Cancel -->
-        <div class="modal fade" id="cancelModel" tabindex="-1" aria-labelledby="cancelModelLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
+        <div class="modal fade" id="cancelModel" tabindex="3" aria-labelledby="cancelModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="cancelModelLabel">Cancel Ticket</h5>
@@ -670,7 +584,7 @@
             </div>
         </div>
 
-        <!--        <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
+        <!--                <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
 
         <!--        modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
@@ -740,21 +654,23 @@
                                                 <div class="col-md-12 text-right">
                                                     <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
                                                     <!--                                                    v-if="selectedBookedSeats.length"-->
-                                                    <button type="button" class="btn btn-info" data-toggle="modal"
-                                                            data-target="#addELTModel">Add ELT
+                                                    <button type="button" class="btn btn-secondary" >Duplicate Ticket
                                                     </button>
-                                                    <!--                                                    href="#reschedule_modal"-->
-                                                    <!--                                                    data-toggle="modal"-->
+                                                    <button type="button" class="btn btn-success ml-2" >Resend SMS
+                                                    </button>
+                                                    <button type="button" class="btn btn-info ml-2" @click="passDataToEltModel(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">Add ELT
+                                                    </button>
                                                     <button type="button" class="btn btn-primary ml-2"
-                                                            @click="reschedulBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
+                                                            @click="passDataToRescheduleModel(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
                                                     >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
-                                                            @click="OverIssueBooking(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
+                                                            @click="passDataToOverIssueModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id,  innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);this.overIssueData.percentage = 'first'">
                                                         Over Issue
                                                     </button>
-                                                    <button type="button" class="btn btn-danger ml-2" data-toggle="modal" data-target="#cancelModel" @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">
-                                                        Cancel
+                                                    <button type="button" class="btn btn-danger ml-2"
+                                                            @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.cancelData.percentage = 'first'">
+                                                        Cancel Ticket
                                                     </button>
                                                 </div>
                                             </div>
@@ -816,7 +732,9 @@ export default {
             detailsFormId: "details-modal",
             customers: [],
             sameDataMain: [],
-            cancelData:[],
+            cancelData: {
+                percentage: 'first',
+            },
             isActive: 1,
             formID: "addBooking",
             deleteFormID: "delete_addBooking",
@@ -827,6 +745,8 @@ export default {
             allSchedules: [],
             allReSchedules: [],
             cancel: [],
+            overIssueData: [],
+            eltData: [],
             schedule: "",
             loading: false,
             getSchedule: false,
@@ -916,9 +836,32 @@ export default {
         },
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
+                if (this.addForm.departureCity == 0) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Select Departure City First",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
+                if (this.addForm.destinationCity == 0) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Select Destination City First",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
+                if (this.addForm.schedule == 0) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Select Schedule City First",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
                 if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
-                    console.log(this.selectedBookedSeats)
-                    console.log(this.selectedBookedOverIssueSeats)
+
                     const dataSeats = {
                         seatNO: (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
                         scheduleId: this.addForm.schedule,
@@ -951,7 +894,7 @@ export default {
                         }
                     }
                 } else {
-                    swal({
+                    return swal({
                         title: "OOPS!!",
                         text: "Please Select Already Booked Seat",
                         icon: "error",
@@ -960,11 +903,9 @@ export default {
                 }
             }
         },
-
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
-
         async getFilterRecord() {
             this.allBookings = [];
             const table = $("#booking_table").DataTable();
@@ -983,7 +924,6 @@ export default {
                 }
             }
         },
-
         minDateFilter: function () {
             var dtToday = new Date();
             var month = dtToday.getMonth() + 1;
@@ -995,7 +935,6 @@ export default {
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
         },
-
         async getDestinationCity() {
             if (this.addForm.departureCity == '0') {
                 this.addForm.destinationCity = 0;
@@ -1009,7 +948,6 @@ export default {
                 }
             }
         },
-
         async getReDestinationCity() {
             if (this.reSchedule.departureCity == '0') {
                 this.reSchedule.destinationCity = 0;
@@ -1024,7 +962,6 @@ export default {
                 }
             }
         },
-
         async fetchAllSchedules() {
             const resBooking = await this.callApi("post", "booking");
             const resClass = await this.callApi("post", "fare-class")
@@ -1041,7 +978,6 @@ export default {
                 console.log(res);
             }
         },
-
         resetSelectBooking(evt) {
             if (evt.target.value == '0') {
                 this.showBookingDiv = false;
@@ -1049,7 +985,6 @@ export default {
                 this.showBookingDiv = true;
             }
         },
-
         async fetchSpecificSchedules() {
             this.getSchedule = true;
             this.showBookingDiv = false;
@@ -1072,7 +1007,6 @@ export default {
             }
             this.fetchScheduleData();
         },
-
         async fetchReSpecificSchedules() {
             this.getReSchedule = true;
             this.showReBookingDiv = false;
@@ -1095,15 +1029,12 @@ export default {
             }
             this.fetchScheduleData();
         },
-
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
-
         phoneFormat: function (string) {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
-
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
@@ -1149,7 +1080,6 @@ export default {
 
             }
         },
-
         calculateTotal: function () {
             if (this.addForm.discount > this.addForm.totalFare) {
                 this.addForm.discount = 0;
@@ -1164,7 +1094,6 @@ export default {
                 this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : 0)
             }
         },
-
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -1178,7 +1107,6 @@ export default {
                 return true;
             }
         },
-
         async fetchScheduleData() {
             if (this.addForm.schedule == 0) {
                 this.showBookingDiv = false;
@@ -1212,7 +1140,6 @@ export default {
                 }
             }
         },
-
         async fetchReScheduleData() {
             if (this.reSchedule.schedule == 0) {
                 this.showReBookingDiv = false;
@@ -1243,7 +1170,6 @@ export default {
                 }
             }
         },
-
         async selectSeat(row, col, seatNo, fare) {
             console.log(this.selectedSeats)
             console.log(this.schedule.bus_class.seat_map[row][col])
@@ -1346,74 +1272,6 @@ export default {
             }
         },
 
-        async addOverIssueTicket() {
-            if (this.addFormOverIssue.customer.cnic == '' || this.addFormOverIssue.customer.cnic == 'undefined') {
-                swal({
-                    title: "Required",
-                    text: "CNIC is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
-            const dataNewTicket = {
-                departure_city: this.addForm.departureCity,
-                destination_city: this.addForm.destinationCity,
-                date: this.addForm.date,
-                schedule_id: this.addForm.schedule,
-                cnic: this.addFormOverIssue.customer.cnic,
-                name: this.addFormOverIssue.customer.name,
-                contact: this.addFormOverIssue.customer.contact,
-                remarks: this.addFormOverIssue.ticket.remarks,
-                gender: this.addFormOverIssue.gender,
-                seat_no: this.addFormOverIssue.ticket.seat_no,
-            };
-
-            const resOverIssue = await this.callApi("post", "booking/overIssueAdd", dataNewTicket);
-
-            if (resOverIssue.status == 201) {
-                swal({
-                    title: "Success",
-                    text: "Booking Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-                this.addFormOverIssue.ticket = '';
-                this.addFormOverIssue.customer = '';
-
-
-            }
-
-            if (resOverIssue.status == 422 && resOverIssue.data.message) {
-                swal({
-                    title: "Error",
-                    text: resOverIssue.data.message,
-                    icon: "error",
-                    timer: 4000
-                });
-            }
-
-            if (resOverIssue.status == 422) {
-                let errorContent = "";
-                let count = 0;
-                for (const key in resOverIssue.data.errors) {
-                    resOverIssue.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 4000
-                    });
-
-                }
-            }
-        },
-
         getClasses(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
@@ -1421,8 +1279,7 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
-
-        adddELT() {
+        addELT() {
             if (this.selectedSeats.length == 0) {
                 return swal({
                     title: "Required!!",
@@ -1434,7 +1291,6 @@ export default {
                 $("#addELTModel").modal("show");
             }
         },
-
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1494,8 +1350,6 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.fetchScheduleData();
-                this.resetingArrays();
                 this.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
@@ -1508,6 +1362,8 @@ export default {
                 };
                 this.showBookingDiv = false;
                 this.allSchedules = '';
+                this.fetchScheduleData();
+                this.resetingArrays();
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
                     $("#booking_table").DataTable();
@@ -1524,11 +1380,9 @@ export default {
                 }
             }
         },
-
         doScroll: function () {
             $("#addBooking").scrollTop(10);
         },
-
         async deleteModal(surcharge, i) {
             const deletingObj = {
                 url: "booking/delete",
@@ -1537,7 +1391,6 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
         },
-
         async rescheduleSeats() {
             this.validationErrors = [];
             if (!this.addForm.schedule) {
@@ -1569,7 +1422,6 @@ export default {
                 }
             }
         },
-
         async resetingArrays() {
             this.selectedSeats = [];
             this.selectedBookedSeats = [];
@@ -1592,7 +1444,6 @@ export default {
                 console.log(res);
             }
         },
-
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
             const resBookingDetail = await this.callApi("post", "booking/details", {date, schedule_id});
@@ -1605,7 +1456,6 @@ export default {
                 console.log(resBookingDetail);
             }
         },
-
         reset() {
             this.addForm = {
                 date: new Date().toISOString().substr(0, 10),
@@ -1622,18 +1472,26 @@ export default {
             this.selectedBookedSeats = '';
             this.selectedBookedOverIssueSeats = '';
         },
-
-        passDataToCancelModel:function (date, schedule, customer, departure, destination, seatNo){
+        passDataToCancelModel: function (date, schedule, customer, departure, destination, seatNo) {
             this.cancelData = {
-                dataDate : date,
-                dataSchedule : schedule,
-                dataCustomer : customer,
-                dataDeparture : departure,
-                dataDestination : destination,
-                dataSeat_no : seatNo,
+                dataDate: date,
+                dataSchedule: schedule,
+                dataCustomer: customer,
+                dataDeparture: departure,
+                dataDestination: destination,
+                dataSeat_no: seatNo,
             }
+            $("#cancelModel").modal('show');
         },
         async cancelBooking(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
+            if (reason == '' || typeof reason == 'undefined') {
+                return swal({
+                    title: "required!",
+                    text: "Please give any Remarks!!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1642,47 +1500,111 @@ export default {
                 destination_id: destination,
                 seat_no: seatNo,
                 percentage: percentage,
-                remarks :reason,
+                remarks: reason,
             }
-            console.log(data);
-            // const resCancelBooking = await this.callApi("post", "booking/canceling", data);
-            // if (resCancelBooking.status == 200) {
-            //     swal({
-            //         title: "Success",
-            //         text: "Booking Canceled Successfully",
-            //         icon: "success",
-            //         timer: 2000
-            //     });
-            //     this.fetchScheduleData();
-            // }
+            const resCancelBooking = await this.callApi("post", "booking/canceling", data);
+            if (resCancelBooking.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Booking Canceled Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+            }
         },
-
-        async OverIssueBooking(date, schedule, departure, destination, seatNo) {
-            this.addFormOverIssue.customer = '';
-            this.addFormOverIssue.ticket = '';
-
+        //over issue model complete data
+         passDataToOverIssueModel:function(date, schedule, customer, departure, destination, seatNo) {
+            this.overIssueData = {
+                dataDate: date,
+                dataSchedule: schedule,
+                dataCustomer: customer,
+                dataDeparture: departure,
+                dataDestination: destination,
+                dataSeat_no: seatNo,
+            }
+            $("#overIssue_model").modal('show');
+        },
+        async addOverIssueTicket(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
+            if (reason == '' || typeof reason == 'undefined') {
+                return swal({
+                    title: "required!",
+                    text: "Please give any Remarks!!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             const data = {
                 date: date,
                 schedule_id: schedule,
+                customer_id: customer,
                 departure_id: departure,
                 destination_id: destination,
                 seat_no: seatNo,
+                percentage: percentage,
+                remarks: reason,
+            }
+            const resOverIssue = await this.callApi("post", "booking/overIssueAdd", data);
+            if (resOverIssue.status == 200 ) {
+                swal({
+                    title: "Success",
+                    text: "Seat over-issued  Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+
             }
 
-            const resOverIssueBooking = await this.callApi("post", "booking/overIssue", data);
-            if (resOverIssueBooking.status == 200) {
-                this.addFormOverIssue.ticket = resOverIssueBooking.data.ticket;
-                this.addFormOverIssue.customer = resOverIssueBooking.data.customer;
-                $("#overIssue_model").modal('show');
+            if (resOverIssue.status == 422 && resOverIssue.data.message) {
+                swal({
+                    title: "Error",
+                    text: resOverIssue.data.message,
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            if (resOverIssue.status == 422) {
+                let errorContent = "";
+                let count = 0;
+                for (const key in resOverIssue.data.errors) {
+                    resOverIssue.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
             }
         },
-
-        async reschedulBooking(date, schedule, departure, destination, seatNo) {
+    // end over issue model data
+        passDataToRescheduleModel:function (date, schedule, departure, destination, seatNo) {
             this.reSchedule.departureCity = 0;
             this.reSchedule.destinationCity = 0;
             this.reSchedule.schedule = 0;
             $("#reschedule_modal").modal('show');
         },
+        //ELT MODEL DATA
+        passDataToEltModel:function (date, schedule, customer, departure, destination, seatNo){
+            this.eltData ={
+                dataDate: date,
+                dataSchedule: schedule,
+                dataCustomer: customer,
+                dataDeparture: departure,
+                dataDestination: destination,
+                dataSeat_no: seatNo,
+            }
+            $("addELTModel").modal('show');
+        }
+
 
     },
     computed: {

@@ -11,6 +11,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -33,7 +34,8 @@ class AuthController extends Controller
 //        $ticket = Customer::with('tickets','tickets.schedule','tickets.customer','tickets.company','tickets.destination_city','tickets.departure_city','tickets.addedBy',)->where('id', 1)->first();
 
 //        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
-//            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket]);
+//        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
+//            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms'=> $format]);
 //
 //            $output = $pdf->output();
 //

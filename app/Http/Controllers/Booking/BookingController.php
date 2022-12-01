@@ -3,19 +3,16 @@
 namespace App\Http\Controllers\Booking;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking\Booking;
+use App\Models\Booking\BookingCancel;
+use App\Models\Booking\TicketsOverIssue;
 use App\Models\City;
 use App\Models\Customer;
-use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
-use App\Models\TicketsOverIssue;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -47,7 +44,6 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
         $schedule = Schedule::where('id', $request->schedule)
             ->where('company_id', $this->company_id)
             ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')
@@ -59,17 +55,13 @@ class BookingController extends Controller
         if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
             $isPartial = 1;
         }
-        // $schedule = Schedule::where('id',$request->schedule)
-        // ->select('id','fare_class_id','company_id')->with('bus_class')
-        // ->first();
+
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
         $phoneFormat = str_replace('-', '', $request->contact);
 
         $customer = Customer::where('cnic', $cnicFormat)->first();
 
         // Fare Fetching About the Schedule
-
-
         if (!$customer) {
             $customer = Customer::create([
                 'company_id' => $this->company_id,
@@ -79,7 +71,6 @@ class BookingController extends Controller
                 'contact' => $phoneFormat,
             ]);
         }
-
 
         // Getting Already Booked Tickets
 
@@ -99,6 +90,7 @@ class BookingController extends Controller
                 'destination_city_id' => $request->destinationCity,
                 // 'bus_class_id'=>$schedule->fare_class_id,
                 'seat_no' => $seat,
+                'seat_fare' => $request->selectedSeatsFare[$i],
                 'is_partial' => $isPartial,
                 'booking_no' => $bookingNo,
                 'date' => $request->date,
@@ -183,79 +175,28 @@ class BookingController extends Controller
 
     public function overIssueAddNew(Request $request)
     {
-//        dd($request->all());
-        $schedule = Schedule::where('id', $request->schedule_id)
-            ->where('company_id', $this->company_id)
-            ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')
-            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
 
-        $departure_city_id = $schedule->route->fares->first()->departure_city_id;
-        $destination_city_id = $schedule->route->fares->last()->destination_city_id;
-        $isPartial = 0;
-        if ($request->departure_city != $departure_city_id || $request->destination_city != $destination_city_id) {
-            $isPartial = 1;
-        }
-
-        $oldBooking = Ticket::where('company_id', $this->company_id)->where('date', $request->date)->where('schedule_id', $request->schedule_id)->where('departure_city_id', $request->departure_city)->where('destination_city_id', $request->destination_city)->first();
-        $cnicFormat = strpos($request->cnic, '-') ? str_replace('-', '', $request->cnic) : $request->cnic;
-        $phoneFormat = strpos($request->contact, '-') ? str_replace('-', '', $request->contact) : $request->contact;
-        $old_customer = Customer::where('cnic', $cnicFormat)->first();
-
-        if (isset($old_customer) && $old_customer->id == $oldBooking->customer_id) {
-            return response()->json([
-                "errors" => [
-                    "message" => ["This Seat already booked against this customer"]
-                ]
-//                'message' => ["This Seat already booked against this customer"],
-            ], 422);
-        }
-        if (!$old_customer) {
-            $new_customer = Customer::create([
-                'company_id' => $this->company_id,
-                'added_by' => Auth::user()->id,
-                'name' => $request->name,
-                'cnic' => $cnicFormat,
-                'contact' => $phoneFormat,
-            ]);
-        }
-
-        if ($request->date == date('Y-m-d')) {
-            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-            ++$bookingNo;
-        } else {
-            $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-            ++$bookingNo;
-        }
-        $oldBooking->delete();
-        $new_ticket = Ticket::create([
+        $ticket = Ticket::where([
             'company_id' => $this->company_id,
-            'departure_city_id' => $oldBooking->departure_city_id,
-            'destination_city_id' => $oldBooking->destination_city_id,
-            // 'bus_class_id'=>$schedule->fare_class_id,
-            'seat_no' => $oldBooking->seat_no,
-            'is_partial' => $isPartial,
-            'booking_no' => $bookingNo,
             'date' => $request->date,
-            'customer_id' => isset($old_customer) ? $old_customer->id : $new_customer->id,
-            'schedule_id' => !isset($request->schedule_id) ? $oldBooking->schedule_id : $request->schedule_id,
-            'remarks' => $request->remarks,
-            'gender' => $request->gender,
-            'type' => $oldBooking->type,
-            'added_by' => Auth::user()->id,
-            'discount' => $oldBooking->discount,
-        ]);
+            'schedule_id' => $request->schedule_id,
+            'customer_id' => $request->customer_id,
+            'departure_city_id' => $request->departure_id,
+            'destination_city_id' => $request->destination_id,
+            'seat_no' => $request->seat_no,
 
-//        Log for over Issue
-        return TicketsOverIssue::create([
+        ])->first();
+        $ticket->update([
+            'type' => 'over-issue',
+        ]);
+        TicketsOverIssue::create([
             'company_id' => $this->company_id,
-            'old_customer_id' => $oldBooking->customer_id,
-            'new_customer_id' => isset($new_customer) ? $new_customer->id : null,
-            'schedule_id' => !isset($request->schedule_id) ? $oldBooking->schedule_id : $request->schedule_id,
-            'seat_no' => !isset($request->seat_no) ? $oldBooking->seat_no : $request->seat_no,
-            'old_booking_no' => $oldBooking->id,
-            'new_booking_no' => $new_ticket->id,
+            'ticket_id' => $ticket->id,
+            'percentage' => $request->percentage,
+            'reason' => $request->remarks,
             'added_by' => Auth::user()->id,
         ]);
+        return $ticket->delete();
     }
 
     public function getCnic(Request $request)
@@ -291,35 +232,15 @@ class BookingController extends Controller
 //        return $allBooking;
     }
 
-
     public function advanceData(Request $request)
     {
-        //dd($request->seatNO);
-//        $customerId = Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->pluck('customer_id');
-//        $checkId = 0;
-//        foreach ($customerId as $single) {
-//            if ($single != $customerId[0]) {
-//                $checkId = 1;
-//            }
-//        }
-//        if($checkId == 1) {
-//            return response()->json([
-//                "errors" => [
-//                    "Customer" => ["Selected Seats are not belongs to same Customers!!!"]
-//                ]
-//            ], 422);
-//
-//        }else{
-//            return Ticket::where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get();
-//            dd($request->all(), $detailData);
         return Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
-//        }
     }
 
     public function cancelingBooking(Request $request)
     {
-
-        return Ticket::where([
+//        dd($request->all());
+        $ticket = Ticket::where([
             'company_id' => $this->company_id,
             'date' => $request->date,
             'schedule_id' => $request->schedule_id,
@@ -328,7 +249,18 @@ class BookingController extends Controller
             'destination_city_id' => $request->destination_id,
             'seat_no' => $request->seat_no,
 
-        ])->delete();
+        ])->first();
+        $ticket->update([
+            'type' => 'canceled',
+        ]);
+         BookingCancel::create([
+           'company_id' => $this->company_id,
+           'ticket_id' => $ticket->id,
+           'percentage' => $request->percentage,
+           'reason' => $request->remarks,
+           'added_by' => Auth::user()->id,
+        ]);
+        return $ticket->delete();
     }
 
     public function overIssueBooking(Request $request)
