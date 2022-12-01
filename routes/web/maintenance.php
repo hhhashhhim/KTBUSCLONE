@@ -21,8 +21,8 @@ Route::group(['prefix' => 'fleet/maintenance/part', 'middleware', [CustomMiddlew
 
 
 Route::group(['prefix' => 'fleet', 'middleware', [CustomMiddleware::class]], function () {
-    Route::post('/all', [FleetMaintenanceController::class, 'allFleets']);
-    Route::post('/part/all', [FleetMaintenanceController::class, 'allParts']);
+    Route::post('/', [FleetMaintenanceController::class, 'index']);
     Route::post('/part/link', [FleetMaintenanceController::class, 'fleetPartLink']);
+    Route::post('/single/part/link', [FleetMaintenanceController::class, 'fleetSinglePartLink']);
 });
 

@@ -22,15 +22,27 @@ class FleetMaintenanceController extends Controller
             return $next($request);
         });
     }
-
-    public function allFleets()
+    
+    public function index()
     {
-        return Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]);
+        $data = [
+            "mainData" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading","reading_date"]),
+            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
+        ];
+        return $data;
+        
     }
     
-    public function allParts()
+    public function fleetSinglePartLink(Request $request)
     {
-        return MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]);
+        return Bus::
+            with("maintenancePartLink:id,bus_id,part_id,maintenance_after,maintenance_at,maintenance_date",
+                "maintenancePartLink.MaintenancePart:id,name")
+            ->where("id",$request->id)
+            ->select("id","bus_number","current_reading")
+            ->first();
+        
     }
     
     public function fleetPartLink(Request $request)

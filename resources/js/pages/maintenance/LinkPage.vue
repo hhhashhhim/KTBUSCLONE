@@ -52,22 +52,22 @@
                                                 >
                                                     <thead>
                                                     <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Added By</th>
+                                                        <th>Fleet Name/Number</th>
+                                                        <th>Current Reading</th>
+                                                        <th>Reading Date</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(route, i) in routes" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ route.name }}</td>
-                                                        <td>{{ route.added_by.name }}</td>
+                                                    <tr v-for="(data, i) in mainData" :key="i">
+                                                        <td>{{ data.bus_number }}</td>
+                                                        <td>{{ data.current_reading }} </td>
+                                                        <td>{{ data.reading_date??'N/A' }} </td>
                                                         <td>
                                                             <button class="btn btn-outline-primary"
                                                                     data-toggle="modal"
                                                                     data-target="#showDetails"
-                                                                    @click="fetchRouteDetails( route.id )">See Details
+                                                                    @click="fetchFleetDetails( data.id )">See Details
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -125,7 +125,7 @@
                             <tr v-for="index in loop" :key="index">
                                 <td>
                                     <select class="form-control rounded-0" @change="saveRow($event,index,'rowPart')">
-                                        <option value="0" selected>Select Part</option>
+                                        <option value="" selected>Select Part </option>
                                         <option v-for="(part, i) in parts" :value="part.id" :key="i">
                                             {{ part.name }}
                                         </option>
@@ -139,7 +139,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow()">Remove</button>
+                                    <button class="btn btn-outline-danger" @click="removeRow($event,index)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -168,26 +168,20 @@
                                             <thead>
                                             <tr>
 
-                                                <th>City From</th>
-                                                <th>City To</th>
-                                                <th v-for="(heading,i) in th" :key="i">
-                                                    {{ heading.name }}
-                                                </th>
+                                                <th>Fleet Part</th>
+                                                <th>Maintenance Required After</th>
+                                                <th>Last Maintenance At</th>
+                                                <th>Last Maintenance Date</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <template v-for="(item,j) in routeDetails" :key="j">
-                                                <tr v-for="(single, i) in item" :key="i">
+                                                <tr v-for="(single, i) in fleetDetails.maintenance_part_link" :key="i">
 
-                                                    <td> {{ single.departure_city }}</td>
-                                                    <td> {{ single.destination_city }}</td>
-                                                    <td v-for="(row, k) in th" :key="k">
-                                                        {{
-                                                            fareClassValue(single, row.name)
-                                                        }}
-                                                    </td>
+                                                    <td> {{ single.maintenance_part.name }}</td>
+                                                    <td> {{ single.maintenance_after }}</td>
+                                                    <td> {{ single.maintenance_at }}</td>
+                                                    <td> {{ single.maintenance_date??'N/A' }}</td>
                                                 </tr>
-                                            </template>
                                             </tbody>
                                         </table>
                         </div>
@@ -218,6 +212,7 @@ export default {
     data() {
         return {
             loading : false,
+            mainData: [],
             fleets: [],
             parts: [],
             validationErrors: [],
@@ -226,6 +221,7 @@ export default {
             fleetPart: [],
             maintenanceAfter: [],
             maintenanceAt: [],
+            fleetDetails: [],
             companies: [],
             terminals: [],
             fetchedData: [],
@@ -243,14 +239,12 @@ export default {
             routeStartName: '',
             routeEndName: '',
             reverseRoute: 1,
-            routeDetails: [],
             th: [],
             classFareName: ''
         };
     },
     created() {
-        this.fetchFleets();
-        this.fetchParts();
+        this.fetchData();
     },
     methods: {
         clearForm: function () {
@@ -283,11 +277,46 @@ export default {
                 this.maintenanceAt[index-1] = event.target.value;
             }
 
-            console.log(this.fleetPart);
-            console.log(this.maintenanceAfter);
-            console.log(this.maintenanceAt);
         },
         async linkMaintenance() {
+            
+            // validation for empty data
+            if(!this.fleetId || !this.currentReading || this.fleetPart.length == 0 || 
+                this.maintenanceAfter.length == 0 || this.maintenanceAt.length == 0)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            // if(this.fleetPart.length != this.maintenanceAfter.length || this.maintenanceAfter.length != this.maintenanceAt.length)
+            // {
+            //     return swal({
+            //         title: "Error",
+            //         text: "Please Fill All Field Or Remove Extra",
+            //         icon: "error",
+            //         timer: 4000
+            //     }); 
+            // }
+            
+            // check if any index is empty or null in object
+            for(var i = 0; i < this.fleetPart.length; i++)
+            {
+                if(!this.fleetPart[i] || !this.maintenanceAfter[i] || !this.maintenanceAt[i])
+                {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 4000
+                    }); 
+                }
+            }
+
+            // post data
             const data = {
                 fleetId: this.fleetId,
                 currentReading: this.currentReading,
@@ -313,7 +342,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                await this.fetchFleets();
+                await this.fetchData();
                 this.loading = false;
             }
             else {
@@ -387,8 +416,13 @@ export default {
         addRow() {
             this.loop++;
         },
-        removeRow() {
-            this.loop--;
+        removeRow(event,index) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.fleetPart.splice((getRowNumber-1), 1);
+            this.maintenanceAfter.splice((getRowNumber-1), 1);
+            this.maintenanceAt.splice((getRowNumber-1), 1);
+            event.target.parentElement.parentElement.remove();
+            // this.loop--;
         },
         addTerminal(event) {
             const value = event.target.value
@@ -418,21 +452,18 @@ export default {
 
             }
         },
-        async fetchFleets() {
-            const fleetRes = await this.callApi("post", "fleet/all");
+        async fetchData() {
+            const fleetRes = await this.callApi("post", "fleet");
             if (fleetRes.status === 200) {
-                this.fleets = fleetRes.data;
+                
+                this.mainData = fleetRes.data.mainData;
+                this.fleets = fleetRes.data.busDrop;
+                this.parts = fleetRes.data.partDrop;
             }
 
             setTimeout(() => {
                 $('#maintenance_table').DataTable();
             }, 300);
-        },
-        async fetchParts() {
-            const partRes = await this.callApi("post", "fleet/part/all");
-            if (partRes.status === 200) {
-                this.parts = partRes.data;
-            }
         },
         changeInfo(from, to) {
             this.from = from.name;
@@ -440,14 +471,13 @@ export default {
             this.data.from = from.id;
             this.data.to = to.id;
         },
-        async fetchRouteDetails(id) {
+        async fetchFleetDetails(id) {
 
-            const routeDetailRes = await this.callApi("post", "cities/routes/details", {
+            const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
                 id: id
             });
-            if (routeDetailRes.status === 200) {
-                this.routeDetails = routeDetailRes.data.data;
-                this.th = routeDetailRes.data.th;
+            if (fleetDetailRes.status === 200) {
+                this.fleetDetails = fleetDetailRes.data;
             }
         },
         async fetchRecord() {
