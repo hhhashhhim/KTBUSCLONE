@@ -64,10 +64,17 @@
                                                         <td>{{ data.current_reading }} </td>
                                                         <td>{{ data.reading_date??'N/A' }} </td>
                                                         <td>
-                                                            <button class="btn btn-outline-primary"
+                                                            <button class="btn btn-primary mx-1"
+                                                                    data-target="#editLinking_form"
+                                                                    data-toggle="modal"
+                                                                    @click="editFleetDetails( data.id )">
+                                                                    <i class="far fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-primary"
                                                                     data-toggle="modal"
                                                                     data-target="#showDetails"
-                                                                    @click="fetchFleetDetails( data.id )">See Details
+                                                                    @click="fetchFleetDetails( data.id )">
+                                                                    <i class="far fa-eye"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -86,7 +93,7 @@
 
             <!-- Add Modal -->
             <Add
-                :heading="'ADD NEW ROUTE'"
+                :heading="'Link Part With Bus'"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
@@ -124,7 +131,7 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="saveRow($event,index,'rowPart')">
+                                    <select class="form-control rounded-0" @change="saveRow($event,'rowPart')">
                                         <option value="" selected>Select Part </option>
                                         <option v-for="(part, i) in parts" :value="part.id" :key="i">
                                             {{ part.name }}
@@ -132,14 +139,14 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,index,'rowAfter')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'rowAfter')" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,index,'rowLast')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'rowLast')" />
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event,index)">Remove</button>
+                                    <button class="btn btn-outline-danger" @click="removeRow($event)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -147,10 +154,82 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="linkMaintenance" :disabled="loading" >{{loading ? 'Loading...' : 'Save Route' }}
+                    <button type="button" class="btn btn-primary" @click="linkMaintenance" :disabled="loading" >{{loading ? 'Loading...' : 'Link' }}
                     </button>
                 </template>
             </Add>
+
+            <Edit
+                heading="Edit"
+                :errors="this.validationErrors"
+                :success="success"
+                :editForm="editFormID"
+            >
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Select Bus <span class="text-danger">*</span></label>
+                        <select class="form-control rounded-0" v-model="edit.fleetId">
+                            <option value="" selected>Select Bus</option>
+                            <option v-for="(fleet, i) in fleets" :value="fleet.id" :key="i">
+                                {{ fleet.bus_number }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="name">Current Reading (km) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" min="0" v-model="edit.currentReading"/>
+                    </div>
+                    <div class="col-md-12 d-flex align-items-center">
+                        <div class="col-md-6">
+                            <h5>Select Part For Maintenance</h5>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12 d-flex align-items-center">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Part</th>
+                                <th>Maintenance Required After (km)</th>
+                                <th>Last Maintenance At (km)</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                              
+                            <tr v-for="index in edit.loop" :key="index" v-if="edit.fleetDetails.maintenance_part_link">
+                                <td>
+                                    <select class="form-control rounded-0" @change="editSaveRow($event,'rowPart')" 
+                                    :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' " >
+                                        <option value="" selected>Select Part </option>
+                                        <option v-for="(part, i) in parts" :value="part.id" :key="i">
+                                            {{ part.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    
+                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowAfter')" 
+                                    :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowLast')" 
+                                    :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' " />
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
+                                    <button class="btn btn-outline-danger" @click="editRemoveRow($event)">Remove</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateLinkMaintenance" :disabled="loading" >{{loading ? 'Loading...' : 'Link' }}
+                    </button>
+                </template>
+            </Edit>
 
             <!--            Details Model-->
             <div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -178,8 +257,8 @@
                                                 <tr v-for="(single, i) in fleetDetails.maintenance_part_link" :key="i">
 
                                                     <td> {{ single.maintenance_part.name }}</td>
-                                                    <td> {{ single.maintenance_after }}</td>
-                                                    <td> {{ single.maintenance_at }}</td>
+                                                    <td> {{ single.maintenance_after }} (km)</td>
+                                                    <td> {{ single.maintenance_at }} (km)</td>
                                                     <td> {{ single.maintenance_date??'N/A' }}</td>
                                                 </tr>
                                             </tbody>
@@ -222,12 +301,22 @@ export default {
             maintenanceAfter: [],
             maintenanceAt: [],
             fleetDetails: [],
+            edit: {
+                fleetDetails: [],
+                fleetId: "",
+                currentReading: "",
+                fleetPart: [],
+                maintenanceAfter: [],
+                maintenanceAt: [],
+                loop: 1,
+            },
             companies: [],
             terminals: [],
             fetchedData: [],
             addTerminalsOnClick: [],
             routes: [],
-            formID: "route_form",
+            formID: "linking_form",
+            editFormID: "editLinking_form",
             data: {},
             dataEdit: {},
             from: {},
@@ -262,21 +351,38 @@ export default {
             });
             return new_name ? new_name + ' PKR' : 'N/A';
         },
-        saveRow(event,index,fieldName) {
+        saveRow(event,fieldName) {
            
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if(fieldName == "rowPart")
             {
-                this.fleetPart[index-1] = event.target.value;
+                this.fleetPart[getRowNumber-1] = event.target.value;
             }
             if(fieldName == "rowAfter")
             {
-                this.maintenanceAfter[index-1] = event.target.value;
+                this.maintenanceAfter[getRowNumber-1] = event.target.value;
             }
             if(fieldName == "rowLast")
             {
-                this.maintenanceAt[index-1] = event.target.value;
+                this.maintenanceAt[getRowNumber-1] = event.target.value;
             }
-
+        },
+        editSaveRow(event,fieldName) {
+           
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+           
+            if(fieldName == "rowPart")
+            {
+                this.edit.fleetPart[getRowNumber-1] = event.target.value;
+            }
+            if(fieldName == "rowAfter")
+            {
+                this.edit.maintenanceAfter[getRowNumber-1] = event.target.value;
+            }
+            if(fieldName == "rowLast")
+            {
+                this.edit.maintenanceAt[getRowNumber-1] = event.target.value;
+            }
         },
         async linkMaintenance() {
             
@@ -291,16 +397,6 @@ export default {
                     timer: 4000
                 });
             }
-
-            // if(this.fleetPart.length != this.maintenanceAfter.length || this.maintenanceAfter.length != this.maintenanceAt.length)
-            // {
-            //     return swal({
-            //         title: "Error",
-            //         text: "Please Fill All Field Or Remove Extra",
-            //         icon: "error",
-            //         timer: 4000
-            //     }); 
-            // }
             
             // check if any index is empty or null in object
             for(var i = 0; i < this.fleetPart.length; i++)
@@ -336,6 +432,86 @@ export default {
                 this.fleetPart =  [];
                 this.maintenanceAfter =  [];
                 this.maintenanceAt =  [];
+               swal({
+                    title: "Success",
+                    text: "Maintenance Added",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchData();
+                this.loading = false;
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+        },
+        async updateLinkMaintenance() {
+            
+            // validation for empty data
+            if(!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 || 
+                this.edit.maintenanceAfter.length == 0 || this.edit.maintenanceAt.length == 0)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+            
+            // check if any index is empty or null in object
+            for(var i = 0; i < this.edit.fleetPart.length; i++)
+            {
+                if(!this.edit.fleetPart[i] || !this.edit.maintenanceAfter[i] || !this.edit.maintenanceAt[i])
+                {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 4000
+                    }); 
+                }
+            }
+
+            // post data
+            const data = {
+                fleetId: this.edit.fleetId,
+                currentReading: this.edit.currentReading,
+                fleetPart: this.edit.fleetPart,
+                maintenanceAfter: this.edit.maintenanceAfter,
+                maintenanceAt: this.edit.maintenanceAt,
+            }
+            this.loading = true;
+            const res = await this.callApi("post", "fleet/part/link/update", data);
+            if (res.status === 200) {
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+                this.edit.fleetId = "";
+                this.edit.currentReading = "";
+                this.edit.loop = 1;
+                this.edit.fleetPart =  [];
+                this.edit.maintenanceAfter =  [];
+                this.edit.maintenanceAt =  [];
                swal({
                     title: "Success",
                     text: "Maintenance Added",
@@ -416,13 +592,27 @@ export default {
         addRow() {
             this.loop++;
         },
-        removeRow(event,index) {
+        removeRow(event) {
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             this.fleetPart.splice((getRowNumber-1), 1);
             this.maintenanceAfter.splice((getRowNumber-1), 1);
             this.maintenanceAt.splice((getRowNumber-1), 1);
             event.target.parentElement.parentElement.remove();
             // this.loop--;
+        },
+        editAddRow() {
+            this.edit.loop++;
+        },
+        editRemoveRow(event) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.edit.fleetPart.splice((getRowNumber-1), 1);
+            this.edit.maintenanceAfter.splice((getRowNumber-1), 1);
+            this.edit.maintenanceAt.splice((getRowNumber-1), 1);
+            event.target.parentElement.parentElement.remove();
+            
+            console.log(this.edit.fleetPart);
+            console.log(this.edit.maintenanceAfter);
+            console.log(this.edit.maintenanceAt);
         },
         addTerminal(event) {
             const value = event.target.value
@@ -478,6 +668,35 @@ export default {
             });
             if (fleetDetailRes.status === 200) {
                 this.fleetDetails = fleetDetailRes.data;
+                this.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
+                this.edit.fleetId = fleetDetailRes.data.id;
+                this.edit.currentReading = fleetDetailRes.data.current_reading;
+            }
+        },
+        async editFleetDetails(id) {
+
+            const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
+                id: id
+            });
+            if (fleetDetailRes.status === 200) {
+
+                // Array Empty
+                this.edit.fleetPart = [];
+                this.edit.maintenanceAfter = [];
+                this.edit.maintenanceAt = [];
+                
+                this.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
+                this.edit.fleetDetails = fleetDetailRes.data;
+                this.edit.fleetId = fleetDetailRes.data.id;
+                this.edit.currentReading = fleetDetailRes.data.current_reading;
+
+                for(var i = 0; i < fleetDetailRes.data.maintenance_part_link.length; i++)
+                {
+                    this.edit.fleetPart.push(fleetDetailRes.data.maintenance_part_link[i].part_id);
+                    this.edit.maintenanceAfter.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_after);
+                    this.edit.maintenanceAt.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_at);
+                }
+
             }
         },
         async fetchRecord() {
