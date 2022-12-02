@@ -10,7 +10,7 @@ use App\Models\Bus\Bus;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use DB;
 class FleetMaintenanceController extends Controller
 {
     public $company_id;
@@ -40,6 +40,7 @@ class FleetMaintenanceController extends Controller
             with("maintenancePartLink:id,bus_id,part_id,maintenance_after,maintenance_at,maintenance_date",
                 "maintenancePartLink.MaintenancePart:id,name")
             ->where("id",$request->id)
+            ->where("company_id",$this->company_id)
             ->select("id","bus_number","current_reading")
             ->first();
         
@@ -75,6 +76,55 @@ class FleetMaintenanceController extends Controller
                 ]);
             }
         }
+    }
+    
+    public function updateFleetPartLink(Request $request)
+    {
+        $rules = [
+            'fleetId' => 'required',
+            'currentReading' => 'required',
+            'fleetPart' => 'required',
+            'maintenanceAfter' => 'required',
+            'maintenanceAt' => 'required',
+        ];
+        $this->validate($request, $rules);
+
+        Bus::where("id",$request->fleetId)->update([
+            "current_reading" => $request->currentReading
+        ]);
+
+        foreach($request->fleetPart as $key => $value)
+        {
+            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>$this->company_id])->first();
+            if($checkExist)
+            {
+                MaintenancePartLink::where("id",$checkExist->id)->update([
+                    "bus_id" => $request->fleetId,
+                    "part_id" => $request->fleetPart[$key],
+                    "maintenance_after" => $request->maintenanceAfter[$key],
+                    "maintenance_at" => $request->maintenanceAt[$key],
+                    'added_by' => Auth::user()->id,
+                    'company_id' => $this->company_id,
+                ]);
+            }
+            else
+            {
+                MaintenancePartLink::create([
+                    "bus_id" => $request->fleetId,
+                    "part_id" => $request->fleetPart[$key],
+                    "maintenance_after" => $request->maintenanceAfter[$key],
+                    "maintenance_at" => $request->maintenanceAt[$key],
+                    'added_by' => Auth::user()->id,
+                    'company_id' => $this->company_id,
+                ]);
+            }
+        }
+    }
+
+
+    public function dueMaintenance()
+    {
+        return 'helo';
     }
     
 }
