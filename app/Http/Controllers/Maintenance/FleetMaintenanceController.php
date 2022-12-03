@@ -124,7 +124,44 @@ class FleetMaintenanceController extends Controller
 
     public function dueMaintenance()
     {
-        return 'helo';
+        $due = Bus::
+        join("maintenance_part_links","maintenance_part_links.bus_id","buses.id")
+        ->join("fleet_maintenance_parts","fleet_maintenance_parts.id","maintenance_part_links.part_id")
+        ->whereRaw('buses.current_reading >= maintenance_part_links.maintenance_after + maintenance_part_links.maintenance_at')
+        ->select('buses.bus_number','buses.current_reading','maintenance_part_links.bus_id','maintenance_part_links.part_id',
+                'maintenance_part_links.maintenance_after','maintenance_part_links.maintenance_at',
+                'maintenance_part_links.maintenance_date','fleet_maintenance_parts.name')
+        ->get();
+        
+        $data = [
+            "mainData" => $due,
+            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
+        ];
+        return $data;
+    }
+    
+    public function dueMaintenanceAdd(Request $request)
+    {
+        return $request->all();
+    }
+    
+    public function updateMeterReading(Request $request)
+    {
+        $fleet = Bus::find($request->fleetId);
+
+        if($fleet->current_reading > $request->currentReading)
+        {
+            return response()->json([
+                "errors" => [
+                    "Reading Error" => ["New Reading should be greater than current reading"]
+                ]
+            ], 422);
+        }
+        Bus::where("id",$request->fleetId)->update([
+            "current_reading" => $request->currentReading,
+            "reading_date" => date("Y-m-d")
+        ]);
     }
     
 }
