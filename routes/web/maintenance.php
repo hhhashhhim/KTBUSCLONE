@@ -25,9 +25,11 @@ Route::group(['prefix' => 'fleet', 'middleware', [CustomMiddleware::class]], fun
     Route::post('/part/link', [FleetMaintenanceController::class, 'fleetPartLink']);
     Route::post('/part/link/update', [FleetMaintenanceController::class, 'updateFleetPartLink']);
     Route::post('/single/part/link', [FleetMaintenanceController::class, 'fleetSinglePartLink']);
+    Route::post('/meter/reading/update', [FleetMaintenanceController::class, 'updateMeterReading']);
 });
 
 
-Route::group(['prefix' => 'fleet/maintenance/due', 'middleware', [CustomMiddleware::class]], function () {
-    Route::post('/', [FleetMaintenanceController::class, 'dueMaintenance']);
+Route::group(['prefix' => 'fleet/maintenance', 'middleware', [CustomMiddleware::class]], function () {
+    Route::post('/due', [FleetMaintenanceController::class, 'dueMaintenance']);
+    Route::post('/due/add', [FleetMaintenanceController::class, 'dueMaintenanceAdd']);
 });

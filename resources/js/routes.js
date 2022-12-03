@@ -26,6 +26,7 @@ import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
 import TicketSettingPage from "./pages/settings/tickets/TicketSettingsPage.vue";
 import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
 import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
+import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 
 // const url = '/projects/kt/'
 const url = '/kt/'
@@ -161,6 +162,11 @@ const routes = [
         path: url + "fleet/maintenance/link",
         component : MaintenanceLinkPage,
         name:"maintenance-link"
+    },
+    {
+        path: url + "fleet/maintenance/due",
+        component : MaintenanceDuePage,
+        name:"maintenance-due"
     },
     {
         path: url + "settings/tickets",
