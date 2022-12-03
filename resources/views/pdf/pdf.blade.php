@@ -22,11 +22,11 @@
             line-height: 1.2;
         }
 
-        .companyname {
+        .companyName {
             font-weight: 900;
-            font-size: 14pt;
+            font-size: 13pt;
             text-transform: uppercase;
-            margin-bottom: 7px;
+            margin-top: -9px;
             text-align: center;
             font-family: sans-serif, Verdana, Arial;
         }
@@ -67,6 +67,14 @@
             white-space: nowrap;
 
         }
+        .kt-bottom{
+         position: fixed;
+         left:23%;
+         bottom:1%;
+        }
+        .table-data{
+            line-height:9px;
+        }
     </style>
     <title>Print Ticket</title>
 </head>
@@ -74,7 +82,7 @@
 {{--{{dd($data)}}--}}
 
 <div id="info">
-    <div class="companyname"><span>Kainat Travels</span></div>
+    <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
         <span>{{$data_terms->address}}</span>
         <div><span><b>UAN(24/7):</b>{{$data_terms->uan}}</span></div>
@@ -86,19 +94,19 @@
                 src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate('Customer Name : '. $data[$key]['customer']->name . ' | ' . 'Customer CNIC : '.$data[$key]['customer']->cnic .' | ' . 'Customer Phone # : '.$data[$key]['customer']->contact .' | '.'Seat No : ' . $data[$key]->seat_no . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . $data[$key]['departure_city']->name . ' | ' . 'To : ' . $data[$key]['destination_city']->name . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data[$key]->date)) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data[$key]['schedule']->time)) . ' | ' . ' Booking Date & Time : '.  date('d/m/Y H:i A', strtotime($data[$key]->created_at)) . ' | ' . 'Fare : 900')) }}"
                 class="rounded"/>
         </div>
-        <div>
+        <div class="table-data">
             <p class="font-weight-bold float-left">Name :</p>
             <p class="float-right">{{ $data[$key]['customer']->name }}</p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Seat No :</p>
             <p class="float-right">{{ $data[$key]->seat_no }}</p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Bus No :</p>
             <p class="float-right">Malik ajay </p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left"><span style="text-decoration: underline;">From :</span> &nbsp;
                 <span>{{$data[$key]['departure_city']->name}}</span>
             </p>
@@ -106,19 +114,19 @@
                 <span>{{ $data[$key]['destination_city']->name }}</span>
             </p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Departure Date :</p>
             <p class="float-right">{{date('d/m/Y', strtotime($data[$key]->date))}}</p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Departure Time :</p>
             <p class="float-right">{{ date('H:i A', strtotime($data[$key]['schedule']->time))}} </p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Booking Date :</p>
             <p class="float-right">{{ date('d/m/Y H:i', strtotime($data[$key]->created_at)) }}</p>
         </div>
-        <div class="clear-both">
+        <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Fare : </p>
             <p class="float-right">900</p>
         </div>
@@ -130,7 +138,7 @@
     <div style="text-align: center;">
         <h5 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h5>
         <h5>{{$data_terms->terms_condition}}</h5>
-        <h4><b>&copy; Rights Reserved By Kainat Travels</b></h4>
+        <h4 class="kt-bottom"><b>&copy; Rights Reserved By Kainat Travels</b></h4>
     </div>
 </div>
 <p style="page-break-before: always"></p>

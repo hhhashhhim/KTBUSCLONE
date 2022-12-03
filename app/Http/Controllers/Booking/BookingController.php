@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Booking;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingCancel;
+use App\Models\Booking\TicketELT;
+use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\City;
 use App\Models\Customer;
@@ -102,7 +104,23 @@ class BookingController extends Controller
                 'added_by' => Auth::user()->id,
                 'discount' => $request->discount,
             ]);
-
+            if ($isPartial == 1) {
+                TicketIsPartial::create([
+                    'company_id' => $this->company_id,
+                    'departure_city_id' => $ticket->departure_city_id,
+                    'destination_city_id' => $ticket->destination_city_id,
+                    'ticket_id' => $ticket->id,
+                    'seat_no' => $ticket->seat_no,
+                    'seat_fare' => $ticket->seat_fare,
+                    'booking_no' => $ticket->booking_no,
+                    'date' => $ticket->date,
+                    'customer_id' => $ticket->customer_id,
+                    'schedule_id' => $ticket->schedule_id,
+                    'gender' => $ticket->gender,
+                    'type' => $ticket->type,
+                    'added_by' => Auth::user()->id,
+                ]);
+            }
         }
         return "Successfully Booking Created";
 //        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
@@ -175,7 +193,6 @@ class BookingController extends Controller
 
     public function overIssueAddNew(Request $request)
     {
-
         $ticket = Ticket::where([
             'company_id' => $this->company_id,
             'date' => $request->date,
@@ -237,6 +254,35 @@ class BookingController extends Controller
         return Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
     }
 
+    public function bookingElt(Request $request)
+    {
+        $ticket = Ticket::where([
+            'company_id' => $this->company_id,
+            'date' => $request->date,
+            'schedule_id' => $request->schedule_id,
+            'customer_id' => $request->customer_id,
+            'departure_city_id' => $request->departure_id,
+            'destination_city_id' => $request->destination_id,
+            'seat_no' => $request->seat_no,
+        ])->first();
+        $elt = TicketELT::create([
+            'company_id' => $this->company_id,
+            'ticket_id' => $ticket->id,
+            'customer_id' => $request->customer_id,
+            'departure_city' => $request->departure_id,
+            'destination_city' => $request->destination_id,
+            'schedule_id' => $request->schedule_id,
+            'seat_no' => $request->seat_no,
+            'date' => $request->date,
+            'elt_price' => $request->totalPrice,
+            'seat_fare' => $request->singleFare,
+            'elt_weight' => $request->eltWeight,
+            'elt_description' => $request->eltDescription,
+            'added_by' => Auth::user()->id,
+        ]);
+        return TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
+    }
+
     public function cancelingBooking(Request $request)
     {
 //        dd($request->all());
@@ -253,12 +299,12 @@ class BookingController extends Controller
         $ticket->update([
             'type' => 'canceled',
         ]);
-         BookingCancel::create([
-           'company_id' => $this->company_id,
-           'ticket_id' => $ticket->id,
-           'percentage' => $request->percentage,
-           'reason' => $request->remarks,
-           'added_by' => Auth::user()->id,
+        BookingCancel::create([
+            'company_id' => $this->company_id,
+            'ticket_id' => $ticket->id,
+            'percentage' => $request->percentage,
+            'reason' => $request->remarks,
+            'added_by' => Auth::user()->id,
         ]);
         return $ticket->delete();
     }
