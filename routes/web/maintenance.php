@@ -32,4 +32,5 @@ Route::group(['prefix' => 'fleet', 'middleware', [CustomMiddleware::class]], fun
 Route::group(['prefix' => 'fleet/maintenance', 'middleware', [CustomMiddleware::class]], function () {
     Route::post('/due', [FleetMaintenanceController::class, 'dueMaintenance']);
     Route::post('/due/add', [FleetMaintenanceController::class, 'dueMaintenanceAdd']);
+    Route::post('/record', [FleetMaintenanceController::class, 'maintenanceRecord']);
 });

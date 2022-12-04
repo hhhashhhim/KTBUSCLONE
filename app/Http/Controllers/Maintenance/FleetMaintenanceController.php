@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hrm\Department\Department;
 use App\Models\Maintenance\MaintenancePart;
 use App\Models\Maintenance\MaintenancePartLink;
+use App\Models\Maintenance\FleetMaintenance;
 use App\Models\Bus\Bus;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -125,7 +126,8 @@ class FleetMaintenanceController extends Controller
     public function dueMaintenance()
     {
         $due = Bus::
-        join("maintenance_part_links","maintenance_part_links.bus_id","buses.id")
+        where("buses.company_id",$this->company_id)
+        ->join("maintenance_part_links","maintenance_part_links.bus_id","buses.id")
         ->join("fleet_maintenance_parts","fleet_maintenance_parts.id","maintenance_part_links.part_id")
         ->whereRaw('buses.current_reading >= maintenance_part_links.maintenance_after + maintenance_part_links.maintenance_at')
         ->select('buses.bus_number','buses.current_reading','maintenance_part_links.bus_id','maintenance_part_links.part_id',
@@ -143,7 +145,26 @@ class FleetMaintenanceController extends Controller
     
     public function dueMaintenanceAdd(Request $request)
     {
-        return $request->all();
+        Bus::where("id",$request->fleetId)->update([
+            "current_reading" => $request->currentReading,
+            "reading_date" => date('Y-m-d'),
+        ]);
+
+        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->partId])->update([
+            "maintenance_at" => $request->currentReading,
+            "maintenance_date" => date("Y-m-d")
+        ]);
+
+        return FleetMaintenance::create([
+            "bus_id" => $request->fleetId,
+            "part_id" => $request->partId,
+            "amount" => $request->amount,
+            "company_paid" => $request->companyPaid,
+            "evidence" => $this->image($request->evidence)??null,
+            "detail" => $request->detail,
+            "maintenance_type" => $request->maintenanceType,
+            'company_id' => $this->company_id,
+        ]);
     }
     
     public function updateMeterReading(Request $request)
@@ -162,6 +183,34 @@ class FleetMaintenanceController extends Controller
             "current_reading" => $request->currentReading,
             "reading_date" => date("Y-m-d")
         ]);
+    }
+
+    public function maintenanceRecord()
+    {
+        $maintenances = FleetMaintenance::
+            where("company_id", $this->company_id)
+            ->with("busName:id,bus_number","partName:id,name")
+            ->orderBy('time','DESC')
+            ->get();
+        
+        $data = [
+            "mainData" => $maintenances,
+        ];
+        return $data;
+    }
+
+    // Image Upload
+    public function image($image){
+
+        $filenameWithExt = $image->getClientOriginalName();
+        //get just filename
+        $filename        = pathinfo($filenameWithExt);
+        //get just extension
+        $extension       = $image->extension();
+        $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        //Move to folder
+        $path            = $image->move(public_path('uploads/maintenance/'), $nameToStore);
+        return $nameToStore;
     }
     
 }

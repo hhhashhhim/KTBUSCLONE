@@ -175,6 +175,12 @@
                                 <i class="fas fa-users"></i> Maintenance Due
                             </router-link>
                         </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'maintenance-record' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i> Maintenance Record
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('hrm')">
