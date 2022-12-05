@@ -243,7 +243,7 @@
                                                         </i>
                                                     </small>
                                                     <small v-if="col.over_issue == true">
-                                                        <i class="type-icons far fa-hand-paper text-dark">
+                                                        <i class="type-icons far fa-hand-paper text-danger">
                                                         </i>
                                                     </small>
                                                 </div>
@@ -433,7 +433,7 @@
         <!-- Model Reschedule       -->
         <div class="modal fade" id="reschedule_modal" tabindex="2" aria-labelledby="reschedule_modalLabel"
              aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="reschedule_modalLabel">Reschedule Seats</h5>
@@ -448,7 +448,7 @@
                                     class="text-danger">*</span></label>
                                 <select class="form-control" id="departureCity"
                                         @change="fetchReSpecificSchedules(); getReDestinationCity()"
-                                        v-model="reSchedule.departureCity">
+                                        v-model="rescheduleData.dataDepartureCity">
                                     <option value="0" selected>Select Departure City</option>
                                     <option
                                         v-for="(city, i) in cities"
@@ -464,7 +464,7 @@
                                     City<span class="text-danger">*</span></label>
                                 <select class="form-control" id="destinationCity"
                                         @change="fetchReSpecificSchedules()"
-                                        v-model="reSchedule.destinationCity">
+                                        v-model="rescheduleData.rescheduleDestinationCity">
                                     <option value="0" selected>Select Destination City</option>
                                     <option v-for="(city, i) in reSpecificCities" :value="city.id"
                                             :key="i">
@@ -475,14 +475,14 @@
                             <div class="col-md-2 class">
                                 <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
                                 <input type="date" :min="minDateFilter()" class="form-control"
-                                       v-model="reSchedule.date"
+                                       v-model="rescheduleData.rescheduleDate"
                                        @change="fetchReSpecificSchedules()"/>
                             </div>
                             <div class="col-md-6 class">
                                 <label for="scheduleName" class="mb-0">Schedule Name <span
                                     class="text-danger">*</span></label>
                                 <select class="form-control" id="scheduleName" @change="fetchReSpecificSchedules()"
-                                        v-model="reSchedule.schedule">
+                                        v-model="rescheduleData.rescheduleSchedule">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
                                             :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
@@ -494,7 +494,7 @@
                             <div class="col-md-12">
                                 <label for="rescheduleReason" class="mb-0">Reason<span
                                     class="text-danger">*</span></label>
-                                <textarea id="rescheduleReason" class="form-control"
+                                <textarea id="rescheduleReason" class="form-control" v-model="rescheduleData.reason"
                                           placeholder="Please Give me a Reason!!" cols="30" rows="10"></textarea>
                             </div>
                         </div>
@@ -626,22 +626,22 @@
                                                         Add ELT
                                                     </button>
                                                     <button type="button" class="btn btn-primary ml-2"
-                                                            @click="passDataToRescheduleModel(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
+                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0"
                                                     >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
-                                                            @click="passDataToOverIssueModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id,  innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);this.overIssueData.percentage = 'first'">
+                                                            @click="passDataToOverIssueModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id,  innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
                                                     <button type="button" class="btn btn-danger ml-2"
-                                                            @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.cancelData.percentage = 'first'">
+                                                            @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.cancelData.percentage = 0 ">
                                                         Cancel Ticket
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div v-if="key + 1">
-                                                <hr>
-                                            </div>
+                                            <!--                                            <div v-if="key + 1">-->
+                                            <!--                                                <hr>-->
+                                            <!--                                            </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -715,7 +715,6 @@ export default {
             schedule: "",
             loading: false,
             getSchedule: false,
-            getReSchedule: false,
             showBookingDiv: false,
             showReBookingDiv: false,
             selectedSeats: [],
@@ -745,10 +744,8 @@ export default {
                 totalAmount: 0,
                 discount: 0,
             },
-            reSchedule: {
+            rescheduleData: {
                 schedule: 0,
-                destinationCity: 0,
-                departureCity: 0,
             },
 
             addFormOverIssue: {
@@ -914,15 +911,14 @@ export default {
             }
         },
         async getReDestinationCity() {
-            if (this.reSchedule.departureCity == '0') {
-                this.reSchedule.destinationCity = 0;
+            if (this.rescheduleData.dataDepartureCity == '0') {
+                this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.reSchedule.departureCity});
-                console.log(resReDepartureCity)
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.rescheduleData.dataDepartureCity});
                 if (resReDepartureCity.length == 0) {
-                    this.reSchedule.destinationCity = 0
+                    this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
-                    this.reSchedule.destinationCity = 0;
+                    this.rescheduleData.rescheduleDestinationCity = 0;
                     this.reSpecificCities = resReDepartureCity.data;
                 }
             }
@@ -972,27 +968,23 @@ export default {
             }
             this.fetchScheduleData();
         },
+
         async fetchReSpecificSchedules() {
-            this.getReSchedule = true;
-            this.showReBookingDiv = false;
             this.allReSchedules = {};
-            this.reSchedule.schedule = 0;
+
             const data = {
-                departure_city_id: this.reSchedule.departureCity,
-                destination_city_id: this.reSchedule.destinationCity,
-                date: this.reSchedule.date,
+                departure_city_id: this.rescheduleData.dataDepartureCity,
+                destination_city_id: this.rescheduleData.rescheduleDestinationCity,
+                date: this.rescheduleData.rescheduleDate,
             }
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
             if (resFetchSchedule.status == 200) {
                 if (resFetchSchedule.length != 0) {
-                    this.getReSchedule = false;
                     this.allReSchedules = resFetchSchedule.data;
                 } else {
-                    this.reSchedule.schedule = 0;
-                    this.showReBookingDiv = false;
+                    this.rescheduleData.rescheduleSchedule = 0;
                 }
             }
-            this.fetchScheduleData();
         },
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
@@ -1249,7 +1241,6 @@ export default {
                 });
             }
         },
-
         getClasses(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
@@ -1257,7 +1248,6 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
-
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1380,37 +1370,7 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
         },
-        async rescheduleSeats() {
-            this.validationErrors = [];
-            if (!this.addForm.schedule) {
-                this.doScroll();
-                return this.errorsArray("Schedule Name is Required", "Schedule");
-            }
-            if (!this.addForm.date) {
-                this.doScroll();
-                return this.errorsArray("Date is Required", "Date");
-            }
-            if (this.selectedSeats.length == 0)
-                return this.errorsArray("Please Select At Least One Seat", "Seat");
-            this.validationErrors = [];
-            const res = await this.callApi("post", "booking/reschedule", {
-                ...this.addForm,
-                bookingSeats: this.seats,
-            });
-            if (res.status == 200) {
-                this.success = "Seats Rescheduled Successfully";
-                this.fetchScheduleData();
-                window.scrollTo(0, 0);
-            } else {
-                if (res.status === 422) {
-                    for (const key in res.addForm.errors) {
-                        res.addForm.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-            }
-        },
+
         async resetingArrays() {
             this.selectedSeats = [];
             this.selectedBookedSeats = [];
@@ -1574,13 +1534,7 @@ export default {
                 }
             }
         },
-        // end over issue model data
-        passDataToRescheduleModel: function (date, schedule, departure, destination, seatNo) {
-            this.reSchedule.departureCity = 0;
-            this.reSchedule.destinationCity = 0;
-            this.reSchedule.schedule = 0;
-            $("#reschedule_modal").modal('show');
-        },
+
         //ELT MODEL DATA
         passDataToEltModel: function (date, customer, schedule, departure, destination, seatNo, seatFare) {
             this.eltData = {
@@ -1630,11 +1584,10 @@ export default {
             if (resOverIssue.status == 200) {
                 swal({
                     title: "Success",
-                    text: "Seat over-issued  Successfully",
+                    text: "ELT Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
-
             }
 
             if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -1668,6 +1621,118 @@ export default {
             }
         },
 
+
+        // Reschedule model
+        async passDataToRescheduleModel(date, customer, schedule, departure, destination, seatNo) {
+            this.rescheduleData = {
+                rescheduleDate: date,
+                existingDate: date,
+                dataCustomer: customer,
+                dataSchedule: schedule,
+                dataDepartureCity: departure,
+                dataDestination: destination,
+                dataSeat_no: seatNo,
+            }
+
+            if (this.rescheduleData.dataDepartureCity == '0') {
+                this.rescheduleData.rescheduleDestinationCity = 0;
+            } else {
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.rescheduleData.dataDepartureCity});
+                if (resReDepartureCity.length == 0) {
+                    this.rescheduleData.rescheduleDestinationCity = 0
+                } else {
+                    this.rescheduleData.rescheduleDestinationCity = 0;
+                    this.reSpecificCities = resReDepartureCity.data;
+                }
+            }
+
+            console.log(this.rescheduleData);
+            $("#reschedule_modal").modal('show');
+        },
+
+        async rescheduleSeats() {
+            console.log(this.rescheduleData)
+            if (this.rescheduleData.dataDepartureCity == 0) {
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.rescheduleData.rescheduleDestinationCity == 0) {
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // if (this.rescheduleData.rescheduleDate ==  this.rescheduleData.rescheduleDate) {
+            //     return swal({
+            //         title: "Required!!",
+            //         text: "Date not be same as previous Booking!! Please Select Future Date",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
+            if (this.rescheduleData.rescheduleDate ==  '' || typeof  this.rescheduleData.rescheduleDate == 'undefined') {
+                return swal({
+                    title: "Required!!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.rescheduleData.rescheduleSchedule == 0 ) {
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Schedule!!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.rescheduleData.reason == '' ) {
+                return swal({
+                    title: "Required!!",
+                    text: "Reason is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            swal({
+                title: "Success",
+                text: "Seat Reschedule Successfully",
+                icon: "success",
+                timer: 4000
+            });
+            // const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
+            // if (res.status == 200) {
+            //     // this.success = "Seat Rescheduled Successfully";
+            //     this.fetchScheduleData();
+            // } else {
+            //     if (res.status == 422) {
+            //         let errorContent = "";
+            //         let count = 0;
+            //         for (const key in res.data.errors) {
+            //             res.data.errors[key].forEach((element) => {
+            //                 errorContent += (
+            //                     (++count) + " - " + //creating serial no.
+            //                     element + // main error
+            //                     "\n" // creating new line
+            //                 );
+            //             });
+            //             swal({
+            //                 title: "Error",
+            //                 text: errorContent,
+            //                 icon: "error",
+            //                 timer: 4000
+            //             });
+            //
+            //         }
+            //     }
+            // }
+        },
 
     },
     computed: {

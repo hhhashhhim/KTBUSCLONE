@@ -139,15 +139,17 @@ class BookingController extends Controller
     public function reschedule(Request $request)
     {
 
-        $request->bookingSeats = collect($request->bookingSeats);
-        foreach ($request->bookingSeats as $i => $bookedSeat) {
-            Ticket::where('id', $bookedSeat['id'])->update([
-                'date' => $request->date,
-                'schedule_id' => $request->schedule,
-                'seat_no' => $request->selectedSeats[$i],
-            ]);
-        }
-        return response()->json("Seats Rescheduled Successfully", 200);
+        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('departure_city_id', $request->existingDate)->where('destination_city_id', $request->dataDestination)->first();
+        dd($request->all(), $ticket);
+//        $request->bookingSeats = collect($request->bookingSeats);
+//        foreach ($request->bookingSeats as $i => $bookedSeat) {
+//            Ticket::where('id', $bookedSeat['id'])->update([
+//                'date' => $request->date,
+//                'schedule_id' => $request->schedule,
+//                'seat_no' => $request->selectedSeats[$i],
+//            ]);
+//        }
+//        return response()->json("Seats Rescheduled Successfully", 200);
 
     }
 

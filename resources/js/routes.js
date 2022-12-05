@@ -30,8 +30,8 @@ import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 import MaintenanceRecordPage from "./pages/maintenance/RecordPage.vue";
 
 // const url = '/projects/kt/'
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 const routes = [
     {
