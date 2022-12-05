@@ -32575,26 +32575,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         maintenanceAt: [],
         loop: 1
       },
-      companies: [],
-      terminals: [],
-      fetchedData: [],
-      addTerminalsOnClick: [],
-      routes: [],
+      // companies: [],
+      // terminals: [],
+      // fetchedData: [],
+      // addTerminalsOnClick: [],
+      // routes: [],
       formID: "linking_form",
       editFormID: "editLinking_form",
-      data: {},
-      dataEdit: {},
-      from: {},
-      to: {},
-      success: false,
-      error: false,
-      icon: ' <i class="fa fa-bus"></i> ',
-      loop: 1,
-      routeStartName: '',
-      routeEndName: '',
-      reverseRoute: 1,
-      th: [],
-      classFareName: ''
+      // data: {},
+      // dataEdit: {},
+      // from: {},
+      // to: {},
+      // success: false,
+      // error: false,
+      // icon: ' <i class="fa fa-bus"></i> ',
+      loop: 1 // routeStartName: '',
+      // routeEndName: '',
+      // reverseRoute: 1,
+      // th: [],
+      // classFareName: ''
+
     };
   },
   created: function created() {
@@ -32605,17 +32605,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data = {};
       this.reverseRoute = 1;
     },
-    fareClassValue: function fareClassValue(data, className) {
-      var dataTwo = data;
-      var converted = Object.keys(dataTwo);
-      var new_name = '';
-      converted.forEach(function (element, i) {
-        if (className + '_fare' == element) {
-          new_name = dataTwo[element];
-        }
-      });
-      return new_name ? new_name + ' PKR' : 'N/A';
-    },
+    // fareClassValue(data, className) {
+    //     const dataTwo = data;
+    //     const converted = Object.keys(dataTwo)
+    //     let new_name = '';
+    //     converted.forEach((element, i) => {
+    //         if (className + '_fare' == element) {
+    //             new_name = dataTwo[element];
+    //         }
+    //     });
+    //     return new_name ? new_name + ' PKR' : 'N/A';
+    // },
     saveRow: function saveRow(event, fieldName) {
       var getRowNumber = event.target.parentElement.parentElement.rowIndex;
 
@@ -32892,73 +32892,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2);
       }))();
     },
-    checkBox: function checkBox(e) {
-      if (e.target.checked) {
-        this.reverseRoute = 1;
-      } else {
-        this.reverseRoute = 0;
-      }
-    },
-    add: function add() {
-      var _this3 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var res, _loop, key;
-
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _this3.validationErrors = [];
-                _this3.loading = true;
-                _context3.next = 4;
-                return _this3.callApi("post", "fare-table/store", _this3.data);
-
-              case 4:
-                res = _context3.sent;
-
-                if (res.status === 200) {
-                  _this3.loading = false; // this.success = "Fare Table Updated Created Successfully";
-
-                  swal({
-                    title: "Success",
-                    text: "Fare Table Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                  }); // Object.keys(obj).forEach((i) => obj[i] = null);
-
-                  _this3.data = {};
-                  _this3.cities = res.data;
-                  window.scrollTo(0, 0);
-
-                  _this3.setTimeout(function () {
-                    _this3.success = "";
-                    $("#add-modal").modal("hide");
-                  }, 3000);
-                } else {
-                  if (res.status === 422) {
-                    _this3.loading = false;
-
-                    _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this3.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
-                  }
-                }
-
-              case 6:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }))();
-    },
+    // checkBox: function (e) {
+    //     if (e.target.checked) {
+    //         this.reverseRoute = 1;
+    //     } else {
+    //         this.reverseRoute = 0;
+    //     }
+    // },
+    // async add() {
+    //     this.validationErrors = [];
+    //     this.loading = true;
+    //     const res = await this.callApi("post", "fare-table/store", this.data);
+    //     if (res.status === 200) {
+    //         this.loading = false;
+    //         // this.success = "Fare Table Updated Created Successfully";
+    //        swal({
+    //             title: "Success",
+    //             text: "Fare Table Created Successfully",
+    //             icon: "success",
+    //             timer: 2000
+    //         });
+    //         // Object.keys(obj).forEach((i) => obj[i] = null);
+    //         this.data = {};
+    //         this.cities = res.data;
+    //         window.scrollTo(0, 0);
+    //         this.
+    //         setTimeout(() => {
+    //             this.success = "";
+    //             $("#add-modal").modal("hide");
+    //         }, 3000);
+    //     } else {
+    //         if (res.status === 422) {
+    //             this.loading = false;
+    //             for (const key in res.data.errors) {
+    //                 res.data.errors[key].forEach((element) => {
+    //                     this.errorsArray(element, key);
+    //                 });
+    //             }
+    //         }
+    //     }
+    // },
     addRow: function addRow() {
       this.loop++;
     },
@@ -32982,76 +32955,50 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log(this.edit.maintenanceAfter);
       console.log(this.edit.maintenanceAt);
     },
-    addTerminal: function addTerminal(event) {
-      var value = event.target.value;
-
-      if (event.target.checked) {
-        var index = this.addTerminalsOnClick.indexOf(value);
-
-        if (index === -1) {
-          this.addTerminalsOnClick.push(value);
-        }
-      } else {
-        var _index = this.addTerminalsOnClick.indexOf(value);
-
-        this.addTerminalsOnClick.splice(_index, 1);
-      }
-    },
-    fetchTerminals: function fetchTerminals(event, index) {
-      var _this4 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var value, indexI, terminalRes;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                value = event.target.value;
-                indexI = _this4.addCities.indexOf(value);
-
-                if (indexI === -1) {
-                  _this4.addCities.push(value);
-                }
-
-                _context4.next = 5;
-                return _this4.callApi("post", "cities/terminals", {
-                  id: value
-                });
-
-              case 5:
-                terminalRes = _context4.sent;
-
-                if (terminalRes.status === 200) {
-                  _this4.terminals[index] = terminalRes.data;
-                }
-
-              case 7:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }))();
-    },
+    // addTerminal(event) {
+    //     const value = event.target.value
+    //     if (event.target.checked) {
+    //         const index = this.addTerminalsOnClick.indexOf(value);
+    //         if (index === -1) {
+    //             this.addTerminalsOnClick.push(value);
+    //         }
+    //     } else {
+    //         const index = this.addTerminalsOnClick.indexOf(value);
+    //         this.addTerminalsOnClick.splice(index, 1);
+    //     }
+    // },
+    // async fetchTerminals(event, index) {
+    //     const value = event.target.value;
+    //     const indexI = this.addCities.indexOf(value);
+    //     if (indexI === -1) {
+    //         this.addCities.push(value);
+    //     }
+    //     const terminalRes = await this.callApi("post", "cities/terminals", {
+    //         id: value
+    //     });
+    //     if (terminalRes.status === 200) {
+    //         this.terminals[index] = terminalRes.data;
+    //     }
+    // },
     fetchData: function fetchData() {
-      var _this5 = this;
+      var _this3 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var fleetRes;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context5.next = 2;
-                return _this5.callApi("post", "fleet");
+                _context3.next = 2;
+                return _this3.callApi("post", "fleet");
 
               case 2:
-                fleetRes = _context5.sent;
+                fleetRes = _context3.sent;
 
                 if (fleetRes.status === 200) {
-                  _this5.mainData = fleetRes.data.mainData;
-                  _this5.fleets = fleetRes.data.busDrop;
-                  _this5.parts = fleetRes.data.partDrop;
+                  _this3.mainData = fleetRes.data.mainData;
+                  _this3.fleets = fleetRes.data.busDrop;
+                  _this3.parts = fleetRes.data.partDrop;
                 }
 
                 setTimeout(function () {
@@ -33060,146 +33007,120 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context5.stop();
+                return _context3.stop();
             }
           }
-        }, _callee5);
+        }, _callee3);
       }))();
     },
-    changeInfo: function changeInfo(from, to) {
-      this.from = from.name;
-      this.to = to.name;
-      this.data.from = from.id;
-      this.data.to = to.id;
-    },
+    // changeInfo(from, to) {
+    //     this.from = from.name;
+    //     this.to = to.name;
+    //     this.data.from = from.id;
+    //     this.data.to = to.id;
+    // },
     fetchFleetDetails: function fetchFleetDetails(id) {
-      var _this6 = this;
+      var _this4 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var fleetDetailRes;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context6.next = 2;
-                return _this6.callApi("post", "fleet/single/part/link", {
+                _context4.next = 2;
+                return _this4.callApi("post", "fleet/single/part/link", {
                   id: id
                 });
 
               case 2:
-                fleetDetailRes = _context6.sent;
+                fleetDetailRes = _context4.sent;
 
                 if (fleetDetailRes.status === 200) {
-                  _this6.fleetDetails = fleetDetailRes.data;
-                  _this6.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
-                  _this6.edit.fleetId = fleetDetailRes.data.id;
-                  _this6.edit.currentReading = fleetDetailRes.data.current_reading;
+                  _this4.fleetDetails = fleetDetailRes.data;
+                  _this4.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
+                  _this4.edit.fleetId = fleetDetailRes.data.id;
+                  _this4.edit.currentReading = fleetDetailRes.data.current_reading;
                 }
 
               case 4:
               case "end":
-                return _context6.stop();
+                return _context4.stop();
             }
           }
-        }, _callee6);
+        }, _callee4);
       }))();
     },
     editFleetDetails: function editFleetDetails(id) {
-      var _this7 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var fleetDetailRes, i;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context7.next = 2;
-                return _this7.callApi("post", "fleet/single/part/link", {
+                _context5.next = 2;
+                return _this5.callApi("post", "fleet/single/part/link", {
                   id: id
                 });
 
               case 2:
-                fleetDetailRes = _context7.sent;
+                fleetDetailRes = _context5.sent;
 
                 if (fleetDetailRes.status === 200) {
                   // Array Empty
-                  _this7.edit.fleetPart = [];
-                  _this7.edit.maintenanceAfter = [];
-                  _this7.edit.maintenanceAt = [];
-                  _this7.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
-                  _this7.edit.fleetDetails = fleetDetailRes.data;
-                  _this7.edit.fleetId = fleetDetailRes.data.id;
-                  _this7.edit.currentReading = fleetDetailRes.data.current_reading;
+                  _this5.edit.fleetPart = [];
+                  _this5.edit.maintenanceAfter = [];
+                  _this5.edit.maintenanceAt = [];
+                  _this5.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
+                  _this5.edit.fleetDetails = fleetDetailRes.data;
+                  _this5.edit.fleetId = fleetDetailRes.data.id;
+                  _this5.edit.currentReading = fleetDetailRes.data.current_reading;
 
                   for (i = 0; i < fleetDetailRes.data.maintenance_part_link.length; i++) {
-                    _this7.edit.fleetPart.push(fleetDetailRes.data.maintenance_part_link[i].part_id);
+                    _this5.edit.fleetPart.push(fleetDetailRes.data.maintenance_part_link[i].part_id);
 
-                    _this7.edit.maintenanceAfter.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_after);
+                    _this5.edit.maintenanceAfter.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_after);
 
-                    _this7.edit.maintenanceAt.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_at);
+                    _this5.edit.maintenanceAt.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_at);
                   }
                 }
 
               case 4:
               case "end":
-                return _context7.stop();
+                return _context5.stop();
             }
           }
-        }, _callee7);
+        }, _callee5);
       }))();
-    },
-    fetchRecord: function fetchRecord() {
-      var _this8 = this;
+    } // async fetchRecord() {
+    //     if (!this.data.fare_class) {
+    //         this.error = true;
+    //         return;
+    //     }
+    //     const res = await this.callApi("post", "fare-table", {
+    //         company_id: this.data.company_id,
+    //         fare_class: this.data.fare_class,
+    //     });
+    //     if (res.status === 200) {
+    //         this.cities = res.data;
+    //         setTimeout(() => {
+    //             this.success = "";
+    //         }, 3000);
+    //     } else {
+    //         alert("Something Went Wrong");
+    //     }
+    // },
+    // deleteModal(terminal, i) {
+    //     const deletingObj = {
+    //         url: "terminal/delete",
+    //         data: terminal,
+    //         index: i,
+    //     };
+    //     this.$store.commit("setDeleteObj", deletingObj);
+    // },
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                if (_this8.data.fare_class) {
-                  _context8.next = 3;
-                  break;
-                }
-
-                _this8.error = true;
-                return _context8.abrupt("return");
-
-              case 3:
-                _context8.next = 5;
-                return _this8.callApi("post", "fare-table", {
-                  company_id: _this8.data.company_id,
-                  fare_class: _this8.data.fare_class
-                });
-
-              case 5:
-                res = _context8.sent;
-
-                if (res.status === 200) {
-                  _this8.cities = res.data;
-                  setTimeout(function () {
-                    _this8.success = "";
-                  }, 3000);
-                } else {
-                  alert("Something Went Wrong");
-                }
-
-              case 7:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        }, _callee8);
-      }))();
-    },
-    deleteModal: function deleteModal(terminal, i) {
-      var deletingObj = {
-        url: "terminal/delete",
-        data: terminal,
-        index: i
-      };
-      this.$store.commit("setDeleteObj", deletingObj);
-    }
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_2__.mapGetters)(["getDeletingObj"])), {}, {
     heading: function heading() {
@@ -51660,7 +51581,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.current_reading) + " (km)", 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.maintenance_after + data.maintenance_at) + " (km)", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat(data.maintenance_after) + parseFloat(data.maintenance_at)) + " (km)", 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_data$maintenance_dat = data.maintenance_date) !== null && _data$maintenance_dat !== void 0 ? _data$maintenance_dat : 'N/A'), 1
     /* TEXT */
@@ -51886,39 +51807,16 @@ var _hoisted_10 = {
   "class": "card-body"
 };
 var _hoisted_11 = {
-  key: 0,
-  "class": "alert alert-danger alert-dismissible fade show",
-  role: "alert"
-};
-
-var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "aria-hidden": "true"
-  }, "×", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_13 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "sr-only"
-  }, "Close", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_14 = [_hoisted_12, _hoisted_13];
-var _hoisted_15 = {
   "class": "row"
 };
-var _hoisted_16 = {
+var _hoisted_12 = {
   "class": "col-12"
 };
-var _hoisted_17 = {
+var _hoisted_13 = {
   "class": "card"
 };
 
-var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "card-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4")], -1
@@ -51926,26 +51824,26 @@ var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_19 = {
+var _hoisted_15 = {
   "class": "card-body"
 };
-var _hoisted_20 = {
+var _hoisted_16 = {
   "class": "table-responsive"
 };
-var _hoisted_21 = {
+var _hoisted_17 = {
   "class": "table table-striped table-hover",
   id: "maintenance_table"
 };
 
-var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fleet Name/Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Current Reading"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reading Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_23 = ["onClick"];
+var _hoisted_19 = ["onClick"];
 
-var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-edit"
   }, null, -1
@@ -51953,10 +51851,10 @@ var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_25 = [_hoisted_24];
-var _hoisted_26 = ["onClick"];
+var _hoisted_21 = [_hoisted_20];
+var _hoisted_22 = ["onClick"];
 
-var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-eye"
   }, null, -1
@@ -51964,10 +51862,34 @@ var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_28 = [_hoisted_27];
-var _hoisted_29 = {
+var _hoisted_24 = [_hoisted_23];
+var _hoisted_25 = {
   "class": "row"
 };
+var _hoisted_26 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "name"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Select Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "",
+    selected: ""
+  }, "Select Bus", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_29 = ["value"];
 var _hoisted_30 = {
   "class": "form-group col-md-6"
 };
@@ -51975,7 +51897,7 @@ var _hoisted_30 = {
 var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Select Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Current Reading (km) "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-danger"
   }, "*")], -1
   /* HOISTED */
@@ -51983,30 +51905,6 @@ var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_32 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-    value: "",
-    selected: ""
-  }, "Select Bus", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_33 = ["value"];
-var _hoisted_34 = {
-  "class": "form-group col-md-6"
-};
-
-var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "name"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Current Reading (km) "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger"
-  }, "*")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-12 d-flex align-items-center"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -52016,20 +51914,20 @@ var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_37 = {
+var _hoisted_33 = {
   "class": "form-group col-md-12 d-flex align-items-center"
 };
-var _hoisted_38 = {
+var _hoisted_34 = {
   "class": "table table-striped"
 };
 
-var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Part"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Maintenance Required After (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance At (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
@@ -52038,16 +51936,16 @@ var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_41 = ["value"];
-var _hoisted_42 = ["disabled"];
-var _hoisted_43 = {
+var _hoisted_37 = ["value"];
+var _hoisted_38 = ["disabled"];
+var _hoisted_39 = {
   "class": "row"
 };
-var _hoisted_44 = {
+var _hoisted_40 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Select Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -52057,7 +51955,7 @@ var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
@@ -52066,12 +51964,12 @@ var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_47 = ["value"];
-var _hoisted_48 = {
+var _hoisted_43 = ["value"];
+var _hoisted_44 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Current Reading (km) "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -52081,7 +51979,7 @@ var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-12 d-flex align-items-center"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -52091,22 +51989,22 @@ var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_51 = {
+var _hoisted_47 = {
   "class": "form-group col-md-12 d-flex align-items-center"
 };
-var _hoisted_52 = {
+var _hoisted_48 = {
   "class": "table table-striped"
 };
 
-var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Part"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Maintenance Required After (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance At (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_54 = ["value"];
+var _hoisted_50 = ["value"];
 
-var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
@@ -52115,11 +52013,11 @@ var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_56 = ["value"];
-var _hoisted_57 = ["value"];
-var _hoisted_58 = ["value"];
-var _hoisted_59 = ["disabled"];
-var _hoisted_60 = {
+var _hoisted_52 = ["value"];
+var _hoisted_53 = ["value"];
+var _hoisted_54 = ["value"];
+var _hoisted_55 = ["disabled"];
+var _hoisted_56 = {
   "class": "modal fade",
   id: "showDetails",
   tabindex: "-1",
@@ -52127,15 +52025,15 @@ var _hoisted_60 = {
   "aria-labelledby": "exampleModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_61 = {
+var _hoisted_57 = {
   "class": "modal-dialog modal-xl",
   role: "document"
 };
-var _hoisted_62 = {
+var _hoisted_58 = {
   "class": "modal-content"
 };
 
-var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -52153,20 +52051,20 @@ var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_64 = {
+var _hoisted_60 = {
   "class": "modal-body"
 };
-var _hoisted_65 = {
+var _hoisted_61 = {
   "class": "table table-striped"
 };
 
-var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fleet Part"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Maintenance Required After"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance Date")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-footer"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -52193,24 +52091,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, " Link New Maintenance ", 8
   /* PROPS */
-  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
-    name: "fade"
-  }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$data.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-        type: "button",
-        "class": "close",
-        "data-dismiss": "alert",
-        "aria-label": "Close",
-        onClick: _cache[1] || (_cache[1] = function ($event) {
-          return $data.error = !$data.error;
-        })
-      }, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Please Enter All Required Fields !!! ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
-    }),
-    _: 1
-    /* STABLE */
-
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.mainData, function (data, i) {
+  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <transition name=\"fade\">\r\n                                <div\r\n                                    class=\"alert alert-danger alert-dismissible fade show\"\r\n                                    role=\"alert\"\r\n                                    v-if=\"error\"\r\n                                >\r\n                                    <button\r\n                                        type=\"button\"\r\n                                        class=\"close\"\r\n                                        data-dismiss=\"alert\"\r\n                                        aria-label=\"Close\"\r\n                                        @click=\"error = !error\"\r\n                                    >\r\n                                        <span aria-hidden=\"true\">&times;</span>\r\n                                        <span class=\"sr-only\">Close</span>\r\n                                    </button>\r\n                                    Please Enter All Required Fields !!!\r\n                                </div>\r\n                            </transition> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.mainData, function (data, i) {
     var _data$current_reading, _data$reading_date;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
@@ -52228,79 +52109,79 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.editFleetDetails(data.id);
       }
-    }, _hoisted_25, 8
+    }, _hoisted_21, 8
     /* PROPS */
-    , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-primary",
       "data-toggle": "modal",
       "data-target": "#showDetails",
       onClick: function onClick($event) {
         return $options.fetchFleetDetails(data.id);
       }
-    }, _hoisted_28, 8
+    }, _hoisted_24, 8
     /* PROPS */
-    , _hoisted_26)])]);
+    , _hoisted_22)])]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
     heading: 'Link Part With Bus',
     errors: this.validationErrors,
-    success: $data.success,
+    success: _ctx.success,
     formID: $data.formID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[9] || (_cache[9] = function () {
+        onClick: _cache[8] || (_cache[8] = function () {
           return $options.linkMaintenance && $options.linkMaintenance.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Link'), 9
       /* TEXT, PROPS */
-      , _hoisted_42)];
+      , _hoisted_38)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
-        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
           return $data.fleetId = $event;
         })
-      }, [_hoisted_32, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleets, function (fleet, i) {
+      }, [_hoisted_28, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleets, function (fleet, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: fleet.id,
           key: i
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(fleet.bus_number), 9
         /* TEXT, PROPS */
-        , _hoisted_33);
+        , _hoisted_29);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.fleetId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.fleetId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "number",
         "class": "form-control",
         min: "0",
-        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
           return $data.currentReading = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.currentReading]])]), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.currentReading]])]), _hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
           "class": "form-control rounded-0",
-          onChange: _cache[4] || (_cache[4] = function ($event) {
+          onChange: _cache[3] || (_cache[3] = function ($event) {
             return $options.saveRow($event, 'rowPart');
           })
-        }, [_hoisted_40, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.parts, function (part, i) {
+        }, [_hoisted_36, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.parts, function (part, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             value: part.id,
             key: i
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(part.name), 9
           /* TEXT, PROPS */
-          , _hoisted_41);
+          , _hoisted_37);
         }), 128
         /* KEYED_FRAGMENT */
         ))], 32
@@ -52309,7 +52190,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[5] || (_cache[5] = function ($event) {
+          onKeyup: _cache[4] || (_cache[4] = function ($event) {
             return $options.saveRow($event, 'rowAfter');
           })
         }, null, 32
@@ -52318,19 +52199,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[6] || (_cache[6] = function ($event) {
+          onKeyup: _cache[5] || (_cache[5] = function ($event) {
             return $options.saveRow($event, 'rowLast');
           })
         }, null, 32
         /* HYDRATE_EVENTS */
         )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[7] || (_cache[7] = function () {
+          onClick: _cache[6] || (_cache[6] = function () {
             return $options.addRow && $options.addRow.apply($options, arguments);
           })
         }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-danger",
-          onClick: _cache[8] || (_cache[8] = function ($event) {
+          onClick: _cache[7] || (_cache[7] = function ($event) {
             return $options.removeRow($event);
           })
         }, "Remove")])]);
@@ -52346,97 +52227,97 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
     heading: "Edit",
     errors: this.validationErrors,
-    success: $data.success,
+    success: _ctx.success,
     editForm: $data.editFormID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[17] || (_cache[17] = function () {
+        onClick: _cache[16] || (_cache[16] = function () {
           return $options.updateLinkMaintenance && $options.updateLinkMaintenance.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Link'), 9
       /* TEXT, PROPS */
-      , _hoisted_59)];
+      , _hoisted_55)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
-        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
           return $data.edit.fleetId = $event;
         })
-      }, [_hoisted_46, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleets, function (fleet, i) {
+      }, [_hoisted_42, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleets, function (fleet, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: fleet.id,
           key: i
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(fleet.bus_number), 9
         /* TEXT, PROPS */
-        , _hoisted_47);
+        , _hoisted_43);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.edit.fleetId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.edit.fleetId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "number",
         "class": "form-control",
         min: "0",
-        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
           return $data.edit.currentReading = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.edit.currentReading]])]), _hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.edit.fleetDetails.maintenance_part_link ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.edit.currentReading]])]), _hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.edit.fleetDetails.maintenance_part_link ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 0
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.edit.loop, function (index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
           "class": "form-control rounded-0",
-          onChange: _cache[12] || (_cache[12] = function ($event) {
+          onChange: _cache[11] || (_cache[11] = function ($event) {
             return $options.editSaveRow($event, 'rowPart');
           }),
           value: $data.edit.fleetDetails.maintenance_part_link[index - 1] ? $data.edit.fleetDetails.maintenance_part_link[index - 1].part_id : ''
-        }, [_hoisted_55, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.parts, function (part, i) {
+        }, [_hoisted_51, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.parts, function (part, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             value: part.id,
             key: i
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(part.name), 9
           /* TEXT, PROPS */
-          , _hoisted_56);
+          , _hoisted_52);
         }), 128
         /* KEYED_FRAGMENT */
         ))], 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_54)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , _hoisted_50)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[13] || (_cache[13] = function ($event) {
+          onKeyup: _cache[12] || (_cache[12] = function ($event) {
             return $options.editSaveRow($event, 'rowAfter');
           }),
           value: $data.edit.fleetDetails.maintenance_part_link[index - 1] ? $data.edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''
         }, null, 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_57)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , _hoisted_53)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[14] || (_cache[14] = function ($event) {
+          onKeyup: _cache[13] || (_cache[13] = function ($event) {
             return $options.editSaveRow($event, 'rowLast');
           }),
           value: $data.edit.fleetDetails.maintenance_part_link[index - 1] ? $data.edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : ''
         }, null, 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_58)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        , _hoisted_54)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[15] || (_cache[15] = function () {
+          onClick: _cache[14] || (_cache[14] = function () {
             return $options.editAddRow && $options.editAddRow.apply($options, arguments);
           })
         }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-danger",
-          onClick: _cache[16] || (_cache[16] = function ($event) {
+          onClick: _cache[15] || (_cache[15] = function ($event) {
             return $options.editRemoveRow($event);
           })
         }, "Remove")])]);
@@ -52449,7 +52330,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleetDetails.maintenance_part_link, function (single, i) {
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fleetDetails.maintenance_part_link, function (single, i) {
     var _single$maintenance_d;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
@@ -52465,7 +52346,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), _hoisted_67])])])])]);
+  ))])])]), _hoisted_63])])])])]);
 }
 
 /***/ }),

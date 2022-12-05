@@ -74,7 +74,7 @@
                                                         <td>{{ data.bus_number }}</td>
                                                         <td>{{ data.name }} </td>
                                                         <td>{{ data.current_reading }} (km)</td>
-                                                        <td>{{ data.maintenance_after + data.maintenance_at }} (km)</td>
+                                                        <td>{{ parseFloat(data.maintenance_after) + parseFloat(data.maintenance_at) }} (km)</td>
                                                         <td>{{ data.maintenance_date??'N/A' }} </td>
                                                         <td>
                                                             <button class="btn btn-primary mx-1"

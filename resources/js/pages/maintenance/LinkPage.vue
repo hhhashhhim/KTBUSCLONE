@@ -18,7 +18,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <transition name="fade">
+                            <!-- <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
                                     role="alert"
@@ -36,7 +36,7 @@
                                     </button>
                                     Please Enter All Required Fields !!!
                                 </div>
-                            </transition>
+                            </transition> -->
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -244,25 +244,25 @@
                         </div>
                         <div class="modal-body">
                             <table class="table table-striped">
-                                            <thead>
-                                            <tr>
+                                <thead>
+                                <tr>
 
-                                                <th>Fleet Part</th>
-                                                <th>Maintenance Required After</th>
-                                                <th>Last Maintenance At</th>
-                                                <th>Last Maintenance Date</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(single, i) in fleetDetails.maintenance_part_link" :key="i">
+                                    <th>Fleet Part</th>
+                                    <th>Maintenance Required After</th>
+                                    <th>Last Maintenance At</th>
+                                    <th>Last Maintenance Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(single, i) in fleetDetails.maintenance_part_link" :key="i">
 
-                                                    <td> {{ single.maintenance_part.name }}</td>
-                                                    <td> {{ single.maintenance_after }} (km)</td>
-                                                    <td> {{ single.maintenance_at }} (km)</td>
-                                                    <td> {{ single.maintenance_date??'N/A' }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <td> {{ single.maintenance_part.name }}</td>
+                                        <td> {{ single.maintenance_after }} (km)</td>
+                                        <td> {{ single.maintenance_at }} (km)</td>
+                                        <td> {{ single.maintenance_date??'N/A' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -310,26 +310,26 @@ export default {
                 maintenanceAt: [],
                 loop: 1,
             },
-            companies: [],
-            terminals: [],
-            fetchedData: [],
-            addTerminalsOnClick: [],
-            routes: [],
+            // companies: [],
+            // terminals: [],
+            // fetchedData: [],
+            // addTerminalsOnClick: [],
+            // routes: [],
             formID: "linking_form",
             editFormID: "editLinking_form",
-            data: {},
-            dataEdit: {},
-            from: {},
-            to: {},
-            success: false,
-            error: false,
-            icon: ' <i class="fa fa-bus"></i> ',
+            // data: {},
+            // dataEdit: {},
+            // from: {},
+            // to: {},
+            // success: false,
+            // error: false,
+            // icon: ' <i class="fa fa-bus"></i> ',
             loop: 1,
-            routeStartName: '',
-            routeEndName: '',
-            reverseRoute: 1,
-            th: [],
-            classFareName: ''
+            // routeStartName: '',
+            // routeEndName: '',
+            // reverseRoute: 1,
+            // th: [],
+            // classFareName: ''
         };
     },
     created() {
@@ -340,17 +340,17 @@ export default {
           this.data = {};
           this.reverseRoute = 1;
         },
-        fareClassValue(data, className) {
-            const dataTwo = data;
-            const converted = Object.keys(dataTwo)
-            let new_name = '';
-            converted.forEach((element, i) => {
-                if (className + '_fare' == element) {
-                    new_name = dataTwo[element];
-                }
-            });
-            return new_name ? new_name + ' PKR' : 'N/A';
-        },
+        // fareClassValue(data, className) {
+        //     const dataTwo = data;
+        //     const converted = Object.keys(dataTwo)
+        //     let new_name = '';
+        //     converted.forEach((element, i) => {
+        //         if (className + '_fare' == element) {
+        //             new_name = dataTwo[element];
+        //         }
+        //     });
+        //     return new_name ? new_name + ' PKR' : 'N/A';
+        // },
         saveRow(event,fieldName) {
            
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
@@ -545,50 +545,50 @@ export default {
                 }
             }
         },
-        checkBox: function (e) {
-            if (e.target.checked) {
-                this.reverseRoute = 1;
-            } else {
-                this.reverseRoute = 0;
-            }
-        },
-        async add() {
-            this.validationErrors = [];
-            this.loading = true;
+        // checkBox: function (e) {
+        //     if (e.target.checked) {
+        //         this.reverseRoute = 1;
+        //     } else {
+        //         this.reverseRoute = 0;
+        //     }
+        // },
+        // async add() {
+        //     this.validationErrors = [];
+        //     this.loading = true;
 
-            const res = await this.callApi("post", "fare-table/store", this.data);
-            if (res.status === 200) {
-                this.loading = false;
+        //     const res = await this.callApi("post", "fare-table/store", this.data);
+        //     if (res.status === 200) {
+        //         this.loading = false;
 
-                // this.success = "Fare Table Updated Created Successfully";
-               swal({
-                    title: "Success",
-                    text: "Fare Table Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-                // Object.keys(obj).forEach((i) => obj[i] = null);
-                this.data = {};
+        //         // this.success = "Fare Table Updated Created Successfully";
+        //        swal({
+        //             title: "Success",
+        //             text: "Fare Table Created Successfully",
+        //             icon: "success",
+        //             timer: 2000
+        //         });
+        //         // Object.keys(obj).forEach((i) => obj[i] = null);
+        //         this.data = {};
 
-                this.cities = res.data;
-                window.scrollTo(0, 0);
-                this.
-                setTimeout(() => {
-                    this.success = "";
-                    $("#add-modal").modal("hide");
-                }, 3000);
-            } else {
-                if (res.status === 422) {
-                    this.loading = false;
+        //         this.cities = res.data;
+        //         window.scrollTo(0, 0);
+        //         this.
+        //         setTimeout(() => {
+        //             this.success = "";
+        //             $("#add-modal").modal("hide");
+        //         }, 3000);
+        //     } else {
+        //         if (res.status === 422) {
+        //             this.loading = false;
 
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-            }
-        },
+        //             for (const key in res.data.errors) {
+        //                 res.data.errors[key].forEach((element) => {
+        //                     this.errorsArray(element, key);
+        //                 });
+        //             }
+        //         }
+        //     }
+        // },
         addRow() {
             this.loop++;
         },
@@ -614,34 +614,34 @@ export default {
             console.log(this.edit.maintenanceAfter);
             console.log(this.edit.maintenanceAt);
         },
-        addTerminal(event) {
-            const value = event.target.value
-            if (event.target.checked) {
-                const index = this.addTerminalsOnClick.indexOf(value);
-                if (index === -1) {
-                    this.addTerminalsOnClick.push(value);
-                }
-            } else {
-                const index = this.addTerminalsOnClick.indexOf(value);
-                this.addTerminalsOnClick.splice(index, 1);
-            }
-        },
-        async fetchTerminals(event, index) {
-            const value = event.target.value;
+        // addTerminal(event) {
+        //     const value = event.target.value
+        //     if (event.target.checked) {
+        //         const index = this.addTerminalsOnClick.indexOf(value);
+        //         if (index === -1) {
+        //             this.addTerminalsOnClick.push(value);
+        //         }
+        //     } else {
+        //         const index = this.addTerminalsOnClick.indexOf(value);
+        //         this.addTerminalsOnClick.splice(index, 1);
+        //     }
+        // },
+        // async fetchTerminals(event, index) {
+        //     const value = event.target.value;
 
-            const indexI = this.addCities.indexOf(value);
-            if (indexI === -1) {
-                this.addCities.push(value);
-            }
+        //     const indexI = this.addCities.indexOf(value);
+        //     if (indexI === -1) {
+        //         this.addCities.push(value);
+        //     }
 
-            const terminalRes = await this.callApi("post", "cities/terminals", {
-                id: value
-            });
-            if (terminalRes.status === 200) {
-                this.terminals[index] = terminalRes.data;
+        //     const terminalRes = await this.callApi("post", "cities/terminals", {
+        //         id: value
+        //     });
+        //     if (terminalRes.status === 200) {
+        //         this.terminals[index] = terminalRes.data;
 
-            }
-        },
+        //     }
+        // },
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet");
             if (fleetRes.status === 200) {
@@ -655,12 +655,12 @@ export default {
                 $('#maintenance_table').DataTable();
             }, 300);
         },
-        changeInfo(from, to) {
-            this.from = from.name;
-            this.to = to.name;
-            this.data.from = from.id;
-            this.data.to = to.id;
-        },
+        // changeInfo(from, to) {
+        //     this.from = from.name;
+        //     this.to = to.name;
+        //     this.data.from = from.id;
+        //     this.data.to = to.id;
+        // },
         async fetchFleetDetails(id) {
 
             const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
@@ -699,33 +699,33 @@ export default {
 
             }
         },
-        async fetchRecord() {
-            if (!this.data.fare_class) {
-                this.error = true;
-                return;
-            }
-            const res = await this.callApi("post", "fare-table", {
-                company_id: this.data.company_id,
-                fare_class: this.data.fare_class,
-            });
-            if (res.status === 200) {
-                this.cities = res.data;
-                setTimeout(() => {
-                    this.success = "";
-                }, 3000);
-            } else {
-                alert("Something Went Wrong");
-            }
-        },
+        // async fetchRecord() {
+        //     if (!this.data.fare_class) {
+        //         this.error = true;
+        //         return;
+        //     }
+        //     const res = await this.callApi("post", "fare-table", {
+        //         company_id: this.data.company_id,
+        //         fare_class: this.data.fare_class,
+        //     });
+        //     if (res.status === 200) {
+        //         this.cities = res.data;
+        //         setTimeout(() => {
+        //             this.success = "";
+        //         }, 3000);
+        //     } else {
+        //         alert("Something Went Wrong");
+        //     }
+        // },
 
-        deleteModal(terminal, i) {
-            const deletingObj = {
-                url: "terminal/delete",
-                data: terminal,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
+        // deleteModal(terminal, i) {
+        //     const deletingObj = {
+        //         url: "terminal/delete",
+        //         data: terminal,
+        //         index: i,
+        //     };
+        //     this.$store.commit("setDeleteObj", deletingObj);
+        // },
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
