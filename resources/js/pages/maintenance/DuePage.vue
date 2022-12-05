@@ -15,6 +15,15 @@
                                 >
                                     Update Meter Reading
                                 </a>
+                                
+                                <a
+                                    href="#"
+                                    data-target="#maintenance_add"
+                                    data-toggle="modal"
+                                    class="btn btn-primary mx-1" @click="dueMaintenanceFrom( data=null , 1)"
+                                >
+                                    Irregular Maintenance
+                                </a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -71,7 +80,7 @@
                                                             <button class="btn btn-primary mx-1"
                                                                     data-target="#maintenance_add"
                                                                     data-toggle="modal"
-                                                                    @click="dueMaintenanceFrom( data )">
+                                                                    @click="dueMaintenanceFrom( data , 0)">
                                                                     <i class="fas fa-plus"></i>
                                                             </button>
                                                         </td>
@@ -99,7 +108,7 @@
             <div class="row">
                 <div class=" form-group col-md-6">
                     <label for="city_id">Fleet <span class="text-danger">*</span></label>
-                    <select class="form-control" v-model="postData.fleetId">
+                    <select class="form-control" v-model="postData.fleetId" :disabled="checkDisable">
                         <option value="">Select Fleet</option>
                         <option
                             v-for="(fleet, i) in fleets"
@@ -112,7 +121,7 @@
                 </div>
                 <div class=" form-group col-md-6">
                     <label for="city_id">Part <span class="text-danger">*</span></label>
-                    <select class="form-control" v-model="postData.partId">
+                    <select class="form-control" v-model="postData.partId" :disabled="checkDisable">
                         <option value="">Select Part</option>
                         <option
                             v-for="(part, i) in parts"
@@ -156,6 +165,8 @@
                         type="file"
                         class="form-control"
                         placeholder=""
+                        @change="evidenceImage($event)"
+
                     />
                 </div>
                 <div class="form-group col-md-12">
@@ -229,6 +240,7 @@ export default {
             formID: "maintenance_add",
             readingFormID: "reading_update",
             loading : false,
+            checkDisable : false,
             validationErrors: [],
             mainData: [],
             fleets: [],
@@ -241,6 +253,7 @@ export default {
                 companyPaid: '',
                 evidence: 'd',
                 detail: '',
+                maintenanceType: '',
             },
             readingData: {
                 fleetId: '',
@@ -269,9 +282,34 @@ export default {
                 $('#maintenance_table').DataTable();
             }, 300);
         },
-        async dueMaintenanceFrom(data) {
-            this.postData.fleetId = data.bus_id;
-            this.postData.partId = data.part_id;
+        async dueMaintenanceFrom(data,type) {
+            this.postData.maintenanceType = type;
+            this.postData.fleetId = data ? data.bus_id : '';
+            this.postData.partId = data ? data.part_id : '';
+            this.postData.currentReading = "";
+            this.postData.amount =  "";
+            this.postData.companyPaid =  "";
+            this.postData.evidence =  "";
+            this.postData.detail =  "";
+            this.checkDisable = data ? true : false;
+        },
+        async evidenceImage(e) {
+            if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
+                
+                const eviImage = e.target.files[0];
+                this.postData.evidence = eviImage;
+
+                
+            } else {
+                e.target.value = '';
+                this.postData.evidence = '';
+                return swal({
+                    title: "Invalid Format",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
         },
         async dueMaintenanceAdd() {
             // validation for empty data
@@ -287,8 +325,24 @@ export default {
             }
 
             this.loading = true;
-            const res = await this.callApi("post", "fleet/maintenance/due/addd", this.postData);
-            if (res.status === 200) {
+
+            const config = {
+                headers: {'content-type': 'multipart/form-data'}
+            }
+
+            let formData = new FormData();
+            formData.append('fleetId', this.postData.fleetId);
+            formData.append('partId', this.postData.partId);
+            formData.append('currentReading', this.postData.currentReading);
+            formData.append('amount', this.postData.amount);
+            formData.append('companyPaid', this.postData.companyPaid);
+            formData.append('evidence', this.postData.evidence);
+            formData.append('detail', this.postData.detail);
+            formData.append('maintenanceType', this.postData.maintenanceType);
+            
+
+            const res = await this.callApi("post", "fleet/maintenance/due/add", formData , config);
+            if (res.status === 201) {
                 this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 this.postData.fleetId = "";
@@ -383,12 +437,12 @@ export default {
                 }
             }
         },
-        changeInfo(from, to) {
-            this.from = from.name;
-            this.to = to.name;
-            this.data.from = from.id;
-            this.data.to = to.id;
-        },
+        // changeInfo(from, to) {
+        //     this.from = from.name;
+        //     this.to = to.name;
+        //     this.data.from = from.id;
+        //     this.data.to = to.id;
+        // },
         
     },
     computed: {
