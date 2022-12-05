@@ -353,7 +353,7 @@ class ScheduleController extends Controller
                             unset($seatMap[$i][$j]['gender']);
 
                         }
-
+    
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
