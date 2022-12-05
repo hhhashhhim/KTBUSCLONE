@@ -335,7 +335,7 @@
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addELTModelLabel">ADD NEW CARGO</h5>
+                        <h5 class="modal-title" id="addELTModelLabel">ADD ELT</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -344,29 +344,44 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <label for="weight">Weight <span class="text-danger">*</span></label>
                                     <input
                                         type="text"
-                                        class="form-control"
-                                        id="fullName"
+                                        class="form-control" placeholder="Enter Elt Weight" @keypress="isNumber($event)"
+                                        id="weight"
+                                        v-model="eltData.eltWeight"
                                     />
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group"
                                 >
-                                    <label>Full Name <span class="text-danger">*</span></label>
+                                    <label>Price<span class="text-danger">*</span></label>
                                     <input
                                         type="text"
-                                        class="form-control"
+                                        class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
                                         id="fullName"
+                                        v-model="eltData.eltPrice"
                                     />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea class="form-control" id="description" placeholder="Enter Elt Description"
+                                              v-model="eltData.dataDescription"
+                                    ></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Add Cargo</button>
+                        <button type="button" class="btn btn-primary"
+                                @click="addEltToTicket(eltData.dataDate, eltData.dataSchedule, eltData.dataCustomer, eltData.dataDeparture, eltData.dataDestination, eltData.dataSeat_no, eltData.eltWeight, eltData.eltPrice, eltData.dataSeatFare, eltData.dataDescription)">
+                            Add ELT
+                        </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -385,27 +400,30 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="over_issue_percentage">Percentage <span
-                                class="text-muted ml-2">(Optional)</span></label>
-                            <select id="over_issue_percentage" class="form-control" v-model="overIssueData.percentage">
-                                <option value="first">Select Over-Issue Percentage</option>
-                                <option value="0">0%</option>
-                                <option value="10">10%</option>
-                                <option value="20">20%</option>
-                                <option value="30">30%</option>
-                                <option value="40">40%</option>
-                                <option value="50">50%</option>
-                            </select>
-                        </div>
+                        <!--                        <div class="form-group">-->
+                        <!--                            <label for="over_issue_percentage">Percentage <span-->
+                        <!--                                class="text-muted ml-2">(Optional)</span></label>-->
+                        <!--                            <select id="over_issue_percentage" class="form-control" v-model="overIssueData.percentage">-->
+                        <!--                                <option value="first">Select Over-Issue Percentage</option>-->
+                        <!--                                <option value="0">0%</option>-->
+                        <!--                                <option value="10">10%</option>-->
+                        <!--                                <option value="20">20%</option>-->
+                        <!--                                <option value="30">30%</option>-->
+                        <!--                                <option value="40">40%</option>-->
+                        <!--                                <option value="50">50%</option>-->
+                        <!--                            </select>-->
+                        <!--                        </div>-->
                         <div class="form-group">
                             <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="over_issue_remarks" v-model="overIssueData.reason"
-                                   placeholder="Reason for over-issue a seat">
+                            <textarea type="text" class="form-control" id="over_issue_remarks"
+                                      v-model="overIssueData.reason"
+                                      placeholder="Reason for over-issue a seat"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary mx-1" @click="addOverIssueTicket(overIssueData.dataDate, overIssueData.dataSchedule, overIssueData.dataCustomer, overIssueData.dataDeparture, overIssueData.dataDestination, overIssueData.dataSeat_no, overIssueData.percentage, overIssueData.reason)"> Over-Issue Ticket
+                        <button class="btn btn-primary mx-1"
+                                @click="addOverIssueTicket(overIssueData.dataDate, overIssueData.dataSchedule, overIssueData.dataCustomer, overIssueData.dataDeparture, overIssueData.dataDestination, overIssueData.dataSeat_no, overIssueData.percentage, overIssueData.reason)">
+                            Over-Issue Ticket
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
@@ -425,8 +443,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row border-bottom mb-1">
-                            <div class="col-md-2  mb-2">
+                        <div class="row">
+                            <div class="col-md-2">
                                 <label for="departureCity" class="mb-0">Departure City <span
                                     class="text-danger">*</span></label>
                                 <select class="form-control" id="departureCity"
@@ -442,7 +460,8 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-2  mb-2"><label for="destinationCity" class="mb-0">Destination
+                            <div class="col-md-2">
+                                <label for="destinationCity" class="mb-0">Destination
                                 City<span class="text-danger">*</span></label>
                                 <select class="form-control" id="destinationCity"
                                         @change="fetchReSpecificSchedules()"
@@ -454,13 +473,13 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-2 class  mb-2">
+                            <div class="col-md-2 class">
                                 <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
                                 <input type="date" :min="minDateFilter()" class="form-control"
                                        v-model="reSchedule.date"
                                        @change="fetchReSpecificSchedules()"/>
                             </div>
-                            <div class="col-md-4 class  mb-2">
+                            <div class="col-md-6 class">
                                 <label for="scheduleName" class="mb-0">Schedule Name <span
                                     class="text-danger">*</span></label>
                                 <select class="form-control" id="scheduleName" @change="fetchReSpecificSchedules()"
@@ -471,73 +490,17 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-md-2 mb-2">
-                                <label class="mb-0">Action</label>
-                                <button @click="fetchReScheduleData" class="btn btn-block btn-danger"
-                                        :class="getReSchedule ? 'disabled': ''">
-                                    {{ getReSchedule ? 'Loading...' : 'Refresh' }}
-                                </button>
-                            </div>
                         </div>
-                        <div class="row">
-                            <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-                            <!--                                     v-if="selectedBookedSeats.length">-->
-                            <!--                                                                    <a-->
-                            <!--                                                                        @click="sameDataAsMain()"-->
-                            <!--                                                                        class="btn btn-primary mx-1"-->
-                            <!--                                                                        href="#reschedule_modal"-->
-                            <!--                                                                        data-toggle="modal"-->
-                            <!--                                                                    >Shifting ( Reschedule ) Seats</a>-->
-                            <!--                                </div>-->
-                            <!--                                <div class="col-md-6 d-flex justify-content-center mx-auto mb-3"-->
-                            <!--                                                                     v-if="selectedBookedOverIssueSeats.length">-->
-                            <!--                                                                    <a-->
-                            <!--                                                                        class="btn btn-primary mx-1"-->
-                            <!--                                                                        href="#overIssue_model"-->
-                            <!--                                                                        data-toggle="modal"-->
-                            <!--                                                                    >Over Issue Seats</a>-->
-                            <!--                                </div>-->
-                            <h1 v-if="loading">Loading.........</h1>
-
-                            <div class="col-md-12 row" v-if="showReBookingDiv">
-                                <div class="col-md-12 mx-auto">
-                                    <div class="d-flex justify-content-center seat-img p-0 m-0"
-                                         v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                         :key="rowIndex"
-                                    >
-                                        <div v-for="(col, colIndex) in record" :key="colIndex">
-                                            <div
-                                                v-if="col.reserved"
-                                                class="image-span d-block text-center text-white shadow"
-                                                @click="selectSeat(rowIndex, colIndex, col.seatNo)"
-                                                :class="getClasses(col)"
-                                                :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
-                                                <small>{{ col.seatNo }} </small>
-                                                <br/>
-                                                <small
-                                                    v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
-                                                    <i class="type-icons fas"
-                                                       :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
-                                                    </i>
-                                                    <!--                                                                            <i class="type-icons fas"-->
-                                                    <!--                                                                               :class="col.over_issue == true ? 'fa-people-carry' : ''"> </i>-->
-                                                </small>
-                                                <small v-if="col.over_issue == true">
-                                                    <!--                                                                            <i class="type-icons fas fa-people-carry text-danger"></i>-->
-                                                    <i class="type-icons far fa-hand-paper text-dark">
-                                                    </i>
-                                                </small>
-                                            </div>
-                                            <span v-else></span>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label for="rescheduleReason" class="mb-0">Reason<span class="text-danger">*</span></label>
+                                <textarea id="rescheduleReason" class="form-control" placeholder="Please Give me a Reason!!" cols="30" rows="10"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary btn-block" @click="rescheduleSeats">Reschedule Seats</button>
+                        <button class="btn btn-primary" @click="rescheduleSeats">Reschedule Seats</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -569,8 +532,8 @@
                         </div>
                         <div class="form-group">
                             <label for="caceling_remakrs">Remarks <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
-                                   placeholder="Reason for canceling a seat">
+                            <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
+                                      placeholder="Reason for canceling a seat"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -602,14 +565,14 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card" v-for="(singleItems, i) in selectedSeatDataBackEnd">
-                                        <div class="card-body p-3" v-for="(innerItem, j) in singleItems">
-                                            <div class="row my-1">
-                                                <div class="col-md-4">
-                                                    <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3">Seat :</p>
-                                                        <p class="mb-0">{{ innerItem.seat_no }}</p>
-                                                    </div>
+                                    <div class="card" v-for="(singleItems,  i) in selectedSeatDataBackEnd">
+                                        <div class="card-body p-3" v-for="(innerItem,key , j) in singleItems">
+                                            <div class="row ml-2 border-bottom" v-if="key == 0">
+                                                <h4 class="mb-0 font-weight-bold mr-3">Seat :</h4>
+                                                <h4 class="mb-0 text-muted">{{ innerItem.seat_no }}</h4>
+                                            </div>
+                                            <div class="row my-2">
+                                                <div class="col-md-6">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Date :</p>
                                                         <p class="mb-0">{{ innerItem.date }}</p>
@@ -622,8 +585,12 @@
                                                         <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
                                                         <p class="mb-0">{{ innerItem.schedule.name }}</p>
                                                     </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
+                                                        <p class="mb-0">{{ innerItem.departure_city.name }}</p>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Name : </p>
                                                         <p class="mb-0">{{ innerItem.customer.name }}</p>
@@ -633,19 +600,13 @@
                                                         <p class="mb-0">{{ cnicFormat(innerItem.customer.cnic) }}</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
-                                                        <p class="mb-0">{{ innerItem.departure_city.name }}</p>
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
+                                                        <p class="mb-0">
+                                                            {{ phoneFormat(innerItem.customer.contact) }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
                                                         <p class="mb-0">{{ innerItem.destination_city.name }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
-                                                        <p class="mb-0">
-                                                            {{ phoneFormat(innerItem.customer.contact) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -654,11 +615,14 @@
                                                 <div class="col-md-12 text-right">
                                                     <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
                                                     <!--                                                    v-if="selectedBookedSeats.length"-->
-                                                    <button type="button" class="btn btn-secondary" >Duplicate Ticket
+                                                    <button type="button" class="btn btn-secondary text-dark">Duplicate
+                                                        Ticket
                                                     </button>
-                                                    <button type="button" class="btn btn-success ml-2" >Resend SMS
+                                                    <button type="button" class="btn btn-success ml-2">Resend SMS
                                                     </button>
-                                                    <button type="button" class="btn btn-info ml-2" @click="passDataToEltModel(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)">Add ELT
+                                                    <button type="button" class="btn btn-info ml-2"
+                                                            @click="passDataToEltModel(innerItem.date, innerItem.customer_id, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no, innerItem.seat_fare)">
+                                                        Add ELT
                                                     </button>
                                                     <button type="button" class="btn btn-primary ml-2"
                                                             @click="passDataToRescheduleModel(innerItem.date, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no)"
@@ -674,7 +638,7 @@
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div v-if="typeof innerItem[j + 1] !== 'undefined'">
+                                            <div v-if="key + 1">
                                                 <hr>
                                             </div>
                                         </div>
@@ -1091,7 +1055,7 @@ export default {
                     timer: 2000
                 });
             } else {
-                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : 0)
+                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : this.addForm.totalFare)
             }
         },
         isNumber: function (evt) {
@@ -1279,18 +1243,18 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
-        addELT() {
-            if (this.selectedSeats.length == 0) {
-                return swal({
-                    title: "Required!!",
-                    text: "Please Select Any Seat First!",
-                    icon: "error",
-                    timer: 2000
-                });
-            } else {
-                $("#addELTModel").modal("show");
-            }
-        },
+        // addELT() {
+        //     if (this.selectedSeats.length == 0) {
+        //         return swal({
+        //             title: "Required!!",
+        //             text: "Please Select Any Seat First!",
+        //             icon: "error",
+        //             timer: 2000
+        //         });
+        //     } else {
+        //         $("#addELTModel").modal("show");
+        //     }
+        // },
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1514,7 +1478,7 @@ export default {
             }
         },
         //over issue model complete data
-         passDataToOverIssueModel:function(date, schedule, customer, departure, destination, seatNo) {
+        passDataToOverIssueModel: function (date, schedule, customer, departure, destination, seatNo) {
             this.overIssueData = {
                 dataDate: date,
                 dataSchedule: schedule,
@@ -1545,7 +1509,7 @@ export default {
                 remarks: reason,
             }
             const resOverIssue = await this.callApi("post", "booking/overIssueAdd", data);
-            if (resOverIssue.status == 200 ) {
+            if (resOverIssue.status == 200) {
                 swal({
                     title: "Success",
                     text: "Seat over-issued  Successfully",
@@ -1585,25 +1549,99 @@ export default {
                 }
             }
         },
-    // end over issue model data
-        passDataToRescheduleModel:function (date, schedule, departure, destination, seatNo) {
+        // end over issue model data
+        passDataToRescheduleModel: function (date, schedule, departure, destination, seatNo) {
             this.reSchedule.departureCity = 0;
             this.reSchedule.destinationCity = 0;
             this.reSchedule.schedule = 0;
             $("#reschedule_modal").modal('show');
         },
         //ELT MODEL DATA
-        passDataToEltModel:function (date, schedule, customer, departure, destination, seatNo){
-            this.eltData ={
+        passDataToEltModel: function (date, customer, schedule, departure, destination, seatNo, seatFare) {
+            this.eltData = {
                 dataDate: date,
-                dataSchedule: schedule,
                 dataCustomer: customer,
+                dataSchedule: schedule,
                 dataDeparture: departure,
                 dataDestination: destination,
                 dataSeat_no: seatNo,
+                dataSeatFare: seatFare
             }
-            $("addELTModel").modal('show');
-        }
+            console.log(this.eltData);
+            $("#addELTModel").modal('show');
+        },
+
+        async addEltToTicket(date, schedule, customer, departure, destination, seatNo, weight, price, seatFare, description) {
+            if (weight == '' || typeof weight == 'undefined') {
+                return swal({
+                    title: "required!",
+                    text: "Weight is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (price == '' || typeof price == 'undefined') {
+                return swal({
+                    title: "required!",
+                    text: "Price is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            const data = {
+                date: date,
+                schedule_id: schedule,
+                customer_id: customer,
+                departure_id: departure,
+                destination_id: destination,
+                seat_no: seatNo,
+                eltWeight: weight,
+                totalPrice: price,
+                singleFare: seatFare,
+                eltDescription: description,
+            }
+            const resOverIssue = await this.callApi("post", "booking/elt", data);
+            if (resOverIssue.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Seat over-issued  Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+
+            }
+
+            if (resOverIssue.status == 422 && resOverIssue.data.message) {
+                swal({
+                    title: "Error",
+                    text: resOverIssue.data.message,
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            if (resOverIssue.status == 422) {
+                let errorContent = "";
+                let count = 0;
+                for (const key in resOverIssue.data.errors) {
+                    resOverIssue.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+        },
 
 
     },

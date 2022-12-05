@@ -1,6 +1,7 @@
 /node_modules
 /vendor
 /storage
+.laravel.log
 .env
 .env.backup
 .env.*.php
