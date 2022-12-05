@@ -13,10 +13,9 @@
                                             @change="fetchSpecificSchedules(); getDestinationCity()"
                                             v-model="addForm.departureCity">
                                         <option value="0" selected>Select Departure City</option>
-                                        <option
-                                            v-for="(city, i) in cities"
-                                            :value="city.id"
-                                            :key="i"
+                                        <option v-for="(city, i) in cities"
+                                                :value="city.id"
+                                                :key="i"
                                         >
                                             {{ city.name }}
                                         </option>
@@ -462,7 +461,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label for="destinationCity" class="mb-0">Destination
-                                City<span class="text-danger">*</span></label>
+                                    City<span class="text-danger">*</span></label>
                                 <select class="form-control" id="destinationCity"
                                         @change="fetchReSpecificSchedules()"
                                         v-model="reSchedule.destinationCity">
@@ -493,8 +492,10 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <label for="rescheduleReason" class="mb-0">Reason<span class="text-danger">*</span></label>
-                                <textarea id="rescheduleReason" class="form-control" placeholder="Please Give me a Reason!!" cols="30" rows="10"></textarea>
+                                <label for="rescheduleReason" class="mb-0">Reason<span
+                                    class="text-danger">*</span></label>
+                                <textarea id="rescheduleReason" class="form-control"
+                                          placeholder="Please Give me a Reason!!" cols="30" rows="10"></textarea>
                             </div>
                         </div>
                     </div>
@@ -610,7 +611,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!--                                            Buttons-->
+                                            <!--Buttons-->
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
                                                     <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
@@ -1072,10 +1073,10 @@ export default {
             }
         },
         async fetchScheduleData() {
-            if (this.addForm.schedule == 0) {
-                this.showBookingDiv = false;
-            }
-            this.showBookingDiv = false;
+            // if (this.addForm.schedule == 0) {
+            //     this.showBookingDiv = false;
+            // }
+            // this.showBookingDiv = false;
             this.resetingArrays();
             this.addForm.totalFare = 0;
             this.addForm.discount = '';
@@ -1088,7 +1089,7 @@ export default {
                 destinationCity: this.addForm.destinationCity,
             });
             if (res.status == 500) {
-                this.showBookingDiv = false;
+                // this.showBookingDiv = false;
             }
             if (res.status == 200) {
                 this.loading = false
@@ -1096,10 +1097,23 @@ export default {
                 this.schedule = res.data;
             } else {
                 if (res.status == 422) {
-                    for (const key in res.addForm.errors) {
-                        res.addForm.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }
@@ -1243,18 +1257,7 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
-        // addELT() {
-        //     if (this.selectedSeats.length == 0) {
-        //         return swal({
-        //             title: "Required!!",
-        //             text: "Please Select Any Seat First!",
-        //             icon: "error",
-        //             timer: 2000
-        //         });
-        //     } else {
-        //         $("#addELTModel").modal("show");
-        //     }
-        // },
+
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1280,7 +1283,6 @@ export default {
                     timer: 2000
                 });
             }
-
             if (!this.addForm.customerName || typeof this.addForm.customerName == 'undefined') {
                 return swal({
                     title: "Required!",
@@ -1307,26 +1309,36 @@ export default {
             }
 
             const res = await this.callApi("post", "booking/store", this.addForm);
-            if (res.status === 200) {
+            if (res.status == 201) {
                 swal({
                     title: "Success",
                     text: "Booking Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                this.fetchScheduleData();
                 this.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
+                    totalAmount: 0,
+                    discount: '',
+                    totalFare: 0,
+                    customerName: '',
+                    contact: '',
+                    remarks: '',
                     gender: "1",
                     customerCNIC: "",
-                    schedule: 0,
-                    totalFare: 0,
-                    destinationCity: 0,
-                    departureCity: 0,
+                    // schedule: 0,
+                    selectedSeats: '',
+                    // destinationCity: 0,
+                    // departureCity: 0,
                 };
-                this.showBookingDiv = false;
-                this.allSchedules = '';
-                this.fetchScheduleData();
+                this.addForm.schedule = res.data.schedule_id;
+                this.addForm.destinationCity = res.data.destination_city_id;
+                this.addForm.departureCity = res.data.departure_city_id;
+                this.selectedSeats.length = 0;
+                // this.showBookingDiv = false;
+                // this.allSchedules = '';
                 this.resetingArrays();
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
@@ -1336,10 +1348,23 @@ export default {
 
             } else {
                 if (res.status == 422) {
-                    for (const key in res.addForm.errors) {
-                        res.addForm.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }

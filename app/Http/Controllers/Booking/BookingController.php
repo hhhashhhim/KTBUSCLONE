@@ -85,7 +85,6 @@ class BookingController extends Controller
         }
 
         foreach ($request->selectedSeats as $i => $seat) {
-
             $ticket = Ticket::create([
                 'company_id' => $this->company_id,
                 'departure_city_id' => $request->departureCity,
@@ -122,7 +121,7 @@ class BookingController extends Controller
                 ]);
             }
         }
-        return "Successfully Booking Created";
+        return $ticket;
 //        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
 //        $pdf = PDF::loadView('pdf/pdf', $data);
 //        return $pdf->stream();

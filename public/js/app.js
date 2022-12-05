@@ -24628,25 +24628,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        var res, _loop, key;
-
+        var res;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                if (_this10.addForm.schedule == 0) {
-                  _this10.showBookingDiv = false;
-                }
-
-                _this10.showBookingDiv = false;
-
+                // if (this.addForm.schedule == 0) {
+                //     this.showBookingDiv = false;
+                // }
+                // this.showBookingDiv = false;
                 _this10.resetingArrays();
 
                 _this10.addForm.totalFare = 0;
                 _this10.addForm.discount = '';
                 _this10.validationErrors = [];
                 _this10.loading = true;
-                _context10.next = 9;
+                _context10.next = 7;
                 return _this10.callApi("post", "schedule/selected", {
                   id: _this10.addForm.schedule,
                   date: _this10.addForm.date,
@@ -24654,11 +24651,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this10.addForm.destinationCity
                 });
 
-              case 9:
+              case 7:
                 res = _context10.sent;
 
-                if (res.status == 500) {
-                  _this10.showBookingDiv = false;
+                if (res.status == 500) {// this.showBookingDiv = false;
                 }
 
                 if (res.status == 200) {
@@ -24667,19 +24663,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this10.schedule = res.data;
                 } else {
                   if (res.status == 422) {
-                    _loop = function _loop(key) {
-                      res.addForm.errors[key].forEach(function (element) {
-                        _this10.errorsArray(element, key);
-                      });
-                    };
+                    (function () {
+                      var errorContent = "";
+                      var count = 0;
 
-                    for (key in res.addForm.errors) {
-                      _loop(key);
-                    }
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 4000
+                        });
+                      }
+                    })();
                   }
                 }
 
-              case 12:
+              case 10:
               case "end":
                 return _context10.stop();
             }
@@ -24691,7 +24697,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this11 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var res, _loop2, key;
+        var res, _loop, key;
 
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) {
@@ -24726,14 +24732,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this11.schedule = res.data;
                 } else {
                   if (res.status == 422) {
-                    _loop2 = function _loop2(key) {
+                    _loop = function _loop(key) {
                       res.addForm.errors[key].forEach(function (element) {
                         _this11.errorsArray(element, key);
                       });
                     };
 
                     for (key in res.addForm.errors) {
-                      _loop2(key);
+                      _loop(key);
                     }
                   }
                 }
@@ -24927,24 +24933,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var over = col.over_issue && col.partial ? "bg-secondary" : "";
       return gender + " " + selected + " " + partial + " " + over;
     },
-    // addELT() {
-    //     if (this.selectedSeats.length == 0) {
-    //         return swal({
-    //             title: "Required!!",
-    //             text: "Please Select Any Seat First!",
-    //             icon: "error",
-    //             timer: 2000
-    //         });
-    //     } else {
-    //         $("#addELTModel").modal("show");
-    //     }
-    // },
     add: function add() {
       var _this13 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
-        var res, _loop3, key;
-
+        var res;
         return _regeneratorRuntime().wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
@@ -25033,27 +25026,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 14:
                 res = _context13.sent;
 
-                if (res.status === 200) {
+                if (res.status == 201) {
                   swal({
                     title: "Success",
                     text: "Booking Created Successfully",
                     icon: "success",
                     timer: 2000
                   });
+
+                  _this13.fetchScheduleData();
+
                   _this13.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
+                    totalAmount: 0,
+                    discount: '',
+                    totalFare: 0,
+                    customerName: '',
+                    contact: '',
+                    remarks: '',
                     gender: "1",
                     customerCNIC: "",
-                    schedule: 0,
-                    totalFare: 0,
-                    destinationCity: 0,
-                    departureCity: 0
-                  };
-                  _this13.showBookingDiv = false;
-                  _this13.allSchedules = '';
+                    // schedule: 0,
+                    selectedSeats: '' // destinationCity: 0,
+                    // departureCity: 0,
 
-                  _this13.fetchScheduleData();
+                  };
+                  _this13.addForm.schedule = res.data.schedule_id;
+                  _this13.addForm.destinationCity = res.data.destination_city_id;
+                  _this13.addForm.departureCity = res.data.departure_city_id;
+                  _this13.selectedSeats.length = 0; // this.showBookingDiv = false;
+                  // this.allSchedules = '';
 
                   _this13.resetingArrays();
 
@@ -25063,15 +25066,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 300); // window.scrollTo(0, 0);
                 } else {
                   if (res.status == 422) {
-                    _loop3 = function _loop3(key) {
-                      res.addForm.errors[key].forEach(function (element) {
-                        _this13.errorsArray(element, key);
-                      });
-                    };
+                    (function () {
+                      var errorContent = "";
+                      var count = 0;
 
-                    for (key in res.addForm.errors) {
-                      _loop3(key);
-                    }
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 4000
+                        });
+                      }
+                    })();
                   }
                 }
 
@@ -25115,7 +25128,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this15 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
-        var res, _loop4, key;
+        var res, _loop2, key;
 
         return _regeneratorRuntime().wrap(function _callee15$(_context15) {
           while (1) {
@@ -25168,14 +25181,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   window.scrollTo(0, 0);
                 } else {
                   if (res.status === 422) {
-                    _loop4 = function _loop4(key) {
+                    _loop2 = function _loop2(key) {
                       res.addForm.errors[key].forEach(function (element) {
                         _this15.errorsArray(element, key);
                       });
                     };
 
                     for (key in res.addForm.errors) {
-                      _loop4(key);
+                      _loop2(key);
                     }
                   }
                 }
@@ -42851,7 +42864,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_194, [_hoisted_195, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_196, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.destination_city.name), 1
       /* TEXT */
-      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                            Buttons"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_197, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_198, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                                        v-if=\"selectedBookedOverIssueSeats.length\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    v-if=\"selectedBookedSeats.length\""), _hoisted_199, _hoisted_200, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Buttons"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_197, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_198, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                                                        v-if=\"selectedBookedOverIssueSeats.length\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    v-if=\"selectedBookedSeats.length\""), _hoisted_199, _hoisted_200, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-info ml-2",
         onClick: function onClick($event) {
