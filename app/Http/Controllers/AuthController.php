@@ -40,8 +40,7 @@ class AuthController extends Controller
 
             $output = $pdf->output();
 
-        // return new Response($output, 200, [
-        //     'Content-Type' => 'application/pdf',
+        // r ' => 'application/pdf',
         // ]);
 //        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
 //        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
