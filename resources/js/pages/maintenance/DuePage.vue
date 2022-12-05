@@ -251,7 +251,7 @@ export default {
                 currentReading: '',
                 amount: '',
                 companyPaid: '',
-                evidence: 'd',
+                evidence: '',
                 detail: '',
                 maintenanceType: '',
             },
