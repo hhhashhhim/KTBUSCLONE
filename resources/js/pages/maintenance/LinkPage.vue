@@ -61,7 +61,7 @@
                                                     <tbody>
                                                     <tr v-for="(data, i) in mainData" :key="i">
                                                         <td>{{ data.bus_number }}</td>
-                                                        <td>{{ data.current_reading }} </td>
+                                                        <td>{{ data.current_reading??'N/A' }} </td>
                                                         <td>{{ data.reading_date??'N/A' }} </td>
                                                         <td>
                                                             <button class="btn btn-primary mx-1"

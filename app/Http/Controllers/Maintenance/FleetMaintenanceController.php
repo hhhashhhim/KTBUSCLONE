@@ -166,6 +166,22 @@ class FleetMaintenanceController extends Controller
             'company_id' => $this->company_id,
         ]);
     }
+
+    public function dueMaintenanceUpdate(Request $request)
+    {
+        if($request->evidence)
+        {
+            FleetMaintenance::where("id",$request->maintenanceId)->update([
+                "evidence" => $this->image($request->evidence)??null,
+            ]);
+        }
+
+        return FleetMaintenance::where("id",$request->maintenanceId)->update([
+            "amount" => $request->amount,
+            "company_paid" => $request->companyPaid,
+            "detail" => $request->detail,
+        ]);
+    }
     
     public function updateMeterReading(Request $request)
     {
@@ -189,12 +205,14 @@ class FleetMaintenanceController extends Controller
     {
         $maintenances = FleetMaintenance::
             where("company_id", $this->company_id)
-            ->with("busName:id,bus_number","partName:id,name")
+            ->with("busName:id,bus_number,current_reading","partName:id,name")
             ->orderBy('time','DESC')
             ->get();
         
         $data = [
             "mainData" => $maintenances,
+            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
         ];
         return $data;
     }

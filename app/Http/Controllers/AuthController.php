@@ -40,9 +40,9 @@ class AuthController extends Controller
 
             $output = $pdf->output();
 
-        return new Response($output, 200, [
-            'Content-Type' => 'application/pdf',
-        ]);
+        // return new Response($output, 200, [
+        //     'Content-Type' => 'application/pdf',
+        // ]);
         //elt pdf  test
 
 //        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', 1)->first();
