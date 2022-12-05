@@ -15,7 +15,9 @@ class AddColumnToTicketsTable extends Migration
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-
+            if (Schema::hasColumn('tickets', 'type')) {
+                $table->dropColumn('type');
+            }
             $table->string('type')->after('is_partial')->nullable();
 //            $table->integer('seat_fare')->after('total_fare')->nullable();
         });
@@ -28,9 +30,9 @@ class AddColumnToTicketsTable extends Migration
      */
     public function down()
     {
-//        Schema::table('tickets', function (Blueprint $table) {
+        Schema::table('tickets', function (Blueprint $table) {
 //          $table->dropColumn('total_receivable');
-//          $table->dropColumn('total_fare');
-//        });
+          $table->dropColumn('type');
+        });
     }
 }
