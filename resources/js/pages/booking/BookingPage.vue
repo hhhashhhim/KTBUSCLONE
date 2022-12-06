@@ -329,7 +329,7 @@
                 </div>
             </div>
         </div>
-        <!--        Add Cargo -->
+        <!--        Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -343,7 +343,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="weight">Weight <span class="text-danger">*</span></label>
+                                    <label for="weight">Weight <span class="text-muted mr-1">(In Kg's)</span> <span
+                                        class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Weight" @keypress="isNumber($event)"
@@ -399,21 +400,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!--                        <div class="form-group">-->
-                        <!--                            <label for="over_issue_percentage">Percentage <span-->
-                        <!--                                class="text-muted ml-2">(Optional)</span></label>-->
-                        <!--                            <select id="over_issue_percentage" class="form-control" v-model="overIssueData.percentage">-->
-                        <!--                                <option value="first">Select Over-Issue Percentage</option>-->
-                        <!--                                <option value="0">0%</option>-->
-                        <!--                                <option value="10">10%</option>-->
-                        <!--                                <option value="20">20%</option>-->
-                        <!--                                <option value="30">30%</option>-->
-                        <!--                                <option value="40">40%</option>-->
-                        <!--                                <option value="50">50%</option>-->
-                        <!--                            </select>-->
-                        <!--                        </div>-->
                         <div class="form-group">
-                            <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
+                            <label for="over_issue_remarks">Remarks</label>
                             <textarea type="text" class="form-control" id="over_issue_remarks"
                                       v-model="overIssueData.reason"
                                       placeholder="Reason for over-issue a seat"></textarea>
@@ -532,7 +520,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="caceling_remakrs">Remarks <span class="text-danger">*</span></label>
+                            <label for="caceling_remakrs">Remarks</label>
                             <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
                                       placeholder="Reason for canceling a seat"></textarea>
                         </div>
@@ -767,6 +755,10 @@ export default {
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
         window.addEventListener('keydown', this.altD);
+        window.setInterval(() => {
+            this.fetchScheduleData(); // call any function or end point
+        }, 15000); // interval set to 15 sec.
+
     },
 
     methods: {
@@ -931,6 +923,7 @@ export default {
                 this.allBookings = resBooking.data;
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
+                console.log(resClass, resBooking, resCity);
                 setTimeout(() => {
                     // $("#" + this.formID).modal("show");
                     $("#booking_table").DataTable();
@@ -1433,14 +1426,14 @@ export default {
             $("#cancelModel").modal('show');
         },
         async cancelBooking(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
-            if (reason == '' || typeof reason == 'undefined') {
-                return swal({
-                    title: "required!",
-                    text: "Please give any Remarks!!",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (reason == '' || typeof reason == 'undefined') {
+            //     return swal({
+            //         title: "required!",
+            //         text: "Please give any Remarks!!",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1475,14 +1468,14 @@ export default {
             $("#overIssue_model").modal('show');
         },
         async addOverIssueTicket(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
-            if (reason == '' || typeof reason == 'undefined') {
-                return swal({
-                    title: "required!",
-                    text: "Please give any Remarks!!",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (reason == '' || typeof reason == 'undefined') {
+            //     return swal({
+            //         title: "required!",
+            //         text: "Please give any Remarks!!",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1676,7 +1669,7 @@ export default {
             //         timer: 2000
             //     });
             // }
-            if (this.rescheduleData.rescheduleDate ==  '' || typeof  this.rescheduleData.rescheduleDate == 'undefined') {
+            if (this.rescheduleData.rescheduleDate == '' || typeof this.rescheduleData.rescheduleDate == 'undefined') {
                 return swal({
                     title: "Required!!",
                     text: "Date is Required",
@@ -1684,7 +1677,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.rescheduleData.rescheduleSchedule == 0 ) {
+            if (this.rescheduleData.rescheduleSchedule == 0) {
                 return swal({
                     title: "Required!!",
                     text: "Please Select Schedule!!",
@@ -1692,7 +1685,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.rescheduleData.reason == '' ) {
+            if (this.rescheduleData.reason == '') {
                 return swal({
                     title: "Required!!",
                     text: "Reason is Required",
@@ -1700,58 +1693,58 @@ export default {
                     timer: 2000
                 });
             }
-            swal({
-                title: "Success",
-                text: "Seat Reschedule Successfully",
-                icon: "success",
-                timer: 4000
-            });
-            // const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
-            // if (res.status == 200) {
-            //     // this.success = "Seat Rescheduled Successfully";
-            //     this.fetchScheduleData();
-            // } else {
-            //     if (res.status == 422) {
-            //         let errorContent = "";
-            //         let count = 0;
-            //         for (const key in res.data.errors) {
-            //             res.data.errors[key].forEach((element) => {
-            //                 errorContent += (
-            //                     (++count) + " - " + //creating serial no.
-            //                     element + // main error
-            //                     "\n" // creating new line
-            //                 );
-            //             });
-            //             swal({
-            //                 title: "Error",
-            //                 text: errorContent,
-            //                 icon: "error",
-            //                 timer: 4000
-            //             });
-            //
-            //         }
-            //     }
-            // }
+
+            const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Seat Reschedule Successfully",
+                    icon: "success",
+                    timer: 4000
+                });
+                this.fetchScheduleData();
+            } else {
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
         },
 
     },
-    computed: {
-        ...
-            mapGetters(["getDeletingObj"]),
-    }
-    ,
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.surcharges.splice(obj.index, 1);
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            }
-        }
-        ,
-    }
-    ,
+    // computed: {
+    //     ...
+    //         mapGetters(["getDeletingObj"]),
+    // }
+    // ,
+    // watch: {
+    //     getDeletingObj(obj) {
+    //         if (obj.isDeleted) {
+    //             this.surcharges.splice(obj.index, 1);
+    //             setTimeout(function () {
+    //                 window.location.reload();
+    //             }, 2000);
+    //         }
+    //     }
+    //     ,
+    // }
+    // ,
 };
 </script>
 <style scoped>

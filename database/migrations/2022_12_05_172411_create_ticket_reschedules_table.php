@@ -26,6 +26,7 @@ class CreateTicketReschedulesTable extends Migration
             $table->integer('reschedule_destination_city_id')->nullable();
             $table->integer('destination_city_id')->nullable();
             $table->string('reason')->nullable();
+            $table->integer('added_by')->useCurrent();
             $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();

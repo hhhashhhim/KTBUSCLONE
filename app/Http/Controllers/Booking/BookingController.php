@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingCancel;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\City;
 use App\Models\Customer;
@@ -139,18 +140,51 @@ class BookingController extends Controller
     public function reschedule(Request $request)
     {
 
-        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('departure_city_id', $request->existingDate)->where('destination_city_id', $request->dataDestination)->first();
-        dd($request->all(), $ticket);
-//        $request->bookingSeats = collect($request->bookingSeats);
-//        foreach ($request->bookingSeats as $i => $bookedSeat) {
-//            Ticket::where('id', $bookedSeat['id'])->update([
-//                'date' => $request->date,
-//                'schedule_id' => $request->schedule,
-//                'seat_no' => $request->selectedSeats[$i],
-//            ]);
-//        }
-//        return response()->json("Seats Rescheduled Successfully", 200);
+        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('departure_city_id', $request->dataDepartureCity)->where('destination_city_id', $request->dataDestination)->first();
+        if ($request->existingDate == $request->rescheduleDate) {
+            $bookingNo = Ticket::where('date', $request->existingDate)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        } else {
+            $bookingNo = Ticket::where('date', $request->rescheduleDate)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        }
 
+
+        TicketReschedule::create([
+            'company_id' => $this->company_id,
+            'schedule_id' => $ticket->schedule_id,
+            'reSchedule_id' => $request->rescheduleSchedule,
+            'customer_id' => $ticket->customer_id,
+            'date' => $ticket->date,
+            'reschedule_date' => $request->rescheduleDate,
+            'departure_city_id' => $ticket->departure_city_id,
+            'reschedule_departure_city_id' => $request->dataDepartureCity,
+            'reschedule_destination_city_id' => $request->rescheduleDestinationCity,
+            'destination_city_id' => $ticket->destination_city_id,
+            'reason' => $request->reason,
+            'added_by' => Auth::user()->id,
+        ]);
+        Ticket::create([
+            'company_id' => $this->company_id,
+            'departure_city_id' => $request->dataDepartureCity,
+            'destination_city_id' => $request->rescheduleDestinationCity,
+            'seat_no' => $ticket->seat_no,
+            'seat_fare' => $ticket->seat_fare,
+            'is_partial' => $ticket->is_partial,
+            'booking_no' => $bookingNo,
+            'date' => $request->rescheduleDate,
+            'customer_id' => $request->dataCustomer,
+            'schedule_id' => $request->rescheduleSchedule,
+            'remarks' => $ticket->remarks,
+            'gender' => $ticket->gender,
+            'type' => $ticket->type,
+            'added_by' => Auth::user()->id,
+            'discount' => $ticket->discount,
+        ]);
+        $ticket->update([
+            'type' => 'reschedule'
+        ]);
+        return $ticket->delete();
     }
 
     public function deleteBooking(Request $request)

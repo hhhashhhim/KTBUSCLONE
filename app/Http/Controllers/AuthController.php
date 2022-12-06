@@ -34,11 +34,11 @@ class AuthController extends Controller
     {
 //        $ticket = Customer::with('tickets','tickets.schedule','tickets.customer','tickets.company','tickets.destination_city','tickets.departure_city','tickets.addedBy',)->where('id', 1)->first();
 
-        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
-        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms'=> $format]);
-
-            $output = $pdf->output();
+//        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
+//        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
+//            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms'=> $format]);
+//
+//            $output = $pdf->output();
 
         // r ' => 'application/pdf',
         // ]);
@@ -51,6 +51,7 @@ class AuthController extends Controller
 //        return new Response($output, 200, [
 //            'Content-Type' => 'application/pdf',
 //        ]);
+
         //elt pdf  test
 
 //        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', 1)->first();
@@ -61,7 +62,7 @@ class AuthController extends Controller
 //
 //        return new Response($output, 200, [
 //            'Content-Type' => 'application/pdf',
-//        ]);
+//            ]);
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
