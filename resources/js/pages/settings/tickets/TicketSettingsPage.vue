@@ -86,7 +86,7 @@
             >
                 <div class="row mt-3">
 
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="addForm.terminal">
@@ -111,26 +111,26 @@
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>
+<!--                    <div class="form-group col-md-6">-->
+<!--                        <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>-->
 
-                        <vue-mask id="phoneNumber"
-                                  class="form-control"
-                                  v-model="addForm.phoneNumber"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsPhone"
-                        >
-                        </vue-mask>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="address">Address<span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
-                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"
-                                  v-model="addForm.address"></textarea>
-                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>
+<!--                        <vue-mask id="phoneNumber"-->
+<!--                                  class="form-control"-->
+<!--                                  v-model="addForm.phoneNumber"-->
+<!--                                  mask="0000-0000000"-->
+<!--                                  :raw="false"-->
+<!--                                  :options="optionsPhone"-->
+<!--                        >-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-12">-->
+<!--                        <label for="address">Address<span class="text-danger">*</span></label>-->
+<!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
+<!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
+<!--                                  v-model="addForm.address"></textarea>-->
+<!--                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>-->
 
-                    </div>
+<!--                    </div>-->
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
@@ -338,22 +338,22 @@ export default {
                     timer: 2000,
                 });
             }
-            if (this.addForm.phoneNumber == '' || typeof this.addForm.phoneNumber == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Phone Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.addForm.address == '' || typeof this.addForm.address == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Address is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
+            // if (this.addForm.phoneNumber == '' || typeof this.addForm.phoneNumber == 'undefined') {
+            //     return swal({
+            //         title: "Required !!!",
+            //         text: "Phone Number is Required",
+            //         icon: "error",
+            //         timer: 2000,
+            //     });
+            // }
+            // if (this.addForm.address == '' || typeof this.addForm.address == 'undefined') {
+            //     return swal({
+            //         title: "Required !!!",
+            //         text: "Address is Required",
+            //         icon: "error",
+            //         timer: 2000,
+            //     });
+            // }
             if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
                 return swal({
                     title: "Required !!!",

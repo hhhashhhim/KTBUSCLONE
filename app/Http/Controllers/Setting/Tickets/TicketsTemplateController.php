@@ -33,26 +33,27 @@ class TicketsTemplateController extends Controller
         $rules = [
             'terminal' => 'required',
             'uanNumber' => 'required',
-            'phoneNumber' => 'required',
-            'address' => 'required',
+//            'phoneNumber' => 'required',
+//            'address' => 'required',
             'termsCondition' => 'required',
         ];
 
         $customMessages = [
             'terminal.required' => 'Please Select Any Terminal',
             'uanNumber.required' => 'UAN Number is required',
-            'phoneNumber.required' => 'Phone Number is required',
-            'address.required' => 'Terminal Address is required',
+//            'phoneNumber.required' => 'Phone Number is required',
+//            'address.required' => 'Terminal Address is required',
             'termsCondition.required' => 'Terms & Condition is required',
         ];
         $this->validate($request, $rules, $customMessages);
+        $terminal  = Terminal::where('company_id', $this->company_id)->where('id', $request->terminal)->first();
         TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->update(array('status' => 0));
         return TicketsTemplate::create([
             'company_id' => $this->company_id,
             'terminal_id' => $request->terminal,
             'uan' => str_replace('-', '', $request->uanNumber),
-            'phone' => str_replace('-', '', $request->phoneNumber),
-            'address' => $request->address,
+            'phone' => str_replace('-', '', $terminal->contact),
+            'address' => $terminal->address,
             'terms_condition' => $request->termsCondition,
             'status' => 1,
             'added_by' => Auth::user()->id,

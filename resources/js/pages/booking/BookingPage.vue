@@ -233,7 +233,7 @@
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
                                                     :class="getClasses(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                    :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
+                                                    @mouseover="getTitle(col)">
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
                                                     <small
@@ -1234,12 +1234,15 @@ export default {
                 });
             }
         },
-        getClasses(col) {
+        getClasses:function(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
+        },
+        getTitle:function(col) {
+            console.log(col)
         },
         async add() {
             if (!this.addForm.schedule) {
