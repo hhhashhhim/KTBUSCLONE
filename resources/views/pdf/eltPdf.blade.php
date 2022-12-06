@@ -1,6 +1,6 @@
 {{--{{dd($data, $data_terms)}}--}}
-@foreach($data as $key => $single)
-    <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html>
 <head>
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
@@ -23,8 +23,8 @@
         }
 
         .companyName {
-            font-weight: 900;
-            font-size: 14pt;
+            font-weight: 800;
+            font-size: 7pt;
             text-transform: uppercase;
             margin-bottom: 3px !important;
             text-align: center;
@@ -67,114 +67,131 @@
             white-space: nowrap;
 
         }
+        .w-25
+        {
+            width: 25%!important;
+        }
+        .w-50
+        {
+            width: 50%!important;
+        }
+        .text-center
+        {
+            text-align: center;
+        }
     </style>
     <title>Print Ticket</title>
 </head>
 <body>
 {{--{{dd($data)}}--}}
 
+<div style="font-weight: 700; text-align: center !important; margin-bottom: 10px !important; font-size: 10pt; text-underline: black "><span>ELT Receipt</span></div>
+<div>
+    <div class="clear-both">
+        <p class="float-left w-25 text-center" style="margin: 2px;">Card #</p>
+        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
+        <p class="float-left w-25 text-center" style="margin: 2px;">33333-3333333-3</p>
+    </div>
+    <div class="clear-both">
+        <p class="float-left w-25 text-center" style="margin: 2px;">Phone</p>
+        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
+        <p class="float-left w-25 text-center" style="margin: 2px;">0300-0000000</p>
+    </div>
+</div>
+<p style="width:100%;  text-align: center; margin:0">
+    .......................................................................................................
+</p>
+
 <div id="info">
-    <div class="companyName"><span>Kainat Travels</span></div>
-    <div class="companyAddress">
+    <!-- <div class="companyAddress">
         <span>{{$data_terms->address}}</span>
         <div><span><b>UAN(24/7):</b>{{$data_terms->uan}}</span></div>
         <div><span><b>Phone:</b>{{$data_terms->phone}}</span></div>
-    </div>
+    </div> -->
     <div class="custinfo" id="custinfo">
-        <div style="text-align: center !important; margin-bottom: 10px !important; font-size: 10pt; text-underline: black "><span>(ELT Receipt)</span></div>
-
-        <div id="barcode-area">
-            <img style="width: 80px !important; height: 80px !important;"
-                src="data:image/png;base64,{{ base64_encode(QrCode::format('svg')->style('round')->generate('Customer Name : '. 'bfhjgf' . ' | ' . 'Customer CNIC : '.'dfsjhfds' .' | ' . 'Customer Phone # : '.'bhjxfd' .' | '.'Seat No : ' . 'dsbfgd' . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . 'jdsfg' . ' | ' . 'To : ' . 'fdhjdsf' . ' | ' . 'Departure Date : ' . 'sgffndbgjkd' . ' | '. 'Departure Time : ' . 'kmshgfkjdsg' . ' | ' . ' Booking Date & Time : '.  'dsjfhdsb' . ' | ' . 'Fare : 900')) }}"
-                class="rounded img-thumbnail"/>
-        </div>
         <div>
-            <p class="font-weight-bold float-left">Name : </p>
-            <p class="float-right">test</p>
+            <h3 class="float-left w-25 text-center">Items</h3>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #fff;"></p>
+            <h3 class="float-left w-25 text-center">Price</h3>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left">Seat No :</p>
-            <p class="float-right">asas</p>
+            <p class="float-left w-25 text-center">Seat No</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">asas</p>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left">Bus No :</p>
-            <p class="float-right">Malik ajay </p>
+            <p class="float-left w-25 text-center">Bus No</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">Malik ajay </p>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left"><span style="text-decoration: underline;">From :</span> &nbsp;
-                <span>hjeghg</span>
-            </p>
-            <p class="font-weight-bold float-right"><span style="text-decoration: underline;">To :</span>&nbsp;
-                <span>asdas</span>
-            </p>
+            <p class="float-left w-25 text-center">Data</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">dsfsdf</p>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left">Departure Date :</p>
-            <p class="float-right">dsfsdf</p>
+            <p class="float-left w-25 text-center">Time</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">asdfdsf</p>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left">Departure Time :</p>
-            <p class="float-right">asdfdsf</p>
+            <p class="float-left w-25 text-center">Booking</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">cxasfdsf</p>
         </div>
         <div class="clear-both">
-            <p class="font-weight-bold float-left">Booking Date :</p>
-            <p class="float-right">cxasfdsf</p>
-        </div>
-        <div class="clear-both">
-            <p class="font-weight-bold float-left">Fare : </p>
-            <p class="float-right">900</p>
+            <p class="float-left w-25 text-center">Fare</p>
+            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
+            <p class="float-left w-25 text-center">900</p>
         </div>
     </div>
 </div>
 <p style="width:100%;  text-align: center; margin:0">
-    .......................................................................................................</p>
+    .......................................................................................................
+</p>
+
 <div>
-    <div style="text-align: center;">
-        <h5 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h5>
-        <h5>{{$data_terms->terms_condition}}</h5>
-        <h4><b>&copy; Rights Reserved By Kainat Travels</b></h4>
+    <div class="clear-both">
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">SUBTOTAL</h4>
+        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">432</h4>
+    </div>
+    <div class="clear-both">
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">TAX</h4>
+        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">18</h4>
+    </div>
+    <div class="clear-both">
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">TOATAL</h4>
+        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
+        <h4 class="float-left w-25 text-center" style="margin: 2px;">450</h4>
     </div>
 </div>
-{{--<p style="page-break-before: always"></p>--}}
-{{--<div class="custinfoverify" id="custinfoverify">--}}
+<p style="width:100%;  text-align: center; margin:0">
+    .......................................................................................................
+</p>
 
-{{--    <div style="width:100%">--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-left"><span style="text-decoration: underline;">Seat # :</span>--}}
-{{--            &nbsp;<span>safdsf</span></p>--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-right"><span style="text-decoration: underline;">Bus No :</span>--}}
-{{--            &nbsp;<span>Bus#&nbsp;&nbsp; </span>--}}
-{{--        </p>--}}
-{{--    </div>--}}
+<div class="clear-both">
+    <div class="text-center">
+        <div class="companyName" style="margin: 10px 0px;"><span>Kainat Travels</span></div>
+        <div>
+            Test Terminal, islamabad.Test Terminal, islamabad.
+        </div>
+    </div>
+    <div class="text-center">
+        
+        <img style="width: 50px !important; height: 50px !important; margin: 10px;"
+                src="data:image/png;base64,{{ base64_encode(QrCode::format('svg')->style('round')->generate('Customer Name : '. 'bfhjgf' . ' | ' . 'Customer CNIC : '.'dfsjhfds' .' | ' . 'Customer Phone # : '.'bhjxfd' .' | '.'Seat No : ' . 'dsbfgd' . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . 'jdsfg' . ' | ' . 'To : ' . 'fdhjdsf' . ' | ' . 'Departure Date : ' . 'sgffndbgjkd' . ' | '. 'Departure Time : ' . 'kmshgfkjdsg' . ' | ' . ' Booking Date & Time : '.  'dsjfhdsb' . ' | ' . 'Fare : 900')) }}"
+                class="rounded img-thumbnail"/>
+        
+    </div>
+</div>
+<!-- <div class="clear-both" style="text-align: center;">
+    <h5 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h5>
+    <h5>{{$data_terms->terms_condition}}</h5>
+    <h4><b>&copy; Rights Reserved By Kainat Travels</b></h4>
+</div> -->
 
-{{--    <div style="width:100%" class="clear-both">--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-left">From :--}}
-{{--            <span>dsfdsf</span></p>--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-right">To :--}}
-{{--            <span>dsfdsf</span></p>--}}
-{{--    </div>--}}
-
-{{--    <div class="clear-both">--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-left">Departure Date :</p>--}}
-{{--        <p style="margin-bottom: 0"--}}
-{{--           class="font-weight-bold float-right">dasr</p>--}}
-{{--    </div>--}}
-
-{{--    <div class="clear-both">--}}
-{{--        <p class="font-weight-bold float-left" style="margin-bottom: 0">Ticket Holder Name :</p>--}}
-{{--        <p class="float-right" style="margin-bottom: 0">dasf</p>--}}
-{{--    </div>--}}
-
-{{--    <div class="clear-both">--}}
-{{--        <p class="font-weight-bold float-left" style="margin-bottom: 0">CNIC Number :</p>--}}
-{{--        <p class="float-right" style="margin-bottom: 0">fvdsf</p>--}}
-{{--    </div>--}}
-
-{{--    <div class="clear-both">--}}
-{{--        <p style="margin-bottom: 0" class="font-weight-bold float-left">Contact # : </p>--}}
-{{--        <p style="margin-bottom: 0" class="float-right">fdds</p>--}}
-{{--    </div>--}}
-
-{{--</div>--}}
 </body>
 </html>
-@endforeach
+

@@ -32263,7 +32263,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.postData.partId = data ? data.part_id : '';
                 _this2.postData.currentReading = "";
                 _this2.postData.amount = "";
-                _this2.postData.companyPaid = "";
+                _this2.postData.companyPaid = "222";
                 _this2.postData.evidence = "";
                 _this2.postData.detail = "";
                 _this2.checkDisable = data ? true : false;
@@ -32323,10 +32323,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(!_this4.postData.fleetId || !_this4.postData.partId || !_this4.postData.currentReading || !_this4.postData.amount || !_this4.postData.companyPaid || !_this4.postData.evidence || !_this4.postData.detail)) {
-                  _context4.next = 2;
+                  _context4.next = 3;
                   break;
                 }
 
+                console.log(_this4.postData);
                 return _context4.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field",
@@ -32334,7 +32335,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 4000
                 }));
 
-              case 2:
+              case 3:
                 _this4.loading = true;
                 config = {
                   headers: {
@@ -32350,14 +32351,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 formData.append('evidence', _this4.postData.evidence);
                 formData.append('detail', _this4.postData.detail);
                 formData.append('maintenanceType', _this4.postData.maintenanceType);
-                _context4.next = 15;
+                _context4.next = 16;
                 return _this4.callApi("post", "fleet/maintenance/due/add", formData, config);
 
-              case 15:
+              case 16:
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 32;
+                  _context4.next = 33;
                   break;
                 }
 
@@ -32376,15 +32377,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 29;
+                _context4.next = 30;
                 return _this4.fetchData();
 
-              case 29:
+              case 30:
                 _this4.loading = false;
-                _context4.next = 34;
+                _context4.next = 35;
                 break;
 
-              case 32:
+              case 33:
                 _this4.loading = false;
 
                 if (res.status == 422) {
@@ -32409,7 +32410,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 34:
+              case 35:
               case "end":
                 return _context4.stop();
             }
@@ -32712,7 +32713,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (!(res.status === 200)) {
-                  _context.next = 29;
+                  _context.next = 30;
                   break;
                 }
 
@@ -32720,7 +32721,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 $('#maintenance_table').DataTable().destroy();
                 _this.fleetId = "";
                 _this.currentReading = "";
-                _this.loop = 1;
+                _this.loop = 0;
                 _this.fleetPart = [];
                 _this.maintenanceAfter = [];
                 _this.maintenanceAt = [];
@@ -32730,15 +32731,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context.next = 26;
+                setInterval(function () {
+                  _this.loop = 1;
+                }, 2000);
+                _context.next = 27;
                 return _this.fetchData();
 
-              case 26:
+              case 27:
                 _this.loading = false;
-                _context.next = 31;
+                _context.next = 32;
                 break;
 
-              case 29:
+              case 30:
                 _this.loading = false;
 
                 if (res.status == 422) {
@@ -32763,7 +32767,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 31:
+              case 32:
               case "end":
                 return _context.stop();
             }
