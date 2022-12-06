@@ -53,15 +53,15 @@ class AuthController extends Controller
 //        ]);
         //elt pdf  test
 
-//        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', 1)->first();
-//        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-//            $pdf = PDF::loadView('pdf/eltPdf', ['data' => $elt, 'data_terms'=> $format]);
-//
-//            $output = $pdf->output();
-//
-//        return new Response($output, 200, [
-//            'Content-Type' => 'application/pdf',
-//        ]);
+       $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', 1)->first();
+       $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
+           $pdf = PDF::loadView('pdf/eltPdf', ['data' => $elt, 'data_terms'=> $format]);
+
+           $output = $pdf->output();
+
+       return new Response($output, 200, [
+           'Content-Type' => 'application/pdf',
+       ]);
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
