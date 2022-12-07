@@ -34,7 +34,7 @@
         .companyAddress {
             font-weight: 400;
             font-size: 10pt;
-            margin-bottom: 10px;
+            margin-bottom: 05px;
             text-align: center;
             font-family: sans-serif, Verdana, Arial;
         }
@@ -85,13 +85,18 @@
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
         <span>{{$data_terms->address}}</span>
-        <div><span><b>UAN(24/7):</b>{{$data_terms->uan}}</span></div>
-        <div><span><b>Phone:</b>{{$data_terms->phone}}</span></div>
+        <div><span><b>UAN(24/7) : </b>{{format_uan($data_terms->uan)}}</span></div>
+        <div><span><b>Phone : </b>{{format_phone($data_terms->phone)}}</span></div>
     </div>
+    @if($duplicate == 1)
+    <div style="text-align: center;" >
+        <span class="text-uppercase font-weight-bold"><u><h1>(Duplicate Ticket)</h1></u></span>
+    </div>
+    @endif
     <div class="custinfo" id="custinfo">
         <div id="barcode-area">
             <img
-                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate('Customer Name : '. $data[$key]['customer']->name . ' | ' . 'Customer CNIC : '.$data[$key]['customer']->cnic .' | ' . 'Customer Phone # : '.$data[$key]['customer']->contact .' | '.'Seat No : ' . $data[$key]->seat_no . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . $data[$key]['departure_city']->name . ' | ' . 'To : ' . $data[$key]['destination_city']->name . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data[$key]->date)) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data[$key]['schedule']->time)) . ' | ' . ' Booking Date & Time : '.  date('d/m/Y H:i A', strtotime($data[$key]->created_at)) . ' | ' . 'Fare : 900')) }}"
+                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate('Customer Name : '. $data[$key]['customer']->name . ' | ' . 'Customer CNIC : '.format_cnic($data[$key]['customer']->cnic) .' | ' . 'Customer Phone # : '.format_phone($data[$key]['customer']->contact ).' | '.'Seat No : ' . $data[$key]->seat_no . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . $data[$key]['departure_city']->name . ' | ' . 'To : ' . $data[$key]['destination_city']->name . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data[$key]->date)) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data[$key]['schedule']->time)) . ' | ' . ' Booking Date & Time : '.  date('d/m/Y H:i A', strtotime($data[$key]->created_at)) . ' | ' . 'Fare : 900')) }}"
                 class="rounded"/>
         </div>
         <div class="table-data">
@@ -103,8 +108,8 @@
             <p class="float-right">{{ $data[$key]->seat_no }}</p>
         </div>
         <div class="clear-both table-data">
-            <p class="font-weight-bold float-left">Bus No :</p>
-            <p class="float-right">Malik ajay </p>
+            <p class="font-weight-bold float-left">Bus Class :</p>
+            <p class="float-right">{{ $data[$key]['schedule']['bus_class']->name }}</p>
         </div>
         <div class="clear-both table-data">
             <p class="font-weight-bold float-left"><span style="text-decoration: underline;">From :</span> &nbsp;
@@ -124,11 +129,11 @@
         </div>
         <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Booking Date :</p>
-            <p class="float-right">{{ date('d/m/Y H:i', strtotime($data[$key]->created_at)) }}</p>
+            <p class="float-right">{{ date('d/m/Y H:i A', strtotime($data[$key]->created_at)) }}</p>
         </div>
         <div class="clear-both table-data">
             <p class="font-weight-bold float-left">Fare : </p>
-            <p class="float-right">900</p>
+            <p class="float-right">{{ $data[$key]->seat_fare }}</p>
         </div>
     </div>
 </div>
@@ -147,8 +152,8 @@
     <div style="width:100%">
         <p style="margin-bottom: 0" class="font-weight-bold float-left"><span style="text-decoration: underline;">Seat # :</span>
             &nbsp;<span>{{ $data[$key]->seat_no }}</span></p>
-        <p style="margin-bottom: 0" class="font-weight-bold float-right"><span style="text-decoration: underline;">Bus No :</span>
-            &nbsp;<span>Bus#&nbsp;&nbsp; </span>
+        <p style="margin-bottom: 0" class="font-weight-bold float-right"><span style="text-decoration: underline;">Bus Class :</span>
+            &nbsp;<span>{{ $data[$key]['schedule']['bus_class']->name }}</span>
         </p>
     </div>
 
@@ -172,12 +177,12 @@
 
     <div class="clear-both">
         <p class="font-weight-bold float-left" style="margin-bottom: 0">CNIC Number :</p>
-        <p class="float-right" style="margin-bottom: 0">{{$data[$key]['customer']->cnic}}</p>
+        <p class="float-right" style="margin-bottom: 0">{{format_cnic($data[$key]['customer']->cnic)}}</p>
     </div>
 
     <div class="clear-both">
         <p style="margin-bottom: 0" class="font-weight-bold float-left">Contact # : </p>
-        <p style="margin-bottom: 0" class="float-right">{{$data[$key]['customer']->contact}}</p>
+        <p style="margin-bottom: 0" class="float-right">{{format_phone($data[$key]['customer']->contact)}}</p>
     </div>
 
 </div>

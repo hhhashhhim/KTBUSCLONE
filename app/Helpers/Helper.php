@@ -49,6 +49,35 @@ if (!function_exists('storeFare')) {
 }
 
 
+if (!function_exists('format_phone')) {
+    function format_phone(string $phone_no) {
+        return preg_replace(
+            "/.*(\d{4})[^\d]{0,7}(\d{7})/",
+            '$1-$2',
+            $phone_no
+        );
+    }
+}
+
+if (!function_exists('format_cnic')) {
+    function format_cnic(string $phone_no) {
+        return preg_replace(
+            "/.*(\d{5})[^\d]{0,7}(\d{7})[^\d]{0,7}(\d{1})/",
+            '$1-$2-$3',
+            $phone_no
+        );
+    }
+}
+
+if (!function_exists('format_uan')) {
+    function format_uan(string $phone_no) {
+        return preg_replace(
+            "/.*(\d{2})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})/",
+            '$1-$2-$3-$4',
+            $phone_no
+        );
+    }
+}
 if (!function_exists('updateFare')) {
     function updateFare($request, $company_id)
     {

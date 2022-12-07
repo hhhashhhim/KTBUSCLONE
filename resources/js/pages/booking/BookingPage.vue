@@ -232,8 +232,9 @@
                                                     class="image-span d-block text-center text-white shadow"
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
                                                     :class="getClasses(col)"
+                                                    :title="getTitle(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                    @mouseover="getTitle(col)">
+                                                    >
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
                                                     <small
@@ -434,7 +435,7 @@
                             <div class="col-md-2">
                                 <label for="departureCity" class="mb-0">Departure City <span
                                     class="text-danger">*</span></label>
-                                <select class="form-control" id="departureCity"
+                                <select class="form-control" id="departureCity" disabled
                                         @change="fetchReSpecificSchedules(); getReDestinationCity()"
                                         v-model="rescheduleData.dataDepartureCity">
                                     <option value="0" selected>Select Departure City</option>
@@ -469,7 +470,7 @@
                             <div class="col-md-6 class">
                                 <label for="scheduleName" class="mb-0">Schedule Name <span
                                     class="text-danger">*</span></label>
-                                <select class="form-control" id="scheduleName" @change="fetchReSpecificSchedules()"
+                                <select class="form-control" id="scheduleName"  @change="fetchReSpecificSchedules()"
                                         v-model="rescheduleData.rescheduleSchedule">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
@@ -604,9 +605,7 @@
                                                 <div class="col-md-12 text-right">
                                                     <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
                                                     <!--                                                    v-if="selectedBookedSeats.length"-->
-                                                    <button type="button" class="btn btn-secondary text-dark">Duplicate
-                                                        Ticket
-                                                    </button>
+                                                    <button type="button" class="btn btn-secondary text-dark" @click="duplicateTicket(innerItem)">Duplicate Ticket </button>
                                                     <button type="button" class="btn btn-success ml-2">Resend SMS
                                                     </button>
                                                     <button type="button" class="btn btn-info ml-2"
@@ -755,9 +754,9 @@ export default {
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
         window.addEventListener('keydown', this.altD);
-        window.setInterval(() => {
-            this.fetchScheduleData(); // call any function or end point
-        }, 15000); // interval set to 15 sec.
+        // window.setInterval(() => {
+        //     this.fetchScheduleData(); // call any function or end point
+        // }, 30000); // interval set to 30 sec.
 
     },
 
@@ -923,9 +922,7 @@ export default {
                 this.allBookings = resBooking.data;
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
-                console.log(resClass, resBooking, resCity);
                 setTimeout(() => {
-                    // $("#" + this.formID).modal("show");
                     $("#booking_table").DataTable();
                 }, 300);
             } else {
@@ -979,12 +976,12 @@ export default {
                 }
             }
         },
-        cnicFormat: function (string) {
-            return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
-        },
-        phoneFormat: function (string) {
-            return string.replace(/(\d{4})(\d{7})/, "$1-$2");
-        },
+            cnicFormat: function (string) {
+                return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
+            },
+            phoneFormat: function (string) {
+                return string.replace(/(\d{4})(\d{7})/, "$1-$2");
+            },
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
@@ -1134,8 +1131,7 @@ export default {
             }
         },
         async selectSeat(row, col, seatNo, fare) {
-            console.log(this.selectedSeats)
-            console.log(this.schedule.bus_class.seat_map[row][col])
+            console.log(this.schedule.bus_class.seat_map[row][col]);
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1241,9 +1237,14 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
+
         getTitle:function(col) {
-            console.log(col)
+            console.log(col);
+            if(col.type == 'booked' || col.type  == 'advance booking'){
+                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks: " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' +"Dept City : " + col.departure_city_name + '\n' +"Dest City : " + col.destination_city_name;
+            }
         },
+
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1295,7 +1296,7 @@ export default {
             }
 
             const res = await this.callApi("post", "booking/store", this.addForm);
-            if (res.status == 201) {
+            if (res.status == 200) {
                 swal({
                     title: "Success",
                     text: "Booking Created Successfully",
@@ -1330,7 +1331,7 @@ export default {
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
-                // window.scrollTo(0, 0);
+                window.open(this.$store.state.app_url  +'print/' + res.data + '/pdf', '_blank').focus();
 
             } else {
                 if (res.status == 422) {
@@ -1729,6 +1730,12 @@ export default {
                 }
             }
         },
+
+        // Duplicate Ticket
+
+        duplicateTicket: function (data) {
+            window.open(this.$store.state.app_url  +'print/' + data.id + '/pdf/duplicate', '_blank').focus();
+        }
 
     },
     // computed: {

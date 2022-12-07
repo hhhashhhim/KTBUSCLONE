@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Bus\BusClass;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -44,6 +45,9 @@ class Ticket extends Model
 
     public function schedule(){
         return $this->hasOne( Schedule::class,'id','schedule_id' );
+    }
+    public function scheduleDetail(){
+        return $this->hasOne( ScheduleDetail::class,'id','schedule_details_id' );
     }
 
 
