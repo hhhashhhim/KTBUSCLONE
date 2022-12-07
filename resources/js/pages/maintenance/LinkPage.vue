@@ -428,7 +428,7 @@ export default {
                 $('#maintenance_table').DataTable().destroy();
                 this.fleetId = "";
                 this.currentReading = "";
-                this.loop = 1;
+                this.loop = 0;
                 this.fleetPart =  [];
                 this.maintenanceAfter =  [];
                 this.maintenanceAt =  [];
@@ -438,6 +438,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                setInterval(() => {
+                    this.loop = 1;
+                }, 2000);
                 await this.fetchData();
                 this.loading = false;
             }
