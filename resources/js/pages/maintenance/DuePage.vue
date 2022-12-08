@@ -166,6 +166,7 @@
                         class="form-control"
                         placeholder=""
                         @change="evidenceImage($event)"
+                        id="imageField"
 
                     />
                 </div>
@@ -288,9 +289,10 @@ export default {
             this.postData.partId = data ? data.part_id : '';
             this.postData.currentReading = "";
             this.postData.amount =  "";
-            this.postData.companyPaid =  "222";
+            this.postData.companyPaid =  "";
             this.postData.evidence =  "";
             this.postData.detail =  "";
+            $("#imageField").val('');
             this.checkDisable = data ? true : false;
         },
         async evidenceImage(e) {
@@ -316,7 +318,6 @@ export default {
             if(!this.postData.fleetId || !this.postData.partId || !this.postData.currentReading || !this.postData.amount ||
                 !this.postData.companyPaid || !this.postData.evidence || !this.postData.detail)
             {
-                console.log(this.postData);
                 return swal({
                     title: "Error",
                     text: "Please Fill All Field",
@@ -353,6 +354,7 @@ export default {
                 this.postData.companyPaid =  "";
                 this.postData.evidence =  "";
                 this.postData.detail =  "";
+                $("#imageField").val('');
                swal({
                     title: "Success",
                     text: "Maintenance Added",
