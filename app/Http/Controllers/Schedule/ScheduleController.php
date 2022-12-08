@@ -248,7 +248,6 @@ class ScheduleController extends Controller
 
         public function selected(Request $request)
     {
-
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
