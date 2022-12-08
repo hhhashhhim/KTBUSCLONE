@@ -6,14 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingCancel;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
@@ -30,7 +34,7 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $bookings = Ticket::select('schedule_id', 'date')->with('schedule:id,name')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
+        $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id')->with('schedule:id,name', 'scheduleDetail')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', $this->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
@@ -46,18 +50,13 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        $schedule = Schedule::where('id', $request->schedule)
-            ->where('company_id', $this->company_id)
-            ->select('id', 'fare_class_id', 'route_id', 'bus_class_id')
-            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-
+        $schedule = Schedule::where('id', $request->schedule)->where('company_id', $this->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
         $departure_city_id = $schedule->route->fares->first()->departure_city_id;
         $destination_city_id = $schedule->route->fares->last()->destination_city_id;
         $isPartial = 0;
         if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
             $isPartial = 1;
         }
-
         $cnicFormat = str_replace('-', '', $request->customerCNIC);
         $phoneFormat = str_replace('-', '', $request->contact);
 
@@ -83,13 +82,19 @@ class BookingController extends Controller
             $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
             ++$bookingNo;
         }
-
+        $scheduleDetail = ScheduleDetail::where([
+            'company_id' => $this->company_id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+            'schedule_id' => $schedule->id,
+        ])->first();
+        $allTicket = [];
         foreach ($request->selectedSeats as $i => $seat) {
             $ticket = Ticket::create([
                 'company_id' => $this->company_id,
                 'departure_city_id' => $request->departureCity,
                 'destination_city_id' => $request->destinationCity,
-                // 'bus_class_id'=>$schedule->fare_class_id,
                 'seat_no' => $seat,
                 'seat_fare' => $request->selectedSeatsFare[$i],
                 'is_partial' => $isPartial,
@@ -97,6 +102,7 @@ class BookingController extends Controller
                 'date' => $request->date,
                 'customer_id' => $customer->id,
                 'schedule_id' => $schedule->id,
+                'schedule_details_id' => $scheduleDetail->id,
                 'remarks' => $request->remarks,
                 'gender' => $request->gender,
                 'type' => $request->type,
@@ -120,8 +126,11 @@ class BookingController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
             }
+            $allTicket[] = $ticket->id;
         }
-        return $ticket;
+//        dd($allTicket);
+
+        return implode('-', $allTicket);
 //        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
 //        $pdf = PDF::loadView('pdf/pdf', $data);
 //        return $pdf->stream();
@@ -139,18 +148,49 @@ class BookingController extends Controller
     public function reschedule(Request $request)
     {
 
-        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('departure_city_id', $request->existingDate)->where('destination_city_id', $request->dataDestination)->first();
-        dd($request->all(), $ticket);
-//        $request->bookingSeats = collect($request->bookingSeats);
-//        foreach ($request->bookingSeats as $i => $bookedSeat) {
-//            Ticket::where('id', $bookedSeat['id'])->update([
-//                'date' => $request->date,
-//                'schedule_id' => $request->schedule,
-//                'seat_no' => $request->selectedSeats[$i],
-//            ]);
-//        }
-//        return response()->json("Seats Rescheduled Successfully", 200);
-
+        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('destination_city_id', $request->dataDestination)->first();
+        if ($request->existingDate == $request->rescheduleDate) {
+            $bookingNo = Ticket::where('date', $request->existingDate)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        } else {
+            $bookingNo = Ticket::where('date', $request->rescheduleDate)->latest()->first()->booking_no ?? 0;
+            ++$bookingNo;
+        }
+        TicketReschedule::create([
+            'company_id' => $this->company_id,
+            'schedule_id' => $ticket->schedule_id,
+            'reSchedule_id' => $request->rescheduleSchedule,
+            'customer_id' => $ticket->customer_id,
+            'date' => $ticket->date,
+            'reschedule_date' => $request->rescheduleDate,
+            'departure_city_id' => $ticket->departure_city_id,
+            'reschedule_departure_city_id' => $request->dataDepartureCity,
+            'reschedule_destination_city_id' => $request->rescheduleDestinationCity,
+            'destination_city_id' => $ticket->destination_city_id,
+            'reason' => $request->reason,
+            'added_by' => Auth::user()->id,
+        ]);
+        Ticket::create([
+            'company_id' => $this->company_id,
+            'departure_city_id' => $request->dataDepartureCity,
+            'destination_city_id' => $request->rescheduleDestinationCity,
+            'seat_no' => $ticket->seat_no,
+            'seat_fare' => $ticket->seat_fare,
+            'is_partial' => $ticket->is_partial,
+            'booking_no' => $bookingNo,
+            'date' => $request->rescheduleDate,
+            'customer_id' => $request->dataCustomer,
+            'schedule_id' => $request->rescheduleSchedule,
+            'remarks' => $ticket->remarks,
+            'gender' => $ticket->gender,
+            'type' => $ticket->type,
+            'added_by' => Auth::user()->id,
+            'discount' => $ticket->discount,
+        ]);
+        $ticket->update([
+            'type' => 'reschedule'
+        ]);
+        return $ticket->delete();
     }
 
     public function deleteBooking(Request $request)
@@ -310,10 +350,24 @@ class BookingController extends Controller
         return $ticket->delete();
     }
 
-    public function overIssueBooking(Request $request)
+    public function pdf($id)
     {
-        dd($request->all());
-
-
+        $ticket = Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->whereIn('id', explode('-', $id))->get();
+        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
+        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 0]);
+        $output = $pdf->output();
+        return new Response($output, 200, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+    public function duplicatePdf($id)
+    {
+        $ticket = Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->whereIn('id', explode('-', $id))->get();
+        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
+        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 1]);
+        $output = $pdf->output();
+        return new Response($output, 200, [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 }

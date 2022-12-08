@@ -3,6 +3,7 @@
 namespace App\Models\Schedule;
 
 use App\Models\Company;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,9 @@ class ScheduleDetail extends Model
     }
     public function schedule(){
         return $this->belongsTo( Schedule::class,'schedule_id','id');
+    }
+    public function ticket(){
+        return $this->hasMany( Ticket::class,'id','schedule_details_id');
     }
 
 

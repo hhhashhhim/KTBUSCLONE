@@ -46,7 +46,6 @@ class ScheduleController extends Controller
             'EndDate' => 'required',
             'route' => 'required',
             'busClass' => 'required',
-//            'fareClass' => 'required',
             'time' => 'required',
         ];
 
@@ -54,7 +53,6 @@ class ScheduleController extends Controller
             'name.required' => 'Schedule Name is Required',
             'StartDate.required' => 'Start Date is Required',
             'EndDate.required' => 'End Date is Required',
-//            'fareClass.required' => 'Class is Required',
             'route.required' => 'Route is Required',
             'time.required' => 'Time Field is Required',
             'busClass.required' => 'Bus Class is Required',
@@ -69,27 +67,22 @@ class ScheduleController extends Controller
             'surcharge_id' => $request->surcharge,
             'discount_id' => $request->discount,
             'bus_class_id' => $request->busClass,
-//            'fare_class_id' => $request->fareClass,
             'route_city_terminal' => $request->addTerminalsOnClick ?? [],
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
         $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-        $days = $this->getDays($schedule->start_date,$schedule->end_date);
+        $days = $this->getDays($schedule->start_date, $schedule->end_date);
 
-        for($i=0; $i<=$days; $i++)
-        {
-            $lastDepId =  $routeDetails[0]->departure_city_id;
+        for ($i = 0; $i <= $days; $i++) {
+            $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$schedule->start_date $schedule->time")) + ($i * 86400);
 
-            foreach ($routeDetails as $key => $detail) {
+            foreach ($routeDetails as  $detail) {
 
-                if($lastDepId == $detail->departure_city_id)
-                {
+                if ($lastDepId == $detail->departure_city_id) {
                     $departureTime = date("Y-m-d H:i", $totalTime);
-                }
-                else
-                {
+                } else {
                     $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference;
                     $timeDiff = explode(':', $fareTableTime);
                     $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
@@ -192,7 +185,7 @@ class ScheduleController extends Controller
     public function getEntire(Request $request)
     {
         return [
-    //            'fareClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->fareClass)->first()->name,
+            //            'fareClass' => FareClass::where('company_id', $this->company_id)->where('id', $request->fareClass)->first()->name,
             'route' => Route::where('company_id', $this->company_id)->where('id', $request->route)->pluck('name')->first(),
             'city' => City::where('company_id', $this->company_id)->where('id', $request->city)->pluck('name')->first(),
             'busClass' => BusClass::where('company_id', $this->company_id)->where('id', $request->busClass)->pluck('name')->first(),
@@ -210,29 +203,26 @@ class ScheduleController extends Controller
         ];
     }
 
-    public function extend(Request $request){
+    public function extend(Request $request)
+    {
         $schedule = Schedule::where('id', $request->id)->where('company_id', $this->company_id)->first();
-        $lastEndDate =  date("Y-m-d", strtotime($schedule->end_date) + 86400);
+        $lastEndDate = date("Y-m-d", strtotime($schedule->end_date) + 86400);
         $schedule->update([
-            'end_date' => date("Y-m-d",strtotime(date("Y-m-d",strtotime($schedule->end_date)) . "+".(int)$request->extended_days."days")),
-            'extended_days'  => (int)$request->extended_days,
+            'end_date' => date("Y-m-d", strtotime(date("Y-m-d", strtotime($schedule->end_date)) . "+" . (int)$request->extended_days . "days")),
+            'extended_days' => (int)$request->extended_days,
         ]);
         $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-        $days = $this->getDays($lastEndDate,$schedule->end_date);
+        $days = $this->getDays($lastEndDate, $schedule->end_date);
 
-        for($i=0; $i<=$days; $i++)
-        {
-            $lastDepId =  $routeDetails[0]->departure_city_id;
+        for ($i = 0; $i <= $days; $i++) {
+            $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
 
             foreach ($routeDetails as $key => $detail) {
 
-                if($lastDepId == $detail->departure_city_id)
-                {
+                if ($lastDepId == $detail->departure_city_id) {
                     $departureTime = date("Y-m-d H:i", $totalTime);
-                }
-                else
-                {
+                } else {
                     $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference;
                     $timeDiff = explode(':', $fareTableTime);
                     $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
@@ -256,7 +246,7 @@ class ScheduleController extends Controller
         return $schedule;
     }
 
-    public function selected(Request $request)
+        public function selected(Request $request)
     {
 
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
@@ -264,13 +254,12 @@ class ScheduleController extends Controller
             return [];
         }
         // Getting Already Booked Tickets
-        $tickets = Ticket::with('departure_city', 'destination_city')
+        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
             ->where('company_id', $this->company_id)->where('schedule_id', $request->id)
             ->whereDate('date', $request->date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         // Getting Already Booked Tickets
         $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', $this->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
-
 
 
         $schedule = Schedule::where('id', $request->id)
@@ -316,26 +305,32 @@ class ScheduleController extends Controller
 
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
-
                 // adding fare to each seat
                 if ($column['reserved']) {
                     $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
 
+
                 if ($result !== false && $leavingIn30Min != true) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['fare'] = 0;
+
                     if ($tickets[$result]['is_partial'] == 1) {
 
                         // Condition for validation that departure city and destination city in the request should be "before" the partial seat's targeted cities
-                        $before = ( array_search($request->departureCity, $allFaresOfRoute) < array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute) &&
-                                    array_search($request->departureCity, $allFaresOfRoute) < array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute) &&
-                                    array_search($request->destinationCity, $allFaresOfRoute) <= array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute) &&
-                                    array_search($request->destinationCity, $allFaresOfRoute) < array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute));
+                        $before = (array_search($request->departureCity, $allFaresOfRoute) < array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute) &&
+                            array_search($request->departureCity, $allFaresOfRoute) < array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute) &&
+                            array_search($request->destinationCity, $allFaresOfRoute) <= array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute) &&
+                            array_search($request->destinationCity, $allFaresOfRoute) < array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute));
 
                         // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
                         $after = (
@@ -362,6 +357,11 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['over_issue'] = true;
                     $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
                     $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
+                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                 }
 //                 print_r($column);
                 if (isset($column['class'])) {
@@ -389,9 +389,9 @@ class ScheduleController extends Controller
 
     }
 
-    public function getDays($start,$end)
+    public function getDays($start, $end)
     {
-        return (strtotime(date("Y-m-d",strtotime($end))) - strtotime(date("Y-m-d",strtotime($start))))/86400;
+        return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
 
 }

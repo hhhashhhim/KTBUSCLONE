@@ -177,7 +177,7 @@
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
-                        <input type="text" class="form-control" @keypress="isNumber($event)"
+                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="45" placeholder="Address Must be less then 45 characters"
                                v-model="data.advance_booking">
                     </div>
                     <div class="form-group col-md-4">

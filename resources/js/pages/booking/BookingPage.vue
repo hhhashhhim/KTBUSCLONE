@@ -232,8 +232,9 @@
                                                     class="image-span d-block text-center text-white shadow"
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
                                                     :class="getClasses(col)"
+                                                    :title="getTitle(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
-                                                    :title="col.partial ? col.departure_city + ' to ' + col.destination_city : ''">
+                                                    >
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
                                                     <small
@@ -329,7 +330,7 @@
                 </div>
             </div>
         </div>
-        <!--        Add Cargo -->
+        <!--        Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -343,7 +344,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="weight">Weight <span class="text-danger">*</span></label>
+                                    <label for="weight">Weight <span class="text-muted mr-1">(In Kg's)</span> <span
+                                        class="text-danger">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Weight" @keypress="isNumber($event)"
@@ -399,21 +401,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!--                        <div class="form-group">-->
-                        <!--                            <label for="over_issue_percentage">Percentage <span-->
-                        <!--                                class="text-muted ml-2">(Optional)</span></label>-->
-                        <!--                            <select id="over_issue_percentage" class="form-control" v-model="overIssueData.percentage">-->
-                        <!--                                <option value="first">Select Over-Issue Percentage</option>-->
-                        <!--                                <option value="0">0%</option>-->
-                        <!--                                <option value="10">10%</option>-->
-                        <!--                                <option value="20">20%</option>-->
-                        <!--                                <option value="30">30%</option>-->
-                        <!--                                <option value="40">40%</option>-->
-                        <!--                                <option value="50">50%</option>-->
-                        <!--                            </select>-->
-                        <!--                        </div>-->
                         <div class="form-group">
-                            <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
+                            <label for="over_issue_remarks">Remarks</label>
                             <textarea type="text" class="form-control" id="over_issue_remarks"
                                       v-model="overIssueData.reason"
                                       placeholder="Reason for over-issue a seat"></textarea>
@@ -446,7 +435,7 @@
                             <div class="col-md-2">
                                 <label for="departureCity" class="mb-0">Departure City <span
                                     class="text-danger">*</span></label>
-                                <select class="form-control" id="departureCity"
+                                <select class="form-control" id="departureCity" disabled
                                         @change="fetchReSpecificSchedules(); getReDestinationCity()"
                                         v-model="rescheduleData.dataDepartureCity">
                                     <option value="0" selected>Select Departure City</option>
@@ -481,7 +470,7 @@
                             <div class="col-md-6 class">
                                 <label for="scheduleName" class="mb-0">Schedule Name <span
                                     class="text-danger">*</span></label>
-                                <select class="form-control" id="scheduleName" @change="fetchReSpecificSchedules()"
+                                <select class="form-control" id="scheduleName"  @change="fetchReSpecificSchedules()"
                                         v-model="rescheduleData.rescheduleSchedule">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
@@ -532,7 +521,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="caceling_remakrs">Remarks <span class="text-danger">*</span></label>
+                            <label for="caceling_remakrs">Remarks</label>
                             <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
                                       placeholder="Reason for canceling a seat"></textarea>
                         </div>
@@ -616,9 +605,7 @@
                                                 <div class="col-md-12 text-right">
                                                     <!--                                                                                                        v-if="selectedBookedOverIssueSeats.length"-->
                                                     <!--                                                    v-if="selectedBookedSeats.length"-->
-                                                    <button type="button" class="btn btn-secondary text-dark">Duplicate
-                                                        Ticket
-                                                    </button>
+                                                    <button type="button" class="btn btn-secondary text-dark" @click="duplicateTicket(innerItem)">Duplicate Ticket </button>
                                                     <button type="button" class="btn btn-success ml-2">Resend SMS
                                                     </button>
                                                     <button type="button" class="btn btn-info ml-2"
@@ -767,6 +754,10 @@ export default {
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
         window.addEventListener('keydown', this.altD);
+        // window.setInterval(() => {
+        //     this.fetchScheduleData(); // call any function or end point
+        // }, 30000); // interval set to 30 sec.
+
     },
 
     methods: {
@@ -932,7 +923,6 @@ export default {
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
                 setTimeout(() => {
-                    // $("#" + this.formID).modal("show");
                     $("#booking_table").DataTable();
                 }, 300);
             } else {
@@ -986,12 +976,12 @@ export default {
                 }
             }
         },
-        cnicFormat: function (string) {
-            return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
-        },
-        phoneFormat: function (string) {
-            return string.replace(/(\d{4})(\d{7})/, "$1-$2");
-        },
+            cnicFormat: function (string) {
+                return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
+            },
+            phoneFormat: function (string) {
+                return string.replace(/(\d{4})(\d{7})/, "$1-$2");
+            },
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
@@ -1141,8 +1131,7 @@ export default {
             }
         },
         async selectSeat(row, col, seatNo, fare) {
-            console.log(this.selectedSeats)
-            console.log(this.schedule.bus_class.seat_map[row][col])
+            console.log(this.schedule.bus_class.seat_map[row][col]);
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1241,13 +1230,21 @@ export default {
                 });
             }
         },
-        getClasses(col) {
+        getClasses:function(col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
+
+        getTitle:function(col) {
+            console.log(col);
+            if(col.type == 'booked' || col.type  == 'advance booking'){
+                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks: " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' +"Dept City : " + col.departure_city_name + '\n' +"Dest City : " + col.destination_city_name;
+            }
+        },
+
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1299,7 +1296,7 @@ export default {
             }
 
             const res = await this.callApi("post", "booking/store", this.addForm);
-            if (res.status == 201) {
+            if (res.status == 200) {
                 swal({
                     title: "Success",
                     text: "Booking Created Successfully",
@@ -1334,7 +1331,7 @@ export default {
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
-                // window.scrollTo(0, 0);
+                window.open(this.$store.state.app_url  +'print/' + res.data + '/pdf', '_blank').focus();
 
             } else {
                 if (res.status == 422) {
@@ -1433,14 +1430,14 @@ export default {
             $("#cancelModel").modal('show');
         },
         async cancelBooking(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
-            if (reason == '' || typeof reason == 'undefined') {
-                return swal({
-                    title: "required!",
-                    text: "Please give any Remarks!!",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (reason == '' || typeof reason == 'undefined') {
+            //     return swal({
+            //         title: "required!",
+            //         text: "Please give any Remarks!!",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1475,14 +1472,14 @@ export default {
             $("#overIssue_model").modal('show');
         },
         async addOverIssueTicket(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
-            if (reason == '' || typeof reason == 'undefined') {
-                return swal({
-                    title: "required!",
-                    text: "Please give any Remarks!!",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (reason == '' || typeof reason == 'undefined') {
+            //     return swal({
+            //         title: "required!",
+            //         text: "Please give any Remarks!!",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
             const data = {
                 date: date,
                 schedule_id: schedule,
@@ -1676,7 +1673,7 @@ export default {
             //         timer: 2000
             //     });
             // }
-            if (this.rescheduleData.rescheduleDate ==  '' || typeof  this.rescheduleData.rescheduleDate == 'undefined') {
+            if (this.rescheduleData.rescheduleDate == '' || typeof this.rescheduleData.rescheduleDate == 'undefined') {
                 return swal({
                     title: "Required!!",
                     text: "Date is Required",
@@ -1684,7 +1681,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.rescheduleData.rescheduleSchedule == 0 ) {
+            if (this.rescheduleData.rescheduleSchedule == 0) {
                 return swal({
                     title: "Required!!",
                     text: "Please Select Schedule!!",
@@ -1692,7 +1689,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.rescheduleData.reason == '' ) {
+            if (this.rescheduleData.reason == '') {
                 return swal({
                     title: "Required!!",
                     text: "Reason is Required",
@@ -1700,58 +1697,64 @@ export default {
                     timer: 2000
                 });
             }
-            swal({
-                title: "Success",
-                text: "Seat Reschedule Successfully",
-                icon: "success",
-                timer: 4000
-            });
-            // const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
-            // if (res.status == 200) {
-            //     // this.success = "Seat Rescheduled Successfully";
-            //     this.fetchScheduleData();
-            // } else {
-            //     if (res.status == 422) {
-            //         let errorContent = "";
-            //         let count = 0;
-            //         for (const key in res.data.errors) {
-            //             res.data.errors[key].forEach((element) => {
-            //                 errorContent += (
-            //                     (++count) + " - " + //creating serial no.
-            //                     element + // main error
-            //                     "\n" // creating new line
-            //                 );
-            //             });
-            //             swal({
-            //                 title: "Error",
-            //                 text: errorContent,
-            //                 icon: "error",
-            //                 timer: 4000
-            //             });
-            //
-            //         }
-            //     }
-            // }
+
+            const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Seat Reschedule Successfully",
+                    icon: "success",
+                    timer: 4000
+                });
+                this.fetchScheduleData();
+            } else {
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
         },
 
-    },
-    computed: {
-        ...
-            mapGetters(["getDeletingObj"]),
-    }
-    ,
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.surcharges.splice(obj.index, 1);
-                setTimeout(function () {
-                    window.location.reload();
-                }, 2000);
-            }
+        // Duplicate Ticket
+
+        duplicateTicket: function (data) {
+            window.open(this.$store.state.app_url  +'print/' + data.id + '/pdf/duplicate', '_blank').focus();
         }
-        ,
-    }
-    ,
+
+    },
+    // computed: {
+    //     ...
+    //         mapGetters(["getDeletingObj"]),
+    // }
+    // ,
+    // watch: {
+    //     getDeletingObj(obj) {
+    //         if (obj.isDeleted) {
+    //             this.surcharges.splice(obj.index, 1);
+    //             setTimeout(function () {
+    //                 window.location.reload();
+    //             }, 2000);
+    //         }
+    //     }
+    //     ,
+    // }
+    // ,
 };
 </script>
 <style scoped>
