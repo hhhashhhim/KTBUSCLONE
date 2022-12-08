@@ -32261,12 +32261,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.postData.partId = data ? data.part_id : '';
                 _this2.postData.currentReading = "";
                 _this2.postData.amount = "";
-                _this2.postData.companyPaid = "222";
+                _this2.postData.companyPaid = "";
                 _this2.postData.evidence = "";
                 _this2.postData.detail = "";
+                $("#imageField").val('');
                 _this2.checkDisable = data ? true : false;
 
-              case 9:
+              case 10:
               case "end":
                 return _context2.stop();
             }
@@ -32321,11 +32322,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(!_this4.postData.fleetId || !_this4.postData.partId || !_this4.postData.currentReading || !_this4.postData.amount || !_this4.postData.companyPaid || !_this4.postData.evidence || !_this4.postData.detail)) {
-                  _context4.next = 3;
+                  _context4.next = 2;
                   break;
                 }
 
-                console.log(_this4.postData);
                 return _context4.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field",
@@ -32333,7 +32333,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 4000
                 }));
 
-              case 3:
+              case 2:
                 _this4.loading = true;
                 config = {
                   headers: {
@@ -32349,10 +32349,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 formData.append('evidence', _this4.postData.evidence);
                 formData.append('detail', _this4.postData.detail);
                 formData.append('maintenanceType', _this4.postData.maintenanceType);
-                _context4.next = 16;
+                _context4.next = 15;
                 return _this4.callApi("post", "fleet/maintenance/due/add", formData, config);
 
-              case 16:
+              case 15:
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
@@ -32369,6 +32369,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.postData.companyPaid = "";
                 _this4.postData.evidence = "";
                 _this4.postData.detail = "";
+                $("#imageField").val('');
                 swal({
                   title: "Success",
                   text: "Maintenance Added",
@@ -51687,7 +51688,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         placeholder: "",
         onChange: _cache[8] || (_cache[8] = function ($event) {
           return $options.evidenceImage($event);
-        })
+        }),
+        id: "imageField"
       }, null, 32
       /* HYDRATE_EVENTS */
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
