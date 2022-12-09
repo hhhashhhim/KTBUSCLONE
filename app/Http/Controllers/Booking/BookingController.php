@@ -352,6 +352,7 @@ class BookingController extends Controller
             'Content-Type' => 'application/pdf',
         ]);
     }
+
     public function duplicatePdf($id)
     {
         $ticket = Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->whereIn('id', explode('-', $id))->get();

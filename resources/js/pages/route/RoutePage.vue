@@ -125,7 +125,8 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" id="selectCities" @change="fetchTerminals($event , index)">
+                                    <select class="form-control rounded-0" id="selectCities"
+                                            @change="fetchTerminals($event , index)">
                                         <option value="0" selected>Select City</option>
                                         <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                             {{ city.name }}
@@ -252,7 +253,7 @@ export default {
             this.data = {};
             this.reverseRoute = 1;
             this.loop = 1;
-            this.addCities = 0;
+            this.addCities = [];
             $("select#selectCities").prop('selectedIndex', 0);
         },
         fareClassValue(data, className) {
@@ -274,7 +275,6 @@ export default {
                 revereRoute: this.reverseRoute,
                 terminals: this.addTerminalsOnClick
             }
-
             this.loading = true;
             const res = await this.callApi("post", "cities/routes", data);
             if (res.status === 200) {
@@ -370,7 +370,7 @@ export default {
             const value = event.target.value
             if (event.target.checked) {
                 const index = this.addTerminalsOnClick.indexOf(value);
-                if (index === -1) {
+                if (index == -1) {
                     this.addTerminalsOnClick.push(value);
                 }
             } else {
@@ -381,17 +381,9 @@ export default {
         async fetchTerminals(event, index) {
             const value = event.target.value;
             const indexI = this.addCities.indexOf(value);
-            if (indexI === -1) {
+            if (indexI == -1) {
                 this.addCities.push(value);
             }
-
-            // const terminalRes = await this.callApi("post", "cities/terminals", {
-            //     id: value
-            // });
-            // if (terminalRes.status === 200) {
-            //     this.terminals[index] = terminalRes.data;
-            //
-            // }
         },
         async fetchCities() {
             const cityRes = await this.callApi("post", "cities/routes/list");

@@ -34220,7 +34220,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data = {};
       this.reverseRoute = 1;
       this.loop = 1;
-      this.addCities = 0;
+      this.addCities = [];
       $("select#selectCities").prop('selectedIndex', 0);
     },
     fareClassValue: function fareClassValue(data, className) {
@@ -34395,7 +34395,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (event.target.checked) {
         var index = this.addTerminalsOnClick.indexOf(value);
 
-        if (index === -1) {
+        if (index == -1) {
           this.addTerminalsOnClick.push(value);
         }
       } else {
@@ -34416,16 +34416,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 value = event.target.value;
                 indexI = _this3.addCities.indexOf(value);
 
-                if (indexI === -1) {
+                if (indexI == -1) {
                   _this3.addCities.push(value);
-                } // const terminalRes = await this.callApi("post", "cities/terminals", {
-                //     id: value
-                // });
-                // if (terminalRes.status === 200) {
-                //     this.terminals[index] = terminalRes.data;
-                //
-                // }
-
+                }
 
               case 3:
               case "end":

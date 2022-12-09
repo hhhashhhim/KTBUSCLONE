@@ -96,11 +96,7 @@ class CityController extends Controller
             'route.required' => 'Route Name is Required !!!!'
         ]);
         if (count($request->cities) < 2) {
-            return response()->json([
-                "errors" => [
-                    "Cities Error" => ["Please Select At leat 2 Cities !!!"]
-                ]
-            ], 422);
+            return response()->json(["errors" => ["Cities Error" => ["Please Select At leat 2 Cities !!!"]]], 422);
         }
         foreach ($request['cities'] as $index => $city) {
             $used_cities[] = $city;
