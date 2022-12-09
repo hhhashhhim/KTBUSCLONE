@@ -28,6 +28,7 @@ import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
 import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
 import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 import MaintenanceRecordPage from "./pages/maintenance/RecordPage.vue";
+import HotelPage from "./pages/refreshment/HotelPage.vue";
 
 // const url = '/projects/kt/'
 const url = '/kt/'
@@ -173,6 +174,11 @@ const routes = [
         path: url + "fleet/maintenance/record",
         component : MaintenanceRecordPage,
         name:"maintenance-record"
+    },
+    {
+        path: url + "refreshments/hotels",
+        component : HotelPage,
+        name:"hotels"
     },
     {
         path: url + "settings/tickets",
