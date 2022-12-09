@@ -43576,6 +43576,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: function onClick($event) {
           $options.passDataToRescheduleModel(innerItem.date, innerItem.customer_id, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);
           _this.rescheduleData.rescheduleSchedule = 0;
+          _this.seatMapReschedule = false;
         }
       }, "Reschedule ", 8
       /* PROPS */

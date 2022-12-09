@@ -647,7 +647,7 @@
                                                         Add ELT
                                                     </button>
                                                     <button type="button" class="btn btn-primary ml-2"
-                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0"
+                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                                     >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
@@ -1289,7 +1289,7 @@ export default {
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
-            let same = data.dataSeat_no == col.seatNo ? 'sameColor' : "";
+            let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + same;
         },
 

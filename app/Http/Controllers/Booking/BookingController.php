@@ -156,6 +156,13 @@ class BookingController extends Controller
             $bookingNo = Ticket::where('date', $request->rescheduleDate)->latest()->first()->booking_no ?? 0;
             ++$bookingNo;
         }
+        $scheduleDetail = ScheduleDetail::where([
+            'company_id' => $this->company_id,
+            'departure_date' => $ticket->date,
+            'departure_id' => $ticket->departure_city_id,
+            'destination_id' => $ticket->destination_city_id,
+            'schedule_id' => $ticket->schedule_id,
+        ])->first();
         TicketReschedule::create([
             'company_id' => $this->company_id,
             'schedule_id' => $ticket->schedule_id,
@@ -179,6 +186,7 @@ class BookingController extends Controller
             'is_partial' => $ticket->is_partial,
             'booking_no' => $bookingNo,
             'date' => $request->rescheduleDate,
+            'schedule_details_id' => $scheduleDetail->id,
             'customer_id' => $request->dataCustomer,
             'schedule_id' => $request->rescheduleSchedule,
             'remarks' => $ticket->remarks,
