@@ -506,6 +506,10 @@
                                                    :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
                                                 </i>
                                             </small>
+                                            <small v-if="col.over_issue == true">
+                                                <i class="type-icons far fa-hand-paper text-danger">
+                                                </i>
+                                            </small>
                                         </div>
                                         <span v-else></span>
                                     </div>

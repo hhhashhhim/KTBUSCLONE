@@ -32,8 +32,8 @@ import HotelPage from "./pages/refreshment/HotelPage.vue";
 import FoodPage from "./pages/refreshment/FoodPage.vue";
 
 // const url = '/projects/kt/'
-const url = '/kt/'
-// const url = '/'
+// const url = '/kt/'
+const url = '/'
 
 const routes = [
     {
