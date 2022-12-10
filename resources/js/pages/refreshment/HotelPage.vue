@@ -27,38 +27,45 @@
                                                 <div class="table-responsive">
                                                     <table
                                                         class="table table-striped table-hover"
-                                                        id="company_table"
+                                                        id="hotel_table"
                                                     >
                                                         <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
                                                             <th>Contact</th>
+                                                            <th>Balance (Rs)</th>
+                                                            <th>Commission (%)</th>
                                                             <th>Location</th>
                                                             <th>Logo</th>
                                                             <th>Action</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr v-for="(company, i) in companies" :key="i">
+                                                        <tr v-for="(hotel, i) in hotels" :key="i">
                                                             <td>{{ i + 1 }}</td>
-                                                            <td>{{ company.name }}</td>
-                                                            <td>{{ phoneFormat(company.contact) }}</td>
-                                                            <td>{{ company.location }}</td>
+                                                            <td>{{ hotel.name }}</td>
+                                                            <td>{{ phoneFormat(hotel.contact) }}</td>
+                                                            <td>{{ hotel.balance??0 }}</td>
+                                                            <td>{{ hotel.commission }}</td>
+                                                            <td>{{ hotel.location }}</td>
                                                             <td>
-                                                                <a :href="$store.state.app_url +'uploads/company/logo/'+(company.logo)" target="_blank">
-                                                                <img :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)" style="width:120px;height:150px;" alt="">
+                                                                <a :href="$store.state.app_url +'uploads/refreshment/hotel/'+(hotel.logo)" target="_blank">
+                                                                <img :src="$store.state.app_url +'uploads/refreshment/hotel/'+(hotel.logo)" style="width:100px;height:100px;" alt="">
                                                                 </a>
                                                             </td>
                                                             <td>
                                                                 <button
                                                                     :data-target="'#'+ editFormID"
                                                                     data-toggle="modal"
-                                                                    @click="edit(company.id, i)"
+                                                                    @click="edit(hotel)"
                                                                     class="btn btn-primary mx-1"
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
+                                                                <router-link class="btn btn-success" @click="hotelId(hotel.id)" :to="{ name:'foods' }">
+                                                                    <i class="fas fa-plus"></i> Add Food
+                                                                </router-link>
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -76,76 +83,99 @@
 
                 <!-- Add Modal -->
                 <Add
-                    heading="Company"
+                    heading="Add Hotel"
                     :errors="this.validationErrors"
                     :success="success"
                     :formID="formID"
                 >
                     <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="name">Company Name <span class="text-danger">*</span></label>
+                        <div class="form-group col-md-6">
+                            <label for="name">Hotel Name <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
-                                placeholder="Enter Name"
+                                placeholder="Enter Hotel Name"
                                 id="name"
-                                v-model="data.name"
+                                v-model="postData.hotelName"
                             />
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="contact">Contact <span class="text-danger">*</span></label>
-                            <vue-mask
-                                class="form-control"
-                                v-model="data.contact"
-                                mask="0000-0000000"
-                                :raw="false"
-                                :options="options">
-                            </vue-mask>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="Logo">Logo</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input"  id="Logo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'add')">
-                                <label class="custom-file-label" for="logo">{{addLogoName != '' ? addLogoName : 'Choose.jpg, .png, .jpeg Image'}}</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="userName">Name <span class="text-danger">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
                                 placeholder="Enter Name"
                                 id="userName"
-                                v-model="data.userName"
+                                v-model="postData.name"
                             />
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="email">Email <span class="text-danger">*</span></label>
                             <input
-                                type="text"
+                                type="email"
                                 class="form-control"
                                 placeholder="Enter Email"
                                 id="email"
-                                v-model="data.email"
+                                v-model="postData.email"
                             />
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
                             <label for="password">Password <span class="text-danger">*</span></label>
                             <input
                                 type="password"
                                 class="form-control"
                                 placeholder="Enter Password"
                                 id="password"
-                                v-model="data.password"
+                                v-model="postData.password"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Contact <span class="text-danger">*</span></label>
+                            <vue-mask
+                                class="form-control"
+                                v-model="postData.contact"
+                                mask="0000-0000000"
+                                :raw="false"
+                                :options="options">
+                            </vue-mask>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="Logo">Logo</label>
+                            <input
+                                type="file"
+                                class="form-control"
+                                placeholder=""
+                                @change="uploadLogo($event,'add')"
+                                id="imageField"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Initial Balance </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                placeholder="Balance"
+                                id="balance"
+                                v-model="postData.balance"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                placeholder="Commission"
+                                id="balance"
+                                v-model="postData.commission"
                             />
                         </div>
                         <div class="form-group col-md-12">
-                            <label for="location">Location</label>
+                            <label for="location">Location <span class="text-danger">*</span></label>
                             <textarea
                                 class="form-control"
                                 placeholder="Enter Location"
                                 id="location"
-                                v-model="data.location"
+                                v-model="postData.location"
                                 cols="30"
                                 rows="10"
                             ></textarea>
@@ -158,9 +188,9 @@
                             type="button"
                             class="btn btn-primary"
                             :disabled="loading"
-                            @click="add"
+                            @click="update"
                         >
-                            {{ loading ? "Loading...." : "Add company" }}
+                            {{ loading ? "Loading...." : "Update Hotel" }}
                         </button>
                     </template>
                 </Add>
@@ -172,88 +202,112 @@
                     :success="success"
                     :editForm="editFormID"
                 >
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="name">Company Name  <span class="text-danger">*</span></label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Name"
-                                id="name"
-                                v-model="dataEdit.name"
-                            />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="contact">Contact <span class="text-danger">*</span></label>
-                            <vue-mask
-                                class="form-control"
-                                v-model="dataEdit.contact"
-                                mask="0000-0000000"
-                                :raw="false"
-                                :options="options">
-                            </vue-mask>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="Logo">Logo</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'edit')">
-                                <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName : 'Choose.jpg, .png, .jpeg Image' }}</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="userName">User Name</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter User Name"
-                                id="userName"
-                                v-model="dataEdit.name"
-                            />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="email">Email</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Email"
-                                id="email"
-                                v-model="dataEdit.email"
-                            />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="password">Password</label>
-                            <input
-                                type="password"
-                                class="form-control"
-                                placeholder="Enter Password"
-                                id="password"
-                                v-model="dataEdit.password"
-                            />
-                        </div>
-                        <div class="form-group col-md-12">
-                            <label for="location">Location</label>
-                            <textarea
-                                class="form-control"
-                                placeholder="Enter Location"
-                                id="location"
-                                v-model="dataEdit.location"
-                                cols="30"
-                                rows="10"
-                            ></textarea>
-                        </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Hotel Name <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Hotel Name"
+                            id="name"
+                            v-model="editData.hotelName"
+                        />
                     </div>
-                    <template v-slot:button>
-                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update" >
-                            {{ loading ? 'Loading...' : 'Update company' }}
-                        </button>
-                    </template>
-                </Edit>
+                    <div class="form-group col-md-6">
+                        <label for="userName">Name <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Name"
+                            id="userName"
+                            v-model="editData.name"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            placeholder="Enter Email"
+                            id="email"
+                            v-model="editData.email"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="password">Password <small>(Empty field will save password same)</small></label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            placeholder="Enter Password"
+                            id="password"
+                            v-model="editData.password"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Contact <span class="text-danger">*</span></label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="editData.contact"
+                            mask="0000-0000000"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Logo">Logo <small>(Empty field will save logo same)</small></label>
+                        <input
+                            type="file"
+                            class="form-control"
+                            placeholder=""
+                            @change="uploadLogo($event,'edit')"
+                            id="editImageField"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Initial Balance </label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            placeholder="Balance"
+                            id="balance"
+                            v-model="editData.balance"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            placeholder="Commission"
+                            id="balance"
+                            v-model="editData.commission"
+                        />
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="location">Location <span class="text-danger">*</span></label>
+                        <textarea
+                            class="form-control"
+                            placeholder="Enter Location"
+                            id="location"
+                            v-model="editData.location"
+                            cols="30"
+                            rows="10"
+                        ></textarea>
+                    </div>
+                </div>
 
-                <!-- Delete Modals -->
-                <ConfirmationModal
-                    :formID="confirmModalID"
-                    v-on:confirmDeleteModal="confirmDeleteModal(event)"
-                />
+                
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        :disabled="loading"
+                        @click="update"
+                    >
+                        {{ loading ? "Loading...." : "Update Hotel" }}
+                    </button>
+                </template>
+                </Edit>
             </div>
         </section>
     </div>
@@ -262,9 +316,6 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
-import ConfirmationModal from "../../components/ConfirmationModal.vue";
-import Modal from "../../components/Modal.vue";
 import vueMask from 'vue-jquery-mask';
 
 import {mapGetters} from "vuex";
@@ -274,9 +325,6 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
-        Modal,
-        ConfirmationModal,
         vueMask,
     },
     data() {
@@ -286,80 +334,106 @@ export default {
                 placeholder: '0300-0000000',
                 // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
-            roles: [],
-            formID: "newCompany",
-            confirmModalID: "confirmModal",
+            formID: "newHotel",
             editFormID:'edit_company_form',
             loading: false,
-            data: {
+            hotels: [],
+            postData: {
+                hotelName: "",
                 name: "",
+                email: "",
+                password: "",
                 contact: "",
                 logo: "",
+                balance: "",
+                commission: "",
                 location: "",
             },
-            addLogoName: '',
-            editLogoName: '',
-            dataEdit: {
+            editData: {
+                hotelId: "",
+                userId: "",
+                hotelName: "",
                 name: "",
+                email: "",
+                password: "",
                 contact: "",
                 logo: "",
+                balance: "",
+                commission: "",
                 location: "",
             },
             success: false,
-            companies: [],
         };
     },
     async created() {
-        await this.fetchCompany();
+        await this.fetchData();
     },
     methods: {
-        async fetchCompany() {
-            this.data.modules = this.dataEdit.modules = this.defaultModules;
-            const companyRes = await this.callApi("post", "company");
-            if (companyRes.status == 200) {
-                this.companies = companyRes.data;
+        async fetchData() {
+            const hotelRes = await this.callApi("post", "refreshments/hotels");
+            if (hotelRes.status == 200) {
+                this.hotels = hotelRes.data;
                 setTimeout(() => {
-                    $("#company_table").DataTable();
+                    $("#hotel_table").DataTable();
                 }, 300);
             }
+        },
+        async hotelId(hotelId) {
+            localStorage.setItem('hotel-id',hotelId);
         },
         phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
-        async add(e) {
+        async add() {
+
+            // validation for empty data
+            if(!this.postData.hotelName || !this.postData.name || !this.postData.email || !this.postData.password ||
+                !this.postData.contact || !this.postData.commission || !this.postData.location)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill Required Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            this.loading = true;
+
             const config = {
                 headers: {'content-type': 'multipart/form-data'}
             }
+
             let formData = new FormData();
-            formData.append('logo', this.data.logo);
+            formData.append('hotelName', this.postData.hotelName);
+            formData.append('name', this.postData.name);
+            formData.append('email', this.postData.email);
+            formData.append('password', this.postData.password);
+            formData.append('contact', this.postData.contact);
+            formData.append('logo', this.postData.logo);
+            formData.append('balance', this.postData.balance);
+            formData.append('commission', this.postData.commission);
+            formData.append('location', this.postData.location);
+            
 
-            this.validationErrors = [];
-            if (this.data.name == "")
-                return this.errorsArray("Company Name is Required", "Name");
-            if (this.data.contact == "")
-                return this.errorsArray("Company Contact is Required", "Contact");
-            if (this.data.userName == "")
-                return this.errorsArray("Name  is Required", "userName");
-            if (this.data.email == "")
-                return this.errorsArray("Company Email is Required", "Email");
-            if (this.data.password == "")
-                return this.errorsArray("Company password is Required", "Contact");
-            this.loading = true;
-
-            let logo = "";
-            if (this.data.logo) {
-                const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
-                logo = logoRes ? logoRes.data.name : ""
-            }
-            const res = await this.callApi("post", "company/store", { ...this.data,  logo });
+            const res = await this.callApi("post", "refreshments/hotels/store", formData , config);
             if (res.status == 201) {
                 this.loading = false
-                $("#company_table").DataTable().destroy();
-                this.success = "Company Created Successfully";
-                await this.fetchCompany();
-                this.data.name = this.data.contact = this.data.location = "";
-                this.data.modules = this.defaultModules;
-                this.data = "";
+                $("#hotel_table").DataTable().destroy();
+                this.success = "Hotel Created Successfully";
+                
+                this.postData.hotelName = "";
+                this.postData.name = "";
+                this.postData.email = "";
+                this.postData.password = "";
+                this.postData.contact = "";
+                this.postData.logo = "";
+                this.postData.balance = "";
+                this.postData.commission = "";
+                this.postData.location = "";
+                $("#imageField").val('');
+                
+                await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {
                     this.success = "";
@@ -376,63 +450,85 @@ export default {
                 }
             }
         },
-        async edit(id, i) {
-            const res = await this.callApi("post", "company/get", {id});
-            let company;
-
-            if (res.status == 200) {
-                company = res.data;
+        async edit(hotel) {
+            
+            if (hotel) {
+                this.editData.hotelId = hotel.id;
+                this.editData.userId = hotel.user_id;
+                this.editData.hotelName = hotel.name;
+                this.editData.name = hotel.user.name;
+                this.editData.email = hotel.user.email;
+                this.editData.contact = hotel.contact;
+                this.editData.balance = hotel.balance;
+                this.editData.commission = hotel.commission;
+                this.editData.location = hotel.location;
             } else {
                 return alert("Something Went Wrong !!!");
             }
 
-            
-
-            this.dataEdit = {
-                ...company,
-            };
         },
         async update() {
+            
+            // validation for empty data
+            if(!this.editData.hotelName || !this.editData.name || !this.editData.email ||
+                !this.editData.contact || !this.editData.commission || !this.editData.location)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill Required Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            this.loading = true;
+
             const config = {
                 headers: {'content-type': 'multipart/form-data'}
             }
+
             let formData = new FormData();
-            formData.append('logo', this.dataEdit.logo);
-            this.validationErrors = [];
-            if (this.dataEdit.name == "")
-                return this.errorsArray("Company Name is Required", "Name");
+            formData.append('hotelId', this.editData.hotelId);
+            formData.append('userId', this.editData.userId);
+            formData.append('hotelName', this.editData.hotelName);
+            formData.append('name', this.editData.name);
+            formData.append('email', this.editData.email);
+            formData.append('password', this.editData.password);
+            formData.append('contact', this.editData.contact);
+            formData.append('logo', this.editData.logo);
+            formData.append('balance', this.editData.balance);
+            formData.append('commission', this.editData.commission);
+            formData.append('location', this.editData.location);
+            
 
-            this.loading = true;
-            let logo = "";
-            if (this.dataEdit.logo) {
-                const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
-                logo = logoRes ? logoRes.data.name : ""
-            }
-
-            const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
-
+            const res = await this.callApi("post", "refreshments/hotels/update", formData , config);
             if (res.status == 200) {
-                this.loading = true;
-                $("#company_table").DataTable().destroy();
-                this.success = "Company Updated Successfully";
-                const companyRes = await this.callApi("post", "company");
-                if (companyRes.status == 200) {
-                    this.companies = companyRes.data;
-                }
-                $("#company_table").DataTable();
-                this.dataEdit.name = "";
-                this.modules = [
-                    {hrm: false},
-                    {accounts: false},
-                    {booking: false},
-                ];
-
+                this.loading = false
+                $("#hotel_table").DataTable().destroy();
+                this.success = "Hotel Updated Successfully";
+                
+                this.editData.hotelId = "";
+                this.editData.userId = "";
+                this.editData.hotelName = "";
+                this.editData.name = "";
+                this.editData.email = "";
+                this.editData.password = "";
+                this.editData.contact = "";
+                this.editData.logo = "";
+                this.editData.balance = "";
+                this.editData.commission = "";
+                this.editData.location = "";
+                $("#editImageField").val('');
+                
+                await this.fetchData();
+                window.scrollTo(0, 0);
                 setTimeout(() => {
                     this.success = "";
-                    $("#edit-modal").modal("hide");
-                }, 3000);
+                    $("#add-modal").modal("hide");
+                }, 2000);
             } else {
                 if (res.status == 422) {
+                    this.loading = false
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
@@ -445,14 +541,10 @@ export default {
             const imageFile = e.target.files[0];
             if (imageFile.name.match(/\.(jpg|jpeg|png)$/i)) {
                 if (name == "add") {
-                    const addLogo = e.target.files[0];
-                    this.addLogoName = addLogo.name;
-                    this.data.logo = imageFile;
+                    this.postData.logo = imageFile;
                 }
                 if (name == "edit") {
-                    const editLogo = e.target.files[0];
-                    this.editLogoName = editLogo.name;
-                    this.dataEdit.logo = imageFile;
+                    this.editData.logo = imageFile;
                 }
             } else {
                return swal({

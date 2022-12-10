@@ -59,6 +59,7 @@ Route::get("/logout", [AuthController::class, 'logout'])->middleware([CustomMidd
 
 
 require_once('web/maintenance.php');
+require_once('web/refreshment.php');
 //role Routes
 Route::group(['prefix' => 'role', 'middleware', [CustomMiddleware::class]], function () {
     Route::post('/', [RoleController::class, 'index']);
