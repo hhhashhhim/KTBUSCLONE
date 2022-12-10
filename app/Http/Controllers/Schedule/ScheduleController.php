@@ -78,7 +78,7 @@ class ScheduleController extends Controller
             $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$schedule->start_date $schedule->time")) + ($i * 86400);
 
-            foreach ($routeDetails as  $detail) {
+            foreach ($routeDetails as $detail) {
 
                 if ($lastDepId == $detail->departure_city_id) {
                     $departureTime = date("Y-m-d H:i", $totalTime);
@@ -246,7 +246,7 @@ class ScheduleController extends Controller
         return $schedule;
     }
 
-        public function selected(Request $request)
+    public function selected(Request $request)
     {
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
