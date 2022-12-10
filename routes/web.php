@@ -170,6 +170,7 @@ Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function ()
     Route::post('/store', [BusClassController::class, 'storeBusClass']);
     Route::post('/update', [BusClassController::class, 'updateBusClass']);
     Route::post('/delete', [BusClassController::class, 'deleteBusClass']);
+    Route::post('/duplicate', [BusClassController::class, 'duplicateBusClass']);
 });
 
 Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {

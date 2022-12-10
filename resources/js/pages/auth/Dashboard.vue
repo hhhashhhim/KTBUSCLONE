@@ -1411,8 +1411,8 @@
 </template>
 <script>
 export default {
-    created() {
-        console.log('something');
-    },
+    // created() {
+    //     console.log('something');
+    // },
 };
 </script>

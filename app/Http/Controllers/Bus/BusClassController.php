@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class BusClassController extends Controller
-{ public $company_id;
+{
+    public $company_id;
 
     public function __construct()
     {
@@ -68,5 +69,16 @@ class BusClassController extends Controller
     public function deleteBusClass(Request $request)
     {
         return BusClass::find($request->id)->delete();
+    }
+
+    public function duplicateBusClass(Request $request)
+    {
+        $busClass = BusClass::where('company_id', $this->company_id)->where('id', $request->id)->first();
+        $busClass->name = $busClass->name .'-' .'Duplicate';
+        $busClass->time = now();
+        $new = $busClass->replicate();
+        $new->created_at  = now();
+        $new->save();
+        return $new;
     }
 }

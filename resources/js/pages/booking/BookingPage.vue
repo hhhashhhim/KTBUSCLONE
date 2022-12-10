@@ -506,10 +506,6 @@
                                                    :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
                                                 </i>
                                             </small>
-                                            <!--                                            <small v-if="col.over_issue == true">-->
-                                            <!--                                                <i class="type-icons far fa-hand-paper text-danger">-->
-                                            <!--                                                </i>-->
-                                            <!--                                            </small>-->
                                         </div>
                                         <span v-else></span>
                                     </div>
@@ -1647,7 +1643,6 @@ export default {
         },
         // Reschedule model
         async passDataToRescheduleModel(data) {
-
             this.rescheduleData = {
                 rescheduleDate: data.date,
                 existingDate: data.date,
@@ -1656,8 +1651,9 @@ export default {
                 dataDepartureCity: data.departure_city_id,
                 dataDestination: data.destination_city_id,
                 dataSeat_no: data.seat_no,
+                dataAll: data,
             }
-
+            console.log(this.rescheduleData);
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {

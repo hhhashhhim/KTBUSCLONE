@@ -70,15 +70,16 @@
                                                             ></div>
                                                         </td>
                                                         <td>
-                                                            {{
-                                                                busClass.is_active == 1
-                                                                    ? "Active"
-                                                                    : "InActive"
-                                                            }}
+                                                            {{ busClass.is_active == 1 ? "Active" : "InActive" }}
                                                         </td>
                                                         <td>{{ busClass.added_by.name }}</td>
 
                                                         <td>
+                                                            <button
+                                                                @click="duplicate(busClass.id, i+1)"
+                                                                class="btn btn-info mx-1"
+                                                            > <i class="fas fa-clone"></i>
+                                                            </button>
                                                             <button
                                                                 :data-target="'#' + editFormID"
                                                                 data-toggle="modal"
@@ -87,6 +88,7 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
+
                                                             <!--                                                            <button-->
                                                             <!--                                                                :data-target="'#' + deleteFormID"-->
                                                             <!--                                                                data-toggle="modal"-->
@@ -150,7 +152,7 @@
                       class="colorinput-input"
                       @change="checkBox($event)"
                   />
-                  <span class="colorinput-color bg-success"></span>
+                  <span class="colorinput-color bg-primary"></span>
                 </span>
                             </label>
                         </div>
@@ -682,6 +684,7 @@ export default {
             error: false,
             isShowDiv: false,
             isShowEditDiv: false,
+            cloneDone: false,
             BusClassName: "",
             updateSeatValue: [],
             editSingleSeat: [],
@@ -1093,8 +1096,7 @@ export default {
                     }
                 }
             }
-        }
-        ,
+        },
 
         async updateBusClass() {
             this.validationErrors = [];
@@ -1170,8 +1172,48 @@ export default {
 
         edit(bus_class) {
             this.dataEdit = {...bus_class, busClassColor: bus_class.color};
+        },
+        async duplicate(id, index){
+            this.cloneDone = true;
+            const res = await this.callApi("post", "bus_classes/duplicate", {id : id});
+            if (res.status == 201) {
+                swal({
+                    title: "Success",
+                    text:  "Row # " + index + " Duplicated Successfully",
+                    icon: "success",
+                    timer: 3000,
+                });
+                this.cloneDone = false;
+                $("#bus_class_table").DataTable().destroy();
+                await this.fetchBussClasses();
+                this.data = {
+                    busClassColor: "#000000",
+                };
+            } else {
+                if (res.status == 422) {
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+
         }
-        ,
     },
     async created() {
         await this.fetchBussClasses();
