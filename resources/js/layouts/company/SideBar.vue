@@ -183,6 +183,23 @@
                         </li>
                     </ul>
                 </li>
+                <!-- <li class="dropdown" v-if="checkPermission('hrm')">
+
+                    <a href="#" class="menu-toggle nav-link has-dropdown">
+                        <i class="fas fa-sitemap"></i>
+                        <span>
+                            Refreshment
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'hotels' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i> Hotels
+                            </router-link>
+                        </li>
+                    </ul>
+                </li> -->
                 <li class="dropdown" v-if="checkPermission('hrm')">
 
                     <a href="#" class="menu-toggle nav-link has-dropdown">
