@@ -99,7 +99,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="fare">Fare <sapn class="text-danger">*</sapn></label>
+                        <label for="fare">Fare <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">
@@ -113,7 +113,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="distance_in_km">Distance in KiloMeter</label>
+                        <label for="distance_in_km">Distance In KM</label>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4" v-model="data.distance_in_km">
                             <div class="input-group-append">

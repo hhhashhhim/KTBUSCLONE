@@ -87,14 +87,14 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-<!--                                                            <button-->
-<!--                                                                :data-target="'#' + deleteFormID"-->
-<!--                                                                data-toggle="modal"-->
-<!--                                                                @click="deleteModal(busClass, i)"-->
-<!--                                                                class="btn btn-danger"-->
-<!--                                                            >-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
+                                                            <!--                                                            <button-->
+                                                            <!--                                                                :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                                data-toggle="modal"-->
+                                                            <!--                                                                @click="deleteModal(busClass, i)"-->
+                                                            <!--                                                                class="btn btn-danger"-->
+                                                            <!--                                                            >-->
+                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -214,16 +214,20 @@
                             :key="rowIndex">
                             <td v-for="(col, colIndex) in record" :key="colIndex"
                             >
-                                <small  class="font-weight-bold position-absolute text-dark" style="font-size: 10px !important"  v-if="col.reserved">{{this.data.seatMap[rowIndex][colIndex].seatNo ?? 'N/A'}}</small>
+                                <small class="font-weight-bold position-absolute text-dark"
+                                       style="font-size: 10px !important"
+                                       v-if="col.reserved">{{
+                                        this.data.seatMap[rowIndex][colIndex].seatNo ?? 'N/A'
+                                    }}</small>
                                 <img
                                     :data-toggle="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? 'modal' : ''"
                                     :data-target="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? '#addSeatNumber' : ''"
-                                     v-if="col.reserved"
+                                    v-if="col.reserved"
                                     class="position-relative"
                                     :class="col.selected ? 'selected' : ''"
                                     :style=" col.class ? checkClass(col.class) : '' "
                                     @click="selectSeat(rowIndex, colIndex)"
-                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt="" />
+                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
                                 <span v-else></span>
                             </td>
                         </tr>
@@ -234,9 +238,9 @@
                                  :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
-                        <button class="btn btn-primary" 
-                        :data-toggle="checkAllSeatAssign ? 'modal' : ''" 
-                        :data-target="checkAllSeatAssign ? '#setSeatClass' : ''"
+                        <button class="btn btn-primary"
+                                :data-toggle="checkAllSeatAssign ? 'modal' : ''"
+                                :data-target="checkAllSeatAssign ? '#setSeatClass' : ''"
                                 @click="resetAttributes()">Set Attributes
                         </button>
                     </div>
@@ -271,7 +275,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="assignSeatNumber(setSeatNumber.rowId, setSeatNumber.colId)">Assign Seat
+                            <button type="button" class="btn btn-primary"
+                                    @click="assignSeatNumber(setSeatNumber.rowId, setSeatNumber.colId)">Assign Seat
                                 Number
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -522,19 +527,16 @@
                                 v-for="(col, colIndex) in record"
                                 :key="colIndex"
                             >
-                                <small  class="font-weight-bold position-absolute text-dark" style="font-size: 10px !important"  v-if="col.reserved">{{col.seatNo ?? 'N/A'}}</small>
+                                <small class="font-weight-bold position-absolute text-dark"
+                                       style="font-size: 10px !important"
+                                       v-if="col.reserved">{{ col.seatNo ?? 'N/A' }}</small>
                                 <img
                                     data-toggle="modal"
                                     data-target="#setEditSeatClass"
                                     @click="getSeatDetails(rowIndex, colIndex)"
                                     :style=" col.class ? checkClass(col.class) : '' "
                                     v-if="col.reserved"
-                                    :src="
-                    $store.state.app_url +
-                    'assets/img/buses/booked_seat_img.gif'
-                  "
-                                    alt=""
-                                />
+                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt="" />
                                 <span v-else></span>
                             </td>
                         </tr>
@@ -707,7 +709,7 @@ export default {
         };
     },
     methods: {
-        resetAttributes: function () {  
+        resetAttributes: function () {
             let b = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
@@ -717,8 +719,7 @@ export default {
                 }
             });
 
-            if(b==1)
-            {
+            if (b == 1) {
                 this.checkAllSeatAssign = false;
                 return swal({
                     title: "Required !",
@@ -729,7 +730,7 @@ export default {
             }
 
             this.checkAllSeatAssign = true;
-            
+
             this.seatModify.class = 0;
             this.seatModify.type = 0;
 
@@ -834,8 +835,7 @@ export default {
         },
         assignSeatNumber: function (rowId, colId) {
 
-            
-            if(this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined'){
+            if (this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined') {
                 return swal({
                     title: "Required !",
                     text: "Please Enter Seat Number",
@@ -844,7 +844,7 @@ export default {
                 });
             }
             // Check seat number should be unique
-            if(this.uniqueSeatNumber.includes(this.setSeatNumber.addSeatNO.toLowerCase())){
+            if (this.uniqueSeatNumber.includes(this.setSeatNumber.addSeatNO.toLowerCase())) {
                 return swal({
                     title: "Required !",
                     text: "This seat number already taken",
@@ -854,25 +854,24 @@ export default {
             }
 
             this.uniqueSeatNumber.push(this.setSeatNumber.addSeatNO);
-            this.data.seatMap[rowId][colId].seatNo =  this.setSeatNumber.addSeatNO;
-
+            this.data.seatMap[rowId][colId].seatNo = this.setSeatNumber.addSeatNO;
             swal({
                 title: "Success",
                 text: "Successfully Added Seat Number",
                 icon: "success",
                 timer: 2000,
             });
-
+            this.setSeatNumber.addSeatNO = '';
         },
         selectSeat(row, col) {
-                let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
-                if (index != -1) {
-                    this.data.seatMap[row][col].selected = false;
-                    this.selectedSeats.splice(index, 1);
-                } else {
-                    this.data.seatMap[row][col].selected = true;
-                    this.selectedSeats.push(JSON.stringify([row, col]));
-                }
+            let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
+            if (index != -1) {
+                this.data.seatMap[row][col].selected = false;
+                this.selectedSeats.splice(index, 1);
+            } else {
+                this.data.seatMap[row][col].selected = true;
+                this.selectedSeats.push(JSON.stringify([row, col]));
+            }
             this.setSeatNumber = {
                 rowId: row,
                 colId: col,
@@ -1004,8 +1003,7 @@ export default {
         ,
         editGenerateMap: function () {
             this.isShowEditDiv = true;
-        }
-        ,
+        },
 
         checkBox: function (e) {
             if (e.target.checked) {
@@ -1027,7 +1025,7 @@ export default {
         async addBusClass() {
             this.validationErrors = [];
 
-            // validation for assign all class 
+            // validation for assign all class
             let b = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
@@ -1037,8 +1035,7 @@ export default {
                 }
             });
 
-            if(b==1)
-            {
+            if (b == 1) {
                 return swal({
                     title: "Required !",
                     text: "Please assign seat class first",
@@ -1232,11 +1229,13 @@ export default {
     display: none;
     opacity: 0;
 }
+
 [tooltip]::before {
     content: '';
     border: 5px solid transparent; /* opinion 4 */
     z-index: 1001; /* absurdity 1 */
 }
+
 [tooltip]::after {
     content: attr(tooltip); /* magic! */
 
@@ -1280,10 +1279,12 @@ export default {
     border-bottom-width: 0;
     border-top-color: #333;
 }
+
 [tooltip]:not([flow])::after,
 [tooltip][flow^="up"]::after {
     bottom: calc(100% + 5px);
 }
+
 [tooltip]:not([flow])::before,
 [tooltip]:not([flow])::after,
 [tooltip][flow^="up"]::before,
@@ -1319,14 +1320,6 @@ export default {
 }
 
 
-
-
-
-
-
-
-
-
 /* UNRELATED to tooltips */
 
 #mytolltip {
@@ -1336,10 +1329,12 @@ export default {
     align-items: center;
     justify-content: center;
 }
+
 #mytolltip div {
     text-align: center;
     color: #353539;
 }
+
 #mytolltip span {
     padding: .5em 1em;
     margin: .5em;

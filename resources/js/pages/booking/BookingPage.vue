@@ -379,7 +379,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="addEltToTicket(eltData.dataDate, eltData.dataSchedule, eltData.dataCustomer, eltData.dataDeparture, eltData.dataDestination, eltData.dataSeat_no, eltData.eltWeight, eltData.eltPrice, eltData.dataSeatFare, eltData.dataDescription)">
+                                @click="addEltToTicket(eltData)">
                             Add ELT
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -409,7 +409,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary mx-1"
-                                @click="addOverIssueTicket(overIssueData.dataDate, overIssueData.dataSchedule, overIssueData.dataCustomer, overIssueData.dataDeparture, overIssueData.dataDestination, overIssueData.dataSeat_no, overIssueData.percentage, overIssueData.reason)">
+                                @click="addOverIssueTicket(overIssueData)">
                             Over-Issue Ticket
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -486,12 +486,9 @@
                         </div>
                         <!--                        Reschedule Seat Map-->
                         <div class=" row mt-3 text-center" v-if="seatMapReschedule">
-                            <div class="col-md-12">
-                                <div
-                                    class="d-flex justify-content-center seat-img p-0 m-0"
-                                    v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map"
-                                    :key="rowIndex"
-                                >
+                            <div class="col-md-10">
+                                <div class="d-flex justify-content-center seat-img p-0 m-0"
+                                     v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
                                     <div v-for="(col, colIndex) in record" :key="colIndex">
                                         <div
                                             v-if="col.reserved"
@@ -509,14 +506,17 @@
                                                    :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
                                                 </i>
                                             </small>
-                                            <small v-if="col.over_issue == true">
-                                                <i class="type-icons far fa-hand-paper text-danger">
-                                                </i>
-                                            </small>
+                                            <!--                                            <small v-if="col.over_issue == true">-->
+                                            <!--                                                <i class="type-icons far fa-hand-paper text-danger">-->
+                                            <!--                                                </i>-->
+                                            <!--                                            </small>-->
                                         </div>
                                         <span v-else></span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-md-2 d-flex d-inline">
+                                <h4>Seat No # {{ rescheduleData.dataSeat_no }} </h4>
                             </div>
                         </div>
                     </div>
@@ -560,7 +560,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="cancelBooking(cancelData.dataDate, cancelData.dataSchedule, cancelData.dataCustomer, cancelData.dataDeparture, cancelData.dataDestination, cancelData.dataSeat_no, cancelData.percentage, cancelData.reason)">
+                                @click="cancelBooking(cancelData)">
                             Cancel Ticket
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -568,9 +568,7 @@
                 </div>
             </div>
         </div>
-
         <!--                <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
-
         <!--        modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
              aria-hidden="true">
@@ -583,7 +581,7 @@
                         </button>
                     </div>
                     <div class="modal-body p-0">
-                        <!--                        loop for number of seats-->
+                        <!--loop for number of seats-->
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
@@ -643,26 +641,23 @@
                                                     <button type="button" class="btn btn-success ml-2">Resend SMS
                                                     </button>
                                                     <button type="button" class="btn btn-info ml-2"
-                                                            @click="passDataToEltModel(innerItem.date, innerItem.customer_id, innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no, innerItem.seat_fare)">
+                                                            @click="passDataToEltModel(innerItem)">
                                                         Add ELT
                                                     </button>
                                                     <button type="button" class="btn btn-primary ml-2"
-                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
+                                                            @click="passDataToRescheduleModel(innerItem); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                                     >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
-                                                            @click="passDataToOverIssueModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id,  innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no);this.overIssueData.percentage = 0">
+                                                            @click="passDataToOverIssueModel(innerItem);this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
                                                     <button type="button" class="btn btn-danger ml-2"
-                                                            @click="passDataToCancelModel(innerItem.date, innerItem.schedule_id, innerItem.customer_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.cancelData.percentage = 0 ">
+                                                            @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0 ">
                                                         Cancel Ticket
                                                     </button>
                                                 </div>
                                             </div>
-                                            <!--                                            <div v-if="key + 1">-->
-                                            <!--                                                <hr>-->
-                                            <!--                                            </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -790,10 +785,6 @@ export default {
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
         window.addEventListener('keydown', this.altD);
-        // window.setInterval(() => {
-        //     this.fetchScheduleData(); // call any function or end point
-        // }, 30000); // interval set to 30 sec.
-
     },
 
     methods: {
@@ -995,7 +986,8 @@ export default {
         },
         async fetchReSpecificSchedules() {
             this.allReSchedules = {};
-
+            this.rescheduleData.rescheduleSchedule = 0;
+            this.seatMapReschedule = false;
             const data = {
                 departure_city_id: this.rescheduleData.dataDepartureCity,
                 destination_city_id: this.rescheduleData.rescheduleDestinationCity,
@@ -1004,6 +996,7 @@ export default {
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
             if (resFetchSchedule.status == 200) {
                 if (resFetchSchedule.length != 0) {
+                    this.seatMapReschedule = false;
                     this.allReSchedules = resFetchSchedule.data;
                 } else {
                     this.rescheduleData.rescheduleSchedule = 0;
@@ -1089,10 +1082,6 @@ export default {
             }
         },
         async fetchScheduleData() {
-            // if (this.addForm.schedule == 0) {
-            //     this.showBookingDiv = false;
-            // }
-            // this.showBookingDiv = false;
             this.resetingArrays();
             this.addForm.totalFare = 0;
             this.addForm.discount = '';
@@ -1284,21 +1273,19 @@ export default {
             return gender + " " + selected + " " + partial + " " + over;
         },
         getClassesReschedule: function (data, col) {
-
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
-            let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
-            return gender + " " + selected + " " + partial + " " + over + " " + same;
+            // let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
+            return gender + " " + selected + " " + partial + " " + over + " " /*+ same*/;
+            // return same;
         },
-
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking') {
-                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks: " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
-
         async add() {
             if (!this.addForm.schedule) {
                 return swal({
@@ -1410,9 +1397,6 @@ export default {
                 }
             }
         },
-        doScroll: function () {
-            $("#addBooking").scrollTop(10);
-        },
         async deleteModal(surcharge, i) {
             const deletingObj = {
                 url: "booking/delete",
@@ -1421,7 +1405,6 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
         },
-
         async resetingArrays() {
             this.selectedSeats = [];
             this.selectedBookedSeats = [];
@@ -1472,18 +1455,19 @@ export default {
             this.selectedBookedSeats = '';
             this.selectedBookedOverIssueSeats = '';
         },
-        passDataToCancelModel: function (date, schedule, customer, departure, destination, seatNo) {
+        passDataToCancelModel: function (data) {
             this.cancelData = {
-                dataDate: date,
-                dataSchedule: schedule,
-                dataCustomer: customer,
-                dataDeparture: departure,
-                dataDestination: destination,
-                dataSeat_no: seatNo,
+                dataDate: data.date,
+                dataSchedule: data.schedule_id,
+                dataCustomer: data.customer_id,
+                dataDeparture: data.departure_city_id,
+                dataDestination: data.destination_city_id,
+                dataSeat_no: data.seat_no,
             }
             $("#cancelModel").modal('show');
         },
-        async cancelBooking(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
+        async cancelBooking(dataEnter) {
+
             // if (reason == '' || typeof reason == 'undefined') {
             //     return swal({
             //         title: "required!",
@@ -1493,14 +1477,14 @@ export default {
             //     });
             // }
             const data = {
-                date: date,
-                schedule_id: schedule,
-                customer_id: customer,
-                departure_id: departure,
-                destination_id: destination,
-                seat_no: seatNo,
-                percentage: percentage,
-                remarks: reason,
+                date: dataEnter.dataDate,
+                schedule_id: dataEnter.dataSchedule,
+                customer_id: dataEnter.dataCustomer,
+                departure_id: dataEnter.dataDeparture,
+                destination_id: dataEnter.dataDestination,
+                seat_no: dataEnter.dataSeat_no,
+                percentage: dataEnter.percentage,
+                remarks: dataEnter.reason,
             }
             const resCancelBooking = await this.callApi("post", "booking/canceling", data);
             if (resCancelBooking.status == 200) {
@@ -1514,35 +1498,28 @@ export default {
             }
         },
         //over issue model complete data
-        passDataToOverIssueModel: function (date, schedule, customer, departure, destination, seatNo) {
+        passDataToOverIssueModel: function (data) {
+
             this.overIssueData = {
-                dataDate: date,
-                dataSchedule: schedule,
-                dataCustomer: customer,
-                dataDeparture: departure,
-                dataDestination: destination,
-                dataSeat_no: seatNo,
+                dataDate: data.date,
+                dataSchedule: data.schedule_id,
+                dataCustomer: data.customer_id,
+                dataDeparture: data.departure_city_id,
+                dataDestination: data.destination_city_id,
+                dataSeat_no: data.seat_no,
             }
             $("#overIssue_model").modal('show');
         },
-        async addOverIssueTicket(date, schedule, customer, departure, destination, seatNo, percentage, reason) {
-            // if (reason == '' || typeof reason == 'undefined') {
-            //     return swal({
-            //         title: "required!",
-            //         text: "Please give any Remarks!!",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // }
+        async addOverIssueTicket(dataEnter) {
             const data = {
-                date: date,
-                schedule_id: schedule,
-                customer_id: customer,
-                departure_id: departure,
-                destination_id: destination,
-                seat_no: seatNo,
-                percentage: percentage,
-                remarks: reason,
+                date: dataEnter.dataDate,
+                schedule_id: dataEnter.dataSchedule,
+                customer_id: dataEnter.dataCustomer,
+                departure_id: dataEnter.dataDeparture,
+                destination_id: dataEnter.dataDestination,
+                seat_no: dataEnter.dataSeat_no,
+                percentage: dataEnter.percentage,
+                remarks: dataEnter.reason,
             }
             const resOverIssue = await this.callApi("post", "booking/overIssueAdd", data);
             if (resOverIssue.status == 200) {
@@ -1585,23 +1562,21 @@ export default {
                 }
             }
         },
-
         //ELT MODEL DATA
-        passDataToEltModel: function (date, customer, schedule, departure, destination, seatNo, seatFare) {
+        passDataToEltModel: function (data) {
             this.eltData = {
-                dataDate: date,
-                dataCustomer: customer,
-                dataSchedule: schedule,
-                dataDeparture: departure,
-                dataDestination: destination,
-                dataSeat_no: seatNo,
-                dataSeatFare: seatFare
+                dataDate: data.date,
+                dataCustomer: data.customer_id,
+                dataSchedule: data.schedule_id,
+                dataDeparture: data.departure_city_id,
+                dataDestination: data.destination_city_id,
+                dataSeat_no: data.seat_no,
+                dataSeatFare: data.seat_fare,
             }
             $("#addELTModel").modal('show');
         },
-
-        async addEltToTicket(date, schedule, customer, departure, destination, seatNo, weight, price, seatFare, description) {
-            if (weight == '' || typeof weight == 'undefined') {
+        async addEltToTicket(dataEnter) {
+            if (dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined') {
                 return swal({
                     title: "required!",
                     text: "Weight is Required",
@@ -1609,7 +1584,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (price == '' || typeof price == 'undefined') {
+            if (dataEnter.eltPrice == '' || typeof dataEnter.eltPrice == 'undefined') {
                 return swal({
                     title: "required!",
                     text: "Price is Required",
@@ -1619,16 +1594,16 @@ export default {
             }
 
             const data = {
-                date: date,
-                schedule_id: schedule,
-                customer_id: customer,
-                departure_id: departure,
-                destination_id: destination,
-                seat_no: seatNo,
-                eltWeight: weight,
-                totalPrice: price,
-                singleFare: seatFare,
-                eltDescription: description,
+                date: dataEnter.dataDate,
+                schedule_id: dataEnter.dataSchedule,
+                customer_id: dataEnter.dataCustomer,
+                departure_id: dataEnter.dataDeparture,
+                destination_id: dataEnter.dataDestination,
+                seat_no: dataEnter.dataSeat_no,
+                eltWeight: dataEnter.eltWeight,
+                totalPrice: dataEnter.eltPrice,
+                singleFare: dataEnter.dataSeatFare,
+                eltDescription: dataEnter.dataDescription,
             }
             const resOverIssue = await this.callApi("post", "booking/elt", data);
             if (resOverIssue.status == 200) {
@@ -1670,18 +1645,17 @@ export default {
                 }
             }
         },
-
-
         // Reschedule model
-        async passDataToRescheduleModel(date, customer, schedule, departure, destination, seatNo) {
+        async passDataToRescheduleModel(data) {
+
             this.rescheduleData = {
-                rescheduleDate: date,
-                existingDate: date,
-                dataCustomer: customer,
-                dataSchedule: schedule,
-                dataDepartureCity: departure,
-                dataDestination: destination,
-                dataSeat_no: seatNo,
+                rescheduleDate: data.date,
+                existingDate: data.date,
+                dataCustomer: data.customer_id,
+                dataSchedule: data.schedule_id,
+                dataDepartureCity: data.departure_city_id,
+                dataDestination: data.destination_city_id,
+                dataSeat_no: data.seat_no,
             }
 
             if (this.rescheduleData.dataDepartureCity == '0') {
@@ -1698,7 +1672,6 @@ export default {
 
             $("#reschedule_modal").modal('show');
         },
-
         async rescheduleSeats() {
             if (this.rescheduleData.dataDepartureCity == 0) {
                 return swal({
@@ -1716,14 +1689,6 @@ export default {
                     timer: 2000
                 });
             }
-            // if (this.rescheduleData.rescheduleDate ==  this.rescheduleData.rescheduleDate) {
-            //     return swal({
-            //         title: "Required!!",
-            //         text: "Date not be same as previous Booking!! Please Select Future Date",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // }
             if (this.rescheduleData.rescheduleDate == '' || typeof this.rescheduleData.rescheduleDate == 'undefined') {
                 return swal({
                     title: "Required!!",
@@ -1781,37 +1746,18 @@ export default {
                 }
             }
         },
-
         // Duplicate Ticket
-
         duplicateTicket: function (data) {
             window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
         }
-
     },
-    // computed: {
-    //     ...
-    //         mapGetters(["getDeletingObj"]),
-    // }
-    // ,
-    // watch: {
-    //     getDeletingObj(obj) {
-    //         if (obj.isDeleted) {
-    //             this.surcharges.splice(obj.index, 1);
-    //             setTimeout(function () {
-    //                 window.location.reload();
-    //             }, 2000);
-    //         }
-    //     }
-    //     ,
-    // }
-    // ,
 };
 </script>
 <style scoped>
-.sameColor{
+.sameColor {
     background-color: #180404 !important;
 }
+
 .image-span {
     background-color: #a2a3a7;
     border-radius: 10px;

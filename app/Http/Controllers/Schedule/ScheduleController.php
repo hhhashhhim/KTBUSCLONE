@@ -316,6 +316,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
