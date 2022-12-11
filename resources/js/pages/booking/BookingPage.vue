@@ -496,8 +496,8 @@
                                         <div
                                             v-if="col.reserved"
                                             class="image-span d-block text-center text-white shadow"
-                                            @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
-                                            :class="getClasses(col)"
+                                            @click="rescheduleselectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
+                                            :class="getClassesReschedule(rescheduleData, col)"
                                             :title="getTitle(col)"
                                             :style="{border:'2px solid ' + col.color + ' !important', }"
                                         >
@@ -647,7 +647,7 @@
                                                         Add ELT
                                                     </button>
                                                     <button type="button" class="btn btn-primary ml-2"
-                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0"
+                                                            @click="passDataToRescheduleModel(innerItem.date,innerItem.customer_id , innerItem.schedule_id, innerItem.departure_city_id, innerItem.destination_city_id, innerItem.seat_no); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                                     >Reschedule
                                                     </button>
                                                     <button type="button" class="btn btn-warning ml-2"
@@ -1257,12 +1257,40 @@ export default {
                 });
             }
         },
+        rescheduleselectSeat: function (row, col, seatNo, fare) {
+            let index = this.selectedBookedSeats.indexOf(seatNo);
+            if (index != -1) {
+                this.schedule.bus_class.seat_map[row][col].selected = false;
+                this.selectedBookedSeats.splice(index, 1);
+                this.bookedSeats = this.bookedSeats.filter((seat) => {
+                    if (seat.seatNo != seatNo) {
+                        return seat;
+                    }
+                });
+                this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
+            } else {
+                this.schedule.bus_class.seat_map[row][col].selected = true;
+                this.selectedBookedSeats.push(seatNo);
+                this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
+                this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
+            }
+            this.addForm.selectedBookedSeats = this.selectedBookedSeats;
+        },
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
+        },
+        getClassesReschedule: function (data, col) {
+
+            let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
+            let selected = col.selected ? "selected" : "";
+            let partial = col.partial ? "partial" : "";
+            let over = col.over_issue && col.partial ? "bg-secondary" : "";
+            let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
+            return gender + " " + selected + " " + partial + " " + over + " " + same;
         },
 
         getTitle: function (col) {
@@ -1781,6 +1809,9 @@ export default {
 };
 </script>
 <style scoped>
+.sameColor{
+    background-color: #180404 !important;
+}
 .image-span {
     background-color: #a2a3a7;
     border-radius: 10px;

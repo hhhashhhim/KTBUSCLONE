@@ -171,13 +171,13 @@
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="address">Address</label>
-                        <textarea class="form-control" spellcheck="false" v-model="data.address"></textarea>
+                        <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="45" placeholder="Address Must be less then 45 characters"></textarea>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
-                        <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="45" placeholder="Address Must be less then 45 characters"
+                        <input type="text" class="form-control" @keypress="isNumber($event)"
                                v-model="data.advance_booking">
                     </div>
                     <div class="form-group col-md-4">
