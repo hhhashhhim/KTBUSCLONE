@@ -1,0 +1,576 @@
+<template>
+    <div>
+        <section class="section">
+            <div class="section-body">
+                <div class="row">
+                    <div class="col-12 col-md-12 col-lg-12">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h4>Foods</h4>
+                                <div class="card-header-action">
+                                    <a
+                                        href="#"
+                                        data-toggle="modal"
+                                        :data-target="'#' + formID"
+                                        class="btn btn-primary"
+                                    >
+                                        Add Food
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Table -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table
+                                                        class="table table-striped table-hover"
+                                                        id="hotel_table"
+                                                    >
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Name</th>
+                                                            <th>Contact</th>
+                                                            <th>Balance (Rs)</th>
+                                                            <th>Commission (%)</th>
+                                                            <th>Location</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr v-for="(hotel, i) in hotels" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td>{{ hotel.name }}</td>
+                                                            <td>{{ phoneFormat(hotel.contact) }}</td>
+                                                            <td>{{ hotel.balance??0 }}</td>
+                                                            <td>{{ hotel.commission }}</td>
+                                                            <td>{{ hotel.location }}</td>
+                                                            <td>
+                                                                <button
+                                                                    :data-target="'#'+ editFormID"
+                                                                    data-toggle="modal"
+                                                                    @click="edit(hotel)"
+                                                                    class="btn btn-primary mx-1"
+                                                                >
+                                                                    <i class="far fa-edit"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END TABLE -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Modal -->
+                <Add
+                    heading="Add Hotel"
+                    :errors="this.validationErrors"
+                    :success="success"
+                    :formID="formID"
+                >
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="name">Hotel Name <span class="text-danger">*</span></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Enter Hotel Name"
+                                id="name"
+                                v-model="postData.hotelName"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="userName">Name <span class="text-danger">*</span></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Enter Name"
+                                id="userName"
+                                v-model="postData.name"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="email">Email <span class="text-danger">*</span></label>
+                            <input
+                                type="email"
+                                class="form-control"
+                                placeholder="Enter Email"
+                                id="email"
+                                v-model="postData.email"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="password">Password <span class="text-danger">*</span></label>
+                            <input
+                                type="password"
+                                class="form-control"
+                                placeholder="Enter Password"
+                                id="password"
+                                v-model="postData.password"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Contact <span class="text-danger">*</span></label>
+                            <vue-mask
+                                class="form-control"
+                                v-model="postData.contact"
+                                mask="0000-0000000"
+                                :raw="false"
+                                :options="options">
+                            </vue-mask>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="Logo">Logo</label>
+                            <input
+                                type="file"
+                                class="form-control"
+                                placeholder=""
+                                @change="uploadLogo($event,'add')"
+                                id="imageField"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Initial Balance </label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                placeholder="Balance"
+                                id="balance"
+                                v-model="postData.balance"
+                            />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                placeholder="Commission"
+                                id="balance"
+                                v-model="postData.commission"
+                            />
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="location">Location <span class="text-danger">*</span></label>
+                            <textarea
+                                class="form-control"
+                                placeholder="Enter Location"
+                                id="location"
+                                v-model="postData.location"
+                                cols="30"
+                                rows="10"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    
+                    <template v-slot:button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            :disabled="loading"
+                            @click="update"
+                        >
+                            {{ loading ? "Loading...." : "Update Hotel" }}
+                        </button>
+                    </template>
+                </Add>
+
+                <!-- Add Modal -->
+                <Edit
+                    heading="Edit Company"
+                    :errors="this.validationErrors"
+                    :success="success"
+                    :editForm="editFormID"
+                >
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Hotel Name <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Hotel Name"
+                            id="name"
+                            v-model="editData.hotelName"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="userName">Name <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Enter Name"
+                            id="userName"
+                            v-model="editData.name"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            placeholder="Enter Email"
+                            id="email"
+                            v-model="editData.email"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="password">Password <small>(Empty field will save password same)</small></label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            placeholder="Enter Password"
+                            id="password"
+                            v-model="editData.password"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Contact <span class="text-danger">*</span></label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="editData.contact"
+                            mask="0000-0000000"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Logo">Logo <small>(Empty field will save logo same)</small></label>
+                        <input
+                            type="file"
+                            class="form-control"
+                            placeholder=""
+                            @change="uploadLogo($event,'edit')"
+                            id="editImageField"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Initial Balance </label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            placeholder="Balance"
+                            id="balance"
+                            v-model="editData.balance"
+                        />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            placeholder="Commission"
+                            id="balance"
+                            v-model="editData.commission"
+                        />
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="location">Location <span class="text-danger">*</span></label>
+                        <textarea
+                            class="form-control"
+                            placeholder="Enter Location"
+                            id="location"
+                            v-model="editData.location"
+                            cols="30"
+                            rows="10"
+                        ></textarea>
+                    </div>
+                </div>
+
+                
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        :disabled="loading"
+                        @click="update"
+                    >
+                        {{ loading ? "Loading...." : "Update Hotel" }}
+                    </button>
+                </template>
+                </Edit>
+            </div>
+        </section>
+    </div>
+</template>
+
+<script>
+import Add from "../../components/Add.vue";
+import Edit from "../../components/Edit.vue";
+import vueMask from 'vue-jquery-mask';
+
+import {mapGetters} from "vuex";
+
+export default {
+    name: "HotelPage",
+    components: {
+        Add,
+        Edit,
+        vueMask,
+    },
+    data() {
+        return {
+            date: null,
+            options: {
+                placeholder: '0300-0000000',
+                // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
+            },
+            formID: "newHotel",
+            editFormID:'edit_company_form',
+            loading: false,
+            hotelId: "",
+            hotelData: [],
+            postData: {
+                hotelName: "",
+                name: "",
+                email: "",
+                password: "",
+                contact: "",
+                logo: "",
+                balance: "",
+                commission: "",
+                location: "",
+            },
+            editData: {
+                hotelId: "",
+                userId: "",
+                hotelName: "",
+                name: "",
+                email: "",
+                password: "",
+                contact: "",
+                logo: "",
+                balance: "",
+                commission: "",
+                location: "",
+            },
+            success: false,
+        };
+    },
+    async created() {
+        await this.setData();
+        await this.fetchData();
+    },
+    methods: {
+        async fetchData() {
+            const hotelId = this.hotelId;
+            alert(hotelId);
+            const hotelRes = await this.callApi("post", "refreshments/hotels/foods/specific",hotelId);
+            if (hotelRes.status == 200) {
+                console.log(hotelRes.data);
+                this.hotelData = hotelRes.data;
+                setTimeout(() => {
+                    $("#hotel_table").DataTable();
+                }, 300);
+            }
+        },
+        async setData() {
+            this.hotelId = localStorage.getItem("hotel-id");
+        },
+        phoneFormat: function (string) {
+            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+        },
+        async add() {
+
+            // validation for empty data
+            if(!this.postData.hotelName || !this.postData.name || !this.postData.email || !this.postData.password ||
+                !this.postData.contact || !this.postData.commission || !this.postData.location)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill Required Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            this.loading = true;
+
+            const config = {
+                headers: {'content-type': 'multipart/form-data'}
+            }
+
+            let formData = new FormData();
+            formData.append('hotelName', this.postData.hotelName);
+            formData.append('name', this.postData.name);
+            formData.append('email', this.postData.email);
+            formData.append('password', this.postData.password);
+            formData.append('contact', this.postData.contact);
+            formData.append('logo', this.postData.logo);
+            formData.append('balance', this.postData.balance);
+            formData.append('commission', this.postData.commission);
+            formData.append('location', this.postData.location);
+            
+
+            const res = await this.callApi("post", "refreshments/hotels/store", formData , config);
+            if (res.status == 201) {
+                this.loading = false
+                $("#hotel_table").DataTable().destroy();
+                this.success = "Hotel Created Successfully";
+                
+                this.postData.hotelName = "";
+                this.postData.name = "";
+                this.postData.email = "";
+                this.postData.password = "";
+                this.postData.contact = "";
+                this.postData.logo = "";
+                this.postData.balance = "";
+                this.postData.commission = "";
+                this.postData.location = "";
+                $("#imageField").val('');
+                
+                await this.fetchData();
+                window.scrollTo(0, 0);
+                setTimeout(() => {
+                    this.success = "";
+                    $("#add-modal").modal("hide");
+                }, 2000);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
+        async edit(hotel) {
+            
+            if (hotel) {
+                this.editData.hotelId = hotel.id;
+                this.editData.userId = hotel.user_id;
+                this.editData.hotelName = hotel.name;
+                this.editData.name = hotel.user.name;
+                this.editData.email = hotel.user.email;
+                this.editData.contact = hotel.contact;
+                this.editData.balance = hotel.balance;
+                this.editData.commission = hotel.commission;
+                this.editData.location = hotel.location;
+            } else {
+                return alert("Something Went Wrong !!!");
+            }
+
+        },
+        async update() {
+            
+            // validation for empty data
+            if(!this.editData.hotelName || !this.editData.name || !this.editData.email ||
+                !this.editData.contact || !this.editData.commission || !this.editData.location)
+            {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill Required Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            this.loading = true;
+
+            const config = {
+                headers: {'content-type': 'multipart/form-data'}
+            }
+
+            let formData = new FormData();
+            formData.append('hotelId', this.editData.hotelId);
+            formData.append('userId', this.editData.userId);
+            formData.append('hotelName', this.editData.hotelName);
+            formData.append('name', this.editData.name);
+            formData.append('email', this.editData.email);
+            formData.append('password', this.editData.password);
+            formData.append('contact', this.editData.contact);
+            formData.append('logo', this.editData.logo);
+            formData.append('balance', this.editData.balance);
+            formData.append('commission', this.editData.commission);
+            formData.append('location', this.editData.location);
+            
+
+            const res = await this.callApi("post", "refreshments/hotels/update", formData , config);
+            if (res.status == 200) {
+                this.loading = false
+                $("#hotel_table").DataTable().destroy();
+                this.success = "Hotel Updated Successfully";
+                
+                this.editData.hotelId = "";
+                this.editData.userId = "";
+                this.editData.hotelName = "";
+                this.editData.name = "";
+                this.editData.email = "";
+                this.editData.password = "";
+                this.editData.contact = "";
+                this.editData.logo = "";
+                this.editData.balance = "";
+                this.editData.commission = "";
+                this.editData.location = "";
+                $("#editImageField").val('');
+                
+                await this.fetchData();
+                window.scrollTo(0, 0);
+                setTimeout(() => {
+                    this.success = "";
+                    $("#add-modal").modal("hide");
+                }, 2000);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
+        uploadLogo(e, name) {
+            const imageFile = e.target.files[0];
+            if (imageFile.name.match(/\.(jpg|jpeg|png)$/i)) {
+                if (name == "add") {
+                    this.postData.logo = imageFile;
+                }
+                if (name == "edit") {
+                    this.editData.logo = imageFile;
+                }
+            } else {
+               return swal({
+                    title: "Invalid Format",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png",
+                    icon: "error",
+                   timer: 2000
+                });
+                e.target.value = '';
+            }
+
+
+        },
+    },
+    computed: {
+        ...mapGetters(["getDeletingObj"]),
+    },
+    watch: {
+        getDeletingObj(obj) {
+            if (obj.isDeleted) {
+                this.companies.splice(obj.index, 1);
+            }
+        },
+    },
+};
+</script>
+<style scoped>
+
+div.dataTables_length select{
+    width: 90px !important;
+    display:inline-block;
+}
+</style>
