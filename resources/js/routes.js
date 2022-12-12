@@ -30,8 +30,8 @@ import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 import MaintenanceRecordPage from "./pages/maintenance/RecordPage.vue";
 import HotelPage from "./pages/refreshment/HotelPage.vue";
 import FoodPage from "./pages/refreshment/FoodPage.vue";
+import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 
-// const url = '/projects/kt/'
 const url = '/kt/'
 // const url = '/'
 
@@ -182,9 +182,14 @@ const routes = [
         name:"hotels"
     },
     {
-        path: url + "refreshments/hotels/foods",
+        path: url + "refreshments/hotels/specific/foods",
         component : FoodPage,
         name:"foods"
+    },
+    {
+        path: url + "refreshments/hotels/specific/foods/deals",
+        component : FoodDealPage,
+        name:"foodDeals"
     },
     {
         path: url + "settings/tickets",
