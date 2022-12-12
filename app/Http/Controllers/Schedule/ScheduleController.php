@@ -299,7 +299,7 @@ class ScheduleController extends Controller
 
 //        dd($schedule->fare_class_id, $schedule->bus_class->seat_map);
 //        $fare = (float)$fareForAllClasses->where('fare_class', $schedule->fare_class_id)->first()->fare;
-        // Looping Throug the each seat of the bus
+        // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
 
         for ($i = 0; $i < count($seatMap); $i++) {
@@ -377,16 +377,12 @@ class ScheduleController extends Controller
                     if ($class) {
                         $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
                     }
-
                 }
             }
         }
-
         $schedule->bus_class->seat_map = $seatMap;
         unset($schedule->route);
         return $schedule;
-
-
     }
 
     public function getDays($start, $end)

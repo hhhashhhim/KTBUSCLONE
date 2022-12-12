@@ -478,8 +478,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label for="rescheduleReason" class="mb-0">Reason<span
-                                    class="text-danger">*</span></label>
+                                <label for="rescheduleReason" class="mb-0">Reason</label>
                                 <input id="rescheduleReason" class="form-control" v-model="rescheduleData.reason"
                                        placeholder="Please Give me a Reason!!">
                             </div>
@@ -493,8 +492,8 @@
                                         <div
                                             v-if="col.reserved"
                                             class="image-span d-block text-center text-white shadow"
-                                            @click="rescheduleselectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
-                                            :class="getClassesReschedule(rescheduleData, col)"
+                                            @click="reScheduleSelectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
+                                            :class="getClassesReschedule(col)"
                                             :title="getTitle(col)"
                                             :style="{border:'2px solid ' + col.color + ' !important', }"
                                         >
@@ -729,6 +728,7 @@ export default {
             allReSchedules: [],
             cancel: [],
             overIssueData: [],
+            alreadyBookedSeats: [],
             eltData: [],
             schedule: "",
             loading: false,
@@ -1246,24 +1246,26 @@ export default {
                 });
             }
         },
-        rescheduleselectSeat: function (row, col, seatNo, fare) {
-            let index = this.selectedBookedSeats.indexOf(seatNo);
-            if (index != -1) {
-                this.schedule.bus_class.seat_map[row][col].selected = false;
-                this.selectedBookedSeats.splice(index, 1);
-                this.bookedSeats = this.bookedSeats.filter((seat) => {
-                    if (seat.seatNo != seatNo) {
-                        return seat;
-                    }
+        reScheduleSelectSeat: function (row, col, seatNo, fare) {
+            if(this.alreadyBookedSeats > 1){
+                this.alreadyBookedSeats = [];
+                swal({
+                    title: "Oops",
+                    text: "You can select just one seat ",
+                    icon: "error",
+                    timer: 2000
                 });
-                this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
-            } else {
-                this.schedule.bus_class.seat_map[row][col].selected = true;
-                this.selectedBookedSeats.push(seatNo);
-                this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
-                this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
             }
-            this.addForm.selectedBookedSeats = this.selectedBookedSeats;
+            let index = this.alreadyBookedSeats.indexOf(seatNo);
+            if (index != -1) {
+                this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
+                this.alreadyBookedSeats.splice(index, 1);
+            } else {
+                this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
+                this.alreadyBookedSeats.push(seatNo);
+            }
+
+
         },
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
@@ -1272,13 +1274,12 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             return gender + " " + selected + " " + partial + " " + over;
         },
-        getClassesReschedule: function (data, col) {
+        getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
-            let selected = col.selected ? "selected" : "";
+            let selected = col.alreadyBooked ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
-            // let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
-            return gender + " " + selected + " " + partial + " " + over + " " /*+ same*/;
+            return gender + " " + selected + " " + partial + " " + over;
             // return same;
         },
         getTitle: function (col) {
@@ -1647,6 +1648,7 @@ export default {
         },
         // Reschedule model
         async passDataToRescheduleModel(data) {
+            this.reSpecificCities = [];
             this.rescheduleData = {
                 rescheduleDate: data.date,
                 existingDate: data.date,
@@ -1657,7 +1659,6 @@ export default {
                 dataSeat_no: data.seat_no,
                 dataAll: data,
             }
-            console.log(this.rescheduleData);
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
@@ -1705,14 +1706,14 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.rescheduleData.reason == '') {
-                return swal({
-                    title: "Required!!",
-                    text: "Reason is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (this.rescheduleData.reason == '') {
+            //     return swal({
+            //         title: "Required!!",
+            //         text: "Reason is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
 
             const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
             if (res.status == 200) {

@@ -23985,6 +23985,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       allReSchedules: [],
       cancel: [],
       overIssueData: [],
+      alreadyBookedSeats: [],
       eltData: [],
       schedule: "",
       loading: false,
@@ -24896,26 +24897,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee12);
       }))();
     },
-    rescheduleselectSeat: function rescheduleselectSeat(row, col, seatNo, fare) {
-      var index = this.selectedBookedSeats.indexOf(seatNo);
-
-      if (index != -1) {
-        this.schedule.bus_class.seat_map[row][col].selected = false;
-        this.selectedBookedSeats.splice(index, 1);
-        this.bookedSeats = this.bookedSeats.filter(function (seat) {
-          if (seat.seatNo != seatNo) {
-            return seat;
-          }
+    reScheduleSelectSeat: function reScheduleSelectSeat(row, col, seatNo, fare) {
+      if (this.alreadyBookedSeats > 1) {
+        this.alreadyBookedSeats = [];
+        swal({
+          title: "Oops",
+          text: "You can select just one seat ",
+          icon: "error",
+          timer: 2000
         });
-        this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
-      } else {
-        this.schedule.bus_class.seat_map[row][col].selected = true;
-        this.selectedBookedSeats.push(seatNo);
-        this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
-        this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
       }
 
-      this.addForm.selectedBookedSeats = this.selectedBookedSeats;
+      var index = this.alreadyBookedSeats.indexOf(seatNo);
+
+      if (index != -1) {
+        this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
+        this.alreadyBookedSeats.splice(index, 1);
+      } else {
+        this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
+        this.alreadyBookedSeats.push(seatNo);
+      }
     },
     getClasses: function getClasses(col) {
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
@@ -24924,15 +24925,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var over = col.over_issue && col.partial ? "bg-secondary" : "";
       return gender + " " + selected + " " + partial + " " + over;
     },
-    getClassesReschedule: function getClassesReschedule(data, col) {
+    getClassesReschedule: function getClassesReschedule(col) {
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
-      var selected = col.selected ? "selected" : "";
+      var selected = col.alreadyBooked ? "selected" : "";
       var partial = col.partial ? "partial" : "";
-      var over = col.over_issue && col.partial ? "bg-secondary" : ""; // let same = (data.dataSeat_no == col.seatNo) ? 'sameColor' : "";
-
-      return gender + " " + selected + " " + partial + " " + over + " "
-      /*+ same*/
-      ; // return same;
+      var over = col.over_issue && col.partial ? "bg-secondary" : "";
+      return gender + " " + selected + " " + partial + " " + over; // return same;
     },
     getTitle: function getTitle(col) {
       if (col.type == 'booked' || col.type == 'advance booking') {
@@ -25495,6 +25493,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
+                _this20.reSpecificCities = [];
                 _this20.rescheduleData = {
                   rescheduleDate: data.date,
                   existingDate: data.date,
@@ -25505,7 +25504,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dataSeat_no: data.seat_no,
                   dataAll: data
                 };
-                console.log(_this20.rescheduleData);
 
                 if (!(_this20.rescheduleData.dataDepartureCity == '0')) {
                   _context20.next = 6;
@@ -25604,23 +25602,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this21.rescheduleData.reason == '')) {
-                  _context21.next = 10;
-                  break;
-                }
-
-                return _context21.abrupt("return", swal({
-                  title: "Required!!",
-                  text: "Reason is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 10:
-                _context21.next = 12;
+                _context21.next = 10;
                 return _this21.callApi("post", "booking/reschedule", _this21.rescheduleData);
 
-              case 12:
+              case 10:
                 res = _context21.sent;
 
                 if (res.status == 200) {
@@ -25656,7 +25641,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 12:
               case "end":
                 return _context21.stop();
             }
@@ -43167,9 +43152,7 @@ var _hoisted_136 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "rescheduleReason",
     "class": "mb-0"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger"
-  }, "*")], -1
+  }, "Reason", -1
   /* HOISTED */
   );
 });
@@ -43932,9 +43915,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: colIndex
       }, [col.reserved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 0,
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow", $options.getClassesReschedule($data.rescheduleData, col)]),
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["image-span d-block text-center text-white shadow", $options.getClassesReschedule(col)]),
         onClick: function onClick($event) {
-          return $options.rescheduleselectSeat(rowIndex, colIndex, col.seatNo, col.fare);
+          return $options.reScheduleSelectSeat(rowIndex, colIndex, col.seatNo, col.fare);
         },
         title: $options.getTitle(col),
         style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
@@ -60776,9 +60759,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // const url = '/projects/kt/'
-// const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
