@@ -55,7 +55,7 @@ class FoodDealController extends Controller
 
         foreach($request->foods as $key => $value)
         {
-            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$deal->id,"food_id"=>$request->foods[$key],"company_id"=>$this->company_id])->first();
+            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$deal->id,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
             if(!$checkExist)
             {
                 HotelFoodDealDetail::create([
@@ -74,17 +74,34 @@ class FoodDealController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            "name" => 'required|unique:hotel_foods,name,'.$request->foodId.',id,hotel_id,'.$request->hotelId,
+            "name" => 'required|unique:hotel_food_deals,name,'.$request->dealId.',id,hotel_id,'.$request->hotelId,
             "price" => 'required',
-            "unit" => 'required',
+            "foods" => 'required',
+            "qtys" => 'required',
         ]);
 
-        return HotelFood::where("id",$request->foodId)->update([
+        HotelFoodDeal::where("id",$request->dealId)->update([
             "name" => $request->name,
             "price" => $request->price,
-            "unit" => $request->unit,
             "description" => $request->description,
         ]);
+
+        HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->delete();
+        foreach($request->foods as $key => $value)
+        {
+            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
+            if(!$checkExist)
+            {
+                HotelFoodDealDetail::create([
+                    "food_id" => $request->foods[$key],
+                    "food_deal_id" => $request->dealId,
+                    "quantity" => $request->qtys[$key],
+                    "hotel_id" => $request->hotelId,
+                    "company_id" => $this->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
+            }
+        }
     }
 
     

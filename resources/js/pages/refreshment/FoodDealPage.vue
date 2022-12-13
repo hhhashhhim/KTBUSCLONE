@@ -71,15 +71,15 @@
                                                 <div class="table-responsive">
                                                     <table
                                                         class="table table-striped table-hover text-capitalize"
-                                                        id="food_table"
+                                                        id="deal_table"
                                                     >
                                                         <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
                                                             <th>Price</th>
-                                                            <th>Unit</th>
-                                                            <!-- <th>Action</th> -->
+                                                            <th>Description</th>
+                                                            <th>Action</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -94,7 +94,7 @@
                                                             </td>
                                                             <td>{{ deal.price }}</td>
                                                             <td>{{ deal.description??'N/A' }}</td>
-                                                            <!-- <td>
+                                                            <td>
                                                                 <button
                                                                     :data-target="'#'+ editFormID"
                                                                     data-toggle="modal"
@@ -103,7 +103,7 @@
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
-                                                            </td> -->
+                                                            </td>
                                                         </tr>
                                                         </tbody>
                                                     </table>
@@ -211,25 +211,21 @@
 
                 <!-- Add Modal -->
                 <Edit
-                    heading="Edit Food"
+                    heading="Edit Deal"
                     :errors="this.validationErrors"
                     :success="success"
                     :editForm="editFormID"
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Food Name <span class="text-danger">*</span></label>
+                            <label for="name">Deal Name <span class="text-danger">*</span></label>
                             <input
                             type="text"
                             class="form-control"
-                            placeholder="Enter Hotel Name"
+                            placeholder="Enter Deal Name"
                             id="name"
                             v-model="editData.name"
                             />
-                        </div>
-                        
-                        <div class="col-md-6">
-                            
                         </div>
                         
                         <div class="form-group col-md-6">
@@ -242,26 +238,54 @@
                                 v-model="editData.price"
                             />
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="email">Unit <span class="text-danger">*</span></label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Email"
-                                id="email"
-                                v-model="editData.unit"
-                            />
-                        </div>
                         <div class="form-group col-md-12">
                             <label for="location">Description</label>
                             <textarea
                                 class="form-control"
-                                placeholder="Enter Location"
+                                placeholder="Enter Description"
                                 id="location"
                                 v-model="editData.description"
                                 cols="30"
                                 rows="10"
                             ></textarea>
+                        </div>
+
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="col-md-12">
+                                <h5>Select Food For Deal <small> (Duplicate food will be remove autometically)</small></h5>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 d-flex align-items-center">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Food</th>
+                                    <th>Quantity</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="index in editLoop" :key="index">
+                                    <td>
+                                        <select class="form-control rounded-0" @change="editSaveRow($event,'rowFood')"
+                                        :value="editData.foods[index - 1] ? editData.foods[index - 1] : '' ">
+                                            <option value="" selected>Select Part </option>
+                                            <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
+                                                {{ food.name }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" min="1" @keyup="editSaveRow($event,'rowQty')" 
+                                        :value="editData.qtys[index - 1] ? editData.qtys[index - 1] : '' "/>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
+                                        <button class="btn btn-outline-danger" @click="editRemoveRow($event)">Remove</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -273,7 +297,7 @@
                             :disabled="loading"
                             @click="update"
                         >
-                            {{ loading ? "Loading...." : "Update Food" }}
+                            {{ loading ? "Loading...." : "Update Deal" }}
                         </button>
                     </template>
                 </Edit>
@@ -303,10 +327,11 @@ export default {
                 placeholder: '0300-0000000',
                 // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
-            formID: "newFood",
-            editFormID:'edit_food_form',
+            formID: "newDeal",
+            editFormID:'edit_deal_form',
             loading: false,
             loop: 1,
+            editLoop: 1,
             hotelId: "",
             allFoods: [],
             hotelData: [],
@@ -319,12 +344,13 @@ export default {
                 qtys: [],
             },
             editData: {
-                foodId: "",
+                dealId: "",
+                hotelId: "",
                 name: "",
                 price: "",
-                unit: "",
                 description: "",
-                hotelId: "",
+                foods: [],
+                qtys: [],
             },
             success: false,
         };
@@ -344,7 +370,7 @@ export default {
             if (hotelRes.status == 200) {
                 this.hotelData = hotelRes.data;
                 setTimeout(() => {
-                    $("#food_table").DataTable();
+                    $("#deal_table").DataTable();
                 }, 300);
             }
         },
@@ -357,7 +383,7 @@ export default {
             if (hotelRes.status == 200) {
                 this.allFoods = hotelRes.data.foods;
                 setTimeout(() => {
-                    $("#food_table").DataTable();
+                    $("#deal_table").DataTable();
                 }, 300);
             }
         },
@@ -402,7 +428,7 @@ export default {
             const res = await this.callApi("post", "refreshments/hotels/specific/foods/deals/store", this.postData);
             if (res.status == 200) {
                 this.loading = false
-                $("#food_table").DataTable().destroy();
+                $("#deal_table").DataTable().destroy();
                 this.success = "Deal Added Successfully";
 
                 this.postData.name = "";
@@ -432,24 +458,37 @@ export default {
                 }
             }
         },
-        async edit(food) {
-            
-            if (food) {
-                this.editData.foodId = food.id;
-                this.editData.name = food.name;
-                this.editData.price = food.price;
-                this.editData.unit = food.unit;
-                this.editData.description = food.description;
+        async edit(deal) {
+            this.editData.dealId = "";
+            this.editData.hotelId = "";
+            this.editData.name = "";
+            this.editData.price = "";
+            this.editData.description = "";
+            this.editData.foods = [];
+            this.editData.qtys = [];
+            if (deal) {
+                this.editLoop = deal.deal_details.length;
+                this.editData.dealId = deal.id;
+                this.editData.hotelId = deal.hotel_id;
+                this.editData.name = deal.name;
+                this.editData.price = deal.price;
+                this.editData.description = deal.description;
+
+                for(var i = 0; i < deal.deal_details.length; i++)
+                {
+                    this.editData.foods.push(deal.deal_details[i].food_id);
+                    this.editData.qtys.push(deal.deal_details[i].quantity);
+                }
+
             } else {
                 return alert("Something Went Wrong !!!");
             }
-
         },
         async update() {
             
             // validation for empty data
-            if(!this.editData.foodId || !this.editData.hotelId || !this.editData.name || 
-                !this.editData.price || !this.editData.unit)
+            if(!this.editData.dealId || !this.editData.name || !this.editData.price || 
+                this.editData.foods == 0 || this.editData.qtys == 0)
             {
                 return swal({
                     title: "Error",
@@ -458,19 +497,37 @@ export default {
                     timer: 4000
                 });
             }
+            
+            // check if any index is empty or null in object
+            for(var i = 0; i < this.editData.foods.length; i++)
+            {
+                if(!this.editData.foods[i] || !this.editData.qtys[i])
+                {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 4000
+                    }); 
+                }
+            }
 
             this.loading = true;
 
-            const res = await this.callApi("post", "refreshments/hotels/specific/foods/update", this.editData);
+            const res = await this.callApi("post", "refreshments/hotels/specific/foods/deals/update", this.editData);
             if (res.status == 200) {
                 this.loading = false
-                $("#food_table").DataTable().destroy();
-                this.success = "Food Updated Successfully";
+                $("#deal_table").DataTable().destroy();
+                this.success = "Deal Updated Successfully";
                 
-                this.postData.name = "";
-                this.postData.price = "";
-                this.postData.unit = "";
-                this.postData.description = "";
+                this.editData.dealId = "";
+                this.editData.hotelId = "";
+                this.editData.name = "";
+                this.editData.price = "";
+                this.editData.description = "";
+                this.editData.foods = [];
+                this.editData.qtys = [];
+                this.editLoop = 0;
                 
                 await this.fetchData();
                 window.scrollTo(0, 0);
@@ -508,6 +565,28 @@ export default {
             this.postData.foods.splice((getRowNumber-1), 1);
             this.postData.qtys.splice((getRowNumber-1), 1);
             event.target.parentElement.parentElement.remove();
+        },
+        // this is for update
+        editSaveRow(event,fieldName) {
+           const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+           if(fieldName == "rowFood")
+           {
+               this.editData.foods[getRowNumber-1] = event.target.value;
+           }
+           if(fieldName == "rowQty")
+           {
+               this.editData.qtys[getRowNumber-1] = event.target.value;
+           }
+       },
+        editAddRow() {
+            this.editLoop++;
+        },
+        editRemoveRow(event) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.editData.foods.splice((getRowNumber-1), 1);
+            this.editData.qtys.splice((getRowNumber-1), 1);
+            // event.target.parentElement.parentElement.remove();
+            this.editLoop--;
         },
     },
     computed: {
