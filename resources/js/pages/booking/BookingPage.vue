@@ -1247,25 +1247,25 @@ export default {
             }
         },
         reScheduleSelectSeat: function (row, col, seatNo, fare) {
-            if(this.alreadyBookedSeats > 1){
-                this.alreadyBookedSeats = [];
+            if (this.alreadyBookedSeats.length > 1) {
+               this.alreadyBookedSeats = [];
+                this.fetchReScheduleData();
                 swal({
                     title: "Oops",
                     text: "You can select just one seat ",
                     icon: "error",
-                    timer: 2000
+                    timer: 3000
                 });
             }
             let index = this.alreadyBookedSeats.indexOf(seatNo);
             if (index != -1) {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
                 this.alreadyBookedSeats.splice(index, 1);
+                this.selectedrescheduleSeatFare.splice(fare);
             } else {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
                 this.alreadyBookedSeats.push(seatNo);
             }
-
-
         },
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";

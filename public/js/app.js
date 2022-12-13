@@ -24898,13 +24898,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     reScheduleSelectSeat: function reScheduleSelectSeat(row, col, seatNo, fare) {
-      if (this.alreadyBookedSeats > 1) {
+      if (this.alreadyBookedSeats.length > 1) {
         this.alreadyBookedSeats = [];
+        this.fetchReScheduleData();
         swal({
           title: "Oops",
           text: "You can select just one seat ",
           icon: "error",
-          timer: 2000
+          timer: 3000
         });
       }
 
@@ -24913,6 +24914,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (index != -1) {
         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
         this.alreadyBookedSeats.splice(index, 1);
+        this.selectedrescheduleSeatFare.splice(fare);
       } else {
         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
         this.alreadyBookedSeats.push(seatNo);
