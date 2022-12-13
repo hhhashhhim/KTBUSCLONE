@@ -187,8 +187,6 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/advance', [BookingController::class, 'advanceData']);
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
-
-
 });
 //pdf Ticket
 Route::get('print/{id}/pdf', [BookingController::class, 'pdf'])->middleware(CustomMiddleware::class);

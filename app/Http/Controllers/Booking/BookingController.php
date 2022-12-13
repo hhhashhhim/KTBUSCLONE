@@ -128,9 +128,11 @@ class BookingController extends Controller
             }
             $allTicket[] = $ticket->id;
         }
-//        dd($allTicket);
 
-        return implode('-', $allTicket);
+        return [
+            'data' => implode('-', $allTicket),
+            'ticket' => Ticket::where('company_id', $this->company_id)->whereIn('id', $allTicket)->get(),
+        ];
 //        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
 //        $pdf = PDF::loadView('pdf/pdf', $data);
 //        return $pdf->stream();
@@ -292,7 +294,7 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-        return Ticket::with('scheduleDetail','schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
+        return Ticket::with('scheduleDetail', 'schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
     }
 
     public function bookingElt(Request $request)

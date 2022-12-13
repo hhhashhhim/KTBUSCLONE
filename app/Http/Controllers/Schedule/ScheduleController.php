@@ -306,10 +306,9 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
                 if ($column['reserved']) {
-                    $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
+                    $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-
 
                 if ($result !== false && $leavingIn30Min != true) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
@@ -317,6 +316,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'];
+                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
@@ -357,6 +357,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['over_issue'] = true;
                     $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
                     $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
+                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];

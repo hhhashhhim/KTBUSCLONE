@@ -229,7 +229,7 @@
                                                 <div
                                                     v-if="col.reserved"
                                                     class="image-span d-block text-center text-white shadow"
-                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare)"
+                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare); updateBookedSeat(col) "
                                                     :class="getClasses(col)"
                                                     :title="getTitle(col)"
                                                     :style="{border:'2px solid ' + col.color + ' !important'}"
@@ -329,6 +329,7 @@
                 </div>
             </div>
         </div>
+
         <!--        Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -784,7 +785,7 @@ export default {
         await this.fetchAllSchedules();
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
-        window.addEventListener('keydown', this.altD);
+        // window.addEventListener('keydown', this.altD);
     },
 
     methods: {
@@ -807,13 +808,13 @@ export default {
                 this.add();
             }
         },
-        altD: function (e) {
-            if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'x')) {
-                $("#fareDiscount").attr('readonly', function (_, attr) {
-                    return !attr
-                });
-            }
-        },
+        // altD: function (e) {
+        //     if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'x')) {
+        //         $("#fareDiscount").attr('readonly', function (_, attr) {
+        //             return !attr
+        //         });
+        //     }
+        // },
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
                 if (this.addForm.departureCity == 0) {
@@ -1083,7 +1084,13 @@ export default {
         },
         async fetchScheduleData() {
             this.resetingArrays();
+            this.addForm.customerName = '';
+            this.addForm.contact = '';
+            this.addForm.remarks = '';
+            this.addForm.type = 'booked';
+            this.addForm.gender = 1;
             this.addForm.totalFare = 0;
+            this.addForm.totalAmount = 0;
             this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true
@@ -1102,6 +1109,8 @@ export default {
                 this.schedule = res.data;
             } else {
                 if (res.status == 422) {
+                    this.showBookingDiv = false;
+                    this.loading = false;
                     let errorContent = "";
                     let count = 0;
                     for (const key in res.data.errors) {
@@ -1147,7 +1156,7 @@ export default {
                 }
             }
         },
-        async selectSeat(row, col, seatNo, fare) {
+        async selectSeat(row, col, seatNo, fare, colData) {
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -1174,7 +1183,7 @@ export default {
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
                     this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                 }
-
+                this.addForm.totalAmount = this.addForm.totalFare;
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
             } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
 
@@ -1193,6 +1202,7 @@ export default {
                     this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
 
                 }
+                this.addForm.totalAmount = this.addForm.totalFare;
                 this.addForm.selectedSeats = this.selectedSeats;
                 this.addForm.selectedSeatsFare = this.selectedSeatsFare;
             } else {
@@ -1246,9 +1256,24 @@ export default {
                 });
             }
         },
+        // update Booked seat ()
+        async updateBookedSeat(data) {
+            console.log(data);
+            if (data.type == 'advance booking' && data.type != 0) {
+                this.addForm.customerCNIC = data.customer_cnic == 0 ?? '';
+                this.addForm.customerName = data.customer_name;
+                this.addForm.contact = data.customer_phone;
+                this.addForm.remarks = data.remarks;
+                this.addForm.selectedSeats = data.seatNo;
+                this.addForm.totalFare = data.fare;
+                this.addForm.totalAmount = data.fare;
+            }
+        },
+
+
         reScheduleSelectSeat: function (row, col, seatNo, fare) {
             if (this.alreadyBookedSeats.length > 1) {
-               this.alreadyBookedSeats = [];
+                this.alreadyBookedSeats = [];
                 this.fetchReScheduleData();
                 swal({
                     title: "Oops",
@@ -1338,6 +1363,7 @@ export default {
             }
 
             const res = await this.callApi("post", "booking/store", this.addForm);
+            console.log(res.data);
             if (res.status == 200) {
                 swal({
                     title: "Success",
@@ -1345,7 +1371,6 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.fetchScheduleData();
                 this.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     type: "booked",
@@ -1362,18 +1387,19 @@ export default {
                     // destinationCity: 0,
                     // departureCity: 0,
                 };
-                this.addForm.schedule = res.data.schedule_id;
-                this.addForm.destinationCity = res.data.destination_city_id;
-                this.addForm.departureCity = res.data.departure_city_id;
+                this.addForm.schedule = res.data.ticket[0].schedule_id;
+                this.addForm.destinationCity = res.data.ticket[0].destination_city_id;
+                this.addForm.departureCity = res.data.ticket[0].departure_city_id;
                 this.selectedSeats.length = 0;
                 // this.showBookingDiv = false;
                 // this.allSchedules = '';
+                this.fetchScheduleData();
                 this.resetingArrays();
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
-                window.open(this.$store.state.app_url + 'print/' + res.data + '/pdf', '_blank').focus();
+                // window.open(this.$store.state.app_url + 'print/' + res.data + '/pdf', '_blank').focus();
 
             } else {
                 if (res.status == 422) {
@@ -1749,7 +1775,7 @@ export default {
         },
         // Duplicate Ticket
         duplicateTicket: function (data) {
-            window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
+            // window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
         }
     },
 };
