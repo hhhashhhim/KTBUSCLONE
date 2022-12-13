@@ -64,7 +64,10 @@
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
                                                                 <router-link class="btn btn-success" @click="hotelId(hotel.id)" :to="{ name:'foods' }">
-                                                                    <i class="fas fa-plus"></i> Add Food
+                                                                     Foods
+                                                                </router-link>
+                                                                <router-link class="btn btn-success mx-1" @click="hotelId(hotel.id)" :to="{ name:'foodDeals' }">
+                                                                     Food Deals
                                                                 </router-link>
                                                             </td>
                                                         </tr>
@@ -188,9 +191,9 @@
                             type="button"
                             class="btn btn-primary"
                             :disabled="loading"
-                            @click="update"
+                            @click="add"
                         >
-                            {{ loading ? "Loading...." : "Update Hotel" }}
+                            {{ loading ? "Loading...." : "Add Hotel" }}
                         </button>
                     </template>
                 </Add>

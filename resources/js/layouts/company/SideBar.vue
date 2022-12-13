@@ -183,7 +183,7 @@
                         </li>
                     </ul>
                 </li>
-                <!-- <li class="dropdown" v-if="checkPermission('hrm')">
+                <li class="dropdown" v-if="checkPermission('hrm')">
 
                     <a href="#" class="menu-toggle nav-link has-dropdown">
                         <i class="fas fa-sitemap"></i>
@@ -199,7 +199,7 @@
                             </router-link>
                         </li>
                     </ul>
-                </li> -->
+                </li>
                 <li class="dropdown" v-if="checkPermission('hrm')">
 
                     <a href="#" class="menu-toggle nav-link has-dropdown">
