@@ -52,7 +52,7 @@
                                           class="colorinput-input"
                                           v-model="permission[i]"
                                     />
-                                    <span class="colorinput-color bg-success"></span>
+                                    <span class="colorinput-color bg-primary"></span>
                                     <span style="position:relative;top:-10px;left:5px;"> {{ i }}</span>
                                   </span>
                                 </label>

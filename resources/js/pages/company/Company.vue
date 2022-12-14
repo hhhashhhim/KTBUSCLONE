@@ -182,7 +182,7 @@
                             class="colorinput-input"
                             v-model="moduleName.allow"
                         />
-                        <span class="colorinput-color bg-success"></span>
+                        <span class="colorinput-color bg-primary"></span>
                       </span>
                                     </label>
                                 </td>
@@ -203,7 +203,7 @@
                             class="colorinput-input"
                             v-model="menus.allow"
                         />
-                        <span class="colorinput-color bg-success"></span>
+                        <span class="colorinput-color bg-primary"></span>
                         <span
                             style="position: relative; left: 5px; top: -10px"
                             class="text-capitalize"
@@ -336,7 +336,7 @@
                             class="colorinput-input"
                             v-model="moduleName.allow"
                         />
-                        <span class="colorinput-color bg-success"></span>
+                        <span class="colorinput-color bg-primary"></span>
                       </span>
                                     </label>
                                 </td>
@@ -357,7 +357,7 @@
                             class="colorinput-input"
                             v-model="menus.allow"
                         />
-                        <span class="colorinput-color bg-success"></span>
+                        <span class="colorinput-color bg-primary"></span>
                         <span
                             style="position: relative; left: 5px; top: -10px"
                             class="text-capitalize"

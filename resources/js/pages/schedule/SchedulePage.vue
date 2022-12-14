@@ -326,7 +326,7 @@
                                   id="terminal"
                                   :value="item.id"
                               />
-                              <span class="colorinput-color bg-success"></span>
+                              <span class="colorinput-color bg-primary"></span>
                             </span>
                           </label>
                           <label class="checkbox-inputs" for="terminal">{{
@@ -652,7 +652,7 @@
                                                               @click="editTerminal($event, city.id)"
                                                               v-bind:checked=" checkedSelectedTerminals(item.id) "
                                                               id="terminal" :value="item.id"/>
-                                                    <span class="colorinput-color bg-success"></span>
+                                                    <span class="colorinput-color bg-primary"></span>
                                                 </span>
                     </label>
                           <label class="checkbox-inputs" for="terminal">{{

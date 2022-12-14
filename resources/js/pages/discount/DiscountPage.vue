@@ -138,7 +138,7 @@
                             <span>
                                 <input type="checkbox" value="1" checked class="colorinput-input"
                                        @change="checkBox($event)"/>
-                                <span class="colorinput-color bg-success"></span>
+                                <span class="colorinput-color bg-primary"></span>
                             </span>
                             </label>
                         </div>
@@ -197,7 +197,7 @@
                             <span>
                                 <input type="checkbox" class="colorinput-input" id="editCheckBox"
                                        @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active == 1"/>
-                                <span class="colorinput-color bg-success"></span>
+                                <span class="colorinput-color bg-primary"></span>
                             </span>
                             </label>
                         </div>

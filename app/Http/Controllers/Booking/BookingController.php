@@ -46,7 +46,7 @@ class BookingController extends Controller
             $allBooking[] = $bookingWithDetails->first();
         }
         return $allBooking;
-    }
+}
 
     public function store(Request $request)
     {
@@ -96,6 +96,7 @@ class BookingController extends Controller
                 'departure_city_id' => $request->departureCity,
                 'destination_city_id' => $request->destinationCity,
                 'seat_no' => $seat,
+                'bus_class_id' => $request->selectedSeatsClass[$i],
                 'seat_fare' => $request->selectedSeatsFare[$i],
                 'is_partial' => $isPartial,
                 'booking_no' => $bookingNo,

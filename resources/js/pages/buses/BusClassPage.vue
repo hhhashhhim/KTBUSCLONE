@@ -461,7 +461,7 @@
                       @change="editCheckBox($event)"
                       v-bind:checked="dataEdit.is_active == 1"
                   />
-                  <span class="colorinput-color bg-success"></span>
+                  <span class="colorinput-color bg-primary"></span>
                 </span>
                             </label>
                         </div>

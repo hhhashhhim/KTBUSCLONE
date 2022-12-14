@@ -201,7 +201,7 @@
                 class="colorinput-input"
                 v-model="data.active"
             />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
@@ -214,7 +214,7 @@
                     class="colorinput-input"
                     v-model="data.active_sms"
                 />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
@@ -227,7 +227,7 @@
                     class="colorinput-input"
                     v-model="data.is_main"
                 />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
@@ -392,7 +392,7 @@
                 v-model="dataEdit.active"
                 v-bind:checked="parseInt(dataEdit.status) === 1 "
             />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
@@ -406,7 +406,7 @@
                     v-model="dataEdit.active_sms"
                     v-bind:checked="dataEdit.active_sms === 1"
                 />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
@@ -420,7 +420,7 @@
                     v-model="dataEdit.is_main"
                     v-bind:checked="dataEdit.is_main === 1"
                 />
-                <span class="colorinput-color bg-success"></span>
+                <span class="colorinput-color bg-primary"></span>
               </span>
                         </label>
                     </div>
