@@ -94,21 +94,12 @@ class FleetMaintenanceController extends Controller
             "current_reading" => $request->currentReading
         ]);
 
+        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"company_id"=>$this->company_id])->delete();
+
         foreach($request->fleetPart as $key => $value)
         {
             $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>$this->company_id])->first();
-            if($checkExist)
-            {
-                MaintenancePartLink::where("id",$checkExist->id)->update([
-                    "bus_id" => $request->fleetId,
-                    "part_id" => $request->fleetPart[$key],
-                    "maintenance_after" => $request->maintenanceAfter[$key],
-                    "maintenance_at" => $request->maintenanceAt[$key],
-                    'added_by' => Auth::user()->id,
-                    'company_id' => $this->company_id,
-                ]);
-            }
-            else
+            if(!$checkExist)
             {
                 MaintenancePartLink::create([
                     "bus_id" => $request->fleetId,

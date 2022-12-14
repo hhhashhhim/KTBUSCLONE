@@ -18,25 +18,6 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <!-- <transition name="fade">
-                                <div
-                                    class="alert alert-danger alert-dismissible fade show"
-                                    role="alert"
-                                    v-if="error"
-                                >
-                                    <button
-                                        type="button"
-                                        class="close"
-                                        data-dismiss="alert"
-                                        aria-label="Close"
-                                        @click="error = !error"
-                                    >
-                                        <span aria-hidden="true">&times;</span>
-                                        <span class="sr-only">Close</span>
-                                    </button>
-                                    Please Enter All Required Fields !!!
-                                </div>
-                            </transition> -->
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -310,26 +291,9 @@ export default {
                 maintenanceAt: [],
                 loop: 1,
             },
-            // companies: [],
-            // terminals: [],
-            // fetchedData: [],
-            // addTerminalsOnClick: [],
-            // routes: [],
             formID: "linking_form",
             editFormID: "editLinking_form",
-            // data: {},
-            // dataEdit: {},
-            // from: {},
-            // to: {},
-            // success: false,
-            // error: false,
-            // icon: ' <i class="fa fa-bus"></i> ',
             loop: 1,
-            // routeStartName: '',
-            // routeEndName: '',
-            // reverseRoute: 1,
-            // th: [],
-            // classFareName: ''
         };
     },
     created() {
@@ -340,17 +304,6 @@ export default {
           this.data = {};
           this.reverseRoute = 1;
         },
-        // fareClassValue(data, className) {
-        //     const dataTwo = data;
-        //     const converted = Object.keys(dataTwo)
-        //     let new_name = '';
-        //     converted.forEach((element, i) => {
-        //         if (className + '_fare' == element) {
-        //             new_name = dataTwo[element];
-        //         }
-        //     });
-        //     return new_name ? new_name + ' PKR' : 'N/A';
-        // },
         saveRow(event,fieldName) {
            
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
@@ -511,7 +464,7 @@ export default {
                 $('#maintenance_table').DataTable().destroy();
                 this.edit.fleetId = "";
                 this.edit.currentReading = "";
-                this.edit.loop = 1;
+                this.edit.loop = 0;
                 this.edit.fleetPart =  [];
                 this.edit.maintenanceAfter =  [];
                 this.edit.maintenanceAt =  [];
@@ -548,50 +501,6 @@ export default {
                 }
             }
         },
-        // checkBox: function (e) {
-        //     if (e.target.checked) {
-        //         this.reverseRoute = 1;
-        //     } else {
-        //         this.reverseRoute = 0;
-        //     }
-        // },
-        // async add() {
-        //     this.validationErrors = [];
-        //     this.loading = true;
-
-        //     const res = await this.callApi("post", "fare-table/store", this.data);
-        //     if (res.status === 200) {
-        //         this.loading = false;
-
-        //         // this.success = "Fare Table Updated Created Successfully";
-        //        swal({
-        //             title: "Success",
-        //             text: "Fare Table Created Successfully",
-        //             icon: "success",
-        //             timer: 2000
-        //         });
-        //         // Object.keys(obj).forEach((i) => obj[i] = null);
-        //         this.data = {};
-
-        //         this.cities = res.data;
-        //         window.scrollTo(0, 0);
-        //         this.
-        //         setTimeout(() => {
-        //             this.success = "";
-        //             $("#add-modal").modal("hide");
-        //         }, 3000);
-        //     } else {
-        //         if (res.status === 422) {
-        //             this.loading = false;
-
-        //             for (const key in res.data.errors) {
-        //                 res.data.errors[key].forEach((element) => {
-        //                     this.errorsArray(element, key);
-        //                 });
-        //             }
-        //         }
-        //     }
-        // },
         addRow() {
             this.loop++;
         },
@@ -612,39 +521,7 @@ export default {
             this.edit.maintenanceAfter.splice((getRowNumber-1), 1);
             this.edit.maintenanceAt.splice((getRowNumber-1), 1);
             event.target.parentElement.parentElement.remove();
-            
-            console.log(this.edit.fleetPart);
-            console.log(this.edit.maintenanceAfter);
-            console.log(this.edit.maintenanceAt);
         },
-        // addTerminal(event) {
-        //     const value = event.target.value
-        //     if (event.target.checked) {
-        //         const index = this.addTerminalsOnClick.indexOf(value);
-        //         if (index === -1) {
-        //             this.addTerminalsOnClick.push(value);
-        //         }
-        //     } else {
-        //         const index = this.addTerminalsOnClick.indexOf(value);
-        //         this.addTerminalsOnClick.splice(index, 1);
-        //     }
-        // },
-        // async fetchTerminals(event, index) {
-        //     const value = event.target.value;
-
-        //     const indexI = this.addCities.indexOf(value);
-        //     if (indexI === -1) {
-        //         this.addCities.push(value);
-        //     }
-
-        //     const terminalRes = await this.callApi("post", "cities/terminals", {
-        //         id: value
-        //     });
-        //     if (terminalRes.status === 200) {
-        //         this.terminals[index] = terminalRes.data;
-
-        //     }
-        // },
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet");
             if (fleetRes.status === 200) {
@@ -658,12 +535,6 @@ export default {
                 $('#maintenance_table').DataTable();
             }, 300);
         },
-        // changeInfo(from, to) {
-        //     this.from = from.name;
-        //     this.to = to.name;
-        //     this.data.from = from.id;
-        //     this.data.to = to.id;
-        // },
         async fetchFleetDetails(id) {
 
             const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
@@ -684,6 +555,7 @@ export default {
             if (fleetDetailRes.status === 200) {
 
                 // Array Empty
+                this.edit.loop = 0;
                 this.edit.fleetPart = [];
                 this.edit.maintenanceAfter = [];
                 this.edit.maintenanceAt = [];
@@ -702,33 +574,6 @@ export default {
 
             }
         },
-        // async fetchRecord() {
-        //     if (!this.data.fare_class) {
-        //         this.error = true;
-        //         return;
-        //     }
-        //     const res = await this.callApi("post", "fare-table", {
-        //         company_id: this.data.company_id,
-        //         fare_class: this.data.fare_class,
-        //     });
-        //     if (res.status === 200) {
-        //         this.cities = res.data;
-        //         setTimeout(() => {
-        //             this.success = "";
-        //         }, 3000);
-        //     } else {
-        //         alert("Something Went Wrong");
-        //     }
-        // },
-
-        // deleteModal(terminal, i) {
-        //     const deletingObj = {
-        //         url: "terminal/delete",
-        //         data: terminal,
-        //         index: i,
-        //     };
-        //     this.$store.commit("setDeleteObj", deletingObj);
-        // },
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
