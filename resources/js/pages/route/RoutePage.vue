@@ -69,6 +69,11 @@
                                                                     data-target="#showDetails"
                                                                     @click="fetchRouteDetails( route.id )">See Details
                                                             </button>
+                                                            <button class="btn btn-primary mx-1"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(route)"
+                                                            ><i class="far fa-edit"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -93,12 +98,12 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Route Start Point <span class="text-danger">*</span></label>
+                        <label for="name">Route Start Point Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeStartName"/>
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="name">Route End Point <span class="text-danger">*</span></label>
+                        <label for="name">Route End Point Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
@@ -195,6 +200,30 @@
                 </div>
             </div>
 
+            <Edit
+                heading="Edit Route Name"
+                :errors="this.validationErrors"
+                :success="success"
+                :editForm="editFormID"
+            >
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Route Start Point Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.routeStartName"/>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="name">Route End Point Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.routeEndName"/>
+                    </div>
+                </div>
+
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" :disabled="editLoading" @click="updateRoute()">
+                        {{ editLoading ? 'Loading...' : 'Update Route' }}
+                    </button>
+                </template>
+            </Edit>
 
             <!-- Add Modal -->
             <Delete confirmationMessage='Are You Sure You want To Delete This "Route" ???'
@@ -219,6 +248,7 @@ export default {
     data() {
         return {
             loading: false,
+            editLoading: false,
             cities: [],
             validationErrors: [],
             city: 0,
@@ -229,6 +259,7 @@ export default {
             addTerminalsOnClick: [],
             routes: [],
             formID: "route_form",
+            editFormID: 'edit_route_form',
             data: {},
             dataEdit: {},
             from: {},
@@ -267,7 +298,31 @@ export default {
             });
             return new_name ? new_name + ' PKR' : 'N/A';
         },
+        edit(route) {
+            this.dataEdit = {
+                id: route.id,
+                routeStartName: route.name.split('-')[0],
+                routeEndName: route.name.split('-')[1],
+            }
+        },
         async addRoute() {
+            if(this.routeStartName == '' || typeof this.routeStartName == 'undefined'){
+                 return swal({
+                    title: "Required!!",
+                    text: "Route Start Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            if(this.routeEndName == '' || typeof this.routeEndName == 'undefined'){
+                return swal({
+                    title: "Required!!",
+                    text: "Route End Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             const data = {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
@@ -295,6 +350,62 @@ export default {
                 await this.fetchCities();
             } else {
                 this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+        },
+
+        async updateRoute() {
+
+            if(this.dataEdit.routeStartName == '' || typeof this.dataEdit.routeStartName == 'undefined'){
+                return swal({
+                    title: "Required!!",
+                    text: "Route Start Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            if(this.dataEdit.routeEndName == '' || typeof this.dataEdit.routeEndName == 'undefined'){
+                return swal({
+                    title: "Required!!",
+                    text: "Route End Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.editLoading = true;
+            const res = await this.callApi("post", "cities/routes/update", this.dataEdit);
+            if (res.status == 200) {
+                this.editLoading = false;
+                $('#route_table').DataTable().destroy();
+                swal({
+                    title: "Success",
+                    text: "Route Name Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchCities();
+            } else {
+                this.editLoading = false;
                 if (res.status == 422) {
                     let errorContent = "";
                     let count = 0;

@@ -34,7 +34,7 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id')->with('schedule:id,name', 'scheduleDetail')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
+        $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', $this->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
@@ -295,7 +295,7 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-        return Ticket::with('scheduleDetail', 'schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
+        return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
     }
 
     public function bookingElt(Request $request)

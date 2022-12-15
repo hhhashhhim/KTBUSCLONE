@@ -280,7 +280,6 @@ class ScheduleController extends Controller
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', $this->company_id)
             ->get()->unique('fare_class');
-
         // getting cities sequence for checking which city will be after other one
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
@@ -306,10 +305,10 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
                 if ($column['reserved']) {
-                    $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
+                    $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
+                    $seatMap[$i][$j]['fare'] = (int)$data->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-
                 if ($result !== false && $leavingIn30Min != true) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
@@ -376,10 +375,11 @@ class ScheduleController extends Controller
                         ], 422);
                     }
                     if ($class) {
-                        $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                        $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
                     }
                 }
             }
+
         }
         $schedule->bus_class->seat_map = $seatMap;
         unset($schedule->route);
