@@ -184,7 +184,7 @@
                     <div class="form-group col-md-3 my-4 pt-2">
                         <button
                             type="button"
-                            class="btn btn-block btn-warning"
+                            class="btn btn-block btn-primary"
                             @click="addFormGenerateMap"
                         >
                             Generate Seat Map
@@ -493,7 +493,7 @@
                     <div class="form-group col-md-3 my-4 pt-2">
                         <button
                             type="button"
-                            class="btn btn-block btn-warning"
+                            class="btn btn-block btn-primary"
                             @click="editGenerateMap"
                         >
                             Generate Seat Map
@@ -879,7 +879,6 @@ export default {
                 rowId: row,
                 colId: col,
             };
-            // }
         },
         checkClass(colorCode) {
             for (let i = 0; i < this.allSeatClasses.length; i++) {

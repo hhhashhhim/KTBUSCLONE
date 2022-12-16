@@ -81,7 +81,7 @@ if (!function_exists('format_uan')) {
 if (!function_exists('updateFare')) {
     function updateFare($request, $company_id)
     {
-        $fare1Side = FareTable::where('id', $request->id)->update([
+        FareTable::where('id', $request->id)->update([
             'fare' => $request->fare,
             'from_city_id' => $request->from,
             'to_city_id' => $request->to,

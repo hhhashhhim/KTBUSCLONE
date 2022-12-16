@@ -549,7 +549,7 @@
                                 <div class="mb-2"><span class="h6">Seat No # {{ this.alreadyBookedSeat[0] }} </span>
                                 </div>
                                 <br>
-                                <div class="mb-2"><span class="h6">Seat Class : {{ this.alreadyBookedSeatClass[0] }} </span>
+                                <div class="mb-2"><span class="h6">Seat Class : {{ this.alreadyBookedSeatClassName[0] }} </span>
                                 </div>
                                 <br>
                                 <div class="mb-2"><span class="h6">Seat Fare :  {{ this.alreadyBookedSeatFare[0] }} </span>
@@ -571,7 +571,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" @click="rescheduleSeats">Reschedule Seats</button>
+                        <button class="btn btn-primary" @click="rescheduleSeats()">Reschedule Seats</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -791,6 +791,7 @@ export default {
             overIssueData: [],
             alreadyBookedSeat: [],
             alreadyBookedSeatFare: [],
+            alreadyBookedSeatClassName: [],
             alreadyBookedSeatClass: [],
             eltData: [],
             schedule: "",
@@ -1205,6 +1206,7 @@ export default {
             this.reScheduleDepart = '';
             this.reScheduleDest = '';
             this.reScheduleDate = '';
+            this.alreadyBookedSeatClassName = [];
             this.alreadyBookedSeatClass = [];
             this.alreadyBookedSeatFare = [];
             this.alreadyBookedSeat = [];
@@ -1376,11 +1378,13 @@ export default {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
                 this.alreadyBookedSeat.splice(index, 1);
                 this.alreadyBookedSeatFare.splice(index, 1);
+                this.alreadyBookedSeatClassName.splice(index, 1);
                 this.alreadyBookedSeatClass.splice(index, 1);
             } else {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
                 this.alreadyBookedSeat.push(data.seatNo);
                 this.alreadyBookedSeatFare.push(data.fare);
+                this.alreadyBookedSeatClassName.push(data.class_name);
                 this.alreadyBookedSeatClass.push(data.class);
             }
             this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
@@ -1832,37 +1836,50 @@ export default {
             //     });
             // }
 
-            const res = await this.callApi("post", "booking/reschedule", this.rescheduleData);
-            if (res.status == 200) {
-                swal({
-                    title: "Success",
-                    text: "Seat Reschedule Successfully",
-                    icon: "success",
-                    timer: 4000
-                });
-                this.fetchScheduleData();
-            } else {
-                if (res.status == 422) {
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
-                            );
-                        });
-                        swal({
-                            title: "Error",
-                            text: errorContent,
-                            icon: "error",
-                            timer: 4000
-                        });
-
-                    }
-                }
+            const reScheduleAddFormData = {
+                    ...this.rescheduleData,
+                'selected_seatNo': this.alreadyBookedSeat[0],
+                'selected_seatClass': this.alreadyBookedSeatClass[0],
+                'selected_seatFare': this.alreadyBookedSeatFare[0],
             }
+            const res = await this.callApi("post", "booking/reschedule", reScheduleAddFormData);
+            console.log(res);
+            swal({
+                title: "Success",
+                text: "Seat Reschedule Successfully",
+                icon: "success",
+                timer: 4000
+            });
+            // if (res.status == 200) {
+            //     swal({
+            //         title: "Success",
+            //         text: "Seat Reschedule Successfully",
+            //         icon: "success",
+            //         timer: 4000
+            //     });
+            //     this.fetchScheduleData();
+            // } else {
+            //     if (res.status == 422) {
+            //         let errorContent = "";
+            //         let count = 0;
+            //         for (const key in res.data.errors) {
+            //             res.data.errors[key].forEach((element) => {
+            //                 errorContent += (
+            //                     (++count) + " - " + //creating serial no.
+            //                     element + // main error
+            //                     "\n" // creating new line
+            //                 );
+            //             });
+            //             swal({
+            //                 title: "Error",
+            //                 text: errorContent,
+            //                 icon: "error",
+            //                 timer: 4000
+            //             });
+            //
+            //         }
+            //     }
+            // }
         },
         // Duplicate Ticket
         duplicateTicket: function (data) {

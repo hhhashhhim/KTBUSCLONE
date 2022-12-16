@@ -295,9 +295,6 @@ class ScheduleController extends Controller
                 ]
             ], 422);
         }
-
-//        dd($schedule->fare_class_id, $schedule->bus_class->seat_map);
-//        $fare = (float)$fareForAllClasses->where('fare_class', $schedule->fare_class_id)->first()->fare;
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
 
@@ -321,6 +318,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
 
                     if ($tickets[$result]['is_partial'] == 1) {
@@ -347,7 +345,6 @@ class ScheduleController extends Controller
                             unset($seatMap[$i][$j]['gender']);
 
                         }
-
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
@@ -362,11 +359,13 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                 }
 //                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     if ($class && $class->is_active == 0) {
                         return response()->json([
                             "errors" => [
