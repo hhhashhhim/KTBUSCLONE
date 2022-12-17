@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Hrm\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hrm\Employee\Employee;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use function PHPUnit\Framework\isNull;
 
@@ -25,15 +27,16 @@ class EmployeeController extends Controller
     public function index()
     {
 
-        return Employee::with('addedBy', 'company', 'department', 'designation')->where('company_id', $this->company_id)->get();
+        return Employee::with('addedBy', 'company', 'department', 'designation', 'user')->where('company_id', $this->company_id)->get();
 
     }
 
     public function store(Request $request)
     {
-
         $rules = [
             'EmployeeName' => 'required',
+            "email" => 'required|email|unique:users',
+            "password" => 'required',
             'EmployeeFatherName' => 'required',
             'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', $this->company_id)->whereNull('deleted_at')],
             'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', $this->company_id)->whereNull('deleted_at')],
@@ -62,7 +65,18 @@ class EmployeeController extends Controller
             'EmployeeSalary.required' => 'Employee Salary is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
+
+        $user = User::create([
+            "name" => $request->EmployeeName,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+            "contact" => str_replace('-', '', $request->EmployeeContact),
+            "role_id" => 0,
+            'company_id' => $this->company_id,
+        ]);
+
         return Employee::create([
+            'user_id' => $user->id,
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
             'cnic' => str_replace('-', '', $request->EmployeeCNIC),
@@ -80,9 +94,8 @@ class EmployeeController extends Controller
             'job_description' => $request->jobDescription,
             'department_id' => $request->EmployeeDepartment,
             'designation_id' => $request->EmployeeDesignation,
-            'profile_Img' => !is_null($request->ImgEmployeeRecord) ? $request->ImgEmployeeRecord['profile'] : null,
-            'cnic_back_img' => !is_null($request->ImgEmployeeRecord) ? $request->ImgEmployeeRecord['back'] : null,
-            'cnic_front_img' => !is_null($request->ImgEmployeeRecord) ? $request->ImgEmployeeRecord['front'] : null,
+            'profile_Img' =>  $request->profile ? $this->image($request->profile) : null,
+            'attachments' =>  $request->attachment ? $this->attachment($request->attachment) : null,
             'status' => 'W',
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
@@ -91,8 +104,10 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
+        return $request->all();
         $rules = [
             'name' => 'required',
+            "email" => 'required|email|unique:users,email,'.$request->userId,
             'f_name' => 'required',
             'contact' => 'required',
             'cnic' => 'required',
@@ -154,68 +169,31 @@ class EmployeeController extends Controller
 
     }
 
-    public function logoUpload(Request $request)
-    {
-        $finalArray = [];
-        if ($request->profile != 'undefined') {
-            $finalArray['profile'] = $this->image($request->profile, 'profile');
-        } else {
-            $finalArray['profile'] = null;
-        }
-        if ($request->cnicBack != 'undefined') {
-            $finalArray['back'] = $this->image($request->cnicBack, 'cnicback');
-        } else {
-            $finalArray['back'] = null;
-        }
-        if ($request->cnicFront != 'undefined') {
-            $finalArray['front'] = $this->image($request->cnicFront, 'cnicfront');
-        } else {
-            $finalArray['front'] = null;
-        }
-        if ($request->attachmentEdit != 'undefined') {
-            $finalArray['attachmentEdit'] = $this->image($request->attachmentEdit, 'attachmentEdit');
-        } else {
-            $finalArray['attachmentEdit'] = null;
-        }
-        if ($request->attachment != 'undefined') {
-            $finalArray['attachment'] = $this->image($request->attachment, 'attachment');
-        } else {
-            $finalArray['attachment'] = null;
-        }
-        return response($finalArray, 200);
-    }
+    // Image Upload
+    public function image($image){
 
-    public function image($image, $flag)
-    {
-        if ($flag == 'profile') {
-            $imageProfile = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME) . "_" . time() . '.' . $image->extension();
-            $image->move(public_path('uploads/hrm/employee/profile/'), $imageProfile);
-            return $imageProfile;
-        }
-        if ($flag == 'cnicback') {
-            $imageBack = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-                . "_" . time() . '.' . $image->extension();
-            $image->move(public_path('uploads/hrm/employee/cnicback/'), $imageBack);
-            return $imageBack;
-        }
-        if ($flag == 'cnicfront') {
-            $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-                . "_" . time() . '.' . $image->extension();
-            $image->move(public_path('uploads/hrm/employee/cnicfront/'), $imageFront);
-            return $imageFront;
-        }
-        if ($flag == 'attachment') {
-            $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-                . "_" . time() . '.' . $image->extension();
-            $image->move(public_path('uploads/hrm/employee/attachment/'), $imageFront);
-            return $imageFront;
-        }
-        if ($flag == 'attachmentEdit') {
-            $imageFront = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
-                . "_" . time() . '.' . $image->extension();
-            $image->move(public_path('uploads/hrm/employee/attachmentEdit/'), $imageFront);
-            return $imageFront;
-        }
+        $filenameWithExt = $image->getClientOriginalName();
+        //get just filename
+        $filename        = pathinfo($filenameWithExt);
+        //get just extension
+        $extension       = $image->extension();
+        $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        //Move to folder
+        $path            = $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
+        return $nameToStore;
+    }
+    
+    public function attachment($image){
+
+        $filenameWithExt = $image->getClientOriginalName();
+        //get just filename
+        $filename        = pathinfo($filenameWithExt);
+        //get just extension
+        $extension       = $image->extension();
+        $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        //Move to folder
+        $path            = $image->move(public_path('uploads/hrm/employee/attachment/'), $nameToStore);
+        return $nameToStore;
     }
 
 

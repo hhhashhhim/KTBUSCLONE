@@ -121,6 +121,14 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
+                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <input type="email" id="email" class="form-control" v-model="addForm.email"/>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="password">Password <span class="text-danger">*</span></label>
+                        <input type="password" id="password" class="form-control" v-model="addForm.password"/>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="EmployeeName">Name <span class="text-danger">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="addForm.EmployeeName"/>
                     </div>
@@ -222,22 +230,19 @@
                         <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="bloodGroup" v-model="addForm.bloodGroup"/>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-6">
                         <label for="salary">Salary<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="salary" v-model="addForm.EmployeeSalary"/>
                     </div>
-                    <div class="form-group col-md-6 mt-4 pt-3">
-                        <label for="salaryType" class="mr-3">Salary Type</label>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" name="salaryTypeAdd" class="custom-control-input" value="bank"
-                                   v-model="addForm.RadioSalaryTypeAdd">
-                            <label class="custom-control-label" for="bank">Bank</label>
+                    <div class="form-group col-md-6">
+                        <label for="attachments">Upload Attachments</label>
+                        <div class="custom-file">
+                            <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
+                                   class="custom-file-input" id="attachments">
+                            <label class="custom-file-label overflow-hidden"
+                                   for="attachments">{{ attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File' }}</label>
                         </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" checked="" name="salaryTypeAdd" class="custom-control-input"
-                                   value="cash" v-model="addForm.RadioSalaryTypeAdd">
-                            <label class="custom-control-label" for="cash">Cash</label>
-                        </div>
+
                     </div>
                     <div class="form-group col-md-4">
                         <label for="salary">Employee Picture</label>
@@ -254,52 +259,7 @@
                                     nameProfile != '' ? nameProfile : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
-
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Front</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFront" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICFront" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFront')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden" for="cincBack">{{
-                                    nameFront != '' ? nameFront : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
-
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Back</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBack" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICBack" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicBack')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden" for="cnicBack">{{
-                                    nameBack != '' ? nameBack : 'Choose.jpg, .png, .jpeg Image'
-                                }}</label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="attachments">Upload Attachments</label>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
-                                   class="custom-file-input" id="attachments">
-                            <label class="custom-file-label overflow-hidden"
-                                   for="attachments">{{ attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File' }}</label>
-                        </div>
-
-                    </div>
-
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
@@ -377,18 +337,26 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
+                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <input type="email" id="email" class="form-control" v-model="editEmp.email"/>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="password">Password </label>
+                        <input type="password" id="password" class="form-control" v-model="editEmp.password"/>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="EmployeeName">Name <span class="text-danger">*</span></label>
-                        <input type="text" id="EmployeeName" class="form-control" v-model="dataEdit.name"/>
+                        <input type="text" id="EmployeeName" class="form-control" v-model="editEmp.EmployeeName"/>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="FatherName">Father Name <span class="text-danger">*</span></label>
-                        <input type="text" id="FatherName" class="form-control" v-model="dataEdit.f_name"/>
+                        <input type="text" id="FatherName" class="form-control" v-model="editEmp.EmployeeFatherName"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="CNIC">CNIC<span class="text-danger">*</span></label>
                         <vue-mask id="CNIC"
                                   class="form-control"
-                                  v-model="dataEdit.cnic"
+                                  v-model="editEmp.EmployeeCNIC"
                                   mask="00000-0000000-0"
                                   :raw="false"
                                   :options="options"
@@ -399,7 +367,7 @@
                         <label for="phone">Contact #<span class="text-danger">*</span></label>
                         <vue-mask id="phone"
                                   class="form-control"
-                                  v-model="dataEdit.contact"
+                                  v-model="editEmp.EmployeeContact"
                                   mask="0000-0000000"
                                   :raw="false"
                                   :options="optionsContact"
@@ -408,25 +376,25 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="dob">Date of Birth<span class="text-danger">*</span></label>
-                        <input type="date" id="dob" class="form-control" v-model="dataEdit.dob">
+                        <input type="date" id="dob" class="form-control" v-model="editEmp.EmployeeDob">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="refOfHiring">Reference of Hiring</label>
-                        <input type="text" id="refOfHiring" class="form-control" v-model="dataEdit.reference">
+                        <input type="text" id="refOfHiring" class="form-control" v-model="editEmp.RefHiring">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="hiringDate">Hiring Date<span class="text-danger">*</span></label>
-                        <input type="date" id="hiringDate" class="form-control" v-model="dataEdit.hiring_date">
+                        <input type="date" id="hiringDate" class="form-control" v-model="editEmp.HiringDate">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="jobDesp">Job Description</label>
-                        <input type="text" id="jobDesp" class="form-control" v-model="dataEdit.job_description">
+                        <input type="text" id="jobDesp" class="form-control" v-model="editEmp.jobDescription">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="emergencyContact">Emergency Contact #</label>
                         <vue-mask id="emergencyContact"
                                   class="form-control"
-                                  v-model="dataEdit.emergency_contact"
+                                  v-model="editEmp.EmergencyContact"
                                   mask="0000-0000000"
                                   :raw="false"
                                   :options="optionsContact"
@@ -436,14 +404,14 @@
                     <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger">*</span></label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
-                                  v-model="dataEdit.address"></textarea>
+                                  v-model="editEmp.EmployeeAddress"></textarea>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="department">Department<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
                         </div>
-                        <select class="form-control" v-model="dataEdit.department_id" @change="getEditDesignation()">
+                        <select class="form-control" v-model="editEmp.EmployeeDepartment" @change="getEditDesignation()">
                             <option value="0">Select Department</option>
                             <option v-for="(department, i) in editDepartments" :key="i" :value="department.id">
                                 {{ department.name }}
@@ -455,7 +423,7 @@
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
                         </div>
-                        <select class="form-control" v-model="dataEdit.designation_id">
+                        <select class="form-control" v-model="editEmp.EmployeeDesignation">
                             <option value="0" selected>Select Designation</option>
                             <option v-for="(designation, i) in editDesignations" :key="i" :value="designation.id">
                                 {{ designation.name }}
@@ -464,45 +432,39 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="workingDays">Working Days<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="workingDays" v-model="dataEdit.working_days"
+                        <input type="text" class="form-control" id="workingDays" v-model="editEmp.workingDays"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="paidLeaves" v-model="dataEdit.paid_leaves"
+                        <input type="text" class="form-control" id="paidLeaves" v-model="editEmp.paidLeaves"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="bloodGroup" v-model="dataEdit.blood_group"/>
+                        <input type="text" class="form-control" id="bloodGroup" v-model="editEmp.bloodGroup"/>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="salary">Salary<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="salary" v-model="dataEdit.salary"/>
+                        <input type="text" class="form-control" id="salary" v-model="editEmp.EmployeeSalary"/>
                     </div>
-                    <div class="form-group col-md-6 mt-4 pt-3">
-                        <label for="salaryType" class="mr-3">Salary Type</label>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="bank" :checked=" dataEdit.salary_type == 'bank'"
-                                   name="salaryTypeEdit" class="custom-control-input" value="bank"
-                                   v-model="dataEdit.salaryTypeRadioEdit">
-                            <label class="custom-control-label" for="bank">Bank</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="cash" :checked=" dataEdit.salary_type == 'cash'"
-                                   name="salaryTypeEdit" class="custom-control-input" value="cash"
-                                   v-model="dataEdit.salaryTypeRadioEdit">
-                            <label class="custom-control-label" for="cash">Cash</label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-4">
                         <label for="status">Status<span class="text-danger">*</span></label>
-                        <select class="form-control" id="status" v-model="dataEdit.status">
+                        <select class="form-control" id="status" v-model="editEmp.status">
                             <option value="0">Select Employee Status</option>
                             <option value="W">Working</option>
                             <option value="R">Resigned</option>
                             <option value="T">Terminated</option>
                         </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="salary">Upload Attachments</label>
+                        <div class="custom-file">
+                            <input type="file" @change="onFileChange($event, 'attachmentsEdit')" accept=".pdf, .docx, .doc"
+                                   class="custom-file-input" id="attachmentsEdit`">
+                            <label class="custom-file-label overflow-hidden"
+                                   for="attachmentsEdit">{{ attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File' }}</label>
+                        </div>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="salary">Employee Picture</label>
@@ -519,49 +481,6 @@
                                     nameProfileEdit != '' ? nameProfileEdit : 'Choose.jpg, .png, .jpeg Image'
                                 }}</label>
                         </div>
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Front</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICFrontEdit" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICFrontEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicFrontEdit')"
-                                   accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cincBack">
-                            <label class="custom-file-label overflow-hidden"
-                                   for="cincBack">{{ nameFrontEdit != '' ? nameFrontEdit : 'Choose.jpg, .png, .jpeg Image' }}</label>
-                        </div>
-
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="salary">Upload CNIC Back</label>
-                        <div class="border border-dark my-3"
-                             style="height: 250px;  width: 250px; background-color: #d9d9d9">
-                            <img v-if="urlCNICBackEdit" class="img-responsive thumbnail rounded "
-                                 style="display: block;  margin-left: auto;  margin-right: auto; margin-top: auto; margin-bottom: auto; height: 248px;  width: 248px;"
-                                 :src="urlCNICBackEdit" alt="">
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'cnicBackEdit')" accept=".png, .jpg, .jpeg"
-                                   class="custom-file-input" id="cnicBack`">
-                            <label class="custom-file-label overflow-hidden"
-                                   for="cnicBack">{{ nameBackEdit != '' ? nameBackEdit : 'Choose.jpg, .png, .jpeg Image' }}</label>
-                        </div>
-
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="salary">Upload Attachments</label>
-                        <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'attachmentsEdit')" accept=".pdf, .docx, .doc"
-                                   class="custom-file-input" id="attachmentsEdit`">
-                            <label class="custom-file-label overflow-hidden"
-                                   for="attachmentsEdit">{{ attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File' }}</label>
-                        </div>
-
                     </div>
                 </div>
 
@@ -608,6 +527,55 @@ export default {
             addForm: {
                 paidLeaves: '0',
                 RadioSalaryTypeAdd: 'cash',
+                profile: '',
+                attachments: '',
+                email: '',
+                password: '',
+                EmployeeName: '',
+                EmployeeFatherName: '',
+                EmployeeCNIC: '',
+                EmployeeContact: '',
+                EmployeeAddress: '',
+                RefHiring: '',
+                HiringDate: '',
+                EmployeeDob: '',
+                EmployeeSalary: '',
+                RadioSalaryTypeAdd: '',
+                workingDays: '',
+                paidLeaves: '',
+                bloodGroup: '',
+                EmergencyContact: '',
+                jobDescription: '',
+                EmployeeDepartment: '',
+                EmployeeDesignation: '',
+            },
+            editEmp: {
+                userId: '',
+                paidLeaves: '0',
+                RadioSalaryTypeAdd: 'cash',
+                profile: '',
+                attachments: '',
+                email: '',
+                password: '',
+                EmployeeName: '',
+                EmployeeFatherName: '',
+                EmployeeCNIC: '',
+                EmployeeContact: '',
+                EmployeeAddress: '',
+                RefHiring: '',
+                HiringDate: '',
+                EmployeeDob: '',
+                EmployeeSalary: '',
+                RadioSalaryTypeAdd: '',
+                workingDays: '',
+                paidLeaves: '',
+                bloodGroup: '',
+                EmergencyContact: '',
+                jobDescription: '',
+                EmployeeDepartment: '',
+                EmployeeDesignation: '',
+                status: '',
+
             },
             departmentName: '',
             designationName: '',
@@ -617,22 +585,11 @@ export default {
             designations: [],
             editDesignations: [],
             urlProfile: '',
-            urlCNICBack: '',
-            urlCNICFront: '',
             urlProfileEdit: '',
-            urlCNICBackEdit: '',
-            urlCNICFrontEdit: '',
-            back: '',
-            front: '',
-            profile: '',
             nameProfile: '',
-            nameBack: '',
-            nameFront: '',
             nameProfileEdit: '',
-            nameBackEdit: '',
-            nameFrontEdit: '',
             attachmentsEdit: '',
-            attachments: '',
+            profileEdit: '',
             loading: false,
             loadingDepart: false,
             loadingDesignation: false,
@@ -695,43 +652,19 @@ export default {
                     const profile = e.target.files[0];
                     this.nameProfile = profile.name;
                     this.urlProfile = URL.createObjectURL(profile);
-                    this.profile = profile;
+                    this.addForm.profile = profile;
 
-                }
-                if (imgTag == 'cnicFront') {
-                    const front = e.target.files[0];
-                    this.nameFront = front.name;
-                    this.urlCNICFront = URL.createObjectURL(front);
-                    this.front = front;
-                }
-                if (imgTag == 'cnicBack') {
-                    const back = e.target.files[0];
-                    this.nameBack = back.name;
-                    this.urlCNICBack = URL.createObjectURL(back);
-                    this.back = back;
                 }
                 if (imgTag == 'profileEdit') {
                     const profile = e.target.files[0];
                     this.nameProfileEdit = profile.name;
                     this.urlProfileEdit = URL.createObjectURL(profile);
-                    this.editImg.profile = profile;
+                    this.profileEdit = profile;
 
-                }
-                if (imgTag == 'cnicFrontEdit') {
-                    const front = e.target.files[0];
-                    this.nameFrontEdit = front.name;
-                    this.urlCNICFrontEdit = URL.createObjectURL(front);
-                    this.editImg.front = front;
-                }
-                if (imgTag == 'cnicBackEdit') {
-                    const back = e.target.files[0];
-                    this.nameBackEdit = back.name;
-                    this.urlCNICBackEdit = URL.createObjectURL(back);
-                    this.editImg.back = back;
                 }
                 if (imgTag == 'attachments') {
                     const attachment = e.target.files[0];
-                    this.attachments = attachment.name;
+                    this.addForm.attachments = attachment;
                 }
                 if (imgTag == 'attachmentsEdit') {
                     const attachmentsEditRes = e.target.files[0];
@@ -741,10 +674,6 @@ export default {
                 e.target.value = '';
                 this.nameProfile = '';
                 this.nameProfileEdit = '';
-                this.nameFrontEdit = '';
-                this.nameFront = '';
-                this.nameBackEdit = '';
-                this.nameBack = '';
                 return swal({
                     title: "Invalid Format",
                     text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
@@ -916,10 +845,6 @@ export default {
                 RadioSalaryTypeAdd: 'cash',
             };
             this.designations = '';
-            this.nameBack = '';
-            this.urlCNICBack = '';
-            this.nameFront = '';
-            this.urlCNICFront = '';
             this.nameProfile = '';
             this.urlProfile = '';
             this.attachments = '';
@@ -941,64 +866,71 @@ export default {
                 headers: {'content-type': 'multipart/form-data'}
             }
             let formData = new FormData();
-            if (this.profile != '') {
-                formData.append('profile', this.profile);
+            if (this.addForm.profile != '') {
+                formData.append('profile', this.addForm.profile);
             }
-            if (this.front != '') {
-                formData.append('cnicFront', this.front);
+            if (this.addForm.attachments != '') {
+                formData.append('attachment', this.addForm.attachments);
             }
-            if (this.back != '') {
-                formData.append('cnicBack', this.back);
-            }
-            if (this.attachments != '') {
-                formData.append('attachment', this.attachments);
-            }
-
 
             this.validationErrors = [];
-            if (this.addForm.EmployeeName == "" || typeof this.addForm.EmployeeName == 'undefined')
+            if (!this.addForm.email)
+                return swal({
+                    title: "Required!",
+                    text: "Email Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.addForm.password)
+                return swal({
+                    title: "Required!",
+                    text: "Password's Father Name Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.addForm.EmployeeName)
                 return swal({
                     title: "Required!",
                     text: "Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeFatherName == "" || typeof this.addForm.EmployeeFatherName == 'undefined')
+            if (!this.addForm.EmployeeFatherName)
                 return swal({
                     title: "Required!",
                     text: "Employee's Father Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeCNIC == "" || typeof this.addForm.EmployeeCNIC == 'undefined')
+            if (!this.addForm.EmployeeCNIC)
                 return swal({
                     title: "Required!",
                     text: "Employee's CNIC Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeContact == "" || typeof this.addForm.EmployeeContact == 'undefined')
+            if (!this.addForm.EmployeeContact)
                 return swal({
                     title: "Required!",
                     text: "Employee's Contact Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDob == "" || typeof this.addForm.EmployeeDob == 'undefined')
+            if (!this.addForm.EmployeeDob)
                 return swal({
                     title: "Required!",
                     text: "Employee's Date of Birth is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.HiringDate == "" || typeof this.addForm.HiringDate == 'undefined')
+            if (!this.addForm.HiringDate)
                 return swal({
                     title: "Required!",
                     text: "Employee's Hiring Date  is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeAddress == "" || typeof this.addForm.EmployeeAddress == 'undefined')
+            if (!this.addForm.EmployeeAddress)
                 return swal({
                     title: "Required!",
                     text: "Employee's Address is Required",
@@ -1012,51 +944,65 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDesignation == "" || typeof this.addForm.EmployeeDesignation == 'undefined')
+            if (!this.addForm.EmployeeDesignation)
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.workingDays == "" || typeof this.addForm.workingDays == 'undefined')
+            if (!this.addForm.workingDays)
                 return swal({
                     title: "Required!",
                     text: "Employee's Working Days is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.paidLeaves == "" || typeof this.addForm.paidLeaves == 'undefined')
+            if (!this.addForm.paidLeaves)
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.bloodGroup == "" || typeof this.addForm.bloodGroup == 'undefined')
+            if (!this.addForm.bloodGroup)
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeSalary == "" || typeof this.addForm.EmployeeSalary == 'undefined')
+            if (!this.addForm.EmployeeSalary)
                 return swal({
                     title: "Required!",
                     text: "Employee's Salary is Required",
                     icon: "error",
                     timer: 2000
                 });
+            
+           
+            formData.append('email', this.addForm.email);
+            formData.append('password', this.addForm.password);
+            formData.append('EmployeeName', this.addForm.EmployeeName);
+            formData.append('EmployeeFatherName', this.addForm.EmployeeFatherName);
+            formData.append('EmployeeCNIC', this.addForm.EmployeeCNIC);
+            formData.append('EmployeeContact', this.addForm.EmployeeContact);
+            formData.append('EmployeeAddress', this.addForm.EmployeeAddress);
+            formData.append('RefHiring', this.addForm.RefHiring);
+            formData.append('HiringDate', this.addForm.HiringDate);
+            formData.append('EmployeeDob', this.addForm.EmployeeDob);
+            formData.append('EmployeeSalary', this.addForm.EmployeeSalary);
+            formData.append('RadioSalaryTypeAdd', this.addForm.RadioSalaryTypeAdd);
+            formData.append('workingDays', this.addForm.workingDays);
+            formData.append('paidLeaves', this.addForm.paidLeaves);
+            formData.append('bloodGroup', this.addForm.bloodGroup);
+            formData.append('EmergencyContact', this.addForm.EmergencyContact);
+            formData.append('jobDescription', this.addForm.jobDescription);
+            formData.append('EmployeeDepartment', this.addForm.EmployeeDepartment);
+            formData.append('EmployeeDesignation', this.addForm.EmployeeDesignation);
+
             this.loading = true;
-            let ImgEmployeeRecord = "";
-            if (this.profile || this.front || this.back) {
-                const logoRes = await this.callApi("post", "hrm/employee/logo-upload", formData, config);
-                ImgEmployeeRecord = logoRes.data ?? "";
-            }
-            const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", {
-                ...this.addForm,
-                ImgEmployeeRecord
-            });
+            const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", formData, config);
             if (resEmployeeAdd.status == 201) {
                 swal({
                     title: "Success",
@@ -1087,128 +1033,136 @@ export default {
                 headers: {'content-type': 'multipart/form-data'}
             }
             let formData = new FormData();
-            if (this.editImg.profile != '') {
-                formData.append('profile', this.editImg.profile);
-            }
-            if (this.editImg.front != '') {
-                formData.append('cnicFront', this.editImg.front);
-            }
-            if (this.editImg.back != '') {
-                formData.append('cnicBack', this.editImg.back);
+            if (this.profileEdit != '') {
+                formData.append('profile', this.profileEdit);
             }
             if (this.attachmentsEdit != '') {
                 formData.append('attachmentEdit', this.attachmentsEdit);
             }
             this.validationErrors = [];
-            if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
+            if (!this.editEmp.email)
+                return swal({
+                    title: "Required!",
+                    text: "Email Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.editEmp.EmployeeName)
                 return swal({
                     title: "Required!",
                     text: "Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.f_name == "" || typeof this.dataEdit.f_name == 'undefined')
+            if (!this.editEmp.EmployeeFatherName)
                 return swal({
                     title: "Required!",
                     text: "Employee's Father Name Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == 'undefined')
+            if (!this.editEmp.EmployeeCNIC)
                 return swal({
                     title: "Required!",
                     text: "Employee's CNIC Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.contact == "" || typeof this.dataEdit.contact == 'undefined')
+            if (!this.editEmp.EmployeeContact)
                 return swal({
                     title: "Required!",
                     text: "Employee's Contact Number is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.dob == "" || typeof this.dataEdit.dob == 'undefined')
+            if (!this.editEmp.EmployeeDob)
                 return swal({
                     title: "Required!",
                     text: "Employee's Date of Birth is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.hiring_date == "" || typeof this.dataEdit.hiring_date == 'undefined')
+            if (!this.editEmp.HiringDate)
                 return swal({
                     title: "Required!",
                     text: "Employee's Hiring Date  is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.address == "" || typeof this.dataEdit.address == 'undefined')
+            if (!this.editEmp.EmployeeAddress)
                 return swal({
                     title: "Required!",
                     text: "Employee's Address is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.department == "" || typeof this.dataEdit.department == 'undefined')
+            if (this.addForm.EmployeeDepartment == "0")
                 return swal({
                     title: "Required!",
-                    text: "Employee's Department Name is Required",
+                    text: "Please Select Employee's Department",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.designation == "" || typeof this.dataEdit.designation == 'undefined')
+            if (!this.editEmp.EmployeeDesignation)
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.working_days == "" || typeof this.dataEdit.working_days == 'undefined')
+            if (!this.editEmp.workingDays)
                 return swal({
                     title: "Required!",
                     text: "Employee's Working Days is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.paid_leaves == "" || typeof this.dataEdit.paid_leaves == 'undefined')
+            if (!this.editEmp.paidLeaves)
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.blood_group == "" || typeof this.dataEdit.blood_group == 'undefined')
+            if (!this.editEmp.bloodGroup)
                 return swal({
                     title: "Required!",
                     text: "Employee's Paid Leaves is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.salary == "" || typeof this.dataEdit.salary == 'undefined')
+            if (!this.editEmp.EmployeeSalary)
                 return swal({
                     title: "Required!",
                     text: "Employee's Salary is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.status == "0")
-                return swal({
-                    title: "Required!",
-                    text: "Please Select Employee Status",
-                    icon: "error",
-                    timer: 2000
-                });
-            // this.loading = true;
-            let ImgEmployeeRecordEdit = "";
-            if (this.editImg.profile || this.editImg.front || this.editImg.back) {
-                const logoRes = await this.callApi("post", "hrm/employee/logo-upload", formData, config);
-                ImgEmployeeRecordEdit = logoRes.data ?? "";
-            }
 
-            const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', {
-                ...this.dataEdit,
-                ImgEmployeeRecordEdit
-            });
+            formData.append('userId', this.editEmp.userId);
+            formData.append('email', this.editEmp.email);
+            formData.append('password', this.editEmp.password);
+            formData.append('EmployeeName', this.editEmp.EmployeeName);
+            formData.append('EmployeeFatherName', this.editEmp.EmployeeFatherName);
+            formData.append('EmployeeCNIC', this.editEmp.EmployeeCNIC);
+            formData.append('EmployeeContact', this.editEmp.EmployeeContact);
+            formData.append('EmployeeAddress', this.editEmp.EmployeeAddress);
+            formData.append('RefHiring', this.editEmp.RefHiring);
+            formData.append('HiringDate', this.editEmp.HiringDate);
+            formData.append('EmployeeDob', this.editEmp.EmployeeDob);
+            formData.append('EmployeeSalary', this.editEmp.EmployeeSalary);
+            formData.append('RadioSalaryTypeAdd', this.editEmp.RadioSalaryTypeAdd);
+            formData.append('workingDays', this.editEmp.workingDays);
+            formData.append('paidLeaves', this.editEmp.paidLeaves);
+            formData.append('bloodGroup', this.editEmp.bloodGroup);
+            formData.append('EmergencyContact', this.editEmp.EmergencyContact);
+            formData.append('jobDescription', this.editEmp.jobDescription);
+            formData.append('EmployeeDepartment', this.editEmp.EmployeeDepartment);
+            formData.append('EmployeeDesignation', this.editEmp.EmployeeDesignation);
+
+            this.loading = true;
+
+            const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', formData, config);
             if (resEmployeeUpdate.status == 200) {
                 swal({
                     title: "Success!",
@@ -1245,9 +1199,30 @@ export default {
         },
 
         async editEmployee(employ) {
-            this.dataEdit = employ;
+            this.editEmp.userId = employ.user_id;
+            this.editEmp.paidLeaves = employ.paid_leaves;
+            this.editEmp.RadioSalaryTypeAdd = employ.salary_type;
+            this.editEmp.email = employ.user.email;
+            this.editEmp.EmployeeName = employ.name;
+            this.editEmp.EmployeeFatherName = employ.f_name;
+            this.editEmp.EmployeeCNIC = employ.cnic;
+            this.editEmp.EmployeeContact = employ.contact;
+            this.editEmp.EmployeeAddress = employ.address;
+            this.editEmp.RefHiring = employ.reference;
+            this.editEmp.HiringDate = employ.hiring_date;
+            this.editEmp.EmployeeDob = employ.dob;
+            this.editEmp.EmployeeSalary = employ.salary;
+            this.editEmp.workingDays = employ.working_days;
+            this.editEmp.paidLeaves = employ.paid_leaves;
+            this.editEmp.bloodGroup = employ.blood_group;
+            this.editEmp.EmergencyContact = employ.emergency_contact;
+            this.editEmp.jobDescription = employ.job_description;
+            this.editEmp.EmployeeDepartment = employ.department_id;
+            this.editEmp.EmployeeDesignation = employ.designation_id;
+            this.editEmp.status = employ.status;
+            
             const resEditSelective = await this.callApi("post", 'hrm/designation/selective', {id: employ.department_id});
-            console.log(resEditSelective);
+            
             if (resEditSelective.status == 200) {
                 if (resEditSelective.data.length == 0) {
                     this.editDesignations = '';
