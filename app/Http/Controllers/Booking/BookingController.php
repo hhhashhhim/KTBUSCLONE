@@ -50,6 +50,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+//        dd($request->all());
         $schedule = Schedule::where('id', $request->schedule)->where('company_id', $this->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
         $departure_city_id = $schedule->route->fares->first()->departure_city_id;
         $destination_city_id = $schedule->route->fares->last()->destination_city_id;

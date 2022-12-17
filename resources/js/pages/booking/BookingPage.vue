@@ -200,7 +200,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label>Total Recieveable </label>
+                                                        <label>Total Receivable </label>
                                                         <input type="text"
                                                                class="form-control"
                                                                readonly
@@ -235,7 +235,7 @@
                                                     @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col) "
                                                     :class="getClasses(col)"
                                                     :title="getTitle(col)"
-                                                    :style="{border:'2px solid ' + col.color + ' !important'}"
+                                                    :style="getStyle(col)"
                                                 >
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
@@ -512,7 +512,9 @@
                                 <div class="mb-2"><span class="h6">Date : {{ rescheduleData.dataAll.date }} </span>
                                 </div>
                                 <br>
-                                <div class="mb-2"><span class="h6">Schedule : {{ rescheduleData.dataAll.schedule.name }} </span></div>
+                                <div class="mb-2"><span class="h6">Schedule : {{
+                                        rescheduleData.dataAll.schedule.name
+                                    }} </span></div>
                                 <br>
                             </div>
                             <div class="col-md-6">
@@ -549,10 +551,14 @@
                                 <div class="mb-2"><span class="h6">Seat No # {{ this.alreadyBookedSeat[0] }} </span>
                                 </div>
                                 <br>
-                                <div class="mb-2"><span class="h6">Seat Class : {{ this.alreadyBookedSeatClassName[0] }} </span>
+                                <div class="mb-2"><span class="h6">Seat Class : {{
+                                        this.alreadyBookedSeatClassName[0]
+                                    }} </span>
                                 </div>
                                 <br>
-                                <div class="mb-2"><span class="h6">Seat Fare :  {{ this.alreadyBookedSeatFare[0] }} </span>
+                                <div class="mb-2"><span class="h6">Seat Fare :  {{
+                                        this.alreadyBookedSeatFare[0]
+                                    }} </span>
                                 </div>
                                 <br>
                                 <div class="mb-2"><span
@@ -795,10 +801,10 @@ export default {
             alreadyBookedSeatClass: [],
             eltData: [],
             schedule: "",
-            reScheduleSchedule : '',
-            reScheduleDepart : '',
-            reScheduleDest : '',
-            reScheduleDate : '',
+            reScheduleSchedule: '',
+            reScheduleDepart: '',
+            reScheduleDest: '',
+            reScheduleDate: '',
             loading: false,
             getSchedule: false,
             showBookingDiv: false,
@@ -1336,20 +1342,22 @@ export default {
                 });
             }
         },
-        // update Booked seat ()
+        // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            let index = this.advanceSeat.indexOf(data.seatNo);
-            if (index != -1) {
-                this.addForm.customerCNIC = '';
-                this.addForm.customerName = '';
-                this.addForm.contact = '';
-                this.addForm.remarks = '';
-                this.addForm.selectedSeats = 0;
-                this.addForm.totalFare = 0;
-                this.addForm.totalAmount = 0;
-                this.advanceSeat.splice(index, 1);
-            } else {
-                if (data.type == 'advance booking' && data.type != 0) {
+            console.log(data);
+            if (data.type == 'advance booking' && data.type != 0) {
+                let index = this.advanceSeat.indexOf(data.seatNo);
+                if (index != -1) {
+                    this.addForm.customerCNIC = '';
+                    this.addForm.customerName = '';
+                    this.addForm.contact = '';
+                    this.addForm.remarks = '';
+                    this.addForm.selectedSeats = 0;
+                    this.addForm.totalFare = 0;
+                    this.addForm.totalAmount = 0;
+                    this.advanceSeat.splice(index, 1);
+                } else {
+                    this.addForm.alreadyBookedId = data.id
                     this.addForm.customerCNIC = data.customer_cnic == 0 ?? '';
                     this.addForm.customerName = data.customer_name;
                     this.addForm.contact = data.customer_phone;
@@ -1392,25 +1400,36 @@ export default {
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
             this.reScheduleDate = this.rescheduleData.rescheduleDate;
         },
+        handler: function (col, e) {
+            if (col.type == 'not_for_sale') {
+                e.preventDefault();
+            }
+        },
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
-            return gender + " " + selected + " " + partial + " " + over;
+            let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
+            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
         },
         getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.alreadyBooked ? "selected" : "";
             let partial = col.partial ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
-            return gender + " " + selected + " " + partial + " " + over;
+            let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
+            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
             // return same;
         },
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking') {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
+        },
+        getStyle: function (col) {
+            let disabledSeat = col.type == 'not_for_sale' ? 'pointer-events: none;' : '';
+            return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
         },
         async add() {
             if (!this.addForm.schedule) {
@@ -1837,7 +1856,7 @@ export default {
             // }
 
             const reScheduleAddFormData = {
-                    ...this.rescheduleData,
+                ...this.rescheduleData,
                 'selected_seatNo': this.alreadyBookedSeat[0],
                 'selected_seatClass': this.alreadyBookedSeatClass[0],
                 'selected_seatFare': this.alreadyBookedSeatFare[0],

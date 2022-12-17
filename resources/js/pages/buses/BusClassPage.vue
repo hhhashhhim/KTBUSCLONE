@@ -78,7 +78,7 @@
                                                             <button
                                                                 @click="duplicate(busClass.id, i+1)"
                                                                 class="btn btn-info mx-1"
-                                                            > <i class="fas fa-clone"></i>
+                                                            ><i class="fas fa-clone"></i>
                                                             </button>
                                                             <button
                                                                 :data-target="'#' + editFormID"
@@ -538,7 +538,7 @@
                                     @click="getSeatDetails(rowIndex, colIndex)"
                                     :style=" col.class ? checkClass(col.class) : '' "
                                     v-if="col.reserved"
-                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt="" />
+                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
                                 <span v-else></span>
                             </td>
                         </tr>
@@ -914,14 +914,16 @@ export default {
                     reserved: singleSeatDetails.reserved,
                     seatNo: singleSeatDetails.seatNo,
                     class: this.editSeatModify.class,
-                    type: this.editSeatModify.type,
+                    type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type,
                 };
-                this.success =
-                    "Seat Class Update Successfully to Seat Number " +
-                    singleSeatDetails.seatNo;
+                swal({
+                    title: "Success!",
+                    text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
+                    icon: "success",
+                    timer: 2000,
+                });
             }
-        }
-        ,
+        },
 
         changeStatus: function (row, col) {
             if (this.data.seatMap[row][col].reserved) {
@@ -1025,13 +1027,14 @@ export default {
         ,
 
         async addBusClass() {
+            console.log(this.data.seatMap);
             this.validationErrors = [];
 
             // validation for assign all class
             let b = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i].class == undefined && seat[i].reserved == true) {
+                    if ((seat[i].class == undefined || seat[i].class == "0" || seat[i].class == 0) && seat[i].reserved == true) {
                         b = 1;
                     }
                 }
@@ -1054,14 +1057,14 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            if (typeof this.data.noOfRows == "undefined")
+            if (typeof this.data.noOfRows == "undefined" || this.data.noOfRows == '')
                 return swal({
                     title: "Required ",
                     text: "Row Field is Required",
                     icon: "error",
                     timer: 2000,
                 });
-            if (typeof this.data.noOfCols == "undefined")
+            if (typeof this.data.noOfCols == "undefined" || this.data.noOfCols == '')
                 return swal({
                     title: "Required",
                     text: "Col Field is required",
@@ -1172,13 +1175,13 @@ export default {
         edit(bus_class) {
             this.dataEdit = {...bus_class, busClassColor: bus_class.color};
         },
-        async duplicate(id, index){
+        async duplicate(id, index) {
             this.cloneDone = true;
-            const res = await this.callApi("post", "bus_classes/duplicate", {id : id});
+            const res = await this.callApi("post", "bus_classes/duplicate", {id: id});
             if (res.status == 201) {
                 swal({
                     title: "Success",
-                    text:  "Row # " + index + " Duplicated Successfully",
+                    text: "Row # " + index + " Duplicated Successfully",
                     icon: "success",
                     timer: 3000,
                 });

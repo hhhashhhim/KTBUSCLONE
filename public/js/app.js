@@ -24935,7 +24935,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee12);
       }))();
     },
-    // update Booked seat ()
+    // update Form After  advanced Booked seat
     updateBookedSeat: function updateBookedSeat(data) {
       var _this13 = this;
 
@@ -24946,20 +24946,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                index = _this13.advanceSeat.indexOf(data.seatNo);
+                console.log(data);
 
-                if (index != -1) {
-                  _this13.addForm.customerCNIC = '';
-                  _this13.addForm.customerName = '';
-                  _this13.addForm.contact = '';
-                  _this13.addForm.remarks = '';
-                  _this13.addForm.selectedSeats = 0;
-                  _this13.addForm.totalFare = 0;
-                  _this13.addForm.totalAmount = 0;
+                if (data.type == 'advance booking' && data.type != 0) {
+                  index = _this13.advanceSeat.indexOf(data.seatNo);
 
-                  _this13.advanceSeat.splice(index, 1);
-                } else {
-                  if (data.type == 'advance booking' && data.type != 0) {
+                  if (index != -1) {
+                    _this13.addForm.customerCNIC = '';
+                    _this13.addForm.customerName = '';
+                    _this13.addForm.contact = '';
+                    _this13.addForm.remarks = '';
+                    _this13.addForm.selectedSeats = 0;
+                    _this13.addForm.totalFare = 0;
+                    _this13.addForm.totalAmount = 0;
+
+                    _this13.advanceSeat.splice(index, 1);
+                  } else {
+                    _this13.addForm.alreadyBookedId = data.id;
                     _this13.addForm.customerCNIC = (_ref = data.customer_cnic == 0) !== null && _ref !== void 0 ? _ref : '';
                     _this13.addForm.customerName = data.customer_name;
                     _this13.addForm.contact = data.customer_phone;
@@ -25013,24 +25016,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.reScheduleSchedule = $("#reScheduleName option:selected").text();
       this.reScheduleDate = this.rescheduleData.rescheduleDate;
     },
+    handler: function handler(col, e) {
+      if (col.type == 'not_for_sale') {
+        e.preventDefault();
+      }
+    },
     getClasses: function getClasses(col) {
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
       var selected = col.selected ? "selected" : "";
       var partial = col.partial ? "partial" : "";
       var over = col.over_issue && col.partial ? "bg-secondary" : "";
-      return gender + " " + selected + " " + partial + " " + over;
+      var disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
+      return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
     },
     getClassesReschedule: function getClassesReschedule(col) {
       var gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
       var selected = col.alreadyBooked ? "selected" : "";
       var partial = col.partial ? "partial" : "";
       var over = col.over_issue && col.partial ? "bg-secondary" : "";
-      return gender + " " + selected + " " + partial + " " + over; // return same;
+      var disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
+      return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat; // return same;
     },
     getTitle: function getTitle(col) {
       if (col.type == 'booked' || col.type == 'advance booking') {
         return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
       }
+    },
+    getStyle: function getStyle(col) {
+      var disabledSeat = col.type == 'not_for_sale' ? 'pointer-events: none;' : '';
+      return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
     },
     add: function add() {
       var _this14 = this;
@@ -27056,9 +27070,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           reserved: singleSeatDetails.reserved,
           seatNo: singleSeatDetails.seatNo,
           "class": this.editSeatModify["class"],
-          type: this.editSeatModify.type
+          type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type
         };
-        this.success = "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo;
+        swal({
+          title: "Success!",
+          text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
+          icon: "success",
+          timer: 2000
+        });
       }
     },
     changeStatus: function changeStatus(row, col) {
@@ -27167,20 +27186,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                console.log(_this4.data.seatMap);
                 _this4.validationErrors = []; // validation for assign all class
 
                 b = 0;
 
                 _this4.data.seatMap.map(function (seat) {
                   for (var i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i]["class"] == undefined && seat[i].reserved == true) {
+                    if ((seat[i]["class"] == undefined || seat[i]["class"] == "0" || seat[i]["class"] == 0) && seat[i].reserved == true) {
                       b = 1;
                     }
                   }
                 });
 
                 if (!(b == 1)) {
-                  _context3.next = 5;
+                  _context3.next = 6;
                   break;
                 }
 
@@ -27191,9 +27211,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
+              case 6:
                 if (!(_this4.data.BusClassName === "")) {
-                  _context3.next = 7;
+                  _context3.next = 8;
                   break;
                 }
 
@@ -27204,9 +27224,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 7:
-                if (!(typeof _this4.data.noOfRows == "undefined")) {
-                  _context3.next = 9;
+              case 8:
+                if (!(typeof _this4.data.noOfRows == "undefined" || _this4.data.noOfRows == '')) {
+                  _context3.next = 10;
                   break;
                 }
 
@@ -27217,9 +27237,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 9:
-                if (!(typeof _this4.data.noOfCols == "undefined")) {
-                  _context3.next = 11;
+              case 10:
+                if (!(typeof _this4.data.noOfCols == "undefined" || _this4.data.noOfCols == '')) {
+                  _context3.next = 12;
                   break;
                 }
 
@@ -27230,16 +27250,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 11:
+              case 12:
                 _this4.loading = true;
-                _context3.next = 14;
+                _context3.next = 15;
                 return _this4.callApi("post", "bus_classes/store", _this4.data);
 
-              case 14:
+              case 15:
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 26;
+                  _context3.next = 27;
                   break;
                 }
 
@@ -27251,19 +27271,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#bus_class_table").DataTable().destroy();
                 _this4.loading = false;
-                _context3.next = 21;
+                _context3.next = 22;
                 return _this4.fetchBussClasses();
 
-              case 21:
+              case 22:
                 _this4.data = {
                   busClassColor: "#000000"
                 };
                 _this4.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context3.next = 27;
+                _context3.next = 28;
                 break;
 
-              case 26:
+              case 27:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -27278,7 +27298,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 27:
+              case 28:
               case "end":
                 return _context3.stop();
             }
@@ -43372,7 +43392,7 @@ var _hoisted_72 = {
 };
 
 var _hoisted_73 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Total Recieveable ", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Total Receivable ", -1
   /* HOISTED */
   );
 });
@@ -44552,9 +44572,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           $options.updateBookedSeat(col);
         },
         title: $options.getTitle(col),
-        style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-          border: '2px solid ' + col.color + ' !important'
-        })
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.getStyle(col))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(col.seatNo), 1
       /* TEXT */
       ), _hoisted_77, col.type && (col.type == 'booked' || col.type == 'advance booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
