@@ -183,6 +183,21 @@ class CityController extends Controller
         return ['message' => 'success'];
     }
 
+    public function cityRoutesUpdate(Request $request)
+    {
+        $request->validate([
+            'routeStartName' => 'required',
+            'routeEndName' => 'required',
+        ]);
+        Route::where([
+            'company_id' => $this->company_id,
+            'id' => $request->id,
+        ])->update([
+            'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
+        ]);
+        return ['message' => 'success'];
+    }
+
     public function city_routes_details(Request $request)
     {
         $routeFareCities = RouteFare::where('route_id', $request->id)->where('company_id', $this->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);

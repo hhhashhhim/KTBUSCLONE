@@ -280,7 +280,6 @@ class ScheduleController extends Controller
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', $this->company_id)
             ->get()->unique('fare_class');
-
         // getting cities sequence for checking which city will be after other one
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
@@ -296,9 +295,6 @@ class ScheduleController extends Controller
                 ]
             ], 422);
         }
-
-//        dd($schedule->fare_class_id, $schedule->bus_class->seat_map);
-//        $fare = (float)$fareForAllClasses->where('fare_class', $schedule->fare_class_id)->first()->fare;
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
 
@@ -306,10 +302,10 @@ class ScheduleController extends Controller
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat
                 if ($column['reserved']) {
-                    $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $column['class'])->first()->fare;
+                    $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
+                    $seatMap[$i][$j]['fare'] = (int)$data->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-
                 if ($result !== false && $leavingIn30Min != true) {
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
@@ -322,6 +318,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
 
                     if ($tickets[$result]['is_partial'] == 1) {
@@ -348,7 +345,6 @@ class ScheduleController extends Controller
                             unset($seatMap[$i][$j]['gender']);
 
                         }
-
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
@@ -363,11 +359,13 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                 }
 //                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     if ($class && $class->is_active == 0) {
                         return response()->json([
                             "errors" => [
@@ -376,10 +374,11 @@ class ScheduleController extends Controller
                         ], 422);
                     }
                     if ($class) {
-                        $seatMap[$i][$j]['fare'] = (float)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                        $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
                     }
                 }
             }
+
         }
         $schedule->bus_class->seat_map = $seatMap;
         unset($schedule->route);

@@ -34,7 +34,7 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
-        $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id')->with('schedule:id,name', 'scheduleDetail')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
+        $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', $this->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
         foreach ($bookings as $i => $singleBooking) {
@@ -150,8 +150,9 @@ class BookingController extends Controller
 
     public function reschedule(Request $request)
     {
-
-        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('destination_city_id', $request->dataDestination)->first();
+//        dd($request->all());
+//        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('destination_city_id', $request->dataDestination)->first();
+        $ticket = $request->dataAll;
         if ($request->existingDate == $request->rescheduleDate) {
             $bookingNo = Ticket::where('date', $request->existingDate)->latest()->first()->booking_no ?? 0;
             ++$bookingNo;
@@ -161,22 +162,23 @@ class BookingController extends Controller
         }
         $scheduleDetail = ScheduleDetail::where([
             'company_id' => $this->company_id,
-            'departure_date' => $ticket->date,
-            'departure_id' => $ticket->departure_city_id,
-            'destination_id' => $ticket->destination_city_id,
-            'schedule_id' => $ticket->schedule_id,
+            'departure_date' => $ticket['date'],
+            'departure_id' => $ticket['departure_city_id'],
+            'destination_id' => $ticket['destination_city_id'],
+            'schedule_id' => $ticket['schedule_id'],
         ])->first();
+        dd($scheduleDetail);
         TicketReschedule::create([
             'company_id' => $this->company_id,
-            'schedule_id' => $ticket->schedule_id,
+            'schedule_id' => $ticket['schedule_id'],
             'reSchedule_id' => $request->rescheduleSchedule,
-            'customer_id' => $ticket->customer_id,
-            'date' => $ticket->date,
+            'customer_id' => $ticket['customer_id'],
+            'date' => $ticket['date'],
             'reschedule_date' => $request->rescheduleDate,
-            'departure_city_id' => $ticket->departure_city_id,
+            'departure_city_id' => $ticket['departure_city_id'],
             'reschedule_departure_city_id' => $request->dataDepartureCity,
             'reschedule_destination_city_id' => $request->rescheduleDestinationCity,
-            'destination_city_id' => $ticket->destination_city_id,
+            'destination_city_id' => $ticket['destination_city_id'],
             'reason' => $request->reason,
             'added_by' => Auth::user()->id,
         ]);
@@ -184,19 +186,19 @@ class BookingController extends Controller
             'company_id' => $this->company_id,
             'departure_city_id' => $request->dataDepartureCity,
             'destination_city_id' => $request->rescheduleDestinationCity,
-            'seat_no' => $ticket->seat_no,
-            'seat_fare' => $ticket->seat_fare,
-            'is_partial' => $ticket->is_partial,
+            'seat_no' => $ticket['seat_no'],
+            'seat_fare' => $ticket['seat_fare'],
+            'is_partial' => $ticket['is_partial'],
             'booking_no' => $bookingNo,
             'date' => $request->rescheduleDate,
             'schedule_details_id' => $scheduleDetail->id,
             'customer_id' => $request->dataCustomer,
             'schedule_id' => $request->rescheduleSchedule,
-            'remarks' => $ticket->remarks,
-            'gender' => $ticket->gender,
-            'type' => $ticket->type,
+            'remarks' => $ticket['remarks'],
+            'gender' => $ticket['gender'],
+            'type' => $ticket['type'],
             'added_by' => Auth::user()->id,
-            'discount' => $ticket->discount,
+            'discount' => $ticket['discount'],
         ]);
         $ticket->update([
             'type' => 'reschedule'
@@ -295,7 +297,7 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-        return Ticket::with('scheduleDetail', 'schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
+        return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', $this->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
     }
 
     public function bookingElt(Request $request)

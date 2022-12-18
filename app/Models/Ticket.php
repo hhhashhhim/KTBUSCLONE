@@ -35,8 +35,8 @@ class Ticket extends Model
         return $this->hasOne( Company::class,'id','company_id' );
     }
 
-    public function bus_class(){
-        return $this->hasOne( BusClass::class,'id','bus_class_id' );
+    public function seatClass(){
+        return $this->hasOne( FareClass::class,'id','bus_class_id' );
     }
 
     public function customer(){
