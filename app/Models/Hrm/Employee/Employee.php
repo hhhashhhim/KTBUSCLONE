@@ -29,4 +29,7 @@ class Employee extends Model
     public function designation(){
         return $this->hasOne( Designation::class,'id','designation_id' );
     }
+    public function user(){
+        return $this->hasOne( User::class,'id','user_id' );
+    }
 }
