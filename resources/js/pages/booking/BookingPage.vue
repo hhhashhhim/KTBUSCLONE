@@ -1093,8 +1093,10 @@ export default {
                         status: flag,
 
                     });
-                    this.addForm.contact = resCnic.data.contact;
-                    this.addForm.customerName = resCnic.data.name;
+                    if ((this.addForm.contact == '' || typeof this.addForm.contact == 'undefined') && (this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined')) {
+                        this.addForm.contact = resCnic.data.contact;
+                        this.addForm.customerName = resCnic.data.name;
+                    }
                 }
             }
             if (flag == 'overIssueCNIC') {
@@ -1104,8 +1106,10 @@ export default {
                         status: flag,
 
                     });
-                    this.addFormOverIssue.customer.name = resCnic.data.name;
-                    this.addFormOverIssue.customer.contact = resCnic.data.contact;
+                    if ((this.addFormOverIssue.customer.name == '' || typeof this.addFormOverIssue.customer.name == 'undefined') && (this.addFormOverIssue.customer.contact == '' || typeof this.addFormOverIssue.customer.contact == 'undefined')) {
+                        this.addFormOverIssue.customer.name = resCnic.data.name;
+                        this.addFormOverIssue.customer.contact = resCnic.data.contact;
+                    }
                 }
             }
             if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
@@ -1114,8 +1118,10 @@ export default {
                         phoneNumber: this.addForm.contact,
                         status: flag,
                     });
-                    this.addForm.customerCNIC = resCnic.data.cnic;
-                    this.addForm.customerName = resCnic.data.name;
+                    if ((this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined') && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined')) {
+                        this.addForm.customerCNIC = resCnic.data.cnic;
+                        this.addForm.customerName = resCnic.data.name;
+                    }
                 }
             }
             if (flag == 'overIssueContact' && this.addFormOverIssue.customer.name == '' && this.addFormOverIssue.customer.cnic == '') {
@@ -1124,10 +1130,11 @@ export default {
                         phoneNumber: this.addFormOverIssue.customer.contact,
                         status: flag,
                     });
-                    this.addFormOverIssue.customer.name = resCnic.data.name;
-                    this.addFormOverIssue.customer.cnic = resCnic.data.cnic;
+                    if ((this.addFormOverIssue.customer.cnic == '' || typeof this.addFormOverIssue.customer.cnic == 'undefined') && (this.addFormOverIssue.customer.name == '' || typeof this.addFormOverIssue.customer.name == 'undefined')) {
+                        this.addFormOverIssue.customer.name = resCnic.data.name;
+                        this.addFormOverIssue.customer.cnic = resCnic.data.cnic;
+                    }
                 }
-
             }
         },
         calculateTotal: function () {

@@ -50,7 +50,8 @@ if (!function_exists('storeFare')) {
 
 
 if (!function_exists('format_phone')) {
-    function format_phone(string $phone_no) {
+    function format_phone(string $phone_no)
+    {
         return preg_replace(
             "/.*(\d{4})[^\d]{0,7}(\d{7})/",
             '$1-$2',
@@ -60,7 +61,8 @@ if (!function_exists('format_phone')) {
 }
 
 if (!function_exists('format_cnic')) {
-    function format_cnic(string $phone_no) {
+    function format_cnic(string $phone_no)
+    {
         return preg_replace(
             "/.*(\d{5})[^\d]{0,7}(\d{7})[^\d]{0,7}(\d{1})/",
             '$1-$2-$3',
@@ -70,12 +72,38 @@ if (!function_exists('format_cnic')) {
 }
 
 if (!function_exists('format_uan')) {
-    function format_uan(string $phone_no) {
+    function format_uan(string $phone_no)
+    {
         return preg_replace(
             "/.*(\d{2})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})/",
             '$1-$2-$3-$4',
             $phone_no
         );
+    }
+}
+
+if (!function_exists('priceDiff')) {
+    function priceDiff(int $old, int $new)
+    {
+
+        if ($new == $old) {
+            return [
+                'diff' => $new - $old,
+                'type' => 'same',
+            ];
+        }
+        if ($new > $old) {
+            return [
+                'diff' => $new - $old,
+                'type' => 'receivable by customer',
+            ];
+        }
+        if ($new < $old) {
+            return [
+                'diff' => $new - $old,
+                'type' => 'refund to customer',
+            ];
+        }
     }
 }
 if (!function_exists('updateFare')) {
@@ -91,7 +119,7 @@ if (!function_exists('updateFare')) {
             'distance_in_km' => $request->distance_in_km,
             'added_by' => auth()->user()->id,
         ]);
-         FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where('fare_class', $request->fare_class)->update([
+        FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where('fare_class', $request->fare_class)->update([
             'fare' => $request->fare,
             'from_city_id' => $request->to,
             'to_city_id' => $request->from,

@@ -24505,12 +24505,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context9.prev = _context9.next) {
               case 0:
                 if (!(flag == 'addFormCNIC')) {
-                  _context9.next = 7;
+                  _context9.next = 6;
                   break;
                 }
 
                 if (!(_this9.addForm.customerCNIC != '' && _this9.addForm.customerCNIC != 'undefined')) {
-                  _context9.next = 7;
+                  _context9.next = 6;
                   break;
                 }
 
@@ -24522,76 +24522,88 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 4:
                 resCnic = _context9.sent;
-                _this9.addForm.contact = resCnic.data.contact;
-                _this9.addForm.customerName = resCnic.data.name;
 
-              case 7:
+                if ((_this9.addForm.contact == '' || typeof _this9.addForm.contact == 'undefined') && (_this9.addForm.customerName == '' || typeof _this9.addForm.customerName == 'undefined')) {
+                  _this9.addForm.contact = resCnic.data.contact;
+                  _this9.addForm.customerName = resCnic.data.name;
+                }
+
+              case 6:
                 if (!(flag == 'overIssueCNIC')) {
-                  _context9.next = 14;
+                  _context9.next = 12;
                   break;
                 }
 
                 if (!(_this9.addFormOverIssue.customer.cnic == '' && _this9.addFormOverIssue.customer.cnic == 'undefined')) {
-                  _context9.next = 14;
+                  _context9.next = 12;
                   break;
                 }
 
-                _context9.next = 11;
+                _context9.next = 10;
                 return _this9.callApi("post", "booking/getCNIC", {
                   cnicNumber: _this9.addFormOverIssue.customer.cnic,
                   status: flag
                 });
 
-              case 11:
+              case 10:
                 _resCnic = _context9.sent;
-                _this9.addFormOverIssue.customer.name = _resCnic.data.name;
-                _this9.addFormOverIssue.customer.contact = _resCnic.data.contact;
 
-              case 14:
+                if ((_this9.addFormOverIssue.customer.name == '' || typeof _this9.addFormOverIssue.customer.name == 'undefined') && (_this9.addFormOverIssue.customer.contact == '' || typeof _this9.addFormOverIssue.customer.contact == 'undefined')) {
+                  _this9.addFormOverIssue.customer.name = _resCnic.data.name;
+                  _this9.addFormOverIssue.customer.contact = _resCnic.data.contact;
+                }
+
+              case 12:
                 if (!(flag == 'addFormContact' && _this9.addForm.customerCNIC == '' && _this9.addForm.customerName == '')) {
-                  _context9.next = 21;
+                  _context9.next = 18;
                   break;
                 }
 
                 if (!(_this9.addForm.contact != '' && _this9.addForm.contact != 'undefined')) {
-                  _context9.next = 21;
+                  _context9.next = 18;
                   break;
                 }
 
-                _context9.next = 18;
+                _context9.next = 16;
                 return _this9.callApi("post", "booking/getCNIC", {
                   phoneNumber: _this9.addForm.contact,
                   status: flag
                 });
 
-              case 18:
+              case 16:
                 _resCnic2 = _context9.sent;
-                _this9.addForm.customerCNIC = _resCnic2.data.cnic;
-                _this9.addForm.customerName = _resCnic2.data.name;
 
-              case 21:
+                if ((_this9.addForm.customerName == '' || typeof _this9.addForm.customerName == 'undefined') && (_this9.addForm.customerCNIC == '' || typeof _this9.addForm.customerCNIC == 'undefined')) {
+                  _this9.addForm.customerCNIC = _resCnic2.data.cnic;
+                  _this9.addForm.customerName = _resCnic2.data.name;
+                }
+
+              case 18:
                 if (!(flag == 'overIssueContact' && _this9.addFormOverIssue.customer.name == '' && _this9.addFormOverIssue.customer.cnic == '')) {
-                  _context9.next = 28;
+                  _context9.next = 24;
                   break;
                 }
 
                 if (!(_this9.addFormOverIssue.customer.contact != '' && _this9.addFormOverIssue.customer.contact != 'undefined')) {
-                  _context9.next = 28;
+                  _context9.next = 24;
                   break;
                 }
 
-                _context9.next = 25;
+                _context9.next = 22;
                 return _this9.callApi("post", "booking/getCNIC", {
                   phoneNumber: _this9.addFormOverIssue.customer.contact,
                   status: flag
                 });
 
-              case 25:
+              case 22:
                 _resCnic3 = _context9.sent;
-                _this9.addFormOverIssue.customer.name = _resCnic3.data.name;
-                _this9.addFormOverIssue.customer.cnic = _resCnic3.data.cnic;
 
-              case 28:
+                if ((_this9.addFormOverIssue.customer.cnic == '' || typeof _this9.addFormOverIssue.customer.cnic == 'undefined') && (_this9.addFormOverIssue.customer.name == '' || typeof _this9.addFormOverIssue.customer.name == 'undefined')) {
+                  _this9.addFormOverIssue.customer.name = _resCnic3.data.name;
+                  _this9.addFormOverIssue.customer.cnic = _resCnic3.data.cnic;
+                }
+
+              case 24:
               case "end":
                 return _context9.stop();
             }
