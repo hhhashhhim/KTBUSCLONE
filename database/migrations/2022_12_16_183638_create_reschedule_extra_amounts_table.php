@@ -15,7 +15,7 @@ class CreateRescheduleExtraAmountsTable extends Migration
     {
         Schema::create('reschedule_extra_amounts', function (Blueprint $table) {
             $table->id();
-            $table->integer('company-id')->nullable();
+            $table->integer('company_id')->nullable();
             $table->integer('old_ticket_id')->nullable();
             $table->integer('old_seat_no')->nullable();
             $table->integer('new_seat_no')->nullable();

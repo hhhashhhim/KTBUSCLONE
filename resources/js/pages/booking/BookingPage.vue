@@ -249,6 +249,9 @@
                                                         <i class="type-icons far fa-hand-paper text-danger">
                                                         </i>
                                                     </small>
+                                                    <small v-if="col.type == 'not_for_sale'">
+                                                        <i class="fas fa-minus-circle text-light"></i>
+                                                    </small>
                                                 </div>
                                                 <span v-else></span>
                                             </div>
@@ -1372,8 +1375,8 @@ export default {
                     this.addForm.selectedSeats = data.seatNo;
                     this.addForm.totalFare = data.fare;
                     this.addForm.totalAmount = data.fare;
+                    this.advanceSeat.push(data.seatNo)
                 }
-                this.advanceSeat.push(data.seatNo)
             }
         },
 
@@ -1439,6 +1442,7 @@ export default {
             return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
         },
         async add() {
+            console.log(this.addForm);
             if (!this.addForm.schedule) {
                 return swal({
                     title: "Required!",
@@ -1455,7 +1459,7 @@ export default {
                     timer: 2000
                 });
             }
-            if ((!this.addForm.customerCNIC || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
+            if ((this.addForm.customerCNIC == '' || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
                 return swal({
                     title: "Required!",
                     text: "CNIC is Required and Should Contain 13 Digits",
@@ -1869,43 +1873,37 @@ export default {
                 'selected_seatFare': this.alreadyBookedSeatFare[0],
             }
             const res = await this.callApi("post", "booking/reschedule", reScheduleAddFormData);
-            console.log(res);
-            swal({
-                title: "Success",
-                text: "Seat Reschedule Successfully",
-                icon: "success",
-                timer: 4000
-            });
-            // if (res.status == 200) {
-            //     swal({
-            //         title: "Success",
-            //         text: "Seat Reschedule Successfully",
-            //         icon: "success",
-            //         timer: 4000
-            //     });
-            //     this.fetchScheduleData();
-            // } else {
-            //     if (res.status == 422) {
-            //         let errorContent = "";
-            //         let count = 0;
-            //         for (const key in res.data.errors) {
-            //             res.data.errors[key].forEach((element) => {
-            //                 errorContent += (
-            //                     (++count) + " - " + //creating serial no.
-            //                     element + // main error
-            //                     "\n" // creating new line
-            //                 );
-            //             });
-            //             swal({
-            //                 title: "Error",
-            //                 text: errorContent,
-            //                 icon: "error",
-            //                 timer: 4000
-            //             });
-            //
-            //         }
-            //     }
-            // }
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Seat Reschedule Successfully",
+                    icon: "success",
+                    timer: 4000
+                });
+                this.fetchScheduleData();
+                this.fetchReScheduleData();
+            } else {
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
         },
         // Duplicate Ticket
         duplicateTicket: function (data) {

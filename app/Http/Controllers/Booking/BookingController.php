@@ -151,9 +151,7 @@ class BookingController extends Controller
 
     public function reschedule(Request $request)
     {
-//        $ticket = Ticket::where('company_id', $this->company_id)->where('seat_no', $request->dataSeat_no)->where('date', $request->existingDate)->where('schedule_id', $request->dataSchedule)->where('customer_id', $request->dataCustomer)->where('destination_city_id', $request->dataDestination)->first();
         $ticket = $request->dataAll;
-        dd($request->dataAll['seat_no']);
         if ($request->existingDate == $request->rescheduleDate) {
             $bookingNo = Ticket::where('date', $request->existingDate)->latest()->first()->booking_no ?? 0;
             ++$bookingNo;
@@ -172,25 +170,24 @@ class BookingController extends Controller
             RescheduleExtraAmount::create([
                 'company_id' => $this->company_id,
                 'old_ticket_id' => $request->dataAll['id'],
-                'old_seat_no' => $request->dataAll['seat_no '],
+                'old_seat_no' => $ticket['seat_no'],
                 'new_seat_no' => $request->selected_seatNo,
-                'old_seat_class' => $request->dataAll['bus_class_id'],
+                'old_seat_class' => $ticket['bus_class_id'],
                 'new_seat_class' => $request->selected_seatClass,
-                'old_seat_fare' => $request->dataAll['seat_fare'],
+                'old_seat_fare' => $ticket['seat_fare'],
                 'new_seat_fare' => $request->selected_seatFare,
-                'type' => priceDiff($request->dataAll['seat_fare'], $request->selected_seatFare)['type'],
-                'diff_amount' => priceDiff($request->dataAll['seat_fare'], $request->selected_seatFare)['diff'],
-                'old_departure_city_id' => $request->dataAll['departure_city_id'],
+                'type' => priceDiff($ticket['seat_fare'], $request->selected_seatFare)['type'],
+                'diff_amount' => priceDiff($ticket['seat_fare'], $request->selected_seatFare)['diff'],
+                'old_departure_city_id' => $ticket['departure_city_id'],
                 'new_departure_city_id' => $request->dataDepartureCity,
-                'old_destination_city_id' => $request->dataAll['destination_city_id'],
+                'old_destination_city_id' => $ticket['destination_city_id'],
                 'new_destination_city_id' => $request->rescheduleDestinationCity,
-                'old_schedule_id' => $request->dataAll['schedule_id'],
+                'old_schedule_id' => $ticket['schedule_id'],
                 'new_schedule_id' => $request->rescheduleSchedule,
-                'old_booking_date' => $request->dataAll['date'],
+                'old_booking_date' => $ticket['date'],
                 'new_booking_date' => $request->rescheduleDate,
             ]);
         }
-        dd('done');
         TicketReschedule::create([
             'company_id' => $this->company_id,
             'schedule_id' => $ticket['schedule_id'],
@@ -210,6 +207,7 @@ class BookingController extends Controller
             'departure_city_id' => $request->dataDepartureCity,
             'destination_city_id' => $request->rescheduleDestinationCity,
             'seat_no' => $ticket['seat_no'],
+            'bus_class_id' => $ticket['bus_class_id'],
             'seat_fare' => $ticket['seat_fare'],
             'is_partial' => $ticket['is_partial'],
             'booking_no' => $bookingNo,
@@ -223,10 +221,11 @@ class BookingController extends Controller
             'added_by' => Auth::user()->id,
             'discount' => $ticket['discount'],
         ]);
-        $ticket->update([
+        $old_ticket = Ticket::where('company_id', $this->company_id)->where('id', $ticket['id'])->first();
+        $old_ticket->update([
             'type' => 'reschedule'
         ]);
-        return $ticket->delete();
+        return $old_ticket->delete();
     }
 
     public function deleteBooking(Request $request)
