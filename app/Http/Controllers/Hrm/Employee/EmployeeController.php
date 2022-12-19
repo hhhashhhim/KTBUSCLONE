@@ -104,63 +104,84 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
-        return $request->all();
         $rules = [
-            'name' => 'required',
+            'EmployeeName' => 'required',
             "email" => 'required|email|unique:users,email,'.$request->userId,
-            'f_name' => 'required',
-            'contact' => 'required',
-            'cnic' => 'required',
-            'dob' => 'required',
-            'hiring_date' => 'required',
-            'address' => 'required',
-            'working_days' => 'required',
-            'paid_leaves' => 'required',
-            'blood_group' => 'required',
-            'salary' => 'required',
+            'EmployeeFatherName' => 'required',
+            'EmployeeContact' => 'required',
+            'EmployeeCNIC' => 'required',
+            'EmployeeDob' => 'required',
+            'HiringDate' => 'required',
+            'EmployeeAddress' => 'required',
+            'workingDays' => 'required',
+            'paidLeaves' => 'required',
+            'bloodGroup' => 'required',
+            'EmployeeSalary' => 'required',
         ];
 
         $customMessages = [
-            'name.required' => 'Employee Name is Required!',
-            'f_name.required' => 'Employees Father Name is Required!',
-            'contact.required' => 'Employee Contact Number is Required!',
-            'cnic.required' => 'Employee CNIC Number  is Required!',
-            'dob.required' => 'Employee Date of Birth is Required!',
-            'hiring_date.required' => 'Employee Hiring Date is Required!',
-            'address.required' => 'Employee Mailing Address is Required!',
-//            'department.required' => 'Employee Department is Required!',
-//            'designation.required' => 'Employee Designation is Required!',
-            'working_days.required' => 'Working Days is Required!',
-            'paid_leaves.required' => 'Paid Leaves is Required!',
-            'blood_group.required' => 'Blood Group is Required!',
-            'salary.required' => 'Employee Salary is Required!',
+            'EmployeeName.required' => 'Employee Name is Required!',
+            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
+            'EmployeeContact.required' => 'Employee Contact Number is Required!',
+            'EmployeeCNIC.required' => 'Employee CNIC Number  is Required!',
+            'EmployeeDob.required' => 'Employee Date of Birth is Required!',
+            'HiringDate.required' => 'Employee Hiring Date is Required!',
+            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
+            'workingDays.required' => 'Working Days is Required!',
+            'paidLeaves.required' => 'Paid Leaves is Required!',
+            'bloodGroup.required' => 'Blood Group is Required!',
+            'EmployeeSalary.required' => 'Employee Salary is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-        $getImg = Employee::where('id', $request->all())->get();
-        return Employee::where('id', $request->id)->update([
-            'name' => $request->name,
-            'f_name' => $request->f_name,
-            'cnic' => str_replace('-', '', $request->cnic),
-            'contact' => str_replace('-', '', $request->contact),
-            'address' => $request->address,
-            'reference' => $request->reference,
-            'hiring_date' => $request->hiring_date,
-            'dob' => $request->dob,
-            'salary' => $request->salary,
-            'salary_type' => $request->salary_type,
-            'working_days' => $request->working_days,
-            'paid_leaves' => $request->paid_leaves,
-            'blood_group' => $request->blood_group,
-            'emergency_contact' => $request->emergency_contact,
-            'job_description' => $request->job_description,
-            'department_id' => $request->department_id,
-            'designation_id' => $request->designation_id,
-            'profile_Img' => !is_null($request->ImgEmployeeRecordEdit) ? (!is_null($request->ImgEmployeeRecordEdit['profile']) ? $request->ImgEmployeeRecordEdit['profile'] : $getImg->profile_Img) : null,
-            'cnic_back_img' => !is_null($request->ImgEmployeeRecordEdit) ? (!is_null($request->ImgEmployeeRecordEdit['back']) ? $request->ImgEmployeeRecordEdit['back'] : $getImg->cnic_back_img) : null,
-            'cnic_front_img' => !is_null($request->ImgEmployeeRecordEdit) ? (!is_null($request->ImgEmployeeRecordEdit['front']) ? $request->ImgEmployeeRecordEdit['front'] : $getImg->cnic_front_img) : null,
-            'status' => $request->status,
-            'company_id' => $this->company_id,
+        
+        $user = User::where("id",$request->userId)->update([
+            "name" => $request->EmployeeName,
+            "email" => $request->email,
+            "contact" => str_replace('-', '', $request->EmployeeContact),
+            "role_id" => 0,
         ]);
+        
+        if($request->password)
+        {
+            $user = User::where("id",$request->userId)->update([
+                "password" => Hash::make($request->password),
+            ]);
+        }
+
+        Employee::where("user_id",$request->userId)->update([
+            'name' => $request->EmployeeName,
+            'f_name' => $request->EmployeeFatherName,
+            'cnic' => str_replace('-', '', $request->EmployeeCNIC),
+            'contact' => str_replace('-', '', $request->EmployeeContact),
+            'address' => $request->EmployeeAddress,
+            'reference' => $request->RefHiring,
+            'hiring_date' => $request->HiringDate,
+            'dob' => $request->EmployeeDob,
+            'salary' => $request->EmployeeSalary,
+            'salary_type' => $request->RadioSalaryTypeAdd,
+            'working_days' => $request->workingDays,
+            'paid_leaves' => $request->paidLeaves,
+            'blood_group' => $request->bloodGroup,
+            'emergency_contact' => $request->EmergencyContact,
+            'job_description' => $request->jobDescription,
+            'department_id' => $request->EmployeeDepartment,
+            'designation_id' => $request->EmployeeDesignation,
+            'status' => $request->status,
+        ]);
+        
+        if($request->profile)
+        {
+            Employee::where("user_id",$request->userId)->update([
+                'profile_Img' =>  $this->image($request->profile),
+            ]);
+        }
+        
+        if($request->attachment)
+        {
+            Employee::where("user_id",$request->userId)->update([
+                'attachments' =>  $this->attachment($request->attachment),
+            ]);
+        }
     }
 
     public function delete(Request $request)
