@@ -91,12 +91,12 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button :data-target="'#' + deleteFormID"
+                                                            <!-- <button :data-target="'#' + deleteFormID"
                                                                     data-toggle="modal"
                                                                     @click="deleteModal(employee,i)"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </button>
+                                                            </button> -->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -341,7 +341,7 @@
                         <input type="email" id="email" class="form-control" v-model="editEmp.email"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="password">Password </label>
+                        <label for="password">Password <small>(Empty field will save password same)</small></label>
                         <input type="password" id="password" class="form-control" v-model="editEmp.password"/>
                     </div>
                     <div class="form-group col-md-6">
@@ -458,7 +458,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Upload Attachments</label>
+                        <label for="salary">Upload Attachments <small>(Empty field will save attachment same)</small></label>
                         <div class="custom-file">
                             <input type="file" @change="onFileChange($event, 'attachmentsEdit')" accept=".pdf, .docx, .doc"
                                    class="custom-file-input" id="attachmentsEdit`">
@@ -467,7 +467,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture</label>
+                        <label for="salary">Employee Picture <small>(Empty field will save picture same)</small></label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
                             <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "
@@ -527,54 +527,54 @@ export default {
             addForm: {
                 paidLeaves: '0',
                 RadioSalaryTypeAdd: 'cash',
-                profile: '',
-                attachments: '',
-                email: '',
-                password: '',
-                EmployeeName: '',
-                EmployeeFatherName: '',
-                EmployeeCNIC: '',
-                EmployeeContact: '',
-                EmployeeAddress: '',
-                RefHiring: '',
-                HiringDate: '',
-                EmployeeDob: '',
-                EmployeeSalary: '',
-                RadioSalaryTypeAdd: '',
-                workingDays: '',
-                paidLeaves: '',
-                bloodGroup: '',
-                EmergencyContact: '',
-                jobDescription: '',
-                EmployeeDepartment: '',
-                EmployeeDesignation: '',
+                profile: null,
+                attachments: null,
+                email: null,
+                password: null,
+                EmployeeName: null,
+                EmployeeFatherName: null,
+                EmployeeCNIC: null,
+                EmployeeContact: null,
+                EmployeeAddress: null,
+                RefHiring: null,
+                HiringDate: null,
+                EmployeeDob: null,
+                EmployeeSalary: null,
+                RadioSalaryTypeAdd: null,
+                workingDays: null,
+                paidLeaves: null,
+                bloodGroup: null,
+                EmergencyContact: null,
+                jobDescription: null,
+                EmployeeDepartment: null,
+                EmployeeDesignation: null,
             },
             editEmp: {
-                userId: '',
+                userId: null,
                 paidLeaves: '0',
                 RadioSalaryTypeAdd: 'cash',
-                profile: '',
-                attachments: '',
-                email: '',
-                password: '',
-                EmployeeName: '',
-                EmployeeFatherName: '',
-                EmployeeCNIC: '',
-                EmployeeContact: '',
-                EmployeeAddress: '',
-                RefHiring: '',
-                HiringDate: '',
-                EmployeeDob: '',
-                EmployeeSalary: '',
-                RadioSalaryTypeAdd: '',
-                workingDays: '',
-                paidLeaves: '',
-                bloodGroup: '',
-                EmergencyContact: '',
-                jobDescription: '',
-                EmployeeDepartment: '',
-                EmployeeDesignation: '',
-                status: '',
+                profile: null,
+                attachments: null,
+                email: null,
+                password: null,
+                EmployeeName: null,
+                EmployeeFatherName: null,
+                EmployeeCNIC: null,
+                EmployeeContact: null,
+                EmployeeAddress: null,
+                RefHiring: null,
+                HiringDate: null,
+                EmployeeDob: null,
+                EmployeeSalary: null,
+                RadioSalaryTypeAdd: null,
+                workingDays: null,
+                paidLeaves: null,
+                bloodGroup: null,
+                EmergencyContact: null,
+                jobDescription: null,
+                EmployeeDepartment: null,
+                EmployeeDesignation: null,
+                status: null,
 
             },
             departmentName: '',
@@ -668,7 +668,7 @@ export default {
                 }
                 if (imgTag == 'attachmentsEdit') {
                     const attachmentsEditRes = e.target.files[0];
-                    this.attachmentsEdit = attachmentsEditRes.name;
+                    this.attachmentsEdit = attachmentsEditRes;
                 }
             } else {
                 e.target.value = '';
@@ -867,10 +867,10 @@ export default {
             }
             let formData = new FormData();
             if (this.addForm.profile != '') {
-                formData.append('profile', this.addForm.profile);
+                formData.append('profile', this.addForm.profile??'');
             }
             if (this.addForm.attachments != '') {
-                formData.append('attachment', this.addForm.attachments);
+                formData.append('attachment', this.addForm.attachments??'');
             }
 
             this.validationErrors = [];
@@ -1034,10 +1034,10 @@ export default {
             }
             let formData = new FormData();
             if (this.profileEdit != '') {
-                formData.append('profile', this.profileEdit);
+                formData.append('profile', this.profileEdit??'');
             }
             if (this.attachmentsEdit != '') {
-                formData.append('attachmentEdit', this.attachmentsEdit);
+                formData.append('attachment', this.attachmentsEdit??'');
             }
             this.validationErrors = [];
             if (!this.editEmp.email)
@@ -1096,7 +1096,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDepartment == "0")
+            if (this.editEmp.EmployeeDepartment == "0")
                 return swal({
                     title: "Required!",
                     text: "Please Select Employee's Department",
@@ -1138,6 +1138,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (!this.editEmp.status)
+                return swal({
+                    title: "Required!",
+                    text: "Employee Status is Required",
+                    icon: "error",
+                    timer: 2000
+                });
 
             formData.append('userId', this.editEmp.userId);
             formData.append('email', this.editEmp.email);
@@ -1159,6 +1166,7 @@ export default {
             formData.append('jobDescription', this.editEmp.jobDescription);
             formData.append('EmployeeDepartment', this.editEmp.EmployeeDepartment);
             formData.append('EmployeeDesignation', this.editEmp.EmployeeDesignation);
+            formData.append('status', this.editEmp.status);
 
             this.loading = true;
 
