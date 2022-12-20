@@ -284,6 +284,11 @@
                                                             class="not-for-sale circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Not For Sale</span>
                                                     </div>
+                                                    <div class="my-1" style="padding-bottom: 10px !important;">
+                                                        <div
+                                                            class="fas fa-minus-circle text-dark circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Not For Sale Badge</span>
+                                                    </div>
                                                     <div class="my-1">
                                                         <div
                                                             class="circles icons-legend mr-1 border shadow">
@@ -408,7 +413,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="over_issue_remarks">Remarks</label>
+                            <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
                             <textarea type="text" class="form-control" id="over_issue_remarks"
                                       v-model="overIssueData.reason"
                                       placeholder="Reason for over-issue a seat"></textarea>
@@ -840,6 +845,7 @@ export default {
                 departureCity: 0,
                 totalAmount: 0,
                 discount: 0,
+                alreadyBookedId: [],
             },
             rescheduleData: {
                 schedule: 0,
@@ -1170,6 +1176,7 @@ export default {
         async fetchScheduleData() {
             this.resetingArrays();
             this.addForm.customerName = '';
+            this.addForm.customerCNIC = '';
             this.addForm.contact = '';
             this.addForm.remarks = '';
             this.addForm.type = 'booked';
@@ -1358,23 +1365,20 @@ export default {
             if (data.type == 'advance booking' && data.type != 0) {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
-                    this.addForm.customerCNIC = '';
-                    this.addForm.customerName = '';
-                    this.addForm.contact = '';
-                    this.addForm.remarks = '';
-                    this.addForm.selectedSeats = 0;
-                    this.addForm.totalFare = 0;
-                    this.addForm.totalAmount = 0;
+                    // this.addForm.customerCNIC = '';
+                    // this.addForm.customerName = '';
+                    // this.addForm.contact = '';
+                    // this.addForm.remarks = '';
+                    this.addForm.selectedSeats.splice(index, 1);
                     this.advanceSeat.splice(index, 1);
+                    this.addForm.alreadyBookedId.splice(index, 1);
                 } else {
-                    this.addForm.alreadyBookedId = data.id
+                    this.addForm.alreadyBookedId.push(data.id);
                     this.addForm.customerCNIC = data.customer_cnic == 0 ?? '';
                     this.addForm.customerName = data.customer_name;
                     this.addForm.contact = data.customer_phone;
                     this.addForm.remarks = data.remarks;
-                    this.addForm.selectedSeats = data.seatNo;
-                    this.addForm.totalFare = data.fare;
-                    this.addForm.totalAmount = data.fare;
+                    this.addForm.selectedSeats.push(data.seatNo);
                     this.advanceSeat.push(data.seatNo)
                 }
             }
@@ -1442,7 +1446,7 @@ export default {
             return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
         },
         async add() {
-            console.log(this.addForm);
+            console.log(this.addForm, this.selectedSeats, this.selectedBookedSeats, this.selectedOverIssueSeats);
             if (!this.addForm.schedule) {
                 return swal({
                     title: "Required!",
@@ -1483,7 +1487,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.selectedSeats.length == 0) {
+            if (this.selectedSeats.length == 0 && this.selectedBookedSeats.length == 0) {
                 return swal({
                     title: "required!",
                     text: "Please Select At Least One Seat",
@@ -1591,22 +1595,25 @@ export default {
                 console.log(resBookingDetail);
             }
         },
-        reset() {
-            this.addForm = {
-                date: new Date().toISOString().substr(0, 10),
-                type: "booked",
-                gender: "1",
-                customerCNIC: "",
-                schedule: 0,
-                totalFare: 0,
-                destinationCity: 0,
-                departureCity: 0,
-            };
-            this.showBookingDiv = false;
-            this.allSchedules = '';
-            this.selectedBookedSeats = '';
-            this.selectedBookedOverIssueSeats = '';
-        },
+        // reset() {
+        //     this.addForm = {
+        //         // date: new Date().toISOString().substr(0, 10),
+        //         type: "booked",
+        //         gender: "1",
+        //         customerCNIC: "",
+        //         // schedule: 0,
+        //         totalFare: 0,
+        //         // destinationCity: 0,
+        //         // departureCity: 0,
+        //     };
+        //     // this.showBookingDiv = false;
+        //
+        //     this.allSchedules = '';
+        //     this.selectedBookedSeats = '';
+        //     this.selectedBookedOverIssueSeats = '';
+        //     this.fetchScheduleData();
+        //     this.resetingArrays();
+        // },
         passDataToCancelModel: function (data) {
             this.cancelData = {
                 dataDate: data.date,
@@ -1663,6 +1670,14 @@ export default {
             $("#overIssue_model").modal('show');
         },
         async addOverIssueTicket(dataEnter) {
+            if (dataEnter.reason == '' || typeof dataEnter.reason == 'undefined') {
+                return swal({
+                    title: "Required!!",
+                    text: "Remarks is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             const data = {
                 date: dataEnter.dataDate,
                 schedule_id: dataEnter.dataSchedule,

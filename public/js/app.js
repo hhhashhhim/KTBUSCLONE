@@ -24032,7 +24032,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         destinationCity: 0,
         departureCity: 0,
         totalAmount: 0,
-        discount: 0
+        discount: 0,
+        alreadyBookedId: []
       },
       rescheduleData: {
         schedule: 0
@@ -24647,6 +24648,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this10.resetingArrays();
 
                 _this10.addForm.customerName = '';
+                _this10.addForm.customerCNIC = '';
                 _this10.addForm.contact = '';
                 _this10.addForm.remarks = '';
                 _this10.addForm.type = 'booked';
@@ -24656,7 +24658,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this10.addForm.discount = '';
                 _this10.validationErrors = [];
                 _this10.loading = true;
-                _context10.next = 13;
+                _context10.next = 14;
                 return _this10.callApi("post", "schedule/selected", {
                   id: _this10.addForm.schedule,
                   date: _this10.addForm.date,
@@ -24664,7 +24666,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this10.addForm.destinationCity
                 });
 
-              case 13:
+              case 14:
                 res = _context10.sent;
 
                 if (res.status == 500) {// this.showBookingDiv = false;
@@ -24700,7 +24702,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context10.stop();
             }
@@ -24964,24 +24966,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index = _this13.advanceSeat.indexOf(data.seatNo);
 
                   if (index != -1) {
-                    _this13.addForm.customerCNIC = '';
-                    _this13.addForm.customerName = '';
-                    _this13.addForm.contact = '';
-                    _this13.addForm.remarks = '';
-                    _this13.addForm.selectedSeats = 0;
-                    _this13.addForm.totalFare = 0;
-                    _this13.addForm.totalAmount = 0;
+                    // this.addForm.customerCNIC = '';
+                    // this.addForm.customerName = '';
+                    // this.addForm.contact = '';
+                    // this.addForm.remarks = '';
+                    _this13.addForm.selectedSeats.splice(index, 1);
 
                     _this13.advanceSeat.splice(index, 1);
+
+                    _this13.addForm.alreadyBookedId.splice(index, 1);
                   } else {
-                    _this13.addForm.alreadyBookedId = data.id;
+                    _this13.addForm.alreadyBookedId.push(data.id);
+
                     _this13.addForm.customerCNIC = (_ref = data.customer_cnic == 0) !== null && _ref !== void 0 ? _ref : '';
                     _this13.addForm.customerName = data.customer_name;
                     _this13.addForm.contact = data.customer_phone;
                     _this13.addForm.remarks = data.remarks;
-                    _this13.addForm.selectedSeats = data.seatNo;
-                    _this13.addForm.totalFare = data.fare;
-                    _this13.addForm.totalAmount = data.fare;
+
+                    _this13.addForm.selectedSeats.push(data.seatNo);
 
                     _this13.advanceSeat.push(data.seatNo);
                   }
@@ -25067,7 +25069,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                console.log(_this14.addForm);
+                console.log(_this14.addForm, _this14.selectedSeats, _this14.selectedBookedSeats, _this14.selectedOverIssueSeats);
 
                 if (_this14.addForm.schedule) {
                   _context14.next = 3;
@@ -25134,7 +25136,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                if (!(_this14.selectedSeats.length == 0)) {
+                if (!(_this14.selectedSeats.length == 0 && _this14.selectedBookedSeats.length == 0)) {
                   _context14.next = 13;
                   break;
                 }
@@ -25324,22 +25326,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee17);
       }))();
     },
-    reset: function reset() {
-      this.addForm = {
-        date: new Date().toISOString().substr(0, 10),
-        type: "booked",
-        gender: "1",
-        customerCNIC: "",
-        schedule: 0,
-        totalFare: 0,
-        destinationCity: 0,
-        departureCity: 0
-      };
-      this.showBookingDiv = false;
-      this.allSchedules = '';
-      this.selectedBookedSeats = '';
-      this.selectedBookedOverIssueSeats = '';
-    },
+    // reset() {
+    //     this.addForm = {
+    //         // date: new Date().toISOString().substr(0, 10),
+    //         type: "booked",
+    //         gender: "1",
+    //         customerCNIC: "",
+    //         // schedule: 0,
+    //         totalFare: 0,
+    //         // destinationCity: 0,
+    //         // departureCity: 0,
+    //     };
+    //     // this.showBookingDiv = false;
+    //
+    //     this.allSchedules = '';
+    //     this.selectedBookedSeats = '';
+    //     this.selectedBookedOverIssueSeats = '';
+    //     this.fetchScheduleData();
+    //     this.resetingArrays();
+    // },
     passDataToCancelModel: function passDataToCancelModel(data) {
       this.cancelData = {
         dataDate: data.date,
@@ -25424,6 +25429,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
+                if (!(dataEnter.reason == '' || typeof dataEnter.reason == 'undefined')) {
+                  _context19.next = 2;
+                  break;
+                }
+
+                return _context19.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Remarks is Required!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
                 data = {
                   date: dataEnter.dataDate,
                   schedule_id: dataEnter.dataSchedule,
@@ -25434,10 +25452,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   percentage: dataEnter.percentage,
                   remarks: dataEnter.reason
                 };
-                _context19.next = 3;
+                _context19.next = 5;
                 return _this19.callApi("post", "booking/overIssueAdd", data);
 
-              case 3:
+              case 5:
                 resOverIssue = _context19.sent;
 
                 if (resOverIssue.status == 200) {
@@ -25480,7 +25498,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 7:
+              case 9:
               case "end":
                 return _context19.stop();
             }
@@ -43507,7 +43525,7 @@ var _hoisted_88 = {
   "class": "col-md-12 mb-2 px-0 d-flex flex-wrap"
 };
 
-var _hoisted_89 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"border-bottom w-100\" data-v-03b302d9><div class=\"my-1\" data-v-03b302d9><div class=\"selected circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Selected</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"for-female circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Female</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"for-male circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Male</span></div></div><div class=\"border-bottom w-100\" data-v-03b302d9><div class=\"my-1\" data-v-03b302d9><div class=\"not-for-sale circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Not For Sale</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-check\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Booked</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"fas fa-check-double circles icons-legend shadow mr-1 border\" data-v-03b302d9></div><span class=\"text-wrap mrn\" data-v-03b302d9>Issued</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"partial-seat circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap mrn\" style=\"margin-top:-10px;\" data-v-03b302d9>Partial Seat</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-people-carry text-danger\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Over Issue</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"far fa-hand-paper text-dark\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Over Issue</span></div></div>", 2);
+var _hoisted_89 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"border-bottom w-100\" data-v-03b302d9><div class=\"my-1\" data-v-03b302d9><div class=\"selected circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Selected</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"for-female circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Female</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"for-male circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Male</span></div></div><div class=\"border-bottom w-100\" data-v-03b302d9><div class=\"my-1\" data-v-03b302d9><div class=\"not-for-sale circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Not For Sale</span></div><div class=\"my-1\" style=\"padding-bottom:10px !important;\" data-v-03b302d9><div class=\"fas fa-minus-circle text-dark circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap\" data-v-03b302d9>Not For Sale Badge</span></div><div class=\"my-1\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-check\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Booked</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"fas fa-check-double circles icons-legend shadow mr-1 border\" data-v-03b302d9></div><span class=\"text-wrap mrn\" data-v-03b302d9>Issued</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"partial-seat circles mr-1 border shadow\" data-v-03b302d9></div><span class=\"text-wrap mrn\" style=\"margin-top:-10px;\" data-v-03b302d9>Partial Seat</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"fas fa-people-carry text-danger\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Over Issue</span></div><div class=\"my-2\" data-v-03b302d9><div class=\"circles icons-legend mr-1 border shadow\" data-v-03b302d9><i class=\"far fa-hand-paper text-dark\" data-v-03b302d9></i></div><span class=\"text-wrap mrn\" data-v-03b302d9>Over Issue</span></div></div>", 2);
 
 var _hoisted_91 = {
   "class": "text-wrap"
@@ -43658,7 +43676,9 @@ var _hoisted_115 = {
 var _hoisted_116 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "over_issue_remarks"
-  }, "Remarks", -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Remarks "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger"
+  }, "*")], -1
   /* HOISTED */
   );
 });
@@ -44615,7 +44635,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-secondary mx-1",
     onClick: _cache[26] || (_cache[26] = function () {
-      return $options.reset && $options.reset.apply($options, arguments);
+      return _ctx.reset && _ctx.reset.apply(_ctx, arguments);
     })
   }, " Reset ")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_75, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedule.bus_class.seat_map, function (record, rowIndex) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {

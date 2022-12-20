@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Customer;
 use App\Models\FareTable;
 use App\Models\Route\RouteFare;
+use App\Models\Ticket;
 
 if (!function_exists('storeFare')) {
     function storeFare($request, $company_id)
@@ -146,6 +148,26 @@ if (!function_exists('updateFare')) {
 //                'fare_id' => $request->id
 //            ]);
 //        }
+    }
+}
+//Updated Already advanced Booked Seat
+if (!function_exists('updateAdvancedSeat')) {
+    function updateAdvancedSeat($request, $company_id)
+    {
+        $customerAll = [];
+        foreach ($request->alreadyBookedId as $key =>$single) {
+            $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
+            $customer_id->update([
+                'type' => 'booked',
+            ]);
+            $customerAll[] = Ticket::where('company_id', $company_id)->where('id', $single)->first(['customer_id'])->customer_id;
+        }
+        $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
+        $updateId->update([
+            'cnic' => str_replace('-', '', $request->customerCNIC),
+        ]);
+
+        return $customerAll;
     }
 }
 
