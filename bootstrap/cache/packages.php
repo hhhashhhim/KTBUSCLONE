@@ -11,6 +11,17 @@
       'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
     ),
   ),
+  'charlieuki/receiptprinter' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'charlieuki\\ReceiptPrinter\\ReceiptPrinterServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'ReceiptPrinter' => 'charlieuki\\ReceiptPrinter\\Facades\\ReceiptPrinter',
+    ),
+  ),
   'elibyy/tcpdf-laravel' => 
   array (
     'providers' => 
