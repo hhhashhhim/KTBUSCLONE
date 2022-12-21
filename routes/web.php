@@ -16,6 +16,7 @@ use App\Http\Controllers\Hrm\Designation\DesignationController;
 use App\Http\Controllers\Hrm\Employee\EmployeeController;
 use App\Http\Controllers\Hrm\Leave\LeaveController;
 use App\Http\Controllers\Schedule\ScheduleController;
+use App\Http\Controllers\Schedule\ScheduleClosingController;
 use App\Http\Controllers\Setting\Tickets\TicketsTemplateController;
 use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
@@ -188,6 +189,16 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/advance', [BookingController::class, 'advanceData']);
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
+
+    // Schedule Closing
+    Route::group(['prefix' => '/schedule', [CustomMiddleware::class]], function () {
+        Route::post('/fetch', [ScheduleClosingController::class, 'fetchSchedule']);
+
+        Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
+            Route::post('/', [ScheduleClosingController::class, 'index']);
+        });
+    });
+
 });
 //pdf Ticket
 Route::get('print/{id}/pdf', [BookingController::class, 'pdf'])->middleware(CustomMiddleware::class);

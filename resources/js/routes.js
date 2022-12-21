@@ -18,6 +18,7 @@ import FareClass from "./pages/fareClass/FareClassPage.vue";
 import BusesPage from "./pages/buses/BusesPage.vue";
 import BusClassPage from "./pages/buses/BusClassPage.vue";
 import BookingPage from "./pages/booking/BookingPage.vue";
+import ScheduleClosingPage from "./pages/schedule/ScheduleClosingPage.vue";
 import AllBookingPage from "./pages/booking/AllBookingPage.vue";
 import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
 import LeavePage from "./pages/hrm/leave/LeavePage.vue";
@@ -130,6 +131,11 @@ const routes = [
         path: url + "booking",
         component : BookingPage,
         name:"booking-page"
+    },
+    {
+        path: url + "booking/schedule/closing",
+        component : ScheduleClosingPage,
+        name:"booking-schedule-closing"
     },
     {
         path: url + "all-booking",
