@@ -779,8 +779,6 @@ export default {
             optionsPhone: {
                 placeholder: "xxxx-xxxxxxx",
             },
-            // rescheduleFormId: "reschedule_modal",
-            // overissueFormId: "overIssue_model",
             getCustomermessage: '',
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
@@ -869,7 +867,6 @@ export default {
         await this.fetchAllSchedules();
         window.addEventListener('keydown', this.enter);
         window.addEventListener('keydown', this.altM);
-        // window.addEventListener('keydown', this.altD);
     },
 
     methods: {
@@ -892,13 +889,6 @@ export default {
                 this.add();
             }
         },
-        // altD: function (e) {
-        //     if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'x')) {
-        //         $("#fareDiscount").attr('readonly', function (_, attr) {
-        //             return !attr
-        //         });
-        //     }
-        // },
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
                 if (this.addForm.departureCity == 0) {
@@ -1192,9 +1182,6 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            if (res.status == 500) {
-                // this.showBookingDiv = false;
-            }
             if (res.status == 200) {
                 this.loading = false
                 this.showBookingDiv = true;
@@ -1236,7 +1223,6 @@ export default {
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
             }
-            // this.resetingArrays();
             const res = await this.callApi("post", "schedule/selected", {
                 id: this.rescheduleData.rescheduleSchedule,
                 date: this.rescheduleData.rescheduleDate,
@@ -1361,17 +1347,13 @@ export default {
         },
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            console.log(data);
-            if (data.type == 'advance booking' && data.type != 0) {
+            if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
-                    // this.addForm.customerCNIC = '';
-                    // this.addForm.customerName = '';
-                    // this.addForm.contact = '';
-                    // this.addForm.remarks = '';
                     this.addForm.selectedSeats.splice(index, 1);
                     this.advanceSeat.splice(index, 1);
                     this.addForm.alreadyBookedId.splice(index, 1);
+                    this.addForm.flag = 0;
                 } else {
                     this.addForm.alreadyBookedId.push(data.id);
                     this.addForm.customerCNIC = data.customer_cnic == 0 ?? '';
@@ -1380,6 +1362,7 @@ export default {
                     this.addForm.remarks = data.remarks;
                     this.addForm.selectedSeats.push(data.seatNo);
                     this.advanceSeat.push(data.seatNo)
+                    this.addForm.flag = 1;
                 }
             }
         },
@@ -1434,7 +1417,6 @@ export default {
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
-            // return same;
         },
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking') {
@@ -1595,25 +1577,6 @@ export default {
                 console.log(resBookingDetail);
             }
         },
-        // reset() {
-        //     this.addForm = {
-        //         // date: new Date().toISOString().substr(0, 10),
-        //         type: "booked",
-        //         gender: "1",
-        //         customerCNIC: "",
-        //         // schedule: 0,
-        //         totalFare: 0,
-        //         // destinationCity: 0,
-        //         // departureCity: 0,
-        //     };
-        //     // this.showBookingDiv = false;
-        //
-        //     this.allSchedules = '';
-        //     this.selectedBookedSeats = '';
-        //     this.selectedBookedOverIssueSeats = '';
-        //     this.fetchScheduleData();
-        //     this.resetingArrays();
-        // },
         passDataToCancelModel: function (data) {
             this.cancelData = {
                 dataDate: data.date,
@@ -1626,15 +1589,6 @@ export default {
             $("#cancelModel").modal('show');
         },
         async cancelBooking(dataEnter) {
-
-            // if (reason == '' || typeof reason == 'undefined') {
-            //     return swal({
-            //         title: "required!",
-            //         text: "Please give any Remarks!!",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // }
             const data = {
                 date: dataEnter.dataDate,
                 schedule_id: dataEnter.dataSchedule,
@@ -1872,15 +1826,6 @@ export default {
                     timer: 2000
                 });
             }
-            // if (this.rescheduleData.reason == '') {
-            //     return swal({
-            //         title: "Required!!",
-            //         text: "Reason is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // }
-
             const reScheduleAddFormData = {
                 ...this.rescheduleData,
                 'selected_seatNo': this.alreadyBookedSeat[0],

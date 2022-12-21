@@ -23967,8 +23967,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       optionsPhone: {
         placeholder: "xxxx-xxxxxxx"
       },
-      // rescheduleFormId: "reschedule_modal",
-      // overissueFormId: "overIssue_model",
       getCustomermessage: '',
       shiftingFormId: "shifting-modal",
       partialSeatFormId: "partialSeat-modal",
@@ -24065,7 +24063,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 2:
               window.addEventListener('keydown', _this.enter);
-              window.addEventListener('keydown', _this.altM); // window.addEventListener('keydown', this.altD);
+              window.addEventListener('keydown', _this.altM);
 
             case 4:
             case "end":
@@ -24095,13 +24093,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.add();
       }
     },
-    // altD: function (e) {
-    //     if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'x')) {
-    //         $("#fareDiscount").attr('readonly', function (_, attr) {
-    //             return !attr
-    //         });
-    //     }
-    // },
     altM: function altM(e) {
       var _this2 = this;
 
@@ -24669,9 +24660,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 14:
                 res = _context10.sent;
 
-                if (res.status == 500) {// this.showBookingDiv = false;
-                }
-
                 if (res.status == 200) {
                   _this10.loading = false;
                   _this10.showBookingDiv = true;
@@ -24702,7 +24690,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 16:
               case "end":
                 return _context10.stop();
             }
@@ -24731,8 +24719,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (_this11.rescheduleData.rescheduleSchedule == 0) {
                   _this11.seatMapReschedule = false;
-                } // this.resetingArrays();
-
+                }
 
                 _context11.next = 11;
                 return _this11.callApi("post", "schedule/selected", {
@@ -24960,21 +24947,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                console.log(data);
-
-                if (data.type == 'advance booking' && data.type != 0) {
+                if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                   index = _this13.advanceSeat.indexOf(data.seatNo);
 
                   if (index != -1) {
-                    // this.addForm.customerCNIC = '';
-                    // this.addForm.customerName = '';
-                    // this.addForm.contact = '';
-                    // this.addForm.remarks = '';
                     _this13.addForm.selectedSeats.splice(index, 1);
 
                     _this13.advanceSeat.splice(index, 1);
 
                     _this13.addForm.alreadyBookedId.splice(index, 1);
+
+                    _this13.addForm.flag = 0;
                   } else {
                     _this13.addForm.alreadyBookedId.push(data.id);
 
@@ -24986,10 +24969,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _this13.addForm.selectedSeats.push(data.seatNo);
 
                     _this13.advanceSeat.push(data.seatNo);
+
+                    _this13.addForm.flag = 1;
                   }
                 }
 
-              case 2:
+              case 1:
               case "end":
                 return _context13.stop();
             }
@@ -25049,7 +25034,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var partial = col.partial ? "partial" : "";
       var over = col.over_issue && col.partial ? "bg-secondary" : "";
       var disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
-      return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat; // return same;
+      return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
     },
     getTitle: function getTitle(col) {
       if (col.type == 'booked' || col.type == 'advance booking') {
@@ -25326,25 +25311,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee17);
       }))();
     },
-    // reset() {
-    //     this.addForm = {
-    //         // date: new Date().toISOString().substr(0, 10),
-    //         type: "booked",
-    //         gender: "1",
-    //         customerCNIC: "",
-    //         // schedule: 0,
-    //         totalFare: 0,
-    //         // destinationCity: 0,
-    //         // departureCity: 0,
-    //     };
-    //     // this.showBookingDiv = false;
-    //
-    //     this.allSchedules = '';
-    //     this.selectedBookedSeats = '';
-    //     this.selectedBookedOverIssueSeats = '';
-    //     this.fetchScheduleData();
-    //     this.resetingArrays();
-    // },
     passDataToCancelModel: function passDataToCancelModel(data) {
       this.cancelData = {
         dataDate: data.date,
@@ -25365,14 +25331,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context18.prev = _context18.next) {
               case 0:
-                // if (reason == '' || typeof reason == 'undefined') {
-                //     return swal({
-                //         title: "required!",
-                //         text: "Please give any Remarks!!",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
                 data = {
                   date: dataEnter.dataDate,
                   schedule_id: dataEnter.dataSchedule,
@@ -25739,14 +25697,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                // if (this.rescheduleData.reason == '') {
-                //     return swal({
-                //         title: "Required!!",
-                //         text: "Reason is Required",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
                 reScheduleAddFormData = _objectSpread(_objectSpread({}, _this22.rescheduleData), {}, {
                   'selected_seatNo': _this22.alreadyBookedSeat[0],
                   'selected_seatClass': _this22.alreadyBookedSeatClass[0],

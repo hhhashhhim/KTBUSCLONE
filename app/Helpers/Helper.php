@@ -166,8 +166,7 @@ if (!function_exists('updateAdvancedSeat')) {
         $updateId->update([
             'cnic' => str_replace('-', '', $request->customerCNIC),
         ]);
-
-        return $customerAll;
+        return $request->alreadyBookedId[0];
     }
 }
 

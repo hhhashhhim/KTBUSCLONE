@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Booking;
 use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingCancel;
 use App\Models\Booking\RescheduleExtraAmount;
+use App\Models\Booking\TicketAdvancedBooked;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
@@ -51,15 +52,10 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-//        dd($request->all());
-//        $allTicket = [];
-//        if (isset($request->alreadyBookedId) && (count($request->alreadyBookedId) > 0) && $request->type == 'advance booking' && $request->type != 'booked' && $request->customerCNIC != '') {
-//            dd('1');
-//            $allTicket[] = updateAdvancedSeat($request, $this->company_id);
-//        }
-//        else
-//        {
-//            dd('2');
+        $allTicket = [];
+        if (isset($request->flag) && $request->flag == 1) {
+            $allTicket[] = updateAdvancedSeat($request, $this->company_id);
+        } else {
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', $this->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -99,7 +95,7 @@ class BookingController extends Controller
                 'destination_id' => $request->destinationCity,
                 'schedule_id' => $schedule->id,
             ])->first();
-        $allTicket = [];
+            $allTicket = [];
             foreach ($request->selectedSeats as $i => $seat) {
                 $ticket = Ticket::create([
                     'company_id' => $this->company_id,
@@ -137,6 +133,24 @@ class BookingController extends Controller
                         'added_by' => Auth::user()->id,
                     ]);
                 }
+
+                if($request->type == 'advance booking'){
+                    TicketAdvancedBooked::create([
+                        'company_id' => $this->company_id,
+                        'departure_city_id' => $ticket->departure_city_id,
+                        'destination_city_id' => $ticket->destination_city_id,
+                        'ticket_id' => $ticket->id,
+                        'seat_no' => $ticket->seat_no,
+                        'seat_fare' => $ticket->seat_fare,
+                        'booking_no' => $ticket->booking_no,
+                        'date' => $ticket->date,
+                        'customer_id' => $ticket->customer_id,
+                        'schedule_id' => $ticket->schedule_id,
+                        'gender' => $ticket->gender,
+                        'type' => $ticket->type,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
                 $allTicket[] = $ticket->id;
             }
 
@@ -152,7 +166,7 @@ class BookingController extends Controller
 
 //        dd('done');
 
-//        }
+        }
         return [
             'data' => implode('-', $allTicket),
             'ticket' => Ticket::where('company_id', $this->company_id)->whereIn('id', $allTicket)->get(),
