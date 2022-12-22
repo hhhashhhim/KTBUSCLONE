@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary mb-0">
-                        <div class="card-body">
+                        <div class="card-body pb-0">
                             <div class="row border-bottom mb-1">
                                 <div class="col-md-2  mb-2">
                                     <label for="departureCity" class="mb-0">Departure City <span
@@ -209,13 +209,30 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group text-right">
+                                            <div class="form-group text-center"
+                                                 style=" margin-bottom: 10PX !important;">
+                                                <button class="btn btn-dark mx-1">
+                                                    Print Terminal Invoice
+                                                </button>
+                                                <button class="btn btn-info mx-1" data-toggle="modal"
+                                                        data-target="#advanceCahModel" @click="openAdvanceModel()">
+                                                    Advance Cash Voucher
+                                                </button>
+                                                <button class="btn btn-warning mx-1">
+                                                    Print Bus Invoice
+                                                </button>
+                                            </div>
+                                            <div class="form-group text-center">
+                                                <button class="btn btn-danger mx-1">
+                                                    Print Pax List
+                                                </button>
                                                 <button class="btn btn-primary mx-1"
                                                         v-on:click="add()"
                                                         v-on:keyup.enter="add()">
                                                     Generate Ticket
                                                 </button>
-                                                <button class="btn btn-secondary mx-1" @click="reset">
+                                                <button class="btn btn-secondary text-dark"
+                                                        @click="this.fetchScheduleData();">
                                                     Reset
                                                 </button>
                                             </div>
@@ -341,7 +358,97 @@
             </div>
         </div>
 
-        <!--        Add ELT -->
+        <!--Advance Cash Model  -->
+        <div class="modal fade" id="advanceCahModel" tabindex="0" aria-labelledby="advanceCahModelLabel"
+             aria-hidden="true" v-if="closeAdvanceCashModel">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="advanceCahModelLabel">ADVANCE BUS TO CASH</h5>
+                        <button type="button" class="close" @click="closeAdvanceModel()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="weight">Terminal Advance Sale<span
+                                        class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control" placeholder="Enter Terminal Advance Sale"
+                                        @keypress="isNumber($event)"
+                                        readonly
+                                        v-model="advanceCash.sale"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group"
+                                >
+                                    <label>Bus Voucher Amount<span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
+                                        readonly
+                                        v-model="advanceCash.amount"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="weight">Advance Deposit<span
+                                        class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control" placeholder="Enter Terminal Advance Deposit"
+                                        @keypress="isNumber($event)"
+                                        id="weight"
+                                        v-model="advanceCash.advanceDeposit"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group"
+                                >
+                                    <label>Withdraw From Bank<span class="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control" placeholder="Enter Withdraw From Bank"
+                                        @keypress="isNumber($event)"
+                                        id="fullName"
+                                        v-model="advanceCash.withdrawBank"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="description">Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description"
+                                              placeholder="Enter Advance Cash Description"
+                                              v-model="advanceCash.description"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"
+                                @click="addAdvanceCash(advanceCash)">
+                            Add Advance Voucher
+                        </button>
+                        <button type="button" class="btn btn-secondary" @click="closeAdvanceModel()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -430,7 +537,7 @@
             </div>
         </div>
 
-        <!-- Model Reschedule       -->
+        <!--Model Reschedule-->
         <div class="modal fade" id="reschedule_modal" tabindex="2" aria-labelledby="reschedule_modalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -592,7 +699,7 @@
             </div>
         </div>
 
-        <!--    Model Cancel -->
+        <!-- Model Cancel -->
         <div class="modal fade" id="cancelModel" tabindex="3" aria-labelledby="cancelModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
@@ -632,8 +739,10 @@
                 </div>
             </div>
         </div>
-        <!--                <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
-        <!--        modal for details-->
+
+        <!-- <ReschedulePopup :formID="rescheduleFormId" :seats="bookedSeats" :formData="sameDataMain"/>-->
+
+        <!--Modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -743,10 +852,7 @@
         </div>
 
         <!--Modal for seat details end-->
-
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
-
-
     </section>
 </template>
 
@@ -754,7 +860,6 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 import ReschedulePopup from "./popup/ReschedulePopup.vue";
 import OverIssuePopup from "./popup/OverIssuePopup.vue";
@@ -795,6 +900,7 @@ export default {
             success: false,
             error: false,
             seatMapReschedule: false,
+            closeAdvanceCashModel: false,
             reScheduleSeatMap: true,
             delId: "",
             allSchedules: [],
@@ -845,6 +951,13 @@ export default {
                 discount: 0,
                 alreadyBookedId: [],
             },
+            advanceCash: {
+                sale: 0,
+                amount: -500,
+                advanceDeposit: 0,
+                withdrawBank: '',
+                description: '',
+            },
             rescheduleData: {
                 schedule: 0,
             },
@@ -870,6 +983,13 @@ export default {
     },
 
     methods: {
+        openAdvanceModel() {
+            this.closeAdvanceCashModel = true;
+        },
+        closeAdvanceModel() {
+            this.closeAdvanceCashModel = false;
+        },
+
         changeGender: function (e) {
             if (e.target.checked) {
                 this.addForm.gender = 0;
@@ -877,6 +997,7 @@ export default {
                 this.addForm.gender = 1;
             }
         },
+
         changeType: function (e) {
             if (e.target.checked) {
                 this.addForm.type = 'advance booking';
@@ -884,11 +1005,13 @@ export default {
                 this.addForm.type = 'booked';
             }
         },
+
         enter: function (e) {
             if (e.key == "Enter") {
                 this.add();
             }
         },
+
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
                 if (this.addForm.departureCity == 0) {
@@ -957,9 +1080,11 @@ export default {
                 }
             }
         },
+
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
+
         async getFilterRecord() {
             this.allBookings = [];
             const table = $("#booking_table").DataTable();
@@ -978,6 +1103,7 @@ export default {
                 }
             }
         },
+
         minDateFilter: function () {
             var dtToday = new Date();
             var month = dtToday.getMonth() + 1;
@@ -989,6 +1115,7 @@ export default {
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
         },
+
         async getDestinationCity() {
             if (this.addForm.departureCity == '0') {
                 this.addForm.destinationCity = 0;
@@ -1002,6 +1129,7 @@ export default {
                 }
             }
         },
+
         async getReDestinationCity() {
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
@@ -1015,6 +1143,7 @@ export default {
                 }
             }
         },
+
         async fetchAllSchedules() {
             const resBooking = await this.callApi("post", "booking");
             const resClass = await this.callApi("post", "fare-class")
@@ -1030,6 +1159,7 @@ export default {
                 console.log(res);
             }
         },
+
         resetSelectBooking(evt) {
             if (evt.target.value == '0') {
                 this.showBookingDiv = false;
@@ -1037,6 +1167,7 @@ export default {
                 this.showBookingDiv = true;
             }
         },
+
         async fetchSpecificSchedules() {
             this.getSchedule = true;
             this.showBookingDiv = false;
@@ -1059,6 +1190,7 @@ export default {
             }
             this.fetchScheduleData();
         },
+
         async fetchReSpecificSchedules() {
             this.allReSchedules = {};
             this.rescheduleData.rescheduleSchedule = 0;
@@ -1078,12 +1210,15 @@ export default {
                 }
             }
         },
+
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
+
         phoneFormat: function (string) {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
+
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
@@ -1136,6 +1271,7 @@ export default {
                 }
             }
         },
+
         calculateTotal: function () {
             if (this.addForm.discount > this.addForm.totalFare) {
                 this.addForm.discount = 0;
@@ -1150,6 +1286,7 @@ export default {
                 this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : this.addForm.totalFare)
             }
         },
+
         isNumber: function (evt) {
             evt = evt ? evt : window.event;
             var charCode = evt.which ? evt.which : evt.keyCode;
@@ -1163,6 +1300,7 @@ export default {
                 return true;
             }
         },
+
         async fetchScheduleData() {
             this.resetingArrays();
             this.addForm.customerName = '';
@@ -1211,6 +1349,7 @@ export default {
                 }
             }
         },
+
         async fetchReScheduleData() {
             this.reScheduleSchedule = '';
             this.reScheduleDepart = '';
@@ -1242,6 +1381,7 @@ export default {
                 }
             }
         },
+
         async selectSeat(row, col, seatNo, fare, colClass) {
             this.validationErrors = [];
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
@@ -1345,6 +1485,7 @@ export default {
                 });
             }
         },
+
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
@@ -1397,11 +1538,13 @@ export default {
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
             this.reScheduleDate = this.rescheduleData.rescheduleDate;
         },
+
         handler: function (col, e) {
             if (col.type == 'not_for_sale') {
                 e.preventDefault();
             }
         },
+
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
@@ -1410,6 +1553,7 @@ export default {
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
         },
+
         getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.alreadyBooked ? "selected" : "";
@@ -1418,17 +1562,19 @@ export default {
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
         },
+
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking') {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
+
         getStyle: function (col) {
             let disabledSeat = col.type == 'not_for_sale' ? 'pointer-events: none;' : '';
             return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
         },
+
         async add() {
-            console.log(this.addForm, this.selectedSeats, this.selectedBookedSeats, this.selectedOverIssueSeats);
             if (!this.addForm.schedule) {
                 return swal({
                     title: "Required!",
@@ -1477,7 +1623,6 @@ export default {
                     timer: 2000
                 });
             }
-            console.log(this.addForm);
             const res = await this.callApi("post", "booking/store", this.addForm);
             if (res.status == 200) {
                 swal({
@@ -1535,6 +1680,7 @@ export default {
                 }
             }
         },
+
         async deleteModal(surcharge, i) {
             const deletingObj = {
                 url: "booking/delete",
@@ -1543,6 +1689,7 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
         },
+
         async resetingArrays() {
             this.selectedSeats = [];
             this.selectedBookedSeats = [];
@@ -1565,6 +1712,7 @@ export default {
                 console.log(res);
             }
         },
+
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
             const resBookingDetail = await this.callApi("post", "booking/details", {date, schedule_id});
@@ -1577,6 +1725,7 @@ export default {
                 console.log(resBookingDetail);
             }
         },
+
         passDataToCancelModel: function (data) {
             this.cancelData = {
                 dataDate: data.date,
@@ -1588,6 +1737,7 @@ export default {
             }
             $("#cancelModel").modal('show');
         },
+
         async cancelBooking(dataEnter) {
             const data = {
                 date: dataEnter.dataDate,
@@ -1610,6 +1760,7 @@ export default {
                 this.fetchScheduleData();
             }
         },
+
         //over issue model complete data
         passDataToOverIssueModel: function (data) {
 
@@ -1623,6 +1774,7 @@ export default {
             }
             $("#overIssue_model").modal('show');
         },
+
         async addOverIssueTicket(dataEnter) {
             if (dataEnter.reason == '' || typeof dataEnter.reason == 'undefined') {
                 return swal({
@@ -1683,6 +1835,7 @@ export default {
                 }
             }
         },
+
         //ELT MODEL DATA
         passDataToEltModel: function (data) {
             this.eltData = {
@@ -1696,6 +1849,7 @@ export default {
             }
             $("#addELTModel").modal('show');
         },
+
         async addEltToTicket(dataEnter) {
             if (dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined') {
                 return swal({
@@ -1766,6 +1920,7 @@ export default {
                 }
             }
         },
+
         // Reschedule model
         async passDataToRescheduleModel(data) {
             this.reSpecificCities = [];
@@ -1793,6 +1948,7 @@ export default {
 
             $("#reschedule_modal").modal('show');
         },
+
         async rescheduleSeats() {
             if (this.rescheduleData.dataDepartureCity == 0) {
                 return swal({
@@ -1865,6 +2021,7 @@ export default {
                 }
             }
         },
+
         // Duplicate Ticket
         duplicateTicket: function (data) {
             // window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
@@ -1872,10 +2029,8 @@ export default {
     },
 };
 </script>
+
 <style scoped>
-.sameColor {
-    background-color: #180404 !important;
-}
 
 .image-span {
     background-color: #a2a3a7;
@@ -1988,7 +2143,6 @@ img {
     box-sizing: content-box;
     -moz-border-radius: 25px;
     -webkit-border-radius: 25px;
-
 }
 
 .mrn {
