@@ -21,6 +21,7 @@ class CreateTicketClosingTable extends Migration
             $table->time('schedule_time');
             $table->integer('sechedule_start')->comment('city_id');
             $table->integer('sechedule_end')->comment('city_id');
+            $table->integer('schedule_type')->nullable();
             $table->text('description')->nullable();
             $table->integer('company_id');
             $table->integer('added_by')->nullable();
