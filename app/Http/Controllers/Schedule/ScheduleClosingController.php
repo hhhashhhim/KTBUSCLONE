@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
-use App\Models\Discount\Discount;
+use App\Models\Hrm\Employee\Employee;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
@@ -34,8 +34,12 @@ class ScheduleClosingController extends Controller
     public function index()
     {
         $buses = Bus::where('company_id', $this->company_id)->orderBy('id')->get();
+        $hosts = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["user_id","name","cnic"]);
+        $drivers = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["id","user_id","name","cnic"]);
         $data = [
             "buses" => $buses,
+            "hosts" => $hosts,
+            "drivers" => $drivers,
         ];
         return $data;
     }

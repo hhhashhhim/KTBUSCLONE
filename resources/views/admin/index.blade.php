@@ -9,10 +9,10 @@
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/css/app.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
     <!-- Custom style CSS -->
     <link rel='shortcut icon' type='image/x-icon' href='{{ asset('assets/img/fav-logo.png') }}'/>
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
@@ -22,6 +22,9 @@
     <style>
         html{
             scroll-behavior: smooth !important;
+        }
+        .select2-container{
+            width: 100%!important;
         }
     </style>
 </head>
