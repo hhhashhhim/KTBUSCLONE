@@ -114,8 +114,8 @@
                     </div>
                     <div class=" form-group col-md-6">
                         <label for="city_id">Schedule <span class="text-danger">*</span></label>
-                        <select class="form-control">
-                            <option value="0">Select Bus Class</option>
+                        <select class="form-control" v-model="addData.schedule">
+                            <option value="">Select Schedule</option>
                             <option
                                 v-for="(schedule, i) in schedules"
                                 :key="i"
@@ -125,21 +125,37 @@
                             </option>
                         </select>
                     </div>
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Schedule <span class="text-danger">*</span></label>
+                        <Multiselect
+                          
+                            :options="options"
+                            :multiple="true"
+                            :searchable="true"
+                            
+                        ></Multiselect>
+                    </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0">
-                            <option value="" selected>Select Part </option>
-                            <option>
-                                f
+                        <select class="form-control rounded-0 select2" v-model="addData.drivers" multiple>
+                            <option
+                                v-for="(driver, i) in drivers"
+                                :key="i"
+                                :value="driver.user_id"
+                            >
+                                {{ driver.name }}
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Host <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0">
-                            <option value="" selected>Select Part </option>
-                            <option>
-                                f
+                        <select class="form-control rounded-0 select2" v-model="addData.hosts" multiple="multiple">
+                            <option
+                                v-for="(host, i) in hosts"
+                                :key="i"
+                                :value="host.id"
+                            >
+                                {{ host.name }}
                             </option>
                         </select>
                     </div>
@@ -149,7 +165,7 @@
                             class="form-control"
                             placeholder="Enter Description"
                             id="location"
-                            
+                            v-model="addData.description"
                             cols="30"
                             rows="10"
                         ></textarea>
@@ -159,7 +175,7 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="updateBus" :disabled="loading"
+                        @click="closeSchedule" :disabled="loading"
                     >
                         {{ loading ? 'Loading...' : 'Add Bus' }}
                     </button>
@@ -254,6 +270,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
+import Multiselect from '@vueform/multiselect'
 // import Delete from "../../components/Delete.vue";
 
 import {mapGetters} from "vuex";
@@ -263,6 +280,7 @@ export default {
     components: {
         Add,
         Edit,
+        Multiselect 
         // Delete,
     },
     data() {
@@ -272,6 +290,8 @@ export default {
             // seatClass: "0",
             // seatType: "0",
             schedules: [],
+            drivers: [],
+            hosts: [],
             // updateSeatValue: [],
             validationErrors: "",
             // records: "",
@@ -285,6 +305,10 @@ export default {
             addData: {
                 bus: "",
                 date: "",
+                schedule: "",
+                drivers: [],
+                hosts: [],
+                description: "",
             },
             // dataEdit: {
             //     busNumber: "",
@@ -300,6 +324,12 @@ export default {
             // delId: "",
             success: false,
             errors: false,
+            value: [],
+        options: [
+    { value: 'batman', label: 'Batman' },
+    { value: 'robin', label: 'Robin' },
+    { value: 'joker', label: 'Joker' },
+  ]
         };
     },
     async created() {
@@ -312,15 +342,17 @@ export default {
         },
         async fetchData(){
             const res = await this.callApi("post", "booking/schedule/closing");
-            console.log(res);
             if (res.status == 200) {
                 this.buses = res.data.buses;
+                this.hosts = res.data.hosts;
+                this.drivers = res.data.drivers;
             } else {
                 console.log(res);
             }
             setTimeout(() => {
                 $('#closing_table').DataTable();
             }, 300);
+            $(".select2").select2();
         },
         async getSchedule(){
             const data = {
@@ -348,52 +380,53 @@ export default {
             }
         },
 
-        // async addBuses() {
-        //     this.validationErrors = [];
-        //     if (this.data.busNumber === "")
-        //       return swal({
-        //             title: "Required",
-        //             text: "Bus Number is required",
-        //             type: 'error',
-        //            timer: 2000
-        //         });
-        //     if (this.data.fare_class === "")
-        //         return swal({
-        //             title: "Required",
-        //             text: "Bus Class is Required",
-        //             icon: "error",
-        //             timer: 2000
-        //         });
-        //     this.loadig = true;
-        //     const res = await this.callApi("post", "buses/store", this.data);
-        //     if (res.status === 201) {
-        //       swal({
-        //             title: "Success",
-        //             text: "Bus Created Successfully",
-        //             icon: "success",
-        //            timer: 2000
-        //         });
-        //         $('#closing_table').DataTable().destroy();
-        //         this.loading = false;
-        //         window.scrollTo(0, 0);
-        //         this.data = {};
-        //         this.data.fare_class = 0;
-        //         await this.fetchBuses();
-        //         setTimeout(() => {
-        //             // window.location.reload();
-        //             this.isShowDiv = false;
-        //         }, 2000);
-        //     } else {
-        //         if (res.status == 422) {
-        //             this.loading = false;
-        //             for (const key in res.data.errors) {
-        //                 res.data.errors[key].forEach((element) => {
-        //                     this.errorsArray(element, key);
-        //                 });
-        //             }
-        //         }
-        //     }
-        // },
+        async closeSchedule() {
+            this.validationErrors = [];
+            // if (this.data.busNumber === "")
+            //   return swal({
+            //         title: "Required",
+            //         text: "Bus Number is required",
+            //         type: 'error',
+            //        timer: 2000
+            //     });
+            // if (this.data.fare_class === "")
+            //     return swal({
+            //         title: "Required",
+            //         text: "Bus Class is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            console.log(this.addData);return ;
+            this.loadig = true;
+            const res = await this.callApi("post", "buses/store", this.data);
+            if (res.status === 201) {
+              swal({
+                    title: "Success",
+                    text: "Bus Created Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
+                $('#closing_table').DataTable().destroy();
+                this.loading = false;
+                window.scrollTo(0, 0);
+                this.data = {};
+                this.data.fare_class = 0;
+                await this.fetchBuses();
+                setTimeout(() => {
+                    // window.location.reload();
+                    this.isShowDiv = false;
+                }, 2000);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
         // editBus(val) {
         //     this.dataEdit = val;
         // },
@@ -456,4 +489,5 @@ export default {
     },
 };
 </script>
+<style src="@vueform/multiselect/themes/default.css"></style>
 
