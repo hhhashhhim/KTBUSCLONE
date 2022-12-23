@@ -423,9 +423,9 @@ class BookingController extends Controller
             'Content-Type' => 'application/pdf',
         ]);
     }
-
-    public function bookingBusAdvanceCash(Request $request)
-    {
-        dd($request->all());
-    }
+//
+//    public function bookingBusAdvanceCash(Request $request)
+//    {
+//        dd($request->all());
+//    }
 }
