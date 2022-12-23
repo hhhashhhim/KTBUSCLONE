@@ -239,7 +239,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 px-1  overflow-auto" style="max-height: 530px !important;">
+                                    <div class="col-md-4 px-1  overflow-auto" style="max-height: 560px !important;">
                                         <div
                                             class="d-flex justify-content-center seat-img p-0 m-0"
                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map"
@@ -365,7 +365,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="advanceCahModelLabel">ADVANCE BUS TO CASH</h5>
-                        <button type="button" class="close" @click="closeAdvanceModel()">
+                        <button type="button" class="close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -373,8 +373,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="weight">Terminal Advance Sale<span
-                                        class="text-danger">*</span></label>
+                                    <label for="weight">Terminal Advance Sale</label>
                                     <input
                                         type="text"
                                         class="form-control" placeholder="Enter Terminal Advance Sale"
@@ -387,7 +386,7 @@
                             <div class="col-md-6">
                                 <div class="form-group"
                                 >
-                                    <label>Bus Voucher Amount<span class="text-danger">*</span></label>
+                                    <label>Bus Voucher Amount</label>
                                     <input
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
@@ -439,10 +438,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="addAdvanceCash(advanceCash)">
+                                @click="addAdvanceCash()">
                             Add Advance Voucher
                         </button>
-                        <button type="button" class="btn btn-secondary" @click="closeAdvanceModel()">Close</button>
+                        <button type="button" class="btn btn-secondary">Close</button>
                     </div>
                 </div>
             </div>
@@ -2025,7 +2024,40 @@ export default {
         // Duplicate Ticket
         duplicateTicket: function (data) {
             // window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
-        }
+        },
+
+        //Advnace Voucher Cash
+        async addAdvanceCash() {
+            console.log(this.advanceCash)
+            if (this.advanceCash.advanceDeposit == '' || typeof this.advanceCash.advanceDeposit == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "Advance Deposit Amount is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.advanceCash.withdrawBank == '' || typeof this.advanceCash.withdrawBank == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "Withdraw Amount from bank is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.advanceCash.description == '' || typeof this.advanceCash.description == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "Description is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            const resAdvanceCash = await this.callApi("post", "booking/advanceCash", this.advanceCash);
+            console.log(resAdvanceCash);
+
+
+        },
     },
 };
 </script>
@@ -2086,7 +2118,7 @@ export default {
 }
 
 .seat-img {
-    height: 55px;
+    height: 47px;
     margin: 10px 0px;
 }
 

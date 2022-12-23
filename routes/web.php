@@ -189,6 +189,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/advance', [BookingController::class, 'advanceData']);
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
+    Route::post('/advanceCash', [BookingController::class, 'bookingBusAdvanceCash']);
 
     // Schedule Closing
     Route::group(['prefix' => '/schedule', [CustomMiddleware::class]], function () {

@@ -131,25 +131,9 @@ if (!function_exists('updateFare')) {
             'distance_in_km' => $request->distance_in_km,
             'added_by' => auth()->user()->id,
         ]);
-//        $routeFares1Side = RouteFare::where('departure_city_id', $request->from_city_id)
-//            ->where('destination_city_id', $request->to_city_id)
-//            ->get();
-//        foreach ($routeFares1Side as $i => $routeFare) {
-//            $routeFare->fare_id = $fare1Side->id;
-//            RouteFare::create($routeFare->toArray());
-//        }
-//
-//        $routeFares2Side = RouteFare::where('departure_city_id', $request->to_city_id)
-//            ->where('destination_city_id', $request->to_city_id)
-//            ->get();
-//        foreach ($routeFares2Side as $i => $routeFare) {
-//            RouteFare::create([
-//                ...$routeFare,
-//                'fare_id' => $request->id
-//            ]);
-//        }
     }
 }
+
 //Updated Already advanced Booked Seat
 if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $company_id)
