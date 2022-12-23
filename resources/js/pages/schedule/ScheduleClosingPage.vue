@@ -125,7 +125,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class=" form-group col-md-6">
+                    <!-- <div class=" form-group col-md-6">
                         <label for="city_id">Schedule <span class="text-danger">*</span></label>
                         <Multiselect
                           
@@ -134,10 +134,10 @@
                             :searchable="true"
                             
                         ></Multiselect>
-                    </div>
+                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0 select2" v-model="addData.drivers" multiple>
+                        <select class="form-control rounded-0" v-model="addData.drivers" multiple>
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
@@ -149,11 +149,11 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Host <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0 select2" v-model="addData.hosts" multiple="multiple">
+                        <select class="form-control rounded-0" v-model="addData.hosts" multiple>
                             <option
                                 v-for="(host, i) in hosts"
                                 :key="i"
-                                :value="host.id"
+                                :value="host.user_id"
                             >
                                 {{ host.name }}
                             </option>
@@ -324,12 +324,6 @@ export default {
             // delId: "",
             success: false,
             errors: false,
-            value: [],
-        options: [
-    { value: 'batman', label: 'Batman' },
-    { value: 'robin', label: 'Robin' },
-    { value: 'joker', label: 'Joker' },
-  ]
         };
     },
     async created() {
@@ -381,28 +375,49 @@ export default {
         },
 
         async closeSchedule() {
+            // console.log(this.addData.drivers.length);return;
             this.validationErrors = [];
-            // if (this.data.busNumber === "")
-            //   return swal({
-            //         title: "Required",
-            //         text: "Bus Number is required",
-            //         type: 'error',
-            //        timer: 2000
-            //     });
-            // if (this.data.fare_class === "")
-            //     return swal({
-            //         title: "Required",
-            //         text: "Bus Class is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            console.log(this.addData);return ;
+            if (!this.addData.bus)
+              return swal({
+                    title: "Required",
+                    text: "Bus is required",
+                    icon: 'error',
+                   timer: 2000
+                });
+            if (!this.addData.date)
+              return swal({
+                    title: "Required",
+                    text: "Date is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (!this.addData.schedule)
+              return swal({
+                    title: "Required",
+                    text: "Schedule is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.addData.drivers.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Driver is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.addData.hosts.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Host is required",
+                    icon: 'error',
+                    timer: 2000
+                });
             this.loadig = true;
-            const res = await this.callApi("post", "buses/store", this.data);
+            const res = await this.callApi("post", "booking/schedule/closing/store", this.addData);
             if (res.status === 201) {
               swal({
                     title: "Success",
-                    text: "Bus Created Successfully",
+                    text: "Schedule Close Successfully",
                     icon: "success",
                    timer: 2000
                 });

@@ -11,6 +11,8 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\TicketClosing;
+use App\Models\Schedule\TicketClosingMemeber;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -50,8 +52,39 @@ class ScheduleClosingController extends Controller
             where('start_date','<=', $request->date)
             ->where('end_date','>=', $request->date)
             ->where('company_id', $this->company_id)
+            // ->with(["scheduleDetail"=>function($q) use ($request){
+            //     return $q->where("departure_date",$request->date);
+            // }])
             ->orderBy('id')
             ->get(["id","name"]);
+    }
+    
+    public function store(Request $request)
+    {
+        // this is for get route id that will be followed by schedule
+        $route = Schedule::find($request->schedule)->route_id;
+        // this is for get schedule start city
+        $departure = RouteFare::where("route_id",$route)->orderBy('id','ASC')->first(); 
+        // this is for get schedule end city
+        $destination = RouteFare::where("route_id",$route)->orderBy('id','DESC')->first();
+        // this is for get schedule departure time
+        return $depTime = ScheduleDetail::
+        where(["schedule_id"=>$request->schedule,"departure_id"=>$departure->departure_city_id,
+                "destination_id"=>$departure->destination_city_id,
+                "departure_date"=>$request->date
+                ])
+        ->first();
+
+        TicketClosing::create([
+            "bus_id" => $request->bus,
+            "schedule_id" => $request->schedule,
+            "schedule_date" => $request->date,
+            "schedule_time" => $depTime->departure_time,
+            "schedule_start" => $departure->departure_city_id,
+            "schedule_end" => $destination->destination_city_id,
+            "description" => $request->description,
+            "return"      => 0 // Not Returned 
+        ]);
     }
 
 }
