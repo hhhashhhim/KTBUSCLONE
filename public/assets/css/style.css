@@ -6631,9 +6631,9 @@ body.layout-3 .main-footer {
 /*}*/
 
 .main-content {
-    padding-left: 260px;
+    padding-left: 255px;
     padding-right: 18px;
-    padding-top: 90px;
+    padding-top: 85px;
     width: 100%;
     min-height: 720px;
     position: relative
