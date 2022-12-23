@@ -125,9 +125,19 @@
                             </option>
                         </select>
                     </div>
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Schedule <span class="text-danger">*</span></label>
+                        <Multiselect
+                          
+                            :options="options"
+                            :multiple="true"
+                            :searchable="true"
+                            
+                        ></Multiselect>
+                    </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0 select2" v-model="addData.drivers" multiple="multiple">
+                        <select class="form-control rounded-0 select2" v-model="addData.drivers" multiple>
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
@@ -260,6 +270,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
+import Multiselect from '@vueform/multiselect'
 // import Delete from "../../components/Delete.vue";
 
 import {mapGetters} from "vuex";
@@ -269,6 +280,7 @@ export default {
     components: {
         Add,
         Edit,
+        Multiselect 
         // Delete,
     },
     data() {
@@ -312,6 +324,12 @@ export default {
             // delId: "",
             success: false,
             errors: false,
+            value: [],
+        options: [
+    { value: 'batman', label: 'Batman' },
+    { value: 'robin', label: 'Robin' },
+    { value: 'joker', label: 'Joker' },
+  ]
         };
     },
     async created() {
@@ -333,8 +351,8 @@ export default {
             }
             setTimeout(() => {
                 $('#closing_table').DataTable();
-                $('.select2').select2();
             }, 300);
+            $(".select2").select2();
         },
         async getSchedule(){
             const data = {
@@ -471,4 +489,5 @@ export default {
     },
 };
 </script>
+<style src="@vueform/multiselect/themes/default.css"></style>
 
