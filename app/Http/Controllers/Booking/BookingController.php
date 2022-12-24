@@ -438,7 +438,18 @@ class BookingController extends Controller
 
     public function passengerListPdf(Request $request)
     {
-        dd($request->all());
+        $customers_id = Ticket::where([
+            'company_id' => $this->company_id,
+            'schedule_id' => $request->schedule_id,
+            'departure_city_id' => $request->departure_city_id,
+            'destination_city_id' => $request->destination_city_id,
+            'date' => $request->date,
+            'type' => 'booked',
+        ])->pluck('customer_id')->toArray();
+        $customers_data = Customer::where('company_id', $this->company_id)->whereIn('id', array_unique($customers_id))->get();
+        return $customers_data;
+
+
     }
 
 }

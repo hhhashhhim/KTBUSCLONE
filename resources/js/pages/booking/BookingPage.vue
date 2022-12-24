@@ -852,6 +852,15 @@
 
         <!--Modal for seat details end-->
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
+
+        <!--Print Passesnger List Form-->
+        <form :action="$store.state.app_url + 'print/pdf/passenger/list'" method="POST" ref="refPassengerList"  target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
+            <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
+            <input type="hidden" name="date" :value="this.addForm.date">
+            <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+        </form>
     </section>
 </template>
 
@@ -877,6 +886,7 @@ export default {
     },
     data() {
         return {
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             options: {
                 placeholder: "xxxxx-xxxxxxx-x",
             },
@@ -2028,24 +2038,27 @@ export default {
 
         // Get Passengers list
         async getCustomerList() {
-            const passengerData = {
-                'departure_city_id': this.addForm.departureCity,
-                'destination_city_id': this.addForm.destinationCity,
-                'date': this.addForm.date,
-                'schedule_id': this.addForm.schedule,
-            }
-            const resPassenger = await this.callApi("post", "booking/getPassenger", passengerData);
-            console.log(resPassenger);
-            if (resPassenger.status == 200 && resPassenger.data != '') {
-                // window.open(this.$store.state.app_url + 'print/' + resPassenger.data + '/pdf/passenger/list', '_blank').focus();
-            } else {
-                swal({
-                    title: "OOPS!!",
-                    text: "No Booking Found in this Bus!!",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // console.log(this.$refs.refPassengerList);
+                this.$refs.refPassengerList.submit();
+
+            // const passengerData = {
+            //     'departure_city_id': this.addForm.departureCity,
+            //     'destination_city_id': this.addForm.destinationCity,
+            //     'date': this.addForm.date,
+            //     'schedule_id': this.addForm.schedule,
+            // }
+            // const resPassenger = await this.callApi("post", "booking/getPassenger", passengerData);
+            // console.log(resPassenger);
+            // if (resPassenger.status == 200 && resPassenger.data != '') {
+            //     // window.open(this.$store.state.app_url + 'print/' + resPassenger.data + '/pdf/passenger/list', '_blank').focus();
+            // } else {
+            //     swal({
+            //         title: "OOPS!!",
+            //         text: "No Booking Found in this Bus!!",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
         }
     },
 };
