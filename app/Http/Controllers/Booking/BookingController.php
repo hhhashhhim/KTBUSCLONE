@@ -435,6 +435,7 @@ class BookingController extends Controller
         ])->pluck('customer_id')->toArray();
         return implode('-', array_unique($customers_id));
     }
+
     public function passengerListPdf(Request $request)
     {
         dd($request->all());

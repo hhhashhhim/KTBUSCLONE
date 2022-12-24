@@ -159,16 +159,16 @@ if (!function_exists('updateAdvancedSeat')) {
 
 //updated Fare Table for first time
 if (!function_exists('updateFareTable')) {
-    function updateFareTable()
+    function updateFareTable($company_id)
     {
-        $fareClass = FareClass::where('company_id', Auth::user()->company_id)->get();
-        $cities = City::where('company_id', Auth::user()->company_id)->get();
-        foreach ($fareClass as $fareClass) {
+        $fareClasses = FareClass::where('company_id', $company_id)->get();
+        $cities = City::where('company_id', $company_id)->get();
+        foreach ($fareClasses as $fareClass) {
             foreach ($cities as $firstCity) {
                 foreach ($cities as $secondCity) {
                     if ($firstCity->id != $secondCity->id) {
                         $oldFare = FareTable::where([
-                            'company_id' => Auth::user()->company_id,
+                            'company_id' => $company_id,
                             "fare_class" => $fareClass->id,
                             "from_city_id" => $firstCity->id,
                             "to_city_id" => $secondCity->id,
@@ -179,7 +179,7 @@ if (!function_exists('updateFareTable')) {
                                 "fare_class" => $fareClass->id,
                                 "from_city_id" => $firstCity->id,
                                 "to_city_id" => $secondCity->id,
-                                "company_id" => Auth::user()->company_id,
+                                "company_id" => $company_id,
                                 "added_by" => Auth::user()->id,
                             ]);
                         }

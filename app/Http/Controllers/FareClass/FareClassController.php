@@ -48,7 +48,7 @@ class FareClassController extends Controller
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        updateFareTable();
+        updateFareTable($this->company_id);
         return $fareClass;
     }
 
