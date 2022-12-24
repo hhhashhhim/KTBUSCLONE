@@ -214,10 +214,10 @@
                                                 <button class="btn btn-info mx-1">
                                                     Print Terminal Invoice
                                                 </button>
-<!--                                                <button class="btn btn-info mx-1" data-toggle="modal"-->
-<!--                                                        data-target="#advanceCahModel" @click="openAdvanceModel()">-->
-<!--                                                    Advance Cash Voucher-->
-<!--                                                </button>-->
+                                                <!--                                                <button class="btn btn-info mx-1" data-toggle="modal"-->
+                                                <!--                                                        data-target="#advanceCahModel" @click="openAdvanceModel()">-->
+                                                <!--                                                    Advance Cash Voucher-->
+                                                <!--                                                </button>-->
                                                 <button class="btn btn-warning mx-1">
                                                     Print Bus Invoice
                                                 </button>
@@ -358,94 +358,94 @@
             </div>
         </div>
 
-<!--        &lt;!&ndash;Advance Cash Model  &ndash;&gt;-->
-<!--        <div class="modal fade" id="advanceCahModel" tabindex="0" aria-labelledby="advanceCahModelLabel"-->
-<!--             aria-hidden="true" v-if="closeAdvanceCashModel">-->
-<!--            <div class="modal-dialog modal-dialog-centered modal-lg">-->
-<!--                <div class="modal-content">-->
-<!--                    <div class="modal-header">-->
-<!--                        <h5 class="modal-title" id="advanceCahModelLabel">ADVANCE BUS TO CASH</h5>-->
-<!--                        <button type="button" class="close">-->
-<!--                            <span aria-hidden="true">&times;</span>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                    <div class="modal-body">-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <label for="weight">Terminal Advance Sale</label>-->
-<!--                                    <input-->
-<!--                                        type="text"-->
-<!--                                        class="form-control" placeholder="Enter Terminal Advance Sale"-->
-<!--                                        @keypress="isNumber($event)"-->
-<!--                                        readonly-->
-<!--                                        v-model="advanceCash.sale"-->
-<!--                                    />-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="col-md-6">-->
-<!--                                <div class="form-group"-->
-<!--                                >-->
-<!--                                    <label>Bus Voucher Amount</label>-->
-<!--                                    <input-->
-<!--                                        type="text"-->
-<!--                                        class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"-->
-<!--                                        readonly-->
-<!--                                        v-model="advanceCash.amount"-->
-<!--                                    />-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-6">-->
-<!--                                <div class="form-group">-->
-<!--                                    <label for="weight">Advance Deposit<span-->
-<!--                                        class="text-danger">*</span></label>-->
-<!--                                    <input-->
-<!--                                        type="text"-->
-<!--                                        class="form-control" placeholder="Enter Terminal Advance Deposit"-->
-<!--                                        @keypress="isNumber($event)"-->
-<!--                                        id="weight"-->
-<!--                                        v-model="advanceCash.advanceDeposit"-->
-<!--                                    />-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="col-md-6">-->
-<!--                                <div class="form-group"-->
-<!--                                >-->
-<!--                                    <label>Withdraw From Bank<span class="text-danger">*</span></label>-->
-<!--                                    <input-->
-<!--                                        type="text"-->
-<!--                                        class="form-control" placeholder="Enter Withdraw From Bank"-->
-<!--                                        @keypress="isNumber($event)"-->
-<!--                                        id="fullName"-->
-<!--                                        v-model="advanceCash.withdrawBank"-->
-<!--                                    />-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="row">-->
-<!--                            <div class="col-md-12">-->
-<!--                                <div class="form-group">-->
-<!--                                    <label for="description">Description <span class="text-danger">*</span></label>-->
-<!--                                    <textarea class="form-control" id="description"-->
-<!--                                              placeholder="Enter Advance Cash Description"-->
-<!--                                              v-model="advanceCash.description"-->
-<!--                                    ></textarea>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="modal-footer">-->
-<!--                        <button type="button" class="btn btn-primary"-->
-<!--                                @click="addAdvanceCash()">-->
-<!--                            Add Advance Voucher-->
-<!--                        </button>-->
-<!--                        <button type="button" class="btn btn-secondary">Close</button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--        &lt;!&ndash;Advance Cash Model  &ndash;&gt;-->
+        <!--        <div class="modal fade" id="advanceCahModel" tabindex="0" aria-labelledby="advanceCahModelLabel"-->
+        <!--             aria-hidden="true" v-if="closeAdvanceCashModel">-->
+        <!--            <div class="modal-dialog modal-dialog-centered modal-lg">-->
+        <!--                <div class="modal-content">-->
+        <!--                    <div class="modal-header">-->
+        <!--                        <h5 class="modal-title" id="advanceCahModelLabel">ADVANCE BUS TO CASH</h5>-->
+        <!--                        <button type="button" class="close">-->
+        <!--                            <span aria-hidden="true">&times;</span>-->
+        <!--                        </button>-->
+        <!--                    </div>-->
+        <!--                    <div class="modal-body">-->
+        <!--                        <div class="row">-->
+        <!--                            <div class="col-md-6">-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="weight">Terminal Advance Sale</label>-->
+        <!--                                    <input-->
+        <!--                                        type="text"-->
+        <!--                                        class="form-control" placeholder="Enter Terminal Advance Sale"-->
+        <!--                                        @keypress="isNumber($event)"-->
+        <!--                                        readonly-->
+        <!--                                        v-model="advanceCash.sale"-->
+        <!--                                    />-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                            <div class="col-md-6">-->
+        <!--                                <div class="form-group"-->
+        <!--                                >-->
+        <!--                                    <label>Bus Voucher Amount</label>-->
+        <!--                                    <input-->
+        <!--                                        type="text"-->
+        <!--                                        class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"-->
+        <!--                                        readonly-->
+        <!--                                        v-model="advanceCash.amount"-->
+        <!--                                    />-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                        <div class="row">-->
+        <!--                            <div class="col-md-6">-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="weight">Advance Deposit<span-->
+        <!--                                        class="text-danger">*</span></label>-->
+        <!--                                    <input-->
+        <!--                                        type="text"-->
+        <!--                                        class="form-control" placeholder="Enter Terminal Advance Deposit"-->
+        <!--                                        @keypress="isNumber($event)"-->
+        <!--                                        id="weight"-->
+        <!--                                        v-model="advanceCash.advanceDeposit"-->
+        <!--                                    />-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                            <div class="col-md-6">-->
+        <!--                                <div class="form-group"-->
+        <!--                                >-->
+        <!--                                    <label>Withdraw From Bank<span class="text-danger">*</span></label>-->
+        <!--                                    <input-->
+        <!--                                        type="text"-->
+        <!--                                        class="form-control" placeholder="Enter Withdraw From Bank"-->
+        <!--                                        @keypress="isNumber($event)"-->
+        <!--                                        id="fullName"-->
+        <!--                                        v-model="advanceCash.withdrawBank"-->
+        <!--                                    />-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                        <div class="row">-->
+        <!--                            <div class="col-md-12">-->
+        <!--                                <div class="form-group">-->
+        <!--                                    <label for="description">Description <span class="text-danger">*</span></label>-->
+        <!--                                    <textarea class="form-control" id="description"-->
+        <!--                                              placeholder="Enter Advance Cash Description"-->
+        <!--                                              v-model="advanceCash.description"-->
+        <!--                                    ></textarea>-->
+        <!--                                </div>-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                    <div class="modal-footer">-->
+        <!--                        <button type="button" class="btn btn-primary"-->
+        <!--                                @click="addAdvanceCash()">-->
+        <!--                            Add Advance Voucher-->
+        <!--                        </button>-->
+        <!--                        <button type="button" class="btn btn-secondary">Close</button>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
 
         <!--Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
@@ -2027,11 +2027,25 @@ export default {
         },
 
         // Get Passengers list
-        async getCustomerList(){
-            const passengerData={
-
+        async getCustomerList() {
+            const passengerData = {
+                'departure_city_id': this.addForm.departureCity,
+                'destination_city_id': this.addForm.destinationCity,
+                'date': this.addForm.date,
+                'schedule_id': this.addForm.schedule,
             }
             const resPassenger = await this.callApi("post", "booking/getPassenger", passengerData);
+            console.log(resPassenger);
+            if (resPassenger.status == 200 && resPassenger.data != '') {
+                // window.open(this.$store.state.app_url + 'print/' + resPassenger.data + '/pdf/passenger/list', '_blank').focus();
+            } else {
+                swal({
+                    title: "OOPS!!",
+                    text: "No Booking Found in this Bus!!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
         }
     },
 };
