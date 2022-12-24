@@ -33,8 +33,8 @@ import HotelPage from "./pages/refreshment/HotelPage.vue";
 import FoodPage from "./pages/refreshment/FoodPage.vue";
 import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 
-const url = '/kt/'
-// const url = '/'
+// const url = '/kt/'
+const url = '/'
 
 const routes = [
     {
