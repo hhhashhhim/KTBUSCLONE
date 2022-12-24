@@ -47,6 +47,7 @@ class CityController extends Controller
             'added_by' => Auth::user()->id,
         ]);
         $this->cityCombinations($city);
+        updateFareTable();
         return City::with('addedBy')->find($city->id);
     }
 

@@ -1,9 +1,12 @@
 <?php
 
+use App\Models\City;
 use App\Models\Customer;
+use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('storeFare')) {
     function storeFare($request, $company_id)
@@ -49,7 +52,6 @@ if (!function_exists('storeFare')) {
         }
     }
 }
-
 
 if (!function_exists('format_phone')) {
     function format_phone(string $phone_no)
@@ -108,6 +110,7 @@ if (!function_exists('priceDiff')) {
         }
     }
 }
+
 if (!function_exists('updateFare')) {
     function updateFare($request, $company_id)
     {
@@ -139,7 +142,7 @@ if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $company_id)
     {
         $customerAll = [];
-        foreach ($request->alreadyBookedId as $key =>$single) {
+        foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
@@ -151,6 +154,39 @@ if (!function_exists('updateAdvancedSeat')) {
             'cnic' => str_replace('-', '', $request->customerCNIC),
         ]);
         return $request->alreadyBookedId[0];
+    }
+}
+
+//updated Fare Table for first time
+if (!function_exists('updateFareTable')) {
+    function updateFareTable()
+    {
+        $fareClass = FareClass::where('company_id', Auth::user()->company_id)->get();
+        $cities = City::where('company_id', Auth::user()->company_id)->get();
+        foreach ($fareClass as $fareClass) {
+            foreach ($cities as $firstCity) {
+                foreach ($cities as $secondCity) {
+                    if ($firstCity->id != $secondCity->id) {
+                        $oldFare = FareTable::where([
+                            'company_id' => Auth::user()->company_id,
+                            "fare_class" => $fareClass->id,
+                            "from_city_id" => $firstCity->id,
+                            "to_city_id" => $secondCity->id,
+                        ])->first();
+                        if (!$oldFare) {
+                            FareTable::create([
+                                "fare" => 0,
+                                "fare_class" => $fareClass->id,
+                                "from_city_id" => $firstCity->id,
+                                "to_city_id" => $secondCity->id,
+                                "company_id" => Auth::user()->company_id,
+                                "added_by" => Auth::user()->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
