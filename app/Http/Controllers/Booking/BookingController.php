@@ -134,7 +134,7 @@ class BookingController extends Controller
                     ]);
                 }
 
-                if($request->type == 'advance booking'){
+                if ($request->type == 'advance booking') {
                     TicketAdvancedBooked::create([
                         'company_id' => $this->company_id,
                         'departure_city_id' => $ticket->departure_city_id,
@@ -423,4 +423,9 @@ class BookingController extends Controller
             'Content-Type' => 'application/pdf',
         ]);
     }
+//
+//    public function bookingBusAdvanceCash(Request $request)
+//    {
+//        dd($request->all());
+//    }
 }
