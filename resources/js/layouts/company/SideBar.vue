@@ -89,6 +89,7 @@
                                 <i class="fas fa-bookmark"></i> Close Booking
                             </router-link>
                         </li> -->
+                        
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'all-booking-page' }">
                                 <i class="fas fa-bookmark"></i> All Booking
