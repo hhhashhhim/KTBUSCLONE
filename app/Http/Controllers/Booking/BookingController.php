@@ -153,19 +153,7 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-
-
-//        $data = Ticket::with('schedule', 'customer', 'bus_class', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', $customer->id)->get();
-//        $pdf = PDF::loadView('pdf/pdf', $data);
-//        return $pdf->stream();
-//            $output = $pdf->output();
-//
-//        return new Response($output, 200, [
-//            'Content-Type' => 'application/pdf',
-//        ]);
-
-//        dd('done');
-
+            printTicket($allTicket, $this->company_id);
         }
         return [
             'data' => implode('-', $allTicket),
@@ -447,9 +435,13 @@ class BookingController extends Controller
             'type' => 'booked',
         ])->pluck('customer_id')->toArray();
         $customers_data = Customer::where('company_id', $this->company_id)->whereIn('id', array_unique($customers_id))->get();
-        return $customers_data;
-
-
+        $format = TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->first();
+        return view('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
+        //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
+//            $output = $pdf->output();
+//        return new Response($output, 200, [
+//            'Content-Type' => 'application/pdf',
+//            ]);
     }
 
 }

@@ -190,6 +190,14 @@ if (!function_exists('updateFareTable')) {
     }
 }
 
+//Print Ticket  function
+if (!function_exists('printTicket')) {
+    function printTicket($request, $company_id)
+    {
+
+    }
+}
+
 
 
 

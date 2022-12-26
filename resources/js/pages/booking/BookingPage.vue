@@ -2099,7 +2099,7 @@ export default {
 }
 
 .not-for-sale {
-    background-color: rgb(140, 109, 109) !important;
+    background-color: #D40B0BFF !important;
 }
 
 .selected {

@@ -179,11 +179,11 @@
         </div>
     </div>
     <div class="text-center">
-        
+
         <img style="width: 50px !important; height: 50px !important; margin: 10px;"
                 src="data:image/png;base64,{{ base64_encode(QrCode::format('svg')->style('round')->generate('Customer Name : '. 'bfhjgf' . ' | ' . 'Customer CNIC : '.'dfsjhfds' .' | ' . 'Customer Phone # : '.'bhjxfd' .' | '.'Seat No : ' . 'dsbfgd' . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . 'jdsfg' . ' | ' . 'To : ' . 'fdhjdsf' . ' | ' . 'Departure Date : ' . 'sgffndbgjkd' . ' | '. 'Departure Time : ' . 'kmshgfkjdsg' . ' | ' . ' Booking Date & Time : '.  'dsjfhdsb' . ' | ' . 'Fare : 900')) }}"
                 class="rounded img-thumbnail"/>
-        
+
     </div>
 </div>
 <!-- <div class="clear-both" style="text-align: center;">
