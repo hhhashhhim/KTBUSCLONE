@@ -26799,6 +26799,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       options: {
         placeholder: "xxxxx-xxxxxxx-x"
       },
@@ -28608,19 +28609,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this23 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
-        var passengerData, resPassenger;
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                passengerData = {};
-                _context23.next = 3;
-                return _this23.callApi("post", "booking/getPassenger", passengerData);
+                // console.log(this.$refs.refPassengerList);
+                _this23.$refs.refPassengerList.submit(); // const passengerData = {
+                //     'departure_city_id': this.addForm.departureCity,
+                //     'destination_city_id': this.addForm.destinationCity,
+                //     'date': this.addForm.date,
+                //     'schedule_id': this.addForm.schedule,
+                // }
+                // const resPassenger = await this.callApi("post", "booking/getPassenger", passengerData);
+                // console.log(resPassenger);
+                // if (resPassenger.status == 200 && resPassenger.data != '') {
+                //     // window.open(this.$store.state.app_url + 'print/' + resPassenger.data + '/pdf/passenger/list', '_blank').focus();
+                // } else {
+                //     swal({
+                //         title: "OOPS!!",
+                //         text: "No Booking Found in this Bus!!",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
 
-              case 3:
-                resPassenger = _context23.sent;
 
-              case 4:
+              case 1:
               case "end":
                 return _context23.stop();
             }
@@ -47640,6 +47654,12 @@ var _hoisted_270 = ["onClick"];
 var _hoisted_271 = ["onClick"];
 var _hoisted_272 = ["onClick"];
 var _hoisted_273 = ["onClick"];
+var _hoisted_274 = ["action"];
+var _hoisted_275 = ["value"];
+var _hoisted_276 = ["value"];
+var _hoisted_277 = ["value"];
+var _hoisted_278 = ["value"];
+var _hoisted_279 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
@@ -48220,7 +48240,44 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     deleteFormID: $data.deleteFormID
   }, null, 8
   /* PROPS */
-  , ["formID", "details", "deleteFormID"])]);
+  , ["formID", "details", "deleteFormID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Passesnger List Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    action: _ctx.$store.state.app_url + 'print/pdf/passenger/list',
+    method: "POST",
+    ref: "refPassengerList",
+    target: "_blank"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "_token",
+    value: $data.csrf
+  }, null, 8
+  /* PROPS */
+  , _hoisted_275), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "destination_city_id",
+    value: this.addForm.destinationCity
+  }, null, 8
+  /* PROPS */
+  , _hoisted_276), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "departure_city_id",
+    value: this.addForm.departureCity
+  }, null, 8
+  /* PROPS */
+  , _hoisted_277), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "date",
+    value: this.addForm.date
+  }, null, 8
+  /* PROPS */
+  , _hoisted_278), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "schedule_id",
+    value: this.addForm.schedule
+  }, null, 8
+  /* PROPS */
+  , _hoisted_279)], 8
+  /* PROPS */
+  , _hoisted_274)]);
 }
 
 /***/ }),

@@ -59,7 +59,6 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(departureCity,i) in cities" :key="i">
-
                                                         <template
                                                             v-for="(destinationCity,j) in departureCity.destinationCities"
                                                             :key="j">

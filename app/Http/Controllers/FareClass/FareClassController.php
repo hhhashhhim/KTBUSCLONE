@@ -41,13 +41,15 @@ class FareClassController extends Controller
             'FareClassColor.required' => 'Fare Class Color is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-        return FareClass::create([
+        $fareClass = FareClass::create([
             'name' => $request->FareClassName,
             'color' => $request->FareClassColor,
             'is_active' => $request->isActive,
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
         ]);
+        updateFareTable($this->company_id);
+        return $fareClass;
     }
 
     public function updateFareClass(Request $request)

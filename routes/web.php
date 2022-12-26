@@ -189,7 +189,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/advance', [BookingController::class, 'advanceData']);
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
-//    Route::post('/advanceCash', [BookingController::class, 'bookingBusAdvanceCash']);
+    Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
 
     // Schedule Closing
     Route::group(['prefix' => '/schedule', [CustomMiddleware::class]], function () {
@@ -204,6 +204,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
 });
 //pdf Ticket
 Route::get('print/{id}/pdf', [BookingController::class, 'pdf'])->middleware(CustomMiddleware::class);
+Route::post('print/pdf/passenger/list', [BookingController::class, 'passengerListPdf'])->middleware(CustomMiddleware::class);
 Route::get('print/{id}/pdf/duplicate', [BookingController::class, 'duplicatePdf'])->middleware(CustomMiddleware::class);
 
 
