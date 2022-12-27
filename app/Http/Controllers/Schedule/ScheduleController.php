@@ -77,7 +77,7 @@ class ScheduleController extends Controller
         for ($i = 0; $i <= $days; $i++) {
             $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$schedule->start_date $schedule->time")) + ($i * 86400);
-
+            $scheduleStartDate = date("Y-m-d",$totalTime);
             foreach ($routeDetails as $detail) {
 
                 if ($lastDepId == $detail->departure_city_id) {
@@ -88,6 +88,8 @@ class ScheduleController extends Controller
                     $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
                     $departureTime = date("Y-m-d H:i", $totalTime);
                     $lastDepId = $detail->departure_city_id;
+                    // this is single schedule end date to calculate schedule completion days
+                    $scheduleEndDate = date("Y-m-d",$totalTime);
                 }
 
                 ScheduleDetail::create([
@@ -102,6 +104,12 @@ class ScheduleController extends Controller
             }
 
         }
+        // get completion days of schedule
+        $schedule_days = $this->getDays($scheduleStartDate, $scheduleEndDate);
+        Schedule::where("id",$schedule->id)->update([
+            'schedule_days' => $schedule_days,
+        ]);
+
         return $schedule;
     }
 

@@ -85,10 +85,10 @@
                                                                     @click="addDays(schedule)"
                                                                     data-target="#addDaysModal" data-toggle="modal"><i
                                                                 class="fas fa-plus"></i></button>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <!-- <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click=" edit(schedule); genericData(); "
                                                                     class="btn btn-primary mr-1 btn-sm"><i
-                                                                class="far fa-edit"></i></button>
+                                                                class="far fa-edit"></i></button> -->
 <!--                                                            <button :data-target="'#' + deleteFormID"-->
 <!--                                                                    data-toggle="modal"-->
 <!--                                                                    @click="deleteSchedule(schedule, i)"-->

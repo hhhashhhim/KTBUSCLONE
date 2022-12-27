@@ -83,7 +83,7 @@ class ScheduleClosingController extends Controller
             "schedule_start" => $departure->departure_city_id,
             "schedule_end" => $destination->destination_city_id,
             "description" => $request->description,
-            "return"      => 0 // Not Returned 
+            "schedule_type" => 0 // Not Returned 
         ]);
     }
 
