@@ -195,39 +195,36 @@ if (!function_exists('updateFareTable')) {
 
 //Print Ticket  function
 if (!function_exists('printTicket')) {
-    function printTicket($ticketIds, $company_id, $duplicate)
+    function printTicket($ticketIds, $company_id, $duplicate = 0)
     {
         $format = TicketsTemplate::where('company_id', $company_id)->where('status', 1)->first();
         $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
-        dd($format, $tickets);
-        foreach ($tickets as $key => $single) {
+        foreach ($tickets as $single) {
 // Set params
             $uan = 'UAN(24/7):' . ' ' . format_uan($format->uan);
             $company_name = 'Kainat Travels';
-            $company_address = 'Address :'.' '.$format->address;
+            $company_address = 'Address :' . ' ' . $format->address;
             $company_phone = 'Phone # :' . ' ' . format_phone($format->phone);
-            $termsCondition = 'Terms & Condition :'.' '.$format->terms_condition;
+            $termsCondition = 'Terms & Condition :' . ' ' . $format->terms_condition;
             $checkDuplicate = $duplicate;
-            $seatNo = 'Seat No:'.' '.$single[$key]->seat_no;
-            $busClass = 'Bus Class'.' '.$single[$key]['schedule']['bus_class']->name ;
-            $departureCity = 'Departure City:'.' '.$single[$key]['departure_city']->name;
-            $destinationCity = 'Destination City:'.' '.$single[$key]['destination_city']->name;
-            $departureDate = 'Departure Date:'.' '.date('d/m/Y', strtotime($single[$key]->date));
-            $departureTime = 'Departure Time:'.' '.date('H:i A', strtotime($single[$key]['schedule']->time));
-            $bookingDate = 'Booking Date:'.' '.date('d/m/Y H:i A', strtotime($single[$key]->created_at));
-            $seatFare = 'Seat Fare:'.' '.$single[$key]->seat_fare;
-            $customerName = 'Customer Name:'.' '.$single[$key]['customer']->name;
-            $customerCnic = 'Customer CNIC:'.' '.format_cnic($single[$key]['customer']->cnic);
-            $customerContact = 'Customer Contact:'.' '.format_phone($single[$key]['customer']->contact);
+            $seatNo = 'Seat No:' . ' ' . $single->seat_no;
+            $busClass = 'Bus Class' . ' ' . $single['schedule']['bus_class']->name;
+            $departureCity = 'Departure City:' . ' ' . $single['departure_city']->name;
+            $destinationCity = 'Destination City:' . ' ' . $single['destination_city']->name;
+            $departureDate = 'Departure Date:' . ' ' . date('d/m/Y', strtotime($single->date));
+            $departureTime = 'Departure Time:' . ' ' . date('H:i A', strtotime($single['schedule']->time));
+            $bookingDate = 'Booking Date:' . ' ' . date('d/m/Y H:i A', strtotime($single->created_at));
+            $seatFare = 'Seat Fare:' . ' ' . $single->seat_fare;
+            $customerName = 'Customer Name:' . ' ' . $single['customer']->name;
+            $customerCNIC = 'Customer CNIC:' . ' ' . format_cnic($single['customer']->cnic);
+            $customerContact = 'Customer Contact:' . ' ' . format_phone($single['customer']->contact);
+
 // Init printer
             $printer = new ReceiptPrinter;
-            $printer->init(
-                config('receiptprinter.connector_type'),
-                config('receiptprinter.connector_descriptor')
-            );
+            $printer->init( config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
 
 // Set store info
-            $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate, $seatNo, $customerContact, $customerCnic, $customerName, $seatFare, $bookingDate, $departureTime, $departureDate, $destinationCity, $busClass);
+            $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate, $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime, $departureDate, $departureCity, $destinationCity, $busClass);
 
 // Set currency
 //        $printer->setCurrency($currency);
@@ -244,8 +241,8 @@ if (!function_exists('printTicket')) {
 //        $printer->setTax($tax_percentage);
 
 // Calculate total
-            $printer->calculateSubTotal();
-            $printer->calculateGrandTotal();
+//            $printer->calculateSubTotal();
+//            $printer->calculateGrandTotal();
 
 // Set transaction ID
 //        $printer->setTransactionID($transaction_id);
@@ -260,7 +257,7 @@ if (!function_exists('printTicket')) {
 //        ]);
 
 // Print receipt
-//        $printer->printReceipt();
+            $printer->printRequest();
         }
     }
 }
