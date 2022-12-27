@@ -39235,33 +39235,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 27;
+                  _context4.next = 31;
                   break;
                 }
 
                 swal({
                   title: "Success",
-                  text: "Schedule Close Successfully",
+                  text: "Schedule Closed Successfully",
                   icon: "success",
                   timer: 2000
                 });
                 $('#closing_table').DataTable().destroy();
                 _this4.loading = false;
                 window.scrollTo(0, 0);
-                _this4.data = {};
-                _this4.data.fare_class = 0;
-                _context4.next = 24;
+                _this4.addData.bus = "";
+                _this4.addData.date = "";
+                _this4.addData.schedule = "";
+                _this4.addData.drivers = [];
+                _this4.addData.hosts = [];
+                _this4.addData.description = "";
+                _context4.next = 28;
                 return _this4.fetchBuses();
 
-              case 24:
+              case 28:
                 setTimeout(function () {
                   // window.location.reload();
                   _this4.isShowDiv = false;
                 }, 2000);
-                _context4.next = 28;
+                _context4.next = 32;
                 break;
 
-              case 27:
+              case 31:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -39276,7 +39280,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 28:
+              case 32:
               case "end":
                 return _context4.stop();
             }
@@ -61064,7 +61068,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $options.clearForm();
     })
-  }, " Add New Bus ", 8
+  }, " Close Booking ", 8
   /* PROPS */
   , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
@@ -61109,7 +61113,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return $options.closeSchedule && $options.closeSchedule.apply($options, arguments);
         }),
         disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Add Bus'), 9
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Close Booking'), 9
       /* TEXT, PROPS */
       , _hoisted_45)];
     }),
@@ -61151,7 +61155,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: schedule.id
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name), 9
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')), 9
         /* TEXT, PROPS */
         , _hoisted_36);
       }), 128

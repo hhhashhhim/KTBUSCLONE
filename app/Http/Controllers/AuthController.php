@@ -33,7 +33,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-        printTicket
 //                  $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('customer_id', 1)->get();
 //            $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
 //            $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms'=> $format, 'duplicate' => 0]);

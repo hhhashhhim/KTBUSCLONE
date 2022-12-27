@@ -8,7 +8,7 @@
                             <h4>Buses</h4>
                             <div class="card-header-action">
                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
-                                    Add New Bus
+                                    Close Booking
                                 </a>
                             </div>
                         </div>
@@ -121,7 +121,7 @@
                                 :key="i"
                                 :value="schedule.id"
                             >
-                                {{ schedule.name }}
+                                {{ schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')') }}
                             </option>
                         </select>
                     </div>
@@ -177,7 +177,7 @@
                         class="btn btn-primary"
                         @click="closeSchedule" :disabled="loading"
                     >
-                        {{ loading ? 'Loading...' : 'Add Bus' }}
+                        {{ loading ? 'Loading...' : 'Close Booking' }}
                     </button>
                 </template>
             </Add>
@@ -417,15 +417,19 @@ export default {
             if (res.status === 201) {
               swal({
                     title: "Success",
-                    text: "Schedule Close Successfully",
+                    text: "Schedule Closed Successfully",
                     icon: "success",
                    timer: 2000
                 });
                 $('#closing_table').DataTable().destroy();
                 this.loading = false;
                 window.scrollTo(0, 0);
-                this.data = {};
-                this.data.fare_class = 0;
+                this.addData.bus = "";
+                this.addData.date = "";
+                this.addData.schedule = "";
+                this.addData.drivers = [];
+                this.addData.hosts = [];
+                this.addData.description = "";
                 await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
