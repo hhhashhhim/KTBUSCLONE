@@ -96,7 +96,7 @@
     <div class="custinfo" id="custinfo">
         <div id="barcode-area">
             <img
-                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate('Customer Name : '. $data[$key]['customer']->name . ' | ' . 'Customer CNIC : '.format_cnic($data[$key]['customer']->cnic) .' | ' . 'Customer Phone # : '.format_phone($data[$key]['customer']->contact ).' | '.'Seat No : ' . $data[$key]->seat_no . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . $data[$key]['departure_city']->name . ' | ' . 'To : ' . $data[$key]['destination_city']->name . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data[$key]->date)) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data[$key]['schedule']->time)) . ' | ' . ' Booking Date & Time : '.  date('d/m/Y H:i A', strtotime($data[$key]->created_at)) . ' | ' . 'Fare : 900')) }}"
+                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate() }}"
                 class="rounded"/>
         </div>
         <div class="table-data">

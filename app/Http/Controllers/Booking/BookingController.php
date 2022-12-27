@@ -153,7 +153,7 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-            printTicket($allTicket, $this->company_id);
+//            printTicket($allTicket, $this->company_id);
         }
         return [
             'data' => implode('-', $allTicket),
