@@ -1,190 +1,199 @@
-{{--{{dd($data, $data_terms)}}--}}
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
-
-    <style type="text/css">
-
+    <style>
         @page {
-            /*size: 76mm 120mm;*/
             transform: rotate(-90deg);
             padding: 0;
-        }
-
-        .p {
-            margin-left: 5px;
+            margin: 10px;
         }
 
         body {
-            /*margin: 0 auto;*/
-            /*margin: 200px,20px;*/
-            /*font-size: 7pt;*/
+            height: 10%;
+            overflow: scroll;
+            margin: 40px 30px 40px 30px;
+            font-size: 6pt;
             font-family: Verdana, Arial, sans-serif;
         }
 
-
-        #info {
-            /*width: 58mm;*/
-        }
-
-        #custinfo {
-            line-height: 2.5;
-        }
-
-        .companyname {
+        .companyName {
             font-weight: 900;
-            font-size: 16pt;
+            font-size: 20pt;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-top: -15px;
             text-align: center;
             font-family: sans-serif, Verdana, Arial;
+        }
+
+        #table1 {
+            border-bottom: none;
+            padding: 10px;
+            font-size: 10pt !important;
+            border-collapse: collapse;
+            width: 100% !important;
+        }
+
+        #table2 {
+            border: 1px solid black;
+            padding: 10px;
+            font-size: 10pt !important;
+            border-collapse: collapse;
+            width: 100% !important;
+            text-align: center;
+        }
+
+        #table3 {
+            border: 1px solid black;
+            padding: 10px;
+            font-size: 10pt !important;
+            border-collapse: collapse;
+            width: 100% !important;
+            text-align: center;
         }
 
         .companyAddress {
             font-weight: 400;
-            font-size: 11pt;
+            font-size: 15pt;
             margin-bottom: 10px;
             text-align: center;
             font-family: sans-serif, Verdana, Arial;
         }
 
-        #barcode-area {
-            text-align: center;
-            /*top: 7.6cm;*/
-            /*left: 3.5cm;*/
+        .centerTH {
+            text-align: start;
+            width: 17%;
         }
 
-        #barcode-hint {
-            position: relative;
-            bottom: 2mm;
+        .fontWightTh {
+            font-weight: 100 !important;
         }
 
-        table {
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        table, td, th {
-            border: 1px solid black;
-        }
-
-        #Pax {
-            font-size: 9px;
-            line-height: 0.5;
+        .countPassenger {
+            margin-top: 18px !important;
         }
     </style>
+    <title>Print Passenger List </title>
 </head>
 <body>
-{{--{{dd($data)}}--}}
-
-<div style="font-weight: 700; text-align: center !important; margin-bottom: 10px !important; font-size: 10pt;"><span>KAINAT TRAVELS</span></div>
-<div>
-    <div class="clear-both">
-        <p class="float-left w-25 text-center" style="margin: 2px;">Card #</p>
-        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
-        <p class="float-left w-25 text-center" style="margin: 2px;">33333-3333333-3</p>
-    </div>
-    <div class="clear-both">
-        <p class="float-left w-25 text-center" style="margin: 2px;">Phone</p>
-        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
-        <p class="float-left w-25 text-center" style="margin: 2px;">0300-0000000</p>
-    </div>
-</div>
-<p style="width:100%;  text-align: center; margin:0">
-    .......................................................................................................
-</p>
 
 <div id="info">
-    <!-- <div class="companyAddress">
-        <span>{{$data_terms->address}}</span>
-        <div><span><b>UAN(24/7):</b>{{$data_terms->uan}}</span></div>
-        <div><span><b>Phone:</b>{{$data_terms->phone}}</span></div>
-    </div> -->
-    <div class="custinfo" id="custinfo">
-        <div>
-            <h3 class="float-left w-25 text-center">Items</h3>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #fff;"></p>
-            <h3 class="float-left w-25 text-center">Price</h3>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Seat No</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">asas</p>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Bus No</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">Malik ajay </p>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Data</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">dsfsdf</p>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Time</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">asdfdsf</p>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Booking</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">cxasfdsf</p>
-        </div>
-        <div class="clear-both">
-            <p class="float-left w-25 text-center">Fare</p>
-            <p class="float-left w-50" style="border-bottom: 1px dotted #000;"></p>
-            <p class="float-left w-25 text-center">900</p>
-        </div>
+    <div class="companyName"><span>Kainat Travels</span></div>
+    <div class="companyAddress">
+        <span>Address</span>
+        <div><span><b>UAN(24/7) : </b>Uan</span></div>
     </div>
 </div>
-<p style="width:100%;  text-align: center; margin:0">
-    .......................................................................................................
-</p>
-
+<table border="2" id="table1">
+    <tr>
+        <th class="centerTH">Route:</th>
+        <th class="fontWightTh">RouteName</th>
+        <th class="centerTH">Date& Time</th>
+        <th class="fontWightTh">Date Time</th>
+        <th class="centerTH">Bus No:</th>
+        <th class="fontWightTh">Class Name</th>
+    </tr>
+    <tr>
+        <th class="centerTH">Driver One Name</th>
+        <th class="fontWightTh">Name 1</th>
+        <th class="centerTH">Driver two Name</th>
+        <th class="fontWightTh">name 2</th>
+        <th class="centerTH">Hostess Name</th>
+        <th class="fontWightTh">name</th>
+    </tr>
+    <tr>
+        <th class="centerTH">Driver One COntact</th>
+        <th class="fontWightTh">Contact</th>
+        <th class="centerTH">driver Two Contatct</th>
+        <th class="fontWightTh">Contact</th>
+        <th></th>
+        <th></th>
+    </tr>
+</table>
+<table border="2" id="table2">
+    <tr>
+        <th style="width: 5% !important;">SR #</th>
+        <th>Seat #</th>
+        <th>Passenger Name</th>
+        <th>CNIC</th>
+        <th>Phone Number</th>
+        <th>Terminal Name</th>
+        <th>Departure City Name</th>
+        <th>Departure City Name</th>
+    </tr>
+    <tr>
+        <td>SR #</td>
+        <td>Seat #</td>
+        <td>Passenger Name</td>
+        <td>CNIC</td>
+        <td>Phone Number</td>
+        <td>Terminal Name</td>
+        <td>Departure City Name</td>
+        <td>Departure City Name</td>
+    </tr>
+</table>
+{{--No of Passenger By Terminal Name--}}
 <div>
-    <div class="clear-both">
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">SUBTOTAL</h4>
-        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">432</h4>
+    <div class="countPassenger">
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+            Terminal Name</h1>
     </div>
-    <div class="clear-both">
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">TAX</h4>
-        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">18</h4>
-    </div>
-    <div class="clear-both">
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">TOATAL</h4>
-        <p class="float-left w-50" style="border-bottom: 1px dotted #fff; margin: 2px;"></p>
-        <h4 class="float-left w-25 text-center" style="margin: 2px;">450</h4>
-    </div>
+
+    <table border="2" id="table3">
+        <tr>
+            <th>Terminal Name</th>
+            <th>No of Passengers</th>
+        </tr>
+        <tr>
+            <td>Main</td>
+            <td>5</td>
+        </tr>
+    </table>
 </div>
-<p style="width:100%;  text-align: center; margin:0">
-    .......................................................................................................
-</p>
-
-<div class="clear-both">
-    <div class="text-center">
-        <div class="companyName" style="margin: 10px 0px;"><span>Kainat Travels</span></div>
-        <div>
-            Test Terminal, islamabad.Test Terminal, islamabad.
-        </div>
+{{--No of Passenger By Departure City--}}
+<div>
+    <div class="countPassenger">
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+            Departure City</h1>
     </div>
-    <div class="text-center">
 
-        <img style="width: 50px !important; height: 50px !important; margin: 10px;"
-             src="data:image/png;base64,{{ base64_encode(QrCode::format('svg')->style('round')->generate('Customer Name : '. 'bfhjgf' . ' | ' . 'Customer CNIC : '.'dfsjhfds' .' | ' . 'Customer Phone # : '.'bhjxfd' .' | '.'Seat No : ' . 'dsbfgd' . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . 'jdsfg' . ' | ' . 'To : ' . 'fdhjdsf' . ' | ' . 'Departure Date : ' . 'sgffndbgjkd' . ' | '. 'Departure Time : ' . 'kmshgfkjdsg' . ' | ' . ' Booking Date & Time : '.  'dsjfhdsb' . ' | ' . 'Fare : 900')) }}"
-             class="rounded img-thumbnail"/>
-
-    </div>
+    <table border="2" id="table3">
+        <tr>
+            <th>Departure City</th>
+            <th>No of Passengers</th>
+        </tr>
+        <tr>
+            <td>Faisalabad</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>Rawalpindi</td>
+            <td>3</td>
+        </tr>
+    </table>
 </div>
-<!-- <div class="clear-both" style="text-align: center;">
-    <h5 style="text-decoration: underline;"><b>Terms & Conditions Applied</b></h5>
-    <h5>{{$data_terms->terms_condition}}</h5>
-    <h4><b>&copy; Rights Reserved By Kainat Travels</b></h4>
-</div> -->
+{{--No of Passenger By Destination City--}}
+<div>
+    <div class="countPassenger">
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+            Destination City</h1>
+    </div>
 
+    <table border="2" id="table3">
+        <tr>
+            <th>Destination Cities</th>
+            <th>No of Passengers</th>
+        </tr>
+        <tr>
+            <td>Karachi</td>
+            <td>5</td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    window.onload = function () {
+        window.print();
+    }
+</script>
 </body>
 </html>
-

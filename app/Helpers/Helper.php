@@ -199,67 +199,67 @@ if (!function_exists('printTicket')) {
     {
         $format = TicketsTemplate::where('company_id', $company_id)->where('status', 1)->first();
         $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
-        foreach ($tickets as $single) {
-// Set params
+//        foreach ($tickets as $single) {
+            // Set params
             $uan = 'UAN(24/7):' . ' ' . format_uan($format->uan);
             $company_name = 'Kainat Travels';
-            $company_address = 'Address :' . ' ' . $format->address;
+            $company_address = $format->address;
             $company_phone = 'Phone # :' . ' ' . format_phone($format->phone);
-            $termsCondition = 'Terms & Condition :' . ' ' . $format->terms_condition;
+            $termsCondition = $format->terms_condition;
             $checkDuplicate = $duplicate;
-            $seatNo = 'Seat No:' . ' ' . $single->seat_no;
-            $busClass = 'Bus Class' . ' ' . $single['schedule']['bus_class']->name;
-            $departureCity = 'Departure City:' . ' ' . $single['departure_city']->name;
-            $destinationCity = 'Destination City:' . ' ' . $single['destination_city']->name;
-            $departureDate = 'Departure Date:' . ' ' . date('d/m/Y', strtotime($single->date));
-            $departureTime = 'Departure Time:' . ' ' . date('H:i A', strtotime($single['schedule']->time));
-            $bookingDate = 'Booking Date:' . ' ' . date('d/m/Y H:i A', strtotime($single->created_at));
-            $seatFare = 'Seat Fare:' . ' ' . $single->seat_fare;
-            $customerName = 'Customer Name:' . ' ' . $single['customer']->name;
-            $customerCNIC = 'Customer CNIC:' . ' ' . format_cnic($single['customer']->cnic);
-            $customerContact = 'Customer Contact:' . ' ' . format_phone($single['customer']->contact);
+            $seatNo = $tickets[0]->seat_no;
+            $busClass = $tickets[0]['schedule']['bus_class']->name;
+            $departureCity = $tickets[0]['departure_city']->name;
+            $destinationCity = $tickets[0]['destination_city']->name;
+            $departureDate = date('d/m/Y', strtotime($tickets[0]->date));
+            $departureTime = date('H:i A', strtotime($tickets[0]['schedule']->time));
+            $bookingDate = date('d/m/Y H:i A', strtotime($tickets[0]->created_at));
+            $seatFare = $tickets[0]->seat_fare;
+            $customerName = $tickets[0]['customer']->name;
+            $customerCNIC = format_cnic($tickets[0]['customer']->cnic);
+            $customerContact = format_phone($tickets[0]['customer']->contact);
 
-// Init printer
+            // Init printer
             $printer = new ReceiptPrinter;
-            $printer->init( config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
+            $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
 
-// Set store info
+            // Set store info
             $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate, $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime, $departureDate, $departureCity, $destinationCity, $busClass);
 
-// Set currency
-//        $printer->setCurrency($currency);
+            // Set currency
+            //        $printer->setCurrency($currency);
 
-// Add items
-//        foreach ($items as $item) {
-//            $printer->addItem(
-//                $item['name'],
-//                $item['qty'],
-//                $item['price']
-//            );
-//        }
-// Set tax
-//        $printer->setTax($tax_percentage);
+            // Add items
+            //        foreach ($items as $item) {
+            //            $printer->addItem(
+            //                $item['name'],
+            //                $item['qty'],
+            //                $item['price']
+            //            );
+            //        }
+            // Set tax
+            //        $printer->setTax($tax_percentage);
 
-// Calculate total
-//            $printer->calculateSubTotal();
-//            $printer->calculateGrandTotal();
+            // Calculate total
+            //            $printer->calculateSubTotal();
+            //            $printer->calculateGrandTotal();
 
-// Set transaction ID
-//        $printer->setTransactionID($transaction_id);
+            // Set transaction ID
+            //        $printer->setTransactionID($transaction_id);
 
-// Set logo
-// Uncomment the line below if $image_path is defined
+            // Set logo
+            // Uncomment the line below if $image_path is defined
 //$printer->setLogo($image_path);
 
-// Set QR code
-//        $printer->setQRcode([
-//            'tid' => $transaction_id,
-//        ]);
+            // Set QR code
+            //        $printer->setQRcode([
+            //            'tid' => $transaction_id,
+            //        ]);
 
-// Print receipt
+            // Print receipt
             $printer->printRequest();
         }
-    }
+//    }
 }
 if (!function_exists('codeImage')) {
     function codeImage($data, $QrNmae)
