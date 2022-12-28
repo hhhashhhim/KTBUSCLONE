@@ -22,7 +22,7 @@ class CreateTicketsTable extends Migration
             $table->integer('schedule_id');
             $table->text('remarks')->nullable();
             $table->tinyInteger('for_female')->default(0);
-            $table->enum('type',['booked','advance booking'])->default('booked');
+            $table->string('type')->nullable();
             $table->decimal('discount',10,2)->nullable();
             $table->timestamps();
         });

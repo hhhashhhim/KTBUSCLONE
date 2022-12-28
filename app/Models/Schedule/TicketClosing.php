@@ -26,5 +26,13 @@ class TicketClosing extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
+    public function bus()
+    {
+        return $this->hasOne( Bus::class, 'id', 'bus_id' );
+    }
+    public function schedule()
+    {
+        return $this->hasOne( Schedule::class, 'id', 'schedule_id' );
+    }
 
 }

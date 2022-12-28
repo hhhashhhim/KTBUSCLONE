@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h4>Buses</h4>
+                            <h4>Schdule Closing Detail</h4>
                             <div class="card-header-action">
                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
                                     Close Booking
@@ -25,46 +25,26 @@
                                                 >
                                                     <thead>
                                                     <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Bus Category</th>
                                                         <th>Bus Number</th>
-                                                        <th>Chassis Number</th>
-                                                        <th>Insurance Number</th>
-                                                        <th>Route Permit</th>
-                                                        <th>Added By</th>
+                                                        <th>Schedule</th>
+                                                        <th>Schedule Date</th>
+                                                        <th>Schedule Time</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(bus, i) in buses" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td v-if="bus.bus_class">{{ bus.bus_class.name }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td>{{ bus.bus_number }}</td>
-                                                        <td>{{ bus.chassis_number ? bus.chassis_number : "N/A" }}</td>
-                                                        <td>{{ bus.insurance_number ? bus.insurance_number : "N/A" }}</td>
-                                                        <td>{{ bus.route_permit_number ? bus.route_permit_number : "N/A" }}</td>
-                                                        <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td>
-                                                            <button
-                                                                :data-target="'#' + editFormID"
-                                                                data-toggle="modal"
-                                                                @click="editBus(bus)"
-                                                                class="btn btn-primary mx-1"
-                                                            >
-                                                                <i class="far fa-edit"></i>
-                                                            </button>
-<!--                                                            <button-->
-<!--                                                                :data-target="'#' + deleteFormID"-->
-<!--                                                                data-toggle="modal"-->
-<!--                                                                @click="deleteBus(bus, i)"-->
-<!--                                                                class="btn btn-danger"-->
-<!--                                                            >-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
-                                                        </td>
-                                                    </tr>
+                                                    <template v-for="(data, i) in closings" :key="i">
+                                                        <tr v-for="(close, j) in data" :key="j">
+                                                            <td>{{ close.bus.bus_number }}</td>
+                                                            <td>{{ close.schedule.name }}</td>
+                                                            <td>{{ close.schedule_date }}</td>
+                                                            <td>{{ close.schedule_time }}</td>
+                                                            <td>N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="border-bottom border-success" colspan="7"></td>
+                                                        </tr>
+                                                    </template>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -287,7 +267,7 @@ export default {
         return {
             loading : false,
             buses: [],
-            // seatClass: "0",
+            closings: [],
             // seatType: "0",
             schedules: [],
             drivers: [],
@@ -337,6 +317,7 @@ export default {
         async fetchData(){
             const res = await this.callApi("post", "booking/schedule/closing");
             if (res.status == 200) {
+                this.closings = res.data.closings;
                 this.buses = res.data.buses;
                 this.hosts = res.data.hosts;
                 this.drivers = res.data.drivers;
