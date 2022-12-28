@@ -12,7 +12,8 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\TicketClosing;
-use App\Models\Schedule\TicketClosingMemeber;
+use App\Models\Schedule\TicketClosingMember;
+use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -52,9 +53,9 @@ class ScheduleClosingController extends Controller
             where('start_date','<=', $request->date)
             ->where('end_date','>=', $request->date)
             ->where('company_id', $this->company_id)
-            // ->with(["scheduleDetail"=>function($q) use ($request){
-            //     return $q->where("departure_date",$request->date);
-            // }])
+            ->with(["scheduleDetail"=>function($q) use ($request){
+                return $q->where("schedule_date",$request->date)->first();
+            }])
             ->orderBy('id')
             ->get(["id","name"]);
     }
@@ -68,23 +69,78 @@ class ScheduleClosingController extends Controller
         // this is for get schedule end city
         $destination = RouteFare::where("route_id",$route)->orderBy('id','DESC')->first();
         // this is for get schedule departure time
-        return $depTime = ScheduleDetail::
-        where(["schedule_id"=>$request->schedule,"departure_id"=>$departure->departure_city_id,
+        $depTime = ScheduleDetail::
+        where(["schedule_id"=>$request->schedule,
+                "departure_id"=>$departure->departure_city_id,
                 "destination_id"=>$departure->destination_city_id,
-                "departure_date"=>$request->date
+                "departure_date"=>$request->date,
+                "company_id"=>$this->company_id
                 ])
         ->first();
 
-        TicketClosing::create([
+        $checkMergeRecord = TicketClosingMerge::
+        where(["company_id"=>$this->company_id,"bus_id"=>$request->bus,"schedule_complete"=>0])
+        ->latest("id")->first();
+
+        if($checkMergeRecord)
+        {
+            TicketClosingMerge::where("id",$checkMergeRecord->id)->update([
+                "schedule_return_date" => $request->date,
+                "schedule_complete" => 1,
+            ]);
+        }
+        else
+        {
+            $newRecord = TicketClosingMerge::create([
+                "bus_id" => $request->bus,
+                "schedule_departure_date" => $request->date,
+                "schedule_complete" => 0,
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
+
+        
+        $closingRecord = TicketClosing::create([
             "bus_id" => $request->bus,
+            "ticket_merge_id" => $checkMergeRecord ? $checkMergeRecord->id : $newRecord->id,
             "schedule_id" => $request->schedule,
             "schedule_date" => $request->date,
             "schedule_time" => $depTime->departure_time,
             "schedule_start" => $departure->departure_city_id,
             "schedule_end" => $destination->destination_city_id,
+            "schedule_return" => $checkMergeRecord ? 1 : 0, 
             "description" => $request->description,
-            "schedule_type" => 0 // Not Returned 
+            'company_id' => $this->company_id,
+            'added_by' => Auth::user()->id,
         ]);
+
+        // for driver
+        foreach($request->drivers as $value)
+        {
+            TicketClosingMember::create([
+                "user_id" => $value,
+                "type" => 1,
+                "ticket_closing_id" => $closingRecord->id,
+                "bus_id" => $request->bus,
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
+        // for host
+        foreach($request->hosts as $value)
+        {
+            TicketClosingMember::create([
+                "user_id" => $value,
+                "type" => 2,
+                "ticket_closing_id" => $closingRecord->id,
+                "bus_id" => $request->bus,
+                'company_id' => $this->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
+
+        return  $closingRecord;
     }
 
 }

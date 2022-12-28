@@ -16,12 +16,13 @@ class CreateTicketClosingTable extends Migration
         Schema::create('ticket_closings', function (Blueprint $table) {
             $table->id();
             $table->integer('bus_id');
+            $table->integer('ticket_merge_id');
             $table->integer('schedule_id');
             $table->date('schedule_date');
             $table->time('schedule_time');
-            $table->integer('sechedule_start')->comment('city_id');
-            $table->integer('sechedule_end')->comment('city_id');
-            $table->integer('schedule_type')->nullable();
+            $table->integer('schedule_start')->comment('city_id');
+            $table->integer('schedule_end')->comment('city_id');
+            $table->integer('schedule_return')->default(0)->comment('0/no, 1/return');
             $table->text('description')->nullable();
             $table->integer('company_id');
             $table->integer('added_by')->nullable();

@@ -100,6 +100,7 @@ class ScheduleController extends Controller
                     'destination_id' => $detail->destination_city_id,
                     'departure_time' => date('H:i', strtotime($departureTime)),
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
+                    'schedule_date' => $scheduleStartDate,// schedule departure date
                 ]);
             }
 
@@ -225,7 +226,7 @@ class ScheduleController extends Controller
         for ($i = 0; $i <= $days; $i++) {
             $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
-
+            $scheduleStartDate = date("Y-m-d",$totalTime);
             foreach ($routeDetails as $key => $detail) {
 
                 if ($lastDepId == $detail->departure_city_id) {
@@ -246,6 +247,7 @@ class ScheduleController extends Controller
                     'destination_id' => $detail->destination_city_id,
                     'departure_time' => date('H:i', strtotime($departureTime)),
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
+                    'schedule_date' => $scheduleStartDate,// schedule departure date
                 ]);
             }
 

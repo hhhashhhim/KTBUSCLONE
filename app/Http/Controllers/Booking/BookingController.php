@@ -52,6 +52,14 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // this is for get actual schedule date
+        $detail = ScheduleDetail::where("departure_id",$request->departureCity)
+        ->where("destination_id",$request->destinationCity)
+        ->where('schedule_id', $request->schedule)
+        ->where('departure_date', $request->date)
+        ->where('company_id', $this->company_id)
+        ->first();
+
         $allTicket = [];
         if (isset($request->flag) && $request->flag == 1) {
             $allTicket[] = updateAdvancedSeat($request, $this->company_id);
@@ -106,6 +114,7 @@ class BookingController extends Controller
                     'seat_fare' => $request->selectedSeatsFare[$i],
                     'is_partial' => $isPartial,
                     'booking_no' => $bookingNo,
+                    'schedule_date' => $detail->schedule_date,
                     'date' => $request->date,
                     'customer_id' => $customer->id,
                     'schedule_id' => $schedule->id,
@@ -153,7 +162,7 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-            printTicket($allTicket, $this->company_id);
+            // printTicket($allTicket, $this->company_id);
         }
         return [
             'data' => implode('-', $allTicket),
