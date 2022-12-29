@@ -1294,9 +1294,10 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            this.data.cities = this.cities;
             this.loading = true;
             const res = await this.callApi("post", "schedule/store", this.data);
-            if (res.status === 201) {
+            if (res.status == 201) {
                 swal({
                     title: "Success",
                     text: "Schedule Created Successfully",
@@ -1308,15 +1309,25 @@ export default {
                 this.loading = false;
                 await this.fetchSchedule();
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
-                        res.data.errors.name.forEach((element) => {
-                            this.errorsArray(element, key);
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
                         });
+
                     }
                 }
             }
