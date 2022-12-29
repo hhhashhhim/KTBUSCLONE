@@ -39,7 +39,34 @@ class ScheduleController extends Controller
     }
 
     public function storeSchedule(Request $request)
-    {
+    { 
+        // this for check time differrence added or not against these citis
+        $cityIds = array_column($request->cities, 'id');
+        foreach($cityIds as $first)
+        {
+            foreach($cityIds as $second)
+            {
+                if($first != $second)
+                {
+                    $checkTimeDiff = FareTable::where([
+                        "company_id"=>$this->company_id,
+                        "from_city_id"=>$first,
+                        "to_city_id"=>$second,
+                        "time_difference"=>null
+                    ])->first();
+
+                    if($checkTimeDiff)
+                    {
+                        return response()->json([
+                            "errors" => [
+                                "Time Error" => ["Time differrence should be added against these cities."]
+                            ]
+                        ], 422);
+                    }
+                }
+            }
+        }
+
         $rules = [
             'name' => 'required',
             'StartDate' => 'required',
@@ -89,9 +116,9 @@ class ScheduleController extends Controller
                     $departureTime = date("Y-m-d H:i", $totalTime);
                     $lastDepId = $detail->departure_city_id;
                     // this is single schedule end date to calculate schedule completion days
-                    $scheduleEndDate = date("Y-m-d",$totalTime);
                 }
-
+                $scheduleEndDate = date("Y-m-d",$totalTime);
+                
                 ScheduleDetail::create([
                     'company_id' => $this->company_id,
                     'added_by' => Auth::user()->id,
