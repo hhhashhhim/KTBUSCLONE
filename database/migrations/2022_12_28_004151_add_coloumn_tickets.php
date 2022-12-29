@@ -14,9 +14,10 @@ class AddColoumnTickets extends Migration
     public function up()
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->date('bus_id')->nullable()->after("company_id");
-            $table->date('ticket_closing_id')->nullable()->after("company_id");
+            $table->integer('bus_id')->nullable()->after("company_id");
+            $table->integer('ticket_closing_id')->nullable()->after("company_id");
             $table->date('schedule_date')->nullable()->after("booking_no");
+            $table->integer('terminal_id')->nullable()->after("company_id");
         });
     }
 
@@ -31,6 +32,7 @@ class AddColoumnTickets extends Migration
             $table->dropColumn('bus_id');
             $table->dropColumn('ticket_closing_id');
             $table->dropColumn('schedule_date');
+            $table->dropColumn('terminal_id');
         });
     }
 }

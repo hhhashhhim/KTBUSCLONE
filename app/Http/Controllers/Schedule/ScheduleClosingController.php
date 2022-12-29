@@ -39,10 +39,16 @@ class ScheduleClosingController extends Controller
         $buses = Bus::where('company_id', $this->company_id)->orderBy('id')->get();
         $hosts = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["user_id","name","cnic"]);
         $drivers = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["id","user_id","name","cnic"]);
+        $closings = TicketClosing::
+            where('company_id', $this->company_id)
+            ->with("bus:id,bus_number","schedule:id,name")
+            ->get()
+            ->groupBy('ticket_merge_id');
         $data = [
             "buses" => $buses,
             "hosts" => $hosts,
             "drivers" => $drivers,
+            "closings" => $closings,
         ];
         return $data;
     }
@@ -140,6 +146,10 @@ class ScheduleClosingController extends Controller
             ]);
         }
 
+        Ticket::where(["schedule_id"=>$request->schedule,"schedule_date"=>$request->date])->update([
+            "bus_id" => $request->bus_id,
+            "ticket_closing_id" => $closingRecord->id
+        ]);
         return  $closingRecord;
     }
 
