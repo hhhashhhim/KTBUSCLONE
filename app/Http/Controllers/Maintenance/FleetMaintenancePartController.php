@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class FleetMaintenancePartController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

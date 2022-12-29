@@ -15,6 +15,7 @@ use Illuminate\Validation\Rule;
 
 class CityController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

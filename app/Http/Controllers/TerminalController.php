@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 
 class TerminalController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

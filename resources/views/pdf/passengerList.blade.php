@@ -76,12 +76,13 @@
     <title>Print Passenger List </title>
 </head>
 <body>
+{{--{{dd($data, $data_terms)}}--}}
 
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <span>Address</span>
-        <div><span><b>UAN(24/7) : </b>Uan</span></div>
+        <span>{{$data_terms->address}}</span>
+        <div><span><b>UAN(24/7) : </b>{{format_uan($data_terms->uan)}}</span></div>
     </div>
 </div>
 <table border="2" id="table1">

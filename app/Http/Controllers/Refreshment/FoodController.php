@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use DB;
 class FoodController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -25,13 +26,13 @@ class FoodController extends Controller
             return $next($request);
         });
     }
-    
+
     public function index(Request $request)
     {
         return Hotel::with('user:id,name,email','foods:id,name,price,unit,description,hotel_id')
                 ->where(["id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -50,7 +51,7 @@ class FoodController extends Controller
             "added_by" => Auth::user()->id,
         ]);
     }
-    
+
     public function update(Request $request)
     {
         $request->validate([
@@ -67,6 +68,6 @@ class FoodController extends Controller
         ]);
     }
 
-    
-    
+
+
 }

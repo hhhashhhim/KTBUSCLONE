@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 class FleetMaintenanceController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -23,7 +24,7 @@ class FleetMaintenanceController extends Controller
             return $next($request);
         });
     }
-    
+
     public function index()
     {
         $data = [
@@ -32,9 +33,9 @@ class FleetMaintenanceController extends Controller
             "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
         ];
         return $data;
-        
+
     }
-    
+
     public function fleetSinglePartLink(Request $request)
     {
         return Bus::
@@ -44,9 +45,9 @@ class FleetMaintenanceController extends Controller
             ->where("company_id",$this->company_id)
             ->select("id","bus_number","current_reading")
             ->first();
-        
+
     }
-    
+
     public function fleetPartLink(Request $request)
     {
         $rules = [
@@ -78,7 +79,7 @@ class FleetMaintenanceController extends Controller
             }
         }
     }
-    
+
     public function updateFleetPartLink(Request $request)
     {
         $rules = [
@@ -125,7 +126,7 @@ class FleetMaintenanceController extends Controller
                 'maintenance_part_links.maintenance_after','maintenance_part_links.maintenance_at',
                 'maintenance_part_links.maintenance_date','fleet_maintenance_parts.name')
         ->get();
-        
+
         $data = [
             "mainData" => $due,
             "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
@@ -133,7 +134,7 @@ class FleetMaintenanceController extends Controller
         ];
         return $data;
     }
-    
+
     public function dueMaintenanceAdd(Request $request)
     {
         Bus::where("id",$request->fleetId)->update([
@@ -173,7 +174,7 @@ class FleetMaintenanceController extends Controller
             "detail" => $request->detail,
         ]);
     }
-    
+
     public function updateMeterReading(Request $request)
     {
         $fleet = Bus::find($request->fleetId);
@@ -199,7 +200,7 @@ class FleetMaintenanceController extends Controller
             ->with("busName:id,bus_number,current_reading","partName:id,name")
             ->orderBy('time','DESC')
             ->get();
-        
+
         $data = [
             "mainData" => $maintenances,
             "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
@@ -221,5 +222,5 @@ class FleetMaintenanceController extends Controller
         $path            = $image->move(public_path('uploads/maintenance/'), $nameToStore);
         return $nameToStore;
     }
-    
+
 }

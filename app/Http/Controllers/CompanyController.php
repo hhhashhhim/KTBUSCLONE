@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

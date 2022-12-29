@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -39,7 +40,7 @@ class ScheduleController extends Controller
     }
 
     public function storeSchedule(Request $request)
-    { 
+    {
         // this for check time differrence added or not against these citis
         $cityIds = array_column($request->cities, 'id');
         foreach($cityIds as $first)
@@ -118,7 +119,7 @@ class ScheduleController extends Controller
                     // this is single schedule end date to calculate schedule completion days
                 }
                 $scheduleEndDate = date("Y-m-d",$totalTime);
-                
+
                 ScheduleDetail::create([
                     'company_id' => $this->company_id,
                     'added_by' => Auth::user()->id,

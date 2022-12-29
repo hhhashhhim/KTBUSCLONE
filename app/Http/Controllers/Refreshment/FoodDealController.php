@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use DB;
 class FoodDealController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -26,7 +27,7 @@ class FoodDealController extends Controller
             return $next($request);
         });
     }
-    
+
     public function index(Request $request)
     {
         return Hotel::
@@ -34,7 +35,7 @@ class FoodDealController extends Controller
             'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
             ->where(["id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -70,7 +71,7 @@ class FoodDealController extends Controller
         }
 
     }
-    
+
     public function update(Request $request)
     {
         $request->validate([
@@ -104,6 +105,6 @@ class FoodDealController extends Controller
         }
     }
 
-    
-    
+
+
 }

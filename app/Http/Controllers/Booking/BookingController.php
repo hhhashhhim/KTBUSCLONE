@@ -53,12 +53,12 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         // this is for get actual schedule date
-        $detail = ScheduleDetail::where("departure_id",$request->departureCity)
-        ->where("destination_id",$request->destinationCity)
-        ->where('schedule_id', $request->schedule)
-        ->where('departure_date', $request->date)
-        ->where('company_id', $this->company_id)
-        ->first();
+        $detail = ScheduleDetail::where("departure_id", $request->departureCity)
+            ->where("destination_id", $request->destinationCity)
+            ->where('schedule_id', $request->schedule)
+            ->where('departure_date', $request->date)
+            ->where('company_id', $this->company_id)
+            ->first();
 
         $allTicket = [];
         if (isset($request->flag) && $request->flag == 1) {
@@ -435,17 +435,14 @@ class BookingController extends Controller
 
     public function passengerListPdf(Request $request)
     {
-        $customers_id = Ticket::where([
+        $customers_data = Ticket::with('customer')->where([
             'company_id' => $this->company_id,
             'schedule_id' => $request->schedule_id,
-            'departure_city_id' => $request->departure_city_id,
-            'destination_city_id' => $request->destination_city_id,
-            'date' => $request->date,
+            'schedule_date' => $request->date,
             'type' => 'booked',
-        ])->pluck('customer_id')->toArray();
-        $customers_data = Customer::where('company_id', $this->company_id)->whereIn('id', array_unique($customers_id))->get();
+        ])->get();
         $format = TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->first();
-        return view('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
+        return view('pdf/passengerList', ['data' => $customers_data, 'data_terms' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();
 //        return new Response($output, 200, [

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class FareTableController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

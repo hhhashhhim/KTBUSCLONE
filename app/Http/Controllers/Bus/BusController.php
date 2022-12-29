@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 
 class BusController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

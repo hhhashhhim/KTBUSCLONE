@@ -14,6 +14,7 @@ use function PHPUnit\Framework\isNull;
 class EmployeeController extends Controller
 {
 
+
     public $company_id;
 
     public function __construct()
@@ -133,14 +134,14 @@ class EmployeeController extends Controller
             'EmployeeSalary.required' => 'Employee Salary is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-        
+
         $user = User::where("id",$request->userId)->update([
             "name" => $request->EmployeeName,
             "email" => $request->email,
             "contact" => str_replace('-', '', $request->EmployeeContact),
             "role_id" => 0,
         ]);
-        
+
         if($request->password)
         {
             $user = User::where("id",$request->userId)->update([
@@ -168,14 +169,14 @@ class EmployeeController extends Controller
             'designation_id' => $request->EmployeeDesignation,
             'status' => $request->status,
         ]);
-        
+
         if($request->profile)
         {
             Employee::where("user_id",$request->userId)->update([
                 'profile_Img' =>  $this->image($request->profile),
             ]);
         }
-        
+
         if($request->attachment)
         {
             Employee::where("user_id",$request->userId)->update([
@@ -203,7 +204,7 @@ class EmployeeController extends Controller
         $path            = $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
         return $nameToStore;
     }
-    
+
     public function attachment($image){
 
         $filenameWithExt = $image->getClientOriginalName();

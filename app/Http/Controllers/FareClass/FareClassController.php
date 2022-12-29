@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 
 class FareClassController extends Controller
 {
+
     public $company_id;
 
     public function __construct()

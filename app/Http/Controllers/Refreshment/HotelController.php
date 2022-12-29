@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use DB;
 class HotelController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -25,7 +26,7 @@ class HotelController extends Controller
             return $next($request);
         });
     }
-    
+
     public function index()
     {
         return Hotel::with("user")->where("company_id",$this->company_id)->get();
@@ -77,20 +78,20 @@ class HotelController extends Controller
             "commission" => 'required',
             "location" => 'required',
         ]);
-        
+
         User::where("id",$request->userId)->update([
             "name" => $request->name,
             "email" => $request->email,
             "contact" => str_replace('-', '', $request->contact),
         ]);
-        
+
         if($request->password)
         {
             User::where("id",$request->userId)->update([
                 "password" => Hash::make($request->password),
             ]);
         }
-        
+
         Hotel::where("id",$request->hotelId)->update([
             "name" => $request->hotelName,
             "contact" => str_replace('-', '', $request->contact),
@@ -122,5 +123,5 @@ class HotelController extends Controller
         $path            = $image->move(public_path('uploads/refreshment/hotel'), $nameToStore);
         return $nameToStore;
     }
-    
+
 }

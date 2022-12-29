@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleClosingController extends Controller
 {
+
     public $company_id;
 
     public function __construct()
@@ -52,7 +53,7 @@ class ScheduleClosingController extends Controller
         ];
         return $data;
     }
-    
+
     public function fetchSchedule(Request $request)
     {
         return Schedule::
@@ -65,13 +66,13 @@ class ScheduleClosingController extends Controller
             ->orderBy('id')
             ->get(["id","name"]);
     }
-    
+
     public function store(Request $request)
     {
         // this is for get route id that will be followed by schedule
         $route = Schedule::find($request->schedule)->route_id;
         // this is for get schedule start city
-        $departure = RouteFare::where("route_id",$route)->orderBy('id','ASC')->first(); 
+        $departure = RouteFare::where("route_id",$route)->orderBy('id','ASC')->first();
         // this is for get schedule end city
         $destination = RouteFare::where("route_id",$route)->orderBy('id','DESC')->first();
         // this is for get schedule departure time
@@ -106,7 +107,7 @@ class ScheduleClosingController extends Controller
             ]);
         }
 
-        
+
         $closingRecord = TicketClosing::create([
             "bus_id" => $request->bus,
             "ticket_merge_id" => $checkMergeRecord ? $checkMergeRecord->id : $newRecord->id,
@@ -115,7 +116,7 @@ class ScheduleClosingController extends Controller
             "schedule_time" => $depTime->departure_time,
             "schedule_start" => $departure->departure_city_id,
             "schedule_end" => $destination->destination_city_id,
-            "schedule_return" => $checkMergeRecord ? 1 : 0, 
+            "schedule_return" => $checkMergeRecord ? 1 : 0,
             "description" => $request->description,
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
