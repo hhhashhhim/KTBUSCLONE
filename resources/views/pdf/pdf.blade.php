@@ -67,13 +67,15 @@
             white-space: nowrap;
 
         }
-        .kt-bottom{
-         position: fixed;
-         left:23%;
-         bottom:1%;
+
+        .kt-bottom {
+            position: fixed;
+            left: 23%;
+            bottom: 1%;
         }
-        .table-data{
-            line-height:9px;
+
+        .table-data {
+            line-height: 9px;
         }
     </style>
     <title>Print Ticket</title>
@@ -89,14 +91,14 @@
         <div><span><b>Phone : </b>{{format_phone($data_terms->phone)}}</span></div>
     </div>
     @if($duplicate == 1)
-    <div style="text-align: center;" >
-        <span class="text-uppercase font-weight-bold"><u><h1>(Duplicate Ticket)</h1></u></span>
-    </div>
+        <div style="text-align: center;">
+            <span class="text-uppercase font-weight-bold"><u><h1>(Duplicate Ticket)</h1></u></span>
+        </div>
     @endif
     <div class="custinfo" id="custinfo">
         <div id="barcode-area">
             <img
-                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate() }}"
+                src="data:image/png;base64,{{ base64_encode(QrCode::size(100)->format('svg')->style('round')->generate('Customer Name : '. $data[$key]['customer']->name . ' | ' . 'Customer CNIC : '.format_cnic($data[$key]['customer']->cnic) .' | ' . 'Customer Phone # : '.format_phone($data[$key]['customer']->contact ).' | '.'Seat No : ' . $data[$key]->seat_no . ' | '.'Bus No : ' . 'Bus No' . ' | '. 'From : ' . $data[$key]['departure_city']->name . ' | ' . 'To : ' . $data[$key]['destination_city']->name . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data[$key]->date)) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data[$key]['schedule']->time)) . ' | ' . ' Booking Date & Time : '.  date('d/m/Y H:i A', strtotime($data[$key]->created_at)) . ' | ' . 'Fare : 900')) }}"
                 class="rounded"/>
         </div>
         <div class="table-data">

@@ -28613,26 +28613,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                // console.log(this.$refs.refPassengerList);
-                _this23.$refs.refPassengerList.submit(); // const passengerData = {
-                //     'departure_city_id': this.addForm.departureCity,
-                //     'destination_city_id': this.addForm.destinationCity,
-                //     'date': this.addForm.date,
-                //     'schedule_id': this.addForm.schedule,
-                // }
-                // const resPassenger = await this.callApi("post", "booking/getPassenger", passengerData);
-                // console.log(resPassenger);
-                // if (resPassenger.status == 200 && resPassenger.data != '') {
-                //     // window.open(this.$store.state.app_url + 'print/' + resPassenger.data + '/pdf/passenger/list', '_blank').focus();
-                // } else {
-                //     swal({
-                //         title: "OOPS!!",
-                //         text: "No Booking Found in this Bus!!",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
-
+                _this23.$refs.refPassengerList.submit();
 
               case 1:
               case "end":
