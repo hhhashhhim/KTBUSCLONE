@@ -1255,7 +1255,7 @@ export default {
             if (this.data.name == "")
                 return swal({
                     title: "Required!",
-                    text: "name Field is Required ",
+                    text: "Name Field is Required ",
                     icon: "error",
                     timer: 2000
                 });

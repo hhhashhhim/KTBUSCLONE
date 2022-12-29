@@ -135,7 +135,7 @@
 {{--No of Passenger By Terminal Name--}}
 <div>
     <div class="countPassenger">
-        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 7px;">&#10233;</span>No of Passenger By
             Terminal Name</h1>
     </div>
 
@@ -153,7 +153,7 @@
 {{--No of Passenger By Departure City--}}
 <div>
     <div class="countPassenger">
-        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 7px;">&#10233;</span>No of Passenger By
             Departure City</h1>
     </div>
 
@@ -175,7 +175,7 @@
 {{--No of Passenger By Destination City--}}
 <div>
     <div class="countPassenger">
-        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 10px;">&#10233;</span>No of Passenger By
+        <h1><span style="font-size: 20px;font-weight: 900;padding-right: 7px;">&#10233;</span>No of Passenger By
             Destination City</h1>
     </div>
 
@@ -192,7 +192,7 @@
 </div>
 <script type="text/javascript">
     window.onload = function () {
-        window.print();
+        // window.print();
     }
 </script>
 </body>
