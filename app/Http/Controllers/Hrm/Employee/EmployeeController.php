@@ -95,8 +95,8 @@ class EmployeeController extends Controller
             'job_description' => $request->jobDescription,
             'department_id' => $request->EmployeeDepartment,
             'designation_id' => $request->EmployeeDesignation,
-            'profile_Img' =>  $request->profile ? $this->image($request->profile) : null,
-            'attachments' =>  $request->attachment ? $this->attachment($request->attachment) : null,
+            'profile_Img' => $request->profile ? $this->image($request->profile) : null,
+            'attachments' => $request->attachment ? $this->attachment($request->attachment) : null,
             'status' => 'W',
             'company_id' => $this->company_id,
             'added_by' => Auth::user()->id,
@@ -107,7 +107,7 @@ class EmployeeController extends Controller
     {
         $rules = [
             'EmployeeName' => 'required',
-            "email" => 'required|email|unique:users,email,'.$request->userId,
+            "email" => 'required|email|unique:users,email,' . $request->userId,
             'EmployeeFatherName' => 'required',
             'EmployeeContact' => 'required',
             'EmployeeCNIC' => 'required',
@@ -135,21 +135,20 @@ class EmployeeController extends Controller
         ];
         $this->validate($request, $rules, $customMessages);
 
-        $user = User::where("id",$request->userId)->update([
+        $user = User::where("id", $request->userId)->update([
             "name" => $request->EmployeeName,
             "email" => $request->email,
             "contact" => str_replace('-', '', $request->EmployeeContact),
             "role_id" => 0,
         ]);
 
-        if($request->password)
-        {
-            $user = User::where("id",$request->userId)->update([
+        if ($request->password) {
+            $user = User::where("id", $request->userId)->update([
                 "password" => Hash::make($request->password),
             ]);
         }
 
-        Employee::where("user_id",$request->userId)->update([
+        Employee::where("user_id", $request->userId)->update([
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
             'cnic' => str_replace('-', '', $request->EmployeeCNIC),
@@ -170,17 +169,15 @@ class EmployeeController extends Controller
             'status' => $request->status,
         ]);
 
-        if($request->profile)
-        {
-            Employee::where("user_id",$request->userId)->update([
-                'profile_Img' =>  $this->image($request->profile),
+        if ($request->profile) {
+            Employee::where("user_id", $request->userId)->update([
+                'profile_Img' => $this->image($request->profile),
             ]);
         }
 
-        if($request->attachment)
-        {
-            Employee::where("user_id",$request->userId)->update([
-                'attachments' =>  $this->attachment($request->attachment),
+        if ($request->attachment) {
+            Employee::where("user_id", $request->userId)->update([
+                'attachments' => $this->attachment($request->attachment),
             ]);
         }
     }
@@ -192,29 +189,31 @@ class EmployeeController extends Controller
     }
 
     // Image Upload
-    public function image($image){
+    public function image($image)
+    {
 
         $filenameWithExt = $image->getClientOriginalName();
         //get just filename
-        $filename        = pathinfo($filenameWithExt);
+        $filename = pathinfo($filenameWithExt);
         //get just extension
-        $extension       = $image->extension();
-        $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        $extension = $image->extension();
+        $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
         //Move to folder
-        $path            = $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
+        $path = $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
         return $nameToStore;
     }
 
-    public function attachment($image){
+    public function attachment($image)
+    {
 
         $filenameWithExt = $image->getClientOriginalName();
         //get just filename
-        $filename        = pathinfo($filenameWithExt);
+        $filename = pathinfo($filenameWithExt);
         //get just extension
-        $extension       = $image->extension();
-        $nameToStore     = $filename['filename'] . "_" . time() . "." . $extension;
+        $extension = $image->extension();
+        $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
         //Move to folder
-        $path            = $image->move(public_path('uploads/hrm/employee/attachment/'), $nameToStore);
+        $path = $image->move(public_path('uploads/hrm/employee/attachment/'), $nameToStore);
         return $nameToStore;
     }
 

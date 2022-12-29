@@ -120,18 +120,22 @@
         <th>Phone Number</th>
         <th>Terminal Name</th>
         <th>Departure City Name</th>
-        <th>Departure City Name</th>
+        <th>Destination City Name</th>
     </tr>
-    <tr>
-        <td>SR #</td>
-        <td>Seat #</td>
-        <td>Passenger Name</td>
-        <td>CNIC</td>
-        <td>Phone Number</td>
-        <td>Terminal Name</td>
-        <td>Departure City Name</td>
-        <td>Departure City Name</td>
-    </tr>
+    @foreach($data as $key => $singles)
+        @foreach($singles as $key => $item)
+            <tr>
+                <td>{{$key + 1}}</td>
+                <td>{{ $item->seat_no }}</td>
+                <td>{{ $item->customer->name }}</td>
+                <td>{{ format_cnic($item->customer->cnic) }}</td>
+                <td>{{format_phone($item->customer->contact)}}</td>
+                <td>Terminal Name</td>
+                <td>{{$item->departure_city->name}}</td>
+                <td>{{ $item->destination_city->name }}</td>
+            </tr>
+        @endforeach
+    @endforeach
 </table>
 {{--No of Passenger By Terminal Name--}}
 <div>
@@ -147,7 +151,7 @@
         </tr>
         <tr>
             <td>Main</td>
-            <td>5</td>
+            <td>{{$data_terms->countPassenger}}</td>
         </tr>
     </table>
 </div>

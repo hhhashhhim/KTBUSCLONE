@@ -435,13 +435,14 @@ class BookingController extends Controller
 
     public function passengerListPdf(Request $request)
     {
-        $customers_data = Ticket::with('customer')->where([
+        $customers_data = Ticket::with('customer', 'schedule.route', 'schedule.bus_class', 'destination_city', 'departure_city')->where([
             'company_id' => $this->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $request->date,
             'type' => 'booked',
-        ])->get();
+        ])->get()->groupBy('schedule_id');
         $format = TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->first();
+        $format->countPassenger = count($customers_data[$request->schedule_id]);
         return view('pdf/passengerList', ['data' => $customers_data, 'data_terms' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();
