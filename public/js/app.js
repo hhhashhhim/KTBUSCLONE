@@ -39227,6 +39227,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
+                _context4.next = 19;
+                return _this4.fetchData();
+
+              case 19:
                 $('#closing_table').DataTable().destroy();
                 _this4.loading = false;
                 window.scrollTo(0, 0);
@@ -39236,10 +39240,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.addData.drivers = [];
                 _this4.addData.hosts = [];
                 _this4.addData.description = "";
-                _context4.next = 28;
-                return _this4.fetchBuses();
-
-              case 28:
                 setTimeout(function () {
                   // window.location.reload();
                   _this4.isShowDiv = false;

@@ -61,7 +61,7 @@ class ScheduleClosingController extends Controller
             ->where('end_date','>=', $request->date)
             ->where('company_id', $this->company_id)
             ->with(["scheduleDetail"=>function($q) use ($request){
-                return $q->where("schedule_date",$request->date)->first();
+                return $q->where("schedule_date",$request->date);
             }])
             ->orderBy('id')
             ->get(["id","name"]);
@@ -148,7 +148,7 @@ class ScheduleClosingController extends Controller
         }
 
         Ticket::where(["schedule_id"=>$request->schedule,"schedule_date"=>$request->date])->update([
-            "bus_id" => $request->bus_id,
+            "bus_id" => $request->bus,
             "ticket_closing_id" => $closingRecord->id
         ]);
         return  $closingRecord;
