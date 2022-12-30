@@ -402,6 +402,7 @@ export default {
                     icon: "success",
                    timer: 2000
                 });
+                await this.fetchData();
                 $('#closing_table').DataTable().destroy();
                 this.loading = false;
                 window.scrollTo(0, 0);
@@ -411,7 +412,6 @@ export default {
                 this.addData.drivers = [];
                 this.addData.hosts = [];
                 this.addData.description = "";
-                await this.fetchBuses();
                 setTimeout(() => {
                     // window.location.reload();
                     this.isShowDiv = false;
