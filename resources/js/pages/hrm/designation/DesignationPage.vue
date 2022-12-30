@@ -48,6 +48,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
+                                                        <th>Terminal Name</th>
                                                         <th>Department Name</th>
                                                         <th>No. Of Designations</th>
                                                         <th>Added By</th>
@@ -56,6 +57,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(designation, i) in designations" :key="i">
+                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ designation.name }}</td>
                                                         <td>{{ designation.designation_count }}</td>
@@ -92,6 +94,19 @@
                 :formID="formID"
             >
                 <div class="row mt-3">
+                    <div class="form-group col-md-12">
+                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="addForm.terminal">
+                            <option value="0" selected>Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
                     <div class="form-group col-md-6">
                             <label for="departmentName">Department<span class="text-danger">*</span></label>
                         <select class="form-control" v-model="addForm.department" >

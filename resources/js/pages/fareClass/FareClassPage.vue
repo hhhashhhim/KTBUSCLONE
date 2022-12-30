@@ -126,7 +126,7 @@
                             <span>
                                 <input type="checkbox" value="1" checked class="colorinput-input"
                                        @change="checkBox($event)"/>
-                                <span class="colorinput-color bg-success"></span>
+                                <span class="colorinput-color bg-primary"></span>
                             </span>
                             </label>
                         </div>

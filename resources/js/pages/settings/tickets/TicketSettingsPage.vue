@@ -98,7 +98,6 @@
                             >{{ terminal.city.name }} - {{ terminal.name }}
                             </option>
                         </select>
-
                     </div>
                     <div class="form-group col-md-6">
                         <label for="uanNumber">UAN Number <span class="text-danger">*</span></label>
