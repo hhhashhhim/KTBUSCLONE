@@ -27,7 +27,6 @@
         }
 
         #table1 {
-            border-bottom: none;
             padding: 10px;
             font-size: 10pt !important;
             border-collapse: collapse;
@@ -37,6 +36,7 @@
         #table2 {
             border: 1px solid black;
             padding: 10px;
+            margin-top: 5px !important;
             font-size: 10pt !important;
             border-collapse: collapse;
             width: 100% !important;
@@ -76,39 +76,57 @@
     <title>Print Passenger List </title>
 </head>
 <body>
-{{--{{dd($data, $data_terms)}}--}}
+{{--{{dd($data, $format)}}--}}
 
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <span>{{$data_terms->address}}</span>
-        <div><span><b>UAN(24/7) : </b>{{format_uan($data_terms->uan)}}</span></div>
+        <span>{{$format->address}}</span>
+        <div><span><b>UAN(24/7) : </b>{{format_uan($format->uan)}}</span></div>
     </div>
 </div>
 <table border="2" id="table1">
     <tr>
-        <th class="centerTH">Route:</th>
-        <th class="fontWightTh">RouteName</th>
+        <th class="centerTH">Schedule:</th>
+        <th class="fontWightTh">{{$format->scheduleName}}</th>
         <th class="centerTH">Date& Time</th>
-        <th class="fontWightTh">Date Time</th>
+        <th class="fontWightTh">{{$format->actualDeparture}}</th>
         <th class="centerTH">Bus No:</th>
-        <th class="fontWightTh">Class Name</th>
+        <th class="fontWightTh">{{$format->busNo}}</th>
     </tr>
     <tr>
-        <th class="centerTH">Driver One Name</th>
-        <th class="fontWightTh">Name 1</th>
-        <th class="centerTH">Driver two Name</th>
-        <th class="fontWightTh">name 2</th>
-        <th class="centerTH">Hostess Name</th>
-        <th class="fontWightTh">name</th>
-    </tr>
-    <tr>
-        <th class="centerTH">Driver One COntact</th>
-        <th class="fontWightTh">Contact</th>
-        <th class="centerTH">driver Two Contatct</th>
-        <th class="fontWightTh">Contact</th>
-        <th></th>
-        <th></th>
+        <th colspan="1" class="centerTH">Driver Info</th>
+        @if($format->driverInfo->count() > 0)
+        <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+            @foreach($format->driverInfo as $key => $value)
+
+                <li>{{$value->name}} ({{format_phone($value->contact)}})<br></li>
+
+            @endforeach
+
+        </th>
+        @else
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                N/A
+            </th>
+        @endif
+        <th colspan="1" class="centerTH">Host Info</th>
+        @if($format->hostInfo->count() > 0)
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+                @foreach($format->hostInfo as $key => $value)
+
+                    <li>{{$value->name}} ({{format_phone($value->contact)}})<br></li>
+
+                @endforeach
+
+            </th>
+        @else
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                N/A
+            </th>
+        @endif
     </tr>
 </table>
 <table border="2" id="table2">
@@ -122,8 +140,8 @@
         <th>Departure City Name</th>
         <th>Destination City Name</th>
     </tr>
-    @foreach($data as $key => $singles)
-        @foreach($singles as $key => $item)
+    @if($data)
+        @foreach($data as $key => $item)
             <tr>
                 <td>{{$key + 1}}</td>
                 <td>{{ $item->seat_no }}</td>
@@ -131,11 +149,12 @@
                 <td>{{ format_cnic($item->customer->cnic) }}</td>
                 <td>{{format_phone($item->customer->contact)}}</td>
                 <td>Terminal Name</td>
-                <td>{{$item->departure_city->name}}</td>
+                <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>
             </tr>
         @endforeach
-    @endforeach
+    @endif
+
 </table>
 {{--No of Passenger By Terminal Name--}}
 <div>
@@ -151,7 +170,7 @@
         </tr>
         <tr>
             <td>Main</td>
-            <td>{{$data_terms->countPassenger}}</td>
+            <td>{{ $format->countPassenger }}</td>
         </tr>
     </table>
 </div>

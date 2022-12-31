@@ -48,6 +48,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
+                                                        <th>Terminal Name</th>
                                                         <th>Name</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -55,6 +56,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(department, i) in departments" :key="i">
+                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ department.name }}</td>
                                                         <td>{{ department.added_by.name }}</td>
@@ -92,8 +94,21 @@
                 :success="success"
                 :formID="formID"
             >
-                <div class="row mt-3">
-                    <div class="form-group col-md-12">
+                <div class="row mt-2">
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="addForm.terminal">
+                            <option value="0">Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="name">Name<span class="text-danger">*</span></label>
                         <input type="text" id="name" class="form-control" v-model="addForm.name"/>
                     </div>
@@ -154,13 +169,16 @@ export default {
     },
     data() {
         return {
-            addForm: {},
+            addForm: {
+                terminal: 0,
+            },
             departments: [],
             loading: false,
             formID: "department_form",
             editFormID: "edit_department_form",
             deleteFormID: "delete_department_form",
             validationErrors: [],
+            terminals: [],
             success: false,
             error: false,
             delId: "",
@@ -173,6 +191,13 @@ export default {
     methods: {
 
         async fetchDepartments() {
+            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            if (resAllTerminals.status == 200) {
+                this.terminals = resAllTerminals.data
+            } else {
+                console.log(resAllTerminals);
+            }
+
             const resDepart = await this.callApi("post", 'hrm/department');
             console.log(resDepart);
             if (resDepart.status == 200) {
@@ -185,7 +210,9 @@ export default {
             }, 300);
         },
         clearForm: function () {
-            this.addForm = {};
+            this.addForm = {
+                terminal: 0,
+            };
         },
 
         async addDepartment() {

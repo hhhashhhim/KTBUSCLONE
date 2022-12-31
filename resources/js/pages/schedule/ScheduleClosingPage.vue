@@ -80,7 +80,7 @@
                         </select>
                     </div>
                     <div class=" form-group col-md-6">
-                        
+
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Date <span class="text-danger">*</span></label>
@@ -108,11 +108,11 @@
                     <!-- <div class=" form-group col-md-6">
                         <label for="city_id">Schedule <span class="text-danger">*</span></label>
                         <Multiselect
-                          
+
                             :options="options"
                             :multiple="true"
                             :searchable="true"
-                            
+
                         ></Multiselect>
                     </div> -->
                     <div class="form-group col-md-6">
@@ -161,7 +161,7 @@
                     </button>
                 </template>
             </Add>
-           
+
 
             <!-- Add Modal -->
             <!--Seat Class-->
@@ -260,7 +260,7 @@ export default {
     components: {
         Add,
         Edit,
-        Multiselect 
+        Multiselect
         // Delete,
     },
     data() {
@@ -334,7 +334,7 @@ export default {
                 date: this.addData.date
             }
             const res = await this.callApi("post", "booking/schedule/fetch", data);
-            
+
             if (res.status == 200) {
                 this.schedules = res.data;
             } else {
@@ -395,34 +395,45 @@ export default {
                 });
             this.loadig = true;
             const res = await this.callApi("post", "booking/schedule/closing/store", this.addData);
-            if (res.status === 201) {
+            if (res.status == 201) {
               swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
                     icon: "success",
                    timer: 2000
                 });
-                await this.fetchData();
-                $('#closing_table').DataTable().destroy();
                 this.loading = false;
-                window.scrollTo(0, 0);
                 this.addData.bus = "";
                 this.addData.date = "";
                 this.addData.schedule = "";
                 this.addData.drivers = [];
                 this.addData.hosts = [];
                 this.addData.description = "";
+                $('#closing_table').DataTable().destroy();
+                this.fetchData();
                 setTimeout(() => {
-                    // window.location.reload();
-                    this.isShowDiv = false;
-                }, 2000);
+                    $('#closing_table').DataTable();
+                    }, 300);
             } else {
                 if (res.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }

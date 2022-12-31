@@ -979,8 +979,8 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            
-           
+
+
             formData.append('email', this.addForm.email);
             formData.append('password', this.addForm.password);
             formData.append('EmployeeName', this.addForm.EmployeeName);
@@ -1018,10 +1018,23 @@ export default {
             } else {
                 if (resEmployeeAdd.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resEmployeeAdd.data.errors) {
                         resEmployeeAdd.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }
@@ -1185,10 +1198,23 @@ export default {
                 if (resEmployeeUpdate.status === 422) {
                     $("#" + formID).scrollTop(0, 0);
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resEmployeeUpdate.data.errors) {
                         resEmployeeUpdate.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
                 setTimeout(function () {
@@ -1228,9 +1254,9 @@ export default {
             this.editEmp.EmployeeDepartment = employ.department_id;
             this.editEmp.EmployeeDesignation = employ.designation_id;
             this.editEmp.status = employ.status;
-            
+
             const resEditSelective = await this.callApi("post", 'hrm/designation/selective', {id: employ.department_id});
-            
+
             if (resEditSelective.status == 200) {
                 if (resEditSelective.data.length == 0) {
                     this.editDesignations = '';

@@ -10,11 +10,13 @@ use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
+use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\TicketClosingMember;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -435,15 +437,34 @@ class BookingController extends Controller
 
     public function passengerListPdf(Request $request)
     {
-        $customers_data = Ticket::with('customer', 'schedule.route', 'schedule.bus_class', 'destination_city', 'departure_city')->where([
+
+        $uniqueDate = ScheduleDetail::where([
             'company_id' => $this->company_id,
             'schedule_id' => $request->schedule_id,
-            'schedule_date' => $request->date,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departure_city_id,
+            'destination_id' => $request->destination_city_id,
+        ])->first()->schedule_date;
+        $scheduleTime = ScheduleDetail::where([
+            'company_id' => $this->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])->first()->departure_time;
+        $customers_data = Ticket::with('customer', 'schedule', 'schedule.bus_class', 'destination_city', 'departure_city')->where([
+            'company_id' => $this->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
             'type' => 'booked',
-        ])->get()->groupBy('schedule_id');
+        ])->get()->groupBy('schedule_id')->first();
+
         $format = TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->first();
-        $format->countPassenger = count($customers_data[$request->schedule_id]);
-        return view('pdf/passengerList', ['data' => $customers_data, 'data_terms' => $format]);
+        $format->countPassenger = count((array)$customers_data);
+        $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
+        $format->driverInfo = getMembers($customers_data, $this->company_id, 1) ?? [];
+        $format->hostInfo = getMembers($customers_data, $this->company_id, 2) ?? [];
+        $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
+        $format->busNo = Bus::where(["id" => $customers_data[0]->bus_id, 'company_id' => $this->company_id])->first()->bus_number ?? '';
+        return view('pdf/passengerList', ['data' => $customers_data, 'format' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();
 //        return new Response($output, 200, [

@@ -38,11 +38,11 @@ class ScheduleClosingController extends Controller
     public function index()
     {
         $buses = Bus::where('company_id', $this->company_id)->orderBy('id')->get();
-        $hosts = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["user_id","name","cnic"]);
-        $drivers = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["id","user_id","name","cnic"]);
+        $hosts = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
-            where('company_id', $this->company_id)
-            ->with("bus:id,bus_number","schedule:id,name")
+        where('company_id', $this->company_id)
+            ->with("bus:id,bus_number", "schedule:id,name")
             ->get()
             ->groupBy('ticket_merge_id');
         $data = [
@@ -57,14 +57,14 @@ class ScheduleClosingController extends Controller
     public function fetchSchedule(Request $request)
     {
         return Schedule::
-            where('start_date','<=', $request->date)
-            ->where('end_date','>=', $request->date)
+        where('start_date', '<=', $request->date)
+            ->where('end_date', '>=', $request->date)
             ->where('company_id', $this->company_id)
-            ->with(["scheduleDetail"=>function($q) use ($request){
-                return $q->where("schedule_date",$request->date);
+            ->with(["scheduleDetail" => function ($q) use ($request) {
+                return $q->where("schedule_date", $request->date);
             }])
             ->orderBy('id')
-            ->get(["id","name"]);
+            ->get(["id", "name"]);
     }
 
     public function store(Request $request)
@@ -72,32 +72,29 @@ class ScheduleClosingController extends Controller
         // this is for get route id that will be followed by schedule
         $route = Schedule::find($request->schedule)->route_id;
         // this is for get schedule start city
-        $departure = RouteFare::where("route_id",$route)->orderBy('id','ASC')->first();
+        $departure = RouteFare::where("route_id", $route)->orderBy('id', 'ASC')->first();
         // this is for get schedule end city
-        $destination = RouteFare::where("route_id",$route)->orderBy('id','DESC')->first();
+        $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
         // this is for get schedule departure time
         $depTime = ScheduleDetail::
-        where(["schedule_id"=>$request->schedule,
-                "departure_id"=>$departure->departure_city_id,
-                "destination_id"=>$departure->destination_city_id,
-                "departure_date"=>$request->date,
-                "company_id"=>$this->company_id
-                ])
-        ->first();
+        where(["schedule_id" => $request->schedule,
+            "departure_id" => $departure->departure_city_id,
+            "destination_id" => $departure->destination_city_id,
+            "departure_date" => $request->date,
+            "company_id" => $this->company_id
+        ])
+            ->first();
 
         $checkMergeRecord = TicketClosingMerge::
-        where(["company_id"=>$this->company_id,"bus_id"=>$request->bus,"schedule_complete"=>0])
-        ->latest("id")->first();
+        where(["company_id" => $this->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
+            ->latest("id")->first();
 
-        if($checkMergeRecord)
-        {
-            TicketClosingMerge::where("id",$checkMergeRecord->id)->update([
+        if ($checkMergeRecord) {
+            TicketClosingMerge::where("id", $checkMergeRecord->id)->update([
                 "schedule_return_date" => $request->date,
                 "schedule_complete" => 1,
             ]);
-        }
-        else
-        {
+        } else {
             $newRecord = TicketClosingMerge::create([
                 "bus_id" => $request->bus,
                 "schedule_departure_date" => $request->date,
@@ -123,8 +120,7 @@ class ScheduleClosingController extends Controller
         ]);
 
         // for driver
-        foreach($request->drivers as $value)
-        {
+        foreach ($request->drivers as $value) {
             TicketClosingMember::create([
                 "user_id" => $value,
                 "type" => 1,
@@ -135,8 +131,7 @@ class ScheduleClosingController extends Controller
             ]);
         }
         // for host
-        foreach($request->hosts as $value)
-        {
+        foreach ($request->hosts as $value) {
             TicketClosingMember::create([
                 "user_id" => $value,
                 "type" => 2,
@@ -147,11 +142,11 @@ class ScheduleClosingController extends Controller
             ]);
         }
 
-        Ticket::where(["schedule_id"=>$request->schedule,"schedule_date"=>$request->date])->update([
+        Ticket::where(["company_id" => $this->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
             "bus_id" => $request->bus,
             "ticket_closing_id" => $closingRecord->id
         ]);
-        return  $closingRecord;
+        return $closingRecord;
     }
 
 }
