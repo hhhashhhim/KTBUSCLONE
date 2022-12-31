@@ -160,7 +160,7 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="dob">Date of Birth<span class="text-danger">*</span></label>
-                        <input type="date" id="dob" class="form-control" v-model="addForm.EmployeeDob">
+                        <input type="date" id="dob" class="form-control" v-model="addForm.EmployeeDob" :max="minDateFilter()">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="refOfHiring">Reference of Hiring</label>
@@ -190,7 +190,20 @@
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="addForm.EmployeeAddress"></textarea>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
+                        <label for="department">Terminal<span class="text-danger">*</span></label>
+                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
+                             data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add
+                            New
+                        </div>
+                        <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
+                            <option value="0" selected>Select Department</option>
+                            <option v-for="(department, i) in departments" :key="i" :value="department.id">
+                                {{ department.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
                         <label for="department">Department<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add
@@ -203,7 +216,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="designation">Designation<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add
@@ -609,6 +622,17 @@ export default {
     },
 
     methods: {
+        minDateFilter: function () {
+            var dtToday = new Date();
+            var month = dtToday.getMonth() + 1;
+            var day = dtToday.getDate();
+            var year = dtToday.getFullYear();
+            if (month < 10)
+                month = '0' + month.toString();
+            if (day < 10)
+                day = '0' + day.toString();
+            return year + '-' + month + '-' + day;
+        },
         async getDesignation() {
             if (this.addForm.EmployeeDepartment == '0') {
                 this.addForm.EmployeeDesignation = 0;

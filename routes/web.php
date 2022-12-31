@@ -240,6 +240,7 @@ Route::group(['prefix' => 'hrm/department', [CustomMiddleware::class]], function
 Route::group(['prefix' => 'hrm/designation', [CustomMiddleware::class]], function () {
     Route::post('/', [DesignationController::class, 'index']);
     Route::post('/store', [DesignationController::class, 'store']);
+    Route::post('/getTerminal', [DesignationController::class, 'getTerminal']);
     Route::post('/edit', [DesignationController::class, 'edit']);
     Route::post('/update', [DesignationController::class, 'update']);
     Route::post('/delete', [DesignationController::class, 'delete']);

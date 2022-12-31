@@ -23,23 +23,25 @@ class DepartmentController extends Controller
 
     public function index()
     {
-            return Department::with('addedBy', 'company')->where('company_id', $this->company_id)->get();
+        return Department::with('addedBy', 'company', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', $this->company_id)->get();
     }
 
     public function store(Request $request)
     {
+//        dd($request->all());
         $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id,)->where( 'terminal_id', $request->terminal)->whereNull('deleted_at')],
 
         ];
 
         $customMessages = [
             'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Department Name Already Registred !',
+            'name.unique' => 'Department Name Already Registered Against this Terminal!',
         ];
         $this->validate($request, $rules, $customMessages);
         return Department::create([
             'name' => $request->name,
+            'terminal_id' => $request->terminal,
             'added_by' => Auth::user()->id,
             'company_id' => $this->company_id,
         ]);
@@ -49,17 +51,18 @@ class DepartmentController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
 
         ];
 
         $customMessages = [
             'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Department Name Already Registred !',
+            'name.unique' => 'Department Name Already Registered Against this Terminal !',
         ];
         $this->validate($request, $rules, $customMessages);
         return Department::where('id', $request->id)->update([
             'name' => $request->name,
+            'terminal_id' => $request->terminal_id,
         ]);
 
 
