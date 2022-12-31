@@ -160,7 +160,8 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="dob">Date of Birth<span class="text-danger">*</span></label>
-                        <input type="date" id="dob" class="form-control" v-model="addForm.EmployeeDob" :max="minDateFilter()">
+                        <input type="date" id="dob" class="form-control" v-model="addForm.EmployeeDob"
+                               :max="minDateFilter()">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="refOfHiring">Reference of Hiring</label>
@@ -193,11 +194,11 @@
                     <div class="form-group col-md-4">
                         <label for="department">Terminal<span class="text-danger">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add
+                             data-toggle="modal" data-target="#addTerminalModal" @click="clearDepartmentForm()"> Add
                             New
                         </div>
                         <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
-                            <option value="0" selected>Select Department</option>
+                            <option value="0" selected>Select Terminal</option>
                             <option v-for="(department, i) in departments" :key="i" :value="department.id">
                                 {{ department.name }}
                             </option>
@@ -253,7 +254,9 @@
                             <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
                                    class="custom-file-input" id="attachments">
                             <label class="custom-file-label overflow-hidden"
-                                   for="attachments">{{ attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File' }}</label>
+                                   for="attachments">{{
+                                    attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File'
+                                }}</label>
                         </div>
 
                     </div>
@@ -288,6 +291,37 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Department</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="form-group col-md-12">
+                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <input type="text" id="name" class="form-control" v-model="departmentName"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" @click="addDepartment()"
+                                    :disabled="loadingDepart">
+                                {{ loadingDepart ? 'Loading...' : ' Add Department' }}
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--            End Add New Department-->
+
+            <!--            Add NEW Terminal-->
+            <div class="modal fade" id="addTerminalModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Terminal</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -424,7 +458,8 @@
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
                         </div>
-                        <select class="form-control" v-model="editEmp.EmployeeDepartment" @change="getEditDesignation()">
+                        <select class="form-control" v-model="editEmp.EmployeeDepartment"
+                                @change="getEditDesignation()">
                             <option value="0">Select Department</option>
                             <option v-for="(department, i) in editDepartments" :key="i" :value="department.id">
                                 {{ department.name }}
@@ -471,12 +506,16 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Upload Attachments <small>(Empty field will save attachment same)</small></label>
+                        <label for="salary">Upload Attachments <small>(Empty field will save attachment
+                            same)</small></label>
                         <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'attachmentsEdit')" accept=".pdf, .docx, .doc"
+                            <input type="file" @change="onFileChange($event, 'attachmentsEdit')"
+                                   accept=".pdf, .docx, .doc"
                                    class="custom-file-input" id="attachmentsEdit`">
                             <label class="custom-file-label overflow-hidden"
-                                   for="attachmentsEdit">{{ attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File' }}</label>
+                                   for="attachmentsEdit">{{
+                                    attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File'
+                                }}</label>
                         </div>
                     </div>
                     <div class="form-group col-md-4">
@@ -891,10 +930,10 @@ export default {
             }
             let formData = new FormData();
             if (this.addForm.profile != '') {
-                formData.append('profile', this.addForm.profile??'');
+                formData.append('profile', this.addForm.profile ?? '');
             }
             if (this.addForm.attachments != '') {
-                formData.append('attachment', this.addForm.attachments??'');
+                formData.append('attachment', this.addForm.attachments ?? '');
             }
 
             this.validationErrors = [];
@@ -1071,10 +1110,10 @@ export default {
             }
             let formData = new FormData();
             if (this.profileEdit != '') {
-                formData.append('profile', this.profileEdit??'');
+                formData.append('profile', this.profileEdit ?? '');
             }
             if (this.attachmentsEdit != '') {
-                formData.append('attachment', this.attachmentsEdit??'');
+                formData.append('attachment', this.attachmentsEdit ?? '');
             }
             this.validationErrors = [];
             if (!this.editEmp.email)
