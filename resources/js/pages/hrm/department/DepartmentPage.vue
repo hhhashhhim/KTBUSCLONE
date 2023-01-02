@@ -48,8 +48,9 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Terminal Name</th>
                                                         <th>Name</th>
+                                                        <th>Terminal Name</th>
+                                                        <th>City Name</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -57,21 +58,22 @@
                                                     <tbody>
                                                     <tr v-for="(department, i) in departments" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ department.name }}</td>
+                                                        <td>{{ department.terminal.name }}</td>
+                                                        <td>{{ department.terminal.city.name }}</td>
                                                         <td>{{ department.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editdepartment(department)"
+                                                                    @click="editDepartment(department)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(department,i)"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
+                                                            <!--                                                            <button :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                                    data-toggle="modal"-->
+                                                            <!--                                                                    @click="deleteModal(department,i)"-->
+                                                            <!--                                                                    class="btn btn-danger">-->
+                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -104,7 +106,7 @@
                                 v-for="(terminal, i) in terminals"
                                 :value="terminal.id"
                                 :key="i"
-                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            >{{ terminal.name }} ({{ terminal.city.name }})
                             </option>
                         </select>
                     </div>
@@ -131,7 +133,20 @@
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="dataEdit.terminal_id">
+                            <option value="0">Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="editName">Name <span class="text-danger">*</span></label>
                         <input type="text" id="editName" class="form-control" v-model="dataEdit.name"/>
                     </div>
@@ -199,7 +214,6 @@ export default {
             }
 
             const resDepart = await this.callApi("post", 'hrm/department');
-            console.log(resDepart);
             if (resDepart.status == 200) {
                 this.departments = resDepart.data
             } else {
@@ -217,6 +231,13 @@ export default {
 
         async addDepartment() {
             this.validationErrors = [];
+            if (this.addForm.terminal == "0")
+                return swal({
+                    title: "Required!",
+                    text: "Please select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.addForm.name == "" || typeof this.addForm.name == 'undefined')
                 return swal({
                     title: "Required!",
@@ -240,10 +261,23 @@ export default {
             } else {
                 if (resDepartAdd.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resDepartAdd.data.errors) {
                         resDepartAdd.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }
@@ -251,6 +285,13 @@ export default {
 
         async updateDepartment() {
             this.validationErrors = [];
+            if (this.dataEdit.terminal_id == "0")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
                 return swal({
                     title: "Required!",
@@ -269,14 +310,27 @@ export default {
                     timer: 2000
                 });
                 $("#department_table").DataTable().destroy();
-                await this.fetchDepartments();
+                this.fetchDepartments();
             } else {
                 if (resDepartmentEdit.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resDepartmentEdit.data.errors) {
                         resDepartmentEdit.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }
@@ -291,7 +345,7 @@ export default {
             this.$store.commit("setDeleteObj", deletingObj);
         },
 
-        editdepartment(departEdit) {
+        editDepartment(departEdit) {
             this.dataEdit = departEdit
         },
     },

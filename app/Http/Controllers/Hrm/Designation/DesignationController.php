@@ -24,7 +24,7 @@ class DesignationController extends Controller
 
     public function index()
     {
-        return Department::withCount('designation')->with('addedBy')->where('company_id', $this->company_id)->get();
+        return Department::withCount('designation')->with('addedBy', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', $this->company_id)->get();
     }
 
     public function edit(Request $request)
@@ -35,15 +35,16 @@ class DesignationController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('terminal_id', $request->terminal)->where('company_id', $this->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
             'name.required' => 'Designation Name is Required!',
-            'name.unique' => 'Designation Name Already Registered Against this Department/Company !',
+            'name.unique' => 'Designation Name Already Registered Against this Department/Terminal! Please Select other Terminal or Department',
         ];
         $this->validate($request, $rules, $customMessages);
         return Designation::create([
+            'terminal_id' => $request->terminal,
             'department_id' => $request->department,
             'name' => $request->name,
             'added_by' => Auth::user()->id,
@@ -78,4 +79,14 @@ class DesignationController extends Controller
     {
         return Designation::where('department_id', $request->id)->get();
     }
+
+    public function getTerminal(Request $request)
+    {
+      return  Department::where([
+            'company_id' => $this->company_id,
+            'terminal_id' => $request->id,
+            ])->get(['id', 'name', 'terminal_id']);
+    }
+
+
 }

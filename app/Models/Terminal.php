@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Hrm\Department\Department;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,12 +23,20 @@ class Terminal extends Model
     {
         return $this->hasOne(City::class, 'id', 'city_id');
     }
-    public function company(){
-        return $this->hasOne( Company::class,'id','company_id' );
+
+    public function company()
+    {
+        return $this->hasOne(Company::class, 'id', 'company_id');
     }
+
     public function updated_by()
     {
         return $this->hasOne(User::class, 'id', 'updated_by');
+    }
+
+    public function departments()
+    {
+        return $this->hasMany(Department::class, 'terminal_id', 'id');
     }
 
 }

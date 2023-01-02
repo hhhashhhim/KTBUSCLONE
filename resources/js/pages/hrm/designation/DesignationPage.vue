@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Deignations</h4>
+                            <h4>Designations</h4>
                             <div class="card-header-action">
                                 <a
                                     href="#"
@@ -48,6 +48,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
+                                                        <th>City Name</th>
                                                         <th>Terminal Name</th>
                                                         <th>Department Name</th>
                                                         <th>No. Of Designations</th>
@@ -58,7 +59,8 @@
                                                     <tbody>
                                                     <tr v-for="(designation, i) in designations" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ i + 1 }}</td>
+                                                        <td>{{ designation.terminal.city.name}}</td>
+                                                        <td>{{ designation.terminal.name}}</td>
                                                         <td>{{ designation.name }}</td>
                                                         <td>{{ designation.designation_count }}</td>
                                                         <td>{{ designation.added_by.name }}</td>
@@ -97,19 +99,19 @@
                     <div class="form-group col-md-12">
                         <label for="terminals">Terminals <span class="text-danger">*</span></label>
                         <select class="form-control" id="terminals"
-                                v-model="addForm.terminal">
-                            <option value="0" selected>Select Terminal</option>
+                                v-model="addForm.terminal" @change="getDepartment(addForm.terminal)">
+                            <option value="0">Select Terminal</option>
                             <option
                                 v-for="(terminal, i) in terminals"
                                 :value="terminal.id"
                                 :key="i"
-                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            >({{ terminal.name }}) {{ terminal.city.name }}
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                            <label for="departmentName">Department<span class="text-danger">*</span></label>
-                        <select class="form-control" v-model="addForm.department" >
+                        <label for="departmentName">Department<span class="text-danger">*</span></label>
+                        <select class="form-control" v-model="addForm.department">
                             <option value="0" selected>Select Department</option>
                             <option
                                 v-for="(department, i) in departments"
@@ -163,17 +165,19 @@
                                                 <td>{{ single.name }}</td>
                                                 <td>{{ single.added_by.name }}</td>
                                                 <td>
-                                                    <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                            @click="editDesignation(single)"
-                                                            class="btn btn-primary mx-1">
-                                                        <i class="far fa-edit"></i>
-                                                    </button>
-                                                    <button :data-target="'#' + deleteFormID"
-                                                            data-toggle="modal"
-                                                            @click="deleteModal(single,i)"
-                                                            class="btn btn-danger">
-                                                        <i class="far fa-trash-alt"></i>
-                                                    </button>
+                                                    <button class="btn btn-primary mx-1"><i class="far fa-edit"></i></button>
+                                                    <button class="btn btn-danger mx-1"><i class="far fa-edit"></i></button>
+<!--                                                    <button :data-target="'#' + editFormID" data-toggle="modal"-->
+<!--                                                            @click="editDesignation(single)"-->
+<!--                                                            class="btn btn-primary mx-1">-->
+<!--                                                        <i class="far fa-edit"></i>-->
+<!--                                                    </button>-->
+<!--                                                    <button :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(single,i)"-->
+<!--                                                            class="btn btn-danger">-->
+<!--                                                        <i class="far fa-trash-alt"></i>-->
+<!--                                                    </button>-->
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -198,12 +202,25 @@
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
+                    <div class="form-group col-md-12">
+                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="dataEdit.terminal_id"  @change="getEditDepartment(dataEdit.terminal_id)">
+                            <option value="0">Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            </option>
+                        </select>
+                    </div>
                     <div class="form-group col-md-6">
                         <label for="departmentName">Department<span class="text-danger">*</span></label>
-                        <select class="form-control" v-model="dataEdit.department_id" disabled>
+                        <select class="form-control" v-model="dataEdit.department_id">
                             <option value="0" selected>Select Department</option>
                             <option
-                                v-for="(department, i) in departments"
+                                v-for="(department, i) in editDepartments"
                                 :key="i"
                                 :value="department.id"
                             >
@@ -253,11 +270,13 @@ export default {
             designations: [],
             departmentsDetails: [],
             departments: [],
+            editDepartments: [],
             loading: false,
             formID: "designation_form",
             editFormID: "edit_designation_form",
             deleteFormID: "delete_designation_form",
             validationErrors: [],
+            terminals: [],
             success: false,
             error: false,
             delId: "",
@@ -270,6 +289,12 @@ export default {
     methods: {
 
         async fetchDesignations() {
+            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            if (resAllTerminals.status == 200) {
+                this.terminals = resAllTerminals.data
+            } else {
+                console.log(resAllTerminals);
+            }
             const resDesig = await this.callApi("post", 'hrm/designation');
             console.log(resDesig.data);
             if (resDesig.status == 200) {
@@ -280,23 +305,18 @@ export default {
             const resDepart = await this.callApi("post", 'hrm/department');
             console.log(resDepart);
             if (resDepart.status == 200) {
-                this.departments = resDepart.data
+                this.editDepartments = resDepart.data
             } else {
                 console.log(resDepart);
             }
             setTimeout(function () {
-                $("#designation_table").DataTable({
-
-
-
-
-
-                });
+                $("#designation_table").DataTable();
                 $("#show_designation").DataTable();
             }, 300);
         },
         clearForm: function () {
             this.addForm = {
+                terminal: 0,
                 department: 0,
             };
         },
@@ -308,8 +328,76 @@ export default {
                 $("#show_designation").DataTable();
             }, 300);
         },
+        async getEditDepartment(id){
+            // this.dataEdit = []
+            const resDepartment = await this.callApi("post", 'hrm/designation/getTerminal', {'id': id});
+            console.log(resDepartment);
+            if (resDepartment.status == 200 && resDepartment.data.length > 0) {
+                this.editDepartments = resDepartment.data;
+            }else{
+                this.dataEdit.department_id = 0;
+            }
+            if (resDepartment.status == 422) {
+
+                let errorContent = "";
+                let count = 0;
+                for (const key in resDepartment.data.errors) {
+                    resDepartment.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+        },
+        async getDepartment(id) {
+            const resDepartment = await this.callApi("post", 'hrm/designation/getTerminal', {'id': id});
+            console.log(resDepartment);
+            if (resDepartment.status == 200 && resDepartment.data.length > 0) {
+                this.departments = resDepartment.data;
+            }else{
+                this.addForm.department = 0;
+            }
+            if (resDepartment.status == 422) {
+
+                let errorContent = "";
+                let count = 0;
+                for (const key in resDepartment.data.errors) {
+                    resDepartment.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+        },
         async addDesignation() {
             this.validationErrors = [];
+            if (this.addForm.terminal == "0")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.addForm.department == "0")
                 return swal({
                     title: "Required!",
@@ -341,9 +429,21 @@ export default {
             } else {
                 if (resDesignationAdd.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resDesignationAdd.data.errors) {
                         resDesignationAdd.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
                         });
                     }
                 }
@@ -382,10 +482,23 @@ export default {
             } else {
                 if (resDepartmentEdit.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resDepartmentEdit.data.errors) {
                         resDepartmentEdit.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
                     }
                 }
             }
