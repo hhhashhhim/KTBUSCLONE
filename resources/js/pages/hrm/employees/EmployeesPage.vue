@@ -50,12 +50,12 @@
                                                         <th>Sr No.</th>
                                                         <th>Profile</th>
                                                         <th>Name</th>
-                                                        <th>Contact #</th>
+                                                        <th>Contact</th>
                                                         <th>Company</th>
                                                         <th>Department</th>
                                                         <th>Designation</th>
                                                         <th>Hiring Date</th>
-                                                        <th>CNIC #</th>
+                                                        <th>CNIC</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
                                                         <th>Action</th>
@@ -121,23 +121,32 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input type="email" id="email" class="form-control" v-model="addForm.email"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="password">Password <span class="text-danger">*</span></label>
+                        <label for="password">Password <span class="text-danger ml-1">*</span></label>
                         <input type="password" id="password" class="form-control" v-model="addForm.password"/>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="EmployeeName">Name <span class="text-danger">*</span></label>
+                    <div class="form-group col-md-4">
+                        <label for="EmployeeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="addForm.EmployeeName"/>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="FatherName">Father Name <span class="text-danger">*</span></label>
+                    <div class="form-group col-md-4">
+                        <label for="FatherName">Father Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="FatherName" class="form-control" v-model="addForm.EmployeeFatherName"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="CNIC">CNIC<span class="text-danger">*</span></label>
+                        <label for="department">Employee Type<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="addForm.EmployeeType">
+                            <option value="">Select Employee Type</option>
+                            <option value="1">Driver</option>
+                            <option value="2">Bus Hostess</option>
+                            <option value="0">Other...</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="CNIC">CNIC<span class="text-danger ml-1">*</span></label>
                         <vue-mask id="CNIC"
                                   class="form-control"
                                   v-model="addForm.EmployeeCNIC"
@@ -148,7 +157,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="phone">Contact #<span class="text-danger">*</span></label>
+                        <label for="phone">Contact #<span class="text-danger ml-1">*</span></label>
                         <vue-mask id="phone"
                                   class="form-control"
                                   v-model="addForm.EmployeeContact"
@@ -159,7 +168,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="dob">Date of Birth<span class="text-danger">*</span></label>
+                        <label for="dob">Date of Birth<span class="text-danger ml-1">*</span></label>
                         <input type="date" id="dob" class="form-control" v-model="addForm.EmployeeDob"
                                :max="minDateFilter()">
                     </div>
@@ -168,7 +177,7 @@
                         <input type="text" id="refOfHiring" class="form-control" v-model="addForm.RefHiring">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="hiringDate">Hiring Date<span class="text-danger">*</span></label>
+                        <label for="hiringDate">Hiring Date<span class="text-danger ml-1">*</span></label>
                         <input type="date" id="hiringDate" class="form-control" v-model="addForm.HiringDate">
                     </div>
                     <div class="form-group col-md-6">
@@ -187,25 +196,24 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="address">Address <span class="text-danger">*</span></label>
+                        <label for="address">Address <span class="text-danger ml-1">*</span></label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="addForm.EmployeeAddress"></textarea>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="department">Terminal<span class="text-danger">*</span></label>
-                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addTerminalModal" @click="clearDepartmentForm()"> Add
-                            New
-                        </div>
-                        <select class="form-control" v-model="addForm.EmployeeDepartment" @change="getDesignation()">
+                        <label for="department">Terminal<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="addForm.EmployeeTerminal" @change="getDepartment()">
                             <option value="0" selected>Select Terminal</option>
-                            <option v-for="(department, i) in departments" :key="i" :value="department.id">
-                                {{ department.name }}
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="department">Department<span class="text-danger">*</span></label>
+                        <label for="department">Department<span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add
                             New
@@ -218,7 +226,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="designation">Designation<span class="text-danger">*</span></label>
+                        <label for="designation">Designation<span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add
                             New
@@ -231,21 +239,21 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="workingDays">Working Days<span class="text-danger">*</span></label>
+                        <label for="workingDays">Working Days<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="workingDays" maxlength="3"
                                v-model="addForm.workingDays" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
+                        <label for="paidLeaves">Paid Leaves<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="paidLeaves" maxlength="3"
                                v-model="addForm.paidLeaves" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
+                        <label for="bloodGroup">Blood Group<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="bloodGroup" v-model="addForm.bloodGroup"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="salary">Salary<span class="text-danger">*</span></label>
+                        <label for="salary">Salary<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="salary" v-model="addForm.EmployeeSalary"/>
                     </div>
                     <div class="form-group col-md-6">
@@ -298,38 +306,7 @@
                         <div class="modal-body">
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
-                                    <label for="name">Name<span class="text-danger">*</span></label>
-                                    <input type="text" id="name" class="form-control" v-model="departmentName"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addDepartment()"
-                                    :disabled="loadingDepart">
-                                {{ loadingDepart ? 'Loading...' : ' Add Department' }}
-                            </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--            End Add New Department-->
-
-            <!--            Add NEW Terminal-->
-            <div class="modal fade" id="addTerminalModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Add Terminal</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row mt-3">
-                                <div class="form-group col-md-12">
-                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <label for="name">Name<span class="text-danger ml-1">*</span></label>
                                     <input type="text" id="name" class="form-control" v-model="departmentName"/>
                                 </div>
                             </div>
@@ -359,7 +336,7 @@
                         <div class="modal-body">
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
-                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <label for="name">Name<span class="text-danger ml-1">*</span></label>
                                     <input type="text" id="name" class="form-control" v-model="designationName"/>
                                 </div>
                             </div>
@@ -384,23 +361,32 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input type="email" id="email" class="form-control" v-model="editEmp.email"/>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password">Password <small>(Empty field will save password same)</small></label>
                         <input type="password" id="password" class="form-control" v-model="editEmp.password"/>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="EmployeeName">Name <span class="text-danger">*</span></label>
+                    <div class="form-group col-md-4">
+                        <label for="EmployeeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="editEmp.EmployeeName"/>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="FatherName">Father Name <span class="text-danger">*</span></label>
+                    <div class="form-group col-md-4">
+                        <label for="FatherName">Father Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="FatherName" class="form-control" v-model="editEmp.EmployeeFatherName"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="CNIC">CNIC<span class="text-danger">*</span></label>
+                        <label for="department">Employee Type<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editEmp.EmployeeType">
+                            <option value="">Select Employee Type</option>
+                            <option value="1">Driver</option>
+                            <option value="2">Bus Hostess</option>
+                            <option value="0">Other...</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="CNIC">CNIC<span class="text-danger ml-1">*</span></label>
                         <vue-mask id="CNIC"
                                   class="form-control"
                                   v-model="editEmp.EmployeeCNIC"
@@ -411,7 +397,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="phone">Contact #<span class="text-danger">*</span></label>
+                        <label for="phone">Contact #<span class="text-danger ml-1">*</span></label>
                         <vue-mask id="phone"
                                   class="form-control"
                                   v-model="editEmp.EmployeeContact"
@@ -422,7 +408,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="dob">Date of Birth<span class="text-danger">*</span></label>
+                        <label for="dob">Date of Birth<span class="text-danger ml-1">*</span></label>
                         <input type="date" id="dob" class="form-control" v-model="editEmp.EmployeeDob">
                     </div>
                     <div class="form-group col-md-6">
@@ -430,7 +416,7 @@
                         <input type="text" id="refOfHiring" class="form-control" v-model="editEmp.RefHiring">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="hiringDate">Hiring Date<span class="text-danger">*</span></label>
+                        <label for="hiringDate">Hiring Date<span class="text-danger ml-1">*</span></label>
                         <input type="date" id="hiringDate" class="form-control" v-model="editEmp.HiringDate">
                     </div>
                     <div class="form-group col-md-6">
@@ -449,15 +435,24 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="address">Address <span class="text-danger">*</span></label>
+                        <label for="address">Address <span class="text-danger ml-1">*</span></label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="editEmp.EmployeeAddress"></textarea>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="department">Department<span class="text-danger">*</span></label>
-                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDepartment" @click="clearDepartmentForm()"> Add New
-                        </div>
+                    <div class="form-group col-md-4">
+                        <label for="department">Terminal<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editEmp.EmployeeTerminal" @change="getDepartment()">
+                            <option value="0" selected>Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="department">Department<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editEmp.EmployeeDepartment"
                                 @change="getEditDesignation()">
                             <option value="0">Select Department</option>
@@ -466,11 +461,8 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="designation">Designation<span class="text-danger">*</span></label>
-                        <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addDesignation" @click="clearDesignationForm()"> Add New
-                        </div>
+                    <div class="form-group col-md-4">
+                        <label for="designation">Designation<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editEmp.EmployeeDesignation">
                             <option value="0" selected>Select Designation</option>
                             <option v-for="(designation, i) in editDesignations" :key="i" :value="designation.id">
@@ -479,25 +471,25 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="workingDays">Working Days<span class="text-danger">*</span></label>
+                        <label for="workingDays">Working Days<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="workingDays" v-model="editEmp.workingDays"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="paidLeaves">Paid Leaves<span class="text-danger">*</span></label>
+                        <label for="paidLeaves">Paid Leaves<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="paidLeaves" v-model="editEmp.paidLeaves"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="bloodGroup">Blood Group<span class="text-danger">*</span></label>
+                        <label for="bloodGroup">Blood Group<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="bloodGroup" v-model="editEmp.bloodGroup"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Salary<span class="text-danger">*</span></label>
+                        <label for="salary">Salary<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" id="salary" v-model="editEmp.EmployeeSalary"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="status">Status<span class="text-danger">*</span></label>
+                        <label for="status">Status<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="status" v-model="editEmp.status">
                             <option value="0">Select Employee Status</option>
                             <option value="W">Working</option>
@@ -573,7 +565,7 @@ export default {
                 placeholder: "xxxxx-xxxxxxx-x",
             },
             optionsContact: {
-                placeholder: "xxxx-xxxxxxx",
+                placeholder: "03xx-xxxxxxx",
             },
 
             addForm: {
@@ -592,14 +584,14 @@ export default {
                 HiringDate: null,
                 EmployeeDob: null,
                 EmployeeSalary: null,
-                RadioSalaryTypeAdd: null,
                 workingDays: null,
-                paidLeaves: null,
                 bloodGroup: null,
                 EmergencyContact: null,
                 jobDescription: null,
-                EmployeeDepartment: null,
-                EmployeeDesignation: null,
+                EmployeeDepartment: 0,
+                EmployeeType: "",
+                EmployeeTerminal: 0,
+                EmployeeDesignation: 0,
             },
             editEmp: {
                 userId: null,
@@ -618,20 +610,21 @@ export default {
                 HiringDate: null,
                 EmployeeDob: null,
                 EmployeeSalary: null,
-                RadioSalaryTypeAdd: null,
                 workingDays: null,
-                paidLeaves: null,
                 bloodGroup: null,
                 EmergencyContact: null,
                 jobDescription: null,
-                EmployeeDepartment: null,
-                EmployeeDesignation: null,
+                EmployeeDepartment: 0,
+                EmployeeType: 0,
+                EmployeeTerminal: 0,
+                EmployeeDesignation: 0,
                 status: null,
 
             },
             departmentName: '',
             designationName: '',
             employees: [],
+            terminals: [],
             departments: [],
             editDepartments: [],
             designations: [],
@@ -640,6 +633,7 @@ export default {
             urlProfileEdit: '',
             nameProfile: '',
             nameProfileEdit: '',
+            attachments: '',
             attachmentsEdit: '',
             profileEdit: '',
             loading: false,
@@ -672,22 +666,44 @@ export default {
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
         },
+
         async getDesignation() {
             if (this.addForm.EmployeeDepartment == '0') {
                 this.addForm.EmployeeDesignation = 0;
                 this.designations = '';
             }
             const resSelectiveDesignation = await this.callApi("post", 'hrm/designation/selective', {id: this.addForm.EmployeeDepartment});
-            console.log(resSelectiveDesignation)
             if (resSelectiveDesignation.status == 200) {
                 if (resSelectiveDesignation.data.length == 0) {
                     this.addForm.EmployeeDesignation = 0;
-                    this.addForm.EmployeeDesignation = 0;
                 } else {
+                    this.addForm.EmployeeDesignation = 0;
                     this.designations = resSelectiveDesignation.data;
                 }
             }
         },
+
+        async getDepartment() {
+            if (this.addForm.EmployeeTerminal == '0') {
+                this.addForm.EmployeeDepartment = 0;
+                this.addForm.EmployeeDesignation = 0;
+                this.designations = '';
+                this.departments = '';
+            }
+            const resSelectiveDesignation = await this.callApi("post", 'hrm/department/selective', {id: this.addForm.EmployeeTerminal});
+            console.log(resSelectiveDesignation.data);
+            if (resSelectiveDesignation.status == 200) {
+                if (resSelectiveDesignation.data.length == 0) {
+                    this.addForm.EmployeeDesignation = 0;
+                    this.addForm.EmployeeDepartment = 0;
+                } else {
+                    this.addForm.EmployeeDesignation = 0;
+                    this.addForm.EmployeeDepartment = 0;
+                    this.departments = resSelectiveDesignation.data;
+                }
+            }
+        },
+
         async getEditDesignation() {
             if (this.dataEdit.department_id == '0') {
                 this.dataEdit.designation_id = 0;
@@ -703,12 +719,15 @@ export default {
                 }
             }
         },
+
         phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },
+
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
+
         onFileChange: function (e, imgTag) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
                 if (imgTag == 'profile') {
@@ -727,6 +746,7 @@ export default {
                 }
                 if (imgTag == 'attachments') {
                     const attachment = e.target.files[0];
+                    this.attachments = attachment.name;
                     this.addForm.attachments = attachment;
                 }
                 if (imgTag == 'attachmentsEdit') {
@@ -745,13 +765,23 @@ export default {
                 });
             }
         },
+
         clearDepartmentForm() {
             this.departmentName = '';
         },
+
         clearDesignationForm() {
             this.designationName = '';
         },
+
         async addDepartment() {
+            if (this.addForm.EmployeeTerminal == '0')
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.departmentName == '' || typeof this.departmentName == 'undefined')
                 return swal({
                     title: "Required!",
@@ -760,7 +790,10 @@ export default {
                     timer: 2000
                 });
             this.loadingDepart = true;
-            const resDepartmentStore = await this.callApi("post", 'hrm/department/store', {name: this.departmentName});
+            const resDepartmentStore = await this.callApi("post", 'hrm/department/store', {
+                terminal: this.addForm.EmployeeTerminal,
+                name: this.departmentName
+            });
             if (resDepartmentStore.status == 201) {
                 swal({
                     title: "Success",
@@ -776,26 +809,26 @@ export default {
                 if (this.editDepartments.indexOf(resDepartmentStore.data) === -1) {
                     this.editDepartments.push(resDepartmentStore.data);
                 }
-            } else {
+            }
+            if (resDepartmentStore.status == 422) {
                 this.loadingDepart = false;
-                if (resDepartmentStore.status == 422) {
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in resDepartmentStore.data.errors) {
-                        resDepartmentStore.data.errors[key].forEach((element) => {
-                            errorContent += ((++count) + " - " + element + "\n");
-                        });
-                        swal({
-                            title: "Error",
-                            text: errorContent,
-                            icon: "error",
-                            timer: 4000
-                        });
+                let errorContent = "";
+                let count = 0;
+                for (const key in resDepartmentStore.data.errors) {
+                    resDepartmentStore.data.errors[key].forEach((element) => {
+                        errorContent += ((++count) + " - " + element + "\n");
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
 
-                    }
                 }
             }
         },
+
         async addDesignation() {
             if (this.addForm.EmployeeDepartment == '0' || this.dataEdit.department_id == '0')
                 return swal({
@@ -854,6 +887,12 @@ export default {
         },
 
         async fetchEmployees() {
+            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            if (resAllTerminals.status == 200) {
+                this.terminals = resAllTerminals.data
+            } else {
+                console.log(resAllTerminals);
+            }
             const resEmployeeIndex = await this.callApi("post", 'hrm/employee');
             if (resEmployeeIndex.status == 200) {
                 this.employees = resEmployeeIndex.data
@@ -863,7 +902,6 @@ export default {
             }
             const resFetchDepartment = await this.callApi("post", 'hrm/department');
             if (resFetchDepartment.status == 200) {
-                this.departments = resFetchDepartment.data
                 this.editDepartments = resFetchDepartment.data
 
             } else {
@@ -905,6 +943,8 @@ export default {
                 paidLeaves: '0',
                 EmployeeDepartment: 0,
                 EmployeeDesignation: 0,
+                EmployeeTerminal: 0,
+                EmployeeType: "",
                 RadioSalaryTypeAdd: 'cash',
             };
             this.designations = '';
@@ -965,6 +1005,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (this.addForm.EmployeeType == "")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Employee's Type",
+                    icon: "error",
+                    timer: 2000
+                });
             if (!this.addForm.EmployeeCNIC)
                 return swal({
                     title: "Required!",
@@ -1000,6 +1047,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (this.addForm.EmployeeTerminal == "0")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Employee's Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.addForm.EmployeeDepartment == "0")
                 return swal({
                     title: "Required!",
@@ -1007,7 +1061,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.addForm.EmployeeDesignation)
+            if (this.addForm.EmployeeDesignation == "0")
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
@@ -1049,6 +1103,8 @@ export default {
             formData.append('EmployeeName', this.addForm.EmployeeName);
             formData.append('EmployeeFatherName', this.addForm.EmployeeFatherName);
             formData.append('EmployeeCNIC', this.addForm.EmployeeCNIC);
+            formData.append('EmployeeTerminal', this.addForm.EmployeeTerminal);
+            formData.append('EmployeeType', this.addForm.EmployeeType);
             formData.append('EmployeeContact', this.addForm.EmployeeContact);
             formData.append('EmployeeAddress', this.addForm.EmployeeAddress);
             formData.append('RefHiring', this.addForm.RefHiring);
@@ -1063,7 +1119,6 @@ export default {
             formData.append('jobDescription', this.addForm.jobDescription);
             formData.append('EmployeeDepartment', this.addForm.EmployeeDepartment);
             formData.append('EmployeeDesignation', this.addForm.EmployeeDesignation);
-
             this.loading = true;
             const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", formData, config);
             if (resEmployeeAdd.status == 201) {
@@ -1315,6 +1370,8 @@ export default {
             this.editEmp.EmergencyContact = employ.emergency_contact;
             this.editEmp.jobDescription = employ.job_description;
             this.editEmp.EmployeeDepartment = employ.department_id;
+            this.editEmp.EmployeeTerminal = employ.terminal_id;
+            this.editEmp.EmployeeType = employ.employee_type;
             this.editEmp.EmployeeDesignation = employ.designation_id;
             this.editEmp.status = employ.status;
 

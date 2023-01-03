@@ -13,15 +13,15 @@ use Illuminate\Support\Facades\DB;
 class FareTableController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function store(Request $request)
     {
@@ -52,9 +52,9 @@ class FareTableController extends Controller
 
     public function getFarePrices($fare_class)
     {
-        $cities = City::with(['city_to' => function ($q) { $q->orderBy('name')->where('cities.company_id', $this->company_id);
+        $cities = City::with(['city_to' => function ($q) { $q->orderBy('name')->where('cities.company_id', Auth::user()->company_id);
         }])
-            ->where('cities.company_id', $this->company_id)
+            ->where('cities.company_id', Auth::user()->company_id)
             ->orderBy('name')->get();
 
         $subRoutes = $cities->map(function ($city_from) use ($fare_class) {
@@ -79,12 +79,12 @@ class FareTableController extends Controller
 
     public function getFareClass()
     {
-        return FareClass::where('company_id', $this->company_id)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
+        return FareClass::where('company_id', Auth::user()->company_id)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
     }
 
     public function check(Request $request)
     {
-        $checkFare = FareTable::where('fare_class', $request->fare_class)->where('from_city_id', $request->from)->where('to_city_id', $request->to)->where('company_id', $this->company_id)->select('id', 'fare', 'distance_in_km', 'time_difference', 'fare_class')->first();
+        $checkFare = FareTable::where('fare_class', $request->fare_class)->where('from_city_id', $request->from)->where('to_city_id', $request->to)->where('company_id', Auth::user()->company_id)->select('id', 'fare', 'distance_in_km', 'time_difference', 'fare_class')->first();
         return response($checkFare, 200);
     }
 

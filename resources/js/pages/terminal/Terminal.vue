@@ -69,14 +69,14 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="city_id">Terminal City <span class="text-danger">*</span></label>
+                        <label for="city_id">Terminal City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="data.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Terminal Name <span class="text-danger">*</span></label>
+                        <label for="name">Terminal Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="data.name">
                     </div>
                 </div>
@@ -158,7 +158,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
+                        <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
                             class="form-control"
                             v-model="data.contact"
@@ -249,14 +249,14 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="city_id">Terminal City <span class="text-danger">*</span></label>
+                        <label for="city_id">Terminal City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="dataEdit.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Terminal Name <span class="text-danger">*</span></label>
+                        <label for="name">Terminal Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name">
                     </div>
                 </div>
@@ -339,7 +339,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="contact">Terminal Contact <span class="text-danger">*</span> </label>
+                        <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
                             class="form-control"
                             v-model="dataEdit.contact"

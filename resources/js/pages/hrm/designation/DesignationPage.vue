@@ -97,7 +97,7 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <label for="terminals">Terminals <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="addForm.terminal" @change="getDepartment(addForm.terminal)">
                             <option value="0">Select Terminal</option>
@@ -110,7 +110,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="departmentName">Department<span class="text-danger">*</span></label>
+                        <label for="departmentName">Department<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="addForm.department">
                             <option value="0" selected>Select Department</option>
                             <option
@@ -123,7 +123,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input type="text" id="name" class="form-control" v-model="addForm.name"/>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <label for="terminals">Terminals <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="dataEdit.terminal_id"  @change="getEditDepartment(dataEdit.terminal_id)">
                             <option value="0">Select Terminal</option>
@@ -216,7 +216,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="departmentName">Department<span class="text-danger">*</span></label>
+                        <label for="departmentName">Department<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="dataEdit.department_id">
                             <option value="0" selected>Select Department</option>
                             <option
@@ -229,7 +229,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input type="text" id="name" class="form-control" v-model="dataEdit.name"/>
                     </div>
                 </div>

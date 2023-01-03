@@ -83,7 +83,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="name">Company Name <span class="text-danger">*</span></label>
+                            <label for="name">Company Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -93,7 +93,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="contact">Contact <span class="text-danger">*</span></label>
+                            <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
                             <vue-mask
                                 class="form-control"
                                 v-model="data.contact"
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="userName">Name <span class="text-danger">*</span></label>
+                            <label for="userName">Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -120,7 +120,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="email">Email <span class="text-danger">*</span></label>
+                            <label for="email">Email <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -130,7 +130,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="password">Password <span class="text-danger">*</span></label>
+                            <label for="password">Password <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="password"
                                 class="form-control"
@@ -238,7 +238,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="name">Company Name  <span class="text-danger">*</span></label>
+                            <label for="name">Company Name  <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -248,7 +248,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="contact">Contact <span class="text-danger">*</span></label>
+                            <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
                             <vue-mask
                                 class="form-control"
                                 v-model="dataEdit.contact"

@@ -14,13 +14,13 @@ class RoleController extends Controller
 
     public function __construct(){
         $this->middleware(function ($request, $next){
-            $this->company_id = Auth::user()->company_id;
+            Auth::user()->company_id = Auth::user()->company_id;
             return $next( $request );
         });
     }
     public function index()
     {
-        return Role::with('company:id,name')->where('company_id',$this->company_id)->latest('id')->get();
+        return Role::with('company:id,name')->where('company_id',Auth::user()->company_id)->latest('id')->get();
     }
     public function role(Request $request)
     {
@@ -77,7 +77,7 @@ class RoleController extends Controller
         ]);
         $role = Role::create([
             'name' => $request->name,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'permissions' => [],
         ]);
         return Role::with('company')->find($role->id);

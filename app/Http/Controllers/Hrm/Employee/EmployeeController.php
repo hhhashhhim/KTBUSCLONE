@@ -13,22 +13,19 @@ use function PHPUnit\Framework\isNull;
 
 class EmployeeController extends Controller
 {
-
-
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-
-        return Employee::with('addedBy', 'company', 'department', 'designation', 'user')->where('company_id', $this->company_id)->get();
+        return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where('company_id', Auth::user()->company_id)->get();
 
     }
 
@@ -39,8 +36,8 @@ class EmployeeController extends Controller
             "email" => 'required|email|unique:users',
             "password" => 'required',
             'EmployeeFatherName' => 'required',
-            'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', $this->company_id)->whereNull('deleted_at')],
-            'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeDob' => 'required',
             'HiringDate' => 'required',
             'EmployeeAddress' => 'required',
@@ -71,9 +68,10 @@ class EmployeeController extends Controller
             "name" => $request->EmployeeName,
             "email" => $request->email,
             "password" => Hash::make($request->password),
+            "terminal_id" => $request->EmployeeTerminal,
             "contact" => str_replace('-', '', $request->EmployeeContact),
             "role_id" => 0,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
         return Employee::create([
@@ -92,13 +90,15 @@ class EmployeeController extends Controller
             'paid_leaves' => $request->paidLeaves,
             'blood_group' => $request->bloodGroup,
             'emergency_contact' => $request->EmergencyContact,
+            "terminal_id" => $request->EmployeeTerminal,
+            "employee_type" => $request->EmployeeType,
             'job_description' => $request->jobDescription,
             'department_id' => $request->EmployeeDepartment,
             'designation_id' => $request->EmployeeDesignation,
             'profile_Img' => $request->profile ? $this->image($request->profile) : null,
             'attachments' => $request->attachment ? $this->attachment($request->attachment) : null,
             'status' => 'W',
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }

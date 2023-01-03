@@ -11,26 +11,25 @@ use Illuminate\Support\Facades\Auth;
 class DepartmentController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Department::with('addedBy', 'company', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', $this->company_id)->get();
+        return Department::with('addedBy', 'company', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
-//        dd($request->all());
         $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id,)->where( 'terminal_id', $request->terminal)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id,)->where('terminal_id', $request->terminal)->whereNull('deleted_at')],
 
         ];
 
@@ -43,7 +42,7 @@ class DepartmentController extends Controller
             'name' => $request->name,
             'terminal_id' => $request->terminal,
             'added_by' => Auth::user()->id,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
     }
@@ -51,7 +50,7 @@ class DepartmentController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', $this->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
 
         ];
 
@@ -71,5 +70,10 @@ class DepartmentController extends Controller
     public function delete(Request $request)
     {
         return Department::find($request->id)->delete();
+    }
+
+    public function selective(Request $request)
+    {
+        return Department::where('terminal_id', $request->id)->get(['id', 'name', 'terminal_id']);
     }
 }

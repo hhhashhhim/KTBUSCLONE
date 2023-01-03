@@ -11,21 +11,21 @@ use Illuminate\Validation\Rule;
 
 class TicketsTemplateController extends Controller
 {
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-
-
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//
+//
+//    }
 
     public function index()
     {
-        return TicketsTemplate::with('terminal.city')->where('company_id', $this->company_id)->get();
+        return TicketsTemplate::with('terminal.city')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -46,10 +46,10 @@ class TicketsTemplateController extends Controller
             'termsCondition.required' => 'Terms & Condition is required',
         ];
         $this->validate($request, $rules, $customMessages);
-        $terminal  = Terminal::where('company_id', $this->company_id)->where('id', $request->terminal)->first();
-        TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->update(array('status' => 0));
+        $terminal  = Terminal::where('company_id', Auth::user()->company_id)->where('id', $request->terminal)->first();
+        TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->update(array('status' => 0));
         return TicketsTemplate::create([
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal,
             'uan' => str_replace('-', '', $request->uanNumber),
             'phone' => str_replace('-', '', $terminal->contact),
@@ -63,7 +63,7 @@ class TicketsTemplateController extends Controller
 
     public function allTerminals()
     {
-        return Terminal::with('city')->where('company_id', $this->company_id)->get();
+        return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get();
     }
 
 
@@ -86,7 +86,7 @@ class TicketsTemplateController extends Controller
             'terms_condition.required' => 'Terms & Condition is required',
         ];
         $this->validate($request, $rules, $customMessages);
-        TicketsTemplate::where('company_id', $this->company_id)->where('status', 1)->update(array('status' => 0));
+        TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->update(array('status' => 0));
         return TicketsTemplate::where('id', $request->id)->update([
             'terminal_id' => $request->terminal_id,
             'uan' => str_replace('-', '', $request->uan),

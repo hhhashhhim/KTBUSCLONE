@@ -25,23 +25,23 @@ use Illuminate\Support\Facades\Auth;
 class ScheduleClosingController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        $buses = Bus::where('company_id', $this->company_id)->orderBy('id')->get();
-        $hosts = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where('company_id', $this->company_id)->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        $hosts = Employee::where('company_id', Auth::user()->company_id)->orderBy('id')->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where('company_id', Auth::user()->company_id)->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
-        where('company_id', $this->company_id)
+        where('company_id', Auth::user()->company_id)
             ->with("bus:id,bus_number", "schedule:id,name")
             ->get()
             ->groupBy('ticket_merge_id');
@@ -59,7 +59,7 @@ class ScheduleClosingController extends Controller
         return Schedule::
         where('start_date', '<=', $request->date)
             ->where('end_date', '>=', $request->date)
-            ->where('company_id', $this->company_id)
+            ->where('company_id', Auth::user()->company_id)
             ->with(["scheduleDetail" => function ($q) use ($request) {
                 return $q->where("schedule_date", $request->date);
             }])
@@ -81,12 +81,12 @@ class ScheduleClosingController extends Controller
             "departure_id" => $departure->departure_city_id,
             "destination_id" => $departure->destination_city_id,
             "departure_date" => $request->date,
-            "company_id" => $this->company_id
+            "company_id" => Auth::user()->company_id
         ])
             ->first();
 
         $checkMergeRecord = TicketClosingMerge::
-        where(["company_id" => $this->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
+        where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
             ->latest("id")->first();
 
         if ($checkMergeRecord) {
@@ -99,7 +99,7 @@ class ScheduleClosingController extends Controller
                 "bus_id" => $request->bus,
                 "schedule_departure_date" => $request->date,
                 "schedule_complete" => 0,
-                'company_id' => $this->company_id,
+                'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
         }
@@ -115,7 +115,7 @@ class ScheduleClosingController extends Controller
             "schedule_end" => $destination->destination_city_id,
             "schedule_return" => $checkMergeRecord ? 1 : 0,
             "description" => $request->description,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
 
@@ -126,7 +126,7 @@ class ScheduleClosingController extends Controller
                 "type" => 1,
                 "ticket_closing_id" => $closingRecord->id,
                 "bus_id" => $request->bus,
-                'company_id' => $this->company_id,
+                'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
         }
@@ -137,12 +137,12 @@ class ScheduleClosingController extends Controller
                 "type" => 2,
                 "ticket_closing_id" => $closingRecord->id,
                 "bus_id" => $request->bus,
-                'company_id' => $this->company_id,
+                'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
         }
 
-        Ticket::where(["company_id" => $this->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
+        Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
             "bus_id" => $request->bus,
             "ticket_closing_id" => $closingRecord->id
         ]);

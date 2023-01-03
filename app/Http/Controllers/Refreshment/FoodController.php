@@ -17,20 +17,20 @@ use DB;
 class FoodController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index(Request $request)
     {
         return Hotel::with('user:id,name,email','foods:id,name,price,unit,description,hotel_id')
-                ->where(["id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
+                ->where(["id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
     }
 
     public function store(Request $request)
@@ -47,7 +47,7 @@ class FoodController extends Controller
             "unit" => $request->unit,
             "description" => $request->description,
             "hotel_id" => $request->hotelId,
-            "company_id" => $this->company_id,
+            "company_id" => Auth::user()->company_id,
             "added_by" => Auth::user()->id,
         ]);
     }

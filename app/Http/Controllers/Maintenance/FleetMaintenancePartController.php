@@ -12,25 +12,25 @@ use Illuminate\Support\Facades\Auth;
 class FleetMaintenancePartController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return MaintenancePart::with('addedBy', 'company')->where('company_id', $this->company_id)->get();
+        return MaintenancePart::with('addedBy', 'company')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 
         ];
 
@@ -43,7 +43,7 @@ class FleetMaintenancePartController extends Controller
         return MaintenancePart::create([
             'name' => $request->name,
             'added_by' => Auth::user()->id,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
     }
@@ -51,7 +51,7 @@ class FleetMaintenancePartController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 
         ];
 

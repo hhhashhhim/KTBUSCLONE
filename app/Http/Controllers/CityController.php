@@ -16,25 +16,25 @@ use Illuminate\Validation\Rule;
 class CityController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return City::with('addedBy')->where('company_id', $this->company_id)->get();
+        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -44,18 +44,18 @@ class CityController extends Controller
         $this->validate($request, $rules, $customMessages);
         $city = City::create([
             'name' => $request->name,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
         $this->cityCombinations($city);
-        updateFareTable($this->company_id);
+        updateFareTable(Auth::user()->company_id);
         return City::with('addedBy')->find($city->id);
     }
 
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -76,8 +76,8 @@ class CityController extends Controller
     public function city_routes_list()
     {
         $data = [
-            'cities' => City::orderBy('name')->where('company_id', $this->company_id)->select('name', 'id')->get(),
-            'routes' => Route::with('addedBy')->where('company_id', $this->company_id)->get()
+            'cities' => City::orderBy('name')->where('company_id', Auth::user()->company_id)->select('name', 'id')->get(),
+            'routes' => Route::with('addedBy')->where('company_id', Auth::user()->company_id)->get()
         ];
 
         return $data;
@@ -85,7 +85,7 @@ class CityController extends Controller
 
     public function cityTerminals(Request $request)
     {
-        return Terminal::where('company_id', $this->company_id)->where('city_id', $request->id)->get();
+        return Terminal::where('company_id', Auth::user()->company_id)->where('city_id', $request->id)->get();
     }
 
     public function cityRoutes(Request $request)
@@ -107,7 +107,7 @@ class CityController extends Controller
                     continue;
                 } else {
                     $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
-                    $fareClasses = FareClass::where('company_id', $this->company_id)->count();
+                    $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->count();
 
                     if ($fareClasses == 0 || $fare->count() < $fareClasses) {
                         return response()->json([
@@ -121,7 +121,7 @@ class CityController extends Controller
         }
         $route = Route::create([
             'name' => $request['routeStart'] . '-' . $request['routeEnd'],
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => auth()->user()->id
         ]);
         $used_cities = [];//key can't be same
@@ -141,7 +141,7 @@ class CityController extends Controller
                                 'fare_class_id' => $detail->fare_class,
                                 'departure_city_id' => $used_cities[$index],
                                 'destination_city_id' => $innerCity,
-                                'company_id' => $this->company_id,
+                                'company_id' => Auth::user()->company_id,
                                 'added_by' => auth()->user()->id
                             ]);
                         }
@@ -153,7 +153,7 @@ class CityController extends Controller
             // Reverse Route
             $route = Route::create([
                 'name' => $request['routeEnd'] . '-' . $request['routeStart'],
-                'company_id' => $this->company_id,
+                'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
             ]);
             $used_cities = [];//key can't be same
@@ -173,7 +173,7 @@ class CityController extends Controller
                                     'fare_class_id' => $detail->fare_class,
                                     'departure_city_id' => $used_cities[$index],
                                     'destination_city_id' => $innerCity,
-                                    'company_id' => $this->company_id,
+                                    'company_id' => Auth::user()->company_id,
                                     'added_by' => auth()->user()->id
                                 ]);
                             }
@@ -192,7 +192,7 @@ class CityController extends Controller
             'routeEndName' => 'required',
         ]);
         Route::where([
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'id' => $request->id,
         ])->update([
             'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
@@ -202,7 +202,7 @@ class CityController extends Controller
 
     public function city_routes_details(Request $request)
     {
-        $routeFareCities = RouteFare::where('route_id', $request->id)->where('company_id', $this->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
+        $routeFareCities = RouteFare::where('route_id', $request->id)->where('company_id', Auth::user()->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
         $data = [];
         foreach ($routeFareCities as $cities) {
             foreach ($cities as $city) {
@@ -216,7 +216,7 @@ class CityController extends Controller
         }
         return [
             'data' => $data,
-            'th' => FareClass::where('company_id', $this->company_id)->orderBY('name', 'ASC')->get(),
+            'th' => FareClass::where('company_id', Auth::user()->company_id)->orderBY('name', 'ASC')->get(),
         ];
 
     }
@@ -229,7 +229,7 @@ class CityController extends Controller
             CityToCity::create([
                 'departure_city_id' => $city->id,
                 'destination_city_id' => $cityTo->id,
-                'company_id' => $this->company_id,
+                'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
 
             ]);
@@ -238,7 +238,7 @@ class CityController extends Controller
                 CityToCity::create([
                     'departure_city_id' => $cityTo->id,
                     'destination_city_id' => $city->id,
-                    'company_id' => $this->company_id,
+                    'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
             }

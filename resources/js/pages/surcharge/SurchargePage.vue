@@ -102,7 +102,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="SurchargeName">Name <span class="text-danger">*</span></label>
+                        <label for="SurchargeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="SurchargeName"/>
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
@@ -119,7 +119,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivPercentage">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
                                    placeholder="Enter Percentage"
@@ -130,7 +130,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span
                             class="text-muted">max: 10K</span> </label>
                         <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
                                placeholder="Enter Flat Amount"
@@ -168,7 +168,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="SurchargeName">Name <span class="text-danger">*</span></label>
+                        <label for="SurchargeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
@@ -187,7 +187,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
                                    placeholder="Enter Percentage"
@@ -198,7 +198,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span><span
                             class="text-muted">max: 10K</span></label>
                         <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat"
                                placeholder="Enter Flat Amount"

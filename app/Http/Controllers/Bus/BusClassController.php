@@ -11,25 +11,25 @@ use Illuminate\Validation\Rule;
 class BusClassController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     protected function index()
     {
-        return BusClass::with('addedBy')->orderBy('id')->where('company_id', $this->company_id)->get();
+        return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeBusClass(Request $request)
     {
         $rules = [
-            'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 //            'BusClassColor' => 'required',
             'noOfRows' => 'required|integer',
             'noOfCols' => 'required|integer',
@@ -50,7 +50,7 @@ class BusClassController extends Controller
             'seat_map' => $request->seatMap,
             'no_of_rows' => $request->noOfRows,
             'no_of_cols' => $request->noOfCols,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }
@@ -74,7 +74,7 @@ class BusClassController extends Controller
 
     public function duplicateBusClass(Request $request)
     {
-        $busClass = BusClass::where('company_id', $this->company_id)->where('id', $request->id)->first();
+        $busClass = BusClass::where('company_id', Auth::user()->company_id)->where('id', $request->id)->first();
         $busClass->name = $busClass->name .'-' .'Duplicate';
         $busClass->time = now();
         $new = $busClass->replicate();

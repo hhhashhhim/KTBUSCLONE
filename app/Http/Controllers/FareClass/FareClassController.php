@@ -12,27 +12,27 @@ use Illuminate\Validation\Rule;
 class FareClassController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     protected function index()
     {
         return FareClass::with('addedBy')
-        ->where('company_id', $this->company_id)->orderBy('id')
+        ->where('company_id', Auth::user()->company_id)->orderBy('id')
         ->get();
     }
 
     public function storeFareClass(Request $request)
     {
         $rules = [
-            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'FareClassColor' => 'required',
         ];
 
@@ -46,10 +46,10 @@ class FareClassController extends Controller
             'name' => $request->FareClassName,
             'color' => $request->FareClassColor,
             'is_active' => $request->isActive,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
-        updateFareTable($this->company_id);
+        updateFareTable(Auth::user()->company_id);
         return $fareClass;
     }
 

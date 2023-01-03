@@ -13,7 +13,7 @@
                       <label
                           class="col-md-3 pt-3 font-weight-bold"
                           for="customer-cnic"
-                      >CNIC <span class="text-danger">*</span>
+                      >CNIC <span class="text-danger ml-1">*</span>
                       </label>
                       <vue-mask
                           v-on:keyup.enter="getCustomer"

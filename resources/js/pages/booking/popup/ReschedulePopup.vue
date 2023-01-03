@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-md-6 form-group">
                     <label for="departureCity"
-                    >Departure City <span class="text-danger">*</span></label
+                    >Departure City <span class="text-danger ml-1">*</span></label
                     >
                     <select
                         class="form-control"
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-md-6 form-group">
                     <label for="destinationCity"
-                    >Destination City<span class="text-danger">*</span></label
+                    >Destination City<span class="text-danger ml-1">*</span></label
                     >
                     <select
                         class="form-control"
@@ -40,7 +40,7 @@
                     </select>
                 </div>
                 <div class="col-md-5 class form-group">
-                    <label for="date">Date <span class="text-danger">*</span></label>
+                    <label for="date">Date <span class="text-danger ml-1">*</span></label>
                     <input
                         type="date"
                         class="form-control"
@@ -51,7 +51,7 @@
                 </div>
                 <div class="col-md-5 class form-group">
                     <label for="scheduleName"
-                    >Schedule Name <span class="text-danger">*</span></label
+                    >Schedule Name <span class="text-danger ml-1">*</span></label
                     >
                     <select
                         class="form-control"

@@ -18,22 +18,22 @@ use DB;
 class FoodDealController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index(Request $request)
     {
         return Hotel::
             with('user:id,name,email','deals:id,name,price,description,hotel_id',
             'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
-            ->where(["id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
+            ->where(["id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
     }
 
     public function store(Request $request)
@@ -50,13 +50,13 @@ class FoodDealController extends Controller
             "price" => $request->price,
             "description" => $request->description,
             "hotel_id" => $request->hotelId,
-            "company_id" => $this->company_id,
+            "company_id" => Auth::user()->company_id,
             "added_by" => Auth::user()->id,
         ]);
 
         foreach($request->foods as $key => $value)
         {
-            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$deal->id,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
+            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$deal->id,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
             if(!$checkExist)
             {
                 HotelFoodDealDetail::create([
@@ -64,7 +64,7 @@ class FoodDealController extends Controller
                     "food_deal_id" => $deal->id,
                     "quantity" => $request->qtys[$key],
                     "hotel_id" => $request->hotelId,
-                    "company_id" => $this->company_id,
+                    "company_id" => Auth::user()->company_id,
                     "added_by" => Auth::user()->id,
                 ]);
             }
@@ -87,10 +87,10 @@ class FoodDealController extends Controller
             "description" => $request->description,
         ]);
 
-        HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->delete();
+        HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"hotel_id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->delete();
         foreach($request->foods as $key => $value)
         {
-            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>$this->company_id])->first();
+            $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$request->dealId,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
             if(!$checkExist)
             {
                 HotelFoodDealDetail::create([
@@ -98,7 +98,7 @@ class FoodDealController extends Controller
                     "food_deal_id" => $request->dealId,
                     "quantity" => $request->qtys[$key],
                     "hotel_id" => $request->hotelId,
-                    "company_id" => $this->company_id,
+                    "company_id" => Auth::user()->company_id,
                     "added_by" => Auth::user()->id,
                 ]);
             }

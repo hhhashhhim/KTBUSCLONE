@@ -98,12 +98,12 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Route Start Point Name <span class="text-danger">*</span></label>
+                        <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeStartName"/>
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="name">Route End Point Name <span class="text-danger">*</span></label>
+                        <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
@@ -208,12 +208,12 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Route Start Point Name <span class="text-danger">*</span></label>
+                        <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeStartName"/>
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="name">Route End Point Name <span class="text-danger">*</span></label>
+                        <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeEndName"/>
                     </div>
                 </div>

@@ -100,7 +100,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="uanNumber">UAN Number <span class="text-danger">*</span></label>
+                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
                         <vue-mask id="uanNumber"
                                   class="form-control"
                                   v-model="addForm.uanNumber"
@@ -111,7 +111,7 @@
                         </vue-mask>
                     </div>
 <!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>-->
+<!--                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>-->
 
 <!--                        <vue-mask id="phoneNumber"-->
 <!--                                  class="form-control"-->
@@ -123,7 +123,7 @@
 <!--                        </vue-mask>-->
 <!--                    </div>-->
 <!--                    <div class="form-group col-md-12">-->
-<!--                        <label for="address">Address<span class="text-danger">*</span></label>-->
+<!--                        <label for="address">Address<span class="text-danger ml-1">*</span></label>-->
 <!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
 <!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
 <!--                                  v-model="addForm.address"></textarea>-->
@@ -131,7 +131,7 @@
 
 <!--                    </div>-->
                     <div class="form-group col-md-12">
-                        <label for="refOfHiring">Terms & Condition <span class="text-danger">*</span></label>
+                        <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
                                   @keypress="countWords(this.addForm.termsCondition.length, 'terms', 140)"
                                   maxlength="140"
@@ -166,7 +166,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="uanNumber">UAN Number <span class="text-danger">*</span></label>
+                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
                         <vue-mask id="uanNumber"
                                   class="form-control"
                                   v-model="dataEdit.uan"
@@ -177,7 +177,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>
+                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
                         <vue-mask id="phoneNumber"
                                   class="form-control"
@@ -189,13 +189,13 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="address">Address<span class="text-danger">*</span></label>
+                        <label for="address">Address<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
                                   v-model="dataEdit.address"></textarea>
 
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="refOfHiring">Terms & Condition <span class="text-danger">*</span></label>
+                        <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
                                   maxlength="140"
                                   v-model="dataEdit.terms_condition"></textarea>
@@ -242,7 +242,7 @@ export default {
                 placeholder: "xx-xxx-xxx-xxx",
             },
             optionsPhone: {
-                placeholder: "xxxx-xxxxxxx",
+                placeholder: "03xx-xxxxxxx",
             },
             countWordsLength: 0,
             countAddressLength: 0,

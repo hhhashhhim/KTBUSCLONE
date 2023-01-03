@@ -64,7 +64,7 @@
             :formID="formID"
             >
                 <div class="form-group">
-                    <label for="name">Name <span class="text-danger">*</span></label>
+                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="data.name">
                 </div>
                 <template v-slot:button>
@@ -80,7 +80,7 @@
             :editForm="editFormID"
             >
                 <div class="form-group">
-                    <label for="name">Name <span class="text-danger">*</span></label>
+                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter City Name" v-model="dataEdit.name">
                 </div>
 

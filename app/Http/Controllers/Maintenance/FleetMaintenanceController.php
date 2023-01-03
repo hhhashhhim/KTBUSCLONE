@@ -15,22 +15,22 @@ use DB;
 class FleetMaintenanceController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
         $data = [
-            "mainData" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading","reading_date"]),
-            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
-            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
+            "mainData" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading","reading_date"]),
+            "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
         ];
         return $data;
 
@@ -42,7 +42,7 @@ class FleetMaintenanceController extends Controller
             with("maintenancePartLink:id,bus_id,part_id,maintenance_after,maintenance_at,maintenance_date",
                 "maintenancePartLink.MaintenancePart:id,name")
             ->where("id",$request->id)
-            ->where("company_id",$this->company_id)
+            ->where("company_id",Auth::user()->company_id)
             ->select("id","bus_number","current_reading")
             ->first();
 
@@ -65,7 +65,7 @@ class FleetMaintenanceController extends Controller
 
         foreach($request->fleetPart as $key => $value)
         {
-            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->fleetPart[$key],"company_id"=>$this->company_id])->first();
+            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->fleetPart[$key],"company_id"=>Auth::user()->company_id])->first();
             if(!$checkExist)
             {
                 MaintenancePartLink::create([
@@ -74,7 +74,7 @@ class FleetMaintenanceController extends Controller
                     "maintenance_after" => $request->maintenanceAfter[$key],
                     "maintenance_at" => $request->maintenanceAt[$key],
                     'added_by' => Auth::user()->id,
-                    'company_id' => $this->company_id,
+                    'company_id' => Auth::user()->company_id,
                 ]);
             }
         }
@@ -95,11 +95,11 @@ class FleetMaintenanceController extends Controller
             "current_reading" => $request->currentReading
         ]);
 
-        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"company_id"=>$this->company_id])->delete();
+        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"company_id"=>Auth::user()->company_id])->delete();
 
         foreach($request->fleetPart as $key => $value)
         {
-            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>$this->company_id])->first();
+            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>Auth::user()->company_id])->first();
             if(!$checkExist)
             {
                 MaintenancePartLink::create([
@@ -108,7 +108,7 @@ class FleetMaintenanceController extends Controller
                     "maintenance_after" => $request->maintenanceAfter[$key],
                     "maintenance_at" => $request->maintenanceAt[$key],
                     'added_by' => Auth::user()->id,
-                    'company_id' => $this->company_id,
+                    'company_id' => Auth::user()->company_id,
                 ]);
             }
         }
@@ -118,7 +118,7 @@ class FleetMaintenanceController extends Controller
     public function dueMaintenance()
     {
         $due = Bus::
-        where("buses.company_id",$this->company_id)
+        where("buses.company_id",Auth::user()->company_id)
         ->join("maintenance_part_links","maintenance_part_links.bus_id","buses.id")
         ->join("fleet_maintenance_parts","fleet_maintenance_parts.id","maintenance_part_links.part_id")
         ->whereRaw('buses.current_reading >= maintenance_part_links.maintenance_after + maintenance_part_links.maintenance_at')
@@ -129,8 +129,8 @@ class FleetMaintenanceController extends Controller
 
         $data = [
             "mainData" => $due,
-            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
-            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
+            "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
         ];
         return $data;
     }
@@ -155,7 +155,7 @@ class FleetMaintenanceController extends Controller
             "evidence" => $this->image($request->evidence)??null,
             "detail" => $request->detail,
             "maintenance_type" => $request->maintenanceType,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
     }
 
@@ -196,15 +196,15 @@ class FleetMaintenanceController extends Controller
     public function maintenanceRecord()
     {
         $maintenances = FleetMaintenance::
-            where("company_id", $this->company_id)
+            where("company_id", Auth::user()->company_id)
             ->with("busName:id,bus_number,current_reading","partName:id,name")
             ->orderBy('time','DESC')
             ->get();
 
         $data = [
             "mainData" => $maintenances,
-            "busDrop" => Bus::orderBy('id')->where('company_id', $this->company_id)->get(["id","bus_number","current_reading"]),
-            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', $this->company_id)->get(["id","name"]),
+            "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
         ];
         return $data;
     }

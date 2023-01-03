@@ -12,30 +12,30 @@ use Illuminate\Validation\Rule;
 class DesignationController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Department::withCount('designation')->with('addedBy', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', $this->company_id)->get();
+        return Department::withCount('designation')->with('addedBy', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function edit(Request $request)
     {
-        return Designation::with('addedBy')->where('department_id', $request->id)->where('company_id', $this->company_id)->get();
+        return Designation::with('addedBy')->where('department_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('terminal_id', $request->terminal)->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('terminal_id', $request->terminal)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -48,7 +48,7 @@ class DesignationController extends Controller
             'department_id' => $request->department,
             'name' => $request->name,
             'added_by' => Auth::user()->id,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
     }
@@ -56,7 +56,7 @@ class DesignationController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -77,13 +77,13 @@ class DesignationController extends Controller
 
     public function selective(Request $request)
     {
-        return Designation::where('department_id', $request->id)->get();
+        return Designation::where('department_id', $request->id)->get(['id', 'name', 'terminal_id', 'department_id']);
     }
 
     public function getTerminal(Request $request)
     {
       return  Department::where([
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->id,
             ])->get(['id', 'name', 'terminal_id']);
     }

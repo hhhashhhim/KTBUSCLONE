@@ -127,7 +127,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Deal Name <span class="text-danger">*</span></label>
+                            <label for="name">Deal Name <span class="text-danger ml-1">*</span></label>
                             <input
                             type="text"
                             class="form-control"
@@ -136,9 +136,9 @@
                             v-model="postData.name"
                             />
                         </div>
-                        
+
                         <div class="form-group col-md-6">
-                            <label for="userName">Price <span class="text-danger">*</span></label>
+                            <label for="userName">Price <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -196,7 +196,7 @@
                         </div>
                     </div>
 
-                    
+
                     <template v-slot:button>
                         <button
                             type="button"
@@ -218,7 +218,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Deal Name <span class="text-danger">*</span></label>
+                            <label for="name">Deal Name <span class="text-danger ml-1">*</span></label>
                             <input
                             type="text"
                             class="form-control"
@@ -227,9 +227,9 @@
                             v-model="editData.name"
                             />
                         </div>
-                        
+
                         <div class="form-group col-md-6">
-                            <label for="userName">Price <span class="text-danger">*</span></label>
+                            <label for="userName">Price <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -276,7 +276,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" min="1" @keyup="editSaveRow($event,'rowQty')" 
+                                        <input type="number" class="form-control" min="1" @keyup="editSaveRow($event,'rowQty')"
                                         :value="editData.qtys[index - 1] ? editData.qtys[index - 1] : '' "/>
                                     </td>
                                     <td>
@@ -289,7 +289,7 @@
                         </div>
                     </div>
 
-                    
+
                     <template v-slot:button>
                         <button
                             type="button"
@@ -365,7 +365,7 @@ export default {
             const data = {
                 hotelId : this.hotelId
             }
-           
+
             const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods/deals",data);
             if (hotelRes.status == 200) {
                 this.hotelData = hotelRes.data;
@@ -378,7 +378,7 @@ export default {
             const data = {
                 hotelId : this.hotelId
             }
-           
+
             const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods",data);
             if (hotelRes.status == 200) {
                 this.allFoods = hotelRes.data.foods;
@@ -398,7 +398,7 @@ export default {
         async add() {
 
             // validation for empty data
-            if(!this.postData.hotelId || !this.postData.name || !this.postData.price || 
+            if(!this.postData.hotelId || !this.postData.name || !this.postData.price ||
                 this.postData.foods == 0 || this.postData.qtys == 0)
             {
                 return swal({
@@ -408,7 +408,7 @@ export default {
                     timer: 4000
                 });
             }
-            
+
             // check if any index is empty or null in object
             for(var i = 0; i < this.postData.foods.length; i++)
             {
@@ -419,7 +419,7 @@ export default {
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
                         timer: 4000
-                    }); 
+                    });
                 }
             }
 
@@ -437,7 +437,7 @@ export default {
                 this.postData.foods = [];
                 this.postData.qtys = [];
                 this.loop = 0;
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {
@@ -485,9 +485,9 @@ export default {
             }
         },
         async update() {
-            
+
             // validation for empty data
-            if(!this.editData.dealId || !this.editData.name || !this.editData.price || 
+            if(!this.editData.dealId || !this.editData.name || !this.editData.price ||
                 this.editData.foods == 0 || this.editData.qtys == 0)
             {
                 return swal({
@@ -497,7 +497,7 @@ export default {
                     timer: 4000
                 });
             }
-            
+
             // check if any index is empty or null in object
             for(var i = 0; i < this.editData.foods.length; i++)
             {
@@ -508,7 +508,7 @@ export default {
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
                         timer: 4000
-                    }); 
+                    });
                 }
             }
 
@@ -519,7 +519,7 @@ export default {
                 this.loading = false
                 $("#deal_table").DataTable().destroy();
                 this.success = "Deal Updated Successfully";
-                
+
                 this.editData.dealId = "";
                 this.editData.hotelId = "";
                 this.editData.name = "";
@@ -528,7 +528,7 @@ export default {
                 this.editData.foods = [];
                 this.editData.qtys = [];
                 this.editLoop = 0;
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {

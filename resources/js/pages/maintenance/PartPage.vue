@@ -88,7 +88,7 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input type="text" id="name" class="form-control" v-model="addForm.name"/>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="editName">Name <span class="text-danger">*</span></label>
+                        <label for="editName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="editName" class="form-control" v-model="dataEdit.name"/>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                 </template>
             </Edit>
             <!--            Edit modal End-->
-         
+
 
         </div>
     </section>

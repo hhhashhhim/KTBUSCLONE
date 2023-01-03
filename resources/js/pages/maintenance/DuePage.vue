@@ -15,7 +15,7 @@
                                 >
                                     Update Meter Reading
                                 </a>
-                                
+
                                 <a
                                     href="#"
                                     data-target="#maintenance_add"
@@ -107,7 +107,7 @@
             >
             <div class="row">
                 <div class=" form-group col-md-6">
-                    <label for="city_id">Fleet <span class="text-danger">*</span></label>
+                    <label for="city_id">Fleet <span class="text-danger ml-1">*</span></label>
                     <select class="form-control" v-model="postData.fleetId" :disabled="checkDisable">
                         <option value="">Select Fleet</option>
                         <option
@@ -120,7 +120,7 @@
                     </select>
                 </div>
                 <div class=" form-group col-md-6">
-                    <label for="city_id">Part <span class="text-danger">*</span></label>
+                    <label for="city_id">Part <span class="text-danger ml-1">*</span></label>
                     <select class="form-control" v-model="postData.partId" :disabled="checkDisable">
                         <option value="">Select Part</option>
                         <option
@@ -133,7 +133,7 @@
                     </select>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="name">Current Reading <span class="text-danger">*</span></label>
+                    <label for="name">Current Reading <span class="text-danger ml-1">*</span></label>
                     <input
                         type="number"
                         class="form-control"
@@ -142,7 +142,7 @@
                     />
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="name">Total Amount <span class="text-danger">*</span></label>
+                    <label for="name">Total Amount <span class="text-danger ml-1">*</span></label>
                     <input
                         type="number"
                         class="form-control"
@@ -151,7 +151,7 @@
                     />
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="name">Paid By Company <span class="text-danger">*</span></label>
+                    <label for="name">Paid By Company <span class="text-danger ml-1">*</span></label>
                     <input
                         type="number"
                         class="form-control"
@@ -160,7 +160,7 @@
                     />
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="name">Evidence <span class="text-danger">*</span></label>
+                    <label for="name">Evidence <span class="text-danger ml-1">*</span></label>
                     <input
                         type="file"
                         class="form-control"
@@ -171,7 +171,7 @@
                     />
                 </div>
                 <div class="form-group col-md-12">
-                    <label for="refOfHiring">Detail <span class="text-danger">*</span></label>
+                    <label for="refOfHiring">Detail <span class="text-danger ml-1">*</span></label>
                     <textarea class="form-control"
                         v-model="postData.detail"
                     >
@@ -193,7 +193,7 @@
             >
             <div class="row">
                 <div class=" form-group col-md-6">
-                    <label for="city_id">Fleet <span class="text-danger">*</span></label>
+                    <label for="city_id">Fleet <span class="text-danger ml-1">*</span></label>
                     <select class="form-control" v-model="readingData.fleetId">
                         <option value="">Select Fleet</option>
                         <option
@@ -206,7 +206,7 @@
                     </select>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="name">Current Reading <span class="text-danger">*</span></label>
+                    <label for="name">Current Reading <span class="text-danger ml-1">*</span></label>
                     <input
                         type="number"
                         class="form-control"
@@ -220,7 +220,7 @@
                 </button>
             </template>
             </Add>
-           
+
         </div>
     </section>
 </template>
@@ -273,7 +273,7 @@ export default {
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet/maintenance/due");
             if (fleetRes.status === 200) {
-                
+
                 this.mainData = fleetRes.data.mainData;
                 this.fleets = fleetRes.data.busDrop;
                 this.parts = fleetRes.data.partDrop;
@@ -297,11 +297,11 @@ export default {
         },
         async evidenceImage(e) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
-                
+
                 const eviImage = e.target.files[0];
                 this.postData.evidence = eviImage;
 
-                
+
             } else {
                 e.target.value = '';
                 this.postData.evidence = '';
@@ -341,7 +341,7 @@ export default {
             formData.append('evidence', this.postData.evidence);
             formData.append('detail', this.postData.detail);
             formData.append('maintenanceType', this.postData.maintenanceType);
-            
+
 
             const res = await this.callApi("post", "fleet/maintenance/due/add", formData , config);
             if (res.status === 201) {
@@ -446,7 +446,7 @@ export default {
         //     this.data.from = from.id;
         //     this.data.to = to.id;
         // },
-        
+
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),

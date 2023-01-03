@@ -11,25 +11,25 @@ use Illuminate\Validation\Rule;
 class DiscountController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Discount::with('addedBy')->orderBy('id')->where('company_id', $this->company_id)->get();
+        return Discount::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeDiscount(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('discounts', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('discounts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -42,7 +42,7 @@ class DiscountController extends Controller
             'type' => $request->type,
             'percentage' => $request->type == "percentage" ?  $request->percentage : null,
             'flat' => $request->type == "flat" ? $request->flat : null,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
@@ -75,6 +75,6 @@ class DiscountController extends Controller
     }
     public function selectiveDiscount()
     {
-        return Discount::where('company_id', $this->company_id)/*->where('is_active', 1)*/->get();
+        return Discount::where('company_id', Auth::user()->company_id)/*->where('is_active', 1)*/->get();
     }
 }

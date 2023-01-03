@@ -38,7 +38,7 @@
                                                         <th>Email</th>
                                                         <th>Contact</th>
                                                         <th>Role</th>
-<!--                                                        <th>Action</th>-->
+                                                        <!--                                                        <th>Action</th>-->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -48,24 +48,24 @@
                                                         <td>{{ user.email }}</td>
                                                         <td>{{ user.contact }}</td>
                                                         <th>{{ user.role ? user.role.name : "Not Found" }}</th>
-<!--                                                        <td>-->
-<!--                                                            <a-->
-<!--                                                                href="#edit-modal"-->
-<!--                                                                data-toggle="modal"-->
-<!--                                                                @click="edit(user)"-->
-<!--                                                                class="btn btn-primary mx-1"-->
-<!--                                                            >-->
-<!--                                                                <i class="far fa-edit"></i>-->
-<!--                                                            </a>-->
-<!--                                                            &lt;!&ndash;                                <a&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                  href="#delete-modal"&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                  data-toggle="modal"&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                  @click="deleteModal(user, i)"&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                  class="btn btn-danger"&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                >&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                  <i class="far fa-trash-alt"></i>&ndash;&gt;-->
-<!--                                                            &lt;!&ndash;                                </a>&ndash;&gt;-->
-<!--                                                        </td>-->
+                                                        <!--                                                        <td>-->
+                                                        <!--                                                            <a-->
+                                                        <!--                                                                href="#edit-modal"-->
+                                                        <!--                                                                data-toggle="modal"-->
+                                                        <!--                                                                @click="edit(user)"-->
+                                                        <!--                                                                class="btn btn-primary mx-1"-->
+                                                        <!--                                                            >-->
+                                                        <!--                                                                <i class="far fa-edit"></i>-->
+                                                        <!--                                                            </a>-->
+                                                        <!--                                                            &lt;!&ndash;                                <a&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                  href="#delete-modal"&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                  data-toggle="modal"&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                  @click="deleteModal(user, i)"&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                  class="btn btn-danger"&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                >&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                  <i class="far fa-trash-alt"></i>&ndash;&gt;-->
+                                                        <!--                                                            &lt;!&ndash;                                </a>&ndash;&gt;-->
+                                                        <!--                                                        </td>-->
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -90,7 +90,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Name <span class="text-danger">*</span></label>
+                        <label for="name">Name <span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -101,7 +101,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -112,18 +112,18 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="contact">Contact <span class="text-danger">*</span></label>
-                        <input
-                            type="number"
-                            class="form-control"
-                            placeholder="Enter Contact"
-                            id="contact"
-                            autocomplete="off"
-                            v-model="data.contact"
-                        />
+                        <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
+                        <vue-mask id="phone"
+                                  class="form-control"
+                                  v-model="data.contact"
+                                  mask="0000-0000000"
+                                  :raw="false"
+                                  :options="optionsContact"
+                        >
+                        </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="password">Password <span class="text-danger">*</span></label>
+                        <label for="password">Password <span class="text-danger ml-1">*</span></label>
                         <input
                             type="password"
                             class="form-control"
@@ -133,8 +133,21 @@
                             v-model="data.password"
                         />
                     </div>
-                    <div class="form-group col-md-12">
-                        <label for="role">Role <span class="text-danger">*</span></label>
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="data.terminal_id">
+                            <option value="0">Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="role">Role <span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addRoleModal"> Add New Role
                         </div>
@@ -173,7 +186,7 @@
                         <div class="modal-body">
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
-                                    <label for="name">Name<span class="text-danger">*</span></label>
+                                    <label for="name">Name<span class="text-danger ml-1">*</span></label>
                                     <input type="text" id="name" class="form-control" v-model="roleName"/>
                                 </div>
                             </div>
@@ -194,7 +207,6 @@
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
-
             >
                 <div class="row">
                     <div class="form-group col-md-6">
@@ -219,13 +231,14 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="contact">Contact</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Contact"
-                            id="contact"
-                            v-model="dataEdit.contact"
-                        />
+                        <vue-mask id="phone"
+                                  class="form-control"
+                                  v-model="dataEdit.contact"
+                                  mask="0000-0000000"
+                                  :raw="false"
+                                  :options="optionsContact"
+                        >
+                        </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password">Password</label>
@@ -237,7 +250,20 @@
                             v-model="dataEdit.password"
                         />
                     </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" id="terminals"
+                                v-model="dataEdit.terminal_id">
+                            <option value="0">Select Terminal</option>
+                            <option
+                                v-for="(terminal, i) in terminals"
+                                :value="terminal.id"
+                                :key="i"
+                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="role">Role</label>
                         <select
                             type="text"
@@ -276,6 +302,8 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import {mapGetters} from "vuex";
+import vueMask from "vue-jquery-mask";
+
 
 export default {
     name: "Role",
@@ -283,9 +311,13 @@ export default {
         Add,
         Edit,
         Delete,
+        vueMask,
     },
     data() {
         return {
+            optionsContact: {
+                placeholder: "03xx-xxxxxxx",
+            },
             roles: [],
             users: [],
             formID: 'newUser',
@@ -297,8 +329,12 @@ export default {
                 password: "",
                 role: 0,
                 company_id: "",
+                terminal_id: 0,
             },
-            dataEdit: {},
+            dataEdit: {
+                terminal_id: 0,
+            },
+            terminals: [],
             success: false,
             loading: false,
             loadingEdit: false,
@@ -320,9 +356,24 @@ export default {
 
         async fetchUsers() {
             const userRes = await this.callApi("post", "user");
-            this.users = userRes.data;
+            if (userRes.status == 200) {
+                this.users = userRes.data;
+            } else {
+                console.log(userRes)
+            }
             const roleRes = await this.callApi("post", "company/roles", {id: this.data.company_id});
-            this.roles = roleRes.data;
+            if (roleRes.status == 200) {
+                this.roles = roleRes.data;
+            } else {
+                console.log(roleRes)
+            }
+
+            const resDepart = await this.callApi("post", 'terminals/all');
+            if (resDepart.status == 200) {
+                this.terminals = resDepart.data
+            } else {
+                console.log(resDepart);
+            }
             setTimeout(() => {
                 $("#users_table").DataTable();
             }, 300);
@@ -338,18 +389,25 @@ export default {
                     timer: 2000
                 });
             if (this.data.email == "" || typeof this.data.email == 'undefined')
-            return swal({
-                title: "Required!!",
-                text: "Email is Required",
-                icon: "error",
-                timer: 2000
-            });
+                return swal({
+                    title: "Required!!",
+                    text: "Email is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.data.password == "" || typeof this.data.password == 'undefined')
                 return swal({
                     title: "Required!!",
                     text: "Password is Required",
                     icon: "error",
                     timer: 4000
+                });
+            if (this.data.terminal_id == 0)
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
                 });
             if (this.data.role == 0)
                 return swal({

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Hrm\Department\Department;
+use App\Models\Hrm\Employee\Employee;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +38,10 @@ class Terminal extends Model
     public function departments()
     {
         return $this->hasMany(Department::class, 'terminal_id', 'id');
+    }
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'terminal_id', 'id');
     }
 
 }

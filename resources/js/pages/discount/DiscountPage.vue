@@ -101,7 +101,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="DiscountName">Name <span class="text-danger">*</span></label>
+                        <label for="DiscountName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="DiscountName"/>
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
@@ -115,7 +115,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDiscountDivPercentage">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="DiscountPercentage" placeholder="Enter Percentage"
                                    @keypress="isNumber($event);  numberRange($event)">
@@ -125,7 +125,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDiscountDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span> <span class="text-muted">max: 10K</span> </label>
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span class="text-muted">max: 10K</span> </label>
                         <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
 
@@ -161,7 +161,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="DiscountName">Name <span class="text-danger">*</span></label>
+                        <label for="DiscountName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name" />
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
@@ -175,7 +175,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger">*</span></label>
+                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage" placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
@@ -185,7 +185,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger">*</span><span class="text-muted">max: 10K</span></label>
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span><span class="text-muted">max: 10K</span></label>
                         <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat" placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
                     </div>

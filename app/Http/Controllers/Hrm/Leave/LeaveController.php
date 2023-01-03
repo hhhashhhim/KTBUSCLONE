@@ -11,24 +11,24 @@ use Illuminate\Support\Facades\Auth;
 class LeaveController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        $role = Role::where('company_id', $this->company_id)->where('id', Auth::user()->role_id)->get(['name']);
+        $role = Role::where('company_id', Auth::user()->company_id)->where('id', Auth::user()->role_id)->get(['name']);
         if($role == 'admin') {
-            return Leave::with('addedBy', 'company', 'decision')->where('company_id', $this->company_id)->get();
+            return Leave::with('addedBy', 'company', 'decision')->where('company_id', Auth::user()->company_id)->get();
         }
         if($role != 'admin'){
-            return Leave::with('addedBy', 'company', 'decision')->where('company_id', $this->company_id)->where('added_by', Auth::user()->id)->get();
+            return Leave::with('addedBy', 'company', 'decision')->where('company_id', Auth::user()->company_id)->where('added_by', Auth::user()->id)->get();
         }
     }
 
@@ -54,7 +54,7 @@ class LeaveController extends Controller
             'status' => 'P',
             'applied_by' => Auth::user()->id,
             'added_by' => Auth::user()->id,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
     }
@@ -104,7 +104,7 @@ class LeaveController extends Controller
             'decider_id'=>Auth::user()->id,
 
         ]);
-        return Leave::with('addedBy', 'company', 'decision')->where('id', $request->id)->where('company_id', $this->company_id)->get();
+        return Leave::with('addedBy', 'company', 'decision')->where('id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }
 
 }

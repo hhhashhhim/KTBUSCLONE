@@ -11,28 +11,32 @@ use Illuminate\Validation\Rule;
 class TerminalController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
     public function index()
     {
-        return City::withCount('terminal')->with('addedBy')->where('company_id', $this->company_id)->get();
+        return City::withCount('terminal')->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+    }
+    public function allTerminals()
+    {
+        return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']);
     }
     public function getTerminal(Request $request)
     {
-        return Terminal::with('addedBy')->where('city_id', $request->id)->where('company_id', $this->company_id)->get();
+        return Terminal::with('addedBy')->where('city_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }
     public function store(Request $request)
     {
 
         $rules = [
-            'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'city_id' => 'required',
             'contact' => 'required',
         ];
@@ -46,7 +50,7 @@ class TerminalController extends Controller
         $this->validate($request, $rules, $customMessages);
         if ($request->is_main) {
             $main = Terminal::where('city_id', $request->city_id)
-                ->where('company_id', $this->company_id)
+                ->where('company_id', Auth::user()->company_id)
                 ->where('is_main', 1)
                 ->first();
             if ($main) {
@@ -71,7 +75,7 @@ class TerminalController extends Controller
             'status' => $request->active ? 1 : 0,
             'is_main' => $request->is_main ? 1 : 0,
             'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->is_super_admin == 0 ? $this->company_id : $request->company_id,
+            'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
         ]);
 
         return $this->index();

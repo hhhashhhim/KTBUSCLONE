@@ -98,7 +98,7 @@
             >
                 <div class="row mt-2">
                     <div class="form-group col-md-6">
-                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <label for="terminals">Terminals <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="addForm.terminal">
                             <option value="0">Select Terminal</option>
@@ -111,7 +111,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input type="text" id="name" class="form-control" v-model="addForm.name"/>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
+                        <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="dataEdit.terminal_id">
                             <option value="0">Select Terminal</option>
@@ -147,7 +147,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="editName">Name <span class="text-danger">*</span></label>
+                        <label for="editName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="editName" class="form-control" v-model="dataEdit.name"/>
                     </div>
                 </div>
@@ -206,7 +206,7 @@ export default {
     methods: {
 
         async fetchDepartments() {
-            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            const resAllTerminals = await this.callApi("post", 'terminals/all');
             if (resAllTerminals.status == 200) {
                 this.terminals = resAllTerminals.data
             } else {

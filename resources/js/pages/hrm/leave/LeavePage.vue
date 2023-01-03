@@ -139,16 +139,16 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="fromDate">From <span class="text-danger">*</span></label>
+                        <label for="fromDate">From <span class="text-danger ml-1">*</span></label>
                         <input type="date" id="fromDate" class="form-control" v-model="addForm.from"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="toDate">To <span class="text-danger">*</span></label>
+                        <label for="toDate">To <span class="text-danger ml-1">*</span></label>
                         <input type="date" id="toDate" :min="minDateFilter()" class="form-control"
                                v-model="addForm.to"/>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="reason">Reason<span class="text-danger">*</span></label>
+                        <label for="reason">Reason<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" name="" id="reason" cols="50" rows="60"
                                   v-model="addForm.reason"></textarea>
                     </div>
@@ -172,16 +172,16 @@
             >
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="fromDate">From <span class="text-danger">*</span></label>
+                        <label for="fromDate">From <span class="text-danger ml-1">*</span></label>
                         <input type="date" id="fromDate" class="form-control" v-model="dataEdit.from"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="toDate">To <span class="text-danger">*</span></label>
+                        <label for="toDate">To <span class="text-danger ml-1">*</span></label>
                         <input type="date" id="toDateEdit" :min="minDateFilter()" class="form-control"
                                v-model="dataEdit.to"/>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="reason">Reason<span class="text-danger">*</span></label>
+                        <label for="reason">Reason<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" name="" id="reason" cols="50" rows="60"
                                   v-model="dataEdit.reason"></textarea>
                     </div>

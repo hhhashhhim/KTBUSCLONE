@@ -101,7 +101,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -111,7 +111,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Color<span class="text-danger">*</span></label>
+                        <label for="name">Color<span class="text-danger ml-1">*</span></label>
                         <input
                             type="color"
                             class="form-control"
@@ -152,11 +152,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="SurchargeName">Name <span class="text-danger">*</span></label>
+                        <label for="SurchargeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="SurchargeName">Color <span class="text-danger">*</span></label>
+                        <label for="SurchargeName">Color <span class="text-danger ml-1">*</span></label>
                         <input type="color" class="form-control" v-model="dataEdit.color"/>
                     </div>
                 </div>

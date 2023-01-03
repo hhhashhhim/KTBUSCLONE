@@ -123,7 +123,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Food Name <span class="text-danger">*</span></label>
+                            <label for="name">Food Name <span class="text-danger ml-1">*</span></label>
                             <input
                             type="text"
                             class="form-control"
@@ -132,13 +132,13 @@
                             v-model="postData.name"
                             />
                         </div>
-                        
+
                         <div class="col-md-6">
-                            
+
                         </div>
-                        
+
                         <div class="form-group col-md-6">
-                            <label for="userName">Price <span class="text-danger">*</span></label>
+                            <label for="userName">Price <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -148,7 +148,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="email">Unit <span class="text-danger">*</span></label>
+                            <label for="email">Unit <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -170,7 +170,7 @@
                         </div>
                     </div>
 
-                    
+
                     <template v-slot:button>
                         <button
                             type="button"
@@ -192,7 +192,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Food Name <span class="text-danger">*</span></label>
+                            <label for="name">Food Name <span class="text-danger ml-1">*</span></label>
                             <input
                             type="text"
                             class="form-control"
@@ -201,13 +201,13 @@
                             v-model="editData.name"
                             />
                         </div>
-                        
+
                         <div class="col-md-6">
-                            
+
                         </div>
-                        
+
                         <div class="form-group col-md-6">
-                            <label for="userName">Price <span class="text-danger">*</span></label>
+                            <label for="userName">Price <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -217,7 +217,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="email">Unit <span class="text-danger">*</span></label>
+                            <label for="email">Unit <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -239,7 +239,7 @@
                         </div>
                     </div>
 
-                    
+
                     <template v-slot:button>
                         <button
                             type="button"
@@ -309,7 +309,7 @@ export default {
             const data = {
                 hotelId : this.hotelId
             }
-           
+
             const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods",data);
             if (hotelRes.status == 200) {
                 this.hotelData = hotelRes.data;
@@ -329,8 +329,8 @@ export default {
         async add() {
 
             // validation for empty data
-            
-            if(!this.postData.hotelId || !this.postData.name || !this.postData.price || 
+
+            if(!this.postData.hotelId || !this.postData.name || !this.postData.price ||
                 !this.postData.unit)
             {
                 return swal({
@@ -342,7 +342,7 @@ export default {
             }
 
             this.loading = true;
-            
+
 
             const res = await this.callApi("post", "refreshments/hotels/specific/foods/store", this.postData);
             if (res.status == 201) {
@@ -354,7 +354,7 @@ export default {
                 this.postData.price = "";
                 this.postData.unit = "";
                 this.postData.description = "";
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {
@@ -373,7 +373,7 @@ export default {
             }
         },
         async edit(food) {
-            
+
             if (food) {
                 this.editData.foodId = food.id;
                 this.editData.name = food.name;
@@ -386,9 +386,9 @@ export default {
 
         },
         async update() {
-            
+
             // validation for empty data
-            if(!this.editData.foodId || !this.editData.hotelId || !this.editData.name || 
+            if(!this.editData.foodId || !this.editData.hotelId || !this.editData.name ||
                 !this.editData.price || !this.editData.unit)
             {
                 return swal({
@@ -406,12 +406,12 @@ export default {
                 this.loading = false
                 $("#food_table").DataTable().destroy();
                 this.success = "Food Updated Successfully";
-                
+
                 this.postData.name = "";
                 this.postData.price = "";
                 this.postData.unit = "";
                 this.postData.description = "";
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {

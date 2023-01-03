@@ -22,7 +22,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2  mb-2"><label for="destinationCity" class="mb-0">Destination
-                                    City<span class="text-danger">*</span></label>
+                                    City<span class="text-danger ml-1">*</span></label>
                                     <select class="form-control" id="destinationCity"
                                             @change="fetchSpecificSchedules()"
                                             v-model="addForm.destinationCity">
@@ -34,7 +34,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-2 class  mb-2">
-                                    <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
+                                    <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
                                     <input type="date" :min="minDateFilter()" class="form-control"
                                            v-model="addForm.date"
                                            @change="fetchSpecificSchedules()"/>
@@ -81,7 +81,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Full Name <span class="text-danger">*</span></label>
+                                                        <label>Full Name <span class="text-danger ml-1">*</span></label>
                                                         <input
                                                             type="text"
                                                             class="form-control"
@@ -94,7 +94,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label>Contact <span class="text-danger">*</span></label>
+                                                        <label>Contact <span class="text-danger ml-1">*</span></label>
                                                         <vue-mask
                                                             v-on:blur="getCustomer('addFormContact')"
                                                             class="form-control"
@@ -413,7 +413,7 @@
         <!--                            <div class="col-md-6">-->
         <!--                                <div class="form-group"-->
         <!--                                >-->
-        <!--                                    <label>Withdraw From Bank<span class="text-danger">*</span></label>-->
+        <!--                                    <label>Withdraw From Bank<span class="text-danger ml-1">*</span></label>-->
         <!--                                    <input-->
         <!--                                        type="text"-->
         <!--                                        class="form-control" placeholder="Enter Withdraw From Bank"-->
@@ -427,7 +427,7 @@
         <!--                        <div class="row">-->
         <!--                            <div class="col-md-12">-->
         <!--                                <div class="form-group">-->
-        <!--                                    <label for="description">Description <span class="text-danger">*</span></label>-->
+        <!--                                    <label for="description">Description <span class="text-danger ml-1">*</span></label>-->
         <!--                                    <textarea class="form-control" id="description"-->
         <!--                                              placeholder="Enter Advance Cash Description"-->
         <!--                                              v-model="advanceCash.description"-->
@@ -474,7 +474,7 @@
                             <div class="col-md-6">
                                 <div class="form-group"
                                 >
-                                    <label>Price<span class="text-danger">*</span></label>
+                                    <label>Price<span class="text-danger ml-1">*</span></label>
                                     <input
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
@@ -519,7 +519,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="over_issue_remarks">Remarks <span class="text-danger">*</span></label>
+                            <label for="over_issue_remarks">Remarks <span class="text-danger ml-1">*</span></label>
                             <textarea type="text" class="form-control" id="over_issue_remarks"
                                       v-model="overIssueData.reason"
                                       placeholder="Reason for over-issue a seat"></textarea>
@@ -567,7 +567,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label for="destinationCity" class="mb-0">Destination
-                                    City<span class="text-danger">*</span></label>
+                                    City<span class="text-danger ml-1">*</span></label>
                                 <select class="form-control" id="reScheduleDestinationCity"
                                         @change="fetchReSpecificSchedules()"
                                         v-model="rescheduleData.rescheduleDestinationCity">
@@ -579,7 +579,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2 class">
-                                <label for="date" class="mb-0">Date <span class="text-danger">*</span></label>
+                                <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
                                 <input type="date" :min="minDateFilter()" class="form-control"
                                        v-model="rescheduleData.rescheduleDate"
                                        @change="fetchReSpecificSchedules()"/>
@@ -892,7 +892,7 @@ export default {
                 placeholder: "xxxxx-xxxxxxx-x",
             },
             optionsPhone: {
-                placeholder: "xxxx-xxxxxxx",
+                placeholder: "03xx-xxxxxxx",
             },
             getCustomermessage: '',
             shiftingFormId: "shifting-modal",

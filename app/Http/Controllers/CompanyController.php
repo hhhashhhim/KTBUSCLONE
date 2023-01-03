@@ -12,15 +12,15 @@ use Illuminate\Support\Facades\Auth;
 class CompanyController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
@@ -110,7 +110,7 @@ class CompanyController extends Controller
 
     public function company_roles(Request $request)
     {
-        return Role::where('company_id', $this->company_id)->get();
+        return Role::where('company_id', Auth::user()->company_id)->get();
     }
 
     public function company(Request $request)

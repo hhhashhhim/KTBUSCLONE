@@ -81,7 +81,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Select Bus <span class="text-danger">*</span></label>
+                        <label for="name">Select Bus <span class="text-danger ml-1">*</span></label>
                         <select class="form-control rounded-0" v-model="fleetId">
                             <option value="" selected>Select Bus</option>
                             <option v-for="(fleet, i) in fleets" :value="fleet.id" :key="i">
@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="name">Current Reading (km) <span class="text-danger">*</span></label>
+                        <label for="name">Current Reading (km) <span class="text-danger ml-1">*</span></label>
                         <input type="number" class="form-control" min="0" v-model="currentReading"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
@@ -148,7 +148,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Select Bus <span class="text-danger">*</span></label>
+                        <label for="name">Select Bus <span class="text-danger ml-1">*</span></label>
                         <select class="form-control rounded-0" v-model="edit.fleetId">
                             <option value="" selected>Select Bus</option>
                             <option v-for="(fleet, i) in fleets" :value="fleet.id" :key="i">
@@ -158,7 +158,7 @@
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="name">Current Reading (km) <span class="text-danger">*</span></label>
+                        <label for="name">Current Reading (km) <span class="text-danger ml-1">*</span></label>
                         <input type="number" class="form-control" min="0" v-model="edit.currentReading"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
@@ -177,10 +177,10 @@
                             </tr>
                             </thead>
                             <tbody>
-                              
+
                             <tr v-for="index in edit.loop" :key="index" v-if="edit.fleetDetails.maintenance_part_link">
                                 <td>
-                                    <select class="form-control rounded-0" @change="editSaveRow($event,'rowPart')" 
+                                    <select class="form-control rounded-0" @change="editSaveRow($event,'rowPart')"
                                     :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' " >
                                         <option value="" selected>Select Part </option>
                                         <option v-for="(part, i) in parts" :value="part.id" :key="i">
@@ -189,12 +189,12 @@
                                     </select>
                                 </td>
                                 <td>
-                                    
-                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowAfter')" 
+
+                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowAfter')"
                                     :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowLast')" 
+                                    <input type="number" class="form-control" min="0" @keyup="editSaveRow($event,'rowLast')"
                                     :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' " />
                                 </td>
                                 <td>
@@ -253,7 +253,7 @@
             </div>
 
 
-           
+
         </div>
     </section>
 </template>
@@ -305,7 +305,7 @@ export default {
           this.reverseRoute = 1;
         },
         saveRow(event,fieldName) {
-           
+
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if(fieldName == "rowPart")
             {
@@ -321,9 +321,9 @@ export default {
             }
         },
         editSaveRow(event,fieldName) {
-           
+
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-           
+
             if(fieldName == "rowPart")
             {
                 this.edit.fleetPart[getRowNumber-1] = event.target.value;
@@ -338,9 +338,9 @@ export default {
             }
         },
         async linkMaintenance() {
-            
+
             // validation for empty data
-            if(!this.fleetId || !this.currentReading || this.fleetPart.length == 0 || 
+            if(!this.fleetId || !this.currentReading || this.fleetPart.length == 0 ||
                 this.maintenanceAfter.length == 0 || this.maintenanceAt.length == 0)
             {
                 return swal({
@@ -350,7 +350,7 @@ export default {
                     timer: 4000
                 });
             }
-            
+
             // check if any index is empty or null in object
             for(var i = 0; i < this.fleetPart.length; i++)
             {
@@ -361,7 +361,7 @@ export default {
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
                         timer: 4000
-                    }); 
+                    });
                 }
             }
 
@@ -422,9 +422,9 @@ export default {
             }
         },
         async updateLinkMaintenance() {
-            
+
             // validation for empty data
-            if(!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 || 
+            if(!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 ||
                 this.edit.maintenanceAfter.length == 0 || this.edit.maintenanceAt.length == 0)
             {
                 return swal({
@@ -434,7 +434,7 @@ export default {
                     timer: 4000
                 });
             }
-            
+
             // check if any index is empty or null in object
             for(var i = 0; i < this.edit.fleetPart.length; i++)
             {
@@ -445,7 +445,7 @@ export default {
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
                         timer: 4000
-                    }); 
+                    });
                 }
             }
 
@@ -525,7 +525,7 @@ export default {
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet");
             if (fleetRes.status === 200) {
-                
+
                 this.mainData = fleetRes.data.mainData;
                 this.fleets = fleetRes.data.busDrop;
                 this.parts = fleetRes.data.partDrop;
@@ -559,7 +559,7 @@ export default {
                 this.edit.fleetPart = [];
                 this.edit.maintenanceAfter = [];
                 this.edit.maintenanceAt = [];
-                
+
                 this.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
                 this.edit.fleetDetails = fleetDetailRes.data;
                 this.edit.fleetId = fleetDetailRes.data.id;

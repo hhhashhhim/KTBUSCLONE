@@ -17,19 +17,19 @@ use DB;
 class HotelController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Hotel::with("user")->where("company_id",$this->company_id)->get();
+        return Hotel::with("user")->where("company_id",Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -37,7 +37,7 @@ class HotelController extends Controller
         $request->validate([
             "name" => 'required',
             // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
-            "hotelName" => 'required|unique:hotels,name,Null,id,company_id,'.$this->company_id,
+            "hotelName" => 'required|unique:hotels,name,Null,id,company_id,'.Auth::user()->company_id,
             "email" => 'required|email|unique:users',
             "password" => 'required',
             "contact" => 'required',
@@ -51,7 +51,7 @@ class HotelController extends Controller
             "password" => Hash::make($request->password),
             "contact" => str_replace('-', '', $request->contact),
             "role_id" => 0,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
         ]);
 
         return Hotel::create([
@@ -62,7 +62,7 @@ class HotelController extends Controller
             "location" => $request->location,
             "commission" => $request->commission,
             "balance" => $request->balance??0,
-            "company_id" => $this->company_id,
+            "company_id" => Auth::user()->company_id,
             "added_by" => Auth::user()->id,
         ]);
     }
@@ -72,7 +72,7 @@ class HotelController extends Controller
         $request->validate([
             "name" => 'required',
             // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
-            "hotelName" => 'required|unique:hotels,name,'.$request->hotelId.',id,company_id,'.$this->company_id,
+            "hotelName" => 'required|unique:hotels,name,'.$request->hotelId.',id,company_id,'.Auth::user()->company_id,
             "email" => 'required|email|unique:users,email,'.$request->userId,
             "contact" => 'required',
             "commission" => 'required',
@@ -98,7 +98,7 @@ class HotelController extends Controller
             "location" => $request->location,
             "commission" => $request->commission,
             "balance" => $request->balance??0,
-            "company_id" => $this->company_id,
+            "company_id" => Auth::user()->company_id,
             "added_by" => Auth::user()->id,
         ]);
 

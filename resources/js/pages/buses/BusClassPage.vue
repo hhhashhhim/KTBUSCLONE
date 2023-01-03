@@ -121,7 +121,7 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger">*</span></label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -131,7 +131,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="color">Color<span class="text-danger">*</span></label>
+                        <label for="color">Color<span class="text-danger ml-1">*</span></label>
                         <input
                             type="color"
                             class="form-control"
@@ -159,7 +159,7 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Rows<span class="text-danger">*</span></label
+                        >No. of Rows<span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"
@@ -171,7 +171,7 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Cols<span class="text-danger">*</span></label
+                        >No. of Cols<span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"
@@ -272,7 +272,7 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Seat Number <span class="text-danger">*</span></label>
+                                <label>Seat Number <span class="text-danger ml-1">*</span></label>
                                 <input type="text" class="form-control" v-model="setSeatNumber.addSeatNO">
                             </div>
                         </div>
@@ -391,7 +391,7 @@
                             <div class="row">
                                 <div class="form-group col-md-12">
                                     <label for="name"
-                                    >Name<span class="text-danger">*</span></label
+                                    >Name<span class="text-danger ml-1">*</span></label
                                     >
                                     <input
                                         type="text"
@@ -433,12 +433,12 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="SurchargeName"
-                        >Name <span class="text-danger">*</span></label
+                        >Name <span class="text-danger ml-1">*</span></label
                         >
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="color">Color<span class="text-danger">*</span></label>
+                        <label for="color">Color<span class="text-danger ml-1">*</span></label>
                         <input
                             type="color"
                             class="form-control"
@@ -468,7 +468,7 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Rows <span class="text-danger">*</span></label
+                        >No. of Rows <span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"
@@ -480,7 +480,7 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Cols <span class="text-danger">*</span></label
+                        >No. of Cols <span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"

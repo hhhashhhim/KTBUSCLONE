@@ -93,7 +93,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="name">Hotel Name <span class="text-danger">*</span></label>
+                            <label for="name">Hotel Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -103,7 +103,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="userName">Name <span class="text-danger">*</span></label>
+                            <label for="userName">Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -113,7 +113,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="email">Email <span class="text-danger">*</span></label>
+                            <label for="email">Email <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="email"
                                 class="form-control"
@@ -123,7 +123,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="password">Password <span class="text-danger">*</span></label>
+                            <label for="password">Password <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="password"
                                 class="form-control"
@@ -133,7 +133,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="contact">Contact <span class="text-danger">*</span></label>
+                            <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
                             <vue-mask
                                 class="form-control"
                                 v-model="postData.contact"
@@ -163,7 +163,7 @@
                             />
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                            <label for="contact">Company Commission (%)<span class="text-danger ml-1">*</span></label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -173,7 +173,7 @@
                             />
                         </div>
                         <div class="form-group col-md-12">
-                            <label for="location">Location <span class="text-danger">*</span></label>
+                            <label for="location">Location <span class="text-danger ml-1">*</span></label>
                             <textarea
                                 class="form-control"
                                 placeholder="Enter Location"
@@ -185,7 +185,7 @@
                         </div>
                     </div>
 
-                    
+
                     <template v-slot:button>
                         <button
                             type="button"
@@ -207,7 +207,7 @@
                 >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Hotel Name <span class="text-danger">*</span></label>
+                        <label for="name">Hotel Name <span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -217,7 +217,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="userName">Name <span class="text-danger">*</span></label>
+                        <label for="userName">Name <span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -227,7 +227,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input
                             type="email"
                             class="form-control"
@@ -247,7 +247,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="contact">Contact <span class="text-danger">*</span></label>
+                        <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
                         <vue-mask
                             class="form-control"
                             v-model="editData.contact"
@@ -277,7 +277,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="contact">Company Commission (%)<span class="text-danger">*</span></label>
+                        <label for="contact">Company Commission (%)<span class="text-danger ml-1">*</span></label>
                         <input
                             type="number"
                             class="form-control"
@@ -287,7 +287,7 @@
                         />
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="location">Location <span class="text-danger">*</span></label>
+                        <label for="location">Location <span class="text-danger ml-1">*</span></label>
                         <textarea
                             class="form-control"
                             placeholder="Enter Location"
@@ -299,7 +299,7 @@
                     </div>
                 </div>
 
-                
+
                 <template v-slot:button>
                     <button
                         type="button"
@@ -417,14 +417,14 @@ export default {
             formData.append('balance', this.postData.balance);
             formData.append('commission', this.postData.commission);
             formData.append('location', this.postData.location);
-            
+
 
             const res = await this.callApi("post", "refreshments/hotels/store", formData , config);
             if (res.status == 201) {
                 this.loading = false
                 $("#hotel_table").DataTable().destroy();
                 this.success = "Hotel Created Successfully";
-                
+
                 this.postData.hotelName = "";
                 this.postData.name = "";
                 this.postData.email = "";
@@ -435,7 +435,7 @@ export default {
                 this.postData.commission = "";
                 this.postData.location = "";
                 $("#imageField").val('');
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {
@@ -454,7 +454,7 @@ export default {
             }
         },
         async edit(hotel) {
-            
+
             if (hotel) {
                 this.editData.hotelId = hotel.id;
                 this.editData.userId = hotel.user_id;
@@ -471,7 +471,7 @@ export default {
 
         },
         async update() {
-            
+
             // validation for empty data
             if(!this.editData.hotelName || !this.editData.name || !this.editData.email ||
                 !this.editData.contact || !this.editData.commission || !this.editData.location)
@@ -502,14 +502,14 @@ export default {
             formData.append('balance', this.editData.balance);
             formData.append('commission', this.editData.commission);
             formData.append('location', this.editData.location);
-            
+
 
             const res = await this.callApi("post", "refreshments/hotels/update", formData , config);
             if (res.status == 200) {
                 this.loading = false
                 $("#hotel_table").DataTable().destroy();
                 this.success = "Hotel Updated Successfully";
-                
+
                 this.editData.hotelId = "";
                 this.editData.userId = "";
                 this.editData.hotelName = "";
@@ -522,7 +522,7 @@ export default {
                 this.editData.commission = "";
                 this.editData.location = "";
                 $("#editImageField").val('');
-                
+
                 await this.fetchData();
                 window.scrollTo(0, 0);
                 setTimeout(() => {

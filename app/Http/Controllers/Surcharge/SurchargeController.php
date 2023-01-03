@@ -12,25 +12,25 @@ use Illuminate\Validation\Rule;
 class SurchargeController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Surcharge::with('addedBy')->orderBy('id')->where('company_id', $this->company_id)->get();
+        return Surcharge::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeSurcharge(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('schedules', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'name' => ['required', Rule::unique('schedules', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -43,7 +43,7 @@ class SurchargeController extends Controller
             'type' => $request->type,
             'percentage' => $request->type == "percentage" ? $request->percentage : null,
             'flat' => $request->type == "flat" ? $request->flat : null,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'is_active' => $request->active,
             'added_by' => Auth::user()->id,
         ]);
@@ -76,6 +76,6 @@ class SurchargeController extends Controller
 
     public function selectiveSurcharge()
     {
-        return Surcharge::where('company_id', $this->company_id)/*->where('is_active', 1)*/->get();
+        return Surcharge::where('company_id', Auth::user()->company_id)/*->where('is_active', 1)*/->get();
     }
 }

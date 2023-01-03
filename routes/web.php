@@ -90,6 +90,7 @@ Route::group(['prefix' => 'user', [CustomMiddleware::class]], function () {
 //Terminals Route
 Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('/', [TerminalController::class, 'index']);
+    Route::post('/all', [TerminalController::class, 'allTerminals']);
     Route::post('/getTerminal', [TerminalController::class, 'getTerminal']);
     Route::post('store', [TerminalController::class, 'store']);
     Route::post('update', [TerminalController::class, 'update']);
@@ -235,6 +236,7 @@ Route::group(['prefix' => 'hrm/department', [CustomMiddleware::class]], function
     Route::post('/store', [DepartmentController::class, 'store']);
     Route::post('/update', [DepartmentController::class, 'update']);
     Route::post('/delete', [DepartmentController::class, 'delete']);
+    Route::post('/selective', [DepartmentController::class, 'selective']);
 });
 
 Route::group(['prefix' => 'hrm/designation', [CustomMiddleware::class]], function () {

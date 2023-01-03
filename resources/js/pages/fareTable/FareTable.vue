@@ -97,11 +97,11 @@
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="fare">Fare <span class="text-danger">*</span></label>
+                        <label for="fare">Fare <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="time_difference">Travel Time ( e.g HH:MM ) <span class="text-danger">*</span></label>
+                        <label for="time_difference">Travel Time ( e.g HH:MM ) <span class="text-danger ml-1">*</span></label>
                         <vue-mask
                             class="form-control"
                             v-model="data.time_difference"

@@ -193,7 +193,7 @@ export default {
                 placeholder: "xxxxx-xxxxxxx-x",
             },
             optionsContact: {
-                placeholder: "xxxx-xxxxxxx",
+                placeholder: "03xx-xxxxxxx",
             },
             loading: false,
             showAllBooking: false,

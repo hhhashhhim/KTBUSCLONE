@@ -199,7 +199,7 @@ if (!function_exists('updateFareTable')) {
 if (!function_exists('printTicket')) {
     function printTicket($ticketIds, $company_id, $duplicate = 0)
     {
-        $format = TicketsTemplate::where('company_id', $company_id)->where('status', 1)->first();
+        $format = TicketsTemplate::where(['company_id' => $company_id, 'status' => 1, 'terminal_id' => Auth::user()->terminal_id])->first();
         $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
 //        foreach ($tickets as $single) {
         // Set params
@@ -276,11 +276,11 @@ if (!function_exists('codeImage')) {
 if (!function_exists('getMembers')) {
     function getMembers($data, $company_id, $type)
     {
-      $dataMember = TicketClosingMember::where([
+        $dataMember = TicketClosingMember::where([
             'company_id' => $company_id,
             'ticket_closing_id' => $data[0]->ticket_closing_id,
             'type' => $type,
         ])->pluck('user_id');
-      return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name','contact']);
+        return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']);
     }
 }

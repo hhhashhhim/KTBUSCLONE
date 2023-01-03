@@ -192,7 +192,7 @@
                 <section class="section1" :class="activeSection != 0 ? 'd-none' : ''">
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="name">Name <span class="text-danger">*</span></label>
+                            <label for="name">Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 id="name"
@@ -201,7 +201,7 @@
                             />
                         </div>
                         <div class="col-md-6 class form-group">
-                            <label for="start">Start Date <span class="text-danger">*</span></label>
+                            <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="date"
                                 id="start"
@@ -212,7 +212,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 class form-group">
-                            <label for="end">End Date <span class="text-danger">*</span></label>
+                            <label for="end">End Date <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="date"
                                 id="end"
@@ -222,7 +222,7 @@
                         </div>
 
                         <div class="col-md-6 class form-group">
-                            <label for="busCLass">Time <span class="text-danger">*</span></label>
+                            <label for="busCLass">Time <span class="text-danger ml-1">*</span></label>
                             <input type="time" class="form-control" v-model="data.time">
                         </div>
                     </div>
@@ -245,7 +245,7 @@
                 >
                     <div class="row">
                         <div class="col-md-8 class form-group">
-                            <label for="route">Routes <span class="text-danger">*</span></label>
+                            <label for="route">Routes <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
                                 id="route"
@@ -260,7 +260,7 @@
                         </div>
 
                         <div class="col-md-4 class form-group">
-                            <label for="busCLass">Bus Class <span class="text-danger">*</span></label>
+                            <label for="busCLass">Bus Class <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
                                 id="busCLass"
@@ -277,7 +277,7 @@
                             </select>
                         </div>
 <!--                        <div class="col-md-3 class form-group">-->
-<!--                            <label for="busCLass">Default Fare CLass <span class="text-danger">*</span></label>-->
+<!--                            <label for="busCLass">Default Fare CLass <span class="text-danger ml-1">*</span></label>-->
 <!--                            <select-->
 <!--                                class="form-control"-->
 <!--                                id="busCLass"-->
@@ -524,7 +524,7 @@
                 >
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="name">Name <span class="text-danger">*</span></label>
+                            <label for="name">Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 id="name"
@@ -533,7 +533,7 @@
                             />
                         </div>
                         <div class="col-md-6 class form-group">
-                            <label for="start">Start Date <span class="text-danger">*</span></label>
+                            <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="date"
                                 id="start"
@@ -544,7 +544,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 class form-group">
-                            <label for="end">End Date <span class="text-danger">*</span></label>
+                            <label for="end">End Date <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="date"
                                 id="end"
@@ -553,7 +553,7 @@
                             />
                         </div>
                         <div class="col-md-6 class form-group">
-                            <label for="time">Time<span class="text-danger">*</span></label>
+                            <label for="time">Time<span class="text-danger ml-1">*</span></label>
                             <input type="time" id="time" class="form-control" v-model="dataEdit.schedules.time"
                             />
                         </div>
@@ -573,7 +573,7 @@
                 <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">
                     <div class="row">
                         <div class="col-md-8 class form-group">
-                            <label for="DiscountName">Routes <span class="text-danger">*</span></label>
+                            <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
                                 id="route" @change="getSelectiveData('routeEdit', $event)"
@@ -590,7 +590,7 @@
                             </select>
                         </div>
                         <div class="col-md-4 class form-group">
-                            <label for="busClassEdit">Bus Class <span class="text-danger">*</span></label>
+                            <label for="busClassEdit">Bus Class <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
                                 id="busClassEdit"
@@ -607,7 +607,7 @@
                             </select>
                         </div>
 <!--                        <div class="col-md-3 class form-group">-->
-<!--                            <label for="fareClassEdit">Fare Class <span class="text-danger">*</span></label>-->
+<!--                            <label for="fareClassEdit">Fare Class <span class="text-danger ml-1">*</span></label>-->
 <!--                            <select-->
 <!--                                class="form-control"-->
 <!--                                id="fareClassEdit"-->

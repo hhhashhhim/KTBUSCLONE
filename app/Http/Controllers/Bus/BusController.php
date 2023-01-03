@@ -14,25 +14,25 @@ use Illuminate\Validation\Rule;
 class BusController extends Controller
 {
 
-    public $company_id;
-
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            $this->company_id = Auth::user()->company_id;
-            return $next($request);
-        });
-    }
+//    public $company_id;
+//
+//    public function __construct()
+//    {
+//        $this->middleware(function ($request, $next) {
+//            Auth::user()->company_id = Auth::user()->company_id;
+//            return $next($request);
+//        });
+//    }
 
     public function index()
     {
-        return Bus::with('addedBy', 'busClass')->orderBy('id')->where('company_id', $this->company_id)->get();
+        return Bus::with('addedBy', 'busClass')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeBus(Request $request)
     {
         $rules = [
-            'busNumber' => ['required', Rule::unique('buses','bus_number')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'busNumber' => ['required', Rule::unique('buses','bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'fare_class' => 'required|integer',
 //            'chassisNumber' => 'required',
 //            'insuranceNumber' => 'required',
@@ -51,7 +51,7 @@ class BusController extends Controller
             'chassis_number' => $request->chassisNumber,
             'insurance_number' => $request->insuranceNumber,
             'route_permit_number' => $request->routePermit,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
     }
@@ -60,7 +60,7 @@ class BusController extends Controller
     {
 
         $rules = [
-            'bus_number' => ['required', Rule::unique('buses','bus_number')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'bus_number' => ['required', Rule::unique('buses','bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'fare_class_id' => 'required|integer',
         ];
 
@@ -76,7 +76,7 @@ class BusController extends Controller
             'insurance_number' => $request->insurance_number,
             'route_permit_number' => $request->route_permit_number,
             'fare_class_id' => $request->fare_class_id,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -88,12 +88,12 @@ class BusController extends Controller
 
     public function getBusData(Request $request)
     {
-        return Bus::where('id', $request->id)->where('company_id', $this->company_id)->first();
+        return Bus::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
     }
     public function saveFareClass(Request $request)
     {
         $rules = [
-            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', $this->company_id)->whereNull('deleted_at')],
+            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
@@ -104,7 +104,7 @@ class BusController extends Controller
         return FareClass::create([
             'name' => $request->FareClassName,
             'is_active' => 1,
-            'company_id' => $this->company_id,
+            'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
 
