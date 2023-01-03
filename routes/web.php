@@ -165,6 +165,8 @@ Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/getBusData', [BusController::class, 'getBusData']);
     Route::post('/storeFareClass', [BusController::class, 'saveFareClass']);
 
+    Route::post('/single/schedule/latest', [BusController::class, 'getBusSchedule']);
+
 });
 
 Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function () {
