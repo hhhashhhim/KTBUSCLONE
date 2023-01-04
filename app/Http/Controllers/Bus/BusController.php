@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusSeatMap;
 use App\Models\FareClass;
+use App\Models\Schedule\TicketClosing;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -108,5 +109,9 @@ class BusController extends Controller
             'added_by' => Auth::user()->id,
         ]);
 
+    }
+    public function getBusSchedule(Request $request)
+    {
+        return TicketClosing::where('bus_id', $request->id)->where('company_id', $this->company_id)->latest()->first(['id','schedule_id','schedule_date','schedule_time']);
     }
 }

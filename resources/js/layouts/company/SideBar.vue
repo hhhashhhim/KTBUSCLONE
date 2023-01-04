@@ -205,6 +205,14 @@
                             </router-link>
                         </li>
                     </ul>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'foodOrder' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i> Food Order
+                            </router-link>
+                        </li>
+                    </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('hrm')">
 
