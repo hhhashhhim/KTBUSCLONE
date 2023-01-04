@@ -113,6 +113,6 @@ class BusController extends Controller
 
     public function getBusSchedule(Request $request)
     {
-        return TicketClosing::where('bus_id', $request->id)->where('company_id', $this->company_id)->latest()->first(['id', 'schedule_id', 'schedule_date', 'schedule_time']);
+        return TicketClosing::where('bus_id', $request->id)->where('company_id', Auth::user()->company_id)->latest()->first(['id','schedule_id','schedule_date','schedule_time']);
     }
 }
