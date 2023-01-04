@@ -36,11 +36,10 @@ class CompanyController extends Controller
             'email' => 'required | unique:users',
             'password' => 'required',
         ]);
-        $contact_format = str_replace('-', '', $request->contact);
 
         $company = Company::create([
             'name' => $request->name,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'location' => $request->location,
             'modules' => $request->modules,
             'logo' => $request->logo,
@@ -56,7 +55,7 @@ class CompanyController extends Controller
         $user = User::create([
             'name' => $request->userName,
             'email' => $request->email,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'password' => Hash::make($request->password),
             'role_id' => $role->id,
             'company_id' => $company->id,
@@ -79,10 +78,9 @@ class CompanyController extends Controller
             'name' => 'required',
             'contact' => 'required',
         ]);
-        $contact_format = str_replace('-', '', $request->contact);
         Company::find($request->id)->update([
             'name' => $request->name,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'logo' => $request->logo,
             'location' => $request->location,
             'modules' => $request->modules,
@@ -90,7 +88,7 @@ class CompanyController extends Controller
         ]);
         User::where('company_id', $request->id)->where('email', $request->email)->first()->update([
             'name' => $request->name,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

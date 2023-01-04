@@ -33,7 +33,7 @@ class BusController extends Controller
     public function storeBus(Request $request)
     {
         $rules = [
-            'busNumber' => ['required', Rule::unique('buses','bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'busNumber' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'fare_class' => 'required|integer',
 //            'chassisNumber' => 'required',
 //            'insuranceNumber' => 'required',
@@ -61,7 +61,7 @@ class BusController extends Controller
     {
 
         $rules = [
-            'bus_number' => ['required', Rule::unique('buses','bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'bus_number' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'fare_class_id' => 'required|integer',
         ];
 
@@ -91,6 +91,7 @@ class BusController extends Controller
     {
         return Bus::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
     }
+
     public function saveFareClass(Request $request)
     {
         $rules = [
@@ -108,10 +109,10 @@ class BusController extends Controller
             'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
-
     }
+
     public function getBusSchedule(Request $request)
     {
-        return TicketClosing::where('bus_id', $request->id)->where('company_id', $this->company_id)->latest()->first(['id','schedule_id','schedule_date','schedule_time']);
+        return TicketClosing::where('bus_id', $request->id)->where('company_id', $this->company_id)->latest()->first(['id', 'schedule_id', 'schedule_date', 'schedule_time']);
     }
 }

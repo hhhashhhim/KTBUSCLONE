@@ -31,7 +31,6 @@
                                     </button>
                                     Please Enter All Required Fields !!!
                                 </div>
-
                             </transition>
                             <!-- Table -->
                             <div class="row">
@@ -238,7 +237,8 @@ export default {
                 window.scrollTo(0, 0);
                 setTimeout(() => {
                     this.success = "";
-                    // $("#add-modal").modal("hide")
+                    // $("#fareTable_form").hide();
+                    $("#fareTable_form").css("display", "none");
                     // window.location.reload();
                 }, 2000);
             } else {

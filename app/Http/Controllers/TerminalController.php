@@ -59,10 +59,9 @@ class TerminalController extends Controller
                 ], 423);
             }
         }
-        $contact_format = str_replace('-', '', $request->contact);
         Terminal::create([
             'name' => $request->name,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'address' => $request->address ?? " ",
             'longitude' => $request->longitude,
             'latitude' => $request->latitude,
@@ -90,10 +89,9 @@ class TerminalController extends Controller
             'name' => 'required',
             'contact' => 'required',
         ]);
-        $contact_format = str_replace('-', '', $request->contact);
         Terminal::find($request->id)->update([
             'name' => $request->name,
-            'contact' => $contact_format,
+            'contact' => plainContactAndCnic($request->contact),
             'address' => $request->address,
             'longitude' => $request->longitude,
             'latitude' => $request->latitude,

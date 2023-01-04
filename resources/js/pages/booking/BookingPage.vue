@@ -263,7 +263,7 @@
                                                         </i>
                                                     </small>
                                                     <small v-if="col.over_issue == true">
-                                                        <i class="type-icons far fa-hand-paper text-danger">
+                                                        <i class="type-icons far fa-hand-paper text-dark">
                                                         </i>
                                                     </small>
                                                     <small v-if="col.type == 'not_for_sale'">

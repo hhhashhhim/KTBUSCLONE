@@ -51,8 +51,8 @@ class TicketsTemplateController extends Controller
         return TicketsTemplate::create([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal,
-            'uan' => str_replace('-', '', $request->uanNumber),
-            'phone' => str_replace('-', '', $terminal->contact),
+            'uan' => plainContactAndCnic($request->uanNumber),
+            'phone' => plainContactAndCnic($terminal->contact),
             'address' => $terminal->address,
             'terms_condition' => $request->termsCondition,
             'status' => 1,
@@ -89,8 +89,8 @@ class TicketsTemplateController extends Controller
         TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->update(array('status' => 0));
         return TicketsTemplate::where('id', $request->id)->update([
             'terminal_id' => $request->terminal_id,
-            'uan' => str_replace('-', '', $request->uan),
-            'phone' => str_replace('-', '', $request->phone),
+            'uan' => plainContactAndCnic($request->uan),
+            'phone' => plainContactAndCnic($request->phone),
             'address' => $request->address,
             'terms_condition' => $request->terms_condition,
             'status' => $request->status,

@@ -58,8 +58,18 @@ if (!function_exists('storeFare')) {
     }
 }
 
-if (!function_exists('format_phone')) {
-    function format_phone(string $phone_no)
+if (!function_exists('plainContactAndCnic')) {
+    function plainContactAndCnic(string $input_string)
+    {
+        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $input_string)) {
+            return str_replace('-', '', $input_string);
+        }
+        return $input_string;
+    }
+}
+
+if (!function_exists('formatContact')) {
+    function formatContact(string $phone_no)
     {
         return preg_replace(
             "/.*(\d{4})[^\d]{0,7}(\d{7})/",
@@ -69,8 +79,8 @@ if (!function_exists('format_phone')) {
     }
 }
 
-if (!function_exists('format_cnic')) {
-    function format_cnic(string $phone_no)
+if (!function_exists('formatCNIC')) {
+    function formatCNIC(string $phone_no)
     {
         return preg_replace(
             "/.*(\d{5})[^\d]{0,7}(\d{7})[^\d]{0,7}(\d{1})/",
@@ -80,8 +90,8 @@ if (!function_exists('format_cnic')) {
     }
 }
 
-if (!function_exists('format_uan')) {
-    function format_uan(string $phone_no)
+if (!function_exists('formatUAN')) {
+    function formatUAN(string $phone_no)
     {
         return preg_replace(
             "/.*(\d{2})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})/",
@@ -156,7 +166,7 @@ if (!function_exists('updateAdvancedSeat')) {
         }
         $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
         $updateId->update([
-            'cnic' => str_replace('-', '', $request->customerCNIC),
+            'cnic' => plainContactAndCnic($request->customerCNIC),
         ]);
         return $request->alreadyBookedId[0];
     }
@@ -203,10 +213,10 @@ if (!function_exists('printTicket')) {
         $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
 //        foreach ($tickets as $single) {
         // Set params
-        $uan = 'UAN(24/7):' . ' ' . format_uan($format->uan);
+        $uan = 'UAN(24/7):' . ' ' . formatUAN($format->uan);
         $company_name = 'Kainat Travels';
         $company_address = $format->address;
-        $company_phone = 'Phone # :' . ' ' . format_phone($format->phone);
+        $company_phone = 'Phone # :' . ' ' . formatContact($format->phone);
         $termsCondition = $format->terms_condition;
         $checkDuplicate = $duplicate;
         $seatNo = $tickets[0]->seat_no;
@@ -218,8 +228,8 @@ if (!function_exists('printTicket')) {
         $bookingDate = date('d/m/Y H:i A', strtotime($tickets[0]->created_at));
         $seatFare = $tickets[0]->seat_fare;
         $customerName = $tickets[0]['customer']->name;
-        $customerCNIC = format_cnic($tickets[0]['customer']->cnic);
-        $customerContact = format_phone($tickets[0]['customer']->contact);
+        $customerCNIC = formatCNIC($tickets[0]['customer']->cnic);
+        $customerContact = formatContact($tickets[0]['customer']->contact);
 
         // Init printer
         $printer = new ReceiptPrinter;

@@ -82,7 +82,7 @@
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
         <span>{{$format->address}}</span>
-        <div><span><b>UAN(24/7) : </b>{{format_uan($format->uan)}}</span></div>
+        <div><span><b>UAN(24/7) : </b>{{formatUAN($format->uan)}}</span></div>
     </div>
 </div>
 <table border="2" id="table1">
@@ -101,7 +101,7 @@
 
             @foreach($format->driverInfo as $key => $value)
 
-                <li>{{$value->name}} ({{format_phone($value->contact)}})<br></li>
+                <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
             @endforeach
 
@@ -117,7 +117,7 @@
 
                 @foreach($format->hostInfo as $key => $value)
 
-                    <li>{{$value->name}} ({{format_phone($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
                 @endforeach
 
@@ -146,8 +146,8 @@
                 <td>{{$key + 1}}</td>
                 <td>{{ $item->seat_no }}</td>
                 <td>{{ $item->customer->name }}</td>
-                <td>{{ format_cnic($item->customer->cnic) }}</td>
-                <td>{{format_phone($item->customer->contact)}}</td>
+                <td>{{ formatCNIC($item->customer->cnic) }}</td>
+                <td>{{formatContact($item->customer->contact)}}</td>
                 <td>Terminal Name</td>
                 <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>

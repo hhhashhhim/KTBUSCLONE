@@ -49,7 +49,7 @@ class HotelController extends Controller
             "name" => $request->name,
             "email" => $request->email,
             "password" => Hash::make($request->password),
-            "contact" => str_replace('-', '', $request->contact),
+            "contact" => plainContactAndCnic($request->contact),
             "role_id" => 0,
             'company_id' => Auth::user()->company_id,
         ]);
@@ -57,7 +57,7 @@ class HotelController extends Controller
         return Hotel::create([
             "user_id" => $user->id,
             "name" => $request->hotelName,
-            "contact" => str_replace('-', '', $request->contact),
+            "contact" => plainContactAndCnic($request->contact),
             "logo" => $request->logo ? $this->image($request->logo) : null,
             "location" => $request->location,
             "commission" => $request->commission,
@@ -82,7 +82,7 @@ class HotelController extends Controller
         User::where("id",$request->userId)->update([
             "name" => $request->name,
             "email" => $request->email,
-            "contact" => str_replace('-', '', $request->contact),
+            "contact" => plainContactAndCnic($request->contact),
         ]);
 
         if($request->password)
@@ -94,7 +94,7 @@ class HotelController extends Controller
 
         Hotel::where("id",$request->hotelId)->update([
             "name" => $request->hotelName,
-            "contact" => str_replace('-', '', $request->contact),
+            "contact" => plainContactAndCnic($request->contact),
             "location" => $request->location,
             "commission" => $request->commission,
             "balance" => $request->balance??0,

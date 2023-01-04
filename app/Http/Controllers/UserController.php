@@ -27,7 +27,6 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-
         $this->validate($request, [
             'name' => 'required',
             'email' => 'bail|required|email|unique:users',
@@ -38,7 +37,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'contact' => $request->contact,
+            'contact' => plainContact($request->contact),
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
             'terminal_id' => $request->terminal_id,
@@ -55,19 +54,18 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
-
         $this->validate($request, [
             'name' => 'required',
             'email' => 'bail|required|email|unique:users,email,' . $request->id,
             'password' => 'min:8',
-            'role' => 'required',
+            'role_id' => 'required',
             'contact' => 'required',
         ]);
         $user = User::find($request->id)->update([
             'name' => $request->name,
             'email' => $request->email,
-            'contact' => $request->contact,
-            'role_id' => $request->role,
+            'contact' => !is_null($request->contact) ? plainContact($request->contact) : null,
+            'role_id' => $request->role_id,
             'terminal_id' => $request->terminal_id,
             'company_id' => Auth::user()->company_id,
         ]);

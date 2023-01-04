@@ -43,21 +43,17 @@ class ScheduleController extends Controller
     {
         // this for check time differrence added or not against these citis
         $cityIds = array_column($request->cities, 'id');
-        foreach($cityIds as $first)
-        {
-            foreach($cityIds as $second)
-            {
-                if($first != $second)
-                {
+        foreach ($cityIds as $first) {
+            foreach ($cityIds as $second) {
+                if ($first != $second) {
                     $checkTimeDiff = FareTable::where([
-                        "company_id"=>Auth::user()->company_id,
-                        "from_city_id"=>$first,
-                        "to_city_id"=>$second,
-                        "time_difference"=>null
+                        "company_id" => Auth::user()->company_id,
+                        "from_city_id" => $first,
+                        "to_city_id" => $second,
+                        "time_difference" => null
                     ])->first();
 
-                    if($checkTimeDiff)
-                    {
+                    if ($checkTimeDiff) {
                         return response()->json([
                             "errors" => [
                                 "Time Error" => ["Time differrence should be added against these cities."]
@@ -105,7 +101,7 @@ class ScheduleController extends Controller
         for ($i = 0; $i <= $days; $i++) {
             $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$schedule->start_date $schedule->time")) + ($i * 86400);
-            $scheduleStartDate = date("Y-m-d",$totalTime);
+            $scheduleStartDate = date("Y-m-d", $totalTime);
             foreach ($routeDetails as $detail) {
 
                 if ($lastDepId == $detail->departure_city_id) {
@@ -118,7 +114,7 @@ class ScheduleController extends Controller
                     $lastDepId = $detail->departure_city_id;
                     // this is single schedule end date to calculate schedule completion days
                 }
-                $scheduleEndDate = date("Y-m-d",$totalTime);
+                $scheduleEndDate = date("Y-m-d", $totalTime);
 
                 ScheduleDetail::create([
                     'company_id' => Auth::user()->company_id,
@@ -135,7 +131,7 @@ class ScheduleController extends Controller
         }
         // get completion days of schedule
         $schedule_days = $this->getDays($scheduleStartDate, $scheduleEndDate);
-        Schedule::where("id",$schedule->id)->update([
+        Schedule::where("id", $schedule->id)->update([
             'schedule_days' => $schedule_days,
         ]);
 
@@ -254,7 +250,7 @@ class ScheduleController extends Controller
         for ($i = 0; $i <= $days; $i++) {
             $lastDepId = $routeDetails[0]->departure_city_id;
             $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
-            $scheduleStartDate = date("Y-m-d",$totalTime);
+            $scheduleStartDate = date("Y-m-d", $totalTime);
             foreach ($routeDetails as $key => $detail) {
 
                 if ($lastDepId == $detail->departure_city_id) {

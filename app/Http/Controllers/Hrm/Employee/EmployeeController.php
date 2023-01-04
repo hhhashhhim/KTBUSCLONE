@@ -69,7 +69,7 @@ class EmployeeController extends Controller
             "email" => $request->email,
             "password" => Hash::make($request->password),
             "terminal_id" => $request->EmployeeTerminal,
-            "contact" => str_replace('-', '', $request->EmployeeContact),
+            "contact" =>  plainContactAndCnic($request->EmployeeContact),
             "role_id" => 0,
             'company_id' => Auth::user()->company_id,
         ]);
@@ -78,8 +78,8 @@ class EmployeeController extends Controller
             'user_id' => $user->id,
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
-            'cnic' => str_replace('-', '', $request->EmployeeCNIC),
-            'contact' => str_replace('-', '', $request->EmployeeContact),
+            'cnic' => plainContactAndCnic($request->EmployeeCNIC),
+            'contact' => plainContactAndCnic($request->EmployeeContact),
             'address' => $request->EmployeeAddress,
             'reference' => $request->RefHiring,
             'hiring_date' => $request->HiringDate,
@@ -138,7 +138,7 @@ class EmployeeController extends Controller
         $user = User::where("id", $request->userId)->update([
             "name" => $request->EmployeeName,
             "email" => $request->email,
-            "contact" => str_replace('-', '', $request->EmployeeContact),
+            "contact" => plainContactAndCnic($request->EmployeeContact),
             "role_id" => 0,
         ]);
 
@@ -151,8 +151,8 @@ class EmployeeController extends Controller
         Employee::where("user_id", $request->userId)->update([
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
-            'cnic' => str_replace('-', '', $request->EmployeeCNIC),
-            'contact' => str_replace('-', '', $request->EmployeeContact),
+            'cnic' => plainContactAndCnic($request->EmployeeCNIC),
+            'contact' => plainContactAndCnic($request->EmployeeContact),
             'address' => $request->EmployeeAddress,
             'reference' => $request->RefHiring,
             'hiring_date' => $request->HiringDate,

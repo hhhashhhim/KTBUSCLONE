@@ -8,10 +8,9 @@
                             <h4>Users</h4>
                             <div class="card-header-action">
                                 <a
-                                    href="#add-modal"
                                     data-toggle="modal"
                                     :data-target="'#'+formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                    class="btn btn-primary text-light" @click="clearForm()"
                                 >
                                     Add New
                                 </a>
@@ -38,7 +37,7 @@
                                                         <th>Email</th>
                                                         <th>Contact</th>
                                                         <th>Role</th>
-                                                        <!--                                                        <th>Action</th>-->
+                                                        <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -48,24 +47,24 @@
                                                         <td>{{ user.email }}</td>
                                                         <td>{{ user.contact }}</td>
                                                         <th>{{ user.role ? user.role.name : "Not Found" }}</th>
-                                                        <!--                                                        <td>-->
-                                                        <!--                                                            <a-->
-                                                        <!--                                                                href="#edit-modal"-->
-                                                        <!--                                                                data-toggle="modal"-->
-                                                        <!--                                                                @click="edit(user)"-->
-                                                        <!--                                                                class="btn btn-primary mx-1"-->
-                                                        <!--                                                            >-->
-                                                        <!--                                                                <i class="far fa-edit"></i>-->
-                                                        <!--                                                            </a>-->
-                                                        <!--                                                            &lt;!&ndash;                                <a&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                  href="#delete-modal"&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                  data-toggle="modal"&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                  @click="deleteModal(user, i)"&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                  class="btn btn-danger"&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                >&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                  <i class="far fa-trash-alt"></i>&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                </a>&ndash;&gt;-->
-                                                        <!--                                                        </td>-->
+                                                        <td>
+                                                            <a
+                                                                :data-target="'#'+editFormID"
+                                                                data-toggle="modal"
+                                                                @click="edit(user)"
+                                                                class="btn btn-primary text-light mx-1"
+                                                            >
+                                                                <i class="far fa-edit"></i>
+                                                            </a>
+                                                            <!--                                <a-->
+                                                            <!--                                  href="#delete-modal"-->
+                                                            <!--                                  data-toggle="modal"-->
+                                                            <!--                                  @click="deleteModal(user, i)"-->
+                                                            <!--                                  class="btn btn-danger"-->
+                                                            <!--                                >-->
+                                                            <!--                                  <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                </a>-->
+                                                        </td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -206,11 +205,11 @@
                 heading="Edit User"
                 :errors="this.validationErrors"
                 :success="success"
-                :formID="formID"
+                :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Name</label>
+                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -220,7 +219,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="email">Email</label>
+                        <label for="email">Email<span class="text-danger ml-1">*</span></label>
                         <input
                             type="text"
                             class="form-control"
@@ -230,7 +229,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="contact">Contact</label>
+                        <label for="contact">Contact<span class="text-danger ml-1">*</span></label>
                         <vue-mask id="phone"
                                   class="form-control"
                                   v-model="dataEdit.contact"
@@ -241,7 +240,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="password">Password</label>
+                        <label for="password">Password<span class="text-danger ml-1">*</span></label>
                         <input
                             type="password"
                             class="form-control"
@@ -264,29 +263,30 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="role">Role</label>
+                        <label for="role">Role<span class="text-danger ml-1">*</span></label>
                         <select
                             type="text"
                             class="form-control"
                             id="role"
-                            v-model="dataEdit.role"
+                            v-model="dataEdit.role_id"
                         >
-                            <option value="">Select Role</option>
+                            <option value="0">Select Role</option>
                             <option v-for="(role, i) in roles" :value="role.id" :key="i">
                                 {{ role.name }}
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-12">
-                        <button
-                            type="button"
-                            class="btn btn-block btn-success"
-                            @click="update"
-                        >
-                            Update User
-                        </button>
-                    </div>
                 </div>
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="update()"
+                        :disabled="this.loadingUpdate"
+                    >
+                        Update User
+                    </button>
+                </template>
             </Edit>
 
             <!-- Add Modal -->
@@ -320,7 +320,8 @@ export default {
             },
             roles: [],
             users: [],
-            formID: 'newUser',
+            formID: 'user_form',
+            editFormID: 'edit_user_form',
             roleName: '',
             data: {
                 name: "",
@@ -333,12 +334,14 @@ export default {
             },
             dataEdit: {
                 terminal_id: 0,
+                role_id: 0,
             },
             terminals: [],
             success: false,
             loading: false,
             loadingEdit: false,
             loadingRole: false,
+            loadingUpdate: false,
         };
     },
     async created() {
@@ -378,9 +381,8 @@ export default {
                 $("#users_table").DataTable();
             }, 300);
         },
-        async add() {
-            this.validationErrors = [];
 
+        async add() {
             if (this.data.name == "" || typeof this.data.name == 'undefined')
                 return swal({
                     title: "Required!!",
@@ -416,9 +418,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-
-
-            $("#users_table").DataTable().destroy();
             this.loading = true;
             const res = await this.callApi("post", "user/store", this.data);
             if (res.status == 200) {
@@ -430,9 +429,11 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                this.users = res.data
-                this.data.name = this.data.email = this.data.contact = this.data.password = this.data.role = this.data.company_id = "";
+                $("#users_table").DataTable().destroy();
                 await this.fetchUsers();
+                setTimeout(() => {
+                    $("#users_table").DataTable();
+                }, 300);
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -452,6 +453,7 @@ export default {
                 }
             }
         },
+
         async addNewRole() {
             if (this.roleName == '' || typeof this.roleName == 'undefined') {
                 return swal({
@@ -493,41 +495,89 @@ export default {
             }
 
         },
+
         async edit(user) {
             this.dataEdit = user;
-            this.dataEdit.role = user.role_id;
-            const roleRes = await this.callApi("post", "company/roles", {id: user.company_id});
-            this.roles = roleRes.data;
         },
+
         async update() {
-            this.validationErrors = [];
-            if (this.dataEdit.name == "")
-                return this.errorsArray("User Name is Required", "Name");
-            $("#users_table").DataTable().destroy();
-            const res = await this.callApi("post", "user/update", this.dataEdit);
-            if (res.status == 201) {
-                this.success = "User Updated Successfully";
-                this.dataEdit = "";
-                const userRes = await this.callApi("post", "user", {});
-                this.users = userRes.data;
-                setTimeout(() => {
-                    this.success = "";
-                    $("#edit-modal").modal("hide");
-                }, 3000);
+            if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined') {
+                return swal({
+                    title: "Required!!!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.email == "" || typeof this.dataEdit.email == 'undefined') {
+                return swal({
+                    title: "Required!!!",
+                    text: "Email is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.contact == "" || typeof this.dataEdit.contact == 'undefined') {
+                return swal({
+                    title: "Required!!!",
+                    text: "Contact Number is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.terminal_id == "0") {
+                return swal({
+                    title: "Required!!!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.role_id == "0") {
+                return swal({
+                    title: "Required!!!",
+                    text: "please select Role",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.loadingUpdate = true;
+            const resUpdateUser = await this.callApi("post", "user/update", this.dataEdit);
+            if (resUpdateUser.status == 201) {
+                this.loadingUpdate = false;
+                // this.success = "";
+                swal({
+                    title: "Successfull!!",
+                    text: "User Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                $("#users_table").DataTable().destroy();
+                await this.fetchUsers();
                 setTimeout(() => {
                     $("#users_table").DataTable();
-                }, 3000);
-            } else {
-                if (res.status == 422) {
-                    console.log();
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
+                }, 300);
+            }
+            if (resUpdateUser.status == 422) {
+                this.loadingUpdate = false;
+                this.error = resUpdateUser.data;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resUpdateUser.data.errors) {
+                    resUpdateUser.data.errors[key].forEach((element) => {
+                        errorContent += ((++count) + " - " + element + "\n");
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
                 }
             }
         },
+
         async deleteModal(user, i) {
             const deletingObj = {
                 url: "user/delete",
@@ -536,15 +586,12 @@ export default {
             };
             this.$store.commit("setDeleteObj", deletingObj);
         },
-        async fetchCompanyRoles() {
-        }
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
     },
     watch: {
         getDeletingObj(obj) {
-            console.log(obj);
             if (obj.isDeleted) {
                 this.users.splice(obj.index, 1);
             }

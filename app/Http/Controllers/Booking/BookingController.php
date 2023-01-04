@@ -16,13 +16,13 @@ use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
-use App\Models\Schedule\TicketClosingMember;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -54,6 +54,8 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+//        try {
+//            DB::beginTransaction();
         // this is for get actual schedule date
         $detail = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
@@ -73,10 +75,7 @@ class BookingController extends Controller
             if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                 $isPartial = 1;
             }
-            $cnicFormat = str_replace('-', '', $request->customerCNIC);
-            $phoneFormat = str_replace('-', '', $request->contact);
-
-            $customer = Customer::where('cnic', $cnicFormat)->first();
+            $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
 
             // Fare Fetching About the Schedule
             if (!$customer) {
@@ -84,13 +83,11 @@ class BookingController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                     'name' => $request->customerName,
-                    'cnic' => is_null($request->customerCNIC) ? 0 : $cnicFormat,
-                    'contact' => $phoneFormat,
+                    'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                    'contact' => plainContactAndCnic($request->contact),
                 ]);
             }
-
             // Getting Already Booked Tickets
-
             if ($request->date == date('Y-m-d')) {
                 $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
                 ++$bookingNo;
@@ -170,6 +167,10 @@ class BookingController extends Controller
             'data' => implode('-', $allTicket),
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
         ];
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+//        }
     }
 
 
@@ -319,12 +320,10 @@ class BookingController extends Controller
     public function getCnic(Request $request)
     {
         if ($request->status == 'addFormCNIC') {
-            $cnicFormat = str_replace('-', '', $request['cnicNumber']);
-            return Customer::where('company_id', Auth::user()->company_id)->where('cnic', $cnicFormat)->first();
+            return Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
         }
         if ($request->status == 'addFormContact') {
-            $phoneFormat = str_replace('-', '', $request['phoneNumber']);
-            return Customer::where('company_id', Auth::user()->company_id)->where('contact', $phoneFormat)->first();
+            return Customer::where('company_id', Auth::user()->company_id)->where('contact', plainContactAndCnic($request['phoneNumber']))->first();
         }
     }
 
@@ -334,11 +333,6 @@ class BookingController extends Controller
             ->whereDate('date', $request->date)
             ->where('schedule_id', $request->schedule_id)
             ->get();
-//        $allBooking = $bookings->map(function($booking){
-//            $booking[0]->count=$booking->count();
-//            return $booking[0];
-//        });
-//        return $allBooking;
     }
 
     public function advanceData(Request $request)
@@ -456,7 +450,6 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
         ])->get()->groupBy('schedule_id')->first();
-
         $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->first();
         $format->countPassenger = count((array)$customers_data);
         $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
