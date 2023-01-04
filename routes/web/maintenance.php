@@ -1,14 +1,9 @@
 <?php
 
-use App\Http\Controllers\Api\RoleController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Booking\AllBookingController;
-use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Maintenance\FleetMaintenancePartController;
 use App\Http\Controllers\Maintenance\FleetMaintenanceController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 
 
 

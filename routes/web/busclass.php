@@ -1,0 +1,13 @@
+<?php
+
+use App\Http\Controllers\Bus\BusClassController;
+use App\Http\Middleware\CustomMiddleware;
+use Illuminate\Support\Facades\Route;
+
+Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function () {
+    Route::post('/', [BusClassController::class, 'index']);
+    Route::post('/store', [BusClassController::class, 'storeBusClass']);
+    Route::post('/update', [BusClassController::class, 'updateBusClass']);
+    Route::post('/delete', [BusClassController::class, 'deleteBusClass']);
+    Route::post('/duplicate', [BusClassController::class, 'duplicateBusClass']);
+});

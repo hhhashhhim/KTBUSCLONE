@@ -22,10 +22,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
+
 //    public $company_id;
 //
 //    public function __construct()
@@ -56,6 +56,7 @@ class BookingController extends Controller
     {
 //        try {
 //            DB::beginTransaction();
+
         // this is for get actual schedule date
         $detail = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)

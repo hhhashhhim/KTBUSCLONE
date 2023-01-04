@@ -4631,7 +4631,7 @@ h6 .badge {
     z-index: 890;
     background-color: transparent;
     height: 70px;
-    left: 250px;
+    left: 225px;
     right: 0;
     position: absolute;
     z-index: 890;
@@ -5982,7 +5982,7 @@ pre {
     position: fixed;
     top: 0;
     height: 100%;
-    width: 250px;
+    width: 225px;
     background-color: #fff;
     z-index: 880;
     left: 0
@@ -6631,8 +6631,8 @@ body.layout-3 .main-footer {
 /*}*/
 
 .main-content {
-    padding-left: 255px;
-    padding-right: 18px;
+    padding-left: 230px;
+    padding-right: 17px;
     padding-top: 85px;
     width: 100%;
     min-height: 720px;

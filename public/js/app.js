@@ -37241,7 +37241,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 30;
+                  _context5.next = 29;
                   break;
                 }
 
@@ -37262,14 +37262,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   _this5.success = "";
                   $("#add-modal").modal("hide");
-                }, 2000);
-                setInterval(function () {
                   _this5.loop = 1;
                 }, 2000);
-                _context5.next = 31;
+                _context5.next = 30;
                 break;
 
-              case 30:
+              case 29:
                 if (res.status == 422) {
                   _this5.loading = false;
 
@@ -37284,7 +37282,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 31:
+              case 30:
               case "end":
                 return _context5.stop();
             }
@@ -38312,11 +38310,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       validationErrors: [],
       buses: [],
-      hotels: [],
       busId: "",
+      hotels: [],
+      items: [],
       schedule: "",
       postData: {
-        ticketClosingId: ""
+        ticketClosingId: "",
+        hotelId: "",
+        item: [],
+        quantity: [],
+        amount: [],
+        seat: []
       },
       // mainData: [],
       // currentReading: "",
@@ -38349,16 +38353,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     saveRow: function saveRow(event, fieldName) {
       var getRowNumber = event.target.parentElement.parentElement.rowIndex;
 
-      if (fieldName == "rowPart") {
-        this.fleetPart[getRowNumber - 1] = event.target.value;
+      if (fieldName == "first") {
+        this.postData.item[getRowNumber - 1] = event.target.value;
       }
 
-      if (fieldName == "rowAfter") {
-        this.maintenanceAfter[getRowNumber - 1] = event.target.value;
+      if (fieldName == "second") {
+        this.postData.quantity[getRowNumber - 1] = event.target.value;
       }
 
-      if (fieldName == "rowLast") {
-        this.maintenanceAt[getRowNumber - 1] = event.target.value;
+      if (fieldName == "third") {
+        this.postData.amount[getRowNumber - 1] = event.target.value;
+      }
+
+      if (fieldName == "fourth") {
+        this.postData.seat[getRowNumber - 1] = event.target.value;
       }
     },
     // editSaveRow(event,fieldName) {
@@ -38406,21 +38414,51 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee);
       }))();
     },
-    linkMaintenance: function linkMaintenance() {
+    getFoods: function getFoods(id) {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var i, data, res;
+        var items;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (!(!_this2.fleetId || !_this2.currentReading || _this2.fleetPart.length == 0 || _this2.maintenanceAfter.length == 0 || _this2.maintenanceAt.length == 0)) {
-                  _context2.next = 2;
+                _this2.items = [];
+                _context2.next = 3;
+                return _this2.callApi("post", "refreshments/hotels/specific/foods/items", {
+                  id: id
+                });
+
+              case 3:
+                items = _context2.sent;
+
+                if (items.status === 200) {
+                  _this2.items = items.data;
+                }
+
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    linkMaintenance: function linkMaintenance() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var i, data, res;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!(!_this3.postData.ticketClosingId || !_this3.postData.hotelId || _this3.postData.item.length == 0 || _this3.postData.quantity.length == 0 || _this3.postData.amount.length == 0 || _this3.postData.seat.length == 0)) {
+                  _context3.next = 2;
                   break;
                 }
 
-                return _context2.abrupt("return", swal({
+                return _context3.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field",
                   icon: "error",
@@ -38431,17 +38469,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 i = 0;
 
               case 3:
-                if (!(i < _this2.fleetPart.length)) {
-                  _context2.next = 9;
+                if (!(i < _this3.postData.item.length)) {
+                  _context3.next = 9;
                   break;
                 }
 
-                if (!(!_this2.fleetPart[i] || !_this2.maintenanceAfter[i] || !_this2.maintenanceAt[i])) {
-                  _context2.next = 6;
+                if (!(!_this3.postData.item[i] || !_this3.postData.quantity[i] || !_this3.postData.amount[i] || !_this3.postData.seat[i])) {
+                  _context3.next = 6;
                   break;
                 }
 
-                return _context2.abrupt("return", swal({
+                return _context3.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field Or Remove Extra",
                   icon: "error",
@@ -38450,38 +38488,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 i++;
-                _context2.next = 3;
+                _context3.next = 3;
                 break;
 
               case 9:
-                // post data
-                data = {
-                  fleetId: _this2.fleetId,
-                  currentReading: _this2.currentReading,
-                  fleetPart: _this2.fleetPart,
-                  maintenanceAfter: _this2.maintenanceAfter,
-                  maintenanceAt: _this2.maintenanceAt
-                };
-                _this2.loading = true;
-                _context2.next = 13;
-                return _this2.callApi("post", "fleet/part/link", data);
+                return _context3.abrupt("return", swal({
+                  title: "Success",
+                  text: "data ready",
+                  icon: "success",
+                  timer: 2000
+                }));
 
-              case 13:
-                res = _context2.sent;
+              case 14:
+                res = _context3.sent;
 
                 if (!(res.status === 200)) {
-                  _context2.next = 30;
+                  _context3.next = 31;
                   break;
                 }
 
-                _this2.loading = false;
+                _this3.loading = false;
                 $('#maintenance_table').DataTable().destroy();
-                _this2.fleetId = "";
-                _this2.currentReading = "";
-                _this2.loop = 0;
-                _this2.fleetPart = [];
-                _this2.maintenanceAfter = [];
-                _this2.maintenanceAt = [];
+                _this3.fleetId = "";
+                _this3.currentReading = "";
+                _this3.loop = 0;
+                _this3.fleetPart = [];
+                _this3.maintenanceAfter = [];
+                _this3.maintenanceAt = [];
                 swal({
                   title: "Success",
                   text: "Maintenance Added",
@@ -38489,18 +38522,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 setInterval(function () {
-                  _this2.loop = 1;
+                  _this3.loop = 1;
                 }, 2000);
-                _context2.next = 27;
-                return _this2.fetchData();
+                _context3.next = 28;
+                return _this3.fetchData();
 
-              case 27:
-                _this2.loading = false;
-                _context2.next = 32;
+              case 28:
+                _this3.loading = false;
+                _context3.next = 33;
                 break;
 
-              case 30:
-                _this2.loading = false;
+              case 31:
+                _this3.loading = false;
 
                 if (res.status == 422) {
                   (function () {
@@ -38524,12 +38557,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 32:
+              case 33:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     // async updateLinkMaintenance() {
@@ -38612,10 +38645,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.loop++;
     },
     removeRow: function removeRow(event) {
+      // Array.from(element.parentNode.children).indexOf(element)
       var getRowNumber = event.target.parentElement.parentElement.rowIndex;
-      this.fleetPart.splice(getRowNumber - 1, 1);
-      this.maintenanceAfter.splice(getRowNumber - 1, 1);
-      this.maintenanceAt.splice(getRowNumber - 1, 1);
+      this.postData.item.splice(getRowNumber - 1, 1);
+      this.postData.quantity.splice(getRowNumber - 1, 1);
+      this.postData.amount.splice(getRowNumber - 1, 1);
+      this.postData.seat.splice(getRowNumber - 1, 1);
       event.target.parentElement.parentElement.remove(); // this.loop--;
     },
     // editAddRow() {
@@ -38629,24 +38664,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     //     event.target.parentElement.parentElement.remove();
     // },
     fetchData: function fetchData() {
-      var _this3 = this;
+      var _this4 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var fleetRes;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
-                return _this3.callApi("post", "refreshments/hotels/food/order");
+                _context4.next = 2;
+                return _this4.callApi("post", "refreshments/hotels/orders/food");
 
               case 2:
-                fleetRes = _context3.sent;
+                fleetRes = _context4.sent;
 
                 if (fleetRes.status === 200) {
-                  _this3.mainData = fleetRes.data.mainData;
-                  _this3.buses = fleetRes.data.busDrop;
-                  _this3.parts = fleetRes.data.partDrop;
+                  _this4.mainData = fleetRes.data.mainData;
+                  _this4.buses = fleetRes.data.busDrop;
+                  _this4.hotels = fleetRes.data.hotelDrop;
                 }
 
                 setTimeout(function () {
@@ -38655,10 +38690,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     } // async fetchFleetDetails(id) {
     //     const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
@@ -61129,7 +61164,7 @@ var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
     "class": "col-md-12 d-flex align-items-center"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-6"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Select Part For Maintenance")])], -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Select Food/Deal")])], -1
   /* HOISTED */
   );
 });
@@ -61142,7 +61177,7 @@ var _hoisted_38 = {
 };
 
 var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Part"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Maintenance Required After (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance At (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Food/Deal"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
@@ -61151,7 +61186,7 @@ var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
-  }, "Select Part ", -1
+  }, "Select Food ", -1
   /* HOISTED */
   );
 });
@@ -61213,7 +61248,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[10] || (_cache[10] = function () {
+        onClick: _cache[12] || (_cache[12] = function () {
           return $options.linkMaintenance && $options.linkMaintenance.apply($options, arguments);
         }),
         disabled: $data.loading
@@ -61254,7 +61289,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-          return _ctx.hotelId = $event;
+          return $data.postData.hotelId = $event;
+        }),
+        onChange: _cache[5] || (_cache[5] = function ($event) {
+          return $options.getFoods($data.postData.hotelId);
         })
       }, [_hoisted_34, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hotels, function (hotel, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -61265,21 +61303,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         , _hoisted_35);
       }), 128
       /* KEYED_FRAGMENT */
-      ))], 512
-      /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.hotelId]])]), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
+      ))], 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.hotelId]])]), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
           "class": "form-control rounded-0",
-          onChange: _cache[5] || (_cache[5] = function ($event) {
-            return $options.saveRow($event, 'rowPart');
+          onChange: _cache[6] || (_cache[6] = function ($event) {
+            return $options.saveRow($event, 'first');
           })
-        }, [_hoisted_40, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.parts, function (part, i) {
+        }, [_hoisted_40, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.items, function (item, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-            value: part.id,
+            value: item.cid,
             key: i
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(part.name), 9
+          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.name), 9
           /* TEXT, PROPS */
           , _hoisted_41);
         }), 128
@@ -61290,8 +61328,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[6] || (_cache[6] = function ($event) {
-            return $options.saveRow($event, 'rowAfter');
+          onKeyup: _cache[7] || (_cache[7] = function ($event) {
+            return $options.saveRow($event, 'second');
           })
         }, null, 32
         /* HYDRATE_EVENTS */
@@ -61299,19 +61337,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[7] || (_cache[7] = function ($event) {
-            return $options.saveRow($event, 'rowLast');
+          onKeyup: _cache[8] || (_cache[8] = function ($event) {
+            return $options.saveRow($event, 'third');
+          })
+        }, null, 32
+        /* HYDRATE_EVENTS */
+        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          type: "number",
+          "class": "form-control",
+          min: "0",
+          onKeyup: _cache[9] || (_cache[9] = function ($event) {
+            return $options.saveRow($event, 'fourth');
           })
         }, null, 32
         /* HYDRATE_EVENTS */
         )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[8] || (_cache[8] = function () {
+          onClick: _cache[10] || (_cache[10] = function () {
             return $options.addRow && $options.addRow.apply($options, arguments);
           })
         }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-danger",
-          onClick: _cache[9] || (_cache[9] = function ($event) {
+          onClick: _cache[11] || (_cache[11] = function ($event) {
             return $options.removeRow($event);
           })
         }, "Remove")])]);
@@ -73174,7 +73221,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-2dff5c38]{\n    width: 90px !important;\n    display:inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-2dff5c38]{\r\n    width: 90px !important;\r\n    display:inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
