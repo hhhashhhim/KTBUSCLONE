@@ -7,6 +7,8 @@ use App\Models\Hrm\Department\Department;
 use App\Models\Refreshment\HotelFoodDeal;
 use App\Models\Refreshment\HotelFoodDealDetail;
 use App\Models\Refreshment\HotelFood;
+use App\Models\Refreshment\HotelFoodOrder;
+use App\Models\Schedule\TicketClosing;
 use App\Models\Refreshment\Hotel;
 use App\Models\Bus\Bus;
 use App\Models\User;
@@ -49,53 +51,56 @@ class FoodOrderController extends Controller
 
     public function hotelItems(Request $request)
     {
-        $food = HotelFood::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get(["id","name"]);
+        $food = HotelFood::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get(["id","name","price"]);
         $food->map(function($q){
-            $q->cid = $q->id.'-1';
+            $q->cid = $q->id.'-1'; // 1 to identify food
         });
-        $foodDeal = HotelFoodDeal::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get(["id","name"]);
+        $foodDeal = HotelFoodDeal::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get(["id","name","price"]);
         $foodDeal->map(function($q){
             $q->name = $q->name.' (Deal)';
-            $q->cid = $q->id.'-2';
+            $q->cid = $q->id.'-2'; // 2 to identify deal
         });
         
         return $data =  [...$food,...$foodDeal];
     }
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         "name" => 'required|unique:hotel_food_deals,name,Null,id,hotel_id,'.$request->hotelId,
-    //         "price" => 'required',
-    //         "foods" => 'required',
-    //         "qtys" => 'required',
-    //     ]);
+    public function orderBook(Request $request)
+    {
+        $request->validate([
+            "ticketClosingId" => 'required',
+            "estimatedTime" => 'required',
+            "hotelId" => 'required',
+            "item" => 'required',
+            "quantity" => 'required',
+            "seat" => 'required',
+        ]);
 
-    //     $deal = HotelFoodDeal::create([
-    //         "name" => $request->name,
-    //         "price" => $request->price,
-    //         "description" => $request->description,
-    //         "hotel_id" => $request->hotelId,
-    //         "company_id" => Auth::user()->company_id,
-    //         "added_by" => Auth::user()->id,
-    //     ]);
+        $TicketClosing = TicketClosing::find($request->ticketClosingId);
 
-    //     foreach($request->foods as $key => $value)
-    //     {
-    //         $checkExist = HotelFoodDealDetail::where(["food_deal_id"=>$deal->id,"food_id"=>$request->foods[$key],"hotel_id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
-    //         if(!$checkExist)
-    //         {
-    //             HotelFoodDealDetail::create([
-    //                 "food_id" => $request->foods[$key],
-    //                 "food_deal_id" => $deal->id,
-    //                 "quantity" => $request->qtys[$key],
-    //                 "hotel_id" => $request->hotelId,
-    //                 "company_id" => Auth::user()->company_id,
-    //                 "added_by" => Auth::user()->id,
-    //             ]);
-    //         }
-    //     }
-// 
-    // }
+        foreach($request->item as $key=>$value)
+        {
+            $checkItem = explode("-",$request->item[$key]);
+            $food = $checkItem[1] == 1 ? HotelFood::find($checkItem[0]) : HotelFoodDeal::find($checkItem[0]);
+
+            HotelFoodOrder::create([
+                "hotel_id" => $request->hotelId,
+                "item_id" => $checkItem[0],
+                "item_type" => $checkItem[1],
+                "quantity" => $request->quantity[$key],
+                "price" => $food->price,
+                "amount" => ($food->price * $request->quantity[$key]),
+                "seat_no" => $request->seat[$key],
+                "estimated_time" => $request->estimatedTime,
+                "ticket_closing_id" => $TicketClosing->id,
+                "bus_id" => $TicketClosing->bus_id,
+                "schedule_id" => $TicketClosing->schedule_id,
+                "schedule_date" => $TicketClosing->schedule_date,
+                "status" => "pending",
+                "company_id" => Auth::user()->company_id,
+                "added_by" => Auth::user()->id,
+            ]);
+        }
+
+    }
 
 
 
