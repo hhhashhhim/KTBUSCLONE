@@ -443,8 +443,6 @@ export default {
                 setTimeout(() => {
                     this.success = "";
                     $("#add-modal").modal("hide");
-                }, 2000);
-                setInterval(() => {
                     this.loop = 1;
                 }, 2000);
             } else {

@@ -97,7 +97,7 @@
                     
                     <div class="form-group col-md-6">
                         <label for="name">Select Hotel <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0" v-model="hotelId">
+                        <select class="form-control rounded-0" v-model="postData.hotelId" @change="getFoods(postData.hotelId)">
                             <option value="" selected>Select Hotel</option>
                             <option v-for="(hotel, i) in hotels" :value="hotel.id" :key="i">
                                 {{ hotel.name }}
@@ -107,34 +107,38 @@
 
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="col-md-6">
-                            <h5>Select Part For Maintenance</h5>
+                            <h5>Select Food/Deal</h5>
                         </div>
                     </div>
                     <div class="form-group col-md-12 d-flex align-items-center">
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Part</th>
-                                <th>Maintenance Required After (km)</th>
-                                <th>Last Maintenance At (km)</th>
+                                <th>Food/Deal</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Seat No</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="saveRow($event,'rowPart')">
-                                        <option value="" selected>Select Part </option>
-                                        <option v-for="(part, i) in parts" :value="part.id" :key="i">
-                                            {{ part.name }}
+                                    <select class="form-control rounded-0" @change="saveRow($event,'first')">
+                                        <option value="" selected>Select Food </option>
+                                        <option v-for="(item, i) in items" :value="item.cid" :key="i">
+                                            {{ item.name }}
                                         </option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'rowAfter')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second')" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'rowLast')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third')" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
@@ -285,11 +289,17 @@ export default {
             loading : false,
             validationErrors: [],
             buses: [],
-            hotels: [],
             busId: "",
+            hotels: [],
+            items: [],
             schedule: "",
             postData : {
                 ticketClosingId: "",
+                hotelId: "",
+                item: [],
+                quantity: [],
+                amount: [],
+                seat: [],
             },
             // mainData: [],
             // currentReading: "",
@@ -322,17 +332,21 @@ export default {
         saveRow(event,fieldName) {
            
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            if(fieldName == "rowPart")
+            if(fieldName == "first")
             {
-                this.fleetPart[getRowNumber-1] = event.target.value;
+                this.postData.item[getRowNumber-1] = event.target.value;
             }
-            if(fieldName == "rowAfter")
+            if(fieldName == "second")
             {
-                this.maintenanceAfter[getRowNumber-1] = event.target.value;
+                this.postData.quantity[getRowNumber-1] = event.target.value;
             }
-            if(fieldName == "rowLast")
+            if(fieldName == "third")
             {
-                this.maintenanceAt[getRowNumber-1] = event.target.value;
+                this.postData.amount[getRowNumber-1] = event.target.value;
+            }
+            if(fieldName == "fourth")
+            {
+                this.postData.seat[getRowNumber-1] = event.target.value;
             }
         },
         // editSaveRow(event,fieldName) {
@@ -362,11 +376,21 @@ export default {
                 this.postData.ticketClosingId = schedule.data.id;
             }
         },
+        async getFoods(id) {
+            
+            this.items = [];
+            const items = await this.callApi("post", "refreshments/hotels/specific/foods/items", {
+                id: id
+            });
+            if (items.status === 200) {
+                this.items = items.data;
+            }
+        },
         async linkMaintenance() {
             
             // validation for empty data
-            if(!this.fleetId || !this.currentReading || this.fleetPart.length == 0 || 
-                this.maintenanceAfter.length == 0 || this.maintenanceAt.length == 0)
+            if(!this.postData.ticketClosingId || !this.postData.hotelId || this.postData.item.length == 0 || 
+                this.postData.quantity.length == 0 || this.postData.amount.length == 0 || this.postData.seat.length == 0)
             {
                 return swal({
                     title: "Error",
@@ -377,9 +401,9 @@ export default {
             }
             
             // check if any index is empty or null in object
-            for(var i = 0; i < this.fleetPart.length; i++)
+            for(var i = 0; i < this.postData.item.length; i++)
             {
-                if(!this.fleetPart[i] || !this.maintenanceAfter[i] || !this.maintenanceAt[i])
+                if(!this.postData.item[i] || !this.postData.quantity[i] || !this.postData.amount[i] || !this.postData.seat[i])
                 {
                     return swal({
                         title: "Error",
@@ -389,7 +413,12 @@ export default {
                     }); 
                 }
             }
-
+            return swal({
+                    title: "Success",
+                    text: "data ready",
+                    icon: "success",
+                    timer: 2000
+                });
             // post data
             const data = {
                 fleetId: this.fleetId,
@@ -530,10 +559,12 @@ export default {
             this.loop++;
         },
         removeRow(event) {
+            // Array.from(element.parentNode.children).indexOf(element)
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            this.fleetPart.splice((getRowNumber-1), 1);
-            this.maintenanceAfter.splice((getRowNumber-1), 1);
-            this.maintenanceAt.splice((getRowNumber-1), 1);
+            this.postData.item.splice((getRowNumber-1), 1);
+            this.postData.quantity.splice((getRowNumber-1), 1);
+            this.postData.amount.splice((getRowNumber-1), 1);
+            this.postData.seat.splice((getRowNumber-1), 1);
             event.target.parentElement.parentElement.remove();
             // this.loop--;
         },
@@ -548,12 +579,12 @@ export default {
         //     event.target.parentElement.parentElement.remove();
         // },
         async fetchData() {
-            const fleetRes = await this.callApi("post", "refreshments/hotels/food/order");
+            const fleetRes = await this.callApi("post", "refreshments/hotels/orders/food");
             if (fleetRes.status === 200) {
                 
                 this.mainData = fleetRes.data.mainData;
                 this.buses = fleetRes.data.busDrop;
-                this.parts = fleetRes.data.partDrop;
+                this.hotels = fleetRes.data.hotelDrop;
             }
 
             setTimeout(() => {
