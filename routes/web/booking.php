@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Booking\BookingController;
+use App\Http\Controllers\Schedule\ScheduleClosingController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 

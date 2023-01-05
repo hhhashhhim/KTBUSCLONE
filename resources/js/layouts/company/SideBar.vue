@@ -13,21 +13,12 @@
                         <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
                 <li class="dropdown" v-if="checkPermission('admin')">
-
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
                             Ticketing
                         </span>
                     </a>
                     <ul class="dropdown-menu">
-<!--                        <li>-->
-
-<!--                            <a href="/kt/admin/dashboard" class="nav-link"><i class="fa fa-desktop"></i>-->
-<!--                                <span>-->
-<!--                                    Dashboard-->
-<!--                                </span>-->
-<!--                            </a>-->
-<!--                        </li>-->
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name:'cities-page' }">
                                 <i class="fas fa-city"></i> Cities
@@ -89,7 +80,7 @@
                                 <i class="fas fa-bookmark"></i> Close Booking
                             </router-link>
                         </li>
-                        
+
                         <li class="dropdown" v-if="checkForSubmenu('route')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'all-booking-page' }">
                                 <i class="fas fa-bookmark"></i> All Booking
@@ -225,6 +216,12 @@
                             <router-link class="nav-link text-capitalize" :to="{ name:'ticketSettings' }"
                                          v-if="checkForSubmenu('employee')">
                                 <i class="fas fa-users"></i> Ticket Format
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name:'ticketSettings' }"
+                                         v-if="checkForSubmenu('employee')">
+                                <i class="fas fa-users"></i>Profile
                             </router-link>
                         </li>
                     </ul>

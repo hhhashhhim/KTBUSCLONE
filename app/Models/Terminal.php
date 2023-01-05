@@ -43,5 +43,9 @@ class Terminal extends Model
     {
         return $this->hasMany(Employee::class, 'terminal_id', 'id');
     }
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'terminal_id', 'id');
+    }
 
 }

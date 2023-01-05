@@ -10,4 +10,5 @@ Route::group(['prefix' => 'user', [CustomMiddleware::class]], function () {
     Route::post('update', [UserController::class, 'update']);
     Route::post('delete', [UserController::class, 'delete']);
     Route::post('permissions', [UserController::class, 'permissions']);
+    Route::post('/update/terminal', [UserController::class, 'updateTerminal']);
 });

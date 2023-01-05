@@ -54,6 +54,10 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        if (is_null(Auth::user()->terminal_id)) {
+            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+        }
+
 //        try {
 //            DB::beginTransaction();
 
@@ -119,6 +123,7 @@ class BookingController extends Controller
                     'customer_id' => $customer->id,
                     'schedule_id' => $schedule->id,
                     'schedule_details_id' => $scheduleDetail->id,
+                    'terminal_id' => Auth::user()->terminal_id,
                     'remarks' => $request->remarks,
                     'gender' => $request->gender,
                     'type' => $request->type,
@@ -445,19 +450,27 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
-        $customers_data = Ticket::with('customer', 'schedule', 'schedule.bus_class', 'destination_city', 'departure_city')->where([
+        $customers_data = Ticket::with('customer', 'schedule', 'schedule.bus_class','terminal:id,name', 'destination_city', 'departure_city')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
-        ])->get()->groupBy('schedule_id')->first();
-        $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->first();
-        $format->countPassenger = count((array)$customers_data);
-        $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
-        $format->driverInfo = getMembers($customers_data, Auth::user()->company_id, 1) ?? [];
-        $format->hostInfo = getMembers($customers_data, Auth::user()->company_id, 2) ?? [];
-        $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
-        $format->busNo = Bus::where(["id" => $customers_data[0]->bus_id, 'company_id' => Auth::user()->company_id])->first()->bus_number ?? '';
+        ])->orWhere('type', 'advance booking')->get()->groupBy('schedule_id')->first();
+        if ($customers_data) {
+            $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
+            if ($format) {
+                $format->countPassenger = count($customers_data);
+                $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
+                $format->driverInfo = getMembers($customers_data, Auth::user()->company_id, 1) ?? [];
+                $format->hostInfo = getMembers($customers_data, Auth::user()->company_id, 2) ?? [];
+                $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
+                $format->busNo = Bus::where(["id" => $customers_data[0]->bus_id, 'company_id' => Auth::user()->company_id])->first()->bus_number ?? 'N/A';
+            } else {
+                return response()->json("Please Add Ticket Template First");
+            }
+        } else {
+            return response()->json("Please Place at least one Booking");
+        }
         return view('pdf/passengerList', ['data' => $customers_data, 'format' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();

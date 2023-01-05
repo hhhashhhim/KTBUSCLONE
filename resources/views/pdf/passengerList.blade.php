@@ -73,7 +73,7 @@
             margin-top: 18px !important;
         }
     </style>
-    <title>Print Passenger List </title>
+    <title> Print Passenger List </title>
 </head>
 <body>
 {{--{{dd($data, $format)}}--}}
@@ -92,20 +92,20 @@
         <th class="centerTH">Date& Time</th>
         <th class="fontWightTh">{{$format->actualDeparture}}</th>
         <th class="centerTH">Bus No:</th>
-        <th class="fontWightTh">{{$format->busNo}}</th>
+        <th class="fontWightTh" style="width: 15% !important;">{{$format->busNo}}</th>
     </tr>
     <tr>
         <th colspan="1" class="centerTH">Driver Info</th>
         @if($format->driverInfo->count() > 0)
-        <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-            @foreach($format->driverInfo as $key => $value)
+                @foreach($format->driverInfo as $key => $value)
 
-                <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-            @endforeach
+                @endforeach
 
-        </th>
+            </th>
         @else
             <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
                 N/A
@@ -148,7 +148,7 @@
                 <td>{{ $item->customer->name }}</td>
                 <td>{{ formatCNIC($item->customer->cnic) }}</td>
                 <td>{{formatContact($item->customer->contact)}}</td>
-                <td>Terminal Name</td>
+                <td>{{$item->terminal->name}}</td>
                 <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>
             </tr>

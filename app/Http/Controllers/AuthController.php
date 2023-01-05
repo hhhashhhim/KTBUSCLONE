@@ -9,7 +9,6 @@ use App\Models\CityToCity;
 use App\Models\Customer;
 use App\Models\FareClass;
 use App\Models\FareTable;
-use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
@@ -18,6 +17,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -33,7 +33,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-
 //        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('id', 150)->get();
 //        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
 //        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 0]);

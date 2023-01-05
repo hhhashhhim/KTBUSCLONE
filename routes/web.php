@@ -15,37 +15,26 @@ use Illuminate\Support\Facades\Route;
 */
 //Reset Password Route
 require_once ('web/reset_password.php');
-
 //Auth Route
 require_once('web/auth.php');
-
 //Maintenance Route
 require_once('web/maintenance.php');
-
 //Refreshment Route
 require_once('web/refreshment.php');
-
 //Role Routes
 require_once ('web/role.php');
-
 //company Routes
 require_once ('web/company.php');
-
 //users Routes
 require_once ('web/users.php');
-
 //Terminals Route
 require_once ('web/terminals.php');
-
 //cities Route
 require_once ('web/cities.php');
-
 // FareTable Route
-require_once ('web/faretable.php');
-
+require_once('web/fareTable.php');
 //fare Class  Route
-require_once ('web/fareclass.php');
-
+require_once('web/fareClass.php');
 // Discount Route
 require_once ('web/discount.php');
 // Surcharge Route
@@ -54,30 +43,22 @@ require_once ('web/surcharge.php');
 require_once ('web/schedule.php');
 //Buses Route
 require_once ('web/buses.php');
-
 //BusClasses Route
-require_once ('web/busclass.php');
+require_once('web/busClass.php');
 //Booking Route
 require_once ('web/booking.php');
-
 //pdf Ticket Route
 require_once ('web/pdf.php');
-
 //AllBooking Route
-require_once ('web/allbooking.php');
-
+require_once('web/allBooking.php');
 //Hrm Employees Route
 require_once ('web/hrm/employees.php');
-
 //Hrm Leave Route
 require_once ('web/hrm/leave.php');
-
 //Hrm Departments Route
 require_once ('web/hrm/departments.php');
-
 //Hrm Designation Route
 require_once ('web/hrm/designation.php');
-
 //Hrm Tickets Route
 require_once ('web/hrm/tickets.php');
 

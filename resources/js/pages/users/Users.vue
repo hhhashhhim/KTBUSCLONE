@@ -7,6 +7,13 @@
                         <div class="card-header">
                             <h4>Users</h4>
                             <div class="card-header-action">
+                                <a v-if="showButton()"
+                                   data-toggle="modal" @click="this.updateTerminal == 0"
+                                   data-target="#assignTerminalUser"
+                                   class="btn btn-primary text-light mr-2"
+                                >
+                                    Assign Terminal To Company Admin (Yourself)
+                                </a>
                                 <a
                                     data-toggle="modal"
                                     :data-target="'#'+formID"
@@ -36,6 +43,7 @@
                                                         <th>Name</th>
                                                         <th>Email</th>
                                                         <th>Contact</th>
+                                                        <th>Terminal Name</th>
                                                         <th>Role</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -45,7 +53,11 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ user.name }}</td>
                                                         <td>{{ user.email }}</td>
-                                                        <td>{{ user.contact }}</td>
+                                                        <td>{{ phoneFormat(user.contact) }}</td>
+                                                        <td v-if="user.terminal_id != null">
+                                                            {{ user.terminal.city.name }} - {{ user.terminal.name }}
+                                                        </td>
+                                                        <td v-else>N/A</td>
                                                         <th>{{ user.role ? user.role.name : "Not Found" }}</th>
                                                         <td>
                                                             <a
@@ -170,8 +182,7 @@
                 </template>
             </Add>
             <!-- Add Modal -->
-            <!--
-                        addRoles New-->
+            <!--Add Roles New-->
             <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -194,6 +205,45 @@
                             <button type="button" class="btn btn-primary" @click="addNewRole()"
                                     :disabled="loadingRole">
                                 {{ loadingRole ? 'Loading...' : 'Add Role' }}
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Update Terminal id To your self-->
+            <div class="modal fade" id="assignTerminalUser" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Update Terminal </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="form-group col-md-12">
+                                    <label for="terminal">Terminal<span class="text-danger ml-1">*</span></label>
+                                    <select class="form-control" id="terminals"
+                                            v-model="updateTerminal">
+                                        <option value="0" selected>Select Terminal</option>
+                                        <option
+                                            v-for="(terminal, i) in terminals"
+                                            :value="terminal.id"
+                                            :key="i"
+                                        >{{ terminal.city.name }} - {{ terminal.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" @click="updateTerminalUser()"
+                                    :disabled="loadingTerminal">
+                                {{ loadingTerminal ? 'Loading...' : 'Update Terminal' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
@@ -303,6 +353,7 @@ import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
+import script from "@vueform/multiselect";
 
 
 export default {
@@ -323,6 +374,7 @@ export default {
             formID: 'user_form',
             editFormID: 'edit_user_form',
             roleName: '',
+            updateTerminal: 0,
             data: {
                 name: "",
                 email: "",
@@ -341,6 +393,7 @@ export default {
             loading: false,
             loadingEdit: false,
             loadingRole: false,
+            loadingTerminal: false,
             loadingUpdate: false,
         };
     },
@@ -348,6 +401,18 @@ export default {
         await this.fetchUsers();
     },
     methods: {
+        phoneFormat: function (string) {
+            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+        },
+
+        cnicFormat: function (string) {
+            return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
+        },
+
+        showButton: function () {
+            return $("meta[name=terminal_id]").attr('content') === "";
+        },
+
         clearForm: function () {
             this.data.name = "";
             this.data.email = "";
@@ -454,6 +519,48 @@ export default {
             }
         },
 
+        async updateTerminalUser() {
+            if (this.updateTerminal == 0) {
+                return swal({
+                    title: "Required!!!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.loadingTerminal = true;
+            const resTerminalUpdate = await this.callApi("post", "user/update/terminal", {terminal_id: this.updateTerminal});
+            if (resTerminalUpdate.status == 201) {
+                this.loadingTerminal = false;
+                swal({
+                    title: "Success!!",
+                    text: "Terminal Id Successfully Updated",
+                    icon: "success",
+                    timer: 2000
+                });
+                setTimeout(function () {
+                    window.location.reload();//code goes here
+                }, 3000);
+            }
+            if (resTerminalUpdate.status == 422) {
+                this.loadingTerminal = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resTerminalUpdate.data.errors) {
+                    resTerminalUpdate.data.errors[key].forEach((element) => {
+                        errorContent += ((++count) + " - " + element + "\n");
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+        },
         async addNewRole() {
             if (this.roleName == '' || typeof this.roleName == 'undefined') {
                 return swal({
