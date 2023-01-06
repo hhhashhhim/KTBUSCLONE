@@ -462,7 +462,7 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
-        ])->Where('type', 'advance booking')->get()->groupBy('schedule_id')->first();
+        ])->get()->groupBy('schedule_id')->first();
         if ($customers_data) {
             $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
             if ($format) {
@@ -478,7 +478,6 @@ class BookingController extends Controller
         } else {
             return response()->json("Please Place at least one Booking");
         }
-        dd($customers_data, $format);
         return view('pdf/passengerList', ['data' => $customers_data, 'format' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();

@@ -730,11 +730,11 @@
                                                             @click="passDataToEltModel(innerItem)">
                                                         Add ELT
                                                     </button>
-                                                    <button type="button" class="btn btn-primary ml-2" v-if="selectedBookedSeats.length"
+                                                    <button type="button" class="btn btn-primary ml-2"
                                                             @click="passDataToRescheduleModel(innerItem); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                                     >Reschedule
                                                     </button>
-                                                    <button type="button" class="btn btn-warning ml-2" v-if="selectedBookedOverIssueSeats.length"
+                                                    <button type="button" class="btn btn-warning ml-2"
                                                             @click="passDataToOverIssueModel(innerItem);this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
