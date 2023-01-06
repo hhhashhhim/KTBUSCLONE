@@ -29,7 +29,7 @@
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-                                                    id="maintenance_table"
+                                                    id="order_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -105,6 +105,17 @@
                         </select>
                     </div>
 
+                    <div class="form-group col-md-6">
+                        <label for="time_difference">Travel Time ( e.g HH:MM ) <span class="text-danger ml-1">*</span></label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="postData.estimatedTime"
+                            mask="00:00"
+                            :raw="false"
+                            :options="options">
+                        </vue-mask>
+                    </div>
+
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="col-md-6">
                             <h5>Select Food/Deal</h5>
@@ -116,7 +127,7 @@
                             <tr>
                                 <th>Food/Deal</th>
                                 <th>Quantity</th>
-                                <th>Amount</th>
+                                <!-- <th>Amount</th> -->
                                 <th>Seat No</th>
                                 <th>Action</th>
                             </tr>
@@ -127,18 +138,18 @@
                                     <select class="form-control rounded-0" @change="saveRow($event,'first')">
                                         <option value="" selected>Select Food </option>
                                         <option v-for="(item, i) in items" :value="item.cid" :key="i">
-                                            {{ item.name }}
+                                            {{parseInt(item.price)}} | {{ item.name }}
                                         </option>
                                     </select>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second')" />
                                 </td>
+                                <!-- <td>
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
+                                </td> -->
                                 <td>
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third')" />
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
@@ -150,7 +161,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="linkMaintenance" :disabled="loading" >{{loading ? 'Loading...' : 'Link' }}
+                    <button type="button" class="btn btn-primary" @click="orderBook" :disabled="loading" >{{loading ? 'Loading...' : 'Link' }}
                     </button>
                 </template>
             </Add>
@@ -277,12 +288,14 @@
 import Add from "../../../components/Add.vue";
 // import Edit from "../../../components/Edit.vue";
 import {mapGetters} from "vuex";
+import vueMask from "vue-jquery-mask";
 
 export default {
     name: "RoutePage",
     components: {
         Add,
         // Edit,
+        vueMask,
     },
     data() {
         return {
@@ -295,11 +308,15 @@ export default {
             schedule: "",
             postData : {
                 ticketClosingId: "",
+                estimatedTime: "",
                 hotelId: "",
                 item: [],
                 quantity: [],
-                amount: [],
+                // amount: [],
                 seat: [],
+            },
+            options: {
+                placeholder: 'HH:MM',
             },
             // mainData: [],
             // currentReading: "",
@@ -340,11 +357,11 @@ export default {
             {
                 this.postData.quantity[getRowNumber-1] = event.target.value;
             }
+            // if(fieldName == "fourth")
+            // {
+            //     this.postData.amount[getRowNumber-1] = event.target.value;
+            // }
             if(fieldName == "third")
-            {
-                this.postData.amount[getRowNumber-1] = event.target.value;
-            }
-            if(fieldName == "fourth")
             {
                 this.postData.seat[getRowNumber-1] = event.target.value;
             }
@@ -386,11 +403,11 @@ export default {
                 this.items = items.data;
             }
         },
-        async linkMaintenance() {
+        async orderBook() {
             
             // validation for empty data
-            if(!this.postData.ticketClosingId || !this.postData.hotelId || this.postData.item.length == 0 || 
-                this.postData.quantity.length == 0 || this.postData.amount.length == 0 || this.postData.seat.length == 0)
+            if(!this.postData.ticketClosingId || !this.postData.hotelId || !this.postData.estimatedTime ||
+                this.postData.item.length == 0 || this.postData.quantity.length == 0 || this.postData.seat.length == 0)
             {
                 return swal({
                     title: "Error",
@@ -403,7 +420,7 @@ export default {
             // check if any index is empty or null in object
             for(var i = 0; i < this.postData.item.length; i++)
             {
-                if(!this.postData.item[i] || !this.postData.quantity[i] || !this.postData.amount[i] || !this.postData.seat[i])
+                if(!this.postData.item[i] || !this.postData.quantity[i] || !this.postData.seat[i])
                 {
                     return swal({
                         title: "Error",
@@ -413,39 +430,24 @@ export default {
                     }); 
                 }
             }
-            return swal({
-                    title: "Success",
-                    text: "data ready",
-                    icon: "success",
-                    timer: 2000
-                });
-            // post data
-            const data = {
-                fleetId: this.fleetId,
-                currentReading: this.currentReading,
-                fleetPart: this.fleetPart,
-                maintenanceAfter: this.maintenanceAfter,
-                maintenanceAt: this.maintenanceAt,
-            }
+
 
             this.loading = true;
-            const res = await this.callApi("post", "fleet/part/link", data);
+            const res = await this.callApi("post", "refreshments/hotels/orders/book", this.postData);
             if (res.status === 200) {
                 this.loading = false;
-                $('#maintenance_table').DataTable().destroy();
-                this.fleetId = "";
-                this.currentReading = "";
+                $('#order_table').DataTable().destroy();
+                this.postData.item = [];
+                this.postData.quantity = [];
+                this.postData.seat = [];
                 this.loop = 0;
-                this.fleetPart =  [];
-                this.maintenanceAfter =  [];
-                this.maintenanceAt =  [];
                swal({
                     title: "Success",
-                    text: "Maintenance Added",
+                    text: "Order Added",
                     icon: "success",
                     timer: 2000
                 });
-                setInterval(() => {
+                setTimeout(() => {
                     this.loop = 1;
                 }, 2000);
                 await this.fetchData();
@@ -515,7 +517,7 @@ export default {
         //     const res = await this.callApi("post", "fleet/part/link/update", data);
         //     if (res.status === 200) {
         //         this.loading = false;
-        //         $('#maintenance_table').DataTable().destroy();
+        //         $('#order_table').DataTable().destroy();
         //         this.edit.fleetId = "";
         //         this.edit.currentReading = "";
         //         this.edit.loop = 0;
@@ -563,7 +565,7 @@ export default {
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             this.postData.item.splice((getRowNumber-1), 1);
             this.postData.quantity.splice((getRowNumber-1), 1);
-            this.postData.amount.splice((getRowNumber-1), 1);
+            // this.postData.amount.splice((getRowNumber-1), 1);
             this.postData.seat.splice((getRowNumber-1), 1);
             event.target.parentElement.parentElement.remove();
             // this.loop--;
@@ -588,7 +590,7 @@ export default {
             }
 
             setTimeout(() => {
-                $('#maintenance_table').DataTable();
+                $('#order_table').DataTable();
             }, 300);
         },
         // async fetchFleetDetails(id) {
