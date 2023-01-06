@@ -399,6 +399,7 @@ export default {
     },
     async created() {
         await this.fetchUsers();
+        console.log(this.authCheck)
     },
     methods: {
         phoneFormat: function (string) {
@@ -410,7 +411,7 @@ export default {
         },
 
         showButton: function () {
-            return $("meta[name=terminal_id]").attr('content') === "";
+            return this.authCheck == 0;
         },
 
         clearForm: function () {
@@ -425,7 +426,8 @@ export default {
         async fetchUsers() {
             const userRes = await this.callApi("post", "user");
             if (userRes.status == 200) {
-                this.users = userRes.data;
+                this.users = userRes.data.users;
+                this.authCheck = userRes.data.authCheck;
             } else {
                 console.log(userRes)
             }
@@ -528,20 +530,20 @@ export default {
                     timer: 2000
                 });
             }
-
             this.loadingTerminal = true;
             const resTerminalUpdate = await this.callApi("post", "user/update/terminal", {terminal_id: this.updateTerminal});
             if (resTerminalUpdate.status == 201) {
                 this.loadingTerminal = false;
+                this.fetchUsers();
                 swal({
                     title: "Success!!",
                     text: "Terminal Id Successfully Updated",
                     icon: "success",
                     timer: 2000
                 });
-                setTimeout(function () {
-                    window.location.reload();//code goes here
-                }, 3000);
+                // setTimeout(function () {
+                //     window.location.reload();//code goes here
+                // }, 3000);
             }
             if (resTerminalUpdate.status == 422) {
                 this.loadingTerminal = false;

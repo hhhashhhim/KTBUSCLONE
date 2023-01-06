@@ -22,7 +22,8 @@ class UserController extends Controller
 
     public function index()
     {
-        return User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->where('id', '!=', Auth::user()->id)->latest('id')->get();
+        return ['users' => User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->where('id', '!=', Auth::user()->id)->latest('id')->get(),
+            'authCheck' => is_null(Auth::user()->terminal_id) ? 0 : Auth::user()->terminal_id];
     }
 
     public function store(Request $request)
@@ -47,10 +48,10 @@ class UserController extends Controller
 
     }
 
-    public function delete(Request $request)
-    {
-        return User::find($request->id)->delete();
-    }
+//    public function delete(Request $request)
+//    {
+//        return User::find($request->id)->delete();
+//    }
 
     public function update(Request $request)
     {
@@ -81,7 +82,7 @@ class UserController extends Controller
 
     public function updateTerminal(Request $request)
     {
-        $user = User::where(['id'=>Auth::user()->id, 'company_id'=>Auth::user()->company_id])->first();
+        $user = User::where(['id' => Auth::user()->id, 'company_id' => Auth::user()->company_id])->first();
         $user->terminal_id = $request->terminal_id;
         $user->save();
         return response()->json([

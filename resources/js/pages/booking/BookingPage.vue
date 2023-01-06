@@ -958,6 +958,8 @@ export default {
                         seatNO: (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
                         scheduleId: this.addForm.schedule,
                         date: this.addForm.date,
+                        departureCity: this.addForm.departureCity,
+                        destinationCity: this.addForm.destinationCity,
                     }
                     const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
                     if (resSeatData.status == 200) {

@@ -38,7 +38,7 @@
                                                             <th>Commission (%)</th>
                                                             <th>Location</th>
                                                             <th>Logo</th>
-                                                            <th>Action</th>
+                                                            <th width="225px !important">Action</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>

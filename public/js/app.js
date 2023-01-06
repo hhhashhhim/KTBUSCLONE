@@ -27007,7 +27007,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 dataSeats = {
                   seatNO: _this2.selectedBookedSeats.length != 0 && _this2.selectedBookedOverIssueSeats.length == 0 ? _this2.selectedBookedSeats : _this2.selectedBookedOverIssueSeats,
                   scheduleId: _this2.addForm.schedule,
-                  date: _this2.addForm.date
+                  date: _this2.addForm.date,
+                  departureCity: _this2.addForm.departureCity,
+                  destinationCity: _this2.addForm.destinationCity
                 };
                 _context2.next = 11;
                 return _this2.callApi("post", "booking/advance", dataSeats);
@@ -38409,7 +38411,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 2:
                 schedule = _context.sent;
 
-                if (schedule.status === 200) {
+                if (schedule.status === 200 && schedule.data) {
                   _this.schedule = schedule.data.schedule_date + " " + schedule.data.schedule_time;
                   _this.postData.ticketClosingId = schedule.data.id;
                 }
@@ -38570,7 +38572,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // async updateLinkMaintenance() {
     //     // validation for empty data
-    //     if(!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 || 
+    //     if(!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 ||
     //         this.edit.maintenanceAfter.length == 0 || this.edit.maintenanceAt.length == 0)
     //     {
     //         return swal({
@@ -38590,7 +38592,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     //                 text: "Please Fill All Field Or Remove Extra",
     //                 icon: "error",
     //                 timer: 4000
-    //             }); 
+    //             });
     //         }
     //     }
     //     // post data
@@ -42688,6 +42690,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _this.fetchUsers();
 
             case 2:
+              console.log(_this.authCheck);
+
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -42703,7 +42708,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
     },
     showButton: function showButton() {
-      return $("meta[name=terminal_id]").attr('content') === "";
+      return this.authCheck == 0;
     },
     clearForm: function clearForm() {
       this.data.name = "";
@@ -42729,7 +42734,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 userRes = _context2.sent;
 
                 if (userRes.status == 200) {
-                  _this2.users = userRes.data;
+                  _this2.users = userRes.data.users;
+                  _this2.authCheck = userRes.data.authCheck;
                 } else {
                   console.log(userRes);
                 }
@@ -42938,15 +42944,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resTerminalUpdate.status == 201) {
                   _this4.loadingTerminal = false;
+
+                  _this4.fetchUsers();
+
                   swal({
                     title: "Success!!",
                     text: "Terminal Id Successfully Updated",
                     icon: "success",
                     timer: 2000
-                  });
-                  setTimeout(function () {
-                    window.location.reload(); //code goes here
-                  }, 3000);
+                  }); // setTimeout(function () {
+                  //     window.location.reload();//code goes here
+                  // }, 3000);
                 }
 
                 if (resTerminalUpdate.status == 422) {
@@ -59503,7 +59511,7 @@ var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
     "class": "col-md-12 d-flex align-items-center"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-12"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Select Food For Deal "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, " (Duplicate food will be remove autometically)")])])], -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Select Food For Deal "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, " (Duplicate food will be remove automatically)")])])], -1
   /* HOISTED */
   );
 });
@@ -59525,7 +59533,7 @@ var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
-  }, "Select Part ", -1
+  }, "Select Food ", -1
   /* HOISTED */
   );
 });
@@ -60332,7 +60340,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.price]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        placeholder: "Enter Email",
+        placeholder: "Enter Unit",
         id: "email",
         "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
           return $data.postData.unit = $event;
@@ -60341,7 +60349,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.unit]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
-        placeholder: "Enter Location",
+        placeholder: "Enter Description",
         id: "location",
         "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
           return $data.postData.description = $event;
@@ -60500,7 +60508,9 @@ var _hoisted_16 = {
 };
 
 var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Balance (Rs)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Commission (%)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Location"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Logo"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Balance (Rs)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Commission (%)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Location"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Logo"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    width: "225px !important"
+  }, "Action")])], -1
   /* HOISTED */
   );
 });
@@ -61370,7 +61380,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
-    heading: 'Link Part With Bus',
+    heading: 'Food Order',
     errors: this.validationErrors,
     success: _ctx.success,
     formID: $data.formID
@@ -61504,7 +61514,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\r\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\r\n                            <option value=\"\" selected>Select Bus</option>\r\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\r\n                                {{ fleet.bus_number }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\r\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\r\n                    </div>\r\n                    <div class=\"col-md-12 d-flex align-items-center\">\r\n                        <div class=\"col-md-6\">\r\n                            <h5>Select Part For Maintenance</h5>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\r\n                        <table class=\"table table-striped\">\r\n                            <thead>\r\n                            <tr>\r\n                                <th>Part</th>\r\n                                <th>Maintenance Required After (km)</th>\r\n                                <th>Last Maintenance At (km)</th>\r\n                                <th>Action</th>\r\n                            </tr>\r\n                            </thead>\r\n                            <tbody>\r\n                              \r\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\r\n                                <td>\r\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\" \r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\r\n                                        <option value=\"\" selected>Select Part </option>\r\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\r\n                                            {{ part.name }}\r\n                                        </option>\r\n                                    </select>\r\n                                </td>\r\n                                <td>\r\n                                    \r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\" \r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\r\n                                </td>\r\n                                <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\" \r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\r\n                                </td>\r\n                                <td>\r\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\r\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"modal fade\" id=\"showDetails\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\"\r\n                 aria-hidden=\"true\">\r\n                <div class=\"modal-dialog modal-xl\" role=\"document\">\r\n                    <div class=\"modal-content\">\r\n                        <div class=\"modal-header\">\r\n                            <h5 class=\"modal-title\" id=\"exampleModalLabel\">Route Fare Chart</h5>\r\n                            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n                                <span aria-hidden=\"true\">&times;</span>\r\n                            </button>\r\n                        </div>\r\n                        <div class=\"modal-body\">\r\n                            <table class=\"table table-striped\">\r\n                                <thead>\r\n                                <tr>\r\n\r\n                                    <th>Fleet Part</th>\r\n                                    <th>Maintenance Required After</th>\r\n                                    <th>Last Maintenance At</th>\r\n                                    <th>Last Maintenance Date</th>\r\n                                </tr>\r\n                                </thead>\r\n                                <tbody>\r\n                                    <tr v-for=\"(single, i) in fleetDetails.maintenance_part_link\" :key=\"i\">\r\n\r\n                                        <td> {{ single.maintenance_part.name }}</td>\r\n                                        <td> {{ single.maintenance_after }} (km)</td>\r\n                                        <td> {{ single.maintenance_at }} (km)</td>\r\n                                        <td> {{ single.maintenance_date??'N/A' }}</td>\r\n                                    </tr>\r\n                                </tbody>\r\n                            </table>\r\n                        </div>\r\n                        <div class=\"modal-footer\">\r\n                            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div> ")])]);
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\r\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\r\n                            <option value=\"\" selected>Select Bus</option>\r\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\r\n                                {{ fleet.bus_number }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\r\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\r\n                    </div>\r\n                    <div class=\"col-md-12 d-flex align-items-center\">\r\n                        <div class=\"col-md-6\">\r\n                            <h5>Select Part For Maintenance</h5>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\r\n                        <table class=\"table table-striped\">\r\n                            <thead>\r\n                            <tr>\r\n                                <th>Part</th>\r\n                                <th>Maintenance Required After (km)</th>\r\n                                <th>Last Maintenance At (km)</th>\r\n                                <th>Action</th>\r\n                            </tr>\r\n                            </thead>\r\n                            <tbody>\r\n\r\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\r\n                                <td>\r\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\r\n                                        <option value=\"\" selected>Select Part </option>\r\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\r\n                                            {{ part.name }}\r\n                                        </option>\r\n                                    </select>\r\n                                </td>\r\n                                <td>\r\n\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\r\n                                </td>\r\n                                <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\r\n                                </td>\r\n                                <td>\r\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\r\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"modal fade\" id=\"showDetails\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\"\r\n                 aria-hidden=\"true\">\r\n                <div class=\"modal-dialog modal-xl\" role=\"document\">\r\n                    <div class=\"modal-content\">\r\n                        <div class=\"modal-header\">\r\n                            <h5 class=\"modal-title\" id=\"exampleModalLabel\">Route Fare Chart</h5>\r\n                            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n                                <span aria-hidden=\"true\">&times;</span>\r\n                            </button>\r\n                        </div>\r\n                        <div class=\"modal-body\">\r\n                            <table class=\"table table-striped\">\r\n                                <thead>\r\n                                <tr>\r\n\r\n                                    <th>Fleet Part</th>\r\n                                    <th>Maintenance Required After</th>\r\n                                    <th>Last Maintenance At</th>\r\n                                    <th>Last Maintenance Date</th>\r\n                                </tr>\r\n                                </thead>\r\n                                <tbody>\r\n                                    <tr v-for=\"(single, i) in fleetDetails.maintenance_part_link\" :key=\"i\">\r\n\r\n                                        <td> {{ single.maintenance_part.name }}</td>\r\n                                        <td> {{ single.maintenance_after }} (km)</td>\r\n                                        <td> {{ single.maintenance_at }} (km)</td>\r\n                                        <td> {{ single.maintenance_date??'N/A' }}</td>\r\n                                    </tr>\r\n                                </tbody>\r\n                            </table>\r\n                        </div>\r\n                        <div class=\"modal-footer\">\r\n                            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div> ")])]);
 }
 
 /***/ }),
@@ -62656,33 +62666,31 @@ var _hoisted_15 = {
   "class": "table-responsive"
 };
 var _hoisted_16 = {
-  "class": "table table-striped table-hover",
-  id: "closing_table"
+  "class": "table table-striped table-hover"
 };
 
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        <th>Action</th>")])], -1
 /* HOISTED */
 );
 
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, "N/A", -1
-/* HOISTED */
-);
-
-var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
   "class": "border-bottom border-success",
-  colspan: "7"
+  colspan: "4",
+  style: {
+    "height": "0 !important"
+  }
 })], -1
 /* HOISTED */
 );
 
-var _hoisted_20 = {
+var _hoisted_19 = {
   "class": "row"
 };
-var _hoisted_21 = {
+var _hoisted_20 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "city_id"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62690,25 +62698,25 @@ var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: ""
 }, "Select Bus Class", -1
 /* HOISTED */
 );
 
-var _hoisted_24 = ["value"];
+var _hoisted_23 = ["value"];
 
-var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "form-group col-md-6"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_26 = {
+var _hoisted_25 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62716,11 +62724,11 @@ var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_28 = {
+var _hoisted_27 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "city_id"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Schedule "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62728,18 +62736,18 @@ var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: ""
 }, "Select Schedule", -1
 /* HOISTED */
 );
 
-var _hoisted_31 = ["value"];
-var _hoisted_32 = {
+var _hoisted_30 = ["value"];
+var _hoisted_31 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Driver "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62747,12 +62755,12 @@ var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_34 = ["value"];
-var _hoisted_35 = {
+var _hoisted_33 = ["value"];
+var _hoisted_34 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Host "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62760,18 +62768,18 @@ var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_37 = ["value"];
-var _hoisted_38 = {
+var _hoisted_36 = ["value"];
+var _hoisted_37 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "location"
 }, "Description", -1
 /* HOISTED */
 );
 
-var _hoisted_40 = ["disabled"];
+var _hoisted_39 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
 
@@ -62799,10 +62807,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(close.schedule_time), 1
       /* TEXT */
-      ), _hoisted_18]);
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <td>N/A</td>")]);
     }), 128
     /* KEYED_FRAGMENT */
-    )), _hoisted_19], 64
+    )), _hoisted_18], 64
     /* STABLE_FRAGMENT */
     );
   }), 128
@@ -62823,26 +62831,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Close Booking'), 9
       /* TEXT, PROPS */
-      , _hoisted_40)];
+      , _hoisted_39)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
           return $data.addData.bus = $event;
         })
-      }, [_hoisted_23, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+      }, [_hoisted_22, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: bus.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
         /* TEXT, PROPS */
-        , _hoisted_24);
+        , _hoisted_23);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.bus]])]), _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.bus]])]), _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         "class": "form-control",
         placeholder: "Enter Bus Name",
@@ -62854,23 +62862,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addData.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addData.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.addData.schedule = $event;
         })
-      }, [_hoisted_30, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedules, function (schedule, i) {
+      }, [_hoisted_29, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedules, function (schedule, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: schedule.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')), 9
         /* TEXT, PROPS */
-        , _hoisted_31);
+        , _hoisted_30);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\r\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\r\n                        <Multiselect\r\n\r\n                            :options=\"options\"\r\n                            :multiple=\"true\"\r\n                            :searchable=\"true\"\r\n\r\n                        ></Multiselect>\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\r\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\r\n                        <Multiselect\r\n\r\n                            :options=\"options\"\r\n                            :multiple=\"true\"\r\n                            :searchable=\"true\"\r\n\r\n                        ></Multiselect>\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.addData.drivers = $event;
@@ -62882,12 +62890,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: driver.user_id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(driver.name), 9
         /* TEXT, PROPS */
-        , _hoisted_34);
+        , _hoisted_33);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [_hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
           return $data.addData.hosts = $event;
@@ -62899,12 +62907,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: host.user_id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(host.name), 9
         /* TEXT, PROPS */
-        , _hoisted_37);
+        , _hoisted_36);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [_hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
         placeholder: "Enter Description",
         id: "location",

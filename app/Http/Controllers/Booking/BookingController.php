@@ -343,7 +343,14 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-        return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('date', $request->date)->get()->groupBy('seat_no');
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->scheduleId,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+        ])->first(['schedule_date']);
+        return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
     }
 
     public function bookingElt(Request $request)
@@ -450,12 +457,12 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
-        $customers_data = Ticket::with('customer', 'schedule', 'schedule.bus_class','terminal:id,name', 'destination_city', 'departure_city')->where([
+        $customers_data = Ticket::with('customer', 'schedule', 'schedule.bus_class', 'terminal:id,name', 'destination_city', 'departure_city')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
-        ])->orWhere('type', 'advance booking')->get()->groupBy('schedule_id')->first();
+        ])->Where('type', 'advance booking')->get()->groupBy('schedule_id')->first();
         if ($customers_data) {
             $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
             if ($format) {
@@ -471,6 +478,7 @@ class BookingController extends Controller
         } else {
             return response()->json("Please Place at least one Booking");
         }
+        dd($customers_data, $format);
         return view('pdf/passengerList', ['data' => $customers_data, 'format' => $format]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();
