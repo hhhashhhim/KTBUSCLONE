@@ -21,7 +21,7 @@
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-                                                    id="closing_table"
+
                                                 >
                                                     <thead>
                                                     <tr>
@@ -29,7 +29,7 @@
                                                         <th>Schedule</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
-                                                        <th>Action</th>
+<!--                                                        <th>Action</th>-->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -39,10 +39,10 @@
                                                             <td>{{ close.schedule.name }}</td>
                                                             <td>{{ close.schedule_date }}</td>
                                                             <td>{{ close.schedule_time }}</td>
-                                                            <td>N/A</td>
+<!--                                                            <td>N/A</td>-->
                                                         </tr>
                                                         <tr>
-                                                            <td class="border-bottom border-success" colspan="7"></td>
+                                                            <td class="border-bottom border-success" colspan="4" style="height:0 !important; "></td>
                                                         </tr>
                                                     </template>
                                                     </tbody>

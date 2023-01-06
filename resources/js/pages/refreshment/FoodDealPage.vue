@@ -161,7 +161,7 @@
 
                         <div class="col-md-12 d-flex align-items-center">
                             <div class="col-md-12">
-                                <h5>Select Food For Deal <small> (Duplicate food will be remove autometically)</small></h5>
+                                <h5>Select Food For Deal <small> (Duplicate food will be remove automatically)</small></h5>
                             </div>
                         </div>
                         <div class="form-group col-md-12 d-flex align-items-center">
@@ -177,7 +177,7 @@
                                 <tr v-for="index in loop" :key="index">
                                     <td>
                                         <select class="form-control rounded-0" @change="saveRow($event,'rowFood')">
-                                            <option value="" selected>Select Part </option>
+                                            <option value="" selected>Select Food </option>
                                             <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
                                                 {{ food.name }}
                                             </option>

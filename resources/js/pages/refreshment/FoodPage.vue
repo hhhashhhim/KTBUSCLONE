@@ -152,7 +152,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                placeholder="Enter Email"
+                                placeholder="Enter Unit"
                                 id="email"
                                 v-model="postData.unit"
                             />
@@ -161,7 +161,7 @@
                             <label for="location">Description</label>
                             <textarea
                                 class="form-control"
-                                placeholder="Enter Location"
+                                placeholder="Enter Description"
                                 id="location"
                                 v-model="postData.description"
                                 cols="30"
