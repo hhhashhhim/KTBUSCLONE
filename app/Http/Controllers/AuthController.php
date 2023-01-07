@@ -33,28 +33,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-        // return printTicket([2,3,4], 1);
-//        $ticket = Ticket::with('schedule', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->where('id', 150)->get();
-//        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-//        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 0]);
-//
-//        $output = $pdf->output();
-//
-//        return new Response($output, 200, [
-//            'Content-Type' => 'application/pdf',
-//        ]);
-
-        //elt pdf  test
-//
-//        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', 1)->first();
-//        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-//            $pdf = PDF::loadView('pdf/eltPdf', ['data' => $elt, 'data_terms'=> $format]);
-//
-//            $output = $pdf->output();
-//
-//        return new Response($output, 200, [
-//            'Content-Type' => 'application/pdf',
-//            ]);
+//         return printTicket([2], 1);
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');

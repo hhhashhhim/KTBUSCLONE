@@ -62,238 +62,245 @@ if (!function_exists('plainContactAndCnic')) {
     function plainContactAndCnic(string $input_string)
     {
         if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $input_string)) {
-    return str_replace('-', '', $input_string);
+            return str_replace('-', '', $input_string);
+        }
+        return $input_string;
     }
-    return $input_string;
-    }
-    }
+}
 
-    if (!function_exists('formatContact')) {
+if (!function_exists('formatContact')) {
     function formatContact(string $phone_no)
     {
-    return preg_replace(
-    "/.*(\d{4})[^\d]{0,7}(\d{7})/",
-    '$1-$2',
-    $phone_no
-    );
+        return preg_replace(
+            "/.*(\d{4})[^\d]{0,7}(\d{7})/",
+            '$1-$2',
+            $phone_no
+        );
     }
-    }
+}
 
-    if (!function_exists('formatCNIC')) {
+if (!function_exists('formatCNIC')) {
     function formatCNIC(string $phone_no)
     {
-    return preg_replace(
-    "/.*(\d{5})[^\d]{0,7}(\d{7})[^\d]{0,7}(\d{1})/",
-    '$1-$2-$3',
-    $phone_no
-    );
+        return preg_replace(
+            "/.*(\d{5})[^\d]{0,7}(\d{7})[^\d]{0,7}(\d{1})/",
+            '$1-$2-$3',
+            $phone_no
+        );
     }
-    }
+}
 
-    if (!function_exists('formatUAN')) {
+if (!function_exists('formatUAN')) {
     function formatUAN(string $phone_no)
     {
-    return preg_replace(
-    "/.*(\d{2})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})/",
-    '$1-$2-$3-$4',
-    $phone_no
-    );
+        return preg_replace(
+            "/.*(\d{2})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})[^\d]{0,7}(\d{3})/",
+            '$1-$2-$3-$4',
+            $phone_no
+        );
     }
-    }
+}
 
-    if (!function_exists('priceDiff')) {
+if (!function_exists('priceDiff')) {
     function priceDiff(int $old, int $new)
     {
 
-    if ($new == $old) {
-    return [
-    'diff' => $new - $old,
-    'type' => 'same',
-    ];
+        if ($new == $old) {
+            return [
+                'diff' => $new - $old,
+                'type' => 'same',
+            ];
+        }
+        if ($new > $old) {
+            return [
+                'diff' => $new - $old,
+                'type' => 'receivable by customer',
+            ];
+        }
+        if ($new < $old) {
+            return ['diff' => $new - $old,
+                'type' => 'refund to customer',
+            ];
+        }
     }
-    if ($new > $old) {
-    return [
-    'diff' => $new - $old,
-    'type' => 'receivable by customer',
-    ];
-    }
-    if ($new < $old) { return [ 'diff'=> $new - $old,
-        'type' => 'refund to customer',
-        ];
-        }
-        }
-        }
+}
 
-        if (!function_exists('updateFare')) {
-        function updateFare($request, $company_id)
-        {
+if (!function_exists('updateFare')) {
+    function updateFare($request, $company_id)
+    {
         FareTable::where('id', $request->id)->update([
-        'fare' => $request->fare,
-        'from_city_id' => $request->from,
-        'to_city_id' => $request->to,
-        'fare_class' => $request->fare_class,
-        'company_id' => $company_id,
-        'time_difference' => $request->time_difference,
-        'distance_in_km' => $request->distance_in_km,
-        'added_by' => auth()->user()->id,
+            'fare' => $request->fare,
+            'from_city_id' => $request->from,
+            'to_city_id' => $request->to,
+            'fare_class' => $request->fare_class,
+            'company_id' => $company_id,
+            'time_difference' => $request->time_difference,
+            'distance_in_km' => $request->distance_in_km,
+            'added_by' => auth()->user()->id,
         ]);
         FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where('fare_class',
-        $request->fare_class)->update([
-        'fare' => $request->fare,
-        'from_city_id' => $request->to,
-        'to_city_id' => $request->from,
-        'fare_class' => $request->fare_class,
-        'company_id' => $company_id,
-        'time_difference' => $request->time_difference,
-        'distance_in_km' => $request->distance_in_km,
-        'added_by' => auth()->user()->id,
+            $request->fare_class)->update([
+            'fare' => $request->fare,
+            'from_city_id' => $request->to,
+            'to_city_id' => $request->from,
+            'fare_class' => $request->fare_class,
+            'company_id' => $company_id,
+            'time_difference' => $request->time_difference,
+            'distance_in_km' => $request->distance_in_km,
+            'added_by' => auth()->user()->id,
         ]);
-        }
-        }
+    }
+}
 
-        //Updated Already advanced Booked Seat
-        if (!function_exists('updateAdvancedSeat')) {
-        function updateAdvancedSeat($request, $company_id)
-        {
+//Updated Already advanced Booked Seat
+if (!function_exists('updateAdvancedSeat')) {
+    function updateAdvancedSeat($request, $company_id)
+    {
         $customerAll = [];
         foreach ($request->alreadyBookedId as $key => $single) {
-        $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
-        $customer_id->update([
-        'type' => 'booked',
-        ]);
-        $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
-        $single)->first(['customer_id'])->customer_id;
+            $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
+            $customer_id->update([
+                'type' => 'booked',
+            ]);
+            $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
+                $single)->first(['customer_id'])->customer_id;
         }
         $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
         $updateId->update([
-        'cnic' => plainContactAndCnic($request->customerCNIC),
+            'cnic' => plainContactAndCnic($request->customerCNIC),
         ]);
         return $request->alreadyBookedId[0];
-        }
-        }
+    }
+}
 
-        //updated Fare Table for first time
-        if (!function_exists('updateFareTable')) {
-        function updateFareTable($company_id)
-        {
+//updated Fare Table for first time
+if (!function_exists('updateFareTable')) {
+    function updateFareTable($company_id)
+    {
         $fareClasses = FareClass::where('company_id', $company_id)->get();
         $cities = City::where('company_id', $company_id)->get();
         foreach ($fareClasses as $fareClass) {
-        foreach ($cities as $firstCity) {
-        foreach ($cities as $secondCity) {
-        if ($firstCity->id != $secondCity->id) {
-        $oldFare = FareTable::where([
-        'company_id' => $company_id,
-        "fare_class" => $fareClass->id,
-        "from_city_id" => $firstCity->id,
-        "to_city_id" => $secondCity->id,
-        ])->first();
-        if (!$oldFare) {
-        FareTable::create([
-        "fare" => 0,
-        "fare_class" => $fareClass->id,
-        "from_city_id" => $firstCity->id,
-        "to_city_id" => $secondCity->id,
-        "company_id" => $company_id,
-        "added_by" => Auth::user()->id,
-        ]);
+            foreach ($cities as $firstCity) {
+                foreach ($cities as $secondCity) {
+                    if ($firstCity->id != $secondCity->id) {
+                        $oldFare = FareTable::where([
+                            'company_id' => $company_id,
+                            "fare_class" => $fareClass->id,
+                            "from_city_id" => $firstCity->id,
+                            "to_city_id" => $secondCity->id,
+                        ])->first();
+                        if (!$oldFare) {
+                            FareTable::create([
+                                "fare" => 0,
+                                "fare_class" => $fareClass->id,
+                                "from_city_id" => $firstCity->id,
+                                "to_city_id" => $secondCity->id,
+                                "company_id" => $company_id,
+                                "added_by" => Auth::user()->id,
+                            ]);
+                        }
+                    }
+                }
+            }
         }
-        }
-        }
-        }
-        }
-        }
-        }
+    }
+}
 
-        //Print Ticket function
-        if (!function_exists('printTicket')) {
-        function printTicket($ticketIds, $company_id, $duplicate = 0)
-        {
+//Print Ticket function
+if (!function_exists('printTicket')) {
+    function printTicket($ticketIds, $company_id, $duplicate = 1)
+    {
+
+
         $format = TicketsTemplate::where(['company_id' => $company_id, 'status' => 1])->first();
-        $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city')->where('company_id',
-        $company_id)->whereIn('id', $ticketIds)->get();
-        // foreach ($tickets as $single) {
-        // Set params
-        $uan = 'UAN(24/7):' . ' ' . formatUAN($format->uan);
-        $company_name = 'Kainat Travels';
-        $company_address = $format->address;
-        $company_phone = 'Phone # :' . ' ' . formatContact($format->phone);
-        $termsCondition = $format->terms_condition;
-        $checkDuplicate = $duplicate;
-        $seatNo = $tickets[0]->seat_no;
-        $busClass = $tickets[0]['schedule']['bus_class']->name;
-        $departureCity = $tickets[0]['departure_city']->name;
-        $destinationCity = $tickets[0]['destination_city']->name;
-        $departureDate = date('d/m/Y', strtotime($tickets[0]->date));
-        $departureTime = date('H:i A', strtotime($tickets[0]['schedule']->time));
-        $bookingDate = date('d/m/Y H:i A', strtotime($tickets[0]->created_at));
-        $seatFare = $tickets[0]->seat_fare;
-        $customerName = $tickets[0]['customer']->name;
-        $customerCNIC = formatCNIC($tickets[0]['customer']->cnic);
-        $customerContact = formatContact($tickets[0]['customer']->contact);
+        $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city', 'seatClass')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
+        foreach ($tickets as $single) {
+            // Set params
+            $uan = formatUAN($format->uan);
+            $company_name = 'Kainat Travels';
+            $company_address = $format->address;
+            $company_phone = formatContact($format->phone);
+            $termsCondition = $format->terms_condition;
+            $checkDuplicate = $duplicate;
+            $seatNo = $single->seat_no;
+            $busClass = $single['schedule']['bus_class']->name;
+            $departureCity = $single['departure_city']->name;
+            $destinationCity = $single['destination_city']->name;
+            $departureDate = date('d/m/Y', strtotime($single->date));
+            $departureTime = date('H:i A', strtotime($single['schedule']->time));
+            $bookingDate = date('d/m/Y H:i A', strtotime($single->created_at));
+            $seatFare = $single->seat_fare;
+            $bookingId = $single->id;
+            $busClass = $single['seatClass']->name;
+            $customerName = $single['customer']->name;
+            $customerCNIC = formatCNIC($single['customer']->cnic);
+            $customerContact = formatContact($single['customer']->contact);
+            //Code for Qr code
+            $code = 'Name: ' . $customerName . '| ' .
+                'CNIC: ' . $customerCNIC . '| ' .
+                'Contact: ' . $customerContact . '| ' .
+                'SeatNo: ' . $seatNo . '| ' .
+                'Bus: ' . $busClass . '| ' .
+                'From: ' . $departureCity . '| ' .
+                'To: ' . $destinationCity . '| ' .
+                'Dept Date: ' . $departureDate . '| ' .
+                'Dept Time: ' . $departureTime . '| ' .
+                'Booking DateTime: ' . $bookingDate . '| ' .
+                'boookingId: ' . $bookingId . '| ' .
+                'Fare: ' . $seatFare;
 
-        // Init printer
-        $printer = new ReceiptPrinter;
-        $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
+            $image = codeImage($code);
+            // Init printer
+            $printer = new ReceiptPrinter;
+            $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
 
-        // Set store info
-        $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate,
-        $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime,
-        $departureDate, $departureCity, $destinationCity, $busClass);
-
-        // Set currency
-        // $printer->setCurrency($currency);
-
-        // Add items
-        // foreach ($items as $item) {
-        // $printer->addItem(
-        // $item['name'],
-        // $item['qty'],
-        // $item['price']
-        // );
-        // }
-        // Set tax
-        // $printer->setTax($tax_percentage);
-
-        // Calculate total
-        // $printer->calculateSubTotal();
-        // $printer->calculateGrandTotal();
-
-        // Set transaction ID
-        // $printer->setTransactionID($transaction_id);
-
-        // Set logo
-        // Uncomment the line below if $image_path is defined
-        //$printer->setLogo($image_path);
-
-        // Set QR code
-        // $printer->setQRcode([
-        // 'tid' => $transaction_id,
-        // ]);
-
-        // Print receipt
-        $printer->printReceipt();
+            // Set store info
+            $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate,
+                $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime,
+                $departureDate, $departureCity, $destinationCity, $busClass);
+            // Print Function passes Array to it
+            $printer->printReceipt([
+                'companyName' => $company_name,
+                'companyAddress' => $company_address,
+                'uan' => $uan,
+                'phone' => $company_phone,
+                'qr' => $image,
+                'customerName' => $customerName,
+                'seatNo' => $seatNo,
+                'busClass' => $busClass,
+                'from' => $departureCity,
+                'to' => $destinationCity,
+                'departDate' => $departureDate,
+                'departTime' => $departureTime,
+                'bookingDate' => $bookingDate,
+                'fare' => $seatFare,
+                'terms' => $termsCondition,
+                'cnic' => $customerCNIC,
+                'contact' => $customerContact,
+                'duplicate' => $duplicate,
+            ]);
         }
-        // }
-        }
-        if (!function_exists('codeImage')) {
-        function codeImage($data)
-        {
-        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=$data");
-        $nameToStore = $data . ".png";
+    }
+}
+if (!function_exists('codeImage')) {
+    function codeImage($code)
+    {
+        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$code&size=350x350");
+        $id = explode("| ", $code)[10];
+        $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
         file_put_contents(public_path("Customers/Qrs/$nameToStore"), $data);
         return $nameToStore;
-        }
-        }
-        //Get Drivers
-        if (!function_exists('getMembers')) {
-        function getMembers($data, $company_id, $type)
-        {
+    }
+}
+//Get Drivers
+if (!function_exists('getMembers')) {
+    function getMembers($data, $company_id, $type)
+    {
         $dataMember = TicketClosingMember::where([
-        'company_id' => $company_id,
-        'ticket_closing_id' => $data[0]->ticket_closing_id,
-        'type' => $type,
+            'company_id' => $company_id,
+            'ticket_closing_id' => $data[0]->ticket_closing_id,
+            'type' => $type,
         ])->pluck('user_id');
         return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']);
-        }
-        }
+    }
+}
