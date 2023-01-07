@@ -127,7 +127,7 @@
                             <tr>
                                 <th>Food/Deal</th>
                                 <th>Quantity</th>
-                                <!-- <th>Amount</th> -->
+                                <th>Total Amount</th>
                                 <th>Seat No</th>
                                 <th>Action</th>
                             </tr>
@@ -135,25 +135,25 @@
                             <tbody>
                             <tr v-for="index in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="saveRow($event,'first')">
+                                    <select class="form-control rounded-0" @change="saveRow($event,'first',index)" :value="postData.item[index]">
                                         <option value="" selected>Select Food </option>
-                                        <option v-for="(item, i) in items" :value="item.cid" :key="i">
-                                            {{parseInt(item.price)}} | {{ item.name }}
+                                        <option v-for="(item, i) in items" :value="item.cid" :key="i" >
+                                            {{ parseInt(item.price)}} | {{ item.name }}
                                         </option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second',index)" :value="postData.quantity[index]" />
                                 </td>
-                                <!-- <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
-                                </td> -->
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third')" />
+                                    <input type="number" class="form-control" min="0" readonly :value="postData.quantity[index] * 2" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third',index)" :value="postData.seat[index]"/>
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event)">Remove</button>
+                                    <button class="btn btn-outline-danger" @click="removeRow($event,index)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -346,24 +346,24 @@ export default {
           this.data = {};
           this.reverseRoute = 1;
         },
-        saveRow(event,fieldName) {
+        saveRow(event,fieldName,index) {
 
-            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if(fieldName == "first")
             {
-                this.postData.item[getRowNumber-1] = event.target.value;
+                this.postData.item[index] = event.target.value;
             }
             if(fieldName == "second")
             {
-                this.postData.quantity[getRowNumber-1] = event.target.value;
+                this.postData.quantity[index] = event.target.value;
             }
             // if(fieldName == "fourth")
             // {
-            //     this.postData.amount[getRowNumber-1] = event.target.value;
+            //     this.postData.amount[index] = event.target.value;
             // }
             if(fieldName == "third")
             {
-                this.postData.seat[getRowNumber-1] = event.target.value;
+                this.postData.seat[index] = event.target.value;
             }
         },
         // editSaveRow(event,fieldName) {
@@ -560,15 +560,15 @@ export default {
         addRow() {
             this.loop++;
         },
-        removeRow(event) {
+        removeRow(event,index) {
             // Array.from(element.parentNode.children).indexOf(element)
-            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            this.postData.item.splice((getRowNumber-1), 1);
-            this.postData.quantity.splice((getRowNumber-1), 1);
-            // this.postData.amount.splice((getRowNumber-1), 1);
-            this.postData.seat.splice((getRowNumber-1), 1);
-            event.target.parentElement.parentElement.remove();
-            // this.loop--;
+            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.postData.item.splice(index, 1);
+            this.postData.quantity.splice(index, 1);
+            // this.postData.amount.splice(index, 1);
+            this.postData.seat.splice(index, 1);
+            // event.target.parentElement.parentElement.remove();
+            this.loop--;
         },
         // editAddRow() {
         //     this.edit.loop++;

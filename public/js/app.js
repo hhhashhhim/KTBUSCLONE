@@ -38360,23 +38360,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data = {};
       this.reverseRoute = 1;
     },
-    saveRow: function saveRow(event, fieldName) {
-      var getRowNumber = event.target.parentElement.parentElement.rowIndex;
-
+    saveRow: function saveRow(event, fieldName, index) {
+      // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
-        this.postData.item[getRowNumber - 1] = event.target.value;
+        this.postData.item[index] = event.target.value;
       }
 
       if (fieldName == "second") {
-        this.postData.quantity[getRowNumber - 1] = event.target.value;
+        this.postData.quantity[index] = event.target.value;
       } // if(fieldName == "fourth")
       // {
-      //     this.postData.amount[getRowNumber-1] = event.target.value;
+      //     this.postData.amount[index] = event.target.value;
       // }
 
 
       if (fieldName == "third") {
-        this.postData.seat[getRowNumber - 1] = event.target.value;
+        this.postData.seat[index] = event.target.value;
       }
     },
     // editSaveRow(event,fieldName) {
@@ -38649,14 +38648,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     addRow: function addRow() {
       this.loop++;
     },
-    removeRow: function removeRow(event) {
+    removeRow: function removeRow(event, index) {
       // Array.from(element.parentNode.children).indexOf(element)
-      var getRowNumber = event.target.parentElement.parentElement.rowIndex;
-      this.postData.item.splice(getRowNumber - 1, 1);
-      this.postData.quantity.splice(getRowNumber - 1, 1); // this.postData.amount.splice((getRowNumber-1), 1);
+      // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+      this.postData.item.splice(index, 1);
+      this.postData.quantity.splice(index, 1); // this.postData.amount.splice(index, 1);
 
-      this.postData.seat.splice(getRowNumber - 1, 1);
-      event.target.parentElement.parentElement.remove(); // this.loop--;
+      this.postData.seat.splice(index, 1); // event.target.parentElement.parentElement.remove();
+
+      this.loop--;
     },
     // editAddRow() {
     //     this.edit.loop++;
@@ -61316,12 +61316,14 @@ var _hoisted_40 = {
 };
 
 var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Food/Deal"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Amount</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Food/Deal"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = ["onChange", "value"];
+
+var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
@@ -61330,8 +61332,12 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_43 = ["value"];
-var _hoisted_44 = ["disabled"];
+var _hoisted_44 = ["value"];
+var _hoisted_45 = ["onKeyup", "value"];
+var _hoisted_46 = ["value"];
+var _hoisted_47 = ["onKeyup", "value"];
+var _hoisted_48 = ["onClick"];
+var _hoisted_49 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -61389,13 +61395,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[12] || (_cache[12] = function () {
+        onClick: _cache[8] || (_cache[8] = function () {
           return $options.orderBook && $options.orderBook.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Link'), 9
       /* TEXT, PROPS */
-      , _hoisted_44)];
+      , _hoisted_49)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -61462,49 +61468,62 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
           "class": "form-control rounded-0",
-          onChange: _cache[7] || (_cache[7] = function ($event) {
-            return $options.saveRow($event, 'first');
-          })
-        }, [_hoisted_42, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.items, function (item, i) {
+          onChange: function onChange($event) {
+            return $options.saveRow($event, 'first', index);
+          },
+          value: $data.postData.item[index]
+        }, [_hoisted_43, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.items, function (item, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             value: item.cid,
             key: i
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(item.price)) + " | " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.name), 9
           /* TEXT, PROPS */
-          , _hoisted_43);
+          , _hoisted_44);
         }), 128
         /* KEYED_FRAGMENT */
-        ))], 32
-        /* HYDRATE_EVENTS */
-        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        ))], 40
+        /* PROPS, HYDRATE_EVENTS */
+        , _hoisted_42)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[8] || (_cache[8] = function ($event) {
-            return $options.saveRow($event, 'second');
-          })
-        }, null, 32
-        /* HYDRATE_EVENTS */
-        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"saveRow($event,'fourth')\" />\r\n                                </td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          onKeyup: function onKeyup($event) {
+            return $options.saveRow($event, 'second', index);
+          },
+          value: $data.postData.quantity[index]
+        }, null, 40
+        /* PROPS, HYDRATE_EVENTS */
+        , _hoisted_45)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
-          onKeyup: _cache[9] || (_cache[9] = function ($event) {
-            return $options.saveRow($event, 'third');
-          })
-        }, null, 32
-        /* HYDRATE_EVENTS */
-        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          readonly: "",
+          value: $data.postData.quantity[index] * 2
+        }, null, 8
+        /* PROPS */
+        , _hoisted_46)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          type: "number",
+          "class": "form-control",
+          min: "0",
+          onKeyup: function onKeyup($event) {
+            return $options.saveRow($event, 'third', index);
+          },
+          value: $data.postData.seat[index]
+        }, null, 40
+        /* PROPS, HYDRATE_EVENTS */
+        , _hoisted_47)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[10] || (_cache[10] = function () {
+          onClick: _cache[7] || (_cache[7] = function () {
             return $options.addRow && $options.addRow.apply($options, arguments);
           })
         }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-danger",
-          onClick: _cache[11] || (_cache[11] = function ($event) {
-            return $options.removeRow($event);
-          })
-        }, "Remove")])]);
+          onClick: function onClick($event) {
+            return $options.removeRow($event, index);
+          }
+        }, "Remove", 8
+        /* PROPS */
+        , _hoisted_48)])]);
       }), 128
       /* KEYED_FRAGMENT */
       ))])])])])];
