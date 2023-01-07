@@ -99,10 +99,11 @@
                                                         <select id="statusFilter" class="form-control"
                                                                 v-model="filterForm.statusFilter">
                                                             <option value="0">---Select Status---</option>
-                                                            <option value="B">Booked</option>
-                                                            <option value="I">Issued</option>
-                                                            <option value="C">Cancelled</option>
-                                                            <option value="CC">Confirmed Cancelled</option>
+                                                                    <option value="advanced booking">Booked</option>
+                                                            <option value="booked">Issued</option>
+                                                            <option value="cancel">Cancelled</option>
+                                                            <option value="reschedule">Reschedule Ticket</option>
+                                                            <option value="over-issue">Over Issue Ticket</option>
                                                         </select>
                                                     </div>
                                                 </div>
