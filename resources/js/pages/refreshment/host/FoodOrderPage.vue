@@ -28,37 +28,50 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table
-                                                    class="table table-striped table-hover"
-                                                    id="order_table"
+                                                    class="table table-striped table-hover text-capitalize"
+
                                                 >
                                                     <thead>
                                                     <tr>
-                                                        <th>Fleet Name/Number</th>
-                                                        <th>Current Reading</th>
-                                                        <th>Reading Date</th>
-                                                        <th>Action</th>
+                                                        <th>Order</th>
+                                                        <th>Quantity</th>
+                                                        <th>Amount</th>
+                                                        <th>Seat No</th>
+                                                        <th>Status</th>
+<!--                                                        <th>Action</th>-->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(data, i) in mainData" :key="i">
-                                                        <td>{{ data.bus_number }}</td>
-                                                        <td>{{ data.current_reading??'N/A' }} </td>
-                                                        <td>{{ data.reading_date??'N/A' }} </td>
-                                                        <td>
-                                                            <button class="btn btn-primary mx-1"
-                                                                    data-target="#editLinking_form"
-                                                                    data-toggle="modal"
-                                                                    @click="editFleetDetails( data.id )">
-                                                                    <i class="far fa-edit"></i>
-                                                            </button>
-                                                            <button class="btn btn-primary"
-                                                                    data-toggle="modal"
-                                                                    data-target="#showDetails"
-                                                                    @click="fetchFleetDetails( data.id )">
-                                                                    <i class="far fa-eye"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                    <template v-for="(data, i) in mainData" :key="i">
+                                                        <tr v-for="(order, j) in data" :key="j">
+                                                            
+                                                            <td v-if="order.item_type==1" class="font-weight-bold">{{ order.food_record.name}}</td>
+                                                            <td v-else-if="order.item_type==2" class="font-weight-bold">
+                                                                {{ order.food_record.name }}
+                                                                <div class="d-flex" v-for="(dealFood, k) in order.food_record.deal_details" :key="k">
+                                                                    <p class="mb-0">{{ dealFood.food.name }} :</p>
+                                                                    <p class="mb-0">{{ dealFood.quantity + " (" + dealFood.food.unit + ")"}}</p>
+                                                                </div>
+                                                            </td>
+
+                                                            <td v-if="order.item_type==1">{{  order.quantity + " (" + order.food_record.unit + ")" }}</td>
+                                                            <td v-else-if="order.item_type==2">{{ order.quantity }} (deal)</td>
+                                                            
+                                                            <td>{{ order.amount }}</td>
+                                                            <td>{{ order.seat_no }}</td>
+                                                            
+                                                            <td>
+                                                                <span v-if="order.status=='pending'" class="badge badge-warning">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='received'" class="badge badge-success">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='ready'" class="badge badge-danger">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='delivered'" class="badge badge-info">{{ order.status }}</span>
+<!--                                                            <td>N/A</td>-->
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
+                                                        </tr>
+                                                    </template>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -127,33 +140,34 @@
                             <tr>
                                 <th>Food/Deal</th>
                                 <th>Quantity</th>
-                                <!-- <th>Amount</th> -->
+                                <th>Amount</th>
                                 <th>Seat No</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="index in loop" :key="index">
+                            <tr v-for="(i,index) in loop" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" @change="saveRow($event,'first')">
-                                        <option value="" selected>Select Food </option>
-                                        <option v-for="(item, i) in items" :value="item.cid" :key="i">
-                                            {{parseInt(item.price)}} | {{ item.name }}
+                                    <!-- {{ items[0] ? items[0].price : '' }} -->
+                                    <select class="form-control rounded-0" @change="saveRow($event,'first',index)" :value="postData.item[index]">
+                                        <option price="0" value="" selected>Select Food </option>
+                                        <option :price="item.price" v-for="(item, i) in items" :value="item.cid" :key="i" >
+                                            {{ parseInt(item.price)}} | {{ item.name }}
                                         </option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second')" />
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second',index)" :value="postData.quantity[index]" />
                                 </td>
-                                <!-- <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
-                                </td> -->
                                 <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third')" />
+                                    <input type="number" class="form-control" min="0" readonly :value="postData.quantity[index] * postData.itemPrice[index]" />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third',index)" :value="postData.seat[index]"/>
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event)">Remove</button>
+                                    <button class="btn btn-outline-danger" @click="removeRow($event,index)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -301,6 +315,7 @@ export default {
         return {
             loading : false,
             validationErrors: [],
+            mainData: [],
             buses: [],
             busId: "",
             hotels: [],
@@ -312,13 +327,13 @@ export default {
                 hotelId: "",
                 item: [],
                 quantity: [],
+                itemPrice: [],
                 // amount: [],
                 seat: [],
             },
             options: {
                 placeholder: 'HH:MM',
             },
-            // mainData: [],
             // currentReading: "",
             // fleetPart: [],
             // maintenanceAfter: [],
@@ -346,24 +361,25 @@ export default {
           this.data = {};
           this.reverseRoute = 1;
         },
-        saveRow(event,fieldName) {
-
-            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+        saveRow(event,fieldName,index) {
+            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if(fieldName == "first")
             {
-                this.postData.item[getRowNumber-1] = event.target.value;
+                const price = event.target.options[event.target.options.selectedIndex].getAttribute('price');
+                this.postData.item[index] = event.target.value;
+                this.postData.itemPrice[index] = price;
             }
             if(fieldName == "second")
             {
-                this.postData.quantity[getRowNumber-1] = event.target.value;
+                this.postData.quantity[index] = event.target.value;
             }
             // if(fieldName == "fourth")
             // {
-            //     this.postData.amount[getRowNumber-1] = event.target.value;
+            //     this.postData.amount[index] = event.target.value;
             // }
             if(fieldName == "third")
             {
-                this.postData.seat[getRowNumber-1] = event.target.value;
+                this.postData.seat[index] = event.target.value;
             }
         },
         // editSaveRow(event,fieldName) {
@@ -560,15 +576,16 @@ export default {
         addRow() {
             this.loop++;
         },
-        removeRow(event) {
+        removeRow(event,index) {
             // Array.from(element.parentNode.children).indexOf(element)
-            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            this.postData.item.splice((getRowNumber-1), 1);
-            this.postData.quantity.splice((getRowNumber-1), 1);
-            // this.postData.amount.splice((getRowNumber-1), 1);
-            this.postData.seat.splice((getRowNumber-1), 1);
-            event.target.parentElement.parentElement.remove();
-            // this.loop--;
+            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.postData.item.splice(index, 1);
+            this.postData.itemPrice.splice(index, 1);
+            this.postData.quantity.splice(index, 1);
+            // this.postData.amount.splice(index, 1);
+            this.postData.seat.splice(index, 1);
+            // event.target.parentElement.parentElement.remove();
+            this.loop--;
         },
         // editAddRow() {
         //     this.edit.loop++;

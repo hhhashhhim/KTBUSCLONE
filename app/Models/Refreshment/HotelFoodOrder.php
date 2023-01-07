@@ -17,9 +17,13 @@ class HotelFoodOrder extends Model
     
     protected $guarded = [];
 
-    // public function user()
-    // {
-    //     return $this->hasOne( User::class, 'id', 'user_id');
-    // }
+    public function food()
+    {
+        return $this->hasOne( HotelFood::class, 'id', 'item_id');
+    }
+    public function deal()
+    {
+        return $this->hasOne( HotelFoodDeal::class, 'id', 'item_id');
+    }
 
 }
