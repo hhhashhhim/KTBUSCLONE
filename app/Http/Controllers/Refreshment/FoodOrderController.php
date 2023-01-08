@@ -9,6 +9,7 @@ use App\Models\Refreshment\HotelFoodDealDetail;
 use App\Models\Refreshment\HotelFood;
 use App\Models\Refreshment\HotelFoodOrder;
 use App\Models\Schedule\TicketClosing;
+use App\Models\Schedule\TicketClosingMember;
 use App\Models\Refreshment\Hotel;
 use App\Models\Bus\Bus;
 use App\Models\User;
@@ -30,19 +31,38 @@ class FoodOrderController extends Controller
 //        });
 //    }
 
-    // public function index(Request $request)
-    // {
-    //     return Hotel::
-    //         with('user:id,name,email','deals:id,name,price,description,hotel_id',
-    //         'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
-    //         ->where(["id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
-    // }
+    public function index(Request $request)
+    {
+        return Hotel::
+            with('user:id,name,email','deals:id,name,price,description,hotel_id',
+            'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
+            ->where(["id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
+    }
     // 
     
     public function orderFoodIndex(Request $request)
     {
-        $data = [
-            // "mainData" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading","reading_date"]),
+        $TicketClosingId = TicketClosingMember::
+            where(["user_id"=>Auth::user()->id,"type"=>2,'company_id'=>Auth::user()->company_id])
+            ->latest()->first()->ticket_closing_id??null;
+        
+            $foodOrders = HotelFoodOrder::
+            where(['ticket_closing_id'=>$TicketClosingId,'company_id'=>Auth::user()->company_id])
+            ->get();
+            
+
+            $foodOrders = $foodOrders->map(function($q){
+                if( $q->item_type == 1){
+                    $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
+                }
+                if( $q->item_type == 2){
+                    $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
+                }
+                return $q;
+            })->groupBy("seat_no");
+
+            $data = [
+            "mainData" => $foodOrders,
             "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
             "hotelDrop" => Hotel::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
         ];

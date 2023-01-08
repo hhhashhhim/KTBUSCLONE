@@ -28,37 +28,50 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table
-                                                    class="table table-striped table-hover"
-                                                    id="order_table"
+                                                    class="table table-striped table-hover text-capitalize"
+
                                                 >
                                                     <thead>
                                                     <tr>
-                                                        <th>Fleet Name/Number</th>
-                                                        <th>Current Reading</th>
-                                                        <th>Reading Date</th>
-                                                        <th>Action</th>
+                                                        <th>Order</th>
+                                                        <th>Quantity</th>
+                                                        <th>Amount</th>
+                                                        <th>Seat No</th>
+                                                        <th>Status</th>
+<!--                                                        <th>Action</th>-->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(data, i) in mainData" :key="i">
-                                                        <td>{{ data.bus_number }}</td>
-                                                        <td>{{ data.current_reading??'N/A' }} </td>
-                                                        <td>{{ data.reading_date??'N/A' }} </td>
-                                                        <td>
-                                                            <button class="btn btn-primary mx-1"
-                                                                    data-target="#editLinking_form"
-                                                                    data-toggle="modal"
-                                                                    @click="editFleetDetails( data.id )">
-                                                                    <i class="far fa-edit"></i>
-                                                            </button>
-                                                            <button class="btn btn-primary"
-                                                                    data-toggle="modal"
-                                                                    data-target="#showDetails"
-                                                                    @click="fetchFleetDetails( data.id )">
-                                                                    <i class="far fa-eye"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                    <template v-for="(data, i) in mainData" :key="i">
+                                                        <tr v-for="(order, j) in data" :key="j">
+                                                            
+                                                            <td v-if="order.item_type==1" class="font-weight-bold">{{ order.food_record.name}}</td>
+                                                            <td v-else-if="order.item_type==2" class="font-weight-bold">
+                                                                {{ order.food_record.name }}
+                                                                <div class="d-flex" v-for="(dealFood, k) in order.food_record.deal_details" :key="k">
+                                                                    <p class="mb-0">{{ dealFood.food.name }} :</p>
+                                                                    <p class="mb-0">{{ dealFood.quantity + " (" + dealFood.food.unit + ")"}}</p>
+                                                                </div>
+                                                            </td>
+
+                                                            <td v-if="order.item_type==1">{{  order.quantity + " (" + order.food_record.unit + ")" }}</td>
+                                                            <td v-else-if="order.item_type==2">{{ order.quantity }} (deal)</td>
+                                                            
+                                                            <td>{{ order.amount }}</td>
+                                                            <td>{{ order.seat_no }}</td>
+                                                            
+                                                            <td>
+                                                                <span v-if="order.status=='pending'" class="badge badge-warning">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='received'" class="badge badge-success">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='ready'" class="badge badge-danger">{{ order.status }}</span>
+                                                                <span v-else-if="order.status=='delivered'" class="badge badge-info">{{ order.status }}</span>
+<!--                                                            <td>N/A</td>-->
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
+                                                        </tr>
+                                                    </template>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -127,17 +140,18 @@
                             <tr>
                                 <th>Food/Deal</th>
                                 <th>Quantity</th>
-                                <th>Total Amount</th>
+                                <th>Amount</th>
                                 <th>Seat No</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="index in loop" :key="index">
+                            <tr v-for="(i,index) in loop" :key="index">
                                 <td>
+                                    <!-- {{ items[0] ? items[0].price : '' }} -->
                                     <select class="form-control rounded-0" @change="saveRow($event,'first',index)" :value="postData.item[index]">
-                                        <option value="" selected>Select Food </option>
-                                        <option v-for="(item, i) in items" :value="item.cid" :key="i" >
+                                        <option price="0" value="" selected>Select Food </option>
+                                        <option :price="item.price" v-for="(item, i) in items" :value="item.cid" :key="i" >
                                             {{ parseInt(item.price)}} | {{ item.name }}
                                         </option>
                                     </select>
@@ -146,7 +160,7 @@
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second',index)" :value="postData.quantity[index]" />
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control" min="0" readonly :value="postData.quantity[index] * 2" />
+                                    <input type="number" class="form-control" min="0" readonly :value="postData.quantity[index] * postData.itemPrice[index]" />
                                 </td>
                                 <td>
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third',index)" :value="postData.seat[index]"/>
@@ -301,6 +315,7 @@ export default {
         return {
             loading : false,
             validationErrors: [],
+            mainData: [],
             buses: [],
             busId: "",
             hotels: [],
@@ -312,13 +327,13 @@ export default {
                 hotelId: "",
                 item: [],
                 quantity: [],
+                itemPrice: [],
                 // amount: [],
                 seat: [],
             },
             options: {
                 placeholder: 'HH:MM',
             },
-            // mainData: [],
             // currentReading: "",
             // fleetPart: [],
             // maintenanceAfter: [],
@@ -347,11 +362,12 @@ export default {
           this.reverseRoute = 1;
         },
         saveRow(event,fieldName,index) {
-
             // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if(fieldName == "first")
             {
+                const price = event.target.options[event.target.options.selectedIndex].getAttribute('price');
                 this.postData.item[index] = event.target.value;
+                this.postData.itemPrice[index] = price;
             }
             if(fieldName == "second")
             {
@@ -564,6 +580,7 @@ export default {
             // Array.from(element.parentNode.children).indexOf(element)
             // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             this.postData.item.splice(index, 1);
+            this.postData.itemPrice.splice(index, 1);
             this.postData.quantity.splice(index, 1);
             // this.postData.amount.splice(index, 1);
             this.postData.seat.splice(index, 1);
