@@ -26,7 +26,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Bus Category</th>
+                                                        <th>Bus Class</th>
                                                         <th>Bus Number</th>
                                                         <th>Chassis Number</th>
                                                         <th>Insurance Number</th>

@@ -43,7 +43,7 @@ class BusController extends Controller
         $customMessages = [
             'busNumber.required' => 'Bus Number is Required!',
             'busNumber.unique' => 'Bus Number is already exist!',
-            'fare_class.required' => 'Fare Class is Required!',
+            'fare_class.required' => 'Bus Class is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         return Bus::create([

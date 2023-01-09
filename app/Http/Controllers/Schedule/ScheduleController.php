@@ -430,5 +430,10 @@ class ScheduleController extends Controller
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
+    public function allBuses(Request  $request)
+    {
+        $busClassId =  Schedule::where(['company_id'=> Auth::user()->company_id, 'id' => $request['id']])->first(['bus_class_id'])->bus_class_id;
+         return Bus::where('company_id',Auth::user()->company_id)->where('fare_class_id',$busClassId)->get(['id', 'bus_number']);
+    }
 
 }

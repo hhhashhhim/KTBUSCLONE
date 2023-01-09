@@ -167,7 +167,7 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-            // printTicket($allTicket, Auth::user()->company_id);
+             printTicket($allTicket, Auth::user()->company_id);
         }
         return [
             'data' => implode('-', $allTicket),
@@ -379,7 +379,9 @@ class BookingController extends Controller
             'elt_description' => $request->eltDescription,
             'added_by' => Auth::user()->id,
         ]);
-        return TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
+        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
+        printEltTicket($elt->id, Auth::user()->company_id);
+        return $elt;
     }
 
     public function cancelingBooking(Request $request)

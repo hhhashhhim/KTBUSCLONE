@@ -6,7 +6,7 @@
                     <div class="card card-primary mb-0">
                         <div class="card-body pb-0">
                             <div class="row border-bottom mb-1">
-                                <div class="col-md-2  mb-2">
+                                <div class="col-md-2  mb-2 px-0">
                                     <label for="departureCity" class="mb-0">Departure City <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="departureCity"
@@ -21,7 +21,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2  mb-2"><label for="destinationCity" class="mb-0">Destination
+                                <div class="col-md-2 pr-0  mb-2"><label for="destinationCity" class="mb-0">Destination
                                     City<span class="text-danger ml-1">*</span></label>
                                     <select class="form-control" id="destinationCity"
                                             @change="fetchSpecificSchedules()"
@@ -33,13 +33,13 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 class  mb-2">
+                                <div class="col-md-2 pr-0  mb-2">
                                     <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
                                     <input type="date" :min="minDateFilter()" class="form-control"
                                            v-model="addForm.date"
                                            @change="fetchSpecificSchedules()"/>
                                 </div>
-                                <div class="col-md-4 class  mb-2">
+                                <div class="col-md-3 pr-0  mb-2">
                                     <label for="scheduleName" class="mb-0">Schedule Name <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="scheduleName" @change="fetchScheduleData()"
@@ -50,9 +50,19 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 mb-2">
+                                <div class="col-md-2  mb-2">
+                                    <label for="buses" class="mb-0">Bus</label>
+                                    <select class="form-control" id="buses" @change="assignBusToSchedule()"
+                                            v-model="assignBus">
+                                        <option value="0">Select Bus</option>
+                                        <option v-for="(bus, i) in buses"
+                                                :value="bus.id" :key="i">{{ bus.bus_number }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1 pr-0 mb-2">
                                     <label class="mb-0">Action</label>
-                                    <button @click="fetchScheduleData" class="btn btn-block btn-danger"
+                                    <button @click="fetchScheduleData" class="btn btn-danger"
                                             :class="getSchedule ? 'disabled': ''">
                                         {{ getSchedule ? 'Loading...' : 'Refresh' }}
                                     </button>
@@ -798,6 +808,8 @@ export default {
             optionsPhone: {
                 placeholder: "03xx-xxxxxxx",
             },
+            buses: [],
+            assignBus: 0,
             getCustomermessage: '',
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
@@ -1240,30 +1252,68 @@ export default {
                 this.loading = false
                 this.showBookingDiv = true;
                 this.schedule = res.data;
-            } else {
-                if (res.status == 422) {
-                    this.showBookingDiv = false;
-                    this.loading = false;
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
-                            );
-                        });
-                        swal({
-                            title: "Error",
-                            text: errorContent,
-                            icon: "error",
-                            timer: 4000
-                        });
+            }
 
-                    }
+            if(res.status == 500 && this.addForm.schedule == 0){
+                this.loading = true
+                this.showBookingDiv = false;
+            }
+            if (res.status == 422) {
+                this.showBookingDiv = false;
+                this.loading = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in res.data.errors) {
+                    res.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
                 }
             }
+
+
+            //fetch all Buses
+            const resBus = await this.callApi("post", "schedule/allBuses", {
+                id: this.addForm.schedule,
+            });
+            if (resBus.status == 200) {
+                this.buses = resBus.data;
+            }
+            if (resBus.status == 500 && this.addForm.schedule == 0) {
+                this.assignBus = 0;
+                this.buses = [];
+            }
+            if (resBus.status == 422) {
+                let errorContent = "";
+                let count = 0;
+                for (const key in resBus.data.errors) {
+                    resBus.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " + //creating serial no.
+                            element + // main error
+                            "\n" // creating new line
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 4000
+                    });
+
+                }
+            }
+
         },
 
         async fetchReScheduleData() {

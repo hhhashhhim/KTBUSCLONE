@@ -33,7 +33,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-//         return printTicket([2], 1);
+//        return printEltTicket(1, Auth::user()->company_id);
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');

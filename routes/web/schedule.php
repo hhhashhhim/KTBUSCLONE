@@ -17,6 +17,7 @@ Route::group(['prefix' => 'schedule', [CustomMiddleware::class]], function () {
     Route::post('/genericCommon', [ScheduleController::class, 'genericCommon']);
     Route::post('/selected', [ScheduleController::class, 'selected']);
     Route::post('/extend', [ScheduleController::class, 'extend']);
-    Route::post('/extendedGet', [ScheduleController::class, 'extendedGet']);
+//    Route::post('/extendedGet', [ScheduleController::class, 'extendedGet']);
+    Route::post('/allBuses', [ScheduleController::class, 'allBuses']);
 
 });

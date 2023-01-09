@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Booking\TicketELT;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\FareClass;
@@ -208,7 +209,7 @@ if (!function_exists('updateFareTable')) {
 
 //Print Ticket function
 if (!function_exists('printTicket')) {
-    function printTicket($ticketIds, $company_id, $duplicate = 1)
+    function printTicket($ticketIds, $company_id, $duplicate = 0)
     {
 
 
@@ -282,6 +283,94 @@ if (!function_exists('printTicket')) {
         }
     }
 }
+
+//Elt Ticket Details
+if (!function_exists('printEltTicket')) {
+    function printEltTicket($eltId, $company_id)
+    {
+        $elt = TicketsTemplate::query();
+        $elt->where(['company_id' => 1, 'status' => 1]);
+        if (Auth::user()->terminal_id == $elt->first(['terminal_id'])->terminal_id) {
+            $elt->where('terminal_id', Auth::user()->terminal_id);
+        }
+        $format = $elt->first();
+
+        $eltTicket = TicketELT::with('departure:id,name', 'destination:id,name', 'company', 'ticket.seatClass', 'customer', 'schedule', 'schedule.bus_class:id,name')->where(['company_id' => $company_id, 'id' => $eltId])->first();
+        // Set params
+        $uan = formatUAN($format->uan);
+        $company_name = 'Kainat Travels';
+        $company_address = $format->address;
+        $company_phone = formatContact($format->phone);
+        $seatNo = $eltTicket->seat_no;
+        $busClass = $eltTicket['schedule']['bus_class']->name;
+        $departureCity = $eltTicket['departure']->name;
+        $destinationCity = $eltTicket['destination']->name;
+        $departureDate = date('d/m/Y', strtotime($eltTicket['ticket']->date));
+        $departureTime = date('H:i A', strtotime($eltTicket['schedule']->time));
+        $bookingDate = date('d/m/Y H:i A', strtotime($eltTicket->created_at));
+        $seatFare = $eltTicket->seat_fare;
+        $elt_price = $eltTicket->elt_price;
+        $bookingId = $eltTicket->id;
+        $customerName = $eltTicket['customer']->name;
+        $customerCNIC = formatCNIC($eltTicket['customer']->cnic);
+        $customerContact = formatContact($eltTicket['customer']->contact);
+        $termsCondition = "test";
+        $checkDuplicate = 0;
+        $weight = $eltTicket->elt_weight . ' '. "Kg";
+        $totalFare = ((int)$eltTicket->elt_price) + ((int)$eltTicket->seat_fare);
+
+
+        //Code for Qr code
+        $code = 'Name: ' . $customerName . '| ' .
+            'CNIC: ' . $customerCNIC . '| ' .
+            'Contact: ' . $customerContact . '| ' .
+            'SeatNo: ' . $seatNo . '| ' .
+            'Bus: ' . $busClass . '| ' .
+            'From: ' . $departureCity . '| ' .
+            'To: ' . $destinationCity . '| ' .
+            'Dept Date: ' . $departureDate . '| ' .
+            'Dept Time: ' . $departureTime . '| ' .
+            'Booking DateTime: ' . $bookingDate . '| ' .
+            'boookingId: ' . $bookingId . '| ' .
+            'Weight: ' . $weight . '| ' .
+            'seatFare: ' . $seatFare . '| ' .
+            'eltPrice: ' . $elt_price . '| ' .
+            'totalFare: ' . $totalFare ;
+            $image = codeImageElt($code);
+        // Init printer
+        $printer = new ReceiptPrinter;
+        $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
+
+        // Set store info
+        $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate,
+            $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime,
+            $departureDate, $departureCity, $destinationCity, $busClass);
+        // Print Function passes Array to it
+        $printer->printRequest([
+            'companyName' => $company_name,
+            'companyAddress' => $company_address,
+            'uan' => $uan,
+            'phone' => $company_phone,
+            'qr' => $image,
+            'customerName' => $customerName,
+            'seatNo' => $seatNo,
+            'busClass' => $busClass,
+            'from' => $departureCity,
+            'to' => $destinationCity,
+            'departDate' => $departureDate,
+            'departTime' => $departureTime,
+            'bookingDate' => $bookingDate,
+            'fare' => $seatFare,
+            'cnic' => $customerCNIC,
+            'weight' => $weight,
+            'contact' => $customerContact,
+            'elt_price' => $elt_price,
+            'total_price' => $totalFare,
+        ]);
+    }
+}
+
+//Upload Image  API
 if (!function_exists('codeImage')) {
     function codeImage($code)
     {
@@ -289,6 +378,18 @@ if (!function_exists('codeImage')) {
         $id = explode("| ", $code)[10];
         $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
         file_put_contents(public_path("Customers/Qrs/$nameToStore"), $data);
+        return $nameToStore;
+    }
+}
+
+//Upload ELt Image  API
+if (!function_exists('codeImageElt')) {
+    function codeImageElt($code)
+    {
+        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$code&size=250x250");
+        $id = explode("| ", $code)[10];
+        $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
+        file_put_contents(public_path("Customers/Elt/$nameToStore"), $data);
         return $nameToStore;
     }
 }
