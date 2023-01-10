@@ -26,6 +26,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use stdClass;
 use Illuminate\Http\Response;
 use TCPDF;
+use Illuminate\Support\Facades\File;
 
 
 class AuthController extends Controller
@@ -33,8 +34,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-//        return printEltTicket(1, Auth::user()->company_id);
-
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

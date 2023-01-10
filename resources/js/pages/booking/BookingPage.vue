@@ -6,7 +6,7 @@
                     <div class="card card-primary mb-0">
                         <div class="card-body pb-0">
                             <div class="row border-bottom mb-1">
-                                <div class="col-md-2  mb-2 px-0">
+                                <div class="col-md-2  mb-2">
                                     <label for="departureCity" class="mb-0">Departure City <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="departureCity"
@@ -21,7 +21,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 pr-0  mb-2"><label for="destinationCity" class="mb-0">Destination
+                                <div class="col-md-2   mb-2"><label for="destinationCity" class="mb-0">Destination
                                     City<span class="text-danger ml-1">*</span></label>
                                     <select class="form-control" id="destinationCity"
                                             @change="fetchSpecificSchedules()"
@@ -33,13 +33,13 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-2 pr-0  mb-2">
+                                <div class="col-md-2   mb-2">
                                     <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
                                     <input type="date" :min="minDateFilter()" class="form-control"
                                            v-model="addForm.date"
                                            @change="fetchSpecificSchedules()"/>
                                 </div>
-                                <div class="col-md-3 pr-0  mb-2">
+                                <div class="col-md-4   mb-2">
                                     <label for="scheduleName" class="mb-0">Schedule Name <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="scheduleName" @change="fetchScheduleData()"
@@ -50,19 +50,19 @@
                                         </option>
                                     </select>
                                 </div>
+                                <!--                                <div class="col-md-2  mb-2">-->
+                                <!--                                    <label for="buses" class="mb-0">Bus</label>-->
+                                <!--                                    <select class="form-control" id="buses" @change="assignBusToSchedule()"-->
+                                <!--                                            v-model="assignBus">-->
+                                <!--                                        <option value="0">Select Bus</option>-->
+                                <!--                                        <option v-for="(bus, i) in buses"-->
+                                <!--                                                :value="bus.id" :key="i">{{ bus.bus_number }}-->
+                                <!--                                        </option>-->
+                                <!--                                    </select>-->
+                                <!--                                </div>-->
                                 <div class="col-md-2  mb-2">
-                                    <label for="buses" class="mb-0">Bus</label>
-                                    <select class="form-control" id="buses" @change="assignBusToSchedule()"
-                                            v-model="assignBus">
-                                        <option value="0">Select Bus</option>
-                                        <option v-for="(bus, i) in buses"
-                                                :value="bus.id" :key="i">{{ bus.bus_number }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-1 pr-0 mb-2">
                                     <label class="mb-0">Action</label>
-                                    <button @click="fetchScheduleData" class="btn btn-danger"
+                                    <button @click="fetchScheduleData" class="btn btn-block btn-danger"
                                             :class="getSchedule ? 'disabled': ''">
                                         {{ getSchedule ? 'Loading...' : 'Refresh' }}
                                     </button>
@@ -221,10 +221,10 @@
                                             </div>
                                             <div class="form-group text-center"
                                                  style=" margin-bottom: 10PX !important;">
-                                                <button class="btn btn-info mx-1">
+                                                <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
                                                     Print Terminal Invoice
                                                 </button>
-                                                <button class="btn btn-warning mx-1">
+                                                <button class="btn btn-warning mx-1" @click="getBusInvoice()">
                                                     Print Bus Invoice
                                                 </button>
                                                 <button class="btn btn-primary mx-1"
@@ -776,6 +776,24 @@
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
         </form>
+        <!--Print Terminal Invoice-->
+        <form :action="$store.state.app_url + 'print/pdf/terminal/invoice'" method="POST" ref="refTerminalInvoice"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
+            <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
+            <input type="hidden" name="date" :value="this.addForm.date">
+            <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+        </form>
+        <!--Print Bus Invoice -->
+        <form :action="$store.state.app_url + 'print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
+            <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
+            <input type="hidden" name="date" :value="this.addForm.date">
+            <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+        </form>
     </section>
 </template>
 
@@ -1254,7 +1272,7 @@ export default {
                 this.schedule = res.data;
             }
 
-            if(res.status == 500 && this.addForm.schedule == 0){
+            if (res.status == 500 && this.addForm.schedule == 0) {
                 this.loading = true
                 this.showBookingDiv = false;
             }
@@ -1989,13 +2007,30 @@ export default {
         },
 
         // Duplicate Ticket
-        duplicateTicket: function (data) {
-            // window.open(this.$store.state.app_url + 'print/' + data.id + '/pdf/duplicate', '_blank').focus();
+        async duplicateTicket(data) {
+            console.log(data);
+            await this.callApi("post", "print/ticket/duplicate", {id: data.id});
+            setTimeout(function () {
+                swal({
+                    title: "Success",
+                    text: "Successfully Requested Fo    r Duplicate Ticket",
+                    icon: "success",
+                    timer: 3000
+                });
+            }, 2000);
         },
 
         // Get Passengers list
-        async getCustomerList() {
+        getCustomerList: function () {
             this.$refs.refPassengerList.submit();
+        },
+        // Get Terminal Invoice
+        getTerminalInvoice: function () {
+            this.$refs.refTerminalInvoice.submit();
+        },
+        // Get Bus Invoice
+        getBusInvoice: function () {
+            this.$refs.refBusInvoice.submit();
         }
     },
 };

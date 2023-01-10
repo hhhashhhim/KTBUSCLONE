@@ -12,6 +12,7 @@ use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
 use charlieuki\ReceiptPrinter\ReceiptPrinter as ReceiptPrinter;
+use Illuminate\Support\Facades\File;
 
 
 if (!function_exists('storeFare')) {
@@ -278,7 +279,7 @@ if (!function_exists('printTicket')) {
                 'terms' => $termsCondition,
                 'cnic' => $customerCNIC,
                 'contact' => $customerContact,
-                'duplicate' => $duplicate,
+                'duplicate' => $checkDuplicate,
             ]);
         }
     }
@@ -288,13 +289,7 @@ if (!function_exists('printTicket')) {
 if (!function_exists('printEltTicket')) {
     function printEltTicket($eltId, $company_id)
     {
-        $elt = TicketsTemplate::query();
-        $elt->where(['company_id' => 1, 'status' => 1]);
-        if (Auth::user()->terminal_id == $elt->first(['terminal_id'])->terminal_id) {
-            $elt->where('terminal_id', Auth::user()->terminal_id);
-        }
-        $format = $elt->first();
-
+        $format = TicketsTemplate::where(['company_id' => 1, 'status' => 1, 'terminal_id' => Auth::user()->terminal_id])->first();
         $eltTicket = TicketELT::with('departure:id,name', 'destination:id,name', 'company', 'ticket.seatClass', 'customer', 'schedule', 'schedule.bus_class:id,name')->where(['company_id' => $company_id, 'id' => $eltId])->first();
         // Set params
         $uan = formatUAN($format->uan);
@@ -316,7 +311,7 @@ if (!function_exists('printEltTicket')) {
         $customerContact = formatContact($eltTicket['customer']->contact);
         $termsCondition = "test";
         $checkDuplicate = 0;
-        $weight = $eltTicket->elt_weight . ' '. "Kg";
+        $weight = $eltTicket->elt_weight . ' ' . "Kg";
         $totalFare = ((int)$eltTicket->elt_price) + ((int)$eltTicket->seat_fare);
 
 
@@ -335,8 +330,8 @@ if (!function_exists('printEltTicket')) {
             'Weight: ' . $weight . '| ' .
             'seatFare: ' . $seatFare . '| ' .
             'eltPrice: ' . $elt_price . '| ' .
-            'totalFare: ' . $totalFare ;
-            $image = codeImageElt($code);
+            'totalFare: ' . $totalFare;
+        $image = codeImageElt($code);
         // Init printer
         $printer = new ReceiptPrinter;
         $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
@@ -377,6 +372,10 @@ if (!function_exists('codeImage')) {
         $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$code&size=350x350");
         $id = explode("| ", $code)[10];
         $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
+        $path = public_path() . '/Customers/Qrs/';
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
         file_put_contents(public_path("Customers/Qrs/$nameToStore"), $data);
         return $nameToStore;
     }
@@ -389,6 +388,10 @@ if (!function_exists('codeImageElt')) {
         $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$code&size=250x250");
         $id = explode("| ", $code)[10];
         $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
+        $path = public_path() . '/Customers/Elt/';
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
         file_put_contents(public_path("Customers/Elt/$nameToStore"), $data);
         return $nameToStore;
     }

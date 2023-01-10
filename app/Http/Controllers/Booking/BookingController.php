@@ -22,6 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -167,7 +168,7 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-             printTicket($allTicket, Auth::user()->company_id);
+            printTicket($allTicket, Auth::user()->company_id);
         }
         return [
             'data' => implode('-', $allTicket),
@@ -355,6 +356,11 @@ class BookingController extends Controller
 
     public function bookingElt(Request $request)
     {
+        if (is_null(Auth::user()->terminal_id)) {
+            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+        }
+//        try {
+//            DB::beginTransaction();
         $ticket = Ticket::where([
             'company_id' => Auth::user()->company_id,
             'date' => $request->date,
@@ -379,9 +385,13 @@ class BookingController extends Controller
             'elt_description' => $request->eltDescription,
             'added_by' => Auth::user()->id,
         ]);
-        $elt =  TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
+        $elt = TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
         printEltTicket($elt->id, Auth::user()->company_id);
         return $elt;
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+//        }
     }
 
     public function cancelingBooking(Request $request)
@@ -410,26 +420,19 @@ class BookingController extends Controller
         return $ticket->delete();
     }
 
-    public function pdf($id)
+    public function terminalInvoice(Request $request)
     {
-        $ticket = Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->whereIn('id', explode('-', $id))->get();
-        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 0]);
-        $output = $pdf->output();
-        return new Response($output, 200, [
-            'Content-Type' => 'application/pdf',
-        ]);
+        dd($request->all());
     }
 
-    public function duplicatePdf($id)
+    public function busInvoice(Request $request)
     {
-        $ticket = Ticket::with('schedule.bus_class', 'customer', 'company', 'destination_city', 'departure_city', 'addedBy')->whereIn('id', explode('-', $id))->get();
-        $format = TicketsTemplate::where('company_id', 1)->where('status', 1)->first();
-        $pdf = PDF::loadView('pdf/pdf', ['data' => $ticket, 'data_terms' => $format, 'duplicate' => 1]);
-        $output = $pdf->output();
-        return new Response($output, 200, [
-            'Content-Type' => 'application/pdf',
-        ]);
+        dd($request->all());
+    }
+
+    public function duplicatePdf(Request $request)
+    {
+        printTicket([$request->id], Auth::user()->company_id, 1);
     }
 
     public function getPassengersList(Request $request)
