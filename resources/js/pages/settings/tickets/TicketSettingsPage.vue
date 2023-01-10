@@ -47,8 +47,8 @@
                                                         </td>
                                                         <td v-else>N/A</td>
                                                         <td>{{ template.address }}</td>
-                                                        <td>{{ uanFormat(template.uan) }}</td>
-                                                        <td>{{ phoneFormat(template.phone) }}</td>
+                                                        <td>{{ template.uan }}</td>
+                                                        <td>{{ template.phone }}</td>
                                                         <td>{{ template.terms_condition }}</td>
                                                         <td v-if="template.status == 1">
                                                             <div class="badge badge-success">Active</div>
@@ -110,26 +110,26 @@
                         >
                         </vue-mask>
                     </div>
-<!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>-->
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>-->
 
-<!--                        <vue-mask id="phoneNumber"-->
-<!--                                  class="form-control"-->
-<!--                                  v-model="addForm.phoneNumber"-->
-<!--                                  mask="0000-0000000"-->
-<!--                                  :raw="false"-->
-<!--                                  :options="optionsPhone"-->
-<!--                        >-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-12">-->
-<!--                        <label for="address">Address<span class="text-danger ml-1">*</span></label>-->
-<!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
-<!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
-<!--                                  v-model="addForm.address"></textarea>-->
-<!--                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>-->
+                    <!--                        <vue-mask id="phoneNumber"-->
+                    <!--                                  class="form-control"-->
+                    <!--                                  v-model="addForm.phoneNumber"-->
+                    <!--                                  mask="0000-0000000"-->
+                    <!--                                  :raw="false"-->
+                    <!--                                  :options="optionsPhone"-->
+                    <!--                        >-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-12">-->
+                    <!--                        <label for="address">Address<span class="text-danger ml-1">*</span></label>-->
+                    <!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
+                    <!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
+                    <!--                                  v-model="addForm.address"></textarea>-->
+                    <!--                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>-->
 
-<!--                    </div>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
@@ -261,11 +261,11 @@ export default {
         };
     },
     async created() {
-        await this.fetchTemplates();
+        this.fetchTemplates();
     },
 
     methods: {
-        clearForm:function(){
+        clearForm: function () {
             this.addForm.terminal = 0;
             this.addForm.termsCondition = '';
             this.addForm.address = '';
@@ -275,12 +275,12 @@ export default {
             this.countAddressLength = 0
 
         },
-        uanFormat: function (string) {
-            return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
-        },
-        phoneFormat: function (string) {
-            return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
-        },
+        // uanFormat: function (string) {
+        //     return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
+        // },
+        // phoneFormat: function (string) {
+        //     return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+        // },
         countWords: function (count, flag, maxvalue) {
             console.log(typeof maxvalue);
             if (flag == 'terms' && maxvalue == 140) {
@@ -298,21 +298,21 @@ export default {
 
         },
         async fetchTemplates() {
-            $("#ticket_templates").DataTable().destroy();
             const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
             if (resAllTerminals.status == 200) {
+
                 this.terminals = resAllTerminals.data
             } else {
                 console.log(resAllTerminals);
             }
             const resTicketTemplate = await this.callApi("post", 'settings/tickets');
-
             if (resTicketTemplate.status == 200) {
                 this.templates = resTicketTemplate.data;
             }
             if (resTicketTemplate.status == 422) {
                 console.log(resTicketTemplate)
             }
+
             setTimeout(function () {
                 $("#ticket_templates").DataTable();
             }, 300);
@@ -403,7 +403,7 @@ export default {
             this.dataEdit = template;
         },
 
-        async updateTemplate(){
+        async updateTemplate() {
             if (this.dataEdit.terminal_id == '0') {
                 return swal({
                     title: "Required !!!",
@@ -446,7 +446,7 @@ export default {
             }
             this.loadingEdit = true;
             const resEditTemplate = await this.callApi("post", 'settings/tickets/update', this.dataEdit);
-            if(resEditTemplate.status == 200){
+            if (resEditTemplate.status == 200) {
                 this.loadingEdit = false;
                 swal({
                     title: "Success",
@@ -456,7 +456,7 @@ export default {
                 });
                 this.fetchTemplates();
             }
-            if(resEditTemplate.status == 422){
+            if (resEditTemplate.status == 422) {
                 this.loadingEdit = false;
                 let errorContent = "";
                 let count = 0;

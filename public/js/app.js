@@ -41264,10 +41264,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
-              return _this.fetchTemplates();
+              _this.fetchTemplates();
 
-            case 2:
+            case 1:
             case "end":
               return _context.stop();
           }
@@ -41285,12 +41284,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.countWordsLength = 0;
       this.countAddressLength = 0;
     },
-    uanFormat: function uanFormat(string) {
-      return string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4");
-    },
-    phoneFormat: function phoneFormat(string) {
-      return string.replace(/(\d{4})(\d{7})/, "$1-$2");
-    },
+    // uanFormat: function (string) {
+    //     return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
+    // },
+    // phoneFormat: function (string) {
+    //     return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
+    // },
     countWords: function countWords(count, flag, maxvalue) {
       console.log(_typeof(maxvalue));
 
@@ -41317,11 +41316,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                $("#ticket_templates").DataTable().destroy();
-                _context2.next = 3;
+                _context2.next = 2;
                 return _this2.callApi("post", 'settings/tickets/terminals');
 
-              case 3:
+              case 2:
                 resAllTerminals = _context2.sent;
 
                 if (resAllTerminals.status == 200) {
@@ -41330,13 +41328,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(resAllTerminals);
                 }
 
-                _context2.next = 7;
+                _context2.next = 6;
                 return _this2.callApi("post", 'settings/tickets');
 
-              case 7:
+              case 6:
                 resTicketTemplate = _context2.sent;
+                console.log(resTicketTemplate.data);
 
                 if (resTicketTemplate.status == 200) {
+                  console.log(resTicketTemplate);
                   _this2.templates = resTicketTemplate.data;
                 }
 
@@ -46990,7 +46990,7 @@ var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "password",
   "class": "control-label"
-}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\r\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\r\n                            Forgot Password?\r\n                          </a>\r\n                        </div> ")], -1
+}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\n                            Forgot Password?\n                          </a>\n                        </div> ")], -1
 /* HOISTED */
 );
 
@@ -64784,9 +64784,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_19, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.address), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.uanFormat(template.uan)), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.uan), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.phoneFormat(template.phone)), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.phone), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.terms_condition), 1
     /* TEXT */

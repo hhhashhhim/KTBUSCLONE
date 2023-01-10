@@ -74,7 +74,7 @@
                       type="password"
                       class="form-control"
                       tabindex="2"
-                      
+
                       v-model="data.password"
                     />
                     <div class="invalid-feedback">

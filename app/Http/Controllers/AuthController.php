@@ -2,31 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking\TicketELT;
-use App\Models\Booking\TicketIsPartial;
-use App\Models\City;
-use App\Models\CityToCity;
-use App\Models\Customer;
-use App\Models\FareClass;
-use App\Models\FareTable;
-use App\Models\Route\RouteFare;
-use App\Models\Schedule\Schedule;
-use App\Models\Schedule\ScheduleDetail;
 use App\Models\Setting\Tickets\TicketsTemplate;
-use App\Models\Ticket;
-use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use stdClass;
-use Illuminate\Http\Response;
-use TCPDF;
-use Illuminate\Support\Facades\File;
 
 
 class AuthController extends Controller
@@ -34,6 +13,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+//        return TicketsTemplate::with('terminal.city')->where(['company_id'=> Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

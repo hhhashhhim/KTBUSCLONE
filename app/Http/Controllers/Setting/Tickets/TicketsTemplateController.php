@@ -7,7 +7,6 @@ use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class TicketsTemplateController extends Controller
 {
@@ -25,7 +24,7 @@ class TicketsTemplateController extends Controller
 
     public function index()
     {
-        return TicketsTemplate::with('terminal.city')->where('company_id', Auth::user()->company_id)->get();
+        return TicketsTemplate::with('terminal.city')->where(['company_id'=> Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
     }
 
     public function store(Request $request)
@@ -33,16 +32,12 @@ class TicketsTemplateController extends Controller
         $rules = [
             'terminal' => 'required',
             'uanNumber' => 'required',
-//            'phoneNumber' => 'required',
-//            'address' => 'required',
             'termsCondition' => 'required',
         ];
 
         $customMessages = [
             'terminal.required' => 'Please Select Any Terminal',
             'uanNumber.required' => 'UAN Number is required',
-//            'phoneNumber.required' => 'Phone Number is required',
-//            'address.required' => 'Terminal Address is required',
             'termsCondition.required' => 'Terms & Condition is required',
         ];
         $this->validate($request, $rules, $customMessages);
