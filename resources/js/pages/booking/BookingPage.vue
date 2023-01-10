@@ -1301,36 +1301,36 @@ export default {
 
 
             //fetch all Buses
-            const resBus = await this.callApi("post", "schedule/allBuses", {
-                id: this.addForm.schedule,
-            });
-            if (resBus.status == 200) {
-                this.buses = resBus.data;
-            }
-            if (resBus.status == 500 && this.addForm.schedule == 0) {
-                this.assignBus = 0;
-                this.buses = [];
-            }
-            if (resBus.status == 422) {
-                let errorContent = "";
-                let count = 0;
-                for (const key in resBus.data.errors) {
-                    resBus.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 4000
-                    });
-
-                }
-            }
+            // const resBus = await this.callApi("post", "schedule/allBuses", {
+            //     id: this.addForm.schedule,
+            // });
+            // if (resBus.status == 200) {
+            //     this.buses = resBus.data;
+            // }
+            // if (resBus.status == 500 && this.addForm.schedule == 0) {
+            //     this.assignBus = 0;
+            //     this.buses = [];
+            // }
+            // if (resBus.status == 422) {
+            //     let errorContent = "";
+            //     let count = 0;
+            //     for (const key in resBus.data.errors) {
+            //         resBus.data.errors[key].forEach((element) => {
+            //             errorContent += (
+            //                 (++count) + " - " + //creating serial no.
+            //                 element + // main error
+            //                 "\n" // creating new line
+            //             );
+            //         });
+            //         swal({
+            //             title: "Error",
+            //             text: errorContent,
+            //             icon: "error",
+            //             timer: 4000
+            //         });
+            //
+            //     }
+            // }
 
         },
 

@@ -27488,7 +27488,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        var res, resBus;
+        var res;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
@@ -27551,48 +27551,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   })();
                 } //fetch all Buses
+                // const resBus = await this.callApi("post", "schedule/allBuses", {
+                //     id: this.addForm.schedule,
+                // });
+                // if (resBus.status == 200) {
+                //     this.buses = resBus.data;
+                // }
+                // if (resBus.status == 500 && this.addForm.schedule == 0) {
+                //     this.assignBus = 0;
+                //     this.buses = [];
+                // }
+                // if (resBus.status == 422) {
+                //     let errorContent = "";
+                //     let count = 0;
+                //     for (const key in resBus.data.errors) {
+                //         resBus.data.errors[key].forEach((element) => {
+                //             errorContent += (
+                //                 (++count) + " - " + //creating serial no.
+                //                 element + // main error
+                //                 "\n" // creating new line
+                //             );
+                //         });
+                //         swal({
+                //             title: "Error",
+                //             text: errorContent,
+                //             icon: "error",
+                //             timer: 4000
+                //         });
+                //
+                //     }
+                // }
 
 
-                _context10.next = 20;
-                return _this10.callApi("post", "schedule/allBuses", {
-                  id: _this10.addForm.schedule
-                });
-
-              case 20:
-                resBus = _context10.sent;
-
-                if (resBus.status == 200) {
-                  _this10.buses = resBus.data;
-                }
-
-                if (resBus.status == 500 && _this10.addForm.schedule == 0) {
-                  _this10.assignBus = 0;
-                  _this10.buses = [];
-                }
-
-                if (resBus.status == 422) {
-                  (function () {
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in resBus.data.errors) {
-                      resBus.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 4000
-                      });
-                    }
-                  })();
-                }
-
-              case 24:
+              case 18:
               case "end":
                 return _context10.stop();
             }
@@ -44759,12 +44750,6 @@ var _hoisted_70 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_71 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-users"
-}, null, -1
-/* HOISTED */
-);
-
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
 
@@ -45106,20 +45091,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
-    key: 0,
-    "class": "nav-link text-capitalize",
-    to: {
-      name: 'ticketSettings'
-    }
-  }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Profile ")];
-    }),
-    _: 1
-    /* STABLE */
-
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]);
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <li>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'profileSettings' }\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                         v-if=\"checkForSubmenu('employee')\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <i class=\"fas fa-users\"></i>Profile"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </router-link>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </li>")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]);
 }
 
 /***/ }),
@@ -67808,7 +67780,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _components_Profile_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Profile.vue */ "./resources/js/components/Profile.vue");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm-bundler.js");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm-bundler.js");
 /* harmony import */ var _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pages/users/Users.vue */ "./resources/js/pages/users/Users.vue");
 /* harmony import */ var _pages_roles_Roles_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/roles/Roles.vue */ "./resources/js/pages/roles/Roles.vue");
 /* harmony import */ var _pages_company_Company_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/company/Company.vue */ "./resources/js/pages/company/Company.vue");
@@ -67841,6 +67813,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pages_refreshment_FoodPage_vue__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./pages/refreshment/FoodPage.vue */ "./resources/js/pages/refreshment/FoodPage.vue");
 /* harmony import */ var _pages_refreshment_FoodDealPage_vue__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./pages/refreshment/FoodDealPage.vue */ "./resources/js/pages/refreshment/FoodDealPage.vue");
 /* harmony import */ var _pages_refreshment_host_FoodOrderPage_vue__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./pages/refreshment/host/FoodOrderPage.vue */ "./resources/js/pages/refreshment/host/FoodOrderPage.vue");
+/* harmony import */ var _pages_profile_ProfilePage_vue__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./pages/profile/ProfilePage.vue */ "./resources/js/pages/profile/ProfilePage.vue");
+
 
 
 
@@ -68013,9 +67987,13 @@ var routes = [{
   path: url + "settings/tickets",
   component: _pages_settings_tickets_TicketSettingsPage_vue__WEBPACK_IMPORTED_MODULE_24__["default"],
   name: "ticketSettings"
+}, {
+  path: url + "settings/profile",
+  component: _pages_profile_ProfilePage_vue__WEBPACK_IMPORTED_MODULE_33__["default"],
+  name: "profileSettings"
 }];
-var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_33__.createRouter)({
-  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_33__.createWebHistory)(),
+var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_34__.createRouter)({
+  history: (0,vue_router__WEBPACK_IMPORTED_MODULE_34__.createWebHistory)(),
   mode: history,
   routes: routes
 }); // router.beforeEach(()=>{
@@ -104753,6 +104731,27 @@ const __exports__ = /*#__PURE__*/(0,D_xampp_htdocs_kt_node_modules_vue_loader_di
 /* hot reload */
 if (false) {}
 
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/pages/profile/ProfilePage.vue":
+/*!****************************************************!*\
+  !*** ./resources/js/pages/profile/ProfilePage.vue ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var D_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+const script = {}
+
+;
+const __exports__ = /*#__PURE__*/(0,D_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__["default"])(script, [['__file',"resources/js/pages/profile/ProfilePage.vue"]])
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
 

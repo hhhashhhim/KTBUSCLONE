@@ -33,6 +33,7 @@ import HotelPage from "./pages/refreshment/HotelPage.vue";
 import FoodPage from "./pages/refreshment/FoodPage.vue";
 import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 import FoodOrderPage from "./pages/refreshment/host/FoodOrderPage.vue";
+import ProfilePage from "./pages/profile/ProfilePage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -207,6 +208,11 @@ const routes = [
         path: url + "settings/tickets",
         component : TicketSettingPage,
         name:"ticketSettings"
+    },
+    {
+        path: url + "settings/profile",
+        component : ProfilePage,
+        name:"profileSettings"
     },
 ]
 const router = createRouter({

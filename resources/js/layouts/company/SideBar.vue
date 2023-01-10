@@ -218,12 +218,12 @@
                                 <i class="fas fa-users"></i> Ticket Format
                             </router-link>
                         </li>
-                        <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name:'ticketSettings' }"
-                                         v-if="checkForSubmenu('employee')">
-                                <i class="fas fa-users"></i>Profile
-                            </router-link>
-                        </li>
+<!--                        <li>-->
+<!--                            <router-link class="nav-link text-capitalize" :to="{ name:'profileSettings' }"-->
+<!--                                         v-if="checkForSubmenu('employee')">-->
+<!--                                <i class="fas fa-users"></i>Profile-->
+<!--                            </router-link>-->
+<!--                        </li>-->
                     </ul>
                 </li>
 
