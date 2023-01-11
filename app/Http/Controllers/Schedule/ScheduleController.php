@@ -298,6 +298,7 @@ class ScheduleController extends Controller
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+
         // Getting Already Booked Tickets
         $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', Auth::user()->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
 

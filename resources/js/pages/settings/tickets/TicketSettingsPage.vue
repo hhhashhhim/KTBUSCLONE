@@ -298,20 +298,22 @@ export default {
 
         },
         async fetchTemplates() {
-            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
-            if (resAllTerminals.status == 200) {
-
-                this.terminals = resAllTerminals.data
-            } else {
-                console.log(resAllTerminals);
-            }
             const resTicketTemplate = await this.callApi("post", 'settings/tickets');
+            console.log(resTicketTemplate);
             if (resTicketTemplate.status == 200) {
                 this.templates = resTicketTemplate.data;
             }
             if (resTicketTemplate.status == 422) {
                 console.log(resTicketTemplate)
             }
+
+            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            if (resAllTerminals.status == 200) {
+                this.terminals = resAllTerminals.data
+            } else {
+                console.log(resAllTerminals);
+            }
+
 
             setTimeout(function () {
                 $("#ticket_templates").DataTable();
@@ -337,22 +339,6 @@ export default {
                     timer: 2000,
                 });
             }
-            // if (this.addForm.phoneNumber == '' || typeof this.addForm.phoneNumber == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "Phone Number is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
-            // if (this.addForm.address == '' || typeof this.addForm.address == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "Address is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
             if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
                 return swal({
                     title: "Required !!!",
@@ -371,6 +357,7 @@ export default {
                     icon: "success",
                     timer: 2000,
                 });
+                $("#ticket_templates").DataTable().destroy();
                 this.clearForm();
                 this.fetchTemplates();
             }
@@ -454,6 +441,7 @@ export default {
                     icon: "success",
                     timer: 4000
                 });
+                $("#ticket_templates").DataTable().destroy();
                 this.fetchTemplates();
             }
             if (resEditTemplate.status == 422) {

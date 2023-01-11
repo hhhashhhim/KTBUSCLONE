@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting\Tickets\TicketsTemplate;
+use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-//        return TicketsTemplate::with('terminal.city')->where(['company_id'=> Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

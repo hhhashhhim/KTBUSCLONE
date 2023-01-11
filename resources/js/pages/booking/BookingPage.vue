@@ -2008,7 +2008,12 @@ export default {
 
         // Duplicate Ticket
         async duplicateTicket(data) {
-            console.log(data);
+            // return swal({
+            //     title: "OOPSS!!!!!",
+            //     text: "Contact TO Adminitration",
+            //     icon: "error",
+            //     timer: 2000
+            // });
             await this.callApi("post", "print/ticket/duplicate", {id: data.id});
             setTimeout(function () {
                 swal({

@@ -28650,13 +28650,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                console.log(data);
-                _context23.next = 3;
+                _context23.next = 2;
                 return _this23.callApi("post", "print/ticket/duplicate", {
                   id: data.id
                 });
 
-              case 3:
+              case 2:
                 setTimeout(function () {
                   swal({
                     title: "Success",
@@ -28666,7 +28665,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 }, 2000);
 
-              case 4:
+              case 3:
               case "end":
                 return _context23.stop();
             }
@@ -41311,37 +41310,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var resAllTerminals, resTicketTemplate;
+        var resTicketTemplate, resAllTerminals;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'settings/tickets/terminals');
+                return _this2.callApi("post", 'settings/tickets');
 
               case 2:
+                resTicketTemplate = _context2.sent;
+                console.log(resTicketTemplate);
+
+                if (resTicketTemplate.status == 200) {
+                  _this2.templates = resTicketTemplate.data;
+                }
+
+                if (resTicketTemplate.status == 422) {
+                  console.log(resTicketTemplate);
+                }
+
+                _context2.next = 8;
+                return _this2.callApi("post", 'settings/tickets/terminals');
+
+              case 8:
                 resAllTerminals = _context2.sent;
 
                 if (resAllTerminals.status == 200) {
                   _this2.terminals = resAllTerminals.data;
                 } else {
                   console.log(resAllTerminals);
-                }
-
-                _context2.next = 6;
-                return _this2.callApi("post", 'settings/tickets');
-
-              case 6:
-                resTicketTemplate = _context2.sent;
-                console.log(resTicketTemplate.data);
-
-                if (resTicketTemplate.status == 200) {
-                  console.log(resTicketTemplate);
-                  _this2.templates = resTicketTemplate.data;
-                }
-
-                if (resTicketTemplate.status == 422) {
-                  console.log(resTicketTemplate);
                 }
 
                 setTimeout(function () {
@@ -41419,6 +41417,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
+                  $("#ticket_templates").DataTable().destroy();
 
                   _this3.clearForm();
 
@@ -41564,6 +41563,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 4000
                   });
+                  $("#ticket_templates").DataTable().destroy();
 
                   _this5.fetchTemplates();
                 }

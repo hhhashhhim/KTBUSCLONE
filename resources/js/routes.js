@@ -35,8 +35,8 @@ import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 import FoodOrderPage from "./pages/refreshment/host/FoodOrderPage.vue";
 import ProfilePage from "./pages/profile/ProfilePage.vue";
 
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 const routes = [
     {
