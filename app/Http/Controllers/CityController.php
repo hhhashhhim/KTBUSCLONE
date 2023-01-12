@@ -28,7 +28,7 @@ class CityController extends Controller
 
     public function index()
     {
-        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function store(Request $request)
@@ -76,7 +76,7 @@ class CityController extends Controller
     public function city_routes_list()
     {
         $data = [
-            'cities' => City::orderBy('name')->where('company_id', Auth::user()->company_id)->select('name', 'id')->get(),
+            'cities' => City::orderBy('id')->where('company_id', Auth::user()->company_id)->select('name', 'id')->get(),
             'routes' => Route::with('addedBy')->where('company_id', Auth::user()->company_id)->get()
         ];
 

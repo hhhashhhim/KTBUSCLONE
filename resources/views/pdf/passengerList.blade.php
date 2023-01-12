@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="{{ asset('assets/js/app.min.js') }}"></script>
+{{--    <script src="{{ asset('assets/js/app.min.js') }}"></script>--}}
     <style>
         @page {
             transform: rotate(-90deg);
@@ -76,12 +76,11 @@
     <title> Print Passenger List </title>
 </head>
 <body>
-{{--{{dd($data, $format)}}--}}
 
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <span>{{$format->address}}</span>
+{{--        <span>{{$format->address}}</span>--}}
         <div><span><b>UAN(24/7) : </b>{{formatUAN($format->uan)}}</span></div>
     </div>
 </div>
@@ -129,6 +128,7 @@
         @endif
     </tr>
 </table>
+{{--Table for passenger list--}}
 <table border="2" id="table2">
     <tr>
         <th style="width: 5% !important;">SR #</th>
@@ -142,13 +142,14 @@
     </tr>
     @if($data)
         @foreach($data as $key => $item)
+{{--            {{dd($item)}}--}}
             <tr>
                 <td>{{$key + 1}}</td>
                 <td>{{ $item->seat_no }}</td>
                 <td>{{ $item->customer->name }}</td>
                 <td>{{ formatCNIC($item->customer->cnic) }}</td>
                 <td>{{formatContact($item->customer->contact)}}</td>
-                <td>{{$item->terminal->name}}</td>
+                <td>{{$item->terminal->city->name}} - {{$item->terminal->name}}</td>
                 <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>
             </tr>
@@ -156,7 +157,10 @@
     @endif
 
 </table>
+
 {{--No of Passenger By Terminal Name--}}
+{{--{{dd(\Illuminate\Support\Facades\Auth::user())}}--}}
+
 <div>
     <div class="countPassenger">
         <h1><span style="font-size: 20px;font-weight: 900;padding-right: 7px;">&#10233;</span>No of Passenger By
@@ -168,10 +172,12 @@
             <th>Terminal Name</th>
             <th>No of Passengers</th>
         </tr>
-        <tr>
-            <td>Main</td>
-            <td>{{ $format->countPassenger }}</td>
-        </tr>
+        @foreach ($terminalData as $single)
+            <tr>
+                <td>{{$single->terminal->city->name}} - {{$single->terminal->name}}</td>
+                <td>{{ $single->terminalPassengerCount }}</td>
+            </tr>
+        @endforeach
     </table>
 </div>
 {{--No of Passenger By Departure City--}}
@@ -186,14 +192,12 @@
             <th>Departure City</th>
             <th>No of Passengers</th>
         </tr>
-        <tr>
-            <td>Faisalabad</td>
-            <td>2</td>
-        </tr>
-        <tr>
-            <td>Rawalpindi</td>
-            <td>3</td>
-        </tr>
+        @foreach($departureData as $item)
+            <tr>
+                <td>{{$item->departure_city->name}}</td>
+                <td>{{$item->departurePassengerCount}}</td>
+            </tr>
+        @endforeach
     </table>
 </div>
 {{--No of Passenger By Destination City--}}
@@ -208,10 +212,12 @@
             <th>Destination Cities</th>
             <th>No of Passengers</th>
         </tr>
-        <tr>
-            <td>Karachi</td>
-            <td>5</td>
-        </tr>
+        @foreach($destinationData as $value)
+            <tr>
+                <td>{{$value->destination_city->name}}</td>
+                <td>{{$value->destinationPassengerCount}}</td>
+            </tr>
+        @endforeach
     </table>
 </div>
 <script type="text/javascript">
