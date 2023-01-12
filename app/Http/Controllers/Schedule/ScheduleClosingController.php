@@ -150,7 +150,6 @@ class ScheduleClosingController extends Controller
     }
     public function update(Request $request)
     {
-        return $request;
         $prevMerge = TicketClosingMerge::
         where(["company_id" => Auth::user()->company_id, "id" => $request->mergeId])
         ->first();
@@ -188,7 +187,7 @@ class ScheduleClosingController extends Controller
             $prevMerge->delete();
         }
         
-        TicketClosingMember::where(["company_id" => Auth::user()->company_id,"ticket_closing_id",$closingId])->delete();
+        TicketClosingMember::where(["company_id" => Auth::user()->company_id,"ticket_closing_id"=>$request->closingId])->delete();
 
         return 'ok';
         $closingRecord = TicketClosing::create([
