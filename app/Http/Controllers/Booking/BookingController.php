@@ -17,6 +17,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Setting\Tickets\TicketsTemplate;
+use App\Models\Terminal;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -62,118 +63,118 @@ class BookingController extends Controller
 //        try {
 //            DB::beginTransaction();
 
-            // this is for get actual schedule date
-            $detail = ScheduleDetail::where("departure_id", $request->departureCity)
-                ->where("destination_id", $request->destinationCity)
-                ->where('schedule_id', $request->schedule)
-                ->where('departure_date', $request->date)
-                ->where('company_id', Auth::user()->company_id)
-                ->first();
+        // this is for get actual schedule date
+        $detail = ScheduleDetail::where("departure_id", $request->departureCity)
+            ->where("destination_id", $request->destinationCity)
+            ->where('schedule_id', $request->schedule)
+            ->where('departure_date', $request->date)
+            ->where('company_id', Auth::user()->company_id)
+            ->first();
 
-            $allTicket = [];
-            if (isset($request->flag) && $request->flag == 1) {
-                $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
-            } else {
-                $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-                $departure_city_id = $schedule->route->fares->first()->departure_city_id;
-                $destination_city_id = $schedule->route->fares->last()->destination_city_id;
-                $isPartial = 0;
-                if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
-                    $isPartial = 1;
-                }
-                $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
-
-                // Fare Fetching About the Schedule
-                if (!$customer) {
-                    $customer = Customer::create([
-                        'company_id' => Auth::user()->company_id,
-                        'added_by' => Auth::user()->id,
-                        'name' => $request->customerName,
-                        'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
-                        'contact' => plainContactAndCnic($request->contact),
-                    ]);
-                }
-                // Getting Already Booked Tickets
-                if ($request->date == date('Y-m-d')) {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-                    ++$bookingNo;
-                } else {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-                    ++$bookingNo;
-                }
-                $scheduleDetail = ScheduleDetail::where([
-                    'company_id' => Auth::user()->company_id,
-                    'departure_date' => $request->date,
-                    'departure_id' => $request->departureCity,
-                    'destination_id' => $request->destinationCity,
-                    'schedule_id' => $schedule->id,
-                ])->first();
-                $allTicket = [];
-                foreach ($request->selectedSeats as $i => $seat) {
-                    $ticket = Ticket::create([
-                        'company_id' => Auth::user()->company_id,
-                        'departure_city_id' => $request->departureCity,
-                        'destination_city_id' => $request->destinationCity,
-                        'seat_no' => $seat,
-                        'bus_class_id' => $request->selectedSeatsClass[$i],
-                        'seat_fare' => $request->selectedSeatsFare[$i],
-                        'is_partial' => $isPartial,
-                        'booking_no' => $bookingNo,
-                        'schedule_date' => $detail->schedule_date,
-                        'date' => $request->date,
-                        'customer_id' => $customer->id,
-                        'schedule_id' => $schedule->id,
-                        'schedule_details_id' => $scheduleDetail->id,
-                        'terminal_id' => Auth::user()->terminal_id,
-                        'remarks' => $request->remarks,
-                        'gender' => $request->gender,
-                        'type' => $request->type,
-                        'added_by' => Auth::user()->id,
-                        'discount' => $request->discount,
-                    ]);
-                    if ($isPartial == 1) {
-                        TicketIsPartial::create([
-                            'company_id' => Auth::user()->company_id,
-                            'departure_city_id' => $ticket->departure_city_id,
-                            'destination_city_id' => $ticket->destination_city_id,
-                            'ticket_id' => $ticket->id,
-                            'seat_no' => $ticket->seat_no,
-                            'seat_fare' => $ticket->seat_fare,
-                            'booking_no' => $ticket->booking_no,
-                            'date' => $ticket->date,
-                            'customer_id' => $ticket->customer_id,
-                            'schedule_id' => $ticket->schedule_id,
-                            'gender' => $ticket->gender,
-                            'type' => $ticket->type,
-                            'added_by' => Auth::user()->id,
-                        ]);
-                    }
-
-                    if ($request->type == 'advance booking') {
-                        TicketAdvancedBooked::create([
-                            'company_id' => Auth::user()->company_id,
-                            'departure_city_id' => $ticket->departure_city_id,
-                            'destination_city_id' => $ticket->destination_city_id,
-                            'ticket_id' => $ticket->id,
-                            'seat_no' => $ticket->seat_no,
-                            'seat_fare' => $ticket->seat_fare,
-                            'booking_no' => $ticket->booking_no,
-                            'date' => $ticket->date,
-                            'customer_id' => $ticket->customer_id,
-                            'schedule_id' => $ticket->schedule_id,
-                            'gender' => $ticket->gender,
-                            'type' => $ticket->type,
-                            'added_by' => Auth::user()->id,
-                        ]);
-                    }
-                    $allTicket[] = $ticket->id;
-                }
-                printTicket($allTicket, Auth::user()->company_id);
+        $allTicket = [];
+        if (isset($request->flag) && $request->flag == 1) {
+            $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
+        } else {
+            $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+            $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+            $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+            $isPartial = 0;
+            if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
+                $isPartial = 1;
             }
-            return [
-                'data' => implode('-', $allTicket),
-                'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
-            ];
+            $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+
+            // Fare Fetching About the Schedule
+            if (!$customer) {
+                $customer = Customer::create([
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                    'name' => $request->customerName,
+                    'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                    'contact' => plainContactAndCnic($request->contact),
+                ]);
+            }
+            // Getting Already Booked Tickets
+            if ($request->date == date('Y-m-d')) {
+                $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                ++$bookingNo;
+            } else {
+                $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                ++$bookingNo;
+            }
+            $scheduleDetail = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'departure_date' => $request->date,
+                'departure_id' => $request->departureCity,
+                'destination_id' => $request->destinationCity,
+                'schedule_id' => $schedule->id,
+            ])->first();
+            $allTicket = [];
+            foreach ($request->selectedSeats as $i => $seat) {
+                $ticket = Ticket::create([
+                    'company_id' => Auth::user()->company_id,
+                    'departure_city_id' => $request->departureCity,
+                    'destination_city_id' => $request->destinationCity,
+                    'seat_no' => $seat,
+                    'bus_class_id' => $request->selectedSeatsClass[$i],
+                    'seat_fare' => $request->selectedSeatsFare[$i],
+                    'is_partial' => $isPartial,
+                    'booking_no' => $bookingNo,
+                    'schedule_date' => $detail->schedule_date,
+                    'date' => $request->date,
+                    'customer_id' => $customer->id,
+                    'schedule_id' => $schedule->id,
+                    'schedule_details_id' => $scheduleDetail->id,
+                    'terminal_id' => Auth::user()->terminal_id,
+                    'remarks' => $request->remarks,
+                    'gender' => $request->gender,
+                    'type' => $request->type,
+                    'added_by' => Auth::user()->id,
+                    'discount' => $request->discount,
+                ]);
+                if ($isPartial == 1) {
+                    TicketIsPartial::create([
+                        'company_id' => Auth::user()->company_id,
+                        'departure_city_id' => $ticket->departure_city_id,
+                        'destination_city_id' => $ticket->destination_city_id,
+                        'ticket_id' => $ticket->id,
+                        'seat_no' => $ticket->seat_no,
+                        'seat_fare' => $ticket->seat_fare,
+                        'booking_no' => $ticket->booking_no,
+                        'date' => $ticket->date,
+                        'customer_id' => $ticket->customer_id,
+                        'schedule_id' => $ticket->schedule_id,
+                        'gender' => $ticket->gender,
+                        'type' => $ticket->type,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+
+                if ($request->type == 'advance booking') {
+                    TicketAdvancedBooked::create([
+                        'company_id' => Auth::user()->company_id,
+                        'departure_city_id' => $ticket->departure_city_id,
+                        'destination_city_id' => $ticket->destination_city_id,
+                        'ticket_id' => $ticket->id,
+                        'seat_no' => $ticket->seat_no,
+                        'seat_fare' => $ticket->seat_fare,
+                        'booking_no' => $ticket->booking_no,
+                        'date' => $ticket->date,
+                        'customer_id' => $ticket->customer_id,
+                        'schedule_id' => $ticket->schedule_id,
+                        'gender' => $ticket->gender,
+                        'type' => $ticket->type,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+                $allTicket[] = $ticket->id;
+            }
+            printTicket($allTicket, Auth::user()->company_id);
+        }
+        return [
+            'data' => implode('-', $allTicket),
+            'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
+        ];
 //        x
     }
 
@@ -437,6 +438,7 @@ class BookingController extends Controller
     function busInvoice(Request $request)
     {
         dd($request->all());
+
     }
 
     public
@@ -459,7 +461,6 @@ class BookingController extends Controller
 
     public function passengerListPdf(Request $request)
     {
-
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -472,13 +473,13 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
-        $passengerData = Ticket::with('customer', 'schedule', 'schedule.bus_class', 'terminal:id,name,city_id','terminal.city:id,name', 'destination_city', 'departure_city')->where([
+        $passengerData = Ticket::with('customer', 'schedule', 'schedule.bus_class', 'terminal:id,name,city_id', 'terminal.city:id,name', 'destination_city', 'departure_city')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
         ])->get();
-        $terminalGroup = Ticket::with('terminal:id,name,city_id','terminal.city:id,name')->where([
+        $terminalGroup = Ticket::with('terminal:id,name,city_id', 'terminal.city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
@@ -496,22 +497,16 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
         ])->groupBy('destination_city_id')->selectRaw('destination_city_id,count(*) as destinationPassengerCount')->get();
-        if ($passengerData) {
-            $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
-            if ($format) {
-                $format->countPassenger = count($passengerData);
-                $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
-                $format->driverInfo = getMembers($passengerData, Auth::user()->company_id, 1) ?? [];
-                $format->hostInfo = getMembers($passengerData, Auth::user()->company_id, 2) ?? [];
-                $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
-                $format->busNo = Bus::where(["id" => $passengerData[0]->bus_id, 'company_id' => Auth::user()->company_id])->first()->bus_number ?? 'N/A';
-            } else {
-                return response()->json("Please Add Ticket Template First");
-            }
-        } else {
-            return response()->json("Please Place at least one Booking");
+        $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
+        if ($format && count($passengerData) > 0) {
+            $format->countPassenger = count($passengerData);
+            $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
+            $format->driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
+            $format->hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
+            $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
+            $format->busNo = Bus::where(["id" => $passengerData[0]->bus_id, 'company_id' => Auth::user()->company_id])->first()->bus_number ?? 'N/A';
         }
-        return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData'=> $destinationGroup]);
+        return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup]);
         //        $pdf = PDF::loadView('pdf/passengerList', ['data' => $customers_data, 'data_terms'=> $format]);
 //            $output = $pdf->output();
 //        return new Response($output, 200, [

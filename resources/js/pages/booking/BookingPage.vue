@@ -2009,8 +2009,8 @@ export default {
         // Duplicate Ticket
         async duplicateTicket(data) {
             // return swal({
-            //     title: "OOPSS!!!!!",
-            //     text: "Contact TO Adminitration",
+            //     title: "OOPS!!!!!",
+            //     text: "Contact TO Administration",
             //     icon: "error",
             //     timer: 2000
             // });

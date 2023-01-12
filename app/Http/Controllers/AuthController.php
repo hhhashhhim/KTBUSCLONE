@@ -7,6 +7,7 @@ use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Rawilk\Printing\Facades\Printing;
 
 
 class AuthController extends Controller
@@ -14,6 +15,9 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+
+//        return Printing::defaultPrinterId();
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

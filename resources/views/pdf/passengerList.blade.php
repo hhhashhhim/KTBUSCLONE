@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-{{--    <script src="{{ asset('assets/js/app.min.js') }}"></script>--}}
+    {{--    <script src="{{ asset('assets/js/app.min.js') }}"></script>--}}
     <style>
         @page {
             transform: rotate(-90deg);
@@ -76,11 +76,9 @@
     <title> Print Passenger List </title>
 </head>
 <body>
-
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-{{--        <span>{{$format->address}}</span>--}}
         <div><span><b>UAN(24/7) : </b>{{formatUAN($format->uan)}}</span></div>
     </div>
 </div>
@@ -95,36 +93,40 @@
     </tr>
     <tr>
         <th colspan="1" class="centerTH">Driver Info</th>
-        @if($format->driverInfo->count() > 0)
-            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+        @if($format->driverInfo)
+            @if($format->driverInfo->count() > 0)
+                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                @foreach($format->driverInfo as $key => $value)
+                    @foreach($format->driverInfo as $key => $value)
 
-                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                @endforeach
+                    @endforeach
 
-            </th>
-        @else
-            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
-                N/A
-            </th>
+                </th>
+            @else
+                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </th>
+            @endif
         @endif
         <th colspan="1" class="centerTH">Host Info</th>
-        @if($format->hostInfo->count() > 0)
-            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+        @if($format->hostInfo)
+            @if($format->hostInfo->count() > 0)
+                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                @foreach($format->hostInfo as $key => $value)
+                    @foreach($format->hostInfo as $key => $value)
 
-                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                @endforeach
+                    @endforeach
 
-            </th>
-        @else
-            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
-                N/A
-            </th>
+                </th>
+            @else
+                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </th>
+            @endif
         @endif
     </tr>
 </table>
@@ -142,7 +144,7 @@
     </tr>
     @if($data)
         @foreach($data as $key => $item)
-{{--            {{dd($item)}}--}}
+            {{--            {{dd($item)}}--}}
             <tr>
                 <td>{{$key + 1}}</td>
                 <td>{{ $item->seat_no }}</td>
@@ -172,12 +174,14 @@
             <th>Terminal Name</th>
             <th>No of Passengers</th>
         </tr>
-        @foreach ($terminalData as $single)
-            <tr>
-                <td>{{$single->terminal->city->name}} - {{$single->terminal->name}}</td>
-                <td>{{ $single->terminalPassengerCount }}</td>
-            </tr>
-        @endforeach
+        @if($terminalData)
+            @foreach ($terminalData as $single)
+                <tr>
+                    <td>{{$single->terminal->city->name}} - {{$single->terminal->name}}</td>
+                    <td>{{ $single->terminalPassengerCount }}</td>
+                </tr>
+            @endforeach
+        @endif
     </table>
 </div>
 {{--No of Passenger By Departure City--}}
@@ -192,12 +196,14 @@
             <th>Departure City</th>
             <th>No of Passengers</th>
         </tr>
-        @foreach($departureData as $item)
-            <tr>
-                <td>{{$item->departure_city->name}}</td>
-                <td>{{$item->departurePassengerCount}}</td>
-            </tr>
-        @endforeach
+        @if($departureData)
+            @foreach($departureData as $item)
+                <tr>
+                    <td>{{$item->departure_city->name}}</td>
+                    <td>{{$item->departurePassengerCount}}</td>
+                </tr>
+            @endforeach
+        @endif
     </table>
 </div>
 {{--No of Passenger By Destination City--}}
@@ -212,12 +218,14 @@
             <th>Destination Cities</th>
             <th>No of Passengers</th>
         </tr>
-        @foreach($destinationData as $value)
-            <tr>
-                <td>{{$value->destination_city->name}}</td>
-                <td>{{$value->destinationPassengerCount}}</td>
-            </tr>
-        @endforeach
+        @if($destinationData)
+            @foreach($destinationData as $value)
+                <tr>
+                    <td>{{$value->destination_city->name}}</td>
+                    <td>{{$value->destinationPassengerCount}}</td>
+                </tr>
+            @endforeach
+        @endif
     </table>
 </div>
 <script type="text/javascript">

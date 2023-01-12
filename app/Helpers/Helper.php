@@ -400,11 +400,14 @@ if (!function_exists('codeImageElt')) {
 if (!function_exists('getMembers')) {
     function getMembers($data, $company_id, $type)
     {
-        $dataMember = TicketClosingMember::where([
-            'company_id' => $company_id,
-            'ticket_closing_id' => $data[0]->ticket_closing_id,
-            'type' => $type,
-        ])->pluck('user_id');
-        return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']);
+        if ($data && $company_id && $type) {
+            $dataMember = TicketClosingMember::where([
+                'company_id' => $company_id,
+                'ticket_closing_id' => $data->ticket_closing_id,
+                'type' => $type,
+            ])->pluck('user_id');
+            return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']) ?? [];
+        }
+        return [];
     }
 }
