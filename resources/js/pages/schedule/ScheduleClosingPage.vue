@@ -29,7 +29,7 @@
                                                         <th>Schedule</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
-<!--                                                        <th>Action</th>-->
+                                                       <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -39,10 +39,15 @@
                                                             <td>{{ close.schedule.name }}</td>
                                                             <td>{{ close.schedule_date }}</td>
                                                             <td>{{ close.schedule_time }}</td>
-<!--                                                            <td>N/A</td>-->
+                                                           <td>
+                                                            <button class="btn btn-success btn-sm mr-1"
+                                                                    @click="addDays()"
+                                                                    data-target="#addDaysModal" data-toggle="modal"><i
+                                                                class="fas fa-edit"></i></button>
+                                                           </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="border-bottom border-success" colspan="4" style="height:0 !important; "></td>
+                                                            <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
                                                         </tr>
                                                     </template>
                                                     </tbody>
@@ -412,7 +417,7 @@ export default {
                 $('#closing_table').DataTable().destroy();
                 this.fetchData();
                 setTimeout(() => {
-                    $('#closing_table').DataTable();
+                        $('#closing_table').DataTable();
                     }, 300);
             } else {
                 if (res.status == 422) {
