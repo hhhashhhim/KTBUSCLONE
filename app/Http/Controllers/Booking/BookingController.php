@@ -431,7 +431,9 @@ class BookingController extends Controller
     public
     function terminalInvoice(Request $request)
     {
-        dd($request->all());
+//        dd($request->all());
+
+        return view('pdf/terminalPaxDetails');
     }
 
     public

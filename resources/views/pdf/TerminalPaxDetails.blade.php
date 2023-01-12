@@ -83,9 +83,6 @@
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <div style=" padding-bottom: 5px;"><span style="padding-bottom: 10px !important;">Peshawar Road Pirwadhai
-                    Mor Rawalpindi</span><br></div>
-        <div style=" padding-bottom: 5px;"><span style="font-weight: 600;">Main</span><br></div>
         <div style=" padding-bottom: 5px;"><span style="font-weight:600">Main Pirwadhai Mor Peshawar Road
                     Rawalpindi</span></div>
         <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b>03-111-777-333 </span></div>
@@ -210,11 +207,11 @@
         <td>Hostess Name</td>
     </tr>
 </table>
-<script type="text/javascript">
-    window.onload = function () {
-        window.print();
-    }
-</script>
+{{--<script type="text/javascript">--}}
+{{--    window.onload = function () {--}}
+{{--        window.print();--}}
+{{--    }--}}
+{{--</script>--}}
 </body>
 
 </html>
