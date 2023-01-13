@@ -39884,6 +39884,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       closings: [],
       // seatType: "0",
       schedules: [],
+      editSchedules: [],
       drivers: [],
       hosts: [],
       // updateSeatValue: [],
@@ -39904,18 +39905,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         hosts: [],
         description: ""
       },
-      // dataEdit: {
-      //     busNumber: "",
-      //     fare_class: "",
-      //     chassisNumber: "",
-      //     insuranceNumber: "",
-      //     noOfSeats: "",
-      //     routePermit: "",
-      //     noOfRows: "",
-      //     no_of_cols: "",
-      //     seatMap: [],
-      // },
-      // delId: "",
+      editData: {
+        closingId: "",
+        mergeId: "",
+        bus: "",
+        date: "",
+        schedule: "",
+        drivers: [],
+        hosts: [],
+        description: ""
+      },
       success: false,
       errors: false
     };
@@ -40012,6 +40011,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
+    getScheduleForEdit: function getScheduleForEdit(date) {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var data, res;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                data = {
+                  date: date
+                };
+                _context4.next = 3;
+                return _this4.callApi("post", "booking/schedule/fetch", data);
+
+              case 3:
+                res = _context4.sent;
+
+                if (res.status == 200) {
+                  _this4.editSchedules = res.data;
+                } else {
+                  console.log(res);
+                }
+
+              case 5:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -40023,23 +40054,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     closeSchedule: function closeSchedule() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 // console.log(this.addData.drivers.length);return;
-                _this4.validationErrors = [];
+                _this5.validationErrors = [];
 
-                if (_this4.addData.bus) {
-                  _context4.next = 3;
+                if (_this5.addData.bus) {
+                  _context5.next = 3;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Bus is required",
                   icon: 'error',
@@ -40047,12 +40078,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (_this4.addData.date) {
-                  _context4.next = 5;
+                if (_this5.addData.date) {
+                  _context5.next = 5;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Date is required",
                   icon: 'error',
@@ -40060,12 +40091,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (_this4.addData.schedule) {
-                  _context4.next = 7;
+                if (_this5.addData.schedule) {
+                  _context5.next = 7;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Schedule is required",
                   icon: 'error',
@@ -40073,12 +40104,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this4.addData.drivers.length == 0)) {
-                  _context4.next = 9;
+                if (!(_this5.addData.drivers.length == 0)) {
+                  _context5.next = 9;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Driver is required",
                   icon: 'error',
@@ -40086,12 +40117,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this4.addData.hosts.length == 0)) {
-                  _context4.next = 11;
+                if (!(_this5.addData.hosts.length == 0)) {
+                  _context5.next = 11;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Host is required",
                   icon: 'error',
@@ -40099,12 +40130,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                _this4.loadig = true;
-                _context4.next = 14;
-                return _this4.callApi("post", "booking/schedule/closing/store", _this4.addData);
+                _this5.loadig = true;
+                _context5.next = 14;
+                return _this5.callApi("post", "booking/schedule/closing/store", _this5.addData);
 
               case 14:
-                res = _context4.sent;
+                res = _context5.sent;
 
                 if (res.status == 201) {
                   swal({
@@ -40113,16 +40144,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this4.loading = false;
-                  _this4.addData.bus = "";
-                  _this4.addData.date = "";
-                  _this4.addData.schedule = "";
-                  _this4.addData.drivers = [];
-                  _this4.addData.hosts = [];
-                  _this4.addData.description = "";
+                  _this5.loading = false;
+                  _this5.addData.bus = "";
+                  _this5.addData.date = "";
+                  _this5.addData.schedule = "";
+                  _this5.addData.drivers = [];
+                  _this5.addData.hosts = [];
+                  _this5.addData.description = "";
                   $('#closing_table').DataTable().destroy();
 
-                  _this4.fetchData();
+                  _this5.fetchData();
 
                   setTimeout(function () {
                     $('#closing_table').DataTable();
@@ -40130,7 +40161,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this4.loading = false;
+                      _this5.loading = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -40154,46 +40185,152 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
-    } // editBus(val) {
-    //     this.dataEdit = val;
-    // },
+    },
+    editSchedule: function editSchedule(schedule) {
+      this.editData.closingId = schedule.id;
+      this.editData.mergeId = schedule.ticket_merge_id;
+      this.editData.bus = schedule.bus_id;
+      this.editData.date = schedule.schedule_date;
+      this.getScheduleForEdit(schedule.schedule_date);
+      this.editData.schedule = schedule.schedule_id;
+      this.editData.description = schedule.description;
+    },
     // viewBus(view) {
     //     this.dataView = view;
     //     console.log(this.dataViews);
     // },
-    // async updateBus() {
-    //     this.validationErrors = [];
-    //     if (this.dataEdit.name === "")
-    //         return this.errorsArray("Bus Name is Required", "Name");
-    //     this.loading = true;
-    //     const res = await this.callApi("post", "buses/update", this.dataEdit);
-    //     if (res.status === 200) {
-    //        swal({
-    //             title: "Success",
-    //             text: "Bus Record updated Successfully",
-    //             icon: "success",
-    //            timer: 2000
-    //         });
-    //         $('#closing_table').DataTable().destroy();
-    //         this.loading = false;
-    //         await this.fetchBuses();
-    //     } else {
-    //         if (res.status == 422) {
-    //             this.loading = false;
-    //             for (const key in res.data.errors) {
-    //                 res.data.errors[key].forEach((element) => {
-    //                     this.errorsArray(element, key);
-    //                 });
-    //             }
-    //         }
-    //     }
-    // },
-    // async deleteBus(busVal, i) {
+    updateSchedule: function updateSchedule() {
+      var _this6 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var res, _loop, key;
+
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _this6.validationErrors = [];
+
+                if (_this6.editData.bus) {
+                  _context6.next = 3;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Bus is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 3:
+                if (_this6.editData.date) {
+                  _context6.next = 5;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Date is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 5:
+                if (_this6.editData.schedule) {
+                  _context6.next = 7;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Schedule is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this6.editData.drivers.length == 0)) {
+                  _context6.next = 9;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Driver is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!(_this6.editData.hosts.length == 0)) {
+                  _context6.next = 11;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Host is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 11:
+                _this6.loading = true;
+                _context6.next = 14;
+                return _this6.callApi("post", "booking/schedule/closing/update", _this6.editData);
+
+              case 14:
+                res = _context6.sent;
+
+                if (!(res.status === 200)) {
+                  _context6.next = 23;
+                  break;
+                }
+
+                swal({
+                  title: "Success",
+                  text: "Schedule Closing Updated Successfully",
+                  icon: "success",
+                  timer: 2000
+                });
+                $('#closing_table').DataTable().destroy();
+                _this6.loading = false;
+                _context6.next = 21;
+                return _this6.fetchData();
+
+              case 21:
+                _context6.next = 24;
+                break;
+
+              case 23:
+                if (res.status == 422) {
+                  _this6.loading = false;
+
+                  _loop = function _loop(key) {
+                    res.data.errors[key].forEach(function (element) {
+                      _this6.errorsArray(element, key);
+                    });
+                  };
+
+                  for (key in res.data.errors) {
+                    _loop(key);
+                  }
+                }
+
+              case 24:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }))();
+    } // async deleteBus(busVal, i) {
     //     const deletingObj = {
     //         url: "buses/delete",
     //         data: busVal,
@@ -44568,22 +44705,11 @@ var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_40 = {
-  key: 11,
-  "class": "dropdown"
-};
-
-var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-bookmark"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_42 = {
   key: 1,
   "class": "dropdown"
 };
 
-var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "#",
   "class": "menu-toggle nav-link has-dropdown"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -44592,28 +44718,28 @@ var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_44 = {
+var _hoisted_42 = {
   "class": "dropdown-menu"
 };
 
-var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fas fa-project-diagram"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-user"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_47 = {
+var _hoisted_45 = {
   key: 2,
   "class": "dropdown"
 };
 
-var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "#",
   "class": "menu-toggle nav-link has-dropdown"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -44622,12 +44748,24 @@ var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_49 = {
+var _hoisted_47 = {
   "class": "dropdown-menu"
 };
 
-var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fas fa-users"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_49 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-street-view"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-street-view"
 }, null, -1
 /* HOISTED */
 );
@@ -44638,24 +44776,12 @@ var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-street-view"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-street-view"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_54 = {
+var _hoisted_52 = {
   key: 3,
   "class": "dropdown"
 };
 
-var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "#",
   "class": "menu-toggle nav-link has-dropdown"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -44664,9 +44790,21 @@ var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_56 = {
+var _hoisted_54 = {
   "class": "dropdown-menu"
 };
+
+var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-users"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_56 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-users"
+}, null, -1
+/* HOISTED */
+);
 
 var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fas fa-users"
@@ -44680,29 +44818,27 @@ var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-users"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-users"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_61 = {
+var _hoisted_59 = {
   key: 4,
   "class": "dropdown"
 };
 
-var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "#",
   "class": "menu-toggle nav-link has-dropdown"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fas fa-sitemap"
 }), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, " Refreshment ")], -1
+/* HOISTED */
+);
+
+var _hoisted_61 = {
+  "class": "dropdown-menu"
+};
+
+var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-users"
+}, null, -1
 /* HOISTED */
 );
 
@@ -44717,21 +44853,11 @@ var _hoisted_64 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_65 = {
-  "class": "dropdown-menu"
-};
-
-var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-users"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_67 = {
   key: 5,
   "class": "dropdown"
 };
 
-var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "#",
   "class": "menu-toggle nav-link has-dropdown"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -44740,11 +44866,11 @@ var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_69 = {
+var _hoisted_67 = {
   "class": "dropdown-menu"
 };
 
-var _hoisted_70 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fas fa-users"
 }, null, -1
 /* HOISTED */
@@ -44898,31 +45024,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('route') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
-    "class": "nav-link text-capitalize",
-    to: {
-      name: 'booking-schedule-closing'
-    }
-  }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Close Booking ")];
-    }),
-    _: 1
-    /* STABLE */
-
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('route') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <li class=\"dropdown\" v-if=\"checkForSubmenu('route')\">\r\n                            <router-link class=\"nav-link text-capitalize\" :to=\"{ name:'booking-schedule-closing' }\">\r\n                                <i class=\"fas fa-bookmark\"></i> Close Booking\r\n                            </router-link>\r\n                        </li> "), $options.checkForSubmenu('route') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
       name: 'all-booking-page'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" All Booking ")];
+      return [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" All Booking ")];
     }),
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('users') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('roles') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('users') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('roles') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -44930,7 +45044,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" roles ")];
+      return [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" roles ")];
     }),
     _: 1
     /* STABLE */
@@ -44943,12 +45057,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Users ")];
+      return [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Users ")];
     }),
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -44956,7 +45070,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Employees ")];
+      return [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Employees ")];
     }),
     _: 1
     /* STABLE */
@@ -44969,7 +45083,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Leave Management ")];
+      return [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Leave Management ")];
     }),
     _: 1
     /* STABLE */
@@ -44982,7 +45096,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Departments ")];
+      return [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Departments ")];
     }),
     _: 1
     /* STABLE */
@@ -44995,12 +45109,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Designations ")];
+      return [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Designations ")];
     }),
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -45008,7 +45122,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Parts ")];
+      return [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Parts ")];
     }),
     _: 1
     /* STABLE */
@@ -45021,7 +45135,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Linking ")];
+      return [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Linking ")];
     }),
     _: 1
     /* STABLE */
@@ -45034,7 +45148,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Due ")];
+      return [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Due ")];
     }),
     _: 1
     /* STABLE */
@@ -45047,12 +45161,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Record ")];
+      return [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Maintenance Record ")];
     }),
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -45060,12 +45174,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Hotels ")];
+      return [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Hotels ")];
     }),
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -45073,12 +45187,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Food Order ")];
+      return [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Food Order ")];
     }),
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_67, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkPermission('hrm') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('employee') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
@@ -45086,7 +45200,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Ticket Format ")];
+      return [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Ticket Format ")];
     }),
     _: 1
     /* STABLE */
@@ -46990,7 +47104,7 @@ var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "password",
   "class": "control-label"
-}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\n                            Forgot Password?\n                          </a>\n                        </div> ")], -1
+}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\r\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\r\n                            Forgot Password?\r\n                          </a>\r\n                        </div> ")], -1
 /* HOISTED */
 );
 
@@ -62856,15 +62970,17 @@ var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-edit"
+var _hoisted_18 = ["data-target", "onClick"];
+
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "far fa-edit"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_19 = [_hoisted_18];
+var _hoisted_20 = [_hoisted_19];
 
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
   "class": "border-bottom border-success",
   colspan: "5",
   style: {
@@ -62874,14 +62990,14 @@ var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_21 = {
+var _hoisted_22 = {
   "class": "row"
 };
-var _hoisted_22 = {
+var _hoisted_23 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "city_id"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62889,25 +63005,25 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: ""
 }, "Select Bus Class", -1
 /* HOISTED */
 );
 
-var _hoisted_25 = ["value"];
+var _hoisted_26 = ["value"];
 
-var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "form-group col-md-6"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_27 = {
+var _hoisted_28 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62915,11 +63031,11 @@ var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_29 = {
+var _hoisted_30 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "city_id"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Schedule "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62927,18 +63043,18 @@ var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: ""
 }, "Select Schedule", -1
 /* HOISTED */
 );
 
-var _hoisted_32 = ["value"];
-var _hoisted_33 = {
+var _hoisted_33 = ["value"];
+var _hoisted_34 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Driver "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62946,12 +63062,12 @@ var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_35 = ["value"];
-var _hoisted_36 = {
+var _hoisted_36 = ["value"];
+var _hoisted_37 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Host "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -62959,20 +63075,119 @@ var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_38 = ["value"];
-var _hoisted_39 = {
+var _hoisted_39 = ["value"];
+var _hoisted_40 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "location"
 }, "Description", -1
 /* HOISTED */
 );
 
-var _hoisted_41 = ["disabled"];
+var _hoisted_42 = ["disabled"];
+var _hoisted_43 = {
+  "class": "row"
+};
+var _hoisted_44 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "city_id"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Bus Class", -1
+/* HOISTED */
+);
+
+var _hoisted_47 = ["value"];
+
+var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "form-group col-md-6"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_49 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "name"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_51 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "city_id"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Schedule "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Schedule", -1
+/* HOISTED */
+);
+
+var _hoisted_54 = ["value"];
+var _hoisted_55 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_56 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "name"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Driver "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_57 = ["value"];
+var _hoisted_58 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "name"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Host "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_60 = ["value"];
+var _hoisted_61 = {
+  "class": "form-group col-md-12"
+};
+
+var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "location"
+}, "Description", -1
+/* HOISTED */
+);
+
+var _hoisted_63 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
+
+  var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     href: "#",
@@ -62999,16 +63214,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(close.schedule_time), 1
       /* TEXT */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-        "class": "btn btn-success btn-sm mr-1",
-        onClick: _cache[1] || (_cache[1] = function ($event) {
-          return _ctx.addDays();
-        }),
-        "data-target": "#addDaysModal",
-        "data-toggle": "modal"
-      }, _hoisted_19)])]);
+        "data-target": '#' + $data.editFormID,
+        "data-toggle": "modal",
+        onClick: function onClick($event) {
+          return $options.editSchedule(close);
+        },
+        "class": "btn btn-primary mx-1"
+      }, _hoisted_20, 8
+      /* PROPS */
+      , _hoisted_18)])]);
     }), 128
     /* KEYED_FRAGMENT */
-    )), _hoisted_20], 64
+    )), _hoisted_21], 64
     /* STABLE_FRAGMENT */
     );
   }), 128
@@ -63023,62 +63240,62 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[9] || (_cache[9] = function () {
+        onClick: _cache[8] || (_cache[8] = function () {
           return $options.closeSchedule && $options.closeSchedule.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Close Booking'), 9
       /* TEXT, PROPS */
-      , _hoisted_41)];
+      , _hoisted_42)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
-        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
           return $data.addData.bus = $event;
         })
-      }, [_hoisted_24, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+      }, [_hoisted_25, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: bus.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
         /* TEXT, PROPS */
-        , _hoisted_25);
+        , _hoisted_26);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.bus]])]), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.bus]])]), _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         "class": "form-control",
         placeholder: "Enter Bus Name",
-        onChange: _cache[3] || (_cache[3] = function () {
+        onChange: _cache[2] || (_cache[2] = function () {
           return $options.getSchedule && $options.getSchedule.apply($options, arguments);
         }),
-        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
           return $data.addData.date = $event;
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addData.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addData.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
-        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.addData.schedule = $event;
         })
-      }, [_hoisted_31, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedules, function (schedule, i) {
+      }, [_hoisted_32, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedules, function (schedule, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: schedule.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')), 9
         /* TEXT, PROPS */
-        , _hoisted_32);
+        , _hoisted_33);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\r\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\r\n                        <Multiselect\r\n\r\n                            :options=\"options\"\r\n                            :multiple=\"true\"\r\n                            :searchable=\"true\"\r\n\r\n                        ></Multiselect>\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\r\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\r\n                        <Multiselect\r\n\r\n                            :options=\"options\"\r\n                            :multiple=\"true\"\r\n                            :searchable=\"true\"\r\n\r\n                        ></Multiselect>\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
-        "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.addData.drivers = $event;
         }),
         multiple: ""
@@ -63088,14 +63305,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: driver.user_id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(driver.name), 9
         /* TEXT, PROPS */
-        , _hoisted_35);
+        , _hoisted_36);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [_hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
-        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+        "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
           return $data.addData.hosts = $event;
         }),
         multiple: ""
@@ -63105,16 +63322,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: host.user_id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(host.name), 9
         /* TEXT, PROPS */
-        , _hoisted_38);
+        , _hoisted_39);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
         placeholder: "Enter Description",
         id: "location",
-        "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
           return $data.addData.description = $event;
         }),
         cols: "30",
@@ -63128,7 +63345,124 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Seat Class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Seat Class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Edit Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit Bus\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-12\">\r\n                        <label for=\"city_id\">Bus Class <span class=\"text-danger ml-1\">*</span></label>\r\n                        <select class=\"form-control\" v-model=\"dataEdit.fare_class_id\">\r\n                            <option value=\"0\">Select Bus Class</option>\r\n                            <option\r\n                                v-for=\"(fareClass, i) in fareClasses\"\r\n                                :key=\"i\"\r\n                                :value=\"fareClass.id\"\r\n                            >\r\n                                {{ fareClass.name }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Bus Number <span class=\"text-danger ml-1\">*</span></label>\r\n                        <input\r\n                            type=\"text\"\r\n                            class=\"form-control\"\r\n                            placeholder=\"Enter Bus Name\"\r\n                            v-model=\"dataEdit.bus_number\"\r\n                        />\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Chassis Number</label>\r\n                        <input\r\n                            type=\"text\"\r\n                            class=\"form-control\"\r\n                            placeholder=\"Enter Chasis Number\"\r\n                            v-model=\"dataEdit.chassis_number\"\r\n                            @keypress=\"isNumber($event)\"\r\n                        />\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Insurance Number</label>\r\n                        <input\r\n                            type=\"text\"\r\n                            class=\"form-control\"\r\n                            placeholder=\"Enter Insurance Number\"\r\n                            v-model=\"dataEdit.insurance_number\"\r\n                            @keypress=\"isNumber($event)\"\r\n                        />\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Route Permit Number</label>\r\n                        <input\r\n                            type=\"text\"\r\n                            class=\"form-control\"\r\n                            placeholder=\"Enter Route Permit Number\"\r\n                            v-model=\"dataEdit.route_permit_number\"\r\n                            @keypress=\"isNumber($event)\"\r\n                        />\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button\r\n                        type=\"button\"\r\n                        class=\"btn btn-primary\"\r\n                        @click=\"updateBus\" :disabled=\"loading\"\r\n                    >\r\n                        {{ loading ? 'Loading...' : 'Update Bus' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\"\r\n                confirmationMessage=\"Are You Sure You want To Delete This Bus Record ???\"\r\n            /> ")])]);
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Seat Class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Seat Class"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Edit Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
+    heading: "Edit Close Schedule",
+    errors: this.validationErrors,
+    success: $data.success,
+    editForm: $data.editFormID
+  }, {
+    button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-primary",
+        onClick: _cache[16] || (_cache[16] = function () {
+          return $options.updateSchedule && $options.updateSchedule.apply($options, arguments);
+        }),
+        disabled: $data.loading
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Schedule'), 9
+      /* TEXT, PROPS */
+      , _hoisted_63)];
+    }),
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+          return $data.editData.bus = $event;
+        })
+      }, [_hoisted_46, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: i,
+          value: bus.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
+        /* TEXT, PROPS */
+        , _hoisted_47);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.bus]])]), _hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "date",
+        "class": "form-control",
+        placeholder: "Enter Bus Name",
+        onChange: _cache[10] || (_cache[10] = function () {
+          return $options.getSchedule && $options.getSchedule.apply($options, arguments);
+        }),
+        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+          return $data.editData.date = $event;
+        }),
+        disabled: ""
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.editData.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+          return $data.editData.schedule = $event;
+        }),
+        disabled: ""
+      }, [_hoisted_53, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editSchedules, function (schedule, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: i,
+          value: schedule.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')), 9
+        /* TEXT, PROPS */
+        , _hoisted_54);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control rounded-0",
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+          return $data.editData.drivers = $event;
+        }),
+        multiple: ""
+      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.drivers, function (driver, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: i,
+          value: driver.user_id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(driver.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_57);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control rounded-0",
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+          return $data.editData.hosts = $event;
+        }),
+        multiple: ""
+      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hosts, function (host, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: i,
+          value: host.user_id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(host.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_60);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+        "class": "form-control",
+        placeholder: "Enter Description",
+        id: "location",
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+          return $data.editData.description = $event;
+        }),
+        cols: "30",
+        rows: "10"
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.editData.description]])])])];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\"\r\n                confirmationMessage=\"Are You Sure You want To Delete This Bus Record ???\"\r\n            /> ")])]);
 }
 
 /***/ }),
@@ -104762,11 +105096,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var D_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var C_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 const script = {}
 
 ;
-const __exports__ = /*#__PURE__*/(0,D_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__["default"])(script, [['__file',"resources/js/pages/profile/ProfilePage.vue"]])
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_0__["default"])(script, [['__file',"resources/js/pages/profile/ProfilePage.vue"]])
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
 

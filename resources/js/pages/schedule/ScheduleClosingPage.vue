@@ -39,12 +39,13 @@
                                                             <td>{{ close.schedule.name }}</td>
                                                             <td>{{ close.schedule_date }}</td>
                                                             <td>{{ close.schedule_time }}</td>
-                                                           <td>
-                                                            <button class="btn btn-success btn-sm mr-1"
-                                                                    @click="addDays()"
-                                                                    data-target="#addDaysModal" data-toggle="modal"><i
-                                                                class="fas fa-edit"></i></button>
-                                                           </td>
+                                                            <td>
+                                                                <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                                        @click="editSchedule(close)"
+                                                                        class="btn btn-primary mx-1">
+                                                                    <i class="far fa-edit"></i>
+                                                                </button>
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
@@ -174,76 +175,99 @@
             <!--End Seat Class-->
 
             <!--Edit Modal-->
-            <!-- <Edit
-                heading="Edit Bus"
+            <Edit
+                heading="Edit Close Schedule"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
             >
                 <div class="row">
-                    <div class="form-group col-md-12">
-                        <label for="city_id">Bus Class <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" v-model="dataEdit.fare_class_id">
-                            <option value="0">Select Bus Class</option>
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editData.bus">
+                            <option value="">Select Bus Class</option>
                             <option
-                                v-for="(fareClass, i) in fareClasses"
+                                v-for="(bus, i) in buses"
                                 :key="i"
-                                :value="fareClass.id"
+                                :value="bus.id"
                             >
-                                {{ fareClass.name }}
+                                {{ bus.bus_number }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class=" form-group col-md-6">
+
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="name">Date <span class="text-danger ml-1">*</span></label>
+                        <input
+                        type="date"
+                        class="form-control"
+                        placeholder="Enter Bus Name"
+                        @change="getSchedule"
+                        v-model="editData.date"
+                        disabled
+                        />
+                    </div>
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editData.schedule" disabled>
+                            <option value="">Select Schedule</option>
+                            <option
+                                v-for="(schedule, i) in editSchedules"
+                                :key="i"
+                                :value="schedule.id"
+                            >
+                                {{ schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')') }}
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Bus Number <span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Bus Name"
-                            v-model="dataEdit.bus_number"
-                        />
+                        <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control rounded-0" v-model="editData.drivers" multiple>
+                            <option
+                                v-for="(driver, i) in drivers"
+                                :key="i"
+                                :value="driver.user_id"
+                            >
+                                {{ driver.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="name">Chassis Number</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Chasis Number"
-                            v-model="dataEdit.chassis_number"
-                            @keypress="isNumber($event)"
-                        />
+                        <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control rounded-0" v-model="editData.hosts" multiple>
+                            <option
+                                v-for="(host, i) in hosts"
+                                :key="i"
+                                :value="host.user_id"
+                            >
+                                {{ host.name }}
+                            </option>
+                        </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="name">Insurance Number</label>
-                        <input
-                            type="text"
+                    <div class="form-group col-md-12">
+                        <label for="location">Description</label>
+                        <textarea
                             class="form-control"
-                            placeholder="Enter Insurance Number"
-                            v-model="dataEdit.insurance_number"
-                            @keypress="isNumber($event)"
-                        />
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="name">Route Permit Number</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Route Permit Number"
-                            v-model="dataEdit.route_permit_number"
-                            @keypress="isNumber($event)"
-                        />
+                            placeholder="Enter Description"
+                            id="location"
+                            v-model="editData.description"
+                            cols="30"
+                            rows="10"
+                        ></textarea>
                     </div>
                 </div>
                 <template v-slot:button>
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="updateBus" :disabled="loading"
+                        @click="updateSchedule" :disabled="loading"
                     >
-                        {{ loading ? 'Loading...' : 'Update Bus' }}
+                        {{ loading ? 'Loading...' : 'Update Schedule' }}
                     </button>
                 </template>
-            </Edit> -->
+            </Edit>
             <!-- Add Modal -->
             <!-- <Delete :deleteForm="deleteFormID"
                 confirmationMessage="Are You Sure You want To Delete This Bus Record ???"
@@ -275,6 +299,7 @@ export default {
             closings: [],
             // seatType: "0",
             schedules: [],
+            editSchedules: [],
             drivers: [],
             hosts: [],
             // updateSeatValue: [],
@@ -295,18 +320,16 @@ export default {
                 hosts: [],
                 description: "",
             },
-            // dataEdit: {
-            //     busNumber: "",
-            //     fare_class: "",
-            //     chassisNumber: "",
-            //     insuranceNumber: "",
-            //     noOfSeats: "",
-            //     routePermit: "",
-            //     noOfRows: "",
-            //     no_of_cols: "",
-            //     seatMap: [],
-            // },
-            // delId: "",
+            editData: {
+                closingId: "",
+                mergeId: "",
+                bus: "",
+                date: "",
+                schedule: "",
+                drivers: [],
+                hosts: [],
+                description: "",
+            },
             success: false,
             errors: false,
         };
@@ -342,6 +365,18 @@ export default {
 
             if (res.status == 200) {
                 this.schedules = res.data;
+            } else {
+                console.log(res);
+            }
+        },
+        async getScheduleForEdit(date){
+            const data = {
+                date: date
+            }
+            const res = await this.callApi("post", "booking/schedule/fetch", data);
+
+            if (res.status == 200) {
+                this.editSchedules = res.data;
             } else {
                 console.log(res);
             }
@@ -443,42 +478,81 @@ export default {
                 }
             }
         },
-        // editBus(val) {
-        //     this.dataEdit = val;
-        // },
+        editSchedule(schedule) {
+            this.editData.closingId = schedule.id;
+            this.editData.mergeId = schedule.ticket_merge_id;
+            this.editData.bus = schedule.bus_id;
+            this.editData.date = schedule.schedule_date;
+            this.getScheduleForEdit(schedule.schedule_date);
+            this.editData.schedule = schedule.schedule_id;
+            this.editData.description = schedule.description;
+        },
         // viewBus(view) {
         //     this.dataView = view;
         //     console.log(this.dataViews);
         // },
-        // async updateBus() {
-        //     this.validationErrors = [];
-        //     if (this.dataEdit.name === "")
-        //         return this.errorsArray("Bus Name is Required", "Name");
-        //     this.loading = true;
+        async updateSchedule() {
+            this.validationErrors = [];
+            if (!this.editData.bus)
+              return swal({
+                    title: "Required",
+                    text: "Bus is required",
+                    icon: 'error',
+                   timer: 2000
+                });
+            if (!this.editData.date)
+              return swal({
+                    title: "Required",
+                    text: "Date is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (!this.editData.schedule)
+              return swal({
+                    title: "Required",
+                    text: "Schedule is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.editData.drivers.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Driver is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.editData.hosts.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Host is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            this.loading = true;
 
-        //     const res = await this.callApi("post", "buses/update", this.dataEdit);
-        //     if (res.status === 200) {
-        //        swal({
-        //             title: "Success",
-        //             text: "Bus Record updated Successfully",
-        //             icon: "success",
-        //            timer: 2000
-        //         });
-        //         $('#closing_table').DataTable().destroy();
-        //         this.loading = false;
-        //         await this.fetchBuses();
-        //     } else {
-        //         if (res.status == 422) {
-        //             this.loading = false;
+            const res = await this.callApi("post", "booking/schedule/closing/update", this.editData);
+            if (res.status === 200) {
+               swal({
+                    title: "Success",
+                    text: "Schedule Closing Updated Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
+                $('#closing_table').DataTable().destroy();
+                this.loading = false;
+                await this.fetchData();
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
 
-        //             for (const key in res.data.errors) {
-        //                 res.data.errors[key].forEach((element) => {
-        //                     this.errorsArray(element, key);
-        //                 });
-        //             }
-        //         }
-        //     }
-        // },
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
         // async deleteBus(busVal, i) {
         //     const deletingObj = {
         //         url: "buses/delete",

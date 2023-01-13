@@ -28,6 +28,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
         Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'index']);
             Route::post('/store', [ScheduleClosingController::class, 'store']);
+            Route::post('/update', [ScheduleClosingController::class, 'update']);
         });
     });
 
