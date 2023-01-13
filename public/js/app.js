@@ -38381,6 +38381,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       busId: "",
       hotels: [],
       items: [],
+      hotelFoods: [],
+      hotelDeals: [],
       schedule: "",
       postData: {
         ticketClosingId: "",
@@ -38517,21 +38519,52 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2);
       }))();
     },
-    orderBook: function orderBook() {
+    hotelItems: function hotelItems(id) {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var i, res;
+        var items;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!(!_this3.postData.ticketClosingId || !_this3.postData.hotelId || !_this3.postData.estimatedTime || _this3.postData.item.length == 0 || _this3.postData.quantity.length == 0 || _this3.postData.seat.length == 0)) {
-                  _context3.next = 2;
+                _this3.hotelFoods = [];
+                _context3.next = 3;
+                return _this3.callApi("post", "refreshments/hotels/items", {
+                  id: id
+                });
+
+              case 3:
+                items = _context3.sent;
+
+                if (items.status === 200) {
+                  _this3.hotelFoods = items.data.foods;
+                  _this3.hotelDeals = items.data.deals;
+                }
+
+              case 5:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    orderBook: function orderBook() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var i, res;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!(!_this4.postData.ticketClosingId || !_this4.postData.hotelId || !_this4.postData.estimatedTime || _this4.postData.item.length == 0 || _this4.postData.quantity.length == 0 || _this4.postData.seat.length == 0)) {
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field",
                   icon: "error",
@@ -38542,17 +38575,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 i = 0;
 
               case 3:
-                if (!(i < _this3.postData.item.length)) {
-                  _context3.next = 9;
+                if (!(i < _this4.postData.item.length)) {
+                  _context4.next = 9;
                   break;
                 }
 
-                if (!(!_this3.postData.item[i] || !_this3.postData.quantity[i] || !_this3.postData.seat[i])) {
-                  _context3.next = 6;
+                if (!(!_this4.postData.item[i] || !_this4.postData.quantity[i] || !_this4.postData.seat[i])) {
+                  _context4.next = 6;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field Or Remove Extra",
                   icon: "error",
@@ -38561,28 +38594,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 i++;
-                _context3.next = 3;
+                _context4.next = 3;
                 break;
 
               case 9:
-                _this3.loading = true;
-                _context3.next = 12;
-                return _this3.callApi("post", "refreshments/hotels/orders/book", _this3.postData);
+                _this4.loading = true;
+                _context4.next = 12;
+                return _this4.callApi("post", "refreshments/hotels/orders/book", _this4.postData);
 
               case 12:
-                res = _context3.sent;
+                res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context3.next = 27;
+                  _context4.next = 27;
                   break;
                 }
 
-                _this3.loading = false;
+                _this4.loading = false;
                 $('#order_table').DataTable().destroy();
-                _this3.postData.item = [];
-                _this3.postData.quantity = [];
-                _this3.postData.seat = [];
-                _this3.loop = 0;
+                _this4.postData.item = [];
+                _this4.postData.quantity = [];
+                _this4.postData.seat = [];
+                _this4.loop = 0;
                 swal({
                   title: "Success",
                   text: "Order Added",
@@ -38590,18 +38623,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 setTimeout(function () {
-                  _this3.loop = 1;
+                  _this4.loop = 1;
                 }, 2000);
-                _context3.next = 24;
-                return _this3.fetchData();
+                _context4.next = 24;
+                return _this4.fetchData();
 
               case 24:
-                _this3.loading = false;
-                _context3.next = 29;
+                _this4.loading = false;
+                _context4.next = 29;
                 break;
 
               case 27:
-                _this3.loading = false;
+                _this4.loading = false;
 
                 if (res.status == 422) {
                   (function () {
@@ -38627,10 +38660,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 29:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     // async updateLinkMaintenance() {
@@ -38734,24 +38767,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     //     event.target.parentElement.parentElement.remove();
     // },
     fetchData: function fetchData() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var fleetRes;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context4.next = 2;
-                return _this4.callApi("post", "refreshments/hotels/orders/food");
+                _context5.next = 2;
+                return _this5.callApi("post", "refreshments/hotels/orders/food");
 
               case 2:
-                fleetRes = _context4.sent;
+                fleetRes = _context5.sent;
 
                 if (fleetRes.status === 200) {
-                  _this4.mainData = fleetRes.data.mainData;
-                  _this4.buses = fleetRes.data.busDrop;
-                  _this4.hotels = fleetRes.data.hotelDrop;
+                  _this5.mainData = fleetRes.data.mainData;
+                  _this5.buses = fleetRes.data.busDrop;
+                  _this5.hotels = fleetRes.data.hotelDrop;
                 }
 
                 setTimeout(function () {
@@ -38760,10 +38793,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     } // async fetchFleetDetails(id) {
     //     const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
@@ -61585,32 +61618,29 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "col-md-12 d-flex align-items-center"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "col-md-6"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Select Food/Deal")])], -1
-  /* HOISTED */
-  );
-});
-
+var _hoisted_43 = {
+  key: 0,
+  "class": "col-md-12 d-flex align-items-center"
+};
 var _hoisted_44 = {
-  "class": "form-group col-md-12 d-flex align-items-center"
+  "class": "col-md-6 px-0 mb-1"
 };
 var _hoisted_45 = {
+  "class": "form-group col-md-12 d-flex align-items-center"
+};
+var _hoisted_46 = {
   "class": "table table-striped"
 };
 
-var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Food/Deal"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_47 = ["onChange", "value"];
+var _hoisted_48 = ["onChange", "value"];
 
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     price: "0",
     value: "",
@@ -61620,12 +61650,84 @@ var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_49 = ["price", "value"];
-var _hoisted_50 = ["onKeyup", "value"];
-var _hoisted_51 = ["value"];
-var _hoisted_52 = ["onKeyup", "value"];
-var _hoisted_53 = ["onClick"];
-var _hoisted_54 = ["disabled"];
+var _hoisted_50 = ["price", "value"];
+var _hoisted_51 = ["onKeyup", "value"];
+var _hoisted_52 = ["value"];
+var _hoisted_53 = ["onKeyup", "value"];
+var _hoisted_54 = ["onClick"];
+var _hoisted_55 = ["disabled"];
+var _hoisted_56 = {
+  "class": "modal fade",
+  id: "showDetails",
+  tabindex: "-1",
+  role: "dialog",
+  "aria-labelledby": "exampleModalLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_57 = {
+  "class": "modal-dialog modal-xl",
+  role: "document"
+};
+var _hoisted_58 = {
+  "class": "modal-content"
+};
+
+var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal-header"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "exampleModalLabel"
+  }, "Detail"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_60 = {
+  "class": "modal-body"
+};
+var _hoisted_61 = {
+  "class": "table table-striped"
+};
+
+var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Food/Deal"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Price")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_63 = {
+  "class": "font-weight-bold"
+};
+var _hoisted_64 = {
+  "class": "font-weight-bold"
+};
+var _hoisted_65 = {
+  "class": "mb-0"
+};
+var _hoisted_66 = {
+  "class": "mb-0"
+};
+
+var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal-footer"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal"
+  }, "Close")], -1
+  /* HOISTED */
+  );
+});
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -61696,13 +61798,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[8] || (_cache[8] = function () {
+        onClick: _cache[9] || (_cache[9] = function () {
           return $options.orderBook && $options.orderBook.apply($options, arguments);
         }),
         disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Link'), 9
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Order'), 9
       /* TEXT, PROPS */
-      , _hoisted_54)];
+      , _hoisted_55)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -61764,7 +61866,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.options
       }, null, 8
       /* PROPS */
-      , ["modelValue", "options"])]), _hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (i, index) {
+      , ["modelValue", "options"])]), $data.postData.hotelId ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <h5 class=\"mb-0 mx-2\">Select Food/Deal</h5> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "data-target": "#showDetails",
+        "data-toggle": "modal",
+        onClick: _cache[7] || (_cache[7] = function ($event) {
+          return $options.hotelItems($data.postData.hotelId);
+        }),
+        "class": "btn btn btn-primary m-1"
+      }, " Show Food/Deal ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (i, index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{ items[0] ? items[0].price : '' }} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -61773,19 +61882,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             return $options.saveRow($event, 'first', index);
           },
           value: $data.postData.item[index]
-        }, [_hoisted_48, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.items, function (item, i) {
+        }, [_hoisted_49, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.items, function (item, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             price: item.price,
             value: item.cid,
             key: i
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(item.price)) + " | " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.name), 9
           /* TEXT, PROPS */
-          , _hoisted_49);
+          , _hoisted_50);
         }), 128
         /* KEYED_FRAGMENT */
         ))], 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_47)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , _hoisted_48)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
@@ -61795,7 +61904,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: $data.postData.quantity[index]
         }, null, 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_50)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , _hoisted_51)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
@@ -61803,7 +61912,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: $data.postData.quantity[index] * $data.postData.itemPrice[index]
         }, null, 8
         /* PROPS */
-        , _hoisted_51)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , _hoisted_52)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "number",
           "class": "form-control",
           min: "0",
@@ -61813,9 +61922,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: $data.postData.seat[index]
         }, null, 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_52)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        , _hoisted_53)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[7] || (_cache[7] = function () {
+          onClick: _cache[8] || (_cache[8] = function () {
             return $options.addRow && $options.addRow.apply($options, arguments);
           })
         }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -61825,7 +61934,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, "Remove", 8
         /* PROPS */
-        , _hoisted_53)])]);
+        , _hoisted_54)])]);
       }), 128
       /* KEYED_FRAGMENT */
       ))])])])])];
@@ -61835,7 +61944,40 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\r\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\r\n                            <option value=\"\" selected>Select Bus</option>\r\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\r\n                                {{ fleet.bus_number }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\r\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\r\n                    </div>\r\n                    <div class=\"col-md-12 d-flex align-items-center\">\r\n                        <div class=\"col-md-6\">\r\n                            <h5>Select Part For Maintenance</h5>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\r\n                        <table class=\"table table-striped\">\r\n                            <thead>\r\n                            <tr>\r\n                                <th>Part</th>\r\n                                <th>Maintenance Required After (km)</th>\r\n                                <th>Last Maintenance At (km)</th>\r\n                                <th>Action</th>\r\n                            </tr>\r\n                            </thead>\r\n                            <tbody>\r\n\r\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\r\n                                <td>\r\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\r\n                                        <option value=\"\" selected>Select Part </option>\r\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\r\n                                            {{ part.name }}\r\n                                        </option>\r\n                                    </select>\r\n                                </td>\r\n                                <td>\r\n\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\r\n                                </td>\r\n                                <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\r\n                                </td>\r\n                                <td>\r\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\r\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"modal fade\" id=\"showDetails\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\"\r\n                 aria-hidden=\"true\">\r\n                <div class=\"modal-dialog modal-xl\" role=\"document\">\r\n                    <div class=\"modal-content\">\r\n                        <div class=\"modal-header\">\r\n                            <h5 class=\"modal-title\" id=\"exampleModalLabel\">Route Fare Chart</h5>\r\n                            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\r\n                                <span aria-hidden=\"true\">&times;</span>\r\n                            </button>\r\n                        </div>\r\n                        <div class=\"modal-body\">\r\n                            <table class=\"table table-striped\">\r\n                                <thead>\r\n                                <tr>\r\n\r\n                                    <th>Fleet Part</th>\r\n                                    <th>Maintenance Required After</th>\r\n                                    <th>Last Maintenance At</th>\r\n                                    <th>Last Maintenance Date</th>\r\n                                </tr>\r\n                                </thead>\r\n                                <tbody>\r\n                                    <tr v-for=\"(single, i) in fleetDetails.maintenance_part_link\" :key=\"i\">\r\n\r\n                                        <td> {{ single.maintenance_part.name }}</td>\r\n                                        <td> {{ single.maintenance_after }} (km)</td>\r\n                                        <td> {{ single.maintenance_at }} (km)</td>\r\n                                        <td> {{ single.maintenance_date??'N/A' }}</td>\r\n                                    </tr>\r\n                                </tbody>\r\n                            </table>\r\n                        </div>\r\n                        <div class=\"modal-footer\">\r\n                            <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div> ")])]);
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\r\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\r\n                            <option value=\"\" selected>Select Bus</option>\r\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\r\n                                {{ fleet.bus_number }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\r\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\r\n                    </div>\r\n                    <div class=\"col-md-12 d-flex align-items-center\">\r\n                        <div class=\"col-md-6\">\r\n                            <h5>Select Part For Maintenance</h5>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\r\n                        <table class=\"table table-striped\">\r\n                            <thead>\r\n                            <tr>\r\n                                <th>Part</th>\r\n                                <th>Maintenance Required After (km)</th>\r\n                                <th>Last Maintenance At (km)</th>\r\n                                <th>Action</th>\r\n                            </tr>\r\n                            </thead>\r\n                            <tbody>\r\n\r\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\r\n                                <td>\r\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\r\n                                        <option value=\"\" selected>Select Part </option>\r\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\r\n                                            {{ part.name }}\r\n                                        </option>\r\n                                    </select>\r\n                                </td>\r\n                                <td>\r\n\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\r\n                                </td>\r\n                                <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\r\n                                </td>\r\n                                <td>\r\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\r\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hotelFoods, function (food, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+      key: i,
+      "class": "border-bottom"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(food.name), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(food.price), 1
+    /* TEXT */
+    )]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  )), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hotelDeals, function (deal, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+      key: i,
+      "class": "border-bottom"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(deal.name) + " ", 1
+    /* TEXT */
+    ), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(deal.deal_details, function (dealFood, k) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        "class": "d-flex font-weight-normal",
+        key: k
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dealFood.food.name) + " :", 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dealFood.quantity + " (" + dealFood.food.unit + ")"), 1
+      /* TEXT */
+      )]);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(deal.price), 1
+    /* TEXT */
+    )]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])])]), _hoisted_67])])])])]);
 }
 
 /***/ }),

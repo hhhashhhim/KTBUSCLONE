@@ -22,6 +22,8 @@ Route::group(['prefix' => 'refreshments', 'middleware', [CustomMiddleware::class
         Route::post('/store', [HotelController::class, 'store']);
         Route::post('/update', [HotelController::class, 'update']);
         
+        Route::post('/items', [FoodOrderController::class, 'hotelAllItems']);
+
         Route::group(['prefix' => '/specific/foods', 'middleware', [CustomMiddleware::class]], function () {
             Route::post('/', [FoodController::class, 'index']);
             Route::post('/store', [FoodController::class, 'store']);
