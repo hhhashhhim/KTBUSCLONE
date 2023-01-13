@@ -356,6 +356,8 @@ export default {
         };
     },
     async created() {
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
         await this.setData();
         await this.fetchData();
         await this.fetchFoods();

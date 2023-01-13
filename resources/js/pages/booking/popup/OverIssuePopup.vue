@@ -174,6 +174,8 @@ export default {
     BasicPopup,
   },
   async created() {
+      window.removeEventListener('keydown', this.enter);
+      window.removeEventListener('keydown', this.altM);
 
   },
   data() {

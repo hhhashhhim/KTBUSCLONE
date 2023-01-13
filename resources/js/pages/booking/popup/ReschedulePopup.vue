@@ -205,6 +205,8 @@ export default {
     },
     async created() {
         this.fetchData();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     data() {
         return {

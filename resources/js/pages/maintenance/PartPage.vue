@@ -158,6 +158,8 @@ export default {
     },
     async created() {
         await this.fetchParts();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     methods: {
 

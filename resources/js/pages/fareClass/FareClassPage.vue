@@ -226,6 +226,8 @@ export default {
     },
     async created() {
         await this.fetchFareClasses();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
 
     },
     methods: {

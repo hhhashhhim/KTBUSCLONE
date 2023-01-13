@@ -234,6 +234,8 @@ export default {
     },
     async created() {
         await this.fetchLeaves();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     methods: {
 

@@ -171,7 +171,8 @@
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="address">Address</label>
-                        <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="45" placeholder="Address Must be less then 45 characters"></textarea>
+                        <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="45"
+                                  placeholder="Address Must be less then 45 characters"></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -417,8 +418,9 @@
                 <input
                     type="checkbox"
                     class="colorinput-input"
-                    v-model="dataEdit.is_main"
-                    v-bind:checked="dataEdit.is_main === 1"
+
+                    @change="checkBoxEdit($event)"
+                    v-bind:checked="dataEdit.is_main == 1"
                 />
                 <span class="colorinput-color bg-primary"></span>
               </span>
@@ -433,79 +435,80 @@
             </Edit>
 
             <!--View Details Model-->
-            <transition duration="1000"  mode="out-in" enter-active-class="loader" leave-active-class="loader" >
-            <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
-                 aria-hidden="true">
-                <div class="modal-dialog modal-xl modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Terminal Details</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body m-1 p-1">
-                            <div class="card-body my-0 py-0">
-                                <!-- Table -->
-                                <div class="row">
-                                    <div class="col-12">
-                                        <table class="table table-striped table-hover" id="show_terminal">
-                                            <thead>
-                                            <tr>
-                                                <th>Sr No.</th>
-                                                <th>Terminal Name</th>
-                                                <th>Address</th>
-                                                <th>Contact Number</th>
-                                                <th>Added By</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr v-for="(single, i) in terminalsDetails" :key="i">
-                                                <td>{{ i + 1 }}</td>
-                                                <td v-if="single.name">{{ single.name }}</td>
-                                                <td v-else>N/A</td>
-                                                <td v-if="single.address">{{ single.address }}</td>
-                                                <td v-else>N/A</td>
-                                                <td v-if="single.contact"> {{ phoneFormat(single.contact) }}</td>
-                                                <td v-else>N/A</td>
-                                                <td v-if="single.added_by">{{ single.added_by.name }}</td>
-                                                <td v-else>N/A</td>
-                                                <td>
-                                                    <button
-                                                        :data-target="'#' + editFormID"
-                                                        data-toggle="modal"
-                                                        @click="editTerminal(single)"
-                                                        class="btn btn-warning mx-2"
-                                                    >
-                                                        <i class="far fa-edit"></i>
-                                                    </button>
-<!--                                                    <button-->
-<!--                                                        :data-target="'#' + deleteFormID"-->
-<!--                                                        data-toggle="modal"-->
-<!--                                                        @click="deleteModal(single, i)"-->
-<!--                                                        class="btn btn-danger"-->
-<!--                                                    >-->
-<!--                                                        <i class="far fa-trash-alt"></i>-->
-<!--                                                    </button>-->
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <!-- END TABLE -->
+            <transition duration="1000" mode="out-in" enter-active-class="loader" leave-active-class="loader">
+                <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Terminal Details</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                        @click="close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <div class="modal-body m-1 p-1">
+                                <div class="card-body my-0 py-0">
+                                    <!-- Table -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <table class="table table-striped table-hover" id="show_terminal">
+                                                <thead>
+                                                <tr>
+                                                    <th>Sr No.</th>
+                                                    <th>Terminal Name</th>
+                                                    <th>Address</th>
+                                                    <th>Contact Number</th>
+                                                    <th>Added By</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="(single, i) in terminalsDetails" :key="i">
+                                                    <td>{{ i + 1 }}</td>
+                                                    <td v-if="single.name">{{ single.name }}</td>
+                                                    <td v-else>N/A</td>
+                                                    <td v-if="single.address">{{ single.address }}</td>
+                                                    <td v-else>N/A</td>
+                                                    <td v-if="single.contact"> {{ phoneFormat(single.contact) }}</td>
+                                                    <td v-else>N/A</td>
+                                                    <td v-if="single.added_by">{{ single.added_by.name }}</td>
+                                                    <td v-else>N/A</td>
+                                                    <td>
+                                                        <button
+                                                            :data-target="'#' + editFormID"
+                                                            data-toggle="modal"
+                                                            @click="editTerminal(single)"
+                                                            class="btn btn-warning mx-2"
+                                                        >
+                                                            <i class="far fa-edit"></i>
+                                                        </button>
+                                                        <!--                                                    <button-->
+                                                        <!--                                                        :data-target="'#' + deleteFormID"-->
+                                                        <!--                                                        data-toggle="modal"-->
+                                                        <!--                                                        @click="deleteModal(single, i)"-->
+                                                        <!--                                                        class="btn btn-danger"-->
+                                                        <!--                                                    >-->
+                                                        <!--                                                        <i class="far fa-trash-alt"></i>-->
+                                                        <!--                                                    </button>-->
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- END TABLE -->
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-whitesmoke br">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </transition>
             <!-- Delete Modal -->
-            <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???' />
+            <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???'/>
         </div>
     </section>
 </template>
@@ -515,7 +518,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
 import vueMask from "vue-jquery-mask";
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
     name: "Terminal",
@@ -588,6 +591,8 @@ export default {
     },
 
     async created() {
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
         await this.fetchTerminals();
     },
     methods: {
@@ -595,6 +600,15 @@ export default {
             setTimeout(() => {
                 $("#show_terminal").DataTable();
             }, 300);
+        },
+        checkBoxEdit: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.is_main = 1;
+            } else {
+                this.dataEdit.is_main = 0;
+            }
+
+            console.log(this.dataEdit.is_main);
         },
         applyMaks: function (value) {
             console.log(value, typeof value);
@@ -803,7 +817,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-
             this.loading = true;
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
@@ -820,15 +833,17 @@ export default {
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
                 }, 3000);
-            } else {
-                if (res.status == 422) {
-                    this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
+            }
+            if (res.status == 422) {
+                this.loading = false;
+                for (const key in res.data.errors) {
+                    res.data.errors[key].forEach((element) => {
+                        this.errorsArray(element, key);
+                    });
                 }
+            }
+            if (res.status == 423) {
+                this.errorsArray(res.data.is_main, 'Main Terminal');
             }
         },
         async deleteModal(terminal, i) {

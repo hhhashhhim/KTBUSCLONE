@@ -108,6 +108,8 @@ export default {
     };
   },
   async created() {
+      window.removeEventListener('keydown', this.enter);
+      window.removeEventListener('keydown', this.altM);
     const res = await this.callApi("post", "role/get", { id: this.$route.params.id });
     if (res.status == 200) {
       this.role = res.data.role;
