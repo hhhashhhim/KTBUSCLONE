@@ -26911,10 +26911,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _this.fetchAllSchedules();
 
             case 2:
-              window.addEventListener('keydown', _this.enter);
-              window.addEventListener('keydown', _this.altM);
+              if (window.location.pathname.split("/").pop() == "booking") {
+                window.addEventListener('keydown', _this.enter);
+                window.addEventListener('keydown', _this.altM);
+              }
 
-            case 4:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -36580,7 +36582,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 resPart = _context2.sent;
-                console.log(resPart);
 
                 if (resPart.status == 200) {
                   _this2.parts = resPart.data;
@@ -36592,7 +36593,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   $("#part_table").DataTable();
                 }, 300);
 
-              case 6:
+              case 5:
               case "end":
                 return _context2.stop();
             }

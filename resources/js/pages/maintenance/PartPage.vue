@@ -163,7 +163,6 @@ export default {
 
         async fetchParts() {
             const resPart = await this.callApi("post", 'fleet/maintenance/part');
-            console.log(resPart);
             if (resPart.status == 200) {
                 this.parts = resPart.data
             } else {

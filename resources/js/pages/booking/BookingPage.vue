@@ -922,8 +922,10 @@ export default {
     },
     async created() {
         await this.fetchAllSchedules();
-        window.addEventListener('keydown', this.enter);
-        window.addEventListener('keydown', this.altM);
+        if (window.location.pathname.split("/").pop() == "booking") {
+            window.addEventListener('keydown', this.enter);
+            window.addEventListener('keydown', this.altM);
+        }
     },
 
     methods: {

@@ -58,4 +58,5 @@ class TicketELT extends Model
     {
         return $this->hasOne(Schedule::class, 'id', 'schedule_id');
     }
+
 }
