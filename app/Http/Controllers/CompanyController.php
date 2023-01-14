@@ -86,7 +86,7 @@ class CompanyController extends Controller
             'modules' => $request->modules,
             'added_by' => auth()->user()->id,
         ]);
-        User::where('company_id', $request->id)->where('email', $request->email)->first()->update([
+        User::where('company_id', $request->id)->first()->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
             'email' => $request->email,

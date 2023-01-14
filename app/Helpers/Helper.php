@@ -11,8 +11,9 @@ use App\Models\Schedule\TicketClosingMember;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
-use charlieuki\ReceiptPrinter\ReceiptPrinter as ReceiptPrinter;
 use Illuminate\Support\Facades\File;
+use Rawilk\Printing\Facades\Printing;
+use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 
 if (!function_exists('storeFare')) {
@@ -212,75 +213,67 @@ if (!function_exists('updateFareTable')) {
 if (!function_exists('printTicket')) {
     function printTicket($ticketIds, $company_id, $duplicate = 0)
     {
-
-
         $format = TicketsTemplate::where(['company_id' => $company_id, 'status' => 1])->first();
         $tickets = Ticket::with('customer', 'schedule', 'departure_city', 'destination_city', 'seatClass')->where('company_id', $company_id)->whereIn('id', $ticketIds)->get();
         foreach ($tickets as $single) {
-            // Set params
-            $uan = formatUAN($format->uan);
-            $company_name = 'Kainat Travels';
-            $company_address = $format->address;
-            $company_phone = formatContact($format->phone);
-            $termsCondition = $format->terms_condition;
-            $checkDuplicate = $duplicate;
-            $seatNo = $single->seat_no;
-            $busClass = $single['schedule']['bus_class']->name;
-            $departureCity = $single['departure_city']->name;
-            $destinationCity = $single['destination_city']->name;
-            $departureDate = date('d/m/Y', strtotime($single->date));
-            $departureTime = date('H:i A', strtotime($single['schedule']->time));
-            $bookingDate = date('d/m/Y H:i A', strtotime($single->created_at));
-            $seatFare = $single->seat_fare;
-            $bookingId = $single->id;
-            $busClass = $single['seatClass']->name;
-            $customerName = $single['customer']->name;
-            $customerCNIC = formatCNIC($single['customer']->cnic);
-            $customerContact = formatContact($single['customer']->contact);
-            //Code for Qr code
-            $code = 'Name: ' . $customerName . '| ' .
-                'CNIC: ' . $customerCNIC . '| ' .
-                'Contact: ' . $customerContact . '| ' .
-                'SeatNo: ' . $seatNo . '| ' .
-                'Bus: ' . $busClass . '| ' .
-                'From: ' . $departureCity . '| ' .
-                'To: ' . $destinationCity . '| ' .
-                'Dept Date: ' . $departureDate . '| ' .
-                'Dept Time: ' . $departureTime . '| ' .
-                'Booking DateTime: ' . $bookingDate . '| ' .
-                'boookingId: ' . $bookingId . '| ' .
-                'Fare: ' . $seatFare;
-
-            $image = codeImage($code);
-            // Init printer
-            $printer = new ReceiptPrinter;
-            $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
-
-            // Set store info
-            $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate,
-                $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime,
-                $departureDate, $departureCity, $destinationCity, $busClass);
-            // Print Function passes Array to it
-            $printer->printReceipt([
-                'companyName' => $company_name,
-                'companyAddress' => $company_address,
-                'uan' => $uan,
-                'phone' => $company_phone,
-                'qr' => $image,
-                'customerName' => $customerName,
-                'seatNo' => $seatNo,
-                'busClass' => $busClass,
-                'from' => $departureCity,
-                'to' => $destinationCity,
-                'departDate' => $departureDate,
-                'departTime' => $departureTime,
-                'bookingDate' => $bookingDate,
-                'fare' => $seatFare,
-                'terms' => $termsCondition,
-                'cnic' => $customerCNIC,
-                'contact' => $customerContact,
-                'duplicate' => $checkDuplicate,
-            ]);
+            $receipt = (string)(new ReceiptPrinter)
+                ->centerAlign()
+                ->text('Kainat Travels')
+                ->feed()
+                ->text($format->address)
+                ->feed()
+                ->text('UAN(24/7) : ' . formatUAN($format->uan))
+                ->feed()
+                ->text('Phone : ' . formatContact($format->phone))
+                ->feed(2)
+                ->twoColumnText('Customer Name : ', $single['customer']->name)
+                ->feed()
+                ->twoColumnText('Seat No : ', $single->seat_no)
+                ->feed()
+                ->twoColumnText('Bus Class : ', $single['schedule']['bus_class']->name)
+                ->feed()
+                ->twoColumnText('From : ', $single['departure_city']->name)
+                ->feed()
+                ->twoColumnText('To : ', $single['destination_city']->name)
+                ->feed()
+                ->twoColumnText('Departure Date : ', date('d/m/Y', strtotime($single->date)))
+                ->feed()
+                ->twoColumnText('Departure Time : ', date('H:i A', strtotime($single['schedule']->time)))
+                ->feed()
+                ->twoColumnText('Booking Date : ', date('d/m/Y H:i A', strtotime($single->created_at)))
+                ->feed()
+                ->twoColumnText('Fare : ', $single->seat_fare)
+                ->feed()
+                ->line()
+                ->centerAlign()
+                ->text('Terms and Condition Applied')
+                ->feed()
+                ->text($format->terms_condition)
+                ->feed(3)
+                ->text('© Rights Reserved By Kainat Travels')
+                ->cut()
+                ->twoColumnText('Seat No : ', $single->seat_no)
+                ->feed()
+                ->twoColumnText('Bus Class : ', $single['schedule']['bus_class']->name)
+                ->feed()
+                ->twoColumnText('From : ', $single['departure_city']->name)
+                ->feed()
+                ->twoColumnText('To : ', $single['destination_city']->name)
+                ->feed()
+                ->twoColumnText('Departure Date : ', date('d/m/Y', strtotime($single->date)))
+                ->feed()
+                ->twoColumnText('Customer Name : ', $single['customer']->name)
+                ->feed()
+                ->twoColumnText('Customer CNIC : ', formatCNIC($single['customer']->cnic))
+                ->feed()
+                ->twoColumnText('Customer Contact : ', formatContact($single['customer']->contact))
+                ->feed()
+                ->cut();
+            // Now send the string to your receipt printer
+            Printing::newPrintTask()
+                ->printer(Session('printerId'))
+                ->content($receipt)
+                ->send();
         }
     }
 }
@@ -289,83 +282,73 @@ if (!function_exists('printTicket')) {
 if (!function_exists('printEltTicket')) {
     function printEltTicket($eltId, $company_id)
     {
-        $format = TicketsTemplate::where(['company_id' => 1, 'status' => 1, 'terminal_id' => Auth::user()->terminal_id])->first();
-        $eltTicket = TicketELT::with('departure:id,name', 'destination:id,name', 'company', 'ticket.seatClass', 'customer', 'schedule', 'schedule.bus_class:id,name')->where(['company_id' => $company_id, 'id' => $eltId])->first();
-        // Set params
-        $uan = formatUAN($format->uan);
-        $company_name = 'Kainat Travels';
-        $company_address = $format->address;
-        $company_phone = formatContact($format->phone);
-        $seatNo = $eltTicket->seat_no;
-        $busClass = $eltTicket['schedule']['bus_class']->name;
-        $departureCity = $eltTicket['departure']->name;
-        $destinationCity = $eltTicket['destination']->name;
-        $departureDate = date('d/m/Y', strtotime($eltTicket['ticket']->date));
-        $departureTime = date('H:i A', strtotime($eltTicket['schedule']->time));
-        $bookingDate = date('d/m/Y H:i A', strtotime($eltTicket->created_at));
-        $seatFare = $eltTicket->seat_fare;
-        $elt_price = $eltTicket->elt_price;
-        $bookingId = $eltTicket->id;
-        $customerName = $eltTicket['customer']->name;
-        $customerCNIC = formatCNIC($eltTicket['customer']->cnic);
-        $customerContact = formatContact($eltTicket['customer']->contact);
-        $termsCondition = "test";
-        $checkDuplicate = 0;
-        $weight = $eltTicket->elt_weight . ' ' . "Kg";
-        $totalFare = ((int)$eltTicket->elt_price) + ((int)$eltTicket->seat_fare);
+        $format = TicketsTemplate::where(['company_id' => 1, 'status' => 1, 'terminal_id' =>
+            Auth::user()->terminal_id])->first();
+        $eltTicket = TicketELT::with('departure:id,name', 'destination:id,name', 'company', 'ticket.seatClass',
+            'customer', 'schedule', 'schedule.bus_class:id,name')->where(['company_id' => $company_id, 'id' =>
+            $eltId])->first();
 
+        $receipt = (string)(new ReceiptPrinter)
+            ->centerAlign()
+            ->text('Kainat Travels')
+            ->text($format->address)
+            ->text('UAN(24/7) : ' . formatUAN($format->uan))
+            ->text('Phone : ' . formatContact($format->phone))
+            ->feed(2)
+            ->twoColumnText('Customer Name : ', $eltTicket['customer']->name)
+            ->feed()
+            ->twoColumnText('Seat No : ', $eltTicket->seat_no)
+            ->feed()
+            ->twoColumnText('Bus Class : ', $eltTicket['schedule']['bus_class']->name)
+            ->feed()
+            ->twoColumnText('From : ', $eltTicket['departure_city']->name)
+            ->feed()
+            ->twoColumnText('To : ', $eltTicket['destination_city']->name)
+            ->feed()
+            ->twoColumnText('Departure Date : ', date('d/m/Y', strtotime($eltTicket->date)))
+            ->feed()
+            ->twoColumnText('Departure Time : ', date('H:i A', strtotime($eltTicket['schedule']->time)))
+            ->feed()
+            ->twoColumnText('Booking Date : ', date('d/m/Y H:i A', strtotime($eltTicket->created_at)))
+            ->feed()
+            ->twoColumnText('Fare : ', $eltTicket->seat_fare)
+            ->feed()
+            ->line()
+            ->centerAlign()
+            ->text('Terms and Condition Applied')
+            ->feed()
+            ->text($format->terms_condition)
+            ->feed(3)
+            ->text('© Rights Reserved By Kainat Travels')
+            ->feed(2)
+            ->cut()
+            ->twoColumnText('Seat No :', $eltTicket->seat_no)
+            ->feed()
+            ->twoColumnText('Bus Class :', $eltTicket['schedule']['bus_class']->name)
+            ->feed()
+            ->twoColumnText('From :', $eltTicket['departure_city']->name)
+            ->feed()
+            ->twoColumnText('To :', $eltTicket['destination_city']->name)
+            ->feed()
+            ->twoColumnText('Departure Date :', date('d/m/Y', strtotime($eltTicket->date)))
+            ->feed()
+            ->twoColumnText('Customer Name :', $eltTicket['customer']->name)
+            ->feed()
+            ->twoColumnText('Customer CNIC :', formatCNIC($eltTicket['customer']->cnic))
+            ->feed()
+            ->twoColumnText('Customer Contact :', formatContact($eltTicket['customer']->contact))
+            ->feed()
+            ->cut();
 
-        //Code for Qr code
-        $code = 'Name: ' . $customerName . '| ' .
-            'CNIC: ' . $customerCNIC . '| ' .
-            'Contact: ' . $customerContact . '| ' .
-            'SeatNo: ' . $seatNo . '| ' .
-            'Bus: ' . $busClass . '| ' .
-            'From: ' . $departureCity . '| ' .
-            'To: ' . $destinationCity . '| ' .
-            'Dept Date: ' . $departureDate . '| ' .
-            'Dept Time: ' . $departureTime . '| ' .
-            'Booking DateTime: ' . $bookingDate . '| ' .
-            'boookingId: ' . $bookingId . '| ' .
-            'Weight: ' . $weight . '| ' .
-            'seatFare: ' . $seatFare . '| ' .
-            'eltPrice: ' . $elt_price . '| ' .
-            'totalFare: ' . $totalFare;
-        $image = codeImageElt($code);
-        // Init printer
-        $printer = new ReceiptPrinter;
-        $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
-
-        // Set store info
-        $printer->setStore($uan, $company_name, $company_address, $company_phone, $termsCondition, $checkDuplicate,
-            $seatNo, $customerContact, $customerCNIC, $customerName, $seatFare, $bookingDate, $departureTime,
-            $departureDate, $departureCity, $destinationCity, $busClass);
-        // Print Function passes Array to it
-        $printer->printRequest([
-            'companyName' => $company_name,
-            'companyAddress' => $company_address,
-            'uan' => $uan,
-            'phone' => $company_phone,
-            'qr' => $image,
-            'customerName' => $customerName,
-            'seatNo' => $seatNo,
-            'busClass' => $busClass,
-            'from' => $departureCity,
-            'to' => $destinationCity,
-            'departDate' => $departureDate,
-            'departTime' => $departureTime,
-            'bookingDate' => $bookingDate,
-            'fare' => $seatFare,
-            'cnic' => $customerCNIC,
-            'weight' => $weight,
-            'contact' => $customerContact,
-            'elt_price' => $elt_price,
-            'total_price' => $totalFare,
-        ]);
+        // Now send the string to your receipt printer
+        Printing::newPrintTask()
+            ->printer(Session('printerId'))
+            ->content($receipt)
+            ->send();
     }
 }
 
-//Upload Image  API
+//Upload Image API
 if (!function_exists('codeImage')) {
     function codeImage($code)
     {
@@ -381,7 +364,7 @@ if (!function_exists('codeImage')) {
     }
 }
 
-//Upload ELt Image  API
+//Upload ELt Image API
 if (!function_exists('codeImageElt')) {
     function codeImageElt($code)
     {
@@ -406,7 +389,8 @@ if (!function_exists('getMembers')) {
                 'ticket_closing_id' => $data->ticket_closing_id,
                 'type' => $type,
             ])->pluck('user_id');
-            return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']) ?? [];
+            return Employee::where('company_id', $company_id)->whereIn('user_id', $dataMember)->get(['name', 'contact']) ??
+                [];
         }
         return [];
     }
