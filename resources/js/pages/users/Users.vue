@@ -398,8 +398,9 @@ export default {
         };
     },
     async created() {
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
         await this.fetchUsers();
-        console.log(this.authCheck)
     },
     methods: {
         phoneFormat: function (string) {

@@ -478,6 +478,8 @@ export default {
     },
     async created() {
         await this.fetchCompany();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     methods: {
         async fetchCompany() {

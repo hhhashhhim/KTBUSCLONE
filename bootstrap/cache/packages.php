@@ -11,17 +11,6 @@
       'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
     ),
   ),
-  'charlieuki/receiptprinter' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'charlieuki\\ReceiptPrinter\\ReceiptPrinterServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'ReceiptPrinter' => 'charlieuki\\ReceiptPrinter\\Facades\\ReceiptPrinter',
-    ),
-  ),
   'elibyy/tcpdf-laravel' => 
   array (
     'providers' => 
@@ -91,6 +80,17 @@
     'providers' => 
     array (
       0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    ),
+  ),
+  'rawilk/laravel-printing' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Rawilk\\Printing\\PrintingServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Printing' => 'Rawilk\\Printing\\Facades\\Printing',
     ),
   ),
   'simplesoftwareio/simple-qrcode' => 

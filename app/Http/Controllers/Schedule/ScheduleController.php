@@ -333,7 +333,6 @@ class ScheduleController extends Controller
         }
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
-
         for ($i = 0; $i < count($seatMap); $i++) {
             foreach ($seatMap[$i] as $j => $column) {
                 // adding fare to each seat

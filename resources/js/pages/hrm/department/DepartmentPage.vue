@@ -202,6 +202,8 @@ export default {
     },
     async created() {
         await this.fetchDepartments();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     methods: {
 

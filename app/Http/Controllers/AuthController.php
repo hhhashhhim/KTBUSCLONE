@@ -15,9 +15,6 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-
-//        return Printing::defaultPrinterId();
-
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

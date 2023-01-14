@@ -10,7 +10,6 @@
     "require": {
         "php": "^7.4|^8.0",
         "barryvdh/laravel-dompdf": "^2.0",
-        "charlieuki/receiptprinter": "^1.2",
         "doctrine/dbal": "^3.4",
         "elibyy/tcpdf-laravel": "^9.1",
         "fruitcake/laravel-cors": "^2.0",
@@ -19,11 +18,13 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
-        "mike42/escpos-php": "^2.2",
         "nesbot/carbon": "^2.64",
+        "rawilk/laravel-printing": "^3.0",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-latest"
+        ,
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
@@ -32,9 +33,6 @@
         "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {
-        "classmap": [
-            "app/Printing"
-        ],
         "files": [
             "app/Helpers/Helper.php"
         ],

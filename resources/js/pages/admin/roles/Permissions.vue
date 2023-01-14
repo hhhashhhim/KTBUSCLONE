@@ -85,6 +85,8 @@ export default {
     };
   },
   async created() {
+      window.removeEventListener('keydown', this.enter);
+      window.removeEventListener('keydown', this.altM);
     let role_id = this.$route.params.id;
     const res = await this.callApi("post", "role/get", { id: role_id });
     if (res.status == 200) {

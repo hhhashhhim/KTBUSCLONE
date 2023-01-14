@@ -1534,7 +1534,7 @@ export default {
         getClasses: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
-            let partial = col.partial ? "partial" : "";
+            let partial = col.partial == 1 ? "partial" : "";
             let over = col.over_issue && col.partial ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
@@ -2096,6 +2096,19 @@ export default {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     background-color: rgba(0, 0, 0, 0.8);
+}
+
+.femaleReserve::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: -1;
+    height: 100%;
+    width: 50%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: hotpink !important;
 }
 
 .seat-img {

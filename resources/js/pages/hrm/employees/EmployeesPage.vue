@@ -652,6 +652,8 @@ export default {
     },
     async created() {
         await this.fetchEmployees();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
 
     methods: {

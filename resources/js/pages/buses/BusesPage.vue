@@ -339,7 +339,9 @@ export default {
         };
     },
     async created() {
-        await this.fetchBuses();
+        await this.fetchBuses()
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
 
     methods: {

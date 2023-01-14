@@ -261,6 +261,8 @@ export default {
     },
     async created() {
        await this.fetchDiscount();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
     },
     methods: {
         numberRange: function(evt) {
