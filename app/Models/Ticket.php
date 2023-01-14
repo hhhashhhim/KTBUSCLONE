@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Booking\TicketELT;
 use App\Models\Bus\BusClass;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
@@ -65,5 +66,8 @@ class Ticket extends Model
         return $this->hasOne(Terminal::class, 'id', 'terminal_id');
     }
 
-
+    public function ticketElt()
+    {
+        return $this->hasOne(TicketELT::class, 'ticket_id', 'id');
+    }
 }

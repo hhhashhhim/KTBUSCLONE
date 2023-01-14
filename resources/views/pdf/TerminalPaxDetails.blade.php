@@ -85,6 +85,7 @@
     <div class="companyAddress">
         <div style=" padding-bottom: 5px;"><span style="font-weight:600">Main Pirwadhai Mor Peshawar Road
                     Rawalpindi</span></div>
+        <div style=" padding-bottom: 5px;"><span style="font-weight:600">Main</span></div>
         <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b>03-111-777-333 </span></div>
         <div><span><b>Phone # : </b>03-111-777-333 </span></div>
     </div>
