@@ -129,9 +129,14 @@
                         </vue-mask>
                     </div>
 
-                    <div class="col-md-12 d-flex align-items-center">
-                        <div class="col-md-6">
-                            <h5>Select Food/Deal</h5>
+                    <div class="col-md-12 d-flex align-items-center" v-if="postData.hotelId">
+                        <div class="col-md-6 px-0 mb-1">
+                            <!-- <h5 class="mb-0 mx-2">Select Food/Deal</h5> -->
+                            <button data-target="#showDetails" data-toggle="modal"
+                                    @click="hotelItems(postData.hotelId)"
+                                    class="btn btn btn-primary m-1">
+                                    Show Food/Deal
+                            </button>
                         </div>
                     </div>
                     <div class="form-group col-md-12 d-flex align-items-center">
@@ -175,7 +180,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="orderBook" :disabled="loading" >{{loading ? 'Loading...' : 'Link' }}
+                    <button type="button" class="btn btn-primary" @click="orderBook" :disabled="loading" >{{loading ? 'Loading...' : 'Order' }}
                     </button>
                 </template>
             </Add>
@@ -253,44 +258,47 @@
             </Edit> -->
 
             <!--            Details Model-->
-            <!-- <div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Route Fare Chart</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Detail</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-
-                                    <th>Fleet Part</th>
-                                    <th>Maintenance Required After</th>
-                                    <th>Last Maintenance At</th>
-                                    <th>Last Maintenance Date</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(single, i) in fleetDetails.maintenance_part_link" :key="i">
-
-                                        <td> {{ single.maintenance_part.name }}</td>
-                                        <td> {{ single.maintenance_after }} (km)</td>
-                                        <td> {{ single.maintenance_at }} (km)</td>
-                                        <td> {{ single.maintenance_date??'N/A' }}</td>
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Food/Deal</th>
+                                        <th>Price</th>
                                     </tr>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(food, i) in hotelFoods" :key="i" class="border-bottom">
+                                            <td class="font-weight-bold"> {{ food.name }}</td>
+                                            <td> {{ food.price }}</td>
+                                        </tr>
+                                        <tr v-for="(deal, i) in hotelDeals" :key="i" class="border-bottom">
+                                            <td class="font-weight-bold"> {{ deal.name }}
+                                            <div class="d-flex font-weight-normal" v-for="(dealFood, k) in deal.deal_details" :key="k">
+                                                <p class="mb-0">{{ dealFood.food.name }} :</p>
+                                                <p class="mb-0">{{ dealFood.quantity + " (" + dealFood.food.unit + ")"}}</p>
+                                            </div>
+                                            </td>
+                                            <td> {{ deal.price }} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
 
 
 
@@ -320,6 +328,8 @@ export default {
             busId: "",
             hotels: [],
             items: [],
+            hotelFoods: [],
+            hotelDeals: [],
             schedule: "",
             postData : {
                 ticketClosingId: "",
@@ -417,6 +427,17 @@ export default {
             });
             if (items.status === 200) {
                 this.items = items.data;
+            }
+        },
+        async hotelItems(id)
+        {
+            this.hotelFoods = [];
+            const items = await this.callApi("post", "refreshments/hotels/items", {
+                id: id
+            });
+            if (items.status === 200) {
+                this.hotelFoods = items.data.foods;
+                this.hotelDeals = items.data.deals;
             }
         },
         async orderBook() {

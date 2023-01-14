@@ -83,6 +83,21 @@ class FoodOrderController extends Controller
         
         return $data =  [...$food,...$foodDeal];
     }
+    
+    public function hotelAllItems(Request $request)
+    {
+        $foods = HotelFood::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get();
+        $deals = HotelFoodDeal::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])
+        ->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")
+        ->get();
+       
+        $data = [
+            "foods" => $foods,
+            "deals" => $deals,
+        ];
+        return $data;
+    }
+
     public function orderBook(Request $request)
     {
         $request->validate([
