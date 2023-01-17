@@ -70,7 +70,7 @@ class BookingController extends Controller
             ->where('departure_date', $request->date)
             ->where('company_id', Auth::user()->company_id)
             ->first();
-        $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id ,  'schedule_date' => $detail->schedule_date, 'schedule_id'=>$request->schedule])->latest()->first(['bus_id', 'ticket_closing_id']);
+        $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id']);
         $allTicket = [];
         if (isset($request->flag) && $request->flag == 1) {
             $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
@@ -82,7 +82,9 @@ class BookingController extends Controller
             if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                 $isPartial = 1;
             }
-            $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+            if ($request->customerCNIC) {
+                $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+            }
 
             // Fare Fetching About the Schedule
             if (!$customer) {

@@ -50,16 +50,6 @@
                                         </option>
                                     </select>
                                 </div>
-                                <!--                                <div class="col-md-2  mb-2">-->
-                                <!--                                    <label for="buses" class="mb-0">Bus</label>-->
-                                <!--                                    <select class="form-control" id="buses" @change="assignBusToSchedule()"-->
-                                <!--                                            v-model="assignBus">-->
-                                <!--                                        <option value="0">Select Bus</option>-->
-                                <!--                                        <option v-for="(bus, i) in buses"-->
-                                <!--                                                :value="bus.id" :key="i">{{ bus.bus_number }}-->
-                                <!--                                        </option>-->
-                                <!--                                    </select>-->
-                                <!--                                </div>-->
                                 <div class="col-md-2  mb-2">
                                     <label class="mb-0">Action</label>
                                     <button @click="fetchScheduleData" class="btn btn-block btn-danger"
@@ -806,6 +796,7 @@ import ReschedulePopup from "./popup/ReschedulePopup.vue";
 import OverIssuePopup from "./popup/OverIssuePopup.vue";
 import DetailsModal from "./popup/DetailsModal.vue";
 
+
 export default {
     name: "BookingPage",
     components: {
@@ -1181,19 +1172,6 @@ export default {
                     }
                 }
             }
-            if (flag == 'overIssueCNIC') {
-                if (this.addFormOverIssue.customer.cnic == '' && this.addFormOverIssue.customer.cnic == 'undefined') {
-                    const resCnic = await this.callApi("post", "booking/getCNIC", {
-                        cnicNumber: this.addFormOverIssue.customer.cnic,
-                        status: flag,
-
-                    });
-                    if ((this.addFormOverIssue.customer.name == '' || typeof this.addFormOverIssue.customer.name == 'undefined') && (this.addFormOverIssue.customer.contact == '' || typeof this.addFormOverIssue.customer.contact == 'undefined')) {
-                        this.addFormOverIssue.customer.name = resCnic.data.name;
-                        this.addFormOverIssue.customer.contact = resCnic.data.contact;
-                    }
-                }
-            }
             if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
@@ -1203,18 +1181,6 @@ export default {
                     if ((this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined') && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined')) {
                         this.addForm.customerCNIC = resCnic.data.cnic;
                         this.addForm.customerName = resCnic.data.name;
-                    }
-                }
-            }
-            if (flag == 'overIssueContact' && this.addFormOverIssue.customer.name == '' && this.addFormOverIssue.customer.cnic == '') {
-                if (this.addFormOverIssue.customer.contact != '' && this.addFormOverIssue.customer.contact != 'undefined') {
-                    const resCnic = await this.callApi("post", "booking/getCNIC", {
-                        phoneNumber: this.addFormOverIssue.customer.contact,
-                        status: flag,
-                    });
-                    if ((this.addFormOverIssue.customer.cnic == '' || typeof this.addFormOverIssue.customer.cnic == 'undefined') && (this.addFormOverIssue.customer.name == '' || typeof this.addFormOverIssue.customer.name == 'undefined')) {
-                        this.addFormOverIssue.customer.name = resCnic.data.name;
-                        this.addFormOverIssue.customer.cnic = resCnic.data.cnic;
                     }
                 }
             }
@@ -1550,7 +1516,7 @@ export default {
         },
 
         getTitle: function (col) {
-            if (col.type == 'booked' || col.type == 'advance booking') {
+            if (col.type == 'booked' || col.type == 'advance booking' || col.over_issue) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
@@ -1577,10 +1543,10 @@ export default {
                     timer: 2000
                 });
             }
-            if ((this.addForm.customerCNIC == '' || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
+            if ((this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined') && this.addForm.type != 'advance booking') {
                 return swal({
                     title: "Required!",
-                    text: "CNIC is Required and Should Contain 13 Digits",
+                    text: "CNIC is Required ",
                     icon: "error",
                     timer: 2000
                 });
@@ -1611,12 +1577,18 @@ export default {
             }
             const res = await this.callApi("post", "booking/store", this.addForm);
             if (res.status == 200) {
-                swal({
-                    title: "Success",
-                    text: "Booking Created Successfully",
-                    icon: "success",
-                    timer: 2000
+                iziToast.success({
+                    title: 'Success!',
+                    message: 'Booking Created Successfully',
+                    position: 'topRight',
+                    hideAfter: 2000
                 });
+                // swal({
+                //     title: "Success",
+                //     text: "Booking Created Successfully",
+                //     icon: "success",
+                //     timer: 2000
+                // });
                 this.addForm = {
                     date: new Date().toISOString().substr(0, 10),
                     totalAmount: 0,
@@ -2038,6 +2010,9 @@ export default {
         // Get Bus Invoice
         getBusInvoice: function () {
             this.$refs.refBusInvoice.submit();
+        },
+
+        testTicket: function () {
         }
     },
 };

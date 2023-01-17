@@ -333,8 +333,8 @@ class ScheduleController extends Controller
         }
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
-        for ($i = 0; $i < count($seatMap); $i++) {
-            foreach ($seatMap[$i] as $j => $column) {
+        foreach ($seatMap as $i => $iValue) {
+            foreach ($iValue as $j => $column) {
                 // adding fare to each seat
                 if ($column['reserved']) {
                     $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
@@ -375,7 +375,7 @@ class ScheduleController extends Controller
 
                         if ($before || $after) {
                             // removing partial tag for that seats which fullfill the conditions
-                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
+                            unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
 
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
@@ -387,6 +387,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
                     $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
+                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
