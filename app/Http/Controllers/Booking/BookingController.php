@@ -60,8 +60,8 @@ class BookingController extends Controller
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
 
-        try {
-            DB::beginTransaction();
+//        try {
+//            DB::beginTransaction();
 
             // this is for get actual schedule date
             $detail = ScheduleDetail::where("departure_id", $request->departureCity)
@@ -181,10 +181,10 @@ class BookingController extends Controller
                 'data' => implode('-', $allTicket),
                 'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
             ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
-        }
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+//        }
     }
 
     public function reschedule(Request $request)
