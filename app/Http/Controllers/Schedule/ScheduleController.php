@@ -308,10 +308,10 @@ class ScheduleController extends Controller
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
 
-        $start_datetime = new DateTime(date('Y-m-d H:i:s'));
-        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
-        $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp()) / 60;
-        $leavingIn30Min = $diffInMins > 30 ? false : true;
+//        $start_datetime = new DateTime(date('Y-m-d H:i:s'));
+//        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
+//        $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp()) / 60;
+//        $leavingIn30Min = $diffInMins > 30 ? false : true;
 
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)
@@ -341,7 +341,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['fare'] = (int)$data->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-                if ($result !== false && $leavingIn30Min != true) {
+                if ($result !== false ) {   /*&& $leavingIn30Min != true*/
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
@@ -382,19 +382,19 @@ class ScheduleController extends Controller
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
                     }
                 }
-                if ($result !== false && $leavingIn30Min) {
-                    $seatMap[$i][$j]['over_issue'] = true;
-                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
-                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
-                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
-                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
-                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
-                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
-                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
-                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
-                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
-                }
+//                if ($result !== false && $leavingIn30Min) {
+//                    $seatMap[$i][$j]['over_issue'] = true;
+//                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
+//                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
+//                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
+//                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
+//                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+//                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+//                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+//                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+//                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+//                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+//                }
 //                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();

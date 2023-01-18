@@ -7,10 +7,10 @@
                         <div class="card-header">
                             <h4>Users</h4>
                             <div class="card-header-action">
-                                <a v-if="showButton()"
-                                   data-toggle="modal" @click="this.updateTerminal == 0"
-                                   data-target="#assignTerminalUser"
-                                   class="btn btn-primary text-light mr-2"
+                                <a
+                                    data-toggle="modal" @click="getAuthTerminal()"
+                                    data-target="#assignTerminalUser"
+                                    class="btn btn-primary text-light mr-2"
                                 >
                                     Assign Terminal To Company Admin (Yourself)
                                 </a>
@@ -414,7 +414,14 @@ export default {
         showButton: function () {
             return this.authCheck == 0;
         },
-
+        async getAuthTerminal () {
+            const resDepart = await this.callApi("post", 'terminals/all');
+            if (resDepart.status == 200) {
+                this.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
+            } else {
+                console.log(resDepart);
+            }
+        },
         clearForm: function () {
             this.data.name = "";
             this.data.email = "";
@@ -441,7 +448,8 @@ export default {
 
             const resDepart = await this.callApi("post", 'terminals/all');
             if (resDepart.status == 200) {
-                this.terminals = resDepart.data
+                this.terminals = resDepart.data.terminals;
+                this.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
             } else {
                 console.log(resDepart);
             }
@@ -533,18 +541,17 @@ export default {
             }
             this.loadingTerminal = true;
             const resTerminalUpdate = await this.callApi("post", "user/update/terminal", {terminal_id: this.updateTerminal});
-            if (resTerminalUpdate.status == 201) {
+            if (resTerminalUpdate.status == 200) {
                 this.loadingTerminal = false;
+                this.updateTerminal = resTerminalUpdate.data.terminal_id;
                 this.fetchUsers();
+                $('#assignTerminalUser').modal('hide');
                 swal({
                     title: "Success!!",
                     text: "Terminal Id Successfully Updated",
                     icon: "success",
                     timer: 2000
                 });
-                // setTimeout(function () {
-                //     window.location.reload();//code goes here
-                // }, 3000);
             }
             if (resTerminalUpdate.status == 422) {
                 this.loadingTerminal = false;

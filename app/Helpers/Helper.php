@@ -6,7 +6,9 @@ use App\Models\Customer;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
+use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
+use App\Models\Schedule\Schedule;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
@@ -393,5 +395,15 @@ if (!function_exists('getMembers')) {
                 [];
         }
         return [];
+    }
+}
+
+
+//Get route name
+if (!function_exists('routeName')) {
+    function routeName($id)
+    {
+        $routeId = Schedule::where('id', $id)->first(['route_id'])->route_id;
+        return Route::where('id', $routeId)->first(['id', 'name'])->name;
     }
 }
