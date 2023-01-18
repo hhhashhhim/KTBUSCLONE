@@ -10,6 +10,7 @@ use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
+use App\Models\Route\Route;
 use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
@@ -156,31 +157,31 @@ class BookingController extends Controller
                     ]);
                 }
 
-                if ($request->type == 'advance booking') {
-                    TicketAdvancedBooked::create([
-                        'company_id' => Auth::user()->company_id,
-                        'departure_city_id' => $ticket->departure_city_id,
-                        'destination_city_id' => $ticket->destination_city_id,
-                        'ticket_id' => $ticket->id,
-                        'seat_no' => $ticket->seat_no,
-                        'seat_fare' => $ticket->seat_fare,
-                        'booking_no' => $ticket->booking_no,
-                        'date' => $ticket->date,
-                        'customer_id' => $ticket->customer_id,
-                        'schedule_id' => $ticket->schedule_id,
-                        'gender' => $ticket->gender,
-                        'type' => $ticket->type,
-                        'added_by' => Auth::user()->id,
-                    ]);
+                    if ($request->type == 'advance booking') {
+                        TicketAdvancedBooked::create([
+                            'company_id' => Auth::user()->company_id,
+                            'departure_city_id' => $ticket->departure_city_id,
+                            'destination_city_id' => $ticket->destination_city_id,
+                            'ticket_id' => $ticket->id,
+                            'seat_no' => $ticket->seat_no,
+                            'seat_fare' => $ticket->seat_fare,
+                            'booking_no' => $ticket->booking_no,
+                            'date' => $ticket->date,
+                            'customer_id' => $ticket->customer_id,
+                            'schedule_id' => $ticket->schedule_id,
+                            'gender' => $ticket->gender,
+                            'type' => $ticket->type,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
+                    $allTicket[] = $ticket->id;
                 }
-                $allTicket[] = $ticket->id;
+                // printTicket($allTicket, Auth::user()->company_id);
             }
-            printTicket($allTicket, Auth::user()->company_id);
-        }
-        return [
-            'data' => implode('-', $allTicket),
-            'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
-        ];
+            return [
+                'data' => implode('-', $allTicket),
+                'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
+            ];
 //        } catch (\Exception $e) {
 //            DB::rollBack();
 //            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
@@ -478,12 +479,47 @@ class BookingController extends Controller
 
     public function busInvoice(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departure_city_id,
+            'destination_id' => $request->destination_city_id,
+            ])->first()->schedule_date;
+        $route = Schedule::where([
+            'company_id' => Auth::user()->company_id,
+            'id' => $request->schedule_id,
+        ])->with('route')->first()->route;
+        $scheduleDeparture = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])->first();
 
+        // this is for general data
+        $infoData = (object)[];
+        $infoData->route = $route->name;
+        $infoData->departure_date = $scheduleDeparture->schedule_date;
+        $infoData->departure_time = $scheduleDeparture->departure_time;
+        $infoData->current_terminal = Terminal::where([
+            'company_id' => Auth::user()->company_id,
+            'id' => Auth::user()->terminal_id,
+        ])->first()->name;
+
+        $mainData = Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])
+        ->with("terminal:id,name","destination_city:id,name")
+        ->get()->groupBy(["terminal_id","destination_city_id"]);
+
+
+        return view('pdf/PrintBusInvoice',["infoData"=>$infoData,"mainData"=>$mainData]);
     }
 
-    public
-    function duplicatePdf(Request $request)
+    public function duplicatePdf(Request $request)
     {
         printTicket([$request->id], Auth::user()->company_id, 1);
     }
