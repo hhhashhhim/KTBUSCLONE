@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
+use Illuminate\Support\Facades\Session;
+use Rawilk\Printing\Receipts\ReceiptPrinter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +17,9 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+        $printers = Printing::printers();
+        Session::put('printerId', $printers->first()->id());
+
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }
