@@ -13,6 +13,7 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/iziToast.min.css') }}">
     <!-- Custom style CSS -->
     <link rel='shortcut icon' type='image/x-icon' href='{{ asset('assets/img/fav-logo.png') }}'/>
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
@@ -51,6 +52,7 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <!-- Custom JS File -->
 <script src="{{ asset('assets/js/custom.js') }}"></script>
+<script src="{{ asset('assets/js/iziToast.min.js') }}"></script>
 <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
 <script src="{{ asset('assets/js/bootstrap-timepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>

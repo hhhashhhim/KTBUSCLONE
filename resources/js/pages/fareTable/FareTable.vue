@@ -238,11 +238,10 @@ export default {
                 setTimeout(() => {
                     this.success = "";
                     // $("#fareTable_form").hide();
-                    $("#fareTable_form").css("display", "none");
                     // window.location.reload();
                 }, 2000);
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {

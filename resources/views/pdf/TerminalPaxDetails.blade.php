@@ -4,14 +4,7 @@
 <head>
     <script src="{{ asset('assets/js/app.min.js') }}"></script>
     <style>
-        @media print {
-            @page {
-                size: portait
-            }
-        }
-
         @page {
-            /* transform: rotate(-90deg); */
             padding: 0;
             margin: 10px;
         }
@@ -78,16 +71,15 @@
     </style>
     <title>Terminal Passenger List </title>
 </head>
-
+{{--{{dd($format)}}--}}
 <body>
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">Main Pirwadhai Mor Peshawar Road
-                    Rawalpindi</span></div>
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">Main</span></div>
-        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b>03-111-777-333 </span></div>
-        <div><span><b>Phone # : </b>03-111-777-333 </span></div>
+        <div style=" padding-bottom: 5px;"><span style="font-weight:600">   {{ $format->address }}</span></div>
+        <div style=" padding-bottom: 5px;"><span style="font-weight:600">{{$format->terminal->name}}</span></div>
+        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> {{ formatUAN($format->uan) }}</span></div>
+        <div><span><b>Phone # : </b>{{ formatContact($format->phone) }}</span></div>
     </div>
 </div>
 <br>
@@ -112,8 +104,8 @@
 <br>
 <table border="2" id="table2">
     <tr>
-        <th> Sr # </th>
-        <th>Seat # </th>
+        <th> Sr #</th>
+        <th>Seat #</th>
         <th>Name</th>
         <th>CNIC</th>
         <th>Dept City</th>
@@ -125,8 +117,8 @@
 
     </tr>
     <tr>
-        <td> Sr # </td>
-        <td>Seat # </td>
+        <td> Sr #</td>
+        <td>Seat #</td>
         <td>Name</td>
         <td>CNIC</td>
         <td>Dept City</td>
@@ -138,8 +130,8 @@
 
     </tr>
     <tr>
-        <td> Sr # </td>
-        <td>Seat # </td>
+        <td> Sr #</td>
+        <td>Seat #</td>
         <td>Name</td>
         <td>CNIC</td>
         <td>Dept City</td>
@@ -163,7 +155,7 @@
         <th>0</th>
     </tr>
     <tr>
-        <th colspan="9"> Terminal Discount </th>
+        <th colspan="9"> Terminal Discount</th>
         <th>0</th>
     </tr>
     <tr>
@@ -183,11 +175,11 @@
         <th>0</th>
     </tr>
     <tr>
-        <th colspan="9"> Main Net Sale </th>
+        <th colspan="9"> Main Net Sale</th>
         <th>0</th>
     </tr>
     <tr>
-        <th colspan="9"> Bank Deposit Amount </th>
+        <th colspan="9"> Bank Deposit Amount</th>
         <th>0</th>
     </tr>
     <tr>

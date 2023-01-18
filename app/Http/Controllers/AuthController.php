@@ -17,8 +17,9 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-        $printers = Printing::printers();
-        Session::put('printerId', $printers->first()->id());
+//        $date = date_create(date('Y-m-d H:i:s'));
+//        echo date_format($date, "l");
+//        die();
 
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
