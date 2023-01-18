@@ -471,7 +471,12 @@ class BookingController extends Controller
         $routeName = routeName($request->schedule_id);
         $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
         $date = date_format(date_create($uniqueDate . ' ' . $scheduleTime), "l") . ' , ' . date_format(date_create($uniqueDate . ' ' . $scheduleTime), "d F Y H:i:s A");
-        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date];
+        $eltAmount = 0;
+//        foreach ($passengerData as $passenger){
+//            return $passenger;
+//            $eltAmount += $passenger->ticket_elt->sum('elt_price');
+//        }
+        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount];
         $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
 
         return view('pdf/terminalPaxDetails', ['data' => $passengerData, 'format' => $format]);

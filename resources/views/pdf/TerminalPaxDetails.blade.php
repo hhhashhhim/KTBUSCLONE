@@ -128,7 +128,7 @@
         <th>Ticket Booked By</th>
 
     </tr>
-{{--        {{dd($data['record'])}}--}}
+    {{--        {{dd($data['record'])}}--}}
     @if(count($data['record']) > 0)
         @foreach ($data['record'] as $key => $item)
             <tr>
@@ -212,13 +212,56 @@
 <table border="2" id="table3">
     <tr>
         <th>Driver One Name</th>
-        <td>Shehbaz Haider Ali</td>
-        <th>Driver Two Name</th>
-        <td>Shehbaz Haider Ali</td>
+        @if($data['driverInfo'])
+            @if(count($data['driverInfo']) > 0)
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+                    @foreach($data['driverInfo'] as $key => $value)
+
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+
+                    @endforeach
+
+                </td>
+            @else
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </td>
+            @endif
+        @endif
+
         <th>Hostess Name</th>
-        <td>Hostess Name</td>
+        @if($data['hostInfo'])
+            @if(count($data['hostInfo']) > 0)
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+                    @foreach($data['hostInfo'] as $key => $value)
+
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+
+                    @endforeach
+
+                </td>
+            @else
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </td>
+            @endif
+        @endif
+
     </tr>
 </table>
+<br>
+<br>
+<hr>
+<br>
+<br>
+<br>
+<br>
+<div style="float: right">
+    <p style="font-size: medium; font-weight: 600">Terminal Manager Signature <span style="font-weight: normal">..........................................</span>
+    </p>
+</div>
 {{--<script type="text/javascript">--}}
 {{--    window.onload = function () {--}}
 {{--        window.print();--}}
