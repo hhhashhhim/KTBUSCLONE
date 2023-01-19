@@ -10,6 +10,7 @@ use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
+use App\Models\Route\Route;
 use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
@@ -175,7 +176,7 @@ class BookingController extends Controller
                     }
                     $allTicket[] = $ticket->id;
                 }
-                printTicket($allTicket, Auth::user()->company_id);
+                // printTicket($allTicket, Auth::user()->company_id);
             }
             return [
                 'data' => implode('-', $allTicket),
@@ -374,8 +375,8 @@ class BookingController extends Controller
         if (is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
         }
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
             $ticket = Ticket::where([
                 'company_id' => Auth::user()->company_id,
                 'date' => $request->date,
@@ -400,13 +401,12 @@ class BookingController extends Controller
                 'elt_description' => $request->eltDescription,
                 'added_by' => Auth::user()->id,
             ]);
-            $elt = TicketELT::with('addedBy', 'departure', 'destination', 'departure', 'updated_by', 'company', 'ticket', 'customer', 'schedule')->where('id', $elt->id)->first();
-            printEltTicket($elt->id, Auth::user()->company_id);
+                    // printEltTicket($elt->id, Auth::user()->company_id);
             return $elt;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+        // }
     }
 
     public
@@ -470,15 +470,49 @@ class BookingController extends Controller
         return view('pdf/terminalPaxDetails', ['data' => $passengerData, 'format' => $format]);
     }
 
-    public
-    function busInvoice(Request $request)
+    public function busInvoice(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departure_city_id,
+            'destination_id' => $request->destination_city_id,
+            ])->first()->schedule_date;
+        $route = Schedule::where([
+            'company_id' => Auth::user()->company_id,
+            'id' => $request->schedule_id,
+        ])->with('route')->first()->route;
+        $scheduleDeparture = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])->first();
 
+        // this is for general data
+        $infoData = (object)[];
+        $infoData->route = $route->name;
+        $infoData->departure_date = $scheduleDeparture->schedule_date;
+        $infoData->departure_time = $scheduleDeparture->departure_time;
+        $infoData->current_terminal = Terminal::where([
+            'company_id' => Auth::user()->company_id,
+            'id' => Auth::user()->terminal_id,
+        ])->first()->name;
+
+        $mainData = Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])
+        ->with("terminal:id,name","destination_city:id,name")
+        ->get()->groupBy(["terminal_id","destination_city_id"]);
+       
+        
+        return view('pdf/PrintBusInvoice',["infoData"=>$infoData,"mainData"=>$mainData]);
     }
 
-    public
-    function duplicatePdf(Request $request)
+    public function duplicatePdf(Request $request)
     {
         printTicket([$request->id], Auth::user()->company_id, 1);
     }
