@@ -26,5 +26,10 @@ class TicketClosingMember extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
+    
+    public function member_name()
+    {
+        return $this->hasOne( User::class, 'id', 'user_id' );
+    }
 
 }

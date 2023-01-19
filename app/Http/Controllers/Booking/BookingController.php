@@ -17,6 +17,7 @@ use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -515,14 +516,25 @@ class BookingController extends Controller
         ])->first()->name;
 
         $mainData = Ticket::where([
+            'tickets.company_id' => Auth::user()->company_id,
+            'tickets.schedule_id' => $request->schedule_id,
+            'tickets.schedule_date' => $uniqueDate,
+        ])
+        ->with("terminal:id,name","destination_city:id,name")
+        ->leftJoin("ticket_e_l_t_s","ticket_e_l_t_s.ticket_id","tickets.id") //this for if elt exist show else null
+        ->select("tickets.*","ticket_e_l_t_s.elt_price")
+        ->get()->groupBy(["terminal_id","destination_city_id"]);
+        
+        $busData = TicketClosing::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])
-        ->with("terminal:id,name","destination_city:id,name")
-        ->get()->groupBy(["terminal_id","destination_city_id"]);
+        ->with("bus:id,bus_number","members:id,user_id,ticket_closing_id,type","members.member_name:id,name,contact")
+        ->first(["id","bus_id"]);
 
-
+        $infoData->bus_data = $busData;
+        
         return view('pdf/PrintBusInvoice',["infoData"=>$infoData,"mainData"=>$mainData]);
     }
 

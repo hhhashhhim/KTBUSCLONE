@@ -82,14 +82,14 @@
 <br>
 <hr>
 <br>
-<table border="2" id="table1">
+<table border="2" id="table1" style="text-transform: capitalize;">
     <tr>
         <th class="centerTH">Route:</th>
         <th>{{ $infoData->route }}</th>
         <th class="centerTH">Date& Time</th>
         <th>{{ date("m/d/Y h:i:s A",strtotime($infoData->departure_date.' '.$infoData->departure_time)) }}</th>
         <th class="centerTH">Bus No:</th>
-        <th>-</th>
+        <th>{{$infoData->bus_data ? $infoData->bus_data->bus->bus_number : 'Bus Not Alloted Yet'}}</th>
     </tr>
 </table>
 <br>
@@ -112,6 +112,7 @@
         $totalSeat = 0;
         $totalSale = 0;
         $totalDiscount = 0;
+        $totalElt = 0;
     @endphp
     @foreach($mainData as $terminal)
     @foreach($terminal as $destination)
@@ -132,9 +133,12 @@
         @php
             $totalDiscount += $destination->sum("discount")
         @endphp
-        <td>Departure City Name</td>
-        <td>Departure City Name</td>
-        <td>{{ $destination->sum("seat_fare") - $destination->sum("discount") }}</td>
+        <td>-</td>
+        <td>{{ $destination->sum("elt_price") }}</td>
+        @php
+            $totalElt += $destination->sum("elt_price")
+        @endphp
+        <td>{{ ($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount") }}</td>
     </tr>
     @endforeach
     @endforeach
@@ -145,17 +149,16 @@
         <th>{{ $totalSale }}</th>
         <th>{{ $totalDiscount }}</th>
         <th>-</th>
-        <th>-</th>
-        <th>{{ $totalSale - $totalDiscount }}</th>
+        <th>{{ $totalElt }}</th>
+        <th>{{ ($totalSale + $totalElt) - $totalDiscount }}</th>
     </tr>
     <tr>
         <th colspan="8">Main Terminal Fixed Commision</th>
-        <th>-</th>
-        <th></th>
+        <th colspan="2">-</th>
     </tr>
     <tr>
         <th colspan="8">Gross Sale</th>
-        <th colspan="2">-</th>
+        <th colspan="2">{{ ($totalSale + $totalElt) - $totalDiscount }}</th>
     </tr>
 </table>
 <br>
@@ -163,16 +166,32 @@
 <br>
 <br>
 <div style="padding-bottom: 8px;">
-    <span style="font-weight: 900;font-size:12pt;">Driver One Name:</span>
-    <span style="font-size: 12pt; padding-left: 10px;">-</span>
+    <span style="font-weight: 900;font-size:12pt;">Drivers Name:</span>
+    <span style="font-size: 12pt; padding-left: 10px;">
+    @if($infoData->bus_data)
+        @foreach($infoData->bus_data->members as $data)
+            @if($data->type == 1)
+                {{ $data->member_name->name . " (". $data->member_name->contact .") |" }}
+            @endif
+        @endforeach
+    @else
+        Bus Not Alloted Yet
+    @endif
+    </span>
 </div>
 <div style="padding-bottom: 8px;">
-    <span style="font-weight: 900;font-size:12pt;">Driver Two Name:</span>
-    <span style="font-size: 12pt; padding-left: 10px;">-</span>
-</div>
-<div style="padding-bottom: 8px;">
-    <span style="font-weight: 900;font-size:12pt;">HostessName:</span>
-    <span style="font-size: 12pt; padding-left: 10px;">-</span>
+    <span style="font-weight: 900;font-size:12pt;">Hosts Name:</span>
+    <span style="font-size: 12pt; padding-left: 10px;">
+    @if($infoData->bus_data)
+        @foreach($infoData->bus_data->members as $data)
+            @if($data->type == 2)
+                {{ $data->member_name->name . " (". $data->member_name->contact .") |" }}
+            @endif
+        @endforeach
+    @else
+        Bus Not Alloted Yet
+    @endif
+    </span>
 </div>
 <script type="text/javascript">
     // window.onload = function () {

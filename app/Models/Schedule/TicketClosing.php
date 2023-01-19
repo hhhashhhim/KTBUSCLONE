@@ -34,5 +34,9 @@ class TicketClosing extends Model
     {
         return $this->hasOne( Schedule::class, 'id', 'schedule_id' );
     }
+    public function members()
+    {
+        return $this->hasMany( TicketClosingMember::class, 'ticket_closing_id', 'id' );
+    }
 
 }
