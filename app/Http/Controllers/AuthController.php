@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
+use DateTime;
 use Illuminate\Support\Facades\Session;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 use Illuminate\Http\Request;

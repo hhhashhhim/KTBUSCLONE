@@ -224,7 +224,7 @@ export default {
                 });
             this.loading = true;
             const res = await this.callApi("post", "fare-table/store", this.data);
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -254,7 +254,7 @@ export default {
 
         async getClasses() {
             const res = await this.callApi("post", 'fare-table/fare_class/get');
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.fareClasses = res.data
             } else {
                 console.log(res);
@@ -270,7 +270,7 @@ export default {
                 to: to.id,
                 fare_class: this.data.fare_class,
             });
-            if (resGetTerminal.status === 200 && resGetTerminal.data !== '') {
+            if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
                 this.data = resGetTerminal.data;
                 this.data.created = 1;
             }else{
@@ -291,7 +291,7 @@ export default {
                 const res = await this.callApi("post", "fare-table", {
                     company_id: this.data.company_id, fare_class: this.data.fare_class
                 });
-                if (res.status === 200) {
+                if (res.status == 200) {
 
                     this.msg = 2;
                     this.cities = res.data

@@ -176,19 +176,23 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
                                v-model="data.advance_booking">
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="longitude">Longitude</label>
                         <input type="text" class="form-control" v-model="data.longitude">
                         <small><a href="https://www.google.com/maps" target="_blank">Click Here to get</a></small>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="data.latitude">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="terminal">Fixed Commission <span class=""></span></label>
+                        <input type="text" @keypress="isNumber($event)" maxlength="4" class="form-control" v-model="data.commission">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
@@ -349,16 +353,6 @@
                             :options="optionsContact">
                         </vue-mask>
                     </div>
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-                    <!--                        <vue-mask-->
-                    <!--                            class="form-control"-->
-                    <!--                            v-model="dataEdit.time_difference"-->
-                    <!--                            mask="00:00"-->
-                    <!--                            :raw="false"-->
-                    <!--                            :options="options">-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
                 </div>
                 <div class="row">
                     <div class="form-group col-md-12">
@@ -483,14 +477,6 @@
                                                         >
                                                             <i class="far fa-edit"></i>
                                                         </button>
-                                                        <!--                                                    <button-->
-                                                        <!--                                                        :data-target="'#' + deleteFormID"-->
-                                                        <!--                                                        data-toggle="modal"-->
-                                                        <!--                                                        @click="deleteModal(single, i)"-->
-                                                        <!--                                                        class="btn btn-danger"-->
-                                                        <!--                                                    >-->
-                                                        <!--                                                        <i class="far fa-trash-alt"></i>-->
-                                                        <!--                                                    </button>-->
                                                     </td>
                                                 </tr>
                                                 </tbody>
@@ -584,6 +570,7 @@ export default {
                 active: "",
                 inactive: "",
                 order: "",
+                commission: "",
             },
             dataEdit: {},
             success: false,
@@ -737,8 +724,7 @@ export default {
 
             this.loading = true;
             const res = await this.callApi("post", "terminals/store", this.data);
-            if (res.status === 200) {
-                // swal('Success', 'Terminal Created Successfully', 'success');
+            if (res.status == 200) {
                 swal({
                     title: "Success",
                     text: "Terminal Created Successfully",

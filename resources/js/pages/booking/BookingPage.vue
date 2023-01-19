@@ -1589,7 +1589,6 @@ export default {
                 //     timer: 2000
                 // });
                 this.addForm = {
-                    date: new Date().toISOString().substr(0, 10),
                     totalAmount: 0,
                     discount: '',
                     totalFare: 0,
@@ -1600,6 +1599,7 @@ export default {
                     customerCNIC: "",
                     selectedSeats: '',
                 };
+                this.addForm.date = res.data.ticket[0].date;
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
                 this.addForm.schedule = res.data.ticket[0].schedule_id;

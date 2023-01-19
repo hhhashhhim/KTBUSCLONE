@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {{--    <script src="{{ asset('assets/js/app.min.js') }}"></script>--}}
     <style>
         @page {
             transform: rotate(-90deg);
@@ -78,26 +77,32 @@
 <body>
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
+    <br>
+    <div class="companyAddress">
+        <div><span><b>{{ $format->address }}</b></span></div>
+    </div>
+    <br>
     <div class="companyAddress">
         <div><span><b>UAN(24/7) : </b>{{formatUAN($format->uan)}}</span></div>
     </div>
 </div>
+<br>
+{{--{{ dd($remain) }}--}}
 <table border="2" id="table1">
     <tr>
         <th class="centerTH">Schedule:</th>
-        <th class="fontWightTh">{{$format->scheduleName}}</th>
+        <th class="fontWightTh">{{$remain['scheduleName']}}</th>
         <th class="centerTH">Date& Time</th>
-        <th class="fontWightTh">{{$format->actualDeparture}}</th>
-        <th class="centerTH">Bus No:</th>
-        <th class="fontWightTh" style="width: 15% !important;">{{$format->busNo}}</th>
+        <th class="fontWightTh">{{$remain['actualDepart']}}</th>
+        <th class="centerTH">Bus Class:</th>
+        <th class="fontWightTh" style="width: 15% !important;">{{$remain['busNo']->bus_class->name}}</th>
     </tr>
     <tr>
         <th colspan="1" class="centerTH">Driver Info</th>
-        @if($format->driverInfo)
-            @if($format->driverInfo->count() > 0)
+            @if(count($remain['driverInfo']) > 0)
                 <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                    @foreach($format->driverInfo as $key => $value)
+                    @foreach($remain['driverInfo'] as $key => $value)
 
                         <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
@@ -109,13 +114,11 @@
                     N/A
                 </th>
             @endif
-        @endif
         <th colspan="1" class="centerTH">Host Info</th>
-        @if($format->hostInfo)
-            @if($format->hostInfo->count() > 0)
+            @if(count($remain['hostInfo']) > 0)
                 <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                    @foreach($format->hostInfo as $key => $value)
+                    @foreach($remain['hostInfo'] as $key => $value)
 
                         <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
@@ -127,7 +130,6 @@
                     N/A
                 </th>
             @endif
-        @endif
     </tr>
 </table>
 {{--Table for passenger list--}}
@@ -159,10 +161,6 @@
     @endif
 
 </table>
-
-{{--No of Passenger By Terminal Name--}}
-{{--{{dd(\Illuminate\Support\Facades\Auth::user())}}--}}
-
 <div>
     <div class="countPassenger">
         <h1><span style="font-size: 20px;font-weight: 900;padding-right: 7px;">&#10233;</span>No of Passenger By
@@ -230,7 +228,7 @@
 </div>
 <script type="text/javascript">
     window.onload = function () {
-        // window.print();
+        window.print();
     }
 </script>
 </body>

@@ -103,7 +103,7 @@
         @endif
     </tr>
     <tr>
-        <th style="text-align: start;">Bus No:</th>
+        <th style="text-align: start;">Bus Class:</th>
         @if ($data)
             <td style="text-align: end;">{{ $data['busNo']->bus_class->name}}</td>
         @else
@@ -162,16 +162,8 @@
 
     @endif
     <tr>
-        <th colspan="9"> Main Total Online Tickets</th>
-        <th>0</th>
-    </tr>
-    <tr>
-        <th colspan="9"> Main Total Online Tickets Amount</th>
-        <th>0</th>
-    </tr>
-    <tr>
         <th colspan="9"> Terminal Gross Sale</th>
-        <th>0</th>
+        <th>{{ $data['record']->sum('seat_fare') }}</th>
     </tr>
     <tr>
         <th colspan="9"> Terminal Discount</th>
@@ -179,7 +171,7 @@
     </tr>
     <tr>
         <th colspan="9"> Elt Amount</th>
-        <th>0</th>
+        <th>{{ $data['totalElt'] }}</th>
     </tr>
     <tr>
         <th colspan="9"> Terminal Tickets Commission</th>
@@ -198,10 +190,6 @@
         <th>0</th>
     </tr>
     <tr>
-        <th colspan="9"> Bank Deposit Amount</th>
-        <th>0</th>
-    </tr>
-    <tr>
         <th colspan="9">Cash On Bus</th>
         <th>0</th>
     </tr>
@@ -211,29 +199,26 @@
 <br>
 <table border="2" id="table3">
     <tr>
-        <th>Driver One Name</th>
-        @if($data['driverInfo'])
-            @if(count($data['driverInfo']) > 0)
-                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+        <th style="width: 25% !important;">Driver One Name</th>
+        @if(count($data['driverInfo']) > 0)
+            <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
 
-                    @foreach($data['driverInfo'] as $key => $value)
+                @foreach($data['driverInfo'] as $key => $value)
 
-                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                    @endforeach
+                @endforeach
 
-                </td>
-            @else
-                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
-                    N/A
-                </td>
-            @endif
+            </td>
+        @else
+            <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
+                N/A
+            </td>
         @endif
 
-        <th>Hostess Name</th>
-        @if($data['hostInfo'])
+        <th style="width: 25% !important;">Hostess Name</th>
             @if(count($data['hostInfo']) > 0)
-                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
 
                     @foreach($data['hostInfo'] as $key => $value)
 
@@ -243,12 +228,10 @@
 
                 </td>
             @else
-                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
                     N/A
                 </td>
             @endif
-        @endif
-
     </tr>
 </table>
 <br>

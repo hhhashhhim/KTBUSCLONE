@@ -298,8 +298,9 @@ class ScheduleController extends Controller
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+//        return $tickets;
         // Getting Already Booked Tickets
-        $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', Auth::user()->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
+//        $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', Auth::user()->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
 
 
         $schedule = Schedule::where('id', $request->id)
@@ -320,10 +321,7 @@ class ScheduleController extends Controller
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
-
-
         $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
-
         if (count($fareClasses) != count($fareForAllClasses)) {
             return response()->json([
                 "errors" => [
@@ -341,7 +339,8 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['fare'] = (int)$data->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-                if ($result !== false ) {   /*&& $leavingIn30Min != true*/
+
+                if ($result !== false) {   /*&& $leavingIn30Min != true*/
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
@@ -372,11 +371,10 @@ class ScheduleController extends Controller
                             array_search($request->destinationCity, $allFaresOfRoute, true) > array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute, true)
                         );
 
-
                         if ($before || $after) {
-                            // removing partial tag for that seats which fullfill the conditions
+                            // removing partial tag for that seats which fulfill the conditions
                             unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
-
+//                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;

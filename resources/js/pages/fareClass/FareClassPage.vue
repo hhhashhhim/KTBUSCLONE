@@ -238,7 +238,7 @@ export default {
         },
         async fetchFareClasses(){
             const res = await this.callApi("post", 'fare-class');
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.fareClasses = res.data
             }
             setTimeout(function(){
@@ -287,7 +287,7 @@ export default {
             });
                 this.loading = true;
             const res = await this.callApi("post", "fare-class/store", this.data);
-            if (res.status === 201) {
+            if (res.status == 201) {
                swal({
                     title: "Success!",
                     text: "Fare Class Added Successfully",
@@ -305,7 +305,7 @@ export default {
                 window.scrollTo(0, 0);
 
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
 
                     for (const key in res.data.errors) {
@@ -349,7 +349,7 @@ export default {
                 await this.fetchFareClasses();
 
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
 
                     for (const key in res.data.errors) {

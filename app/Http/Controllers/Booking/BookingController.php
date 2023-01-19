@@ -60,7 +60,9 @@ class BookingController extends Controller
         if (is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
-
+        if(count($request->selectedSeats) == 0){
+            return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Refresh the page"]]], 422);
+        }
 //        try {
 //            DB::beginTransaction();
 
@@ -460,7 +462,7 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
-        $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'ticketElt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
+        $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
@@ -472,10 +474,10 @@ class BookingController extends Controller
         $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
         $date = date_format(date_create($uniqueDate . ' ' . $scheduleTime), "l") . ' , ' . date_format(date_create($uniqueDate . ' ' . $scheduleTime), "d F Y H:i:s A");
         $eltAmount = 0;
-//        foreach ($passengerData as $passenger){
-//            return $passenger;
-//            $eltAmount += $passenger->ticket_elt->sum('elt_price');
-//        }
+//        return $passengerData[0]->elt;
+        foreach ($passengerData as $passenger){
+            $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
+        }
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount];
         $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
 
@@ -580,15 +582,14 @@ class BookingController extends Controller
             'type' => 'booked',
         ])->groupBy('destination_city_id')->selectRaw('destination_city_id,count(*) as destinationPassengerCount')->get();
         $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
-        if ($format && count($passengerData) > 0) {
-            $format->countPassenger = count($passengerData);
-            $format->actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
-            $format->driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
-            $format->hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
-            $format->scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
-            $format->busNo = Bus::where(["id" => $passengerData[0]->bus_id, 'company_id' => Auth::user()->company_id])->first()->bus_number ?? 'N/A';
-        }
-        return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup]);
+        $countPassenger = count($passengerData);
+        $actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
+        $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
+        $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
+        $scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
+        $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
+        $remainData = ['passengerCount' => $countPassenger, 'actualDepart'=> $actualDeparture, 'driverInfo'=> $driverInfo, 'hostInfo'=> $hostInfo, 'scheduleName' => $scheduleName, 'busNo' => $busNo];
+        return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup, 'remain'=>$remainData]);
     }
 
 }

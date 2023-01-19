@@ -748,7 +748,7 @@ export default {
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
             const resClass = await this.callApi("post", "fare-class")
-            if (resBusClass.status === 200 && resClass.status == 200) {
+            if (resBusClass.status == 200 && resClass.status == 200) {
                 this.busClasses = resBusClass.data;
                 this.allSeatClasses = resClass.data;
 
@@ -756,7 +756,7 @@ export default {
                 console.log(resBusClass);
             }
             const resFareClass = await this.callApi("post", "fare-class");
-            if (resFareClass.status === 200) {
+            if (resFareClass.status == 200) {
                 this.fareClasses = resFareClass.data;
             } else {
                 console.log(res);
@@ -791,7 +791,7 @@ export default {
                 "buses/storeFareClass",
                 this.addData
             );
-            if (resSaveFareClass.status === 201) {
+            if (resSaveFareClass.status == 201) {
                 swal({
                     title: "Success",
                     text: "Fare Class Added Successfully",
@@ -1073,7 +1073,7 @@ export default {
                 });
             this.loading = true;
             const res = await this.callApi("post", "bus_classes/store", this.data);
-            if (res.status === 201) {
+            if (res.status == 201) {
                 swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
@@ -1089,7 +1089,7 @@ export default {
                 this.isShowDiv = false;
                 window.scrollTo(0, 0);
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
@@ -1138,7 +1138,7 @@ export default {
                 "bus_classes/update",
                 this.dataEdit
             );
-            if (res.status === 200) {
+            if (res.status == 200) {
                 swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",
@@ -1149,7 +1149,7 @@ export default {
                 this.loading = false;
                 await this.fetchBussClasses();
             } else {
-                if (res.status === 422) {
+                if (res.status == 422) {
                     this.loading = false;
 
                     for (const key in res.data.errors) {
