@@ -24,14 +24,20 @@ class TerminalController extends Controller
     {
         return City::withCount('terminal')->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
+
     public function allTerminals()
     {
-        return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']);
+        return [
+            'terminals' => Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']),
+            'authTerminalId' => Auth::user()->terminal_id,
+        ];
     }
+
     public function getTerminal(Request $request)
     {
         return Terminal::with('addedBy')->where('city_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }
+
     public function store(Request $request)
     {
 
@@ -79,10 +85,12 @@ class TerminalController extends Controller
 
         return $this->index();
     }
-    public function  delete(Request $request)
+
+    public function delete(Request $request)
     {
         return Terminal::find($request->id)->delete();
     }
+
     public function update(Request $request)
     {
         $this->validate($request, [
@@ -111,9 +119,9 @@ class TerminalController extends Controller
             'available_seats' => $request->available_seats,
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name,
-            'is_main' => (int) $request->is_main ,
+            'is_main' => (int)$request->is_main,
             'active_sms' => $request->active_sms ? 1 : 0,
-            'status' => (int) $request->status,
+            'status' => (int)$request->status,
         ]);
         return response()->json([
             'message' => 'Updated Successfully',

@@ -85,9 +85,7 @@ class UserController extends Controller
         $user = User::where(['id' => Auth::user()->id, 'company_id' => Auth::user()->company_id])->first();
         $user->terminal_id = $request->terminal_id;
         $user->save();
-        return response()->json([
-            'message' => 'Terminal Id Updated Successfully',
-        ], 201);
+        return $user;
     }
 
 }

@@ -71,7 +71,7 @@
     </style>
     <title>Terminal Passenger List </title>
 </head>
-{{--{{dd($format)}}--}}
+{{--{{dd($data)}}--}}
 <body>
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
@@ -88,15 +88,27 @@
 <table id="table1">
     <tr>
         <th style="text-align: start;">Route:</th>
-        <td style="text-align: end;">Rawalpindi - Karachi</td>
+        @if ($data)
+            <td style="text-align: end;">{{ $data['routeName'] }}</td>
+        @else
+            <td style="text-align: end;"></td>
+        @endif
     </tr>
     <tr>
-        <th style="text-align: start;">Date:</th>
-        <td style="text-align: end;">Tuesday, 13 December 2022 21:00:00</td>
+        <th style="text-align: start;">Schedule Date:</th>
+        @if($data)
+            <td style="text-align: end;">{{ $data['date'] }}</td>
+        @else
+            <td style="text-align: end;">N/A</td>
+        @endif
     </tr>
     <tr>
         <th style="text-align: start;">Bus No:</th>
-        <td style="text-align: end;">BUSINESS CLASS</td>
+        @if ($data)
+            <td style="text-align: end;">{{ $data['busNo']->bus_class->name}}</td>
+        @else
+            <td style="text-align: end;"></td>
+        @endif
     </tr>
 </table>
 <br>
@@ -116,32 +128,39 @@
         <th>Ticket Booked By</th>
 
     </tr>
-    <tr>
-        <td> Sr #</td>
-        <td>Seat #</td>
-        <td>Name</td>
-        <td>CNIC</td>
-        <td>Dept City</td>
-        <td>Dest City</td>
-        <td>Elt Price</td>
-        <td>Ticket Amount</td>
-        <td>Terminal Name</td>
-        <td>Ticket Booked By</td>
+    {{--        {{dd($data['record'])}}--}}
+    @if(count($data['record']) > 0)
+        @foreach ($data['record'] as $key => $item)
+            <tr>
+                <td>{{ $key +1 }}</td>
+                <td>{{ $item->seat_no }}</td>
+                <td>{{ ucfirst($item->customer->name) }}</td>
+                <td>{{ formatCNIC($item->customer->cnic) }}</td>
+                <td>{{ucfirst($item->departure_city->name)}}</td>
+                <td>{{ ucfirst($item->destination_city->name) }}</td>
+                <td>{{ $item->ticketElt == null ? 0 : $item->ticketElt->elt_price }}</td>
+                <td>{{ $item->seat_fare }}</td>
+                <td>{{ ucfirst($item->terminal->name) }}</td>
+                <td>{{ ucfirst($item->addedBy->name) }}</td>
 
-    </tr>
-    <tr>
-        <td> Sr #</td>
-        <td>Seat #</td>
-        <td>Name</td>
-        <td>CNIC</td>
-        <td>Dept City</td>
-        <td>Dest City</td>
-        <td>Elt Price</td>
-        <td>Ticket Amount</td>
-        <td>Terminal Name</td>
-        <td>Ticket Booked By</td>
+            </tr>
+        @endforeach
+    @else
+        <tr style="height: 20px">
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
 
-    </tr>
+        </tr>
+
+    @endif
     <tr>
         <th colspan="9"> Main Total Online Tickets</th>
         <th>0</th>
@@ -193,13 +212,56 @@
 <table border="2" id="table3">
     <tr>
         <th>Driver One Name</th>
-        <td>Shehbaz Haider Ali</td>
-        <th>Driver Two Name</th>
-        <td>Shehbaz Haider Ali</td>
+        @if($data['driverInfo'])
+            @if(count($data['driverInfo']) > 0)
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+                    @foreach($data['driverInfo'] as $key => $value)
+
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+
+                    @endforeach
+
+                </td>
+            @else
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </td>
+            @endif
+        @endif
+
         <th>Hostess Name</th>
-        <td>Hostess Name</td>
+        @if($data['hostInfo'])
+            @if(count($data['hostInfo']) > 0)
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+
+                    @foreach($data['hostInfo'] as $key => $value)
+
+                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+
+                    @endforeach
+
+                </td>
+            @else
+                <td colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                    N/A
+                </td>
+            @endif
+        @endif
+
     </tr>
 </table>
+<br>
+<br>
+<hr>
+<br>
+<br>
+<br>
+<br>
+<div style="float: right">
+    <p style="font-size: medium; font-weight: 600">Terminal Manager Signature <span style="font-weight: normal">..........................................</span>
+    </p>
+</div>
 {{--<script type="text/javascript">--}}
 {{--    window.onload = function () {--}}
 {{--        window.print();--}}
