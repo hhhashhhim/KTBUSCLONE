@@ -1582,12 +1582,6 @@ export default {
                     position: 'topRight',
                     hideAfter: 2000
                 });
-                // swal({
-                //     title: "Success",
-                //     text: "Booking Created Successfully",
-                //     icon: "success",
-                //     timer: 2000
-                // });
                 this.addForm = {
                     totalAmount: 0,
                     discount: '',
