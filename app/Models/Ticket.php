@@ -70,4 +70,9 @@ class Ticket extends Model
     {
         return $this->hasOne(TicketELT::class, 'ticket_id', 'id');
     }
+
+    public function elt()
+    {
+        return $this->hasOne(TicketELT::class, 'ticket_id', 'id');
+    }
 }
