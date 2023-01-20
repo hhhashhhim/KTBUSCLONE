@@ -545,12 +545,12 @@ class BookingController extends Controller
     public function duplicatePdf(Request $request)
     {
 
-        return Response::make(file_get_contents('images/image1.pdf'), 200, [
-            'content-type'=>'application/pdf',
-        ]);
-//        $printers = Printing::printers();
-//        Session::put('printerId', $printers->first()->id());
-//        printTicket([$request->id], Auth::user()->company_id, 1);
+//        return Response::make(file_get_contents('images/image1.pdf'), 200, [
+//            'content-type'=>'application/pdf',
+//        ]);
+        $printers = Printing::printers();
+        Session::put('printerId', $printers->first()->id());
+        printTicket([$request->id], Auth::user()->company_id, 1);
     }
 
     public function getPassengersList(Request $request)
