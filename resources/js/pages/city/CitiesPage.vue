@@ -149,7 +149,7 @@ export default {
         },
         async add(){
             this.validationErrors = []
-            if(this.data.name == "")
+            if(!this.data.name)
               return swal({
                     title: "Required",
                     text: "City Name is required",

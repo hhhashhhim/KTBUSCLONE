@@ -63,5 +63,7 @@ require_once ('web/hrm/designation.php');
 require_once ('web/hrm/tickets.php');
 // Profile Routes
 require_once ('web/profile/profile.php');
+// Expenses Routes
+require_once ('web/expenses.php');
 
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

@@ -179,7 +179,7 @@ class BookingController extends Controller
                     }
                     $allTicket[] = $ticket->id;
                 }
-                // printTicket($allTicket, Auth::user()->company_id);
+                printTicket($allTicket, Auth::user()->company_id);
             }
             return [
                 'data' => implode('-', $allTicket),

@@ -18,6 +18,10 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+
+        $printers = Printing::printers();
+        Session::put('printerId', $printers->first()->id());
+        
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

@@ -34,6 +34,7 @@ import FoodPage from "./pages/refreshment/FoodPage.vue";
 import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 import FoodOrderPage from "./pages/refreshment/host/FoodOrderPage.vue";
 import ProfilePage from "./pages/profile/ProfilePage.vue";
+import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -213,6 +214,11 @@ const routes = [
         path: url + "settings/profile",
         component : ProfilePage,
         name:"profileSettings"
+    },
+    {
+        path: url + "expense/categories",
+        component : ExpenseCategoryPage,
+        name:"expense-category-page"
     },
 ]
 const router = createRouter({
