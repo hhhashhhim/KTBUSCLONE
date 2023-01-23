@@ -1,3 +1,7 @@
+
+
+
+
 <template>
     <section class="section">
         <div class="section-body">
@@ -30,6 +34,7 @@
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
                                                        <th>Action</th>
+                                                       <th>Expense</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -46,9 +51,14 @@
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
                                                             </td>
+                                                            <td v-if="(j / 2) == 0 && data[j+1]" rowspan="2">
+                                                                <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:close.ticket_merge_id }}">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </router-link>
+                                                            </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
+                                                            <td class="border-bottom border-success" colspan="6" style="height:0 !important; "></td>
                                                         </tr>
                                                     </template>
                                                     </tbody>

@@ -35,6 +35,7 @@ import FoodDealPage from "./pages/refreshment/FoodDealPage.vue";
 import FoodOrderPage from "./pages/refreshment/host/FoodOrderPage.vue";
 import ProfilePage from "./pages/profile/ProfilePage.vue";
 import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
+import ExpensePage from "./pages/expense/ExpensePage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -219,6 +220,11 @@ const routes = [
         path: url + "expense/categories",
         component : ExpenseCategoryPage,
         name:"expense-category-page"
+    },
+    {
+        path: url + "expenses/:id",
+        component : ExpensePage,
+        name:"expense-page"
     },
 ]
 const router = createRouter({
