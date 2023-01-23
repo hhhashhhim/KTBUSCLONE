@@ -223,6 +223,10 @@
                                                 </button>
                                             </div>
                                             <div class="form-group text-center">
+                                                <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="closingData()">
+                                                    Assign Bus
+                                                </a>
+                                                
                                                 <button class="btn btn-danger mx-1" @click="getCustomerList()">
                                                     Print Pax List
                                                 </button>
@@ -753,6 +757,106 @@
             </div>
         </div>
 
+        <!-- Close Schedule -->
+        <Add
+                heading="Close Schedule"
+                :errors="this.validationErrors"
+                :success="success"
+                :formID="formID"
+            >
+            <div class="row">
+                <div class=" form-group col-md-6">
+                    <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
+                    <select class="form-control" v-model="dataForClose.bus" :disabled="checkCloseData">
+                        <option value="">Select Bus Class</option>
+                        <option
+                            v-for="(bus, i) in buses"
+                            :key="i"
+                            :value="bus.id"
+                        >
+                            {{ bus.bus_number }}
+                        </option>
+                    </select>
+                </div>
+                <div class=" form-group col-md-6">
+                    <label for="city_id">Route</label> 
+                    <input
+                    type="text"
+                    class="form-control"
+                    placeholder="N/A"
+                    readonly
+                    v-model="dataForClose.route_name"
+                    />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="name">Date <span class="text-danger ml-1">*</span></label>
+                    <input
+                    type="date"
+                    class="form-control"
+                    placeholder="Enter Bus Name"
+                    readonly
+                    v-model="dataForClose.date"
+                    />
+                </div>
+                <div class=" form-group col-md-6">
+                    <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label> 
+                    <input
+                    type="text"
+                    class="form-control"
+                    placeholder="N/A"
+                    readonly
+                    v-model="dataForClose.schedule_detail"
+                    />
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
+                    <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple :disabled="checkCloseData">
+                        <option
+                            v-for="(driver, i) in drivers"
+                            :key="i"
+                            :value="driver.user_id"
+                        >
+                            {{ driver.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
+                    <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple :disabled="checkCloseData">
+                        <option
+                            v-for="(host, i) in hosts"
+                            :key="i"
+                            :value="host.user_id"
+                        >
+                            {{ host.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="location">Description</label>
+                    <textarea
+                        class="form-control"
+                        placeholder="Enter Description"
+                        id="location"
+                        :disabled="checkCloseData"
+                        v-model="dataForClose.description"
+                        cols="30"
+                        rows="10"
+                    ></textarea>
+                </div>
+            </div>
+            <template v-slot:button>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    v-if="!checkCloseData"
+                    @click="closeSchedule" :disabled="loading"
+                >
+                    {{ loading ? 'Loading...' : 'Close Booking' }}
+                </button>
+            </template>
+        </Add>
+
         <!--Modal for seat details end-->
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
 
@@ -817,6 +921,8 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             buses: [],
+            drivers: [],
+            hosts: [],
             assignBus: 0,
             getCustomermessage: '',
             shiftingFormId: "shifting-modal",
@@ -826,6 +932,17 @@ export default {
             sameDataMain: [],
             cancelData: {
                 percentage: 'first',
+            },
+            checkCloseData: true,
+            dataForClose: {
+                bus: '',
+                date: '',
+                schedule: '',
+                route_name: '',
+                schedule_detail: '',
+                drivers: [],
+                hosts: [],
+                description: '',
             },
             isActive: 1,
             formID: "addBooking",
@@ -1064,6 +1181,108 @@ export default {
                 } else {
                     this.addForm.destinationCity = 0;
                     this.specificCities = resDepartureCity.data;
+                }
+            }
+        },
+        
+        async closingData() {
+            const resData = await this.callApi("post", "booking/getClosingData",{
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            this.buses = resData.data.buses;
+            this.drivers = resData.data.drivers;
+            this.hosts = resData.data.hosts;
+            this.dataForClose.date = resData.data.infoData.schedule_date;
+            this.dataForClose.schedule_detail = resData.data.infoData.schedule;
+            this.dataForClose.schedule = resData.data.infoData.schedule_id;
+            this.dataForClose.route_name = resData.data.infoData.route_name;
+            this.dataForClose.bus = resData.data.infoData.bus;
+            this.dataForClose.drivers = resData.data.infoData.drivers;
+            this.dataForClose.hosts = resData.data.infoData.hosts;
+            this.dataForClose.description = resData.data.infoData.description;
+            this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
+            
+        },
+
+        async closeSchedule() {
+            // console.log(this.addData.drivers.length);return;
+            this.validationErrors = [];
+            if (!this.dataForClose.bus)
+              return swal({
+                    title: "Required",
+                    text: "Bus is required",
+                    icon: 'error',
+                   timer: 2000
+                });
+            if (!this.dataForClose.date)
+              return swal({
+                    title: "Required",
+                    text: "Date is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (!this.dataForClose.schedule)
+              return swal({
+                    title: "Required",
+                    text: "Schedule is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.dataForClose.drivers.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Driver is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.dataForClose.hosts.length == 0)
+              return swal({
+                    title: "Required",
+                    text: "Host is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            this.loadig = true;
+            const res = await this.callApi("post", "booking/schedule/closing/store", this.dataForClose);
+            if (res.status == 201) {
+              swal({
+                    title: "Success",
+                    text: "Schedule Closed Successfully",
+                    icon: "success",
+                   timer: 2000
+                });
+                this.loading = false;
+                this.dataForClose.bus = "";
+                this.dataForClose.date = "";
+                this.dataForClose.schedule = "";
+                this.dataForClose.drivers = [];
+                this.dataForClose.hosts = [];
+                this.dataForClose.description = "";
+                this.closingData();
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
                 }
             }
         },
