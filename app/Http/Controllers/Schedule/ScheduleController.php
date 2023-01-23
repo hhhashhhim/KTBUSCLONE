@@ -298,7 +298,7 @@ class ScheduleController extends Controller
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-//        return $tickets;
+//        return $ticketSeatNumbers;
         // Getting Already Booked Tickets
 //        $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', Auth::user()->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
 
@@ -374,7 +374,7 @@ class ScheduleController extends Controller
                         if ($before || $after) {
                             // removing partial tag for that seats which fulfill the conditions
                             unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
-//                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
+                            //                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
                         $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->name;
@@ -401,7 +401,7 @@ class ScheduleController extends Controller
                     if ($class && $class->is_active == 0) {
                         return response()->json([
                             "errors" => [
-                                "Fare Error" => ["This Bus Class Includes a Class Which is't Active Please Active That Class First !!!"]
+                                "Fare Error" => ["This Bus Class Includes a Class Which isn't Active Please Active That Class First !!!"]
                             ]
                         ], 422);
                     }

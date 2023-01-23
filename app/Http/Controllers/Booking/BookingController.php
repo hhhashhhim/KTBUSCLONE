@@ -10,6 +10,7 @@ use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
+use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
@@ -368,7 +369,7 @@ class BookingController extends Controller
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
         ])->first()->schedule_date;
-        
+
         $schedule = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
@@ -384,7 +385,7 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
         ])
         ->with("members")
-        ->first(); 
+        ->first();
 
         $infoData = (object)[];
         $infoData->schedule = date("m/d/Y h:i A",strtotime("$schedule->schedule_date $schedule->departure_time")).' - '.$schedule->schedule->name;
@@ -395,7 +396,7 @@ class BookingController extends Controller
         $infoData->bus = $checkAssign ? $checkAssign->bus_id : '';
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type",1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type",2)->pluck('user_id') : [];
-        
+
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
         $hosts = Employee::where(['employee_type'=>2,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type'=>1,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
