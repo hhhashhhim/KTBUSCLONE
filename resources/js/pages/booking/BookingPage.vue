@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="col-md-2   mb-2">
                                     <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
-                                    <input type="date" :min="minDateFilter()" class="form-control"
+                                    <input type="date" :min="minDateFilter()" class="form-control" id="dynamicDate"
                                            v-model="addForm.date"
                                            @change="fetchSpecificSchedules()"/>
                                 </div>
@@ -219,7 +219,7 @@
                                                 <button class="btn btn-primary mx-1"
                                                         v-on:click="add()"
                                                         v-on:keyup.enter="add()">
-                                                    Generate Ticket
+                                                    {{ this.addForm.type == 'advance booking'  ? 'Reserved Seat' : 'Generate Ticket' }}
                                                 </button>
                                             </div>
                                             <div class="form-group text-center">
@@ -1043,10 +1043,10 @@ export default {
         },
 
         minDateFilter: function () {
-            var dtToday = new Date();
-            var month = dtToday.getMonth() + 1;
-            var day = dtToday.getDate();
-            var year = dtToday.getFullYear();
+            const dtToday = new Date();
+            let month = dtToday.getMonth() + 1;
+            let day = dtToday.getDate() - 2;
+            const year = dtToday.getFullYear();
             if (month < 10)
                 month = '0' + month.toString();
             if (day < 10)

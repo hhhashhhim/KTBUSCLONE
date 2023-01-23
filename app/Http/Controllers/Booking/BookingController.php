@@ -10,8 +10,6 @@ use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
-use App\Models\Route\Route;
-use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
@@ -21,27 +19,13 @@ use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
 use App\Models\Ticket;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Rawilk\Printing\Facades\Printing;
 
 class BookingController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index(Request $request)
     {
         $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
@@ -354,8 +338,7 @@ class BookingController extends Controller
         }
     }
 
-    public
-    function detailTicket(Request $request)
+    public function detailTicket(Request $request)
     {
         return Ticket::with('addedBy', 'customer')->where('company_id', Auth::user()->company_id)
             ->whereDate('date', $request->date)
@@ -363,8 +346,7 @@ class BookingController extends Controller
             ->get();
     }
 
-    public
-    function advanceData(Request $request)
+    public function advanceData(Request $request)
     {
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
@@ -429,7 +411,6 @@ class BookingController extends Controller
     public
     function cancelingBooking(Request $request)
     {
-//        dd($request->all());
         $ticket = Ticket::where([
             'company_id' => Auth::user()->company_id,
             'date' => $request->date,
@@ -545,9 +526,6 @@ class BookingController extends Controller
     public function duplicatePdf(Request $request)
     {
 
-//        return Response::make(file_get_contents('images/image1.pdf'), 200, [
-//            'content-type'=>'application/pdf',
-//        ]);
         $printers = Printing::printers();
         Session::put('printerId', $printers->first()->id());
         printTicket([$request->id], Auth::user()->company_id, 1);
@@ -583,8 +561,7 @@ class BookingController extends Controller
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
-            'type' => 'booked',
-        ])->get();
+        ])->whereIn('type', ['booked', 'advanced booking', 'reschedule'])->get();
         $terminalGroup = Ticket::with('terminal:id,name,city_id', 'terminal.city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
