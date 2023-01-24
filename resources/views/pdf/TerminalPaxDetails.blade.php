@@ -128,7 +128,6 @@
         <th>Ticket Booked By</th>
 
     </tr>
-    {{--        {{dd($data['record'])}}--}}
     @if(count($data['record']) > 0)
         @foreach ($data['record'] as $key => $item)
             <tr>

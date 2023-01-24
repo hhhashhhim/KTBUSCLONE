@@ -250,7 +250,7 @@ class BookingController extends Controller
             'departure_city_id' => $request->dataDepartureCity,
             'destination_city_id' => $request->rescheduleDestinationCity,
             'seat_no' => $ticket['seat_no'],
-            'terminal_id' => $currentTicketData->terminal_id,
+            'terminal_id' => $ticket['terminal_id'],
             'ticket_closing_id' => $currentTicketData->ticket_closing_id,
             'bus_id' => $currentTicketData->bus_id,
             'bus_class_id' => $ticket['bus_class_id'],
@@ -501,6 +501,7 @@ class BookingController extends Controller
 
     public function terminalInvoice(Request $request)
     {
+
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -513,12 +514,14 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
+
         $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->get();
+
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
         $routeName = routeName($request->schedule_id);

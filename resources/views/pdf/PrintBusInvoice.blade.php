@@ -118,7 +118,7 @@
     @foreach($terminal as $destination)
     <tr>
         <td>SR #</td>
-        <td>{{ $destination[0]->terminal->name }}</td>
+        <td>{{ $destination[0] && $destination[0]->terminal ? $destination[0]->terminal->name : 'Terminal Not Alloted Yet' }}</td>
         <td>{{ $destination->count() }}</td>
         @php
             $totalSeat += $destination->count()
