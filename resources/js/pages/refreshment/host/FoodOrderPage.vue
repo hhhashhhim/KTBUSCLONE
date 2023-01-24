@@ -44,7 +44,7 @@
                                                     <tbody>
                                                     <template v-for="(data, i) in mainData" :key="i">
                                                         <tr v-for="(order, j) in data" :key="j">
-                                                            
+
                                                             <td v-if="order.item_type==1" class="font-weight-bold">{{ order.food_record.name}}</td>
                                                             <td v-else-if="order.item_type==2" class="font-weight-bold">
                                                                 {{ order.food_record.name }}
@@ -56,10 +56,10 @@
 
                                                             <td v-if="order.item_type==1">{{  order.quantity + " (" + order.food_record.unit + ")" }}</td>
                                                             <td v-else-if="order.item_type==2">{{ order.quantity }} (deal)</td>
-                                                            
+
                                                             <td>{{ order.amount }}</td>
                                                             <td>{{ order.seat_no }}</td>
-                                                            
+
                                                             <td>
                                                                 <span v-if="order.status=='pending'" class="badge badge-warning">{{ order.status }}</span>
                                                                 <span v-else-if="order.status=='received'" class="badge badge-success">{{ order.status }}</span>
@@ -172,7 +172,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event,index)">Remove</button>
+                                    <button class="btn btn-outline-danger" v-if="index != 0" @click="removeRow($event,index)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>

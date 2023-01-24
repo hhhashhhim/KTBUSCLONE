@@ -77,7 +77,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Terminal Name <span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="data.name">
+                        <input type="text" class="form-control" v-model="data.name" placeholder="Enter Terminal Name">
                     </div>
                 </div>
                 <div class="row">
@@ -176,23 +176,34 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
-                               v-model="data.advance_booking">
+                               v-model="data.advance_booking" placeholder="Enter Advance Booking Allowed">
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="longitude">Longitude</label>
-                        <input type="text" class="form-control" v-model="data.longitude">
+                        <input type="text" class="form-control" v-model="data.longitude" placeholder="Enter Longitude">
                         <small><a href="https://www.google.com/maps" target="_blank">Click Here to get</a></small>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-4">
                         <label for="Latitude">Latitude</label>
-                        <input type="text" class="form-control" v-model="data.latitude">
+                        <input type="text" class="form-control" v-model="data.latitude" placeholder="Enter Latitude">
                     </div>
-                    <div class="form-group col-md-3">
-                        <label for="terminal">Fixed Commission <span class=""></span></label>
-                        <input type="text" @keypress="isNumber($event)" maxlength="4" class="form-control" v-model="data.commission">
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Fixed Commission <span class="text-danger ml-1">*</span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="data.commission"
+                               placeholder="Enter Terminal Fixed Commission">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Commission in Flat<span class="text-danger ml-1">*</span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control"
+                               v-model="data.flatCommission" placeholder="Enter Ticket Commission In Flat Amount">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Commission in Percentage <span class="text-danger ml-1">*</span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control"
+                               v-model="data.percentageCommission" placeholder="Enter Ticket Commission In Percentage">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
@@ -373,6 +384,21 @@
                     <div class="form-group col-md-4">
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="dataEdit.latitude">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Fixed Commission <span class=""></span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="dataEdit.fixed_commission"
+                               placeholder="Enter Terminal Fixed Commission">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Commission in Flat<span class=""></span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control"
+                               v-model="dataEdit.ticket_flat_commission" placeholder="Enter Ticket Commission In Flat Amount ">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="terminal">Commission in Percentage <span class=""></span></label>
+                        <input type="text" @keypress="isNumber($event)" class="form-control"
+                               v-model="dataEdit.ticket_percentage_commission" placeholder="Enter Ticket Commission In Percentage">
                     </div>
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
@@ -571,6 +597,8 @@ export default {
                 inactive: "",
                 order: "",
                 commission: "",
+                flatCommission: "",
+                percentageCommission: "",
             },
             dataEdit: {},
             success: false,
@@ -652,6 +680,9 @@ export default {
         clearForm: function () {
             this.data = {};
             this.data.city_id = 0;
+            this.data.commission = "";
+            this.data.flatCommission = "";
+            this.data.percentageCommission = "";
             this.dataTime.time = "positiveTime";
             this.dataCheck.seatNumberType = "comma";
             this.showDivComma = true;
@@ -689,8 +720,7 @@ export default {
         },
         async add() {
             this.validationErrors = [];
-            if (this.data.name === "")
-                // swal('Required', 'Terminal Name is Required', 'error')
+            if (!this.data.name)
                 return swal({
                     title: "Required",
                     text: "Terminal Name is required",
@@ -698,26 +728,44 @@ export default {
                     timer: 2000
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
-                // swal('Required', 'Company is Required', 'error')
                 return swal({
                     title: "Required",
                     text: "Company is required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.city_id === "")
-                // swal('Required', 'Terminal City is Required', 'error')
+            if (!this.data.city_id)
                 return swal({
                     title: "Required",
                     text: "Terminal City is rquired",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.contact === "")
-                // swal('Required', 'Terminal Contact is Required', 'error')
+            if (!this.data.contact)
                 return swal({
                     title: "Required",
                     text: "Terminal Contact is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.data.commission)
+                return swal({
+                    title: "Required",
+                    text: "Commission is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.data.flatCommission)
+                return swal({
+                    title: "Required",
+                    text: "Flat Commission Value is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.data.percentageCommission)
+                return swal({
+                    title: "Required",
+                    text: "Percentage Commission Value is required",
                     icon: "error",
                     timer: 2000
                 });
@@ -772,7 +820,6 @@ export default {
         async update() {
             this.validationErrors = [];
             if (this.dataEdit.name === "")
-                // swal('Required', 'Terminal Name is Required', 'error')
                 return swal({
                     title: "Required",
                     text: "Terminal name is required",
@@ -780,7 +827,6 @@ export default {
                     timer: 2000
                 });
             if (this.$store.state.user.is_super_admin === 1 && this.data.company_id === "")
-                // swal('Required', 'Company is Required', 'error')
                 return swal({
                     title: "Required",
                     text: "Company is required",
@@ -788,7 +834,6 @@ export default {
                     timer: 2000
                 });
             if (this.dataEdit.city_id === "")
-                // swal('Required', 'Terminal City is Required', 'error')
                 return swal({
                     title: "Required",
                     text: "Terminal City is required ",
@@ -796,10 +841,30 @@ export default {
                     timer: 2000
                 });
             if (this.dataEdit.contact === "")
-                // swal('Required', 'Terminal Contact is Required', 'error')
                 return swal({
                     title: "Required",
                     text: "Terminal Contact is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.dataEdit.fixed_commission)
+            return swal({
+                title: "Required",
+                text: "Commission is required",
+                icon: "error",
+                timer: 2000
+            });
+            if (!this.dataEdit.ticket_flat_commission)
+                return swal({
+                    title: "Required",
+                    text: "Flat Commission Value is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.dataEdit.ticket_percentage_commission)
+                return swal({
+                    title: "Required",
+                    text: "Percentage Commission Value is required",
                     icon: "error",
                     timer: 2000
                 });

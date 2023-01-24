@@ -40,18 +40,22 @@ class TerminalController extends Controller
 
     public function store(Request $request)
     {
-
+        // return $request->all();
         $rules = [
             'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'city_id' => 'required',
             'contact' => 'required',
+            'commission' => 'required',
         ];
 
         $customMessages = [
             'name.required' => 'Name Field is Required!',
             'name.unique' => 'Terminal Name already exist against This City',
             'city_id.required' => 'Please Select Any City ',
-            'contact.required' => 'Please Enter your Phone Number   '
+            'contact.required' => 'Please Enter your Phone Number',
+            'commission.required' => 'Please Enter Commission',
+            'flatCommission.required' => 'Please Enter Flat Commission',
+            'percentageCommission.required' => 'Please Enter Percentage Commission',
         ];
         $this->validate($request, $rules, $customMessages);
         if ($request->is_main) {
@@ -79,6 +83,9 @@ class TerminalController extends Controller
             'online_terminal_name' => $request->online_terminal_name ?? " ",
             'status' => $request->active ? 1 : 0,
             'is_main' => $request->is_main ? 1 : 0,
+            'fixed_commission' => $request->commission??0,
+            'ticket_flat_commission' => $request->flatCommission??0,
+            'ticket_percentage_commission' => $request->percentageCommission??0,
             'added_by' => Auth::user()->id,
             'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
         ]);
@@ -101,6 +108,7 @@ class TerminalController extends Controller
             $main = Terminal::where('city_id', $request->city_id)
                 ->where('company_id', Auth::user()->company_id)
                 ->where('is_main', 1)
+                ->where('id','!=', $request->id)
                 ->first();
             if ($main) {
                 return response()->json([
@@ -120,6 +128,9 @@ class TerminalController extends Controller
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name,
             'is_main' => (int)$request->is_main,
+            'fixed_commission' => $request->fixed_commission,
+            'ticket_flat_commission' => $request->ticket_flat_commission,
+            'ticket_percentage_commission' => $request->ticket_percentage_commission,
             'active_sms' => $request->active_sms ? 1 : 0,
             'status' => (int)$request->status,
         ]);

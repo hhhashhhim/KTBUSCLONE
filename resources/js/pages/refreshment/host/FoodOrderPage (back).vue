@@ -145,15 +145,12 @@
                                 <td>
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'second')" />
                                 </td>
-                                <!-- <td>
-                                    <input type="number" class="form-control" min="0" @keyup="saveRow($event,'fourth')" />
-                                </td> -->
                                 <td>
                                     <input type="number" class="form-control" min="0" @keyup="saveRow($event,'third')" />
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event)">Remove</button>
+                                    <button class="btn btn-outline-danger" v-if="index != 0" @click="removeRow($event)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>

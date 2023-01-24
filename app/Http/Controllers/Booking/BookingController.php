@@ -198,6 +198,17 @@ class BookingController extends Controller
             'destination_id' => $ticket['destination_city_id'],
             'schedule_id' => $ticket['schedule_id'],
         ])->first();
+        $currentTicketData =  Ticket::where('company_id', Auth::user()->company_id)->where('schedule_id', $ticket['schedule_id'])
+        ->whereDate('schedule_date', $scheduleDetail->schedule_date)->first ();
+
+        $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id')->first();
+        $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+        $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+        $isPartial = 0;
+        if ($ticket['departure_city_id'] != $departure_city_id || $ticket['destination_city_id'] != $destination_city_id) {
+            $isPartial = 1;
+        }
+
         if ($request->selected_seatFare != $request->dataAll['seat_fare']) {
             RescheduleExtraAmount::create([
                 'company_id' => Auth::user()->company_id,
@@ -239,10 +250,14 @@ class BookingController extends Controller
             'departure_city_id' => $request->dataDepartureCity,
             'destination_city_id' => $request->rescheduleDestinationCity,
             'seat_no' => $ticket['seat_no'],
+            'terminal_id' => $currentTicketData->terminal_id,
+            'ticket_closing_id' => $currentTicketData->ticket_closing_id,
+            'bus_id' => $currentTicketData->bus_id,
             'bus_class_id' => $ticket['bus_class_id'],
             'seat_fare' => $ticket['seat_fare'],
-            'is_partial' => $ticket['is_partial'],
+            'is_partial' => $isPartial,
             'booking_no' => $bookingNo,
+            'schedule_date' => $scheduleDetail->schedule_date,
             'date' => $request->rescheduleDate,
             'schedule_details_id' => $scheduleDetail->id,
             'customer_id' => $request->dataCustomer,
@@ -288,8 +303,7 @@ class BookingController extends Controller
         return City::whereIn('id', array_unique($depart_city))->where('company_id', Auth::user()->company_id)->get(['id', 'name']);
     }
 
-    public
-    function fetchSpecificOverIssueSeat(Request $request)
+    public function fetchSpecificOverIssueSeat(Request $request)
     {
         $ticket = Ticket::where(["company_id" => Auth::user()->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id, "destination_city_id" => $request->destination_id, "departure_city_id" => $request->departure_id])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
         $customer = Customer::where(["company_id" => Auth::user()->company_id, "id" => $ticket->customer_id])->first();

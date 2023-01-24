@@ -127,7 +127,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow($event)">Remove</button>
+                                    <button class="btn btn-outline-danger" v-if=" index != 1" @click="removeRow($event)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -141,7 +141,7 @@
             </Add>
 
             <Edit
-                heading="Edit"
+                heading="Edit Maintenance"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
@@ -199,7 +199,7 @@
                                 </td>
                                 <td>
                                     <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="editRemoveRow($event)">Remove</button>
+                                    <button class="btn btn-outline-danger" v-if="index != 1" @click="editRemoveRow($event)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
