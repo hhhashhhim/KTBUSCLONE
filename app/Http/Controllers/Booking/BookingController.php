@@ -19,6 +19,7 @@ use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
+use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -374,6 +375,55 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
         ])->first(['schedule_date']);
         return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+    }
+
+    public function getClosingData(Request $request)
+    {
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->scheduleId,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+        ])->first()->schedule_date;
+        
+        $schedule = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->scheduleId,
+            'schedule_date' => $uniqueDate,
+        ])
+        ->with("schedule.route:id,name")
+        ->first();
+
+        // if already assign
+        $checkAssign = TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->scheduleId,
+            'schedule_date' => $uniqueDate,
+        ])
+        ->with("members")
+        ->first(); 
+
+        $infoData = (object)[];
+        $infoData->schedule = date("m/d/Y h:i A",strtotime("$schedule->schedule_date $schedule->departure_time")).' - '.$schedule->schedule->name;
+        $infoData->schedule_date = $schedule->schedule_date;
+        $infoData->schedule_id = $schedule->schedule_id;
+        $infoData->route_name = $schedule->schedule->route->name;
+        $infoData->description = $checkAssign ? $checkAssign->description : '';
+        $infoData->bus = $checkAssign ? $checkAssign->bus_id : '';
+        $infoData->drivers = $checkAssign ? $checkAssign->members->where("type",1)->pluck('user_id') : [];
+        $infoData->hosts = $checkAssign ? $checkAssign->members->where("type",2)->pluck('user_id') : [];
+        
+        $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        $hosts = Employee::where(['employee_type'=>2,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type'=>1,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $data = [
+            "buses" => $buses,
+            "hosts" => $hosts,
+            "drivers" => $drivers,
+            "infoData" => $infoData,
+        ];
+        return $data;
     }
 
     public function bookingElt(Request $request)
