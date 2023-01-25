@@ -226,7 +226,7 @@
                                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="closingData()">
                                                     Assign Bus
                                                 </a>
-                                                
+
                                                 <button class="btn btn-danger mx-1" @click="getCustomerList()">
                                                     Print Pax List
                                                 </button>
@@ -779,7 +779,7 @@
                     </select>
                 </div>
                 <div class=" form-group col-md-6">
-                    <label for="city_id">Route</label> 
+                    <label for="city_id">Route</label>
                     <input
                     type="text"
                     class="form-control"
@@ -799,7 +799,7 @@
                     />
                 </div>
                 <div class=" form-group col-md-6">
-                    <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label> 
+                    <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
                     <input
                     type="text"
                     class="form-control"
@@ -886,6 +886,18 @@
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+        </form>
+<!--        print Customer Ticket Print-->
+        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refTicket"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="ticket_ids" :value="this.ticketsIds">
+        </form>
+<!--        Elt Customer PDF Form  -->
+        <form :action="$store.state.app_url + 'print/pdf/customer/elt'" method="POST" ref="refElt"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="elt_ids" :value="this.eltIds">
         </form>
     </section>
 </template>
@@ -989,6 +1001,8 @@ export default {
             filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
             advanceSeat: [],
+            eltIds: "",
+            ticketsIds: "",
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -1184,7 +1198,7 @@ export default {
                 }
             }
         },
-        
+
         async closingData() {
             const resData = await this.callApi("post", "booking/getClosingData",{
                 scheduleId: this.addForm.schedule,
@@ -1204,7 +1218,7 @@ export default {
             this.dataForClose.hosts = resData.data.infoData.hosts;
             this.dataForClose.description = resData.data.infoData.description;
             this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
-            
+
         },
 
         async closeSchedule() {
@@ -1658,6 +1672,9 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
+            console.log(typeof this.addForm.alreadyBookedId);
+            this.addForm.alreadyBookedId = [];
+            console.log(typeof this.addForm.alreadyBookedId);
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
@@ -1794,6 +1811,7 @@ export default {
                 });
             }
             const res = await this.callApi("post", "booking/store", this.addForm);
+            console.log(res.data);
             if (res.status == 200) {
                 iziToast.success({
                     title: 'Success!',
@@ -1812,6 +1830,10 @@ export default {
                     customerCNIC: "",
                     selectedSeats: '',
                 };
+                this.ticketsIds = res.data.ids;
+                if(res.data.ticket[0].type == "booked") {
+                    this.$refs.refTicket.submit();
+                }
                 this.addForm.date = res.data.ticket[0].date;
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';

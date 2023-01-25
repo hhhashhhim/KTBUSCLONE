@@ -167,12 +167,14 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-            $printers = Printing::printers();
-            Session::put('printerId', $printers->first()->id());
-            printTicket($allTicket, Auth::user()->company_id);
+            if($request->type == 'booked') {
+                $printers = Printing::printers();
+                Session::put('printerId', $printers->first()->id());
+                printTicket($allTicket, Auth::user()->company_id);
+            }
         }
         return [
-            'data' => implode('-', $allTicket),
+            'ids' => implode('-', $allTicket),
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
         ];
 //        } catch (\Exception $e) {
@@ -593,10 +595,28 @@ class BookingController extends Controller
 
     public function duplicatePdf(Request $request)
     {
+        dd($request->all());
+//
+//        $printers = Printing::printers();
+//        Session::put('printerId', $printers->first()->id());
+//        printTicket([$request->id], Auth::user()->company_id, 1);
+    }
 
-        $printers = Printing::printers();
-        Session::put('printerId', $printers->first()->id());
-        printTicket([$request->id], Auth::user()->company_id, 1);
+    public function ticketPdf(Request $request)
+    {
+        dd($request->all());
+//
+//        $printers = Printing::printers();
+//        Session::put('printerId', $printers->first()->id());
+//        printTicket([$request->id], Auth::user()->company_id, 1);
+    }
+    public function eltPdf(Request $request)
+    {
+        dd($request->all());
+
+//        $printers = Printing::printers();
+//        Session::put('printerId', $printers->first()->id());
+//        printTicket([$request->id], Auth::user()->company_id, 1);
     }
 
     public function getPassengersList(Request $request)
