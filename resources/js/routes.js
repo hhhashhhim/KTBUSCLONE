@@ -37,8 +37,8 @@ import ProfilePage from "./pages/profile/ProfilePage.vue";
 import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 import ExpensePage from "./pages/expense/ExpensePage.vue";
 
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 const routes = [
     {
