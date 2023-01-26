@@ -167,11 +167,11 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-            if($request->type == 'booked') {
-                $printers = Printing::printers();
-                Session::put('printerId', $printers->first()->id());
-                printTicket($allTicket, Auth::user()->company_id);
-            }
+//            if($request->type == 'booked') {
+//                $printers = Printing::printers();
+//                Session::put('printerId', $printers->first()->id());
+//                printTicket($allTicket, Auth::user()->company_id);
+//            }
         }
         return [
             'ids' => implode('-', $allTicket),
@@ -592,31 +592,25 @@ class BookingController extends Controller
 
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
     }
-
-    public function duplicatePdf(Request $request)
-    {
-        dd($request->all());
-//
-//        $printers = Printing::printers();
-//        Session::put('printerId', $printers->first()->id());
-//        printTicket([$request->id], Auth::user()->company_id, 1);
-    }
-
     public function ticketPdf(Request $request)
     {
-        dd($request->all());
-//
-//        $printers = Printing::printers();
-//        Session::put('printerId', $printers->first()->id());
-//        printTicket([$request->id], Auth::user()->company_id, 1);
+        if((int)$request->duplicate == 0){
+            $ids = explode("-",$request->ticket_ids);
+        }else{
+            $ids = [$request->ticket_id];
+        }
+        $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+        $format = TicketsTemplate::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> Auth::user()->terminal_id])->first();
+        $finalData = [
+            'tickets' => $tickets,
+            'format' => $format,
+            'duplicate' => (int) $request->duplicate,
+        ];
+        return view('pdf/pdf', ['data' => $finalData]);
     }
     public function eltPdf(Request $request)
     {
         dd($request->all());
-
-//        $printers = Printing::printers();
-//        Session::put('printerId', $printers->first()->id());
-//        printTicket([$request->id], Auth::user()->company_id, 1);
     }
 
     public function getPassengersList(Request $request)

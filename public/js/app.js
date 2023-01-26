@@ -26879,6 +26879,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       advanceSeat: [],
       eltIds: "",
       ticketsIds: "",
+      ticketsId: "",
       addForm: {
         date: new Date().toISOString().substr(0, 10),
         type: "booked",
@@ -27692,38 +27693,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       });
                     }
                   })();
-                } //fetch all Buses
-                // const resBus = await this.callApi("post", "schedule/allBuses", {
-                //     id: this.addForm.schedule,
-                // });
-                // if (resBus.status == 200) {
-                //     this.buses = resBus.data;
-                // }
-                // if (resBus.status == 500 && this.addForm.schedule == 0) {
-                //     this.assignBus = 0;
-                //     this.buses = [];
-                // }
-                // if (resBus.status == 422) {
-                //     let errorContent = "";
-                //     let count = 0;
-                //     for (const key in resBus.data.errors) {
-                //         resBus.data.errors[key].forEach((element) => {
-                //             errorContent += (
-                //                 (++count) + " - " + //creating serial no.
-                //                 element + // main error
-                //                 "\n" // creating new line
-                //             );
-                //         });
-                //         swal({
-                //             title: "Error",
-                //             text: errorContent,
-                //             icon: "error",
-                //             timer: 4000
-                //         });
-                //
-                //     }
-                // }
-
+                }
 
               case 18:
               case "end":
@@ -28176,7 +28146,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 14:
                 res = _context16.sent;
-                console.log(res.data);
+                console.log(res.data.ids);
 
                 if (res.status == 200) {
                   iziToast.success({
@@ -28197,11 +28167,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     selectedSeats: ''
                   };
                   _this16.ticketsIds = res.data.ids;
-
-                  if (res.data.ticket[0].type == "booked") {
-                    _this16.$refs.refTicket.submit();
-                  }
-
                   _this16.addForm.date = res.data.ticket[0].date;
                   _this16.addForm.gender = 1;
                   _this16.addForm.type = 'booked';
@@ -28215,6 +28180,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this16.resetingArrays();
 
                   $("#booking_table").DataTable().destroy();
+                  setTimeout(function () {
+                    if (res.data.ticket[0].type == "booked") {
+                      _this16.$refs.refTicket.submit();
+                    }
+                  }, 700);
                   setTimeout(function () {
                     $("#booking_table").DataTable();
                   }, 300); // window.open(this.$store.state.app_url + 'print/' + res.data + '/pdf', '_blank').focus();
@@ -28798,33 +28768,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     duplicateTicket: function duplicateTicket(data) {
       var _this25 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee25() {
-        return _regeneratorRuntime().wrap(function _callee25$(_context25) {
-          while (1) {
-            switch (_context25.prev = _context25.next) {
-              case 0:
-                _context25.next = 2;
-                return _this25.callApi("post", "print/ticket/duplicate", {
-                  id: data.id
-                });
-
-              case 2:
-                setTimeout(function () {
-                  swal({
-                    title: "Success",
-                    text: "Successfully Requested Fo    r Duplicate Ticket",
-                    icon: "success",
-                    timer: 3000
-                  });
-                }, 2000);
-
-              case 3:
-              case "end":
-                return _context25.stop();
-            }
-          }
-        }, _callee25);
-      }))();
+      this.ticketsId = data.id;
+      setTimeout(function () {
+        if (data.type == "booked") {
+          _this25.$refs.refDuplicateTicket.submit();
+        }
+      }, 700);
     },
     // Get Passengers list
     getCustomerList: function getCustomerList() {
@@ -50033,9 +49982,34 @@ var _hoisted_315 = ["value"];
 var _hoisted_316 = ["action"];
 var _hoisted_317 = ["value"];
 var _hoisted_318 = ["value"];
-var _hoisted_319 = ["action"];
-var _hoisted_320 = ["value"];
+
+var _hoisted_319 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "duplicate",
+    value: "0"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_320 = ["action"];
 var _hoisted_321 = ["value"];
+var _hoisted_322 = ["value"];
+
+var _hoisted_323 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "duplicate",
+    value: "1"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_324 = ["action"];
+var _hoisted_325 = ["value"];
+var _hoisted_326 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
@@ -50888,9 +50862,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.ticketsIds
   }, null, 8
   /* PROPS */
-  , _hoisted_318)], 8
+  , _hoisted_318), _hoisted_319], 8
   /* PROPS */
-  , _hoisted_316), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Elt Customer PDF Form  "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_316), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    action: _ctx.$store.state.app_url + 'print/pdf/customer/ticket',
+    method: "POST",
+    ref: "refDuplicateTicket",
+    target: "_blank"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "_token",
+    value: $data.csrf
+  }, null, 8
+  /* PROPS */
+  , _hoisted_321), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "ticket_id",
+    value: this.ticketsId
+  }, null, 8
+  /* PROPS */
+  , _hoisted_322), _hoisted_323], 8
+  /* PROPS */
+  , _hoisted_320), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Elt Customer PDF Form  "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.app_url + 'print/pdf/customer/elt',
     method: "POST",
     ref: "refElt",
@@ -50901,15 +50894,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: $data.csrf
   }, null, 8
   /* PROPS */
-  , _hoisted_320), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_325), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "elt_ids",
     value: this.eltIds
   }, null, 8
   /* PROPS */
-  , _hoisted_321)], 8
+  , _hoisted_326)], 8
   /* PROPS */
-  , _hoisted_319)]);
+  , _hoisted_324)]);
 }
 
 /***/ }),

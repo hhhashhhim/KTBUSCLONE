@@ -219,11 +219,14 @@
                                                 <button class="btn btn-primary mx-1"
                                                         v-on:click="add()"
                                                         v-on:keyup.enter="add()">
-                                                    {{ this.addForm.type == 'advance booking'  ? 'Reserved Seat' : 'Generate Ticket' }}
+                                                    {{
+                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
+                                                    }}
                                                 </button>
                                             </div>
                                             <div class="form-group text-center">
-                                                <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="closingData()">
+                                                <a href="#" :data-target="'#' + formID" data-toggle="modal"
+                                                   class="btn btn-primary" @click="closingData()">
                                                     Assign Bus
                                                 </a>
 
@@ -759,11 +762,11 @@
 
         <!-- Close Schedule -->
         <Add
-                heading="Close Schedule"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
+            heading="Close Schedule"
+            :errors="this.validationErrors"
+            :success="success"
+            :formID="formID"
+        >
             <div class="row">
                 <div class=" form-group col-md-6">
                     <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
@@ -781,36 +784,37 @@
                 <div class=" form-group col-md-6">
                     <label for="city_id">Route</label>
                     <input
-                    type="text"
-                    class="form-control"
-                    placeholder="N/A"
-                    readonly
-                    v-model="dataForClose.route_name"
+                        type="text"
+                        class="form-control"
+                        placeholder="N/A"
+                        readonly
+                        v-model="dataForClose.route_name"
                     />
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Date <span class="text-danger ml-1">*</span></label>
                     <input
-                    type="date"
-                    class="form-control"
-                    placeholder="Enter Bus Name"
-                    readonly
-                    v-model="dataForClose.date"
+                        type="date"
+                        class="form-control"
+                        placeholder="Enter Bus Name"
+                        readonly
+                        v-model="dataForClose.date"
                     />
                 </div>
                 <div class=" form-group col-md-6">
                     <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
                     <input
-                    type="text"
-                    class="form-control"
-                    placeholder="N/A"
-                    readonly
-                    v-model="dataForClose.schedule_detail"
+                        type="text"
+                        class="form-control"
+                        placeholder="N/A"
+                        readonly
+                        v-model="dataForClose.schedule_detail"
                     />
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple :disabled="checkCloseData">
+                    <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple
+                            :disabled="checkCloseData">
                         <option
                             v-for="(driver, i) in drivers"
                             :key="i"
@@ -822,7 +826,8 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple :disabled="checkCloseData">
+                    <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple
+                            :disabled="checkCloseData">
                         <option
                             v-for="(host, i) in hosts"
                             :key="i"
@@ -887,13 +892,21 @@
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
         </form>
-<!--        print Customer Ticket Print-->
+        <!--        print Customer Ticket Print-->
         <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refTicket"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="ticket_ids" :value="this.ticketsIds">
+            <input type="hidden" name="duplicate" value=0>
         </form>
-<!--        Elt Customer PDF Form  -->
+        <!--        print Customer Duplicate Ticket Print-->
+        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refDuplicateTicket"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="ticket_id" :value="this.ticketsId">
+            <input type="hidden" name="duplicate" value=1>
+        </form>
+        <!--        Elt Customer PDF Form  -->
         <form :action="$store.state.app_url + 'print/pdf/customer/elt'" method="POST" ref="refElt"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
@@ -1003,6 +1016,7 @@ export default {
             advanceSeat: [],
             eltIds: "",
             ticketsIds: "",
+            ticketsId: "",
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -1200,7 +1214,7 @@ export default {
         },
 
         async closingData() {
-            const resData = await this.callApi("post", "booking/getClosingData",{
+            const resData = await this.callApi("post", "booking/getClosingData", {
                 scheduleId: this.addForm.schedule,
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
@@ -1225,35 +1239,35 @@ export default {
             // console.log(this.addData.drivers.length);return;
             this.validationErrors = [];
             if (!this.dataForClose.bus)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Bus is required",
                     icon: 'error',
-                   timer: 2000
+                    timer: 2000
                 });
             if (!this.dataForClose.date)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Date is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (!this.dataForClose.schedule)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Schedule is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.dataForClose.drivers.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Driver is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.dataForClose.hosts.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Host is required",
                     icon: 'error',
@@ -1262,11 +1276,11 @@ export default {
             this.loadig = true;
             const res = await this.callApi("post", "booking/schedule/closing/store", this.dataForClose);
             if (res.status == 201) {
-              swal({
+                swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 this.loading = false;
                 this.dataForClose.bus = "";
@@ -1498,40 +1512,6 @@ export default {
 
                 }
             }
-
-
-            //fetch all Buses
-            // const resBus = await this.callApi("post", "schedule/allBuses", {
-            //     id: this.addForm.schedule,
-            // });
-            // if (resBus.status == 200) {
-            //     this.buses = resBus.data;
-            // }
-            // if (resBus.status == 500 && this.addForm.schedule == 0) {
-            //     this.assignBus = 0;
-            //     this.buses = [];
-            // }
-            // if (resBus.status == 422) {
-            //     let errorContent = "";
-            //     let count = 0;
-            //     for (const key in resBus.data.errors) {
-            //         resBus.data.errors[key].forEach((element) => {
-            //             errorContent += (
-            //                 (++count) + " - " + //creating serial no.
-            //                 element + // main error
-            //                 "\n" // creating new line
-            //             );
-            //         });
-            //         swal({
-            //             title: "Error",
-            //             text: errorContent,
-            //             icon: "error",
-            //             timer: 4000
-            //         });
-            //
-            //     }
-            // }
-
         },
 
         async fetchReScheduleData() {
@@ -1811,7 +1791,7 @@ export default {
                 });
             }
             const res = await this.callApi("post", "booking/store", this.addForm);
-            console.log(res.data);
+            console.log(     res.data.ids);
             if (res.status == 200) {
                 iziToast.success({
                     title: 'Success!',
@@ -1831,9 +1811,6 @@ export default {
                     selectedSeats: '',
                 };
                 this.ticketsIds = res.data.ids;
-                if(res.data.ticket[0].type == "booked") {
-                    this.$refs.refTicket.submit();
-                }
                 this.addForm.date = res.data.ticket[0].date;
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
@@ -1845,7 +1822,14 @@ export default {
                 this.resetingArrays();
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
+                    if (res.data.ticket[0].type == "booked") {
+                        this.$refs.refTicket.submit();
+                    }
+                }, 700);
+
+                setTimeout(() => {
                     $("#booking_table").DataTable();
+
                 }, 300);
                 // window.open(this.$store.state.app_url + 'print/' + res.data + '/pdf', '_blank').focus();
 
@@ -2213,24 +2197,14 @@ export default {
                 }
             }
         },
-
         // Duplicate Ticket
-        async duplicateTicket(data) {
-            // return swal({
-            //     title: "OOPS!!!!!",
-            //     text: "Contact TO Administration",
-            //     icon: "error",
-            //     timer: 2000
-            // });
-            await this.callApi("post", "print/ticket/duplicate", {id: data.id});
-            setTimeout(function () {
-                swal({
-                    title: "Success",
-                    text: "Successfully Requested Fo    r Duplicate Ticket",
-                    icon: "success",
-                    timer: 3000
-                });
-            }, 2000);
+        duplicateTicket: function(data) {
+            this.ticketsId = data.id
+            setTimeout(() => {
+                if (data.type == "booked") {
+                    this.$refs.refDuplicateTicket.submit();
+                }
+            }, 700);
         },
 
         // Get Passengers list

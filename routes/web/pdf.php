@@ -9,4 +9,4 @@ Route::post('print/pdf/bus/invoice', [BookingController::class, 'busInvoice'])->
 Route::post('print/pdf/passenger/list', [BookingController::class, 'passengerListPdf'])->middleware(CustomMiddleware::class);
 Route::post('print/ticket/duplicate', [BookingController::class, 'duplicatePdf'])->middleware(CustomMiddleware::class);
 Route::post('print/pdf/customer/ticket', [BookingController::class, 'ticketPdf'])->middleware(CustomMiddleware::class);
-    Route::post('print/pdf/customer/elt', [BookingController::class, 'eltPdf'])->middleware(CustomMiddleware::class);
+Route::post('print/pdf/customer/elt', [BookingController::class, 'eltPdf'])->middleware(CustomMiddleware::class);

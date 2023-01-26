@@ -1,191 +1,197 @@
-<!DOCTYPE html>
+@foreach($data['tickets']  as $key => $single)
+    <!DOCTYPE html>
 <html>
 
 <head>
-  <style>
-    @page {
-      size: 72mm 210mm;
-      transform: rotate(-90deg);
-      padding: 0;
-      margin: 10px 8px 10px 8px;
-    }
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+    <style>
+        @page {
+            size: 72mm 210mm;
+            transform: rotate(-90deg);
+            padding: 0;
+            margin: 10px 8px 10px 8px;
+        }
 
-    .p {
-      margin-left: 7px;
-    }
+        .p {
+            margin-left: 7px;
+        }
 
-    body {
-      margin: 10px 8px 10px 8px;
-      font-size: 8pt;
-      font-family: Verdana, Arial, sans-serif;
+        body {
+            margin: 10px 8px 10px 8px;
+            font-size: 7pt;
+            font-family: Franklin Gothic Medium, serif;
 
-    }
+        }
 
-    #custinfo {
-      line-height: 1.2;
-    }
+        #custinfo {
+            line-height: 1.2;
+        }
 
-    .companyname {
-      font-weight: 900;
-      font-size: 16pt;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      text-align: center;
-      font-family: sans-serif, Verdana, Arial;
+        .companyname {
+            font-weight: 900;
+            font-size: 16pt;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: Franklin Gothic Medium, serif;
 
-    }
+        }
 
-    .companyAddress {
-      font-weight: 400;
-      font-size: 12pt;
-      margin-bottom: 10px;
-      text-align: center;
-      font-family: sans-serif, Verdana, Arial;
+        .companyAddress {
+            font-weight: 400;
+            font-size: 12pt;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: Franklin Gothic Medium, serif;
 
-    }
+        }
 
-    #barcode-area {
-      text-align: center;
-    }
+        #barcode-area {
+            text-align: center;
+        }
 
-    #barcode-hint {
-      position: relative;
-      bottom: 2mm;
-    }
+        .font-weight-bold {
+            font-weight: 700;
+        }
 
-    .font-weight-bold {
-      font-weight: 700;
-    }
+        .float-left {
+            float: left;
+        }
 
-    .float-left {
-      float: left;
-    }
+        .float-right {
+            float: right;
+        }
 
-    .float-right {
-      float: right;
-    }
+        .clear-both {
+            clear: both;
+        }
+        hr {
+            border: 2px dashed black;
+        }
+    </style>
+    <script type="text/javascript">
 
-    .clear-both {
-      clear: both;
-    }
-  </style>
-  <title>Print Ticket</title>
+        $(document).ready(function () {
+            window.print();
+        });
+    </script>
+    <title>Print Ticket</title>
 </head>
 
 <body>
-  <div id="info">
+<div style="page-break-before:always">&nbsp;</div>
+<div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
-    <div class="companyAddress">
-
-      <span>Main Pirwadhai Mor Peshawar Road Rawalpindi</span>
-      <div><span><b>UAN(24/7):</b> 03-111-777-333</span></div>
-      <div><span><b>Phone:</b> 03108886286</span></div>
+    <div class="companyAddress"><span>{{ $data['format']->address }}</span>
+        <div><span><b>UAN(24/7) : </b>{{ formatUAN($data['format']->uan )}}</span></div>
+        <div><span><b>Phone : </b> {{ formatContact($data['format']->phone) }}</span></div>
     </div>
+    @if($data['duplicate'] == 1)
+    <div style="text-align: center; border:2px dashed black;"><h3>Duplicate Ticket</h3></div>
+    @endif
     <div class="custinfo" id="custinfo">
-      <hr />
-      <div class="fa fa-qrcode" id="barcode-area">
-        <img
-          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAVkSURBVHhe7ZFBCiQxDAP3/5/eZWAFprDaybQGckiBDpLdwk3+/L0cxX2Qw7gPchj3QQ7jPshh3Ac5jPsgh3Ef5DDugxzGfZDDuA9yGPdBDuM+yGHcBzmM+yCHcR/kMO6DHEbkQf78+fOVHJzXb7rc4fadRDdbUYJIS3fcihyc12+63OH2nUQ3W1GCSMvuQdyfvFC+KkFPdvfJ7v4TkZa3PzB5oXxVgp7s7pPd/SciLTxInhL0E7WjfreaU4S585Sgf0OkxR1ICfqJ2lG/W80pwtx5StC/IdLiDqSE85SYvFBO7cLvaleVoH9DpMUdSAnnKTF5oZzahd/VripB/4ZIizuQEvTC5Q7tu++Y191OwnlK0L8h0uIOpAS9cLlD++475nW3k3CeEvRviLTsHsR9+dVcuDm9WM3dnmN3/4lIy9sfkF/NhZvTi9Xc7Tl295+ItOigXYlT/a4SRFq641YkTvW7SpBpCdH95Efk2zlz6gTugxSdQOSK7uc6iW5WJeiJ23f5xPTd5BNE2nTYJNHNqgQ9cfsun5i+m3yCSJs7TPnu3PlJhHnd3RHpdj5KEGlxB9Vjd+bOTyLM6+6OSLfzUYJIizuIuTxFppwSLiduvvvdtP8NkTZ3GHN5ikw5JVxO3Hz3u2n/G6JtOtAdyrzu1py4PXpRd+vceSfS7XyUJNo2Hcq87tacuD16UXfr3Hkn0u18lCTSxsPqsTUXzOtulXB+N/+W2ll76BNE2tyhzAXzulslnN/Nv6V21h76BJG26VB6x+reKuyT35WY8gSRlulAesfq3irsk9+VmPIEub8v1KOrxKqnCPO6+5RL35Lq6ci2/YcHS2LVU4R53X3KpW9J9XRk2/7Dg6VVpu9256siu3mCn7TqYGqV6bvd+arIbp7gN63/0eH8AeaScLmD+9RbXE+qv5JtAzqYhzOXhMsd3Kfe4npS/ZVImw7jgfSkftNJdLOPHG6P+arINH9DpM0dSE/qN51EN/vI4faYr4pM8zdE2qbD6vGdVum+rRLOMyduzlyeeYJI23RYPb7TKt23VcJ55sTNmcszTxBp44GTHG7P5Q63Vzue5sJ5KkmkrTvySQ6353KH26sdT3PhPJUk2sYDnXcSq36SoBd1t5sL7jklyLT8h4c57yRW/SRBL+puNxfcc0oQaZkOcnPlTm9hT+3ekZjyBJGW6SA3V+70FvbU7h2JKU8QaXEHTrkkulkVWc13vUN7q/vfEGnlgfXop1wS3ayKrOa73qG91f1viLTywHp0l5NUPjH1UaKbVSWJtPGwemyXk1Q+MfVRoptVJYm08TDnnUQ3+2ii++YjQS/q7o5+SaSdhzrvJLrZRxPdNx8JelF3d/RLftu+CH/UeWqCe/XbTg7O6zdVCTItL+EPOU9NcK9+28nBef2mKkGkpTtuRcLlhHsSYe48JZxn/gsi7Tx4VcLlhHsSYe48JZxn/gsi7buHun3lnLt8lel7l4v67ZMSRFp2D3L7yjl3+SrT9y4X9dsnJYi08KB6ZJVwnhLOr2qi+6aTY5rvEGnhQfKUcJ4Szq9qovumk2Oa7xBp4UHylJj8t6z2KqdIt/OkBJEWHlSPrBKT/5bVXuUU6XaelCDSwoPqkVXC+dVccE6J1dxJuDxJpJUH1qOrhPOrueCcEqu5k3B5kkjr7oHcd565cLmYvqOE806/INK6eyD3nWcuXC6m7yjhvNMviLR2x65ITLmjfrMih9vb9QkibTpsV2LKHfWbFTnc3q5PkG27vOY+yGHcBzmM+yCHcR/kMO6DHMZ9kMO4D3IY90EO4z7IYdwHOYz7IIdxH+Qw7oMcxn2Qw7gPchj3QY7i799/1PC6TV6gwP0AAAAASUVORK5CYII="
-          class="rounded" />
-      </div>
-      <div>
-        <p class="font-weight-bold float-left">Customer Name :</p>
-        <p class="float-right">Malik ajay </p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Seat No :</p>
-        <p class="float-right">1</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Bus Class:</p>
-        <p class="float-right">Bussiness</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">From :</p>
-        <p class="float-right">Pindi</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">To :</p>
-        <p class="float-right">Karachi</p>
-      </div>
+        <hr/>
+        <br>
+        <div id="barcode-area">
+            <img style="width: 130px !important;"
+                 src="{{ asset('/Customers/Qrs/'.codeImage('Customer Name : '.ucfirst($data['tickets'][$key]->customer->name) . ' | ' . 'Customer CNIC : '. formatCNIC($data['tickets'][$key]->customer->cnic).' | ' . 'Customer Phone : '. formatContact($data['tickets'][$key]->customer->contact) .' | '.'Seat No : ' . $data['tickets'][$key]['seat_no'] .' | '.'Bus Class : ' .ucfirst($data['tickets'][$key]->seatClass->name) . ' | '. 'From : ' . ucfirst($data['tickets'][$key]->departure_city->name) . ' | ' . 'To : ' . ucfirst($data['tickets'][$key]->destination_city->name) . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data['tickets'][$key]['date'])) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data['tickets'][$key]->schedule->time)) . ' | ' . ' Booking Date Time : '.  date('d/m/Y H:i A', strtotime($data['tickets'][$key]['created_at'])) . ' | ' . 'Fare :'. $data['tickets'][$key]['seat_fare'])) }}"
+                 class="rounded"/>
 
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Departure Date :</p>
-        <p class="float-right">05/01/2023</p>
-      </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Customer Name :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->customer->name)}}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Seat No :</p>
+                <p class="float-right">{{ $data['tickets'][$key]['seat_no'] }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Bus Class:</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->seatClass->name) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">From :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->departure_city->name) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">To :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->destination_city->name) }}</p>
+            </div>
 
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Departure Time :</p>
-        <p class="float-right">22:00 pm</p>
-      </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Departure Date :</p>
+                <p class="float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['date'])) }}</p>
+            </div>
 
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Booking Date :</p>
-        <p class="float-right">05/01/2023 14:51 PM</p>
-      </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Departure Time :</p>
+                <p class="float-right">{{ date('H:i A', strtotime($data['tickets'][$key]->schedule->time)) }}</p>
+            </div>
 
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Fare :</p>
-        <p class="float-right">2500</p>
-      </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Booking Date :</p>
+                <p class="float-right">{{ date('d/m/Y H:i A', strtotime($data['tickets'][$key]['created_at'])) }}</p>
+            </div>
+
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Fare :</p>
+                <p class="float-right">{{ $data['tickets'][$key]['seat_fare'] }}</p>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <hr>
+
+        <div style="text-align: center;">
+            <h3 style="font-weight: 900;"> Terms & Condition Applied!</h3>
+            <p>{{ $data['format']->terms_condition }}</p>
+
+            <br>
+            <br>
+            <br>
+            <p> &#169; Rights Reserved by Kainat Travels</p>
+        </div>
+
+        <div style="page-break-before:always">&nbsp;</div>
+        <div class="custinfo" id="custinfo">
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Seat No :</p>
+                <p class="float-right">{{ $data['tickets'][$key]['seat_no'] }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Bus Class:</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->seatClass->name) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">From :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->departure_city->name) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">To :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->destination_city->name) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Departure Date :</p>
+                <p class="float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['date'])) }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Customer Name :</p>
+                <p class="float-right">{{ ucfirst($data['tickets'][$key]->customer->name)}}</p>
+            </div>
+
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Customer CNIC :</p>
+                <p class="float-right">{{ formatCNIC($data['tickets'][$key]->customer->cnic)}}</p>
+            </div>
+
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Customer Contact :</p>
+                <p class="float-right">{{ formatContact($data['tickets'][$key]->customer->contact)}}</p>
+            </div>
+        </div>
     </div>
-    <br>
-    <br>
-    <br>
-    <hr>
-
-    <div style="text-align: center;">
-      <h3 style="font-weight: 900;"> Terms & Condition Applied!</h3>
-      <p>Refreshment,WIFI upto 350MB, And MOD is Complimentary Refreshment,WIFI Bus will not drop passengers without
-        Company TerminalBus will not drop</p>
-
-      <br>
-      <br>
-      <br>
-      <p> &#169; Rights Reserved by Kainat Travels</p>
-    </div>
-
-    <div style="page-break-before:always">&nbsp;</div>
-    <div class="custinfo" id="custinfo">
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Seat No :</p>
-        <p class="float-right">1</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Bus Class:</p>
-        <p class="float-right">Bussiness</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">From :</p>
-        <p class="float-right">Pindi</p>
-      </div>
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">To :</p>
-        <p class="float-right">Karachi</p>
-      </div>
-
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Departure Date :</p>
-        <p class="float-right">05/01/2023</p>
-      </div>
-      <div>
-        <p class="font-weight-bold float-left">Customer Name :</p>
-        <p class="float-right">Malik ajay </p>
-      </div>
-
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Customer CNIC :</p>
-        <p class="float-right">33202-1651669-9</p>
-      </div>
-
-      <div class="clear-both">
-        <p class="font-weight-bold float-left">Customer Contact :</p>
-        <p class="float-right">0315-7053558</p>
-      </div>
-    </div>
-
-
-  </div>
+</div>
 </body>
-
 </html>
+@endforeach

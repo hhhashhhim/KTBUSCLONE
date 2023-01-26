@@ -174,7 +174,7 @@ if (!function_exists('updateAdvancedSeat')) {
         $updateId->update([
             'cnic' => plainContactAndCnic($request->customerCNIC),
         ]);
-        return $request->alreadyBookedId[0];
+        return $request->alreadyBookedId->first();
     }
 }
 
