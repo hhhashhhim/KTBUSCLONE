@@ -89,11 +89,16 @@ class CompanyController extends Controller
         Company::find($request->id)->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
-            'logo' => $request->logo,
             'location' => $request->location,
             'modules' => $request->modules,
             'added_by' => auth()->user()->id,
         ]);
+        if($request->logo)
+        {
+            Company::find($request->id)->update([
+                'logo' => $request->logo,
+            ]);
+        }
         User::where('company_id', $request->id)->first()->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
