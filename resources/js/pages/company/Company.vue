@@ -587,7 +587,7 @@ export default {
             const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
 
             if (res.status == 200) {
-                this.loading = true;
+                this.loading = false;
                 $("#company_table").DataTable().destroy();
                 this.success = "Company Updated Successfully";
                 const companyRes = await this.callApi("post", "company");
