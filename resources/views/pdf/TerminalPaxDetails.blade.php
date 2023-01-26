@@ -60,15 +60,18 @@
             font-family: sans-serif, Verdana, Arial;
         }
 
-        .centerTH {
-            text-align: start;
-            width: 17%;
-        }
-
-        .countPassenger {
-            margin-top: 18px !important;
-        }
     </style>
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            window.print();
+        });
+
+        setTimeout(function(){
+            window.close() ;
+        }, 2000); //Time before execution
+    </script>
     <title>Terminal Passenger List </title>
 </head>
 {{--{{dd($data)}}--}}
@@ -76,10 +79,10 @@
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">   {{ $format->address }}</span></div>
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">{{$format->terminal->name}}</span></div>
-        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> {{ formatUAN($format->uan) }}</span></div>
-        <div><span><b>Phone # : </b>{{ formatContact($format->phone) }}</span></div>
+        <div style=" padding-bottom: 5px;"><span style="font-weight:600">   {{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</span></div>
+        <div style=" padding-bottom: 5px;"><span style="font-weight:600">{{ isset($format->terminal) ? $format->terminal->name : "Main Terminal"}}</span></div>
+        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> {{ isset( $format->uan ) ? formatUAN($format->uan) : "03-111-777-333" }}</span></div>
+        <div><span><b>Phone # : </b>{{ isset( $format->phone) ? formatContact($format->phone) : "0310-8886286" }}</span></div>
     </div>
 </div>
 <br>
@@ -89,7 +92,7 @@
     <tr>
         <th style="text-align: start;">Route:</th>
         @if ($data)
-            <td style="text-align: end;">{{ $data['routeName'] }}</td>
+            <td style="text-align: end;">{{ ucfirst($data['routeName']) }}</td>
         @else
             <td style="text-align: end;"></td>
         @endif

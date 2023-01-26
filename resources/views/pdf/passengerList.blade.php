@@ -72,6 +72,17 @@
             margin-top: 18px !important;
         }
     </style>
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            window.print();
+        });
+
+        setTimeout(function(){
+            window.close() ;
+        }, 2000); //Time before execution
+    </script>
     <title> Print Passenger List </title>
 </head>
 <body>
@@ -79,11 +90,11 @@
     <div class="companyName"><span>Kainat Travels</span></div>
     <br>
     <div class="companyAddress">
-        <div><span><b>{{ $format->address }}</b></span></div>
+        <div><span><b>{{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</b></span></div>
     </div>
     <br>
     <div class="companyAddress">
-        <div><span><b>UAN(24/7) : </b>{{formatUAN($format->uan)}}</span></div>
+        <div><span><b>UAN(24/7) : </b>{{isset($format->uan) ? formatUAN($format->uan) : "03-111-777-333"}}</span></div>
     </div>
 </div>
 <br>

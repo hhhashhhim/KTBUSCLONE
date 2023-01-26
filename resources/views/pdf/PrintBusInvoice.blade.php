@@ -67,6 +67,17 @@
             margin-top: 18px !important;
         }
     </style>
+    <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            window.print();
+        });
+
+        setTimeout(function(){
+            window.close() ;
+        }, 2000); //Time before execution
+    </script>
     <title>Print Bus Invoice</title>
 </head>
 <body>
