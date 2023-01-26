@@ -157,10 +157,9 @@
 {{--            {{dd($data['format'])}}--}}
 
             <div class="companyname" style="margin-bottom: 15px;"><span>Kainat Travels</span></div>
-            <div class="companyAddress">
-                <span style="margin-bottom: 10px !important;">{{ $data['format']->address }}</span>
-                <div style="margin-bottom: 10px !important;"><span><b>UAN(24/7) : </b> {{ formatUAN($data['format']->uan) }}</span></div>
-                <div style="margin-bottom: 10px !important;"><span><b>Phone : </b> {{ formatContact( $data['format']->phone)  }}</span></div>
+            <div class="companyAddress"><span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
+                <div><span><b>UAN(24/7) : </b>{{ isset($data['format']->uan) ? formatUAN($data['format']->uan) : "03-111-777-333" }}</span></div>
+                <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span></div>
             </div>
             <div class="custinfo" id="custinfo">
                 <div class="fa fa-qrcode" id="barcode-area">
