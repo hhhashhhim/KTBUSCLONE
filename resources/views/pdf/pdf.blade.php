@@ -145,7 +145,7 @@
 
         <div style="text-align: center;">
             <h3 style="font-weight: 900;"> Terms & Condition Applied!</h3>
-            <p>{{ $data['format']->terms_condition }}</p>
+            <p>{{ isset($data['format']->terms_condition) ? $data['format']->terms_condition : "Refreshment,WIFI upto 350MB, And MOD is Complimentary Refreshment,WIFI Bus will not drop passengers without Company TerminalBus will not drop" }}</p>
 
             <br>
             <br>
