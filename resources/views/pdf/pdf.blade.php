@@ -12,9 +12,6 @@
             margin: 10px 8px 10px 8px;
         }
 
-        .p {
-            margin-left: 7px;
-        }
 
         body {
             margin: 10px 8px 10px 8px;
@@ -70,10 +67,13 @@
         }
     </style>
     <script type="text/javascript">
-
         $(document).ready(function () {
             window.print();
         });
+
+        setTimeout(function(){
+            window.close() ;
+        }, 2000); //Time before execution
     </script>
     <title>Print Ticket</title>
 </head>

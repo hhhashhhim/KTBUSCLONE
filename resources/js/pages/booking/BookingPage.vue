@@ -411,8 +411,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="addEltToTicket(eltData)">
-                            Add ELT
+                                @click="addEltToTicket(eltData)" :disabled="this.EltButton">
+                            {{ this.EltButton ? 'Loading...' :  'Add ELT' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
@@ -1015,6 +1015,7 @@ export default {
             cities: [],
             advanceSeat: [],
             eltIds: "",
+            EltButton : false,
             ticketsIds: "",
             ticketsId: "",
             addForm: {
@@ -1791,7 +1792,7 @@ export default {
                 });
             }
             const res = await this.callApi("post", "booking/store", this.addForm);
-            console.log(     res.data.ids);
+            console.log(res.data.ids);
             if (res.status == 200) {
                 iziToast.success({
                     title: 'Success!',
@@ -2056,8 +2057,15 @@ export default {
                 singleFare: dataEnter.dataSeatFare,
                 eltDescription: dataEnter.dataDescription,
             }
+            this.EltButton = true;
             const resOverIssue = await this.callApi("post", "booking/elt", data);
-            if (resOverIssue.status == 200) {
+            console.log(resOverIssue.data);
+            if (resOverIssue.status == 201) {
+                this.EltButton = false;
+                this.eltIds = resOverIssue.data.id
+                setTimeout(() => {
+                    this.$refs.refElt.submit();
+                }, 700);
                 swal({
                     title: "Success",
                     text: "ELT Added Successfully",
@@ -2067,6 +2075,7 @@ export default {
             }
 
             if (resOverIssue.status == 422 && resOverIssue.data.message) {
+                this.EltButton = false;
                 swal({
                     title: "Error",
                     text: resOverIssue.data.message,
@@ -2076,6 +2085,7 @@ export default {
             }
 
             if (resOverIssue.status == 422) {
+                this.EltButton = false;
                 let errorContent = "";
                 let count = 0;
                 for (const key in resOverIssue.data.errors) {
@@ -2198,7 +2208,7 @@ export default {
             }
         },
         // Duplicate Ticket
-        duplicateTicket: function(data) {
+        duplicateTicket: function (data) {
             this.ticketsId = data.id
             setTimeout(() => {
                 if (data.type == "booked") {
@@ -2219,9 +2229,6 @@ export default {
         getBusInvoice: function () {
             this.$refs.refBusInvoice.submit();
         },
-
-        testTicket: function () {
-        }
     },
 };
 </script>

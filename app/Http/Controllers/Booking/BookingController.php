@@ -23,6 +23,7 @@ use App\Models\Terminal;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Rawilk\Printing\Facades\Printing;
 
@@ -179,7 +180,8 @@ class BookingController extends Controller
         ];
 //        } catch (\Exception $e) {
 //            DB::rollBack();
-//            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+//            return response()->json(["errors" => ["Error" => ["OOPS!! Something Went Wrong Please Try Again"]]], 422);
+////            return response()->json(["errors" => ["Error" => [$e->getMessage()]]], 422);
 //        }
     }
 
@@ -530,7 +532,6 @@ class BookingController extends Controller
         $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
         $date = date_format(date_create($uniqueDate . ' ' . $scheduleTime), "l") . ' , ' . date_format(date_create($uniqueDate . ' ' . $scheduleTime), "d F Y H:i:s A");
         $eltAmount = 0;
-//        return $passengerData[0]->elt;
         foreach ($passengerData as $passenger) {
             $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
         }
@@ -610,7 +611,14 @@ class BookingController extends Controller
     }
     public function eltPdf(Request $request)
     {
-        dd($request->all());
+//        dd($request->elt_ids);
+        $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id'=> Auth::user()->company_id,'id' => $request->elt_ids])->first();
+        $format = TicketsTemplate::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> Auth::user()->terminal_id])->first();
+        $finalData = [
+            'elt' => $ticketsElt,
+            'format' => $format,
+        ];
+        return view('pdf/eltPdf', ['data' => $finalData]);
     }
 
     public function getPassengersList(Request $request)
