@@ -258,7 +258,7 @@
                             </vue-mask>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="Logo">Logo</label>
+                            <label for="Logo">Logo <small>(Empty field will save logo same)</small></label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'edit')">
                                 <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName : 'Choose.jpg, .png, .jpeg Image' }}</label>
@@ -285,7 +285,7 @@
                             />
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="password">Password</label>
+                            <label for="password">Password <small>(Empty field will save password same)</small></label>
                             <input
                                 type="password"
                                 class="form-control"
@@ -587,7 +587,7 @@ export default {
             const res = await this.callApi("post", "company/update", {...this.dataEdit, logo});
 
             if (res.status == 200) {
-                this.loading = true;
+                this.loading = false;
                 $("#company_table").DataTable().destroy();
                 this.success = "Company Updated Successfully";
                 const companyRes = await this.callApi("post", "company");

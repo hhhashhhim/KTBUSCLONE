@@ -68,8 +68,16 @@ class CompanyController extends Controller
 
     public function logoUpload(Request $request)
     {
-        $name = $this->image($request->logo);
-        return response(['name' => $name], 200);
+        if($request->logo)
+        {
+            $name = $this->image($request->logo);
+            return response(['name' => $name], 200);
+        }
+        else
+        {
+            return;
+        }
+        
     }
 
     public function update(Request $request)
@@ -81,17 +89,27 @@ class CompanyController extends Controller
         Company::find($request->id)->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
-            'logo' => $request->logo,
             'location' => $request->location,
             'modules' => $request->modules,
             'added_by' => auth()->user()->id,
         ]);
+        if($request->logo)
+        {
+            Company::find($request->id)->update([
+                'logo' => $request->logo,
+            ]);
+        }
         User::where('company_id', $request->id)->first()->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
             'email' => $request->email,
-            'password' => Hash::make($request->password),
         ]);
+        if($request->password)
+        {
+            User::where('company_id', $request->id)->first()->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
         Role::where('company_id', $request->id)->where('name', 'admin')->update([
             'permissions' => $request->modules,
         ]);
