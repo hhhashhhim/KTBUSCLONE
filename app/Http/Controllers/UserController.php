@@ -38,7 +38,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'contact' => plainContact($request->contact),
+            'contact' => formatContact($request->contact),
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
             'terminal_id' => $request->terminal_id,
@@ -65,7 +65,7 @@ class UserController extends Controller
         $user = User::find($request->id)->update([
             'name' => $request->name,
             'email' => $request->email,
-            'contact' => !is_null($request->contact) ? plainContact($request->contact) : null,
+            'contact' => !is_null($request->contact) ? formatContact($request->contact) : null,
             'role_id' => $request->role_id,
             'terminal_id' => $request->terminal_id,
             'company_id' => Auth::user()->company_id,
