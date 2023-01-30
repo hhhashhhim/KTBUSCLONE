@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/store', [BookingController::class, 'store']);
+    Route::post('/terminals', [BookingController::class, 'getTerminals']);
     Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/details', [BookingController::class, 'detailTicket']);

@@ -118,6 +118,21 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="row pb-2">
+                                                <div class="col-md-12 form-group">
+                                                    <label for="Terminals" class="mb-0"> Terminal ID</label>
+                                                    <select class="form-control" id="Terminals"
+                                                            v-model="addForm.terminalId">
+                                                        <option value="0">Select Terminal</option>
+                                                        <option
+                                                            v-for="(terminal, i) in terminals"
+                                                            :value="terminal.id"
+                                                            :key="i"
+                                                        >{{ changeToUpperCase(terminal.city.name) }} - {{ changeToUpperCase(terminal.name) }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -685,8 +700,8 @@
                                                 </div>
 
                                             </div>
-                                            <div class="row my-2">
-                                                <div class="col-md-6">
+                                            <div class="row my-3 pl-3">
+                                                <div class="col-md-4">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Date :</p>
                                                         <p class="mb-0">{{ innerItem.date }}</p>
@@ -699,12 +714,8 @@
                                                         <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
                                                         <p class="mb-0">{{ innerItem.schedule.name }}</p>
                                                     </div>
-                                                    <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
-                                                        <p class="mb-0">{{ innerItem.departure_city.name }}</p>
-                                                    </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Name : </p>
                                                         <p class="mb-0">{{ innerItem.customer.name }}</p>
@@ -718,9 +729,19 @@
                                                         <p class="mb-0">
                                                             {{ phoneFormat(innerItem.customer.contact) }}</p>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Booking Date & Time  : </p>
+                                                        <p class="mb-0">{{ innerItem.bookingDate }}</p>
+                                                    </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
                                                         <p class="mb-0">{{ innerItem.destination_city.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
+                                                        <p class="mb-0">{{ innerItem.departure_city.name }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -988,6 +1009,7 @@ export default {
             alreadyBookedSeatClassName: [],
             alreadyBookedSeatClass: [],
             eltData: [],
+            terminals: [],
             schedule: "",
             reScheduleSchedule: '',
             reScheduleDepart: '',
@@ -1029,6 +1051,7 @@ export default {
                 departureCity: 0,
                 totalAmount: 0,
                 discount: 0,
+                terminalId: 0,
                 alreadyBookedId: [],
             },
             advanceCash: {
@@ -1115,7 +1138,7 @@ export default {
                 if (this.addForm.schedule == 0) {
                     return swal({
                         title: "OOPS!!",
-                        text: "Please Select Schedule City First",
+                        text: "Please Select Departure Time First ",
                         icon: "error",
                         timer: 2000,
                     });
@@ -1334,10 +1357,13 @@ export default {
             const resBooking = await this.callApi("post", "booking");
             const resClass = await this.callApi("post", "fare-class")
             const resCity = await this.callApi("post", "cities")
-            if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200) {
+            const resTerminals = await this.callApi("post", "booking/terminals")
+            if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
                 this.allBookings = resBooking.data;
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
+                this.terminals = resTerminals.data.terminals;
+                this.addForm.terminalId = resTerminals.data.authTerminalId;
                 setTimeout(() => {
                     $("#booking_table").DataTable();
                 }, 300);
@@ -1815,6 +1841,7 @@ export default {
                 };
                 this.ticketsIds = res.data.ids;
                 this.addForm.date = res.data.ticket[0].date;
+                this.addForm.terminalId = res.data.authTerminalId;
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
                 this.addForm.schedule = res.data.ticket[0].schedule_id;

@@ -51,8 +51,9 @@ class BookingController extends Controller
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
         if (count($request->selectedSeats) == 0) {
-            return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Refresh the page"]]], 422);
+            return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
         }
+
 //        try {
 //            DB::beginTransaction();
 
@@ -68,6 +69,11 @@ class BookingController extends Controller
         if (isset($request->flag) && $request->flag == 1) {
             $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
         } else {
+//            $oldBooking = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule, 'departure_city_id' => $request->departureCity, 'destination_city_id' => $request->destinationCity])->whereIn('seat_no', count($request->selectedSeats) == 0 ? $request->selectedBookedSeats : $request->selectedSeats)->get();
+//            if($oldBooking){
+//
+//            }
+//            dd($oldBooking, $request->all());
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -124,7 +130,7 @@ class BookingController extends Controller
                     'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                     'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
                     'schedule_details_id' => $scheduleDetail->id,
-                    'terminal_id' => Auth::user()->terminal_id,
+                    'terminal_id' => $request->terminalId ??  Auth::user()->terminal_id,
                     'remarks' => $request->remarks,
                     'gender' => $request->gender,
                     'type' => $request->type,
@@ -177,6 +183,7 @@ class BookingController extends Controller
         return [
             'ids' => implode('-', $allTicket),
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
+            'authTerminalId' => Auth::user()->terminal_id,
         ];
 //        } catch (\Exception $e) {
 //            DB::rollBack();
@@ -202,8 +209,8 @@ class BookingController extends Controller
             'destination_id' => $ticket['destination_city_id'],
             'schedule_id' => $ticket['schedule_id'],
         ])->first();
-        $currentTicketData =  Ticket::where('company_id', Auth::user()->company_id)->where('schedule_id', $ticket['schedule_id'])
-        ->whereDate('schedule_date', $scheduleDetail->schedule_date)->first ();
+        $currentTicketData = Ticket::where('company_id', Auth::user()->company_id)->where('schedule_id', $ticket['schedule_id'])
+            ->whereDate('schedule_date', $scheduleDetail->schedule_date)->first();
 
         $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id')->first();
         $departure_city_id = $schedule->route->fares->first()->departure_city_id;
@@ -347,8 +354,7 @@ class BookingController extends Controller
         return $ticket->delete();
     }
 
-    public
-    function getCnic(Request $request)
+    public function getCnic(Request $request)
     {
         if ($request->status == 'addFormCNIC') {
             return Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
@@ -356,6 +362,14 @@ class BookingController extends Controller
         if ($request->status == 'addFormContact') {
             return Customer::where('company_id', Auth::user()->company_id)->where('contact', plainContactAndCnic($request['phoneNumber']))->first();
         }
+    }
+
+    public function getTerminals()
+    {
+        return[
+            'terminals'=> Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(),
+            'authTerminalId'=> Auth::user()->terminal_id ?? 0,
+        ];
     }
 
     public function detailTicket(Request $request)
@@ -375,7 +389,13 @@ class BookingController extends Controller
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
         ])->first(['schedule_date']);
-        return Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+        foreach ($tickets as $key => $single) {
+            foreach ($single as $key => $item) {
+                $item->bookingDate = date('d/m/Y H:i A', strtotime($item->created_at));
+            }
+        }
+        return $tickets;
     }
 
     public function getClosingData(Request $request)
@@ -393,8 +413,8 @@ class BookingController extends Controller
             'schedule_id' => $request->scheduleId,
             'schedule_date' => $uniqueDate,
         ])
-        ->with("schedule.route:id,name")
-        ->first();
+            ->with("schedule.route:id,name")
+            ->first();
 
         // if already assign
         $checkAssign = TicketClosing::where([
@@ -402,22 +422,22 @@ class BookingController extends Controller
             'schedule_id' => $request->scheduleId,
             'schedule_date' => $uniqueDate,
         ])
-        ->with("members")
-        ->first();
+            ->with("members")
+            ->first();
 
         $infoData = (object)[];
-        $infoData->schedule = date("m/d/Y h:i A",strtotime("$schedule->schedule_date $schedule->departure_time")).' - '.$schedule->schedule->name;
+        $infoData->schedule = date("m/d/Y h:i A", strtotime("$schedule->schedule_date $schedule->departure_time")) . ' - ' . $schedule->schedule->name;
         $infoData->schedule_date = $schedule->schedule_date;
         $infoData->schedule_id = $schedule->schedule_id;
         $infoData->route_name = $schedule->schedule->route->name;
         $infoData->description = $checkAssign ? $checkAssign->description : '';
         $infoData->bus = $checkAssign ? $checkAssign->bus_id : '';
-        $infoData->drivers = $checkAssign ? $checkAssign->members->where("type",1)->pluck('user_id') : [];
-        $infoData->hosts = $checkAssign ? $checkAssign->members->where("type",2)->pluck('user_id') : [];
+        $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
+        $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
 
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type'=>2,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type'=>1,'company_id'=>Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->orderBy('id')->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         $data = [
             "buses" => $buses,
             "hosts" => $hosts,
@@ -593,27 +613,29 @@ class BookingController extends Controller
 
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
     }
+
     public function ticketPdf(Request $request)
     {
-        if((int)$request->duplicate == 0){
-            $ids = explode("-",$request->ticket_ids);
-        }else{
+        if ((int)$request->duplicate == 0) {
+            $ids = explode("-", $request->ticket_ids);
+        } else {
             $ids = [$request->ticket_id];
         }
         $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
-        $format = TicketsTemplate::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> Auth::user()->terminal_id])->first();
+        $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
         $finalData = [
             'tickets' => $tickets,
             'format' => $format,
-            'duplicate' => (int) $request->duplicate,
+            'duplicate' => (int)$request->duplicate,
         ];
         return view('pdf/pdf', ['data' => $finalData]);
     }
+
     public function eltPdf(Request $request)
     {
 //        dd($request->elt_ids);
-        $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id'=> Auth::user()->company_id,'id' => $request->elt_ids])->first();
-        $format = TicketsTemplate::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> Auth::user()->terminal_id])->first();
+        $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id' => Auth::user()->company_id, 'id' => $request->elt_ids])->first();
+        $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
         $finalData = [
             'elt' => $ticketsElt,
             'format' => $format,
