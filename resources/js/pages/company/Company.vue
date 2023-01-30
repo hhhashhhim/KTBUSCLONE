@@ -45,9 +45,14 @@
                                                             <td>{{ company.name }}</td>
                                                             <td>{{ phoneFormat(company.contact) }}</td>
                                                             <td>{{ company.location }}</td>
-                                                            <td>
+                                                            <td v-if="company.logo != null">
                                                                 <a :href="$store.state.app_url +'uploads/company/logo/'+(company.logo)" target="_blank">
-                                                                <img :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)" style="width:120px;height:150px;" alt="">
+                                                                <img :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)" style="width:90px;height:100px;" alt="">
+                                                                </a>
+                                                            </td>
+                                                            <td v-else>
+                                                                <a :href="$store.state.app_url +'uploads/no-user.png'" target="_blank">
+                                                                <img :src="$store.state.app_url +'uploads/no-user.png'" style="width:90px;height:100px;" alt="">
                                                                 </a>
                                                             </td>
                                                             <td>

@@ -64,11 +64,17 @@
                                                     <tbody>
                                                     <tr v-for="(employee, i) in employees" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td><a
+                                                        <td v-if="employee.profile_Img != null"><a
                                                             :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
                                                             target="_blank">
-                                                            <img
-                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                            <img :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                                style="width:90px;height:100px;" alt="">
+                                                        </a>
+                                                        </td>
+                                                        <td v-else><a
+                                                            :href="$store.state.app_url +'uploads/no-user.png'"
+                                                            target="_blank">
+                                                            <img :src="$store.state.app_url +'uploads/no-user.png'"
                                                                 style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
@@ -133,7 +139,7 @@
                         <input type="text" id="EmployeeName" class="form-control" v-model="addForm.EmployeeName"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="FatherName">Father Name <span class="text-danger ml-1">*</span></label>
+                        <label for="FatherName">Father Name</label>
                         <input type="text" id="FatherName" class="form-control" v-model="addForm.EmployeeFatherName"/>
                     </div>
                     <div class="form-group col-md-4">
@@ -1000,13 +1006,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.addForm.EmployeeFatherName)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Father Name Field is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.addForm.EmployeeFatherName)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Father Name Field is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (this.addForm.EmployeeType == "")
                 return swal({
                     title: "Required!",
@@ -1028,27 +1034,27 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.addForm.EmployeeDob)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Date of Birth is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.addForm.HiringDate)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Hiring Date  is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.addForm.EmployeeAddress)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Address is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.addForm.EmployeeDob)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Date of Birth is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.addForm.HiringDate)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Hiring Date  is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.addForm.EmployeeAddress)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Address is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (this.addForm.EmployeeTerminal == "0")
                 return swal({
                     title: "Required!",
@@ -1070,34 +1076,34 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.addForm.workingDays)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Working Days is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.addForm.paidLeaves)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.addForm.bloodGroup)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.addForm.EmployeeSalary)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Salary is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.addForm.workingDays)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Working Days is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.addForm.paidLeaves)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Paid Leaves is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.addForm.bloodGroup)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Paid Leaves is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.addForm.EmployeeSalary)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Salary is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (!this.addForm.profile)
                 return swal({
                     title: "Required!",
