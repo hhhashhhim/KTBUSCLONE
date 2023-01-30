@@ -67,8 +67,9 @@
                                                                     data-toggle="modal"
                                                                     @click="changeInfo(departureCity,destinationCity)"
                                                                     v-if="departureCity.id!=destinationCity.id"
-                                                                    class="btn btn-success btn-block modal-btn">
-                                                                    {{ destinationCity.fare }}
+                                                                    class="btn btn-success btn-block modal-btn d-flex flex-column justify-content-between">
+                                                                    <span>Fare : {{ destinationCity.fare }}</span>
+                                                                    <span class="text-title">Time : {{ destinationCity.time_difference??'Not Added' }}</span>
                                                                 </a>
                                                             </td>
                                                         </template>
@@ -344,12 +345,12 @@ table, table * {
     transition: 0.5s transform;
 }
 
-.modal-cell:hover .modal-btn {
+/*.modal-cell:hover .modal-btn {
     position: absolute;
     z-index: 20;
     transform: scale(1.3) translateY(-20px);
     box-shadow: 0px 0px 10px black;
-}
+}*/
 
 .header-select {
     width: 35%;

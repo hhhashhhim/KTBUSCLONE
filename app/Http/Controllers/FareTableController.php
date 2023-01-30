@@ -69,6 +69,10 @@ class FareTableController extends Controller
                     ->where('to_city_id', $routeCities->destination_city_id)
                     ->where('fare_class', $fare_class)
                     ->value('fare');
+                $city_from['destinationCities'][$j]['time_difference'] = FareTable::where('from_city_id', $routeCities->departure_city_id)
+                    ->where('to_city_id', $routeCities->destination_city_id)
+                    ->where('fare_class', $fare_class)
+                    ->value('time_difference');
             }
             unset($city_from['city_to']);
             return $city_from;
