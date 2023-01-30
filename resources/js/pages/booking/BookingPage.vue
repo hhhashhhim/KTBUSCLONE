@@ -17,7 +17,7 @@
                                                 :value="city.id"
                                                 :key="i"
                                         >
-                                            {{ city.name }}
+                                            {{ changeToUpperCase(city.name) }}
                                         </option>
                                     </select>
                                 </div>
@@ -29,7 +29,7 @@
                                         <option value="0" selected>Select Destination City</option>
                                         <option v-for="(city, i) in specificCities" :value="city.id"
                                                 :key="i">
-                                            {{ city.name }}
+                                            {{ changeToUpperCase(city.name) }}
                                         </option>
                                     </select>
                                 </div>
@@ -40,11 +40,11 @@
                                            @change="fetchSpecificSchedules()"/>
                                 </div>
                                 <div class="col-md-4   mb-2">
-                                    <label for="scheduleName" class="mb-0">Schedule Name <span
+                                    <label for="scheduleName" class="mb-0">Departure Time <span
                                         class="text-danger">*</span></label>
                                     <select class="form-control" id="scheduleName" @change="fetchScheduleData()"
                                             v-model="addForm.schedule">
-                                        <option value="0" selected>Select Schedule</option>
+                                        <option value="0">Select Departure Time</option>
                                         <option v-for="(schedule, i) in allSchedules"
                                                 :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
                                         </option>
@@ -412,7 +412,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
                                 @click="addEltToTicket(eltData)" :disabled="this.EltButton">
-                            {{ this.EltButton ? 'Loading...' :  'Add ELT' }}
+                            {{ this.EltButton ? 'Loading...' : 'Add ELT' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
@@ -499,7 +499,7 @@
                                        @change="fetchReSpecificSchedules()"/>
                             </div>
                             <div class="col-md-3 class">
-                                <label for="scheduleName" class="mb-0">Schedule Name <span
+                                <label for="scheduleName" class="mb-0">Departure Time <span
                                     class="text-danger">*</span></label>
                                 <select class="form-control" id="reScheduleName" @change="fetchReScheduleData()"
                                         v-model="rescheduleData.rescheduleSchedule">
@@ -1015,7 +1015,7 @@ export default {
             cities: [],
             advanceSeat: [],
             eltIds: "",
-            EltButton : false,
+            EltButton: false,
             ticketsIds: "",
             ticketsId: "",
             addForm: {
@@ -1461,7 +1461,9 @@ export default {
                 return true;
             }
         },
-
+        changeToUpperCase: function (string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
         async fetchScheduleData() {
             this.resetingArrays();
             this.addForm.customerName = '';
@@ -1746,7 +1748,7 @@ export default {
             if (!this.addForm.schedule) {
                 return swal({
                     title: "Required!",
-                    text: "Schedule Name is Required",
+                    text: "Departure Time is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -2163,7 +2165,7 @@ export default {
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 return swal({
                     title: "Required!!",
-                    text: "Please Select Schedule!!",
+                    text: "Please Select Departure Time!!",
                     icon: "error",
                     timer: 2000
                 });

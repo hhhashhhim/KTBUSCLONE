@@ -49,7 +49,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>Name</th>
+                                                        <th>Via</th>
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
                                                         <th>Time</th>
@@ -192,7 +192,7 @@
                 <section class="section1" :class="activeSection != 0 ? 'd-none' : ''">
                     <div class="row">
                         <div class="col-md-6">
-                            <label for="name">Name <span class="text-danger ml-1">*</span></label>
+                            <label for="name">Via <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 id="name"
@@ -1257,7 +1257,7 @@ export default {
             if (this.data.name == "")
                 return swal({
                     title: "Required!",
-                    text: "Name Field is Required ",
+                    text: "Via Field is Required ",
                     icon: "error",
                     timer: 2000
                 });
