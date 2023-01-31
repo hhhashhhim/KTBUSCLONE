@@ -12,7 +12,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/details', [BookingController::class, 'detailTicket']);
-    Route::post('/reschedule', [BookingController::class, 'reschedule']);
+    Route::post('/reschedule', [BookingController::class, 'singleReschedule']);
     Route::post('/seat-classes', [BookingController::class, 'seatClasses']);
     Route::post('/fetchSchedule', [BookingController::class, 'fetchSpecificSchedule']);
     Route::post('/getDestination', [BookingController::class, 'fetchSpecificDestination']);

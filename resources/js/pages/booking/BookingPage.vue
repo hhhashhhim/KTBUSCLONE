@@ -128,7 +128,8 @@
                                                             v-for="(terminal, i) in terminals"
                                                             :value="terminal.id"
                                                             :key="i"
-                                                        >{{ changeToUpperCase(terminal.city.name) }} - {{ changeToUpperCase(terminal.name) }}
+                                                        >{{ changeToUpperCase(terminal.city.name) }} -
+                                                            {{ changeToUpperCase(terminal.name) }}
                                                         </option>
                                                     </select>
                                                 </div>
@@ -532,35 +533,35 @@
                         </div>
 
                         <!--Reschedule Seat Map-->
-                        <div class=" row mt-3" v-if="seatMapReschedule">
-                            <div class="col-md-3">
-                                <h4 class="mb-2">Old Booking</h4><br>
-                                <div class="mb-2"><span class="h6">Seat No # {{ rescheduleData.dataSeat_no }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Seat Class : {{ rescheduleData.dataAll.seat_class.name }} </span></div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Seat Fare :  {{ rescheduleData.dataAll.seat_fare }} </span></div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Departure City : {{ rescheduleData.dataAll.departure_city.name }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Destination City : {{
-                                        rescheduleData.dataAll.destination_city.name
-                                    }} </span></div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Date : {{ rescheduleData.dataAll.date }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Schedule : {{
-                                        rescheduleData.dataAll.schedule.name
-                                    }} </span></div>
-                                <br>
-                            </div>
-                            <div class="col-md-6">
+                        <div class=" row mt-3 text-center" v-if="seatMapReschedule">
+                            <!--                            <div class="col-md-3">-->
+                            <!--                                <h4 class="mb-2">Old Booking</h4><br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Seat No # {{ rescheduleData.dataSeat_no }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Seat Class : {{ rescheduleData.dataAll.seat_class.name }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Seat Fare :  {{ rescheduleData.dataAll.seat_fare }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Departure City : {{ rescheduleData.dataAll.departure_city.name }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Destination City : {{-->
+                            <!--                                        rescheduleData.dataAll.destination_city.name-->
+                            <!--                                    }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Date : {{ rescheduleData.dataAll.date }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Schedule : {{-->
+                            <!--                                        rescheduleData.dataAll.schedule.name-->
+                            <!--                                    }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                            </div>-->
+                            <div class="col-md-12">
                                 <div class="d-flex justify-content-center seat-img p-0 m-0"
                                      v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
                                     <div v-for="(col, colIndex) in record" :key="colIndex">
@@ -570,7 +571,7 @@
                                             @click="reScheduleSelectSeat(rowIndex, colIndex, col)"
                                             :class="getClassesReschedule(col)"
                                             :title="getTitle(col)"
-                                            :style="{border:'2px solid ' + col.color + ' !important', }"
+                                            :style="{border:'2px solid ' + col.color + ' !important',}"
                                         >
                                             <small>{{ col.seatNo }} </small>
                                             <br/>
@@ -589,34 +590,34 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <h4 class="mb-3">Current Booking</h4>
-                                <div class="mb-2"><span class="h6">Seat No # {{ this.alreadyBookedSeat[0] }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Seat Class : {{
-                                        this.alreadyBookedSeatClassName[0]
-                                    }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Seat Fare :  {{
-                                        this.alreadyBookedSeatFare[0]
-                                    }} </span>
-                                </div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Departure City : {{ this.reScheduleDepart }} </span></div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Destination City : {{ this.reScheduleDest }} </span></div>
-                                <br>
-                                <div class="mb-2"><span
-                                    class="h6">Date : {{ this.reScheduleDate }} </span></div>
-                                <br>
-                                <div class="mb-2"><span class="h6">Schedule : {{ this.reScheduleSchedule }} </span>
-                                </div>
-                                <br>
-                            </div>
+                            <!--                            <div class="col-md-3">-->
+                            <!--                                <h4 class="mb-3">Current Booking</h4>-->
+                            <!--                                <div class="mb-2"><span class="h6">Seat No # {{ this.alreadyBookedSeat[0] }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Seat Class : {{-->
+                            <!--                                        this.alreadyBookedSeatClassName[0]-->
+                            <!--                                    }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Seat Fare :  {{-->
+                            <!--                                        this.alreadyBookedSeatFare[0]-->
+                            <!--                                    }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Departure City : {{ this.reScheduleDepart }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Destination City : {{ this.reScheduleDest }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span-->
+                            <!--                                    class="h6">Date : {{ this.reScheduleDate }} </span></div>-->
+                            <!--                                <br>-->
+                            <!--                                <div class="mb-2"><span class="h6">Schedule : {{ this.reScheduleSchedule }} </span>-->
+                            <!--                                </div>-->
+                            <!--                                <br>-->
+                            <!--                            </div>-->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -681,7 +682,17 @@
                     </div>
                     <div class="modal-body p-0">
                         <!--loop for number of seats-->
+
                         <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <button type="button" class=" shadow-style btn btn-primary ml-2"
+                                            v-if="this.allRescheduleButton"
+                                            @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
+                                    >Reschedule All
+                                    </button>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card" v-for="(singleItems,  i) in selectedSeatDataBackEnd">
@@ -732,7 +743,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3">Booking Date & Time  : </p>
+                                                        <p class="mb-0 font-weight-bold mr-3">Booking Date & Time : </p>
                                                         <p class="mb-0">{{ innerItem.bookingDate }}</p>
                                                     </div>
                                                     <div class="d-flex">
@@ -1033,11 +1044,13 @@ export default {
             specificCities: [],
             reSpecificCities: [],
             selectedSeatDataBackEnd: [],
+            mainAllRescheduleData: [],
             filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
             advanceSeat: [],
             eltIds: "",
             EltButton: false,
+            allRescheduleButton: false,
             ticketsIds: "",
             ticketsId: "",
             addForm: {
@@ -1151,10 +1164,12 @@ export default {
                         date: this.addForm.date,
                         departureCity: this.addForm.departureCity,
                         destinationCity: this.addForm.destinationCity,
+
                     }
                     const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
                     if (resSeatData.status == 200) {
-                        this.selectedSeatDataBackEnd = resSeatData.data;
+                        this.selectedSeatDataBackEnd = resSeatData.data.tickets;
+                        this.allRescheduleButton = resSeatData.data.showButton;
                         $('#seatAllDetailsModal').modal('show');
                     }
                     if (resSeatData.status == 422) {
@@ -1260,7 +1275,6 @@ export default {
         },
 
         async closeSchedule() {
-            // console.log(this.addData.drivers.length);return;
             this.validationErrors = [];
             if (!this.dataForClose.bus)
                 return swal({
@@ -1340,6 +1354,7 @@ export default {
         },
 
         async getReDestinationCity() {
+            this.reSpecificCities = [];
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
@@ -1681,9 +1696,7 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            console.log(typeof this.addForm.alreadyBookedId);
             this.addForm.alreadyBookedId = [];
-            console.log(typeof this.addForm.alreadyBookedId);
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
@@ -1704,17 +1717,38 @@ export default {
             }
         },
 
+        // reScheduleSelectSeat: function (row, col, data) {
+        //     if (this.alreadyBookedSeat.length > 0) {
+        //         this.alreadyBookedSeat = [];
+        //         this.fetchReScheduleData();
+        //         return swal({
+        //             title: "Oops",
+        //             text: "You can select just one seat ",
+        //             icon: "error",
+        //             timer: 3000
+        //         });
+        //     }
+        //     let index = this.alreadyBookedSeat.indexOf(data.seatNo);
+        //     if (index != -1) {
+        //         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
+        //         this.alreadyBookedSeat.splice(index, 1);
+        //         this.alreadyBookedSeatFare.splice(index, 1);
+        //         this.alreadyBookedSeatClassName.splice(index, 1);
+        //         this.alreadyBookedSeatClass.splice(index, 1);
+        //     } else {
+        //         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
+        //         this.alreadyBookedSeat.push(data.seatNo);
+        //         this.alreadyBookedSeatFare.push(data.fare);
+        //         this.alreadyBookedSeatClassName.push(data.class_name);
+        //         this.alreadyBookedSeatClass.push(data.class);
+        //     }
+        //     this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
+        //     this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
+        //     this.reScheduleSchedule = $("#reScheduleName option:selected").text();
+        //     this.reScheduleDate = this.rescheduleData.rescheduleDate;
+        // },
+
         reScheduleSelectSeat: function (row, col, data) {
-            if (this.alreadyBookedSeat.length > 0) {
-                this.alreadyBookedSeat = [];
-                this.fetchReScheduleData();
-                return swal({
-                    title: "Oops",
-                    text: "You can select just one seat ",
-                    icon: "error",
-                    timer: 3000
-                });
-            }
             let index = this.alreadyBookedSeat.indexOf(data.seatNo);
             if (index != -1) {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
@@ -1820,7 +1854,6 @@ export default {
                 });
             }
             const res = await this.callApi("post", "booking/store", this.addForm);
-            console.log(res.data.ids);
             if (res.status == 200) {
                 iziToast.success({
                     title: 'Success!',
@@ -2088,7 +2121,6 @@ export default {
             }
             this.EltButton = true;
             const resOverIssue = await this.callApi("post", "booking/elt", data);
-            console.log(resOverIssue.data);
             if (resOverIssue.status == 201) {
                 this.EltButton = false;
                 this.eltIds = resOverIssue.data.id
@@ -2135,9 +2167,47 @@ export default {
                 }
             }
         },
+        async allRescheduleData() {
+            const arraySingleRescheduleData = [];
+            this.reSpecificCities = [];
+            this.rescheduleData.rescheduleSchedule = [];
+            Object.entries(this.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
+                let singlePostData = {};
+                singlePostData = {
+                    rescheduleDate: singleSeat[1][0].date,
+                    existingDate: singleSeat[1][0].date,
+                    dataCustomer: singleSeat[1][0].customer_id,
+                    dataSchedule: singleSeat[1][0].schedule_id,
+                    dataDepartureCity: singleSeat[1][0].departure_city_id,
+                    dataDestination: singleSeat[1][0].destination_city_id,
+                    dataSeat_no: singleSeat[1][0].seat_no,
+                    dataAll: singleSeat[1][0],
+                }
+                arraySingleRescheduleData[i] = singlePostData;
+            });
+            this.mainAllRescheduleData = arraySingleRescheduleData;
+            this.rescheduleData.dataDepartureCity = this.mainAllRescheduleData[0].dataDepartureCity;
+            this.rescheduleData.rescheduleDate = this.mainAllRescheduleData[0].rescheduleDate;
+            this.rescheduleData.rescheduleSchedule = 0;
+
+            if (this.rescheduleData.dataDepartureCity == '0') {
+                this.rescheduleData.rescheduleDestinationCity = 0;
+            } else {
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.mainAllRescheduleData[0].dataDepartureCity});
+                if (resReDepartureCity.length == 0) {
+                    this.rescheduleData.rescheduleDestinationCity = 0
+                } else {
+                    this.rescheduleData.rescheduleDestinationCity = 0;
+                    this.reSpecificCities = resReDepartureCity.data;
+                }
+            }
+            $("#reschedule_modal").modal('show');
+
+        },
 
         // Reschedule model
         async passDataToRescheduleModel(data) {
+            this.mainAllRescheduleData = [];
             this.reSpecificCities = [];
             this.rescheduleData = {
                 rescheduleDate: data.date,
@@ -2149,6 +2219,9 @@ export default {
                 dataSeat_no: data.seat_no,
                 dataAll: data,
             }
+
+            this.mainAllRescheduleData[0] = this.rescheduleData;
+
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
@@ -2165,6 +2238,17 @@ export default {
         },
 
         async rescheduleSeats() {
+            if (this.alreadyBookedSeat.length != this.mainAllRescheduleData.length) {
+                this.alreadyBookedSeat = [];
+                this.fetchReScheduleData();
+                return swal({
+                    title: "Oops",
+                    text: "You can select just one seat ",
+                    icon: "error",
+                    timer: 3000
+                });
+            }
+
             if (this.rescheduleData.dataDepartureCity == 0) {
                 return swal({
                     title: "Required!!",
@@ -2197,13 +2281,14 @@ export default {
                     timer: 2000
                 });
             }
-            const reScheduleAddFormData = {
-                ...this.rescheduleData,
-                'selected_seatNo': this.alreadyBookedSeat[0],
-                'selected_seatClass': this.alreadyBookedSeatClass[0],
-                'selected_seatFare': this.alreadyBookedSeatFare[0],
-            }
-            const res = await this.callApi("post", "booking/reschedule", reScheduleAddFormData);
+            this.mainAllRescheduleData.map((single, index) => {
+                single.selected_seatNo = this.alreadyBookedSeat[index];
+                single.selected_seatClass = this.alreadyBookedSeatClass[index];
+                single.selected_seatFare = this.alreadyBookedSeatFare[index];
+                single.reason = this.rescheduleData.reason;
+                single.rescheduleDate = this.rescheduleData.rescheduleDate;
+            });
+            const res = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
             if (res.status == 200) {
                 swal({
                     title: "Success",
@@ -2258,8 +2343,10 @@ export default {
         getBusInvoice: function () {
             this.$refs.refBusInvoice.submit();
         },
-    },
-};
+    }
+    ,
+}
+;
 </script>
 
 <style scoped>
