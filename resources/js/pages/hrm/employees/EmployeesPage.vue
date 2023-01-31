@@ -1098,6 +1098,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (!this.addForm.profile)
+                return swal({
+                    title: "Required!",
+                    text: "Employee's Profile is Required",
+                    icon: "error",
+                    timer: 2000
+                });
 
 
             formData.append('email', this.addForm.email);

@@ -45,6 +45,7 @@ class EmployeeController extends Controller
             'paidLeaves' => 'required',
             'bloodGroup' => 'required',
             'EmployeeSalary' => 'required',
+            'profile' => 'required',
         ];
 
         $customMessages = [
@@ -61,9 +62,10 @@ class EmployeeController extends Controller
             'paidLeaves.required' => 'Paid Leaves is Required!',
             'bloodGroup.required' => 'Blood Group is Required!',
             'EmployeeSalary.required' => 'Employee Salary is Required!',
+            'profile.required' => 'Employee Profile is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-
+        
         $user = User::create([
             "name" => $request->EmployeeName,
             "email" => $request->email,

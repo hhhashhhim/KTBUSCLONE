@@ -154,6 +154,15 @@ if (!function_exists('updateFare')) {
             'distance_in_km' => $request->distance_in_km,
             'added_by' => auth()->user()->id,
         ]);
+        // this is for automatic store time diffrence against all fare classes
+        FareTable::where('from_city_id', $request->from)->where('to_city_id', $request->to)
+            ->where('company_id', $company_id)->update([
+            'time_difference' => $request->time_difference,
+        ]);
+        FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)
+        ->where('company_id', $company_id)->update([
+            'time_difference' => $request->time_difference,
+        ]);
     }
 }
 
