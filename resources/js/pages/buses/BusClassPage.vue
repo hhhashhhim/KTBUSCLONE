@@ -822,7 +822,7 @@ export default {
                     title: "Success",
                     text: "Seats Modified Successfully !!!!",
                     icon: "success",
-                    timer: 2500,
+                    timer: 2000,
                 });
 
             } else {
@@ -1183,7 +1183,7 @@ export default {
                     title: "Success",
                     text: "Row # " + index + " Duplicated Successfully",
                     icon: "success",
-                    timer: 3000,
+                    timer: 2000,
                 });
                 this.cloneDone = false;
                 $("#bus_class_table").DataTable().destroy();
@@ -1208,7 +1208,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                    timer: 2000
                         });
 
                     }

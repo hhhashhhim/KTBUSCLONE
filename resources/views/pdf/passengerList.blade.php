@@ -81,7 +81,7 @@
 
         setTimeout(function(){
             window.close() ;
-        }, 2000); //Time before execution
+        }, 1000); //Time before execution
     </script>
     <title> Print Passenger List </title>
 </head>
@@ -94,7 +94,7 @@
     </div>
     <br>
     <div class="companyAddress">
-        <div><span><b>UAN(24/7) : </b>{{isset($format->uan) ? formatUAN($format->uan) : "03-111-777-333"}}</span></div>
+        <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
     </div>
 </div>
 <br>

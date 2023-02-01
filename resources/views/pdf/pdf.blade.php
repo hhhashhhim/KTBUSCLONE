@@ -73,7 +73,7 @@
 
         setTimeout(function(){
             window.close() ;
-        }, 2000); //Time before execution
+        }, 1000); //Time before execution
     </script>
     <title>Print Ticket</title>
 </head>
@@ -83,7 +83,7 @@
 <div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
         <div class="companyAddress"><span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
-            <div><span><b>UAN(24/7) : </b>{{ isset($data['format']->uan) ? formatUAN($data['format']->uan) : "03-111-777-333" }}</span></div>
+            <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
             <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span></div>
         </div>
     @if($data['duplicate'] == 1)

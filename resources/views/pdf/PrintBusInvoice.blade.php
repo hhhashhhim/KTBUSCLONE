@@ -76,7 +76,7 @@
 
         setTimeout(function(){
             window.close() ;
-        }, 2000); //Time before execution
+        }, 1000); //Time before execution
     </script>
     <title>Print Bus Invoice</title>
 </head>

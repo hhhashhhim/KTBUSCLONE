@@ -534,34 +534,16 @@
 
                         <!--Reschedule Seat Map-->
                         <div class=" row mt-3 text-center" v-if="seatMapReschedule">
-                            <!--                            <div class="col-md-3">-->
-                            <!--                                <h4 class="mb-2">Old Booking</h4><br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Seat No # {{ rescheduleData.dataSeat_no }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Seat Class : {{ rescheduleData.dataAll.seat_class.name }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Seat Fare :  {{ rescheduleData.dataAll.seat_fare }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Departure City : {{ rescheduleData.dataAll.departure_city.name }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Destination City : {{-->
-                            <!--                                        rescheduleData.dataAll.destination_city.name-->
-                            <!--                                    }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Date : {{ rescheduleData.dataAll.date }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Schedule : {{-->
-                            <!--                                        rescheduleData.dataAll.schedule.name-->
-                            <!--                                    }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                            </div>-->
-                            <div class="col-md-12">
+                            <div class="col-md-3">
+                                <h4 class="mb-2">Old Booking</h4><br>
+                                <div class="mb-2"><span class="h6">Old Fare : Rs {{ mainAllRescheduleData.totalFare }} </span>
+                                </div>
+                                <br>
+                                <div class="mb-2"><span class="h6"> Booked Seat Numbers </span><br>
+                                    <span>{{ (mainAllRescheduleData.oldSeats).join(', ') }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="d-flex justify-content-center seat-img p-0 m-0"
                                      v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
                                     <div v-for="(col, colIndex) in record" :key="colIndex">
@@ -590,38 +572,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <!--                            <div class="col-md-3">-->
-                            <!--                                <h4 class="mb-3">Current Booking</h4>-->
-                            <!--                                <div class="mb-2"><span class="h6">Seat No # {{ this.alreadyBookedSeat[0] }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Seat Class : {{-->
-                            <!--                                        this.alreadyBookedSeatClassName[0]-->
-                            <!--                                    }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Seat Fare :  {{-->
-                            <!--                                        this.alreadyBookedSeatFare[0]-->
-                            <!--                                    }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Departure City : {{ this.reScheduleDepart }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Destination City : {{ this.reScheduleDest }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span-->
-                            <!--                                    class="h6">Date : {{ this.reScheduleDate }} </span></div>-->
-                            <!--                                <br>-->
-                            <!--                                <div class="mb-2"><span class="h6">Schedule : {{ this.reScheduleSchedule }} </span>-->
-                            <!--                                </div>-->
-                            <!--                                <br>-->
-                            <!--                            </div>-->
+                            <div class="col-md-3">
+                                <h4 class="mb-3">Current Booking</h4>
+                                <div class="mb-2"><span class="h6"> New Fare : Rs {{ alreadyBookedSeatFare ?? "" }} </span>
+                                </div>
+                                <br>
+                                <div class="mb-2"><span class="h6"> Selected Seats Numbers </span><br>
+                                    <span>{{ alreadyBookedSeat.join(', ') ?? "Not Selected Yet" }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary" @click="rescheduleSeats()">Reschedule Seats</button>
+                        <button class="btn btn-primary" @click="rescheduleSeats()" :disabled="loadingRescheduleButton">
+                            {{ loadingRescheduleButton ? 'Loading....' : 'Reschedule Seats' }}
+                        </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1016,7 +981,7 @@ export default {
             cancel: [],
             overIssueData: [],
             alreadyBookedSeat: [],
-            alreadyBookedSeatFare: [],
+            alreadyBookedSeatFare: 0,
             alreadyBookedSeatClassName: [],
             alreadyBookedSeatClass: [],
             eltData: [],
@@ -1043,6 +1008,7 @@ export default {
             allSeatClasses: [],
             specificCities: [],
             reSpecificCities: [],
+            previousSumFare: 0,
             selectedSeatDataBackEnd: [],
             mainAllRescheduleData: [],
             filterDate: new Date().toISOString().substr(0, 10),
@@ -1050,6 +1016,7 @@ export default {
             advanceSeat: [],
             eltIds: "",
             EltButton: false,
+            loadingRescheduleButton: false,
             allRescheduleButton: false,
             ticketsIds: "",
             ticketsId: "",
@@ -1345,7 +1312,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                            timer: 2000
                         });
 
                     }
@@ -1565,7 +1532,7 @@ export default {
             this.reScheduleDate = '';
             this.alreadyBookedSeatClassName = [];
             this.alreadyBookedSeatClass = [];
-            this.alreadyBookedSeatFare = [];
+            this.alreadyBookedSeatFare = 0;
             this.alreadyBookedSeat = [];
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
@@ -1753,13 +1720,13 @@ export default {
             if (index != -1) {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
                 this.alreadyBookedSeat.splice(index, 1);
-                this.alreadyBookedSeatFare.splice(index, 1);
+                this.alreadyBookedSeatFare -= parseFloat(data.fare);
                 this.alreadyBookedSeatClassName.splice(index, 1);
                 this.alreadyBookedSeatClass.splice(index, 1);
             } else {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
                 this.alreadyBookedSeat.push(data.seatNo);
-                this.alreadyBookedSeatFare.push(data.fare);
+                this.alreadyBookedSeatFare += parseFloat(data.fare);
                 this.alreadyBookedSeatClassName.push(data.class_name);
                 this.alreadyBookedSeatClass.push(data.class);
             }
@@ -1859,7 +1826,7 @@ export default {
                     title: 'Success!',
                     message: 'Booking Created Successfully',
                     position: 'topRight',
-                    hideAfter: 2000
+                    hideAfter: 1000
                 });
                 this.addForm = {
                     totalAmount: 0,
@@ -1912,7 +1879,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                            timer: 2000
                         });
 
                     }
@@ -2049,7 +2016,7 @@ export default {
                     title: "Error",
                     text: resOverIssue.data.message,
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 
@@ -2141,7 +2108,7 @@ export default {
                     title: "Error",
                     text: resOverIssue.data.message,
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 
@@ -2169,6 +2136,8 @@ export default {
         },
         async allRescheduleData() {
             const arraySingleRescheduleData = [];
+            const oldSeats = [];
+            let totalFare = 0;
             this.reSpecificCities = [];
             this.rescheduleData.rescheduleSchedule = [];
             Object.entries(this.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
@@ -2184,8 +2153,13 @@ export default {
                     dataAll: singleSeat[1][0],
                 }
                 arraySingleRescheduleData[i] = singlePostData;
+                totalFare += (parseFloat(singleSeat[1][0].seat_fare) - parseFloat(singleSeat[1][0].discount ?? 0));
+                oldSeats.push(singleSeat[1][0].seat_no);
+                arraySingleRescheduleData['totalFare'] = totalFare;
+                arraySingleRescheduleData['oldSeats'] = oldSeats;
             });
             this.mainAllRescheduleData = arraySingleRescheduleData;
+            console.log(this.mainAllRescheduleData)
             this.rescheduleData.dataDepartureCity = this.mainAllRescheduleData[0].dataDepartureCity;
             this.rescheduleData.rescheduleDate = this.mainAllRescheduleData[0].rescheduleDate;
             this.rescheduleData.rescheduleSchedule = 0;
@@ -2243,9 +2217,9 @@ export default {
                 this.fetchReScheduleData();
                 return swal({
                     title: "Oops",
-                    text: "You can select just one seat ",
+                    text: "Your Just Select " + this.mainAllRescheduleData.length + " for Reschedule",
                     icon: "error",
-                    timer: 3000
+                    timer: 2000
                 });
             }
 
@@ -2288,22 +2262,26 @@ export default {
                 single.reason = this.rescheduleData.reason;
                 single.rescheduleDate = this.rescheduleData.rescheduleDate;
             });
-            const res = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
-            if (res.status == 200) {
+            this.loadingRescheduleButton = true;
+            const resReschedule = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
+            if (resReschedule.status == 200) {
+                this.loadingRescheduleButton = false;
                 swal({
                     title: "Success",
                     text: "Seat Reschedule Successfully",
                     icon: "success",
-                    timer: 4000
+                    timer: 2000
                 });
+
                 this.fetchScheduleData();
                 this.fetchReScheduleData();
             } else {
-                if (res.status == 422) {
+                if (resReschedule.status == 422) {
+                    this.loadingRescheduleButton = false;
                     let errorContent = "";
                     let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resReschedule.data.errors) {
+                        resReschedule.data.errors[key].forEach((element) => {
                             errorContent += (
                                 (++count) + " - " + //creating serial no.
                                 element + // main error
@@ -2314,7 +2292,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                            timer: 2000
                         });
 
                     }

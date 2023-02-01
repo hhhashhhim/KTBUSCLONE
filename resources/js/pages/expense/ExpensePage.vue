@@ -229,9 +229,9 @@ export default {
             this.loop--;
         },
         async add() {
-        
+
         // validation for empty data
-        if(!this.postData.ticket_merge_id || this.postData.category.length == 0 || this.postData.description.length == 0 || 
+        if(!this.postData.ticket_merge_id || this.postData.category.length == 0 || this.postData.description.length == 0 ||
             this.postData.amount.length == 0 || this.postData.invoice.length == 0)
         {
             return swal({
@@ -251,7 +251,7 @@ export default {
                     title: "Error",
                     text: "Please Fill All Field Or Remove Extra",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
         }

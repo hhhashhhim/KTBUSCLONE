@@ -407,7 +407,7 @@ export default {
                     title: "Error",
                     text: "Please Fill Required Field",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 
@@ -494,7 +494,7 @@ export default {
                     title: "Error",
                     text: "Please Fill Required Field",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 

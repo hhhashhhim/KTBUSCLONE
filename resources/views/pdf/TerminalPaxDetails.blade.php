@@ -70,7 +70,7 @@
 
         setTimeout(function(){
             window.close() ;
-        }, 2000); //Time before execution
+        }, 1000); //Time before execution
     </script>
     <title>Terminal Passenger List </title>
 </head>
@@ -81,7 +81,7 @@
     <div class="companyAddress">
         <div style=" padding-bottom: 5px;"><span style="font-weight:600">   {{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</span></div>
         <div style=" padding-bottom: 5px;"><span style="font-weight:600">{{ isset($format->terminal) ? $format->terminal->name : "Main Terminal"}}</span></div>
-        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> {{ isset( $format->uan ) ? formatUAN($format->uan) : "03-111-777-333" }}</span></div>
+        <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> 03-111-777-333 </span></div>
         <div><span><b>Phone # : </b>{{ isset( $format->phone) ? formatContact($format->phone) : "0310-8886286" }}</span></div>
     </div>
 </div>

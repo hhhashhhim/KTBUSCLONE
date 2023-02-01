@@ -478,7 +478,7 @@ export default {
                     title: "Required!!",
                     text: "Password is Required",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             if (this.data.terminal_id == 0)
                 return swal({
@@ -523,7 +523,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                    timer: 2000
                         });
                     }
                 }

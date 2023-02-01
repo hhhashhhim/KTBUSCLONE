@@ -441,7 +441,7 @@ export default {
                     title: "Success",
                     text: "Template Update Successfully ",
                     icon: "success",
-                    timer: 4000
+                    timer: 2000
                 });
                 $("#ticket_templates").DataTable().destroy();
                 this.fetchTemplates();
