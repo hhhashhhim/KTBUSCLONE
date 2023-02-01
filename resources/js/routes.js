@@ -36,6 +36,7 @@ import FoodOrderPage from "./pages/refreshment/host/FoodOrderPage.vue";
 import ProfilePage from "./pages/profile/ProfilePage.vue";
 import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 import ExpensePage from "./pages/expense/ExpensePage.vue";
+import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -225,6 +226,11 @@ const routes = [
         path: url + "expenses/:id",
         component : ExpensePage,
         name:"expense-page"
+    },
+    {
+        path: url + "terminals/:id/commissions",
+        component : TerminalCommissionPage,
+        name:"terminal-commission"
     },
 ]
 const router = createRouter({

@@ -494,7 +494,7 @@
                                                     <td v-else>N/A</td>
                                                     <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                     <td v-else>N/A</td>
-                                                    <td>
+                                                    <td style="width:200px;">
                                                         <button
                                                             :data-target="'#' + editFormID"
                                                             data-toggle="modal"
@@ -503,6 +503,10 @@
                                                         >
                                                             <i class="far fa-edit"></i>
                                                         </button>
+                                                        <router-link class="btn btn-success mx-2" :to="{ name:'terminal-commission', params: { id:single.id }}">
+                                                            <!-- <i class="fas fa-plus"></i> -->
+                                                            Commissions
+                                                        </router-link>
                                                     </td>
                                                 </tr>
                                                 </tbody>
