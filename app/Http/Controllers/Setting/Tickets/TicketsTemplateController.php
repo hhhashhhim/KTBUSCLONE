@@ -10,43 +10,34 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketsTemplateController extends Controller
 {
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//
-//
-//    }
-
     public function index()
     {
-        return TicketsTemplate::with('terminal.city')->where(['company_id'=> Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
+        return TicketsTemplate::with('terminal.city')->where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
     }
 
     public function store(Request $request)
     {
+        if(Auth::user()->terminal_id == null){
+            return response()->json(["errors" => ["users Error" => ["Your Account Don't Have Default Terminal, Assign Terminal First"]]], 422);
+        }
         $rules = [
-            'terminal' => 'required',
-            'uanNumber' => 'required',
+//            'terminal' => 'required',
+//            'uanNumber' => 'required',
             'termsCondition' => 'required',
         ];
 
         $customMessages = [
-            'terminal.required' => 'Please Select Any Terminal',
-            'uanNumber.required' => 'UAN Number is required',
+//            'terminal.required' => 'Please Select Any Terminal',
+//            'uanNumber.required' => 'UAN Number is required',
             'termsCondition.required' => 'Terms & Condition is required',
         ];
         $this->validate($request, $rules, $customMessages);
-        $terminal  = Terminal::where('company_id', Auth::user()->company_id)->where('id', $request->terminal)->first();
+        $terminal = Terminal::where('company_id', Auth::user()->company_id)->where('id',Auth::user()->terminal_id)->first();
         TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->update(array('status' => 0));
         return TicketsTemplate::create([
             'company_id' => Auth::user()->company_id,
-            'terminal_id' => $request->terminal,
-            'uan' => plainContactAndCnic($request->uanNumber),
+            'terminal_id' => Auth::user()->terminal_id,
+            'uan' => '03111777333',
             'phone' => plainContactAndCnic($terminal->contact),
             'address' => $terminal->address,
             'terms_condition' => $request->termsCondition,

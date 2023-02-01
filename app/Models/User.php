@@ -39,13 +39,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function role(){
-        return $this->hasOne( Role::class,'id','role_id' );
+    public function role()
+    {
+        return $this->hasOne(Role::class, 'id', 'role_id');
     }
-    public function company(){
-        return $this->hasOne( Company::class,'id','company_id' );
+
+    public function company()
+    {
+        return $this->hasOne(Company::class, 'id', 'company_id');
     }
-    public function terminal(){
-        return $this->hasOne( Terminal::class,'id','terminal_id' );
+
+    public function terminal()
+    {
+        return $this->hasOne(Terminal::class, 'id', 'terminal_id');
+    }
+
+    public function departureCity()
+    {
+        return $this->hasOne(City::class, 'id', 'departure_city_id');
+    }
+
+    public function destinationCity()
+    {
+        return $this->hasOne(City::class, 'id', 'destination_city_id');
     }
 }

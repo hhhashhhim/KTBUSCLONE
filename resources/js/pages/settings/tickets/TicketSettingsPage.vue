@@ -84,52 +84,53 @@
                 :success="success"
                 :formID="formID"
             >
+                <!--                <div class="row mt-3">-->
+                <!--                    <div class="form-group col-md-6">-->
+                <!--                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>-->
+                <!--                        <select class="form-control" id="terminals"-->
+                <!--                                v-model="addForm.terminal">-->
+                <!--                            <option value="0" selected>Select Terminal</option>-->
+                <!--                            <option-->
+                <!--                                v-for="(terminal, i) in terminals"-->
+                <!--                                :value="terminal.id"-->
+                <!--                                :key="i"-->
+                <!--                            >{{ terminal.city.name }} - {{ terminal.name }}-->
+                <!--                            </option>-->
+                <!--                        </select>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <!--                    <div class="form-group col-md-6">-->
+                <!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
+                <!--                        <vue-mask id="uanNumber"-->
+                <!--                                  class="form-control"-->
+                <!--                                  v-model="addForm.uanNumber"-->
+                <!--                                  mask="00-000-000-000"-->
+                <!--                                  :raw="false"-->
+                <!--                                  :options="optionsUan"-->
+                <!--                        >-->
+                <!--                        </vue-mask>-->
+                <!--                    </div>-->
+                <!--                    <div class="form-group col-md-6">-->
+                <!--                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>-->
+
+                <!--                        <vue-mask id="phoneNumber"-->
+                <!--                                  class="form-control"-->
+                <!--                                  v-model="addForm.phoneNumber"-->
+                <!--                                  mask="0000-0000000"-->
+                <!--                                  :raw="false"-->
+                <!--                                  :options="optionsPhone"-->
+                <!--                        >-->
+                <!--                        </vue-mask>-->
+                <!--                    </div>-->
+                <!--                    <div class="form-group col-md-12">-->
+                <!--                        <label for="address">Address<span class="text-danger ml-1">*</span></label>-->
+                <!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
+                <!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
+                <!--                                  v-model="addForm.address"></textarea>-->
+                <!--                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>-->
+
+                <!--                    </div>-->
                 <div class="row mt-3">
-
-                    <div class="form-group col-md-6">
-                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="addForm.terminal">
-                            <option value="0" selected>Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.city.name }} - {{ terminal.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
-                        <vue-mask id="uanNumber"
-                                  class="form-control"
-                                  v-model="addForm.uanNumber"
-                                  mask="00-000-000-000"
-                                  :raw="false"
-                                  :options="optionsUan"
-                        >
-                        </vue-mask>
-                    </div>
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>-->
-
-                    <!--                        <vue-mask id="phoneNumber"-->
-                    <!--                                  class="form-control"-->
-                    <!--                                  v-model="addForm.phoneNumber"-->
-                    <!--                                  mask="0000-0000000"-->
-                    <!--                                  :raw="false"-->
-                    <!--                                  :options="optionsPhone"-->
-                    <!--                        >-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-12">-->
-                    <!--                        <label for="address">Address<span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"-->
-                    <!--                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"-->
-                    <!--                                  v-model="addForm.address"></textarea>-->
-                    <!--                        <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>-->
-
-                    <!--                    </div>-->
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
@@ -325,26 +326,26 @@ export default {
 
         async addTemplate() {
 
-            if (this.addForm.terminal == '0') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Please Select any Terminal",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.addForm.uanNumber == '' || typeof this.addForm.uanNumber == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "UAN Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
+            // if (this.addForm.terminal == '0') {
+            //     return swal({
+            //         title: "Required !!!",
+            //         text: "Please Select any Terminal",
+            //         icon: "error",
+            //         timer: 2000,
+            //     });
+            // }
+            // if (this.addForm.uanNumber == '' || typeof this.addForm.uanNumber == 'undefined') {
+            //     return swal({
+            //         title: "Required !!!",
+            //         text: "UAN Number is Required",
+            //         icon: "error",
+            //         timer: 2000,
+            //     });
+            // }
             if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
                 return swal({
                     title: "Required !!!",
-                    text: "Terms &Condition is Required",
+                    text: "Terms & Condition is Required",
                     icon: "error",
                     timer: 2000,
                 });

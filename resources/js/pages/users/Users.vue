@@ -145,6 +145,32 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="departure">Departure City </label>
+                        <select class="form-control" id="departure"
+                                v-model="data.departure">
+                            <option value="0">Select Departure City</option>
+                            <option
+                                v-for="(singleDeparture, i) in departureCities"
+                                :value="singleDeparture.id"
+                                :key="i"
+                            >{{ singleDeparture.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="destinations">Destination City </label>
+                        <select class="form-control" id="destinations"
+                                v-model="data.destination">
+                            <option value="0">Select Destination City</option>
+                            <option
+                                v-for="(singleDestination, i) in destinationCities"
+                                :value="singleDestination.id"
+                                :key="i"
+                            >{{ singleDestination.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="data.terminal_id">
@@ -176,7 +202,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="this.loading" @click="add">
+                    <button type="button" class="btn btn-primary" :disabled="this.loading" @click="add()">
                         {{ this.loading ? 'Loading...' : 'Add User' }}
                     </button>
                 </template>
@@ -300,6 +326,32 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="departure">Departure City </label>
+                        <select class="form-control" id="departure"
+                                v-model="dataEdit.departure_city_id">
+                            <option value="0">Select Departure City</option>
+                            <option
+                                v-for="(singleDeparture, i) in departureCities"
+                                :value="singleDeparture.id"
+                                :key="i"
+                            >{{ singleDeparture.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="destinations">Destination City </label>
+                        <select class="form-control" id="destinations"
+                                v-model="dataEdit.destination_city_id">
+                            <option value="0">Select Destination City</option>
+                            <option
+                                v-for="(singleDestination, i) in destinationCities"
+                                :value="singleDestination.id"
+                                :key="i"
+                            >{{ singleDestination.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
                         <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
                                 v-model="dataEdit.terminal_id">
@@ -371,6 +423,8 @@ export default {
             },
             roles: [],
             users: [],
+            departureCities: [],
+            destinationCities: [],
             formID: 'user_form',
             editFormID: 'edit_user_form',
             roleName: '',
@@ -383,9 +437,13 @@ export default {
                 role: 0,
                 company_id: "",
                 terminal_id: 0,
+                destination: 0,
+                departure: 0,
             },
             dataEdit: {
                 terminal_id: 0,
+                departure_city_id: 0,
+                destination_city_id: 0,
                 role_id: 0,
             },
             terminals: [],
@@ -428,16 +486,23 @@ export default {
             this.data.contact = "";
             this.data.password = "";
             this.data.role = 0;
+            this.data.departure = 0;
+            this.data.destination = 0;
             this.roleName = '';
         },
 
         async fetchUsers() {
             const userRes = await this.callApi("post", "user");
-            if (userRes.status == 200) {
+            const resCities = await this.callApi("post", "user/cities");
+            console.log(resCities);
+            if (userRes.status == 200 && resCities.status == 200) {
                 this.users = userRes.data.users;
                 this.authCheck = userRes.data.authCheck;
+                this.destinationCities = resCities.data;
+                this.departureCities = resCities.data;
             } else {
-                console.log(userRes)
+                console.log(userRes);
+                console.log(resCities);
             }
             const roleRes = await this.callApi("post", "company/roles", {id: this.data.company_id});
             if (roleRes.status == 200) {
@@ -615,6 +680,8 @@ export default {
 
         async edit(user) {
             this.dataEdit = user;
+            this.dataEdit.departure_city_id = user.departure_city_id == null ? 0 : user.departure_city_id;
+            this.dataEdit.destination_city_id = user.destination_city_id == null ? 0 : user.destination_city_id;
         },
 
         async update() {

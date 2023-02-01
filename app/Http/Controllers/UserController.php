@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -9,24 +10,27 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
-    public function index()
+    public function index(): array
     {
-        return ['users' => User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->where('id', '!=', Auth::user()->id)->latest('id')->get(),
-            'authCheck' => is_null(Auth::user()->terminal_id) ? 0 : Auth::user()->terminal_id];
+        $users = User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->where('id', '!=', Auth::user()->id)->latest('id')->get();
+        foreach ($users as $user) {
+            $user->name = ucfirst($user->name);
+        }
+        return ['users' => $users,
+            'authCheck' => is_null(Auth::user()->terminal_id) ? 0 : Auth::user()->terminal_id
+        ];
     }
 
-    public function store(Request $request)
+    public function getCities()
+    {
+        $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        foreach ($cities as $key => $single) {
+            $single->name = ucfirst($single->name);
+        }
+        return $cities;
+    }
+
+    public function store(Request $request): array
     {
         $this->validate($request, [
             'name' => 'required',
@@ -42,6 +46,8 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
             'terminal_id' => $request->terminal_id,
+            'destination_city_id' => $request->destination,
+            'departure_city_id' => $request->departure,
             'company_id' => Auth::user()->company_id,
         ]);
         return $this->index();
@@ -68,6 +74,8 @@ class UserController extends Controller
             'contact' => !is_null($request->contact) ? formatContact($request->contact) : null,
             'role_id' => $request->role_id,
             'terminal_id' => $request->terminal_id,
+            'destination_city_id' => $request->destination_city_id,
+            'departure_city_id' => $request->departure_city_id,
             'company_id' => Auth::user()->company_id,
         ]);
         if ($request->password != "") {
