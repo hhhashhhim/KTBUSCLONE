@@ -4,8 +4,8 @@
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
-                        <div class="card-header">
-                            <h4>Terminal Commission</h4>
+                        <div class="card-header text-capitalize">
+                            <h4>{{ terminal.name }} Terminal Commission</h4>
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -43,24 +43,28 @@
                                                             <td>
                                                                 <input type="number" class="form-control"
                                                                     @keyup="saveRow($event, 'second', index)"
+                                                                    placeholder="Rs"
                                                                     :value="postData.fixCommission[index]"
                                                                     :disabled="editAble" />
                                                             </td>
                                                             <td>
-                                                                <input type="number" class="form-control"
+                                                                <input type="number" class="form-control border-secondary"
                                                                     @keyup="saveRow($event, 'third', index)"
+                                                                    placeholder="Rs"
                                                                     :value="postData.flatCommission[index]"
                                                                     :disabled="editAble" />
                                                             </td>
                                                             <td>
-                                                                <input type="number" min="0" class="form-control"
+                                                                <input type="number" min="0" class="form-control border-secondary"
                                                                     @keyup="saveRow($event, 'fourth', index)"
+                                                                    placeholder="%"
                                                                     :value="postData.percentCommission[index]"
                                                                     :disabled="editAble" />
                                                             </td>
                                                             <td>
                                                                 <input type="number" class="form-control"
                                                                     @keyup="saveRow($event, 'fifth', index)"
+                                                                    placeholder="%"
                                                                     :value="postData.adjustmentCommission[index]"
                                                                     :disabled="editAble" />
                                                             </td>
@@ -69,7 +73,7 @@
                                                                     @click="addRow">Add</button>
                                                                 <button class="btn btn-outline-danger"
                                                                     @click="removeRow($event, index)"
-                                                                    v-if="index != 0">Remove</button>
+                                                                    v-if="loop != 1">Remove</button>
                                                             </td>
                                                             <td v-else></td>
                                                         </tr>
@@ -122,8 +126,9 @@ export default {
     data() {
         return {
             validationErrors: [],
-            editAble: false,
+            editAble: true,
             routes: [],
+            terminal: [],
             loading: false,
             formID: 'terminal_commission',
             editFormID: 'edit_terminal_commission',
@@ -162,28 +167,30 @@ export default {
             }
 
         },
-        // async existingCommissions() {
-        //     const res = await this.callApi("post",'expenses',{ticket_merge_id : this.postData.ticket_merge_id});
-        //     if (res.status == 200) {
-        //         const expenses = res.data;
-        //         if(expenses != "")
-        //         {
-        //             this.loop = expenses.length;
-        //             for(var i = 0; i < expenses.length; i++)
-        //             {
-        //                 this.postData.category.push(expenses[i].expense_category_id);
-        //                 this.postData.description.push(expenses[i].description);
-        //                 this.postData.amount.push(expenses[i].amount);
-        //                 this.postData.invoice.push(expenses[i].invoice);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             this.loop = 1;
-        //             this.editAble = false;
-        //         }
-        //     }
-        // },
+        async existingCommissions() {
+            const res = await this.callApi("post",'terminals/commissions',{terminal_id : this.postData.terminal_id});
+            if (res.status == 200) {
+                const commissions = res.data.terminalCommission;
+                this.terminal = res.data.terminal;
+                if(commissions != "")
+                {
+                    this.loop = commissions.length;
+                    for(var i = 0; i < commissions.length; i++)
+                    {
+                        this.postData.route.push(commissions[i].route_id);
+                        this.postData.fixCommission.push(commissions[i].fix_commission);
+                        this.postData.flatCommission.push(commissions[i].flat_commission);
+                        this.postData.percentCommission.push(commissions[i].percentage_commission);
+                        this.postData.adjustmentCommission.push(commissions[i].adjustment_commission);
+                    }
+                }
+                else
+                {
+                    this.loop = 1;
+                    this.editAble = false;
+                }
+            }
+        },
         saveRow(event, fieldName, index) {
             // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
             if (fieldName == "first") {
@@ -262,7 +269,7 @@ export default {
                 this.editAble = true;
                 swal({
                     title: "Success",
-                    text: "Expense Saved",
+                    text: "Commission Updated",
                     icon: "success",
                     timer: 2000
                 });

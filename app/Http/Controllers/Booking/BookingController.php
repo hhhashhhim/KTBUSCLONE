@@ -639,6 +639,7 @@ class BookingController extends Controller
             'tickets.schedule_date' => $uniqueDate,
         ])
             ->with("terminal:id,name", "destination_city:id,name")
+            ->with(["commission"=>function($q) use ($route){return $q->where("route_id",$route->id);}])
             ->leftJoin("ticket_e_l_t_s", "ticket_e_l_t_s.ticket_id", "tickets.id") //this for if elt exist show else null
             ->select("tickets.*", "ticket_e_l_t_s.elt_price")
             ->get()->groupBy(["terminal_id", "destination_city_id"]);
@@ -652,7 +653,7 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-
+        // return $mainData;
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
     }
 
