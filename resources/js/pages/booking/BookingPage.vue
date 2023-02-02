@@ -4,11 +4,9 @@
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary mb-0">
-                        <div class="card-body pb-0">
+                        <div class="card-body pb-0 pt-2">
                             <div class="row">
-                                <!--                                <h1 v-if="loading">Loading.........</h1>-->
                                 <div class="col-md-12 row">  <!--v-if="showBookingDiv"-->
-                                    <!--                                        Form-->
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -126,8 +124,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
+                                        <div class="row mt-2 mb-2">
+                                            <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
@@ -143,31 +141,35 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
                                             <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label class=" mr-3">Female : </label>
-                                                    <label class="colorinput">
-                                                        <input name="gender" type="checkbox" value="0"
-                                                               class="colorinput-input"
-                                                               @click="changeGender($event)"
-                                                               v-bind:checked="addForm.gender == 0">
-                                                        <span class="colorinput-color bg-primary"></span>
-                                                    </label>
+                                                <div class="row text-center">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group mb-0">
+                                                            <label class=" mr-3">Female : </label>
+                                                            <label class="colorinput">
+                                                                <input name="gender" type="checkbox" value="0"
+                                                                       class="colorinput-input"
+                                                                       @click="changeGender($event)"
+                                                                       v-bind:checked="addForm.gender == 0">
+                                                                <span class="colorinput-color bg-primary"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label class="mr-3">Advanced Booked : </label>
-                                                    <label class="colorinput">
-                                                        <input name="bookingType" type="checkbox"
-                                                               value="advance booking"
-                                                               class="colorinput-input bookingCheck"
-                                                               @click="changeType($event)"
-                                                               v-bind:checked="addForm.type == 'advance booking'">
-                                                        <span class="colorinput-color bg-primary"></span>
-                                                    </label>
+                                                <div class="row text-center">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group mb-0">
+                                                            <label class="mr-3">Advanced Booked : </label>
+                                                            <label class="colorinput">
+                                                                <input name="bookingType" type="checkbox"
+                                                                       value="advance booking"
+                                                                       class="colorinput-input bookingCheck"
+                                                                       @click="changeType($event)"
+                                                                       v-bind:checked="addForm.type == 'advance booking'">
+                                                                <span class="colorinput-color bg-primary"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -234,14 +236,8 @@
                                         </div>
                                         <div class="row">
                                             <div class="form-group mt-2 mb-2"
-                                                 >
-                                                <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
-                                                    Terminal Invoice
-                                                </button>
-                                                <button class="btn btn-warning mx-1" @click="getBusInvoice()">
-                                                    Bus Invoice
-                                                </button>
-                                                <button class="btn btn-primary mx-1"
+                                            >
+                                                <button class="btn btn-success mx-1"
                                                         v-on:click="add()"
                                                         v-on:keyup.enter="add()">
                                                     {{
@@ -252,17 +248,22 @@
                                                    class="btn btn-primary" @click="closingData()">
                                                     Assign Bus
                                                 </a>
-
+                                                <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
+                                                    Terminal Invoice
+                                                </button>
+                                                <button class="btn btn-warning mx-1" @click="getBusInvoice()">
+                                                    Bus Invoice
+                                                </button>
                                                 <button class="btn btn-danger mx-1" @click="getCustomerList()">
                                                     Pax List
                                                 </button>
                                             </div>
                                         </div>
                                         <div class="text-center mb-2">
-                                                <button class="btn btn-secondary text-dark"
-                                                        @click="fetchScheduleData()" :disabled="getSchedule">
-                                                    {{ getSchedule ? "Loading.." : 'Reset' }}
-                                                </button>
+                                            <button class="btn btn-secondary text-dark"
+                                                    @click="fetchScheduleData()" :disabled="getSchedule">
+                                                {{ getSchedule ? "Loading.." : 'Reset' }}
+                                            </button>
                                         </div>
                                     </div>
                                     <!--                                        Seat Map-->
@@ -324,7 +325,8 @@
                                                 </div>
                                                 <div class="border-bottom w-100">
                                                     <div class="my-1" style="padding-bottom: 10px !important;">
-                                                        <div class="bg-danger text-dark circles mr-1 border shadow"><i class="fas fa-minus-circle"></i></div>
+                                                        <div class="bg-danger text-dark circles mr-1 border shadow"><i
+                                                            class="fas fa-minus-circle"></i></div>
                                                         <span class="text-wrap">Not For Sale Badge</span>
                                                     </div>
                                                     <div class="my-1">
@@ -1778,10 +1780,18 @@ export default {
         },
 
         async add() {
-            if (!this.addForm.schedule) {
+            if (this.addForm.departureCity == 0) {
                 return swal({
                     title: "Required!",
-                    text: "Departure Time is Required",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
                     icon: "error",
                     timer: 2000
                 });
@@ -1790,6 +1800,14 @@ export default {
                 return swal({
                     title: "Required!",
                     text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -1891,15 +1909,6 @@ export default {
                     }
                 }
             }
-        },
-
-        async deleteModal(surcharge, i) {
-            const deletingObj = {
-                url: "booking/delete",
-                data: surcharge,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
         },
 
         async resetingArrays() {
@@ -2307,6 +2316,7 @@ export default {
         },
         // Duplicate Ticket
         duplicateTicket: function (data) {
+
             this.ticketsId = data.id
             setTimeout(() => {
                 if (data.type == "booked") {
@@ -2317,14 +2327,112 @@ export default {
 
         // Get Passengers list
         getCustomerList: function () {
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.date) {
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.$refs.refPassengerList.submit();
         },
         // Get Terminal Invoice
         getTerminalInvoice: function () {
+
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.date) {
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.$refs.refTerminalInvoice.submit();
         },
         // Get Bus Invoice
         getBusInvoice: function () {
+
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.date) {
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.$refs.refBusInvoice.submit();
         },
     }
