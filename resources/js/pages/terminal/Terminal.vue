@@ -190,21 +190,21 @@
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="data.latitude" placeholder="Enter Latitude">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Fixed Commission <span class="text-danger ml-1">*</span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="data.commission"
-                               placeholder="Enter Terminal Fixed Commission">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Commission in Flat<span class="text-danger ml-1">*</span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control"
-                               v-model="data.flatCommission" placeholder="Enter Ticket Commission In Flat Amount">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Commission in Percentage <span class="text-danger ml-1">*</span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control"
-                               v-model="data.percentageCommission" placeholder="Enter Ticket Commission In Percentage">
-                    </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Fixed Commission <span class="text-danger ml-1">*</span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="data.commission"-->
+<!--                               placeholder="Enter Terminal Fixed Commission">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Commission in Flat<span class="text-danger ml-1">*</span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
+<!--                               v-model="data.flatCommission" placeholder="Enter Ticket Commission In Flat Amount">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Commission in Percentage <span class="text-danger ml-1">*</span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
+<!--                               v-model="data.percentageCommission" placeholder="Enter Ticket Commission In Percentage">-->
+<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
@@ -385,21 +385,21 @@
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="dataEdit.latitude">
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Fixed Commission <span class=""></span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="dataEdit.fixed_commission"
-                               placeholder="Enter Terminal Fixed Commission">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Commission in Flat<span class=""></span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control"
-                               v-model="dataEdit.ticket_flat_commission" placeholder="Enter Ticket Commission In Flat Amount ">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="terminal">Commission in Percentage <span class=""></span></label>
-                        <input type="text" @keypress="isNumber($event)" class="form-control"
-                               v-model="dataEdit.ticket_percentage_commission" placeholder="Enter Ticket Commission In Percentage">
-                    </div>
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Fixed Commission <span class=""></span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="dataEdit.fixed_commission"-->
+<!--                               placeholder="Enter Terminal Fixed Commission">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Commission in Flat<span class=""></span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
+<!--                               v-model="dataEdit.ticket_flat_commission" placeholder="Enter Ticket Commission In Flat Amount ">-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-4">-->
+<!--                        <label for="terminal">Commission in Percentage <span class=""></span></label>-->
+<!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
+<!--                               v-model="dataEdit.ticket_percentage_commission" placeholder="Enter Ticket Commission In Percentage">-->
+<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="dataEdit.online_terminal_name">
@@ -752,27 +752,27 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.data.commission)
-                return swal({
-                    title: "Required",
-                    text: "Commission is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.data.flatCommission)
-                return swal({
-                    title: "Required",
-                    text: "Flat Commission Value is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.data.percentageCommission)
-                return swal({
-                    title: "Required",
-                    text: "Percentage Commission Value is required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.data.commission)
+            //     return swal({
+            //         title: "Required",
+            //         text: "Commission is required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.data.flatCommission)
+            //     return swal({
+            //         title: "Required",
+            //         text: "Flat Commission Value is required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.data.percentageCommission)
+            //     return swal({
+            //         title: "Required",
+            //         text: "Percentage Commission Value is required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
 
             this.loading = true;
             const res = await this.callApi("post", "terminals/store", this.data);
@@ -851,31 +851,30 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.dataEdit.fixed_commission)
-            return swal({
-                title: "Required",
-                text: "Commission is required",
-                icon: "error",
-                timer: 2000
-            });
-            if (!this.dataEdit.ticket_flat_commission)
-                return swal({
-                    title: "Required",
-                    text: "Flat Commission Value is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.dataEdit.ticket_percentage_commission)
-                return swal({
-                    title: "Required",
-                    text: "Percentage Commission Value is required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.dataEdit.fixed_commission)
+            // return swal({
+            //     title: "Required",
+            //     text: "Commission is required",
+            //     icon: "error",
+            //     timer: 2000
+            // });
+            // if (!this.dataEdit.ticket_flat_commission)
+            //     return swal({
+            //         title: "Required",
+            //         text: "Flat Commission Value is required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.dataEdit.ticket_percentage_commission)
+            //     return swal({
+            //         title: "Required",
+            //         text: "Percentage Commission Value is required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             this.loading = true;
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
-                // swal('Success', 'Terminal Updated Successfully', 'success')
                 swal({
                     title: "Success",
                     text: "Terminal Updated Successfully",

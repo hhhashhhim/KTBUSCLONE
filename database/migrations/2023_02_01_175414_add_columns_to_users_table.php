@@ -14,8 +14,8 @@ class AddColumnsToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('departure_city_id')->nullable()->after('terminal_id');
-            $table->integer('destination_city_id')->nullable()->after('role_id');
+            $table->json('departure_city_ids')->nullable()->after('terminal_id');
+            $table->json('destination_city_ids')->nullable()->after('role_id');
         });
     }
 

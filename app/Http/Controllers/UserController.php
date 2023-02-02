@@ -24,7 +24,7 @@ class UserController extends Controller
     public function getCities()
     {
         $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
-        foreach ($cities as $key => $single) {
+        foreach ($cities as $single) {
             $single->name = ucfirst($single->name);
         }
         return $cities;
@@ -46,18 +46,21 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
             'terminal_id' => $request->terminal_id,
-            'destination_city_id' => $request->destination,
-            'departure_city_id' => $request->departure,
+            'destination_city_ids' => json_encode($request->destination),
+            'departure_city_ids' => json_encode($request->departure),
             'company_id' => Auth::user()->company_id,
         ]);
         return $this->index();
 
     }
 
-//    public function delete(Request $request)
-//    {
-//        return User::find($request->id)->delete();
-//    }
+    public function edit(Request $request)
+    {
+        $user = User::find($request->id);
+        $user->departure_city_ids = json_decode($user->departure_city_ids);
+        $user->destination_city_ids = json_decode($user->destination_city_ids);
+        return $user;
+    }
 
     public function update(Request $request)
     {
@@ -74,8 +77,8 @@ class UserController extends Controller
             'contact' => !is_null($request->contact) ? formatContact($request->contact) : null,
             'role_id' => $request->role_id,
             'terminal_id' => $request->terminal_id,
-            'destination_city_id' => $request->destination_city_id,
-            'departure_city_id' => $request->departure_city_id,
+            'destination_city_ids' => json_encode($request->destination_city_ids),
+            'departure_city_ids' => json_encode($request->departure_city_ids),
             'company_id' => Auth::user()->company_id,
         ]);
         if ($request->password != "") {

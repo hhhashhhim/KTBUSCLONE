@@ -12,16 +12,6 @@ use Illuminate\Validation\Rule;
 
 class TerminalController extends Controller
 {
-
-    //    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
     public function index()
     {
         return City::withCount('terminal')->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
@@ -47,12 +37,11 @@ class TerminalController extends Controller
 
     public function store(Request $request)
     {
-        // return $request->all();
         $rules = [
             'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'city_id' => 'required',
             'contact' => 'required',
-            'commission' => 'required',
+//            'commission' => 'required',
         ];
 
         $customMessages = [
@@ -60,9 +49,9 @@ class TerminalController extends Controller
             'name.unique' => 'Terminal Name already exist against This City',
             'city_id.required' => 'Please Select Any City ',
             'contact.required' => 'Please Enter your Phone Number',
-            'commission.required' => 'Please Enter Commission',
-            'flatCommission.required' => 'Please Enter Flat Commission',
-            'percentageCommission.required' => 'Please Enter Percentage Commission',
+//            'commission.required' => 'Please Enter Commission',
+//            'flatCommission.required' => 'Please Enter Flat Commission',
+//            'percentageCommission.required' => 'Please Enter Percentage Commission',
         ];
         $this->validate($request, $rules, $customMessages);
         if ($request->is_main) {
@@ -135,9 +124,9 @@ class TerminalController extends Controller
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name,
             'is_main' => (int) $request->is_main,
-            'fixed_commission' => $request->fixed_commission,
-            'ticket_flat_commission' => $request->ticket_flat_commission,
-            'ticket_percentage_commission' => $request->ticket_percentage_commission,
+            'fixed_commission' => $request->fixed_commission ?? 0,
+            'ticket_flat_commission' => $request->ticket_flat_commission ?? 0,
+            'ticket_percentage_commission' => $request->ticket_percentage_commission ?? 0,
             'active_sms' => $request->active_sms ? 1 : 0,
             'status' => (int) $request->status,
         ]);
@@ -148,7 +137,7 @@ class TerminalController extends Controller
     public function commissionStore(Request $request)
     {
         return $request;
-        
+
         $request->validate([
             "terminal_id" => 'required',
             "route" => 'required',

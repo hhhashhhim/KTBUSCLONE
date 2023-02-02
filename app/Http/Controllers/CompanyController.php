@@ -58,6 +58,8 @@ class CompanyController extends Controller
             'contact' => plainContactAndCnic($request->contact),
             'password' => Hash::make($request->password),
             'role_id' => $role->id,
+            'destination_city_ids' => "all",
+            'departure_city_ids' => "all",
             'company_id' => $company->id,
         ]);
 
@@ -77,7 +79,7 @@ class CompanyController extends Controller
         {
             return;
         }
-        
+
     }
 
     public function update(Request $request)

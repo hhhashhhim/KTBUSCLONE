@@ -45,6 +45,21 @@ class BookingController extends Controller
         return $allBooking;
     }
 
+    public function cities()
+    {
+
+        if(Auth::user()->departure_city_ids == "all")
+        {
+            $ids = City::where("company_id",Auth::user()->company_id)->pluck('id');
+        }
+        else
+        {
+            $ids = json_decode(Auth::user()->departure_city_ids);
+        }
+
+        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+    }
+
     public function store(Request $request)
     {
         if (is_null(Auth::user()->terminal_id)) {
@@ -314,7 +329,16 @@ class BookingController extends Controller
     function fetchSpecificDestination(Request $request)
     {
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', Auth::user()->company_id)->pluck('destination_city_id')->toArray();
-        return City::whereIn('id', array_unique($depart_city))->where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        if(Auth::user()->destination_city_ids == "all")
+        {
+            $finalArray = $depart_city;
+        }
+        else
+        {
+            $ids = json_decode(Auth::user()->destination_city_ids);
+            $finalArray = array_intersect(array_unique($depart_city), $ids);
+        }
+        return City::whereIn('id', $finalArray)->where('company_id', Auth::user()->company_id)->get(['id', 'name']);
     }
 
     public function fetchSpecificOverIssueSeat(Request $request)

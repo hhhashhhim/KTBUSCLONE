@@ -146,9 +146,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City </label>
-                        <select class="form-control" id="departure"
+                        <select class="form-control" id="departure" multiple
                                 v-model="data.departure">
-                            <option value="0">Select Departure City</option>
                             <option
                                 v-for="(singleDeparture, i) in departureCities"
                                 :value="singleDeparture.id"
@@ -159,9 +158,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="destinations">Destination City </label>
-                        <select class="form-control" id="destinations"
+                        <select class="form-control" id="destinations" multiple
                                 v-model="data.destination">
-                            <option value="0">Select Destination City</option>
                             <option
                                 v-for="(singleDestination, i) in destinationCities"
                                 :value="singleDestination.id"
@@ -327,9 +325,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City </label>
-                        <select class="form-control" id="departure"
-                                v-model="dataEdit.departure_city_id">
-                            <option value="0">Select Departure City</option>
+                        <select class="form-control" id="departure" multiple
+                                v-model="dataEdit.departure_city_ids">
                             <option
                                 v-for="(singleDeparture, i) in departureCities"
                                 :value="singleDeparture.id"
@@ -340,9 +337,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="destinations">Destination City </label>
-                        <select class="form-control" id="destinations"
-                                v-model="dataEdit.destination_city_id">
-                            <option value="0">Select Destination City</option>
+                        <select class="form-control" id="destinations" multiple
+                                v-model="dataEdit.destination_city_ids">
                             <option
                                 v-for="(singleDestination, i) in destinationCities"
                                 :value="singleDestination.id"
@@ -437,13 +433,13 @@ export default {
                 role: 0,
                 company_id: "",
                 terminal_id: 0,
-                destination: 0,
-                departure: 0,
+                destination : [],
+                departure : [],
             },
             dataEdit: {
                 terminal_id: 0,
-                departure_city_id: 0,
-                destination_city_id: 0,
+                departure_city_ids: [],
+                destination_city_ids: [],
                 role_id: 0,
             },
             terminals: [],
@@ -494,7 +490,6 @@ export default {
         async fetchUsers() {
             const userRes = await this.callApi("post", "user");
             const resCities = await this.callApi("post", "user/cities");
-            console.log(resCities);
             if (userRes.status == 200 && resCities.status == 200) {
                 this.users = userRes.data.users;
                 this.authCheck = userRes.data.authCheck;
@@ -679,9 +674,12 @@ export default {
         },
 
         async edit(user) {
-            this.dataEdit = user;
-            this.dataEdit.departure_city_id = user.departure_city_id == null ? 0 : user.departure_city_id;
-            this.dataEdit.destination_city_id = user.destination_city_id == null ? 0 : user.destination_city_id;
+            const resEditUser = await this.callApi("post", "user/edit", {'id' : user.id});
+            if(resEditUser.status == 200){
+                this.dataEdit = resEditUser.data;
+            }else{
+                console.log(resEditUser);
+            }
         },
 
         async update() {
@@ -729,7 +727,6 @@ export default {
             const resUpdateUser = await this.callApi("post", "user/update", this.dataEdit);
             if (resUpdateUser.status == 201) {
                 this.loadingUpdate = false;
-                // this.success = "";
                 swal({
                     title: "Successfull!!",
                     text: "User Updated Successfully",

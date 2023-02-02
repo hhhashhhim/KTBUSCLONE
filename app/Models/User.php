@@ -37,6 +37,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'departure_city_ids' => 'array',
+        'destination_city_ids' => 'array',
     ];
 
     public function role()
