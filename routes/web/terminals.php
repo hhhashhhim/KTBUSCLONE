@@ -12,4 +12,10 @@ Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('update', [TerminalController::class, 'update']);
     Route::post('delete', [TerminalController::class, 'delete']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
+    
+    Route::post('/routes', [TerminalController::class, 'getRoutes']);
+    
+    Route::group(['prefix' => '/commissions', [CustomMiddleware::class]], function () {
+        Route::post('/store', [TerminalController::class, 'commissionStore']);
+    });
 });

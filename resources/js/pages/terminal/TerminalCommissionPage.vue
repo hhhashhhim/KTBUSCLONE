@@ -1,0 +1,312 @@
+<template>
+    <section class="section">
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-12">
+                    <div class="card card-primary ">
+                        <div class="card-header">
+                            <h4>Terminal Commission</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:200px">Route</th>
+                                                            <th>Fix Commission</th>
+                                                            <th>Flat Commission</th>
+                                                            <th>Percentage Commission</th>
+                                                            <th>Adjustment Commission</th>
+                                                            <th style="width:200px">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(i, index) in loop" :key="index">
+                                                            <td>
+                                                                <!-- {{ items[0] ? items[0].price : '' }} -->
+                                                                <select class="form-control rounded-0"
+                                                                    @change="saveRow($event, 'first', index)"
+                                                                    :value="postData.route[index]" :disabled="editAble">
+                                                                    <option value="" selected>Select Route </option>
+                                                                    <option v-for="(route, i) in routes"
+                                                                        :value="route.id" :key="i">
+                                                                        {{ route.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control"
+                                                                    @keyup="saveRow($event, 'second', index)"
+                                                                    :value="postData.fixCommission[index]"
+                                                                    :disabled="editAble" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control"
+                                                                    @keyup="saveRow($event, 'third', index)"
+                                                                    :value="postData.flatCommission[index]"
+                                                                    :disabled="editAble" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" min="0" class="form-control"
+                                                                    @keyup="saveRow($event, 'fourth', index)"
+                                                                    :value="postData.percentCommission[index]"
+                                                                    :disabled="editAble" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control"
+                                                                    @keyup="saveRow($event, 'fifth', index)"
+                                                                    :value="postData.adjustmentCommission[index]"
+                                                                    :disabled="editAble" />
+                                                            </td>
+                                                            <td v-if="!editAble">
+                                                                <button class="btn btn-outline-primary mx-2"
+                                                                    @click="addRow">Add</button>
+                                                                <button class="btn btn-outline-danger"
+                                                                    @click="removeRow($event, index)"
+                                                                    v-if="index != 0">Remove</button>
+                                                            </td>
+                                                            <td v-else></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-outline-success mr-4"
+                                                        @click="add" :disabled="loading" v-if="!editAble">{{
+                                                            loading?
+                                                                                                                'Loading...': 'Save'
+                                                        }}
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary mr-4"
+                                                        @click="editAble = false" :disabled="loading" v-else>Edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary mr-4"
+                                                        @click="editAble=true"
+                                                        v-if="!editAble && postData.route.length != 0">Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</template>
+
+<script>
+// import Add from '../../components/Add.vue';
+// import Edit from '../../components/Edit.vue';
+// import Delete from '../../components/Delete.vue';
+import { mapGetters } from 'vuex';
+
+export default {
+    name: "TerminalCommissionPage",
+    components: {
+        // Add,
+        // Edit,
+        // Delete,
+    },
+    data() {
+        return {
+            validationErrors: [],
+            editAble: false,
+            routes: [],
+            loading: false,
+            formID: 'terminal_commission',
+            editFormID: 'edit_terminal_commission',
+            // deleteFormID:'delete_city_form',
+            postData: {
+                terminal_id: "",
+                route: [],
+                fixCommission: [],
+                flatCommission: [],
+                percentCommission: [],
+                adjustmentCommission: [],
+            },
+            success: false,
+            errors: false,
+            loop: 1,
+        }
+    },
+    async created() {
+        $(".modal").click();
+        await this.fetchData();
+        await this.existingCommissions();
+        setTimeout(function () {
+            $("#commission_table").DataTable();
+        }, 300);
+    },
+    methods: {
+        clearForm: function () {
+            this.data = {};
+        },
+        async fetchData() {
+            this.postData.terminal_id = this.$route.params.id;
+
+            const res = await this.callApi("post", 'terminals/routes');
+            if (res.status == 200) {
+                this.routes = res.data;
+            }
+
+        },
+        // async existingCommissions() {
+        //     const res = await this.callApi("post",'expenses',{ticket_merge_id : this.postData.ticket_merge_id});
+        //     if (res.status == 200) {
+        //         const expenses = res.data;
+        //         if(expenses != "")
+        //         {
+        //             this.loop = expenses.length;
+        //             for(var i = 0; i < expenses.length; i++)
+        //             {
+        //                 this.postData.category.push(expenses[i].expense_category_id);
+        //                 this.postData.description.push(expenses[i].description);
+        //                 this.postData.amount.push(expenses[i].amount);
+        //                 this.postData.invoice.push(expenses[i].invoice);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             this.loop = 1;
+        //             this.editAble = false;
+        //         }
+        //     }
+        // },
+        saveRow(event, fieldName, index) {
+            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            if (fieldName == "first") {
+                this.postData.route[index] = event.target.value;
+            }
+            if (fieldName == "second") {
+                this.postData.fixCommission[index] = event.target.value;
+            }
+            if (fieldName == "third") {
+                this.postData.flatCommission[index] = event.target.value;
+            }
+            if (fieldName == "fourth") {
+                this.postData.percentCommission[index] = event.target.value;
+            }
+            if (fieldName == "fifth") {
+                this.postData.adjustmentCommission[index] = event.target.value;
+            }
+        },
+        addRow() {
+            this.loop++;
+        },
+        removeRow(event, index) {
+            this.postData.route.splice(index, 1);
+            this.postData.fixCommission.splice(index, 1);
+            this.postData.flatCommission.splice(index, 1);
+            this.postData.percentCommission.splice(index, 1);
+            this.postData.adjustmentCommission.splice(index, 1);
+            this.loop--;
+        },
+        async add() {
+
+            // validation for empty data
+            if (!this.postData.terminal_id || this.postData.route.length == 0 || this.postData.fixCommission.length == 0 ||
+                this.postData.flatCommission.length == 0 || this.postData.percentCommission.length == 0 || this.postData.adjustmentCommission.length == 0) {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 4000
+                });
+            }
+
+            // check if any index is empty or null in object
+            for (var i = 0; i < this.postData.route.length; i++) {
+                if (!this.postData.route[i] || !this.postData.fixCommission[i] || !this.postData.flatCommission[i] ||
+                 !this.postData.percentCommission[i] || !this.postData.adjustmentCommission[i]) {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 4000
+                    });
+                }
+                
+                if (this.postData.flatCommission[i] != 0 && this.postData.percentCommission[i] != 0) {
+                    return swal({
+                        title: "Error",
+                        text: "Flat Commission or Percentage Commission should be 0 against single route",
+                        icon: "error",
+                        timer: 5000
+                    });
+                }
+            }
+
+            this.loading = true;
+            const res = await this.callApi("post", "terminals/commissions/store", this.postData);
+            if (res.status === 200) {
+                this.loading = false;
+                // $('#expense').DataTable().destroy();
+                this.postData.route = [];
+                this.postData.fixCommission = [];
+                this.postData.flatCommission = [];
+                this.postData.percentCommission = [];
+                this.postData.adjustmentCommission = [];
+                this.loop = 0;
+                this.editAble = true;
+                swal({
+                    title: "Success",
+                    text: "Expense Saved",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchData();
+                await this.existingCommissions();
+                this.loading = false;
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 4000
+                        });
+
+                    }
+                }
+            }
+        },
+    },
+    computed: {
+        ...mapGetters(['getDeletingObj'])
+    },
+    watch: {
+        getDeletingObj(obj) {
+            if (obj.isDeleted) {
+                this.cities.splice(obj.index, 1)
+                $("#commission_table").DataTable().destroy();
+                this.fetchData();
+                this.existingCommissions();
+            }
+        }
+    }
+}
+</script>

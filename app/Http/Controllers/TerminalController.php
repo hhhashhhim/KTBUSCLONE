@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Terminal;
+use App\Models\TerminalCommission;
+use App\Models\Route\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -11,7 +13,7 @@ use Illuminate\Validation\Rule;
 class TerminalController extends Controller
 {
 
-//    public $company_id;
+    //    public $company_id;
 //
 //    public function __construct()
 //    {
@@ -36,6 +38,11 @@ class TerminalController extends Controller
     public function getTerminal(Request $request)
     {
         return Terminal::with('addedBy')->where('city_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
+    }
+
+    public function getRoutes(Request $request)
+    {
+        return Route::where('company_id', Auth::user()->company_id)->get(["id", "name"]);
     }
 
     public function store(Request $request)
@@ -83,9 +90,9 @@ class TerminalController extends Controller
             'online_terminal_name' => $request->online_terminal_name ?? " ",
             'status' => $request->active ? 1 : 0,
             'is_main' => $request->is_main ? 1 : 0,
-            'fixed_commission' => $request->commission??0,
-            'ticket_flat_commission' => $request->flatCommission??0,
-            'ticket_percentage_commission' => $request->percentageCommission??0,
+            'fixed_commission' => $request->commission ?? 0,
+            'ticket_flat_commission' => $request->flatCommission ?? 0,
+            'ticket_percentage_commission' => $request->percentageCommission ?? 0,
             'added_by' => Auth::user()->id,
             'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
         ]);
@@ -108,7 +115,7 @@ class TerminalController extends Controller
             $main = Terminal::where('city_id', $request->city_id)
                 ->where('company_id', Auth::user()->company_id)
                 ->where('is_main', 1)
-                ->where('id','!=', $request->id)
+                ->where('id', '!=', $request->id)
                 ->first();
             if ($main) {
                 return response()->json([
@@ -127,15 +134,41 @@ class TerminalController extends Controller
             'available_seats' => $request->available_seats,
             'city_id' => $request->city_id,
             'online_terminal_name' => $request->online_terminal_name,
-            'is_main' => (int)$request->is_main,
+            'is_main' => (int) $request->is_main,
             'fixed_commission' => $request->fixed_commission,
             'ticket_flat_commission' => $request->ticket_flat_commission,
             'ticket_percentage_commission' => $request->ticket_percentage_commission,
             'active_sms' => $request->active_sms ? 1 : 0,
-            'status' => (int)$request->status,
+            'status' => (int) $request->status,
         ]);
         return response()->json([
             'message' => 'Updated Successfully',
         ], 201);
+    }
+    public function commissionStore(Request $request)
+    {
+        return $request;
+        
+        $request->validate([
+            "terminal_id" => 'required',
+            "route" => 'required',
+            "fixCommission" => 'required',
+            "flatCommission" => 'required',
+            "percentCommission" => 'required',
+            "adjustmentCommission" => 'required',
+        ]);
+        TerminalCommission::where("terminal_id",$request->terminal_id)->delete();
+        foreach ($request->route as $key => $value) {
+            TerminalCommission::create([
+                'terminal_id' => $request->ticket_merge_id,
+                'route_id' => $request->route[$key],
+                'fix_commission' => $request->fixCommission[$key],
+                'flat_commission' => $request->flatCommission[$key],
+                'percentage_commission' => $request->percentCommission[$key],
+                'adjustment_commission' => $request->adjustmentCommission[$key],
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
     }
 }
