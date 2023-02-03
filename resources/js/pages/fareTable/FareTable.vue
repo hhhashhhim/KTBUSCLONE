@@ -21,6 +21,12 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="d-flex justify-content-between px-4 border">
+                            <p>After updating time differrence press button this will check and update your schedule. This can take time.</p>
+                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes" :disabled="loadingTable">
+                                {{loadingTable ? 'Loading...' : 'Update Schedule' }}
+                            </button>
+                        </div>
                         <div class="card-body">
                             <transition name="fade">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
@@ -257,6 +263,25 @@ export default {
             const res = await this.callApi("post", 'fare-table/fare_class/get');
             if (res.status == 200) {
                 this.fareClasses = res.data
+            } else {
+                console.log(res);
+            }
+        },
+        
+        async updateScheduleTimes() {
+            this.loadingTable = true;
+            const res = await this.callApi("post", 'fare-table/schedules/times/update');
+            if (res.status == 200) {
+                // this.fareClasses = res.data
+                swal({
+                    title: "Success",
+                    text: "Schedule Times Updated",
+                    icon: "success",
+                    timer: 4000
+                });
+                setTimeout(() => {
+                    this.loadingTable = false;
+                }, 500);
             } else {
                 console.log(res);
             }

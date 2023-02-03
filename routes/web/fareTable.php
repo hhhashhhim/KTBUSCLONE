@@ -9,4 +9,5 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
     Route::post('/store', [FareTableController::class, 'store']);
     Route::post('/fare_class/get', [FareTableController::class, 'getFareClass']);
     Route::post('/check', [FareTableController::class, 'check']);
+    Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
 });
