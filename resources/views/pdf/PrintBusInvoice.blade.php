@@ -70,13 +70,13 @@
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript">
 
-        $(document).ready(function () {
-            window.print();
-        });
+        // $(document).ready(function () {
+        //     window.print();
+        // });
 
-        setTimeout(function(){
-            window.close() ;
-        }, 1000); //Time before execution
+        // setTimeout(function(){
+        //     window.close() ;
+        // }, 1000); //Time before execution
     </script>
     <title>Print Bus Invoice</title>
 </head>
@@ -116,6 +116,7 @@
         <th>Sale</th>
         <th>Discount</th>
         <th>Commission</th>
+        <th>KT Commission</th>
         <th>ELT Price</th>
         <th>Net Sale</th>
     </tr>
@@ -124,6 +125,9 @@
         $totalSale = 0;
         $totalDiscount = 0;
         $totalElt = 0;
+        $totalCommission = 0;
+        $totalFixCommission = 0;
+        $totalAdjustCommission = 0;
     @endphp
     @foreach($mainData as $terminal)
     @foreach($terminal as $destination)
@@ -144,12 +148,35 @@
         @php
             $totalDiscount += $destination->sum("discount")
         @endphp
-        <td>-</td>
+        <td>
+            @if($destination[0]->commission)
+                @if($destination[0]->commission->flat_commission == 0)
+                {{ $commission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->percentage_commission }}
+                @else
+                {{ $commission = $destination->count() * $destination[0]->commission->flat_commission }}
+                @endif
+            @else
+                {{ $commission = 0; }}
+            @endif
+            @php
+                $totalCommission += $commission;   
+            @endphp
+        </td>
+        <td>
+            @if($destination[0]->commission)
+                {{ $adjustCommission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->adjustment_commission }}                
+            @else
+                {{ $adjustCommission = 0; }}
+            @endif
+            @php
+                $totalAdjustCommission += $adjustCommission;   
+            @endphp
+        </td>
         <td>{{ $destination->sum("elt_price") }}</td>
         @php
             $totalElt += $destination->sum("elt_price")
         @endphp
-        <td>{{ ($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount") }}</td>
+        <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount")) - $commission) - $totalAdjustCommission }}</td>
     </tr>
     @endforeach
     @endforeach
@@ -159,17 +186,23 @@
         <th></th>
         <th>{{ $totalSale }}</th>
         <th>{{ $totalDiscount }}</th>
-        <th>-</th>
+        <th>{{ $totalCommission }}</th>
+        <th>{{ $totalAdjustCommission }}</th>
         <th>{{ $totalElt }}</th>
-        <th>{{ ($totalSale + $totalElt) - $totalDiscount }}</th>
+        <th>{{ ((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalAdjustCommission }}</th>
     </tr>
+    @foreach($mainData as $terminal)
     <tr>
-        <th colspan="8">Main Terminal Fixed Commision</th>
-        <th colspan="2">-</th>
+        <th colspan="8">{{ $terminal->first()[0]->terminal->name }} Fix Commission</th>
+        <td colspan="3">{{ $fixCommission = $terminal->first()[0]->commission ? intVal($terminal->first()[0]->commission->fix_commission) : 0 }}</td>
     </tr>
+    @php
+        $totalFixCommission += $fixCommission;
+    @endphp
+    @endforeach
     <tr>
         <th colspan="8">Gross Sale</th>
-        <th colspan="2">{{ ($totalSale + $totalElt) - $totalDiscount }}</th>
+        <th colspan="3">{{ (((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalFixCommission) - $totalAdjustCommission }}</th>
     </tr>
 </table>
 <br>

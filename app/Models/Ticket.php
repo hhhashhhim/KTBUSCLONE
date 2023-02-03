@@ -6,6 +6,7 @@ use App\Models\Booking\TicketELT;
 use App\Models\Bus\BusClass;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\TerminalCommission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -74,5 +75,10 @@ class Ticket extends Model
     public function elt()
     {
         return $this->hasOne(TicketELT::class, 'ticket_id', 'id');
+    }
+    
+    public function commission()
+    {
+        return $this->hasOne(TerminalCommission::class,"terminal_id","terminal_id");
     }
 }

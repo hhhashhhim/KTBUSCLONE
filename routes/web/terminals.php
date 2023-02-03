@@ -16,6 +16,7 @@ Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
     Route::post('/routes', [TerminalController::class, 'getRoutes']);
     
     Route::group(['prefix' => '/commissions', [CustomMiddleware::class]], function () {
+        Route::post('/', [TerminalController::class, 'terminalCommissions']);
         Route::post('/store', [TerminalController::class, 'commissionStore']);
     });
 });

@@ -23,5 +23,9 @@ class TerminalCommission extends Model
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
     }
+    
+    public function terminal(){
+        return $this->hasOne( Terminal::class,'id','terminal_id' );
+    }
 
 }

@@ -145,10 +145,18 @@ class TerminalController extends Controller
             'message' => 'Updated Successfully',
         ], 201);
     }
-    public function commissionStore(Request $request)
+    public function terminalCommissions(Request $request)
     {
-        return $request;
-        
+
+        $terminalCommission = TerminalCommission::where(["terminal_id"=>$request->terminal_id,'company_id'=> Auth::user()->company_id])->orderBy('id')->get();
+        $terminal = Terminal::where(["id"=>$request->terminal_id,'company_id'=> Auth::user()->company_id])->first();
+        return [
+            "terminalCommission" => $terminalCommission,
+            "terminal" => $terminal,
+        ];
+    }
+    public function commissionStore(Request $request)
+    {   
         $request->validate([
             "terminal_id" => 'required',
             "route" => 'required',
@@ -159,16 +167,21 @@ class TerminalController extends Controller
         ]);
         TerminalCommission::where("terminal_id",$request->terminal_id)->delete();
         foreach ($request->route as $key => $value) {
-            TerminalCommission::create([
-                'terminal_id' => $request->ticket_merge_id,
-                'route_id' => $request->route[$key],
-                'fix_commission' => $request->fixCommission[$key],
-                'flat_commission' => $request->flatCommission[$key],
-                'percentage_commission' => $request->percentCommission[$key],
-                'adjustment_commission' => $request->adjustmentCommission[$key],
-                'company_id' => Auth::user()->company_id,
-                'added_by' => Auth::user()->id,
-            ]);
+            $checkExist = TerminalCommission::where(["terminal_id"=>$request->terminal_id,"route_id"=>$request->route[$key],'company_id'=> Auth::user()->company_id])->first();
+            if(!$checkExist)
+            {
+                TerminalCommission::create([
+                    'terminal_id' => $request->terminal_id,
+                    'route_id' => $request->route[$key],
+                    'fix_commission' => $request->fixCommission[$key],
+                    'flat_commission' => $request->flatCommission[$key],
+                    'percentage_commission' => $request->percentCommission[$key],
+                    'adjustment_commission' => $request->adjustmentCommission[$key],
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+            }
         }
     }
+
 }
