@@ -237,13 +237,6 @@
                                         <div class="row">
                                             <div class="form-group mt-2 mb-2"
                                             >
-                                                <button class="btn btn-success mx-1"
-                                                        v-on:click="add()"
-                                                        v-on:keyup.enter="add()">
-                                                    {{
-                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
-                                                    }}
-                                                </button>
                                                 <a href="#" :data-target="'#' + formID" data-toggle="modal"
                                                    class="btn btn-primary" @click="closingData()">
                                                     Assign Bus
@@ -257,12 +250,19 @@
                                                 <button class="btn btn-danger mx-1" @click="getCustomerList()">
                                                     Pax List
                                                 </button>
+                                                <button class="btn btn-success mx-1"
+                                                        v-on:click="add()"
+                                                        v-on:keyup.enter="add()">
+                                                    {{
+                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
+                                                    }}
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="text-center mb-2">
                                             <button class="btn btn-secondary text-dark"
                                                     @click="fetchScheduleData()" :disabled="getSchedule">
-                                                {{ getSchedule ? "Loading.." : 'Reset' }}
+                                                {{ getSchedule ? "Loading.." : 'Refresh' }}
                                             </button>
                                         </div>
                                     </div>
@@ -284,17 +284,19 @@
                                                 >
                                                     <small>{{ col.seatNo }} </small>
                                                     <br/>
-                                                    <small
-                                                        v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
-                                                        <i class="type-icons fas"
-                                                           :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
+                                                    <small v-if="col.type && col.type == 'booked'">
+                                                        <i class="type-icons fas fa-check-double">
                                                         </i>
                                                     </small>
-                                                    <small v-if="col.over_issue == true">
-                                                        <i class="type-icons far fa-hand-paper text-dark">
+                                                    <small v-if="col.type && col.type == 'advance booking'">
+                                                        <i class="type-icons fas fa-check">
                                                         </i>
                                                     </small>
-                                                    <small v-if="col.type == 'not_for_sale'">
+                                                    <small v-if="col.type && col.type == 'over-issue'">
+                                                        <i class="type-icons far fa-hand-paper text-light">
+                                                        </i>
+                                                    </small>
+                                                    <small v-if="col.type && col.type == 'not_for_sale'">
                                                         <i class="fas fa-minus-circle text-light"></i>
                                                     </small>
                                                 </div>
@@ -348,13 +350,6 @@
                                                         <span class="text-wrap mrn"
                                                               style="margin-top:-10px;">Partial Seat</span>
                                                     </div>
-                                                    <!--                                                    <div class="my-2">-->
-                                                    <!--                                                        <div-->
-                                                    <!--                                                            class="circles icons-legend mr-1 border shadow">-->
-                                                    <!--                                                            <i class="fas fa-people-carry text-danger"></i>-->
-                                                    <!--                                                        </div>-->
-                                                    <!--                                                        <span class="text-wrap mrn">Over Issue</span>-->
-                                                    <!--                                                    </div>-->
                                                     <div class="my-2">
                                                         <div class="circles icons-legend mr-1 border shadow">
                                                             <i class="far fa-hand-paper text-dark"></i>
@@ -546,7 +541,7 @@
                                 </div>
                                 <br>
                                 <div class="mb-2"><span class="h6"> Booked Seat Numbers </span><br>
-                                    <span>{{ (mainAllRescheduleData.oldSeats).join(', ') }}</span>
+                                    <span>{{ (mainAllRescheduleData.oldSeats) }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -563,15 +558,20 @@
                                         >
                                             <small>{{ col.seatNo }} </small>
                                             <br/>
-                                            <small
-                                                v-if="col.type && (col.type == 'booked' || col.type == 'advance booking')">
-                                                <i class="type-icons fas"
-                                                   :class="col.type == 'booked' && col.over_issue != true ? 'fa-check-double' : 'fa-check'">
+                                            <small v-if="col.type && col.type == 'booked'">
+                                                <i class="type-icons fas fa-check-double">
                                                 </i>
                                             </small>
-                                            <small v-if="col.over_issue == true">
-                                                <i class="type-icons far fa-hand-paper text-danger">
+                                            <small v-if="col.type && col.type == 'advance booking'">
+                                                <i class="type-icons fas fa-check">
                                                 </i>
+                                            </small>
+                                            <small v-if="col.type && col.type == 'over-issue'">
+                                                <i class="type-icons far fa-hand-paper text-light">
+                                                </i>
+                                            </small>
+                                            <small v-if="col.type && col.type == 'not_for_sale'">
+                                                <i class="fas fa-minus-circle text-light"></i>
                                             </small>
                                         </div>
                                         <span v-else></span>
@@ -581,13 +581,45 @@
                             <div class="col-md-3">
                                 <h4 class="mb-3">Current Booking</h4>
                                 <div class="mb-2"><span class="h6"> New Fare : Rs {{
-                                        alreadyBookedSeatFare ?? ""
+                                        totalAlreadyBookedSeatFare ?? ""
                                     }} </span>
                                 </div>
                                 <br>
                                 <div class="mb-2"><span class="h6"> Selected Seats Numbers </span><br>
                                     <span>{{ alreadyBookedSeat.join(', ') ?? "Not Selected Yet" }}</span>
                                 </div>
+                                <div class="mt-3">
+                                    <div class="form-group">
+                                        <span class="h6">Over Issue Reschedule : </span>
+                                        <label class="colorinput">
+                                            <input name="overIssueReschedule" type="checkbox" value="1"
+                                                   class="colorinput-input"
+                                                   @click="getApprovalOverIssueSeat($event)">
+                                            <span class="colorinput-color bg-primary"></span>
+                                        </label>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <span class="h6">Advance Booked :</span>
+                                        <label class="colorinput">
+                                            <input name="overIssueRescheduleAdvance" type="checkbox" value="1"
+                                                   class="colorinput-input"
+                                                   @click="changeTypeReschedule($event)">
+                                            <span class="colorinput-color bg-primary"></span>
+                                        </label>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <label for="name">Discount </label>
+                                        <input
+                                            type="text"
+                                            @keypress="isNumber($event)"
+                                            class="form-control"
+                                            v-model="rescheduleDiscount"
+                                        />
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -675,10 +707,10 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Seat :</h4>
                                                     <h4 class="mb-0 text-muted">{{ innerItem.seat_no }}</h4>
                                                 </div>
-                                                <div class="col-md-6 d-flex justify-content-end"
-                                                     v-if="innerItem.type == 'advance booking'">
+                                                <div class="col-md-6 d-flex justify-content-end">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
-                                                    <h4 class="mb-0 text-muted text-capitalize">{{
+                                                    <h4 class="mb-0 text-muted text-capitalize"><span
+                                                        v-if="innerItem.is_partial == 1">Partial - </span>{{
                                                             innerItem.type
                                                         }}</h4>
                                                 </div>
@@ -720,12 +752,12 @@
                                                         <p class="mb-0">{{ innerItem.bookingDate }}</p>
                                                     </div>
                                                     <div class="d-flex">
-                                                        <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
-                                                        <p class="mb-0">{{ innerItem.destination_city.name }}</p>
-                                                    </div>
-                                                    <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
                                                         <p class="mb-0">{{ innerItem.departure_city.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
+                                                        <p class="mb-0">{{ innerItem.destination_city.name }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -989,7 +1021,8 @@ export default {
             cancel: [],
             overIssueData: [],
             alreadyBookedSeat: [],
-            alreadyBookedSeatFare: 0,
+            alreadyBookedSeatFare: [],
+            totalAlreadyBookedSeatFare: 0,
             alreadyBookedSeatClassName: [],
             alreadyBookedSeatClass: [],
             eltData: [],
@@ -1022,9 +1055,13 @@ export default {
             filterDate: new Date().toISOString().substr(0, 10),
             cities: [],
             advanceSeat: [],
+            overIssueScheduleCheckBox: 'general',
+            rescheduleSeatType: "booked",
+            rescheduleDiscount: "",
             eltIds: "",
             EltButton: false,
             loadingRescheduleButton: false,
+            showRescheduleDiscountDiv: false,
             allRescheduleButton: false,
             ticketsIds: "",
             ticketsId: "",
@@ -1088,6 +1125,22 @@ export default {
                 this.addForm.gender = 0;
             } else {
                 this.addForm.gender = 1;
+            }
+        },
+
+        getApprovalOverIssueSeat: function (e) {
+            if (e.target.checked) {
+                this.overIssueScheduleCheckBox = 'overIssue_reschedule';
+            } else {
+                this.overIssueScheduleCheckBox = 'general';
+            }
+        },
+
+        changeTypeReschedule: function (e) {
+            if (e.target.checked) {
+                this.rescheduleSeatType = 'advance booking';
+            } else {
+                this.rescheduleSeatType = 'booked';
             }
         },
 
@@ -1540,7 +1593,8 @@ export default {
             this.reScheduleDate = '';
             this.alreadyBookedSeatClassName = [];
             this.alreadyBookedSeatClass = [];
-            this.alreadyBookedSeatFare = 0;
+            this.alreadyBookedSeatFare = [];
+            this.totalAlreadyBookedSeatFare = 0;
             this.alreadyBookedSeat = [];
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
@@ -1692,57 +1746,44 @@ export default {
             }
         },
 
-        // reScheduleSelectSeat: function (row, col, data) {
-        //     if (this.alreadyBookedSeat.length > 0) {
-        //         this.alreadyBookedSeat = [];
-        //         this.fetchReScheduleData();
-        //         return swal({
-        //             title: "Oops",
-        //             text: "You can select just one seat ",
-        //             icon: "error",
-        //             timer: 3000
-        //         });
-        //     }
-        //     let index = this.alreadyBookedSeat.indexOf(data.seatNo);
-        //     if (index != -1) {
-        //         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
-        //         this.alreadyBookedSeat.splice(index, 1);
-        //         this.alreadyBookedSeatFare.splice(index, 1);
-        //         this.alreadyBookedSeatClassName.splice(index, 1);
-        //         this.alreadyBookedSeatClass.splice(index, 1);
-        //     } else {
-        //         this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
-        //         this.alreadyBookedSeat.push(data.seatNo);
-        //         this.alreadyBookedSeatFare.push(data.fare);
-        //         this.alreadyBookedSeatClassName.push(data.class_name);
-        //         this.alreadyBookedSeatClass.push(data.class);
-        //     }
-        //     this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
-        //     this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
-        //     this.reScheduleSchedule = $("#reScheduleName option:selected").text();
-        //     this.reScheduleDate = this.rescheduleData.rescheduleDate;
-        // },
-
         reScheduleSelectSeat: function (row, col, data) {
+            console.log(data);
             let index = this.alreadyBookedSeat.indexOf(data.seatNo);
             if (index != -1) {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
                 this.alreadyBookedSeat.splice(index, 1);
-                this.alreadyBookedSeatFare -= parseFloat(data.fare);
+                this.alreadyBookedSeatFare.splice(parseFloat(data.fare), 1);
+                this.totalAlreadyBookedSeatFare -= parseFloat(data.fare);
                 this.alreadyBookedSeatClassName.splice(index, 1);
                 this.alreadyBookedSeatClass.splice(index, 1);
             } else {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
                 this.alreadyBookedSeat.push(data.seatNo);
-                this.alreadyBookedSeatFare += parseFloat(data.fare);
+                this.alreadyBookedSeatFare.push(parseFloat(data.fare));
+                this.totalAlreadyBookedSeatFare += parseFloat(data.fare);
                 this.alreadyBookedSeatClassName.push(data.class_name);
                 this.alreadyBookedSeatClass.push(data.class);
             }
+
+            // if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
+            // } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
+            //
+            // }else{
+            //     this.fetchScheduleData();
+            //     this.resetingArrays();
+            //     return swal({
+            //         title: "Oops",
+            //         text: "Invalid Seat Combination",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // },
             this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
             this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
             this.reScheduleDate = this.rescheduleData.rescheduleDate;
-        },
+        }
+        ,
 
         handler: function (col, e) {
             if (col.type == 'not_for_sale') {
@@ -1754,30 +1795,34 @@ export default {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.selected ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
-            let over = col.over_issue && col.partial ? "bg-secondary" : "";
+            let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
-        },
+        }
+        ,
 
         getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.alreadyBooked ? "selected" : "";
             let partial = col.partial ? "partial" : "";
-            let over = col.over_issue && col.partial ? "bg-secondary" : "";
+            let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
-        },
+        }
+        ,
 
         getTitle: function (col) {
-            if (col.type == 'booked' || col.type == 'advance booking' || col.over_issue) {
+            if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue') {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
-        },
+        }
+        ,
 
         getStyle: function (col) {
             let disabledSeat = col.type == 'not_for_sale' ? 'pointer-events: none;' : '';
             return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
-        },
+        }
+        ,
 
         async add() {
             if (this.addForm.departureCity == 0) {
@@ -1885,7 +1930,6 @@ export default {
                     $("#booking_table").DataTable();
 
                 }, 300);
-                // window.open(this.$store.state.app_url + 'print/' + res.data + '/pdf', '_blank').focus();
 
             } else {
                 if (res.status == 422) {
@@ -1909,7 +1953,8 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
 
         async resetingArrays() {
             this.selectedSeats = [];
@@ -1932,7 +1977,8 @@ export default {
             } else {
                 console.log(res);
             }
-        },
+        }
+        ,
 
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
@@ -1945,7 +1991,8 @@ export default {
             } else {
                 console.log(resBookingDetail);
             }
-        },
+        }
+        ,
 
         passDataToCancelModel: function (data) {
             this.cancelData = {
@@ -1957,7 +2004,8 @@ export default {
                 dataSeat_no: data.seat_no,
             }
             $("#cancelModel").modal('show');
-        },
+        }
+        ,
 
         async cancelBooking(dataEnter) {
             const data = {
@@ -1979,6 +2027,8 @@ export default {
                     timer: 2000
                 });
                 this.fetchScheduleData();
+                this.fetchReScheduleData();
+                this.resetingArrays();
             }
         },
 
@@ -1994,7 +2044,8 @@ export default {
                 dataSeat_no: data.seat_no,
             }
             $("#overIssue_model").modal('show');
-        },
+        }
+        ,
 
         async addOverIssueTicket(dataEnter) {
             if (dataEnter.reason == '' || typeof dataEnter.reason == 'undefined') {
@@ -2023,7 +2074,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-
+                this.fetchScheduleData();
+                this.fetchReSpecificSchedules();
+                this.resetingArrays();
             }
 
             if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -2055,7 +2108,8 @@ export default {
 
                 }
             }
-        },
+        }
+        ,
 
         //ELT MODEL DATA
         passDataToEltModel: function (data) {
@@ -2069,7 +2123,8 @@ export default {
                 dataSeatFare: data.seat_fare,
             }
             $("#addELTModel").modal('show');
-        },
+        }
+        ,
 
         async addEltToTicket(dataEnter) {
             if (dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined') {
@@ -2148,7 +2203,8 @@ export default {
 
                 }
             }
-        },
+        }
+        ,
         async allRescheduleData() {
             const arraySingleRescheduleData = [];
             const oldSeats = [];
@@ -2162,9 +2218,8 @@ export default {
                     existingDate: singleSeat[1][0].date,
                     dataCustomer: singleSeat[1][0].customer_id,
                     dataSchedule: singleSeat[1][0].schedule_id,
-                    dataDepartureCity: singleSeat[1][0].departure_city_id,
-                    dataDestination: singleSeat[1][0].destination_city_id,
                     dataSeat_no: singleSeat[1][0].seat_no,
+                    dataDepartureCity: singleSeat[1][0].departure_city_id,
                     dataAll: singleSeat[1][0],
                 }
                 arraySingleRescheduleData[i] = singlePostData;
@@ -2174,7 +2229,6 @@ export default {
                 arraySingleRescheduleData['oldSeats'] = oldSeats;
             });
             this.mainAllRescheduleData = arraySingleRescheduleData;
-            console.log(this.mainAllRescheduleData)
             this.rescheduleData.dataDepartureCity = this.mainAllRescheduleData[0].dataDepartureCity;
             this.rescheduleData.rescheduleDate = this.mainAllRescheduleData[0].rescheduleDate;
             this.rescheduleData.rescheduleSchedule = 0;
@@ -2192,7 +2246,8 @@ export default {
             }
             $("#reschedule_modal").modal('show');
 
-        },
+        }
+        ,
 
         // Reschedule model
         async passDataToRescheduleModel(data) {
@@ -2224,7 +2279,8 @@ export default {
             }
 
             $("#reschedule_modal").modal('show');
-        },
+        }
+        ,
 
         async rescheduleSeats() {
             if (this.alreadyBookedSeat.length != this.mainAllRescheduleData.length) {
@@ -2276,7 +2332,13 @@ export default {
                 single.selected_seatFare = this.alreadyBookedSeatFare[index];
                 single.reason = this.rescheduleData.reason;
                 single.rescheduleDate = this.rescheduleData.rescheduleDate;
+                single.rescheduleType = this.rescheduleSeatType;
+                single.overIssueReschedule = this.overIssueScheduleCheckBox;
+                single.rescheduleDiscount = this.rescheduleDiscount;
+                single.dataDepartureCity = this.rescheduleData.dataDepartureCity;
+                single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
             });
+            console.log(this.mainAllRescheduleData);
             this.loadingRescheduleButton = true;
             const resReschedule = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
             if (resReschedule.status == 200) {
@@ -2287,7 +2349,6 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-
                 this.fetchScheduleData();
                 this.fetchReScheduleData();
             } else {
@@ -2313,7 +2374,8 @@ export default {
                     }
                 }
             }
-        },
+        }
+        ,
         // Duplicate Ticket
         duplicateTicket: function (data) {
 
@@ -2323,7 +2385,8 @@ export default {
                     this.$refs.refDuplicateTicket.submit();
                 }
             }, 700);
-        },
+        }
+        ,
 
         // Get Passengers list
         getCustomerList: function () {
@@ -2360,7 +2423,8 @@ export default {
                 });
             }
             this.$refs.refPassengerList.submit();
-        },
+        }
+        ,
         // Get Terminal Invoice
         getTerminalInvoice: function () {
 
@@ -2397,7 +2461,8 @@ export default {
                 });
             }
             this.$refs.refTerminalInvoice.submit();
-        },
+        }
+        ,
         // Get Bus Invoice
         getBusInvoice: function () {
 
@@ -2434,7 +2499,8 @@ export default {
                 });
             }
             this.$refs.refBusInvoice.submit();
-        },
+        }
+        ,
     }
     ,
 }

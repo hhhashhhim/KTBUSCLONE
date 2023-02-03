@@ -209,6 +209,7 @@ class BookingController extends Controller
 
     public function singleReschedule(Request $request)
     {
+//        dd($request->all());
         foreach ($request->data as $key => $item) {
             $ticket = $item['dataAll'];
             if ($item['existingDate'] == $item['rescheduleDate']) {
@@ -229,7 +230,7 @@ class BookingController extends Controller
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
             $isPartial = 0;
-            if ($ticket['departure_city_id'] != $departure_city_id || $ticket['destination_city_id'] != $destination_city_id) {
+            if ($item['dataDepartureCity'] != $departure_city_id || $item['dataDestination'] != $destination_city_id) {
                 $isPartial = 1;
             }
 
@@ -274,9 +275,10 @@ class BookingController extends Controller
                 'schedule_id' => $item['dataSchedule'],
                 'remarks' => $ticket['remarks'],
                 'gender' => $ticket['gender'],
-                'type' => $ticket['type'],
+                'type' => $item['rescheduleType'],
+                'reschedule_type' => $item['overIssueReschedule'],
                 'added_by' => Auth::user()->id,
-                'discount' => $ticket['discount'] ?? 0,
+                'discount' => $item['rescheduleDiscount'] ?? 0,
             ]);
             TicketReschedule::create([
                 'company_id' => Auth::user()->company_id,
@@ -378,7 +380,7 @@ class BookingController extends Controller
             'reason' => $request->remarks,
             'added_by' => Auth::user()->id,
         ]);
-        return $ticket->delete();
+        return $ticket;
     }
 
     public function getCnic(Request $request)
