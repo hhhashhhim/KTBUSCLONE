@@ -136,7 +136,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="extendedDate()">Extend Schedule
+                            <button type="button" class="btn btn-primary" @click="extendedDate()" :disabled="loading">
+                                {{ loading ? 'Loading... ' : 'Extend Schedule' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
@@ -911,6 +912,7 @@ export default {
             this.extendDate = sche;
         },
         async extendedDate() {
+            this.loading = true;
             const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
             console.log(resExtend);
             if(resExtend.status == 200){
@@ -920,6 +922,9 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                setTimeout(() => {
+                    this.loading = false;
+                }, 500);
                 await this.fetchSchedule();
             }
         },
