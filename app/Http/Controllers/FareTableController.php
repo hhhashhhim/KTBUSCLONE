@@ -11,6 +11,7 @@ use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\UpdateSchedulesTime;
 
 class FareTableController extends Controller
 {
@@ -96,7 +97,6 @@ class FareTableController extends Controller
     
     public function updateScheduleTimes(Request $request)
     {
-        // return 'helo';
         $start_date = date("Y-m-d");
         $schedules = Schedule::where("end_date",'>=', $start_date)->where(["company_id"=>Auth::user()->company_id])->get();
         
@@ -142,6 +142,8 @@ class FareTableController extends Controller
                 'schedule_days' => $schedule_days,
             ]);
         }
+        // UpdateSchedulesTime::dispatch();
+        
     }
 
     public function getDays($start, $end)
