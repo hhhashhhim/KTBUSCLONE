@@ -504,8 +504,10 @@
                                                             <i class="far fa-edit"></i>
                                                         </button>
                                                         <router-link class="btn btn-success mx-2" :to="{ name:'terminal-commission', params: { id:single.id }}">
-                                                            <!-- <i class="fas fa-plus"></i> -->
-                                                            Commissions
+                                                            <i class="fas fa-percent"></i>
+                                                        </router-link>
+                                                        <router-link class="btn btn-primary mx-2" :to="{ name:'terminal-discount', params: { id:single.id }}">
+                                                            <i class="fas fa-tag"></i>
                                                         </router-link>
                                                     </td>
                                                 </tr>
