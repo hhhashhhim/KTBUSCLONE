@@ -14,6 +14,7 @@ use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
+use App\Models\Schedule\DropSchedule;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\TicketClosing;
@@ -48,12 +49,9 @@ class BookingController extends Controller
     public function cities()
     {
 
-        if(Auth::user()->departure_city_ids == "all")
-        {
-            $ids = City::where("company_id",Auth::user()->company_id)->pluck('id');
-        }
-        else
-        {
+        if (Auth::user()->departure_city_ids == "all") {
+            $ids = City::where("company_id", Auth::user()->company_id)->pluck('id');
+        } else {
             $ids = json_decode(Auth::user()->departure_city_ids);
         }
 
@@ -331,12 +329,9 @@ class BookingController extends Controller
     function fetchSpecificDestination(Request $request)
     {
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', Auth::user()->company_id)->pluck('destination_city_id')->toArray();
-        if(Auth::user()->destination_city_ids == "all")
-        {
+        if (Auth::user()->destination_city_ids == "all") {
             $finalArray = $depart_city;
-        }
-        else
-        {
+        } else {
             $ids = json_decode(Auth::user()->destination_city_ids);
             $finalArray = array_intersect(array_unique($depart_city), $ids);
         }
@@ -440,6 +435,39 @@ class BookingController extends Controller
                 'tickets' => $tickets,
             ];
         }
+    }
+
+    public function dropSchedule(Request $request)
+    {
+//        dd($request->all());
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departure_city_id,
+            'destination_id' => $request->destination_city_id,
+        ])->first()->schedule_date;
+        $old = DropSchedule::where([
+            'company_id' => Auth::user()->company_id,
+            'date' => $request->date,
+            'schedule_date' => $uniqueDate,
+            'schedule_id' => $request->schedule_id,
+        ])->first();
+        if (!$old) {
+            DropSchedule::create([
+                'company_id' => Auth::user()->company_id,
+                'terminal_id' => Auth::user()->terminal_id,
+                'date' => $request->date,
+                'schedule_date' => $uniqueDate,
+                'schedule_id' => $request->schedule_id,
+                'added_by' => Auth::user()->id,
+                'is_drop' => 1,
+                'reason' => $request->reason,
+            ]);
+            return response()->json(['success' => 'Success'], 200);
+        }
+        return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
+
     }
 
     public function getClosingData(Request $request)
@@ -641,7 +669,9 @@ class BookingController extends Controller
             'tickets.schedule_date' => $uniqueDate,
         ])
             ->with("terminal:id,name", "destination_city:id,name")
-            ->with(["commission"=>function($q) use ($route){return $q->where("route_id",$route->id);}])
+            ->with(["commission" => function ($q) use ($route) {
+                return $q->where("route_id", $route->id);
+            }])
             ->leftJoin("ticket_e_l_t_s", "ticket_e_l_t_s.ticket_id", "tickets.id") //this for if elt exist show else null
             ->select("tickets.*", "ticket_e_l_t_s.elt_price")
             ->get()->groupBy(["terminal_id", "destination_city_id"]);

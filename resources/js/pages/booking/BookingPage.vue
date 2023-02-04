@@ -113,7 +113,7 @@
                                                     <label for="scheduleName" class="mb-0">Departure Time <span
                                                         class="text-danger">*</span></label>
                                                     <select class="form-control" id="scheduleName"
-                                                            @change="fetchScheduleData()"
+                                                            @change="fetchScheduleData(); busDropCheck()"
                                                             v-model="addForm.schedule">
                                                         <option value="0">Select Departure Time</option>
                                                         <option v-for="(schedule, i) in allSchedules"
@@ -144,7 +144,7 @@
                                             <div class="col-md-6">
                                                 <div class="row text-center">
                                                     <div class="col-md-12">
-                                                        <div class="form-group mb-0">
+                                                        <div class="form-group mb-0 pl-3">
                                                             <label class=" mr-3">Female : </label>
                                                             <label class="colorinput">
                                                                 <input name="gender" type="checkbox" value="0"
@@ -159,7 +159,7 @@
                                                 <div class="row text-center">
                                                     <div class="col-md-12">
                                                         <div class="form-group mb-0">
-                                                            <label class="mr-3">Advanced Booked : </label>
+                                                            <label class="mr-3">Advanced : </label>
                                                             <label class="colorinput">
                                                                 <input name="bookingType" type="checkbox"
                                                                        value="advance booking"
@@ -234,36 +234,45 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="form-group mt-2 mb-2"
-                                            >
-                                                <a href="#" :data-target="'#' + formID" data-toggle="modal"
-                                                   class="btn btn-primary" @click="closingData()">
-                                                    Assign Bus
-                                                </a>
-                                                <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
-                                                    Terminal Invoice
+                                        <div v-if="hideDivButtonsDrop" class="my-2">
+                                            <div class="row">
+                                                <div class="form-group mt-2 mb-2"
+                                                >
+                                                    <a href="#" :data-target="'#' + formID" data-toggle="modal"
+                                                       class="btn btn-primary" @click="closingData()">
+                                                        Assign Bus
+                                                    </a>
+                                                    <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
+                                                        Terminal Invoice
+                                                    </button>
+                                                    <button class="btn btn-warning mx-1" @click="getBusInvoice()">
+                                                        Bus Invoice
+                                                    </button>
+                                                    <button class="btn btn-danger mx-1" @click="getCustomerList()">
+                                                        Pax List
+                                                    </button>
+                                                    <button class="btn btn-success mx-1"
+                                                            v-on:click="add()"
+                                                            v-on:keyup.enter="add()">
+                                                        {{
+                                                            this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
+                                                        }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="text-center mb-2">
+                                                <button class="btn btn-secondary text-dark mr-2"
+                                                        @click="scheduleDrop()">
+                                                    Drop Schedule
                                                 </button>
-                                                <button class="btn btn-warning mx-1" @click="getBusInvoice()">
-                                                    Bus Invoice
-                                                </button>
-                                                <button class="btn btn-danger mx-1" @click="getCustomerList()">
-                                                    Pax List
-                                                </button>
-                                                <button class="btn btn-success mx-1"
-                                                        v-on:click="add()"
-                                                        v-on:keyup.enter="add()">
-                                                    {{
-                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
-                                                    }}
+                                                <button class="btn btn-secondary text-dark"
+                                                        @click="fetchScheduleData()" :disabled="getSchedule">
+                                                    {{ getSchedule ? "Loading.." : 'Refresh' }}
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="text-center mb-2">
-                                            <button class="btn btn-secondary text-dark"
-                                                    @click="fetchScheduleData()" :disabled="getSchedule">
-                                                {{ getSchedule ? "Loading.." : 'Refresh' }}
-                                            </button>
+                                        <div v-else class="text-center  my-2">
+                                            <span class="h2 font-weight-bold">{{ labelDrop }}</span>
                                         </div>
                                     </div>
                                     <!--                                        Seat Map-->
@@ -633,6 +642,34 @@
             </div>
         </div>
 
+        <!-- Model Cancel -->
+        <div class="modal fade" id="dropSchedule" tabindex="3" aria-labelledby="dropScheduleLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dropScheduleLabel">Drop Schedule</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="dropSheduleRemarks">Remarks</label>
+                            <textarea type="text" class="form-control" id="dropSheduleRemarks"
+                                      v-model="dropScheduleFormData.reason"
+                                      placeholder="Reason for drop schedule"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"
+                                @click="dropScheduleData()">
+                            Drop Schedule
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Model Cancel -->
         <div class="modal fade" id="cancelModel" tabindex="3" aria-labelledby="cancelModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -1006,6 +1043,13 @@ export default {
                 hosts: [],
                 description: '',
             },
+            dropScheduleFormData: {
+                reason: '',
+                departure_city_id: '',
+                destination_city_id: '',
+                date: '',
+                schedule_id: '',
+            },
             isActive: 1,
             formID: "addBooking",
             deleteFormID: "delete_addBooking",
@@ -1063,6 +1107,8 @@ export default {
             loadingRescheduleButton: false,
             showRescheduleDiscountDiv: false,
             allRescheduleButton: false,
+            labelDrop: '',
+            hideDivButtonsDrop: true,
             ticketsIds: "",
             ticketsId: "",
             addForm: {
@@ -1154,6 +1200,14 @@ export default {
 
         enter: function (e) {
             if (e.key == "Enter") {
+                if (!this.hideDivButtonsDrop) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Selected Schedule is dropped \n You can't Booked any Seat Against it",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
                 this.add();
             }
         },
@@ -1206,9 +1260,9 @@ export default {
                         for (const key in resSeatData.data.errors) {
                             resSeatData.data.errors[key].forEach((element) => {
                                 errorContent += (
-                                    (++count) + " - " + //creating serial no.
-                                    element + // main error
-                                    "\n" // creating new line
+                                    (++count) + " - " +
+                                    element +
+                                    "\n"
                                 );
                             });
                             swal({
@@ -1364,9 +1418,9 @@ export default {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
+                                (++count) + " - " +
+                                element +
+                                "\n"
                             );
                         });
                         swal({
@@ -1545,34 +1599,34 @@ export default {
             this.addForm.totalAmount = 0;
             this.addForm.discount = '';
             this.validationErrors = [];
-            this.loading = true
-            const res = await this.callApi("post", "schedule/selected", {
+            this.loading = true;
+            const resSelected = await this.callApi("post", "schedule/selected", {
                 id: this.addForm.schedule,
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            if (res.status == 200) {
+            if (resSelected.status == 200 && this.addForm.schedule != 0 && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
                 this.loading = false
                 this.showBookingDiv = true;
-                this.schedule = res.data;
+                this.schedule = resSelected.data;
             }
 
-            if (res.status == 500 && this.addForm.schedule == 0) {
+            if (resSelected.status == 500 && this.addForm.schedule == 0) {
                 this.loading = true
                 this.showBookingDiv = false;
             }
-            if (res.status == 422) {
+            if (resSelected.status == 422) {
                 this.showBookingDiv = false;
                 this.loading = false;
                 let errorContent = "";
                 let count = 0;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
+                for (const key in resSelected.data.errors) {
+                    resSelected.data.errors[key].forEach((element) => {
                         errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
+                            (++count) + " - " +
+                            element +
+                            "\n"
                         );
                     });
                     swal({
@@ -1584,6 +1638,71 @@ export default {
 
                 }
             }
+        },
+
+        scheduleDrop: function () {
+
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.date) {
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.dropScheduleFormData = {
+                departure_city_id: this.addForm.departureCity,
+                destination_city_id: this.addForm.destinationCity,
+                date: this.addForm.date,
+                schedule_id: this.addForm.schedule,
+                reason: '',
+            }
+            $('#dropSchedule').modal('show');
+        },
+
+        async busDropCheck() {
+            this.labelDrop = '';
+            this.hideDivButtonsDrop = true;
+            const resDropCheck = await this.callApi("post", "schedule/dropCheck", {
+                id: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            console.log(resDropCheck, resDropCheck.data);
+            if (resDropCheck.status == 200 && resDropCheck.data) {
+                this.labelDrop = 'This Schedule is Dropped';
+                this.hideDivButtonsDrop = false;
+            }
+            if (resDropCheck.status == 422) {
+                this.hideDivButtonsDrop = true;
+                this.labelDrop = '';
+            }
+
         },
 
         async fetchReScheduleData() {
@@ -1610,10 +1729,23 @@ export default {
                 this.reScheduleSeatMap = res.data;
             } else {
                 if (res.status == 422) {
-                    for (const key in res.addForm.errors) {
-                        res.addForm.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
                 }
             }
@@ -1782,8 +1914,7 @@ export default {
             this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
             this.reScheduleDate = this.rescheduleData.rescheduleDate;
-        }
-        ,
+        },
 
         handler: function (col, e) {
             if (col.type == 'not_for_sale') {
@@ -1938,9 +2069,9 @@ export default {
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
                             errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
+                                (++count) + " - " +
+                                element +
+                                "\n"
                             );
                         });
                         swal({
@@ -2094,9 +2225,9 @@ export default {
                 for (const key in resOverIssue.data.errors) {
                     resOverIssue.data.errors[key].forEach((element) => {
                         errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
+                            (++count) + " - " +
+                            element +
+                            "\n"
                         );
                     });
                     swal({
@@ -2189,9 +2320,9 @@ export default {
                 for (const key in resOverIssue.data.errors) {
                     resOverIssue.data.errors[key].forEach((element) => {
                         errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
+                            (++count) + " - " +
+                            element +
+                            "\n"
                         );
                     });
                     swal({
@@ -2263,9 +2394,7 @@ export default {
                 dataSeat_no: data.seat_no,
                 dataAll: data,
             }
-
             this.mainAllRescheduleData[0] = this.rescheduleData;
-
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
@@ -2279,8 +2408,41 @@ export default {
             }
 
             $("#reschedule_modal").modal('show');
-        }
-        ,
+        },
+
+        async dropScheduleData() {
+            const resDropSchedule = await this.callApi("post", "booking/dropSchedule", this.dropScheduleFormData);
+            if (resDropSchedule.status == 200) {
+                this.busDropCheck();
+                swal({
+                    title: "Success",
+                    text: "Schedule Drop Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+            if (resDropSchedule.status == 422) {
+                this.loadingRescheduleButton = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resDropSchedule.data.errors) {
+                    resDropSchedule.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
+                }
+            }
+        },
 
         async rescheduleSeats() {
             if (this.alreadyBookedSeat.length != this.mainAllRescheduleData.length) {
@@ -2338,7 +2500,6 @@ export default {
                 single.dataDepartureCity = this.rescheduleData.dataDepartureCity;
                 single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
             });
-            console.log(this.mainAllRescheduleData);
             this.loadingRescheduleButton = true;
             const resReschedule = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
             if (resReschedule.status == 200) {
@@ -2359,9 +2520,9 @@ export default {
                     for (const key in resReschedule.data.errors) {
                         resReschedule.data.errors[key].forEach((element) => {
                             errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
+                                (++count) + " - " +
+                                element +
+                                "\n"
                             );
                         });
                         swal({

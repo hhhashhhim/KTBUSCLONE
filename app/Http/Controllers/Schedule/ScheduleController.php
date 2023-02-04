@@ -11,6 +11,7 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
+use App\Models\Schedule\DropSchedule;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Surcharge\Surcharge;
@@ -420,6 +421,29 @@ class ScheduleController extends Controller
     public function getDays($start, $end)
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
+    }
+    public function dropCheck(Request $request)
+    {
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+        ])->first()->schedule_date;
+        $found =  DropSchedule::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_date' => $uniqueDate,
+            'schedule_id' => $request->id,
+            'is_drop' => 1,
+        ])->first();
+        if($found){
+            return response()->json(["success" => ["dropScheudle" => ["Data Found"]]], 200);
+
+        }else{
+            return response()->json(["errors" => ["Error" => ["Not Found"]]], 422);
+
+        }
     }
 
     public function allBuses(Request $request)
