@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\Terminal;
 use App\Models\TerminalCommission;
+use App\Models\TerminalDiscount;
 use App\Models\Route\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -166,6 +167,43 @@ class TerminalController extends Controller
                     'flat_commission' => $request->flatCommission[$key],
                     'percentage_commission' => $request->percentCommission[$key],
                     'adjustment_commission' => $request->adjustmentCommission[$key],
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+            }
+        }
+    }
+    public function terminalDiscounts(Request $request)
+    {
+
+        $terminalDiscount = TerminalDiscount::where(["terminal_id"=>$request->terminal_id,'company_id'=> Auth::user()->company_id])->orderBy('id')->get();
+        $terminal = Terminal::where(["id"=>$request->terminal_id,'company_id'=> Auth::user()->company_id])->first();
+        return [
+            "terminalDiscount" => $terminalDiscount,
+            "terminal" => $terminal,
+        ];
+    }
+    public function discountStore(Request $request)
+    {
+        $request->validate([
+            "terminal_id" => 'required',
+            "route" => 'required',
+            "discount" => 'required',
+            "startDate" => 'required',
+            "endDate" => 'required',
+        ]);
+
+        TerminalDiscount::where("terminal_id",$request->terminal_id)->delete();
+        foreach ($request->route as $key => $value) {
+            $checkExist = TerminalDiscount::where(["terminal_id"=>$request->terminal_id,"route_id"=>$request->route[$key],'company_id'=> Auth::user()->company_id])->first();
+            if(!$checkExist)
+            {
+                TerminalDiscount::create([
+                    'terminal_id' => $request->terminal_id,
+                    'route_id' => $request->route[$key],
+                    'discount' => $request->discount[$key],
+                    'start_date' => $request->startDate[$key],
+                    'end_date' => $request->endDate[$key],
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);

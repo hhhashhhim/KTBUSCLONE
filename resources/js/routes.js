@@ -37,6 +37,7 @@ import ProfilePage from "./pages/profile/ProfilePage.vue";
 import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 import ExpensePage from "./pages/expense/ExpensePage.vue";
 import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue";
+import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -231,6 +232,11 @@ const routes = [
         path: url + "terminals/:id/commissions",
         component : TerminalCommissionPage,
         name:"terminal-commission"
+    },
+    {
+        path: url + "terminals/:id/discounts",
+        component : TerminalDiscountPage,
+        name:"terminal-discount"
     },
 ]
 const router = createRouter({

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Auth; 
 
 class UpdateSchedulesTime implements ShouldQueue
 {
@@ -37,7 +38,7 @@ class UpdateSchedulesTime implements ShouldQueue
     public function handle()
     {
         $start_date = date("Y-m-d");
-        $schedules = Schedule::where("end_date",'>=', $start_date)->where(["company_id"=>Auth::user()->company_id])->get();
+        $schedules = Schedule::where("end_date",'>=', $start_date)->where(["company_id"=> Auth::user()->company_id ])->get();
         
         foreach($schedules as $schedule)
         {
