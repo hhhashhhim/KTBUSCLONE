@@ -27811,7 +27811,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 4:
                 resDropCheck = _context13.sent;
-                console.log(resDropCheck, resDropCheck.data);
 
                 if (resDropCheck.status == 200 && resDropCheck.data) {
                   _this13.labelDrop = 'This Schedule is Dropped';
@@ -27823,7 +27822,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this13.labelDrop = '';
                 }
 
-              case 8:
+              case 7:
               case "end":
                 return _context13.stop();
             }
@@ -28125,7 +28124,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     reScheduleSelectSeat: function reScheduleSelectSeat(row, col, data) {
-      console.log(data);
       var index = this.alreadyBookedSeat.indexOf(data.seatNo);
 
       if (index != -1) {
@@ -28833,26 +28831,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dataDepartureCity: data.departure_city_id,
                   dataDestination: data.destination_city_id,
                   dataSeat_no: data.seat_no,
+                  dataSeatFare: data.seat_fare,
                   dataAll: data
                 };
                 _this24.mainAllRescheduleData[0] = _this24.rescheduleData;
+                _this24.mainAllRescheduleData.totalFare = _this24.rescheduleData.dataSeatFare;
+                _this24.mainAllRescheduleData.oldSeats = _this24.rescheduleData.dataSeat_no;
 
                 if (!(_this24.rescheduleData.dataDepartureCity == '0')) {
-                  _context24.next = 8;
+                  _context24.next = 10;
                   break;
                 }
 
                 _this24.rescheduleData.rescheduleDestinationCity = 0;
-                _context24.next = 12;
+                _context24.next = 14;
                 break;
 
-              case 8:
-                _context24.next = 10;
+              case 10:
+                _context24.next = 12;
                 return _this24.callApi("post", "booking/getDestination", {
                   id: _this24.rescheduleData.dataDepartureCity
                 });
 
-              case 10:
+              case 12:
                 resReDepartureCity = _context24.sent;
 
                 if (resReDepartureCity.length == 0) {
@@ -28862,10 +28863,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this24.reSpecificCities = resReDepartureCity.data;
                 }
 
-              case 12:
+              case 14:
                 $("#reschedule_modal").modal('show');
 
-              case 13:
+              case 15:
               case "end":
                 return _context24.stop();
             }

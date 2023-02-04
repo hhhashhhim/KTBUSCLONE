@@ -82,17 +82,6 @@
       0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     ),
   ),
-  'rawilk/laravel-printing' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Rawilk\\Printing\\PrintingServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Printing' => 'Rawilk\\Printing\\Facades\\Printing',
-    ),
-  ),
   'simplesoftwareio/simple-qrcode' => 
   array (
     'providers' => 

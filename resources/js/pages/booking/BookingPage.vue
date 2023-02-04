@@ -1693,7 +1693,6 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            console.log(resDropCheck, resDropCheck.data);
             if (resDropCheck.status == 200 && resDropCheck.data) {
                 this.labelDrop = 'This Schedule is Dropped';
                 this.hideDivButtonsDrop = false;
@@ -1879,7 +1878,6 @@ export default {
         },
 
         reScheduleSelectSeat: function (row, col, data) {
-            console.log(data);
             let index = this.alreadyBookedSeat.indexOf(data.seatNo);
             if (index != -1) {
                 this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
@@ -2392,9 +2390,12 @@ export default {
                 dataDepartureCity: data.departure_city_id,
                 dataDestination: data.destination_city_id,
                 dataSeat_no: data.seat_no,
+                dataSeatFare: data.seat_fare,
                 dataAll: data,
             }
             this.mainAllRescheduleData[0] = this.rescheduleData;
+            this.mainAllRescheduleData.totalFare = this.rescheduleData.dataSeatFare;
+            this.mainAllRescheduleData.oldSeats = this.rescheduleData.dataSeat_no;
             if (this.rescheduleData.dataDepartureCity == '0') {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
