@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\Job;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Schedule\Schedule;
@@ -97,8 +98,11 @@ class FareTableController extends Controller
     
     public function updateScheduleTimes(Request $request)
     {
-        $job = (new UpdateSchedulesTime(Auth::user()));
+        $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
         $id = $this->dispatch($job);
+        // DB::table("jobs")->where("queue","default")->update([
+        //     "progress" => 3233
+        // ]);
         
         // return UpdateSchedulesTime::dispatch(Auth::user());
         return $id;

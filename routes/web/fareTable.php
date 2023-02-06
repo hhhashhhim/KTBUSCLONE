@@ -13,6 +13,6 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
 });
 
 
-// Route::get('/progress/{id}', function ($batchId) {
-//     return Bus::findBatch($batchId);
-// });
+Route::get('/progress', function () {
+    return DB::table("jobs")->where("queue","UpdateSchedulesTime")->latest()->first()->passed_time;
+});

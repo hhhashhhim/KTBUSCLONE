@@ -9,6 +9,7 @@ use App\Models\FareTable;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Route\RouteFare;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -67,6 +68,10 @@ class UpdateSchedulesTime implements ShouldQueue
                     }
                     $scheduleEndDate = date("Y-m-d", $totalTime);
 
+                    DB::table("jobs")->where("queue","default")->update([
+                        "total_time" => $schedules->count() * $days * $routeDetails->count(),
+                    ]);
+
                     ScheduleDetail::where([
                         'company_id' => $this->user->company_id,
                         'schedule_id' => $schedule->id,
@@ -77,6 +82,8 @@ class UpdateSchedulesTime implements ShouldQueue
                         'departure_time' => date('H:i', strtotime($departureTime)),
                         'departure_date' => date('Y-m-d', strtotime($departureTime)),
                     ]);
+
+                    DB::table("jobs")->where("queue","default")->increment("passed_time");
                 }
 
             }
