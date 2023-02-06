@@ -11,3 +11,8 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
     Route::post('/check', [FareTableController::class, 'check']);
     Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
 });
+
+
+Route::get('/progress', function () {
+    return DB::table("jobs")->where("queue","UpdateSchedulesTime")->latest()->first()->passed_time;
+});
