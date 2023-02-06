@@ -5,30 +5,22 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Fare Table</h4>
+                            <h4>Terminal Time Difference</h4>
                             <div class="w-50 d-flex align-items-center">
                                 <div class="header-select mx-2">
-                                    <label for="fare_class" class="font-weight-bold my-0">Fare Class</label>
-                                    <select v-model="data.fare_class" class="form-control rounded-0 text-capitalize">
-                                        <option value="0" selected>Select Fare Class</option>
-                                        <option v-for="(fareClass,i) in fareClasses" :key="i" :value="fareClass.id"
-                                                class="text-capitalize"> {{ fareClass.name }}
+                                    <label for="fare_class" class="font-weight-bold my-0">Cities</label>
+                                    <select v-model="data.city" class="form-control rounded-0 text-capitalize">
+                                        <option value="0" selected>Select City</option>
+                                        <option v-for="(city,i) in cities" :key="i" :value="city.id"
+                                                class="text-capitalize"> {{ city.name }}
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord"
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord()"
                                         :disabled="loadingTable">
                                     {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
                                 </button>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-between px-4 border">
-                            <p>After updating time difference press button this will check and update your schedule.
-                                This can take time.</p>
-                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes"
-                                    :disabled="loadingTable">
-                                {{ loadingTable ? 'Loading...' : 'Update Schedule' }}
-                            </button>
                         </div>
                         <div class="card-body">
                             <transition name="fade">
@@ -52,37 +44,33 @@
                                 <div class="col-12" v-else>
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="table-responsive" v-if="cities">
+                                            <div class="table-responsive" v-if="terminals">
                                                 <table class="table table-striped table-hover table-bordered">
                                                     <thead>
-                                                    <tr v-if="cities.length == 0">
-                                                        <th style="font-size:15px;">{{
-                                                                msg == 1 ? "Class Not Selected......." : "No Cities Found......."
-                                                            }}
-                                                        </th>
+                                                    <tr v-if="terminals.length == 0">
+                                                        <th style="font-size:15px;">No Cities Found.......</th>
                                                     </tr>
                                                     <tr v-else>
                                                         <th></th>
-                                                        <th v-for="(city,i) in cities" :key="i"> {{ city.name }}</th>
+                                                        <th v-for="(terminal,i) in terminals" :key="i"> {{
+                                                                terminal.name
+                                                            }}
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(departureCity,i) in cities" :key="i">
+                                                    <tr v-for="(single,i) in terminals" :key="i">
                                                         <template
-                                                            v-for="(destinationCity,j) in departureCity.destinationCities"
+                                                            v-for="(terminal,j) in terminals"
                                                             :key="j">
-                                                            <th v-if="j==0"> {{ cities[i].name }}</th>
-                                                            <td :class="destinationCity.id==departureCity.id?'bg-danger':'modal-cell'">
+                                                            <th v-if="j==0"> {{ terminals[i].name }}</th>
+                                                            <td :class="terminal.id==single.id?'bg-danger':'modal-cell'">
                                                                 <a
                                                                     href="#" :data-target="'#'+formID"
                                                                     data-toggle="modal"
-                                                                    @click="changeInfo(departureCity,destinationCity)"
-                                                                    v-if="departureCity.id!=destinationCity.id"
+                                                                    @click="changeInfo(single,terminal)"
+                                                                    v-if="single.id!=terminal.id"
                                                                     class="btn btn-success btn-block modal-btn d-flex flex-column justify-content-between">
-                                                                    <span>Fare : {{ destinationCity.fare }}</span>
-                                                                    <span class="text-title">Time : {{
-                                                                            destinationCity.time_difference ?? 'Not Added'
-                                                                        }}</span>
                                                                 </a>
                                                             </td>
                                                         </template>
@@ -109,12 +97,8 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
-                        <label for="fare">Fare <span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="data.fare" @keypress="isNumber($event)">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="time_difference">Travel Time ( e.g HH:MM ) <span
+                    <div class="form-group col-md-12">
+                        <label for="time_difference">Time Difference ( e.g HH:MM ) <span
                             class="text-danger ml-1">*</span></label>
                         <vue-mask
                             class="form-control"
@@ -124,38 +108,13 @@
                             :options="options">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="distance_in_km">Distance In KM</label>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4"
-                                   v-model="data.distance_in_km">
-                            <div class="input-group-append">
-                                <span class="input-group-text">km</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="add" :disabled="loading">
-                        {{ loading ? 'Loading... ' : 'Save Fare Details' }}
+                    <button type="button" class="btn btn-primary" @click="add()" :disabled="loading">
+                        {{ loading ? 'Loading... ' : 'Save Terminals Time' }}
                     </button>
                 </template>
             </Add>
-
-            <!-- Add Modal -->
-            <Edit
-                heading="Add Fare Class"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
-
-            </Edit>
-
-            <!-- Add Modal -->
-            <Delete
-                confirmationMessage='Are You Sure You want To Delete This "terminal" ???'
-            />
         </div>
     </section>
 </template>
@@ -164,19 +123,20 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Delete from "../../components/Delete.vue";
-import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
+import {mapGetters} from "vuex";
 
 export default {
-    name: "FareTable",
+    name: "TerminalTimeDifference",
     created() {
-        this.getClasses();
+        this.getCities();
     },
     components: {
         Add,
         Edit,
         Delete,
         vueMask,
+
     },
     data() {
         return {
@@ -187,50 +147,28 @@ export default {
                 placeholder: 'HH:MM',
             },
             cities: [],
+            terminals: [],
             companies: [],
             fetchedData: [],
             validationErrors: [],
             FareClassName: '',
             msg: 1,
             formID: "fareTable_form",
-            fareClasses: [],
             data: {
-                fare_class: '0',
+                city: '0',
             },
             dataEdit: {},
             from: {},
             to: {},
             success: false,
             error: false,
-            icon: ' <i class="fa fa-bus"></i> ',
+            icon: ' <i class="fa fa-arrow-right"></i>  ',
 
         };
     },
     methods: {
-        isNumber: function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
-        },
-        isAlphabet: function (evet) {
-            if (!/[a-zA-Z\s]/.test(event.key)) {
-                this.ignoredValue = event.key ? event.key : "";
-                event.preventDefault();
-            }
-        },
         async add() {
             this.validationErrors = [];
-            if (this.data.fare == '' || typeof this.data.fare == 'undefined')
-                return swal({
-                    title: "Required!",
-                    text: "Fare is Required!",
-                    icon: "error",
-                    timer: 2000
-                });
             if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined')
                 return swal({
                     title: "Required!",
@@ -239,23 +177,23 @@ export default {
                     timer: 2000
                 });
             this.loading = true;
-            const res = await this.callApi("post", "fare-table/store", this.data);
-            if (res.status == 200) {
+            const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
+            console.log(resTimeDiff.data)
+            if (resTimeDiff.status == 200) {
                 this.loading = false;
                 swal({
                     title: "Success",
-                    text: "Fare Table Updated Successfully",
+                    text: "Terminal To Terminal Time Difference Added Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.cities = res.data
             }
-            if (res.status == 422) {
+            if (resTimeDiff.status == 422) {
                 this.loading = false;
                 let errorContent = "";
                 let count = 0;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
+                for (const key in resTimeDiff.data.errors) {
+                    resTimeDiff.data.errors[key].forEach((element) => {
                         errorContent += (
                             (++count) + " - " +
                             element +
@@ -271,15 +209,14 @@ export default {
 
                 }
             }
-
         },
 
-        async getClasses() {
-            const res = await this.callApi("post", 'fare-table/fare_class/get');
-            if (res.status == 200) {
-                this.fareClasses = res.data
+        async getCities() {
+            const resCities = await this.callApi("post", 'terminal_time/cities');
+            if (resCities.status == 200) {
+                this.cities = resCities.data
             } else {
-                console.log(res);
+                console.log(resCities);
             }
         },
 
@@ -287,12 +224,12 @@ export default {
             this.loadingTable = true;
             const res = await this.callApi("post", 'fare-table/schedules/times/update');
             if (res.status == 200) {
-                // this.fareClasses = res.data
+                this.cities = res.data
                 swal({
                     title: "Success",
                     text: "Schedule Times Updated",
                     icon: "success",
-                    timer: 2000
+                    timer: 4000
                 });
                 setTimeout(() => {
                     this.loadingTable = false;
@@ -303,13 +240,9 @@ export default {
         },
 
         async changeInfo(from, to) {
-            this.data.fare = '';
-            this.data.distance_in_km = '';
-            this.data.time_difference = '';
             const resGetTerminal = await this.callApi("post", 'fare-table/check', {
                 from: from.id,
                 to: to.id,
-                fare_class: this.data.fare_class,
             });
             if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
                 this.data = resGetTerminal.data;
@@ -323,26 +256,24 @@ export default {
             this.data.to = to.id;
         },
         async fetchRecord() {
-            if (!this.data.fare_class) {
-                this.error = true;
-                return
+            if (this.data.city == 0) {
+                // this.terminals = [];
+                return swal({
+                    title: "Required",
+                    text: "Select Any City",
+                    icon: "error",
+                    timer: 2000
+                });
             }
             this.loadingTable = true;
 
-            const res = await this.callApi("post", "fare-table", {
-                company_id: this.data.company_id, fare_class: this.data.fare_class
-            });
-            if (res.status == 200) {
-
-                this.msg = 2;
-                this.cities = res.data
+            const resGetTerminals = await this.callApi("post", "terminal_time/cities/get", {city: this.data.city});
+            if (resGetTerminals.status == 200) {
+                this.terminals = resGetTerminals.data
                 setTimeout(() => {
                     this.loadingTable = false;
                 }, 500);
-            } else {
-                alert("Something Went Wrong")
             }
-            // }
         },
 
         deleteModal(terminal, i) {
@@ -385,13 +316,6 @@ table, table * {
     transition: 0.5s transform;
 }
 
-/*.modal-cell:hover .modal-btn {
-    position: absolute;
-    z-index: 20;
-    transform: scale(1.3) translateY(-20px);
-    box-shadow: 0px 0px 10px black;
-}*/
-
 .header-select {
     width: 35%;
 }
@@ -401,8 +325,7 @@ table, table * {
     transition: opacity 1s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
+.fade-enter, .fade-leave-to {
     opacity: 0;
 }
 </style>

@@ -220,7 +220,7 @@ export default {
                     title: "Error",
                     text: "Please Fill All Field",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 
@@ -232,11 +232,11 @@ export default {
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
                 }
             }
-            
+
             this.loading = true;
             const res = await this.callApi("post", "terminals/discounts/store", this.postData);
             if (res.status === 200) {
@@ -246,7 +246,7 @@ export default {
                 this.postData.discount = [];
                 this.postData.startDate = [];
                 this.postData.endDate = [];
-                
+
                 this.loop = 0;
                 this.editAble = true;
                 swal({
@@ -276,7 +276,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                            timer: 2000
                         });
 
                     }

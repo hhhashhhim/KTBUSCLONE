@@ -360,7 +360,7 @@ export default {
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
                 }
             }
@@ -444,7 +444,7 @@ export default {
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
                 }
             }

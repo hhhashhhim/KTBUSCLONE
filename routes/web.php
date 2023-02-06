@@ -33,6 +33,8 @@ require_once ('web/terminals.php');
 require_once ('web/cities.php');
 // FareTable Route
 require_once('web/fareTable.php');
+// FareTable Route
+require_once('web/terminalTimeDifference.php');
 //fare Class  Route
 require_once('web/fareClass.php');
 // Discount Route

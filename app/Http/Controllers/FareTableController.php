@@ -64,7 +64,6 @@ class FareTableController extends Controller
 
             // Storing Destination Cities into new Array Index
             $city_from['destinationCities'] = $city_from->city_to;
-
             // Fetching and storing the fare of the Departure and the Destination city Fare.
             foreach ($city_from['destinationCities'] as $j => $city_to) {
                 $routeCities = $city_to->pivot;
@@ -94,7 +93,7 @@ class FareTableController extends Controller
         $checkFare = FareTable::where('fare_class', $request->fare_class)->where('from_city_id', $request->from)->where('to_city_id', $request->to)->where('company_id', Auth::user()->company_id)->select('id', 'fare', 'distance_in_km', 'time_difference', 'fare_class')->first();
         return response($checkFare, 200);
     }
-    
+
     public function updateScheduleTimes(Request $request)
     {
         UpdateSchedulesTime::dispatch();

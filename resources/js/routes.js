@@ -38,6 +38,7 @@ import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 import ExpensePage from "./pages/expense/ExpensePage.vue";
 import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue";
 import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
+import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
 
 const url = '/kt/'
 // const url = '/'
@@ -237,6 +238,11 @@ const routes = [
         path: url + "terminals/:id/discounts",
         component : TerminalDiscountPage,
         name:"terminal-discount"
+    },
+    {
+        path: url + "terminal/time/difference",
+        component : TerminalTimeDifferencePage,
+        name:"terminal-difference"
     },
 ]
 const router = createRouter({
