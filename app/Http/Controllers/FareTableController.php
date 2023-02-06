@@ -97,8 +97,11 @@ class FareTableController extends Controller
     
     public function updateScheduleTimes(Request $request)
     {
-        UpdateSchedulesTime::dispatch();
-        return 'helo';
+        $job = (new UpdateSchedulesTime(Auth::user()));
+        $id = $this->dispatch($job);
+        
+        // return UpdateSchedulesTime::dispatch(Auth::user());
+        return $id;
     }
 
     public function getDays($start, $end)

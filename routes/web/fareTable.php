@@ -11,3 +11,8 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
     Route::post('/check', [FareTableController::class, 'check']);
     Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
 });
+
+
+// Route::get('/progress/{id}', function ($batchId) {
+//     return Bus::findBatch($batchId);
+// });
