@@ -48,7 +48,7 @@
                                                 <table class="table table-striped table-hover table-bordered">
                                                     <thead>
                                                     <tr v-if="terminals.length == 0">
-                                                        <th style="font-size:15px;">No Cities Found.......</th>
+                                                        <th style="font-size:15px;">No Terminal Data Found.......</th>
                                                     </tr>
                                                     <tr v-else>
                                                         <th></th>
@@ -172,21 +172,32 @@ export default {
             if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined')
                 return swal({
                     title: "Required!",
-                    text: "Travel Time is Required!",
+                    text: "Time Difference is Required!",
                     icon: "error",
                     timer: 2000
                 });
             this.loading = true;
             const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
-            console.log(resTimeDiff.data)
             if (resTimeDiff.status == 200) {
                 this.loading = false;
-                swal({
-                    title: "Success",
-                    text: "Terminal To Terminal Time Difference Added Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
+                let Content = "";
+                let count = 0;
+                for (const key in resTimeDiff.data.success) {
+                    resTimeDiff.data.success[key].forEach((element) => {
+                        Content += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Success",
+                        text: Content,
+                        icon: "success",
+                        timer: 2000
+                    });
+
+                }
             }
             if (resTimeDiff.status == 422) {
                 this.loading = false;
@@ -240,16 +251,19 @@ export default {
         },
 
         async changeInfo(from, to) {
-            const resGetTerminal = await this.callApi("post", 'fare-table/check', {
+            const resGetTerminal = await this.callApi("post", 'terminal_time/time/check', {
                 from: from.id,
+                city: this.data.city,
                 to: to.id,
             });
-            if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
-                this.data = resGetTerminal.data;
-                this.data.created = 1;
-            } else {
-                this.data.created = 0;
-            }
+
+            console.log(from, to, resGetTerminal);
+            // if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
+            //     this.data = resGetTerminal.data;
+            //     this.data.created = 1;
+            // } else {
+            //     this.data.created = 0;
+            // }
             this.from = from.name;
             this.to = to.name;
             this.data.from = from.id
@@ -257,7 +271,8 @@ export default {
         },
         async fetchRecord() {
             if (this.data.city == 0) {
-                // this.terminals = [];
+                this.terminals.length = 0;
+                this.terminals = [];
                 return swal({
                     title: "Required",
                     text: "Select Any City",
