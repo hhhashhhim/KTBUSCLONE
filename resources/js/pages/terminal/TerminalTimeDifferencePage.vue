@@ -111,7 +111,7 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="add()" :disabled="loading">
-                        {{ loading ? 'Loading... ' : 'Save Terminals Time' }}
+                        {{ loading ? 'Loading... ' : ( this.data.created ? 'Update Terminals Time': 'Save Terminal Time') }}
                     </button>
                 </template>
             </Add>
@@ -121,8 +121,6 @@
 
 <script>
 import Add from "../../components/Add.vue";
-import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
 import vueMask from "vue-jquery-mask";
 import {mapGetters} from "vuex";
 
@@ -133,8 +131,6 @@ export default {
     },
     components: {
         Add,
-        Edit,
-        Delete,
         vueMask,
 
     },
@@ -178,18 +174,16 @@ export default {
                 });
             this.loading = true;
             const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
-            console.log(resTimeDiff.data.success);
             if (resTimeDiff.status == 200) {
                 this.loading = false;
-                this.terminals = [];
-                this.data.city = resTimeDiff.data.returnData[0].city_id;
-                this.terminals = resTimeDiff.data.returnData;
+                this.fetchRecord();
                 swal({
                     title: "Success",
                     text: resTimeDiff.data.success[0],
                     icon: "success",
                     timer: 2000
                 });
+
             }
             if (resTimeDiff.status == 422) {
                 this.loading = false;
@@ -244,22 +238,22 @@ export default {
 
         async changeInfo(from, to) {
             this.data.time_difference = '';
+            this.from = from.name;
+            this.to = to.name;
+            this.data.from = from.id
+            this.data.to = to.id;
             const resGetTerminal = await this.callApi("post", 'terminal_time/time/check', {
                 from: from.id,
                 city: this.data.city,
                 to: to.id,
             });
-            if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
+            if (resGetTerminal.status == 200 && resGetTerminal.data.length != 0) {
                 this.data = resGetTerminal.data;
                 this.data.city = resGetTerminal.data.city_id;
                 this.data.created = 1;
             } else {
                 this.data.created = 0;
             }
-            this.from = from.name;
-            this.to = to.name;
-            this.data.from = from.id
-            this.data.to = to.id;
         },
         async fetchRecord() {
             if (this.data.city == 0) {
@@ -282,28 +276,6 @@ export default {
             }
         },
 
-        deleteModal(terminal, i) {
-            const deletingObj = {
-                url: "terminal/delete",
-                data: terminal,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
-        }
-    },
-    computed: {
-        ...mapGetters(["getDeletingObj"]),
-
-        heading: function () {
-            return (from.name + "<i class='fa fa-user'></i>" + to.name);
-        }
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.terminals.splice(obj.index, 1);
-            }
-        },
     },
 };
 </script>
