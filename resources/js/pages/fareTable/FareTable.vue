@@ -21,7 +21,12 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between px-4 border">
+                        <div class="bg-secondary mx-4 border rounded" v-if="queueProgress">
+                            <div class="bg-success rounded text-center text-white" :style="{'width':(progressPercent > 1 ? progressPercent : 2) +'%'}">
+                                {{ progressPercent > 100 ? Progressing : progressPercent }}% 
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between px-4 border"  v-else>
                             <p>After updating time differrence press button this will check and update your schedule. This can take time.</p>
                             <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes" :disabled="loadingTable">
                                 {{loadingTable ? 'Loading...' : 'Update Schedule' }}
@@ -162,6 +167,10 @@ export default {
     name: "FareTable",
     created() {
         this.getClasses();
+        this.getScheduleProgress();
+        setInterval(() => {
+            this.getScheduleProgress();
+        }, 2000)
     },
     components: {
         Add,
@@ -180,6 +189,8 @@ export default {
             cities: [],
             companies: [],
             fetchedData: [],
+            queueProgress: [],
+            progressPercent: "",
             validationErrors: [],
             FareClassName: '',
             msg: 1,
@@ -267,12 +278,23 @@ export default {
                 console.log(res);
             }
         },
+
+        async getScheduleProgress() {
+            const res = await this.callApi("post", 'fare-table/schedules/times/update/progress');
+            if (res.status == 200) {
+                this.queueProgress = res.data
+                this.progressPercent = parseFloat(parseFloat(res.data.passed_time??1) / parseFloat(res.data.total_time??1) * 100).toFixed(0);
+            } else {
+                console.log(res);
+            }
+        },
         
         async updateScheduleTimes() {
             this.loadingTable = true;
             const res = await this.callApi("post", 'fare-table/schedules/times/update');
             if (res.status == 200) {
                 // this.fareClasses = res.data
+                this.getScheduleProgress();
                 swal({
                     title: "Success",
                     text: "Schedule Times Updated",

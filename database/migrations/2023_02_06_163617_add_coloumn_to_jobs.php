@@ -14,7 +14,7 @@ class AddColoumnToJobs extends Migration
     public function up()
     {
         Schema::table('jobs', function (Blueprint $table) {
-            $table->decimal('total_time',12,2)->after("attempts")->nullable();
+            $table->decimal('total_time',12,2)->after("attempts")->default(0)->nullable();
             $table->decimal('passed_time',12,2)->after("attempts")->default(0)->nullable();
         });
     }

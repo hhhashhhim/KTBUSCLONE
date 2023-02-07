@@ -12,6 +12,7 @@ use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
 use App\Models\City;
+use App\Models\TerminalCommission;
 use App\Models\Customer;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\DropSchedule;
@@ -617,17 +618,21 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->get();
+        
+        $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
+        $commission = TerminalCommission::where(["company_id"=>Auth::user()->company_id,'terminal_id'=> Auth::user()->terminal_id,"route_id"=>$routeId])->first();
 
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
         $routeName = routeName($request->schedule_id);
+        $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
         $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
         $date = date_format(date_create($uniqueDate . ' ' . $scheduleTime), "l") . ' , ' . date_format(date_create($uniqueDate . ' ' . $scheduleTime), "d F Y H:i:s A");
         $eltAmount = 0;
         foreach ($passengerData as $passenger) {
             $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
         }
-        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount];
+        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount,'commission' => $commission];
         $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
 
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'format' => $format]);

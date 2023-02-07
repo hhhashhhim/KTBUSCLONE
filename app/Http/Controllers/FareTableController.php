@@ -112,6 +112,9 @@ class FareTableController extends Controller
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
-
+    public function updateScheduleTimesProgress()
+    {
+        return DB::table("jobs")->where("queue","UpdateSchedulesTime")->latest()->first();
+    }
 
 }
