@@ -149,7 +149,7 @@ export default {
             validationErrors: [],
             FareClassName: '',
             msg: 1,
-            formID: "fareTable_form",
+            formID: "timeDiff_form",
             data: {
                 city: '0',
             },
