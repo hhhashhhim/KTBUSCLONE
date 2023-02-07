@@ -29,6 +29,11 @@
                                 <i class="fa fa-landmark"></i> Terminal
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'terminal-difference'}">
+                                <i class="fas fa-clock"></i> Terminal Time
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('fare-table')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'fare-class' }">
                                 <i class="fas fa-table"></i> Fare Class

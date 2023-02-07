@@ -625,7 +625,7 @@ export default {
                         title: "Error",
                         text: errorContent,
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
 
                 }
@@ -665,7 +665,7 @@ export default {
                         title: "Error",
                         text: errorContent,
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
 
                 }
@@ -752,7 +752,7 @@ export default {
                         title: "Error",
                         text: errorContent,
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
 
                 }

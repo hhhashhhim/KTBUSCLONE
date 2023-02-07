@@ -68,7 +68,6 @@ class AuthController extends Controller
 
     public function doubleCheck(Request $request)
     {
-
         $request->validate([
             'password' => 'required',
         ]);

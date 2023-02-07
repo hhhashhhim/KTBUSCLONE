@@ -132,7 +132,6 @@ export default {
             loading: false,
             formID: 'terminal_commission',
             editFormID: 'edit_terminal_commission',
-            // deleteFormID:'delete_city_form',
             postData: {
                 terminal_id: "",
                 route: [],
@@ -148,8 +147,8 @@ export default {
     },
     async created() {
         $(".modal").click();
-        await this.fetchData();
-        await this.existingCommissions();
+        this.fetchData();
+        this.existingCommissions();
         setTimeout(function () {
             $("#commission_table").DataTable();
         }, 300);
@@ -229,7 +228,7 @@ export default {
                     title: "Error",
                     text: "Please Fill All Field",
                     icon: "error",
-                    timer: 4000
+                    timer: 2000
                 });
             }
 
@@ -241,10 +240,10 @@ export default {
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
                         icon: "error",
-                        timer: 4000
+                        timer: 2000
                     });
                 }
-                
+
                 if (this.postData.flatCommission[i] != 0 && this.postData.percentCommission[i] != 0) {
                     return swal({
                         title: "Error",
@@ -294,7 +293,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 4000
+                            timer: 2000
                         });
 
                     }
