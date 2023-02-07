@@ -44806,7 +44806,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       data: {
         city: '0'
       },
-      dataEdit: {},
       from: {},
       to: {},
       success: false,

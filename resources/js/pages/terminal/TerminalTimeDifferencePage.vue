@@ -153,7 +153,6 @@ export default {
             data: {
                 city: '0',
             },
-            dataEdit: {},
             from: {},
             to: {},
             success: false,
