@@ -296,7 +296,7 @@ export default {
             const res = await this.callApi("post", 'fare-table/schedules/times/update/progress');
             if (res.status == 200) {
                 this.queueProgress = res.data
-                this.progressPercent = parseFloat(parseFloat(res.data.passed_time??1) / parseFloat(res.data.total_time??1) * 100).toFixed(0);
+                this.progressPercent = parseFloat(parseFloat(res.data.passed_time) / parseFloat(res.data.total_time == 0 ? 1 : res.data.total_time ) * 100).toFixed(0);
             } else {
                 console.log(res);
             }

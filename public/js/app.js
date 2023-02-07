@@ -33943,8 +33943,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var res, _res$data$passed_time, _res$data$total_time;
-
+        var res;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -33957,7 +33956,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status == 200) {
                   _this4.queueProgress = res.data;
-                  _this4.progressPercent = parseFloat(parseFloat((_res$data$passed_time = res.data.passed_time) !== null && _res$data$passed_time !== void 0 ? _res$data$passed_time : 1) / parseFloat((_res$data$total_time = res.data.total_time) !== null && _res$data$total_time !== void 0 ? _res$data$total_time : 1) * 100).toFixed(0);
+                  _this4.progressPercent = parseFloat(parseFloat(res.data.passed_time) / parseFloat(res.data.total_time == 0 ? 1 : res.data.total_time) * 100).toFixed(0);
                 } else {
                   console.log(res);
                 }
