@@ -10,9 +10,6 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
     Route::post('/fare_class/get', [FareTableController::class, 'getFareClass']);
     Route::post('/check', [FareTableController::class, 'check']);
     Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
-});
-
-
-Route::get('/progress', function () {
-    return DB::table("jobs")->where("queue","UpdateSchedulesTime")->latest()->first()->passed_time;
+    
+    Route::post('/schedules/times/update/progress', [FareTableController::class, 'updateScheduleTimesProgress']);
 });

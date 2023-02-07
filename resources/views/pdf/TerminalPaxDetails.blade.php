@@ -169,7 +169,7 @@
     </tr>
     <tr>
         <th colspan="9"> Terminal Discount</th>
-        <th>0</th>
+        <th>{{ $terminalDiscount = $data['record']->sum('discount'); }}</th>
     </tr>
     <tr>
         <th colspan="9"> Elt Amount</th>
@@ -177,23 +177,39 @@
     </tr>
     <tr>
         <th colspan="9"> Terminal Tickets Commission</th>
-        <th>0</th>
+        <th>
+            @if($data['commission'])
+                @if($data['commission']->flat_commission == 0)
+                {{ $ticketCommission = (($data['record']->sum('seat_fare') - $data['record']->sum('discount'))/100)*$data['commission']->percentage_commission }}
+                @else
+                {{ $ticketCommission = $data['record']->count() * $data['commission']->flat_commission }}
+                @endif
+            @else
+                {{ $ticketCommission = 0; }}
+            @endif
+        </th>
     </tr>
     <tr>
         <th colspan="9"> Terminal Fixed Commission</th>
-        <th>0</th>
+        <th>
+            @if($data['commission'] && $data['record']->count() > 0)
+            {{ $fixCommission = $data['commission']->fix_commission }}
+            @else
+            {{ $fixCommission = 0 }}
+            @endif
+        </th>
     </tr>
     <tr>
         <th colspan="9"> Terminal Ticket Refund</th>
-        <th>0</th>
+        <th>{{ $refund = 0 }}</th>
     </tr>
     <tr>
         <th colspan="9"> Main Net Sale</th>
-        <th>0</th>
+        <th>{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
     <tr>
         <th colspan="9">Cash On Bus</th>
-        <th>0</th>
+        <th>{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
 </table>
 <br>

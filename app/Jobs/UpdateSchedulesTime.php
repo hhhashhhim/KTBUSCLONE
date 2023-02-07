@@ -68,8 +68,8 @@ class UpdateSchedulesTime implements ShouldQueue
                     }
                     $scheduleEndDate = date("Y-m-d", $totalTime);
 
-                    DB::table("jobs")->where("queue","default")->update([
-                        "total_time" => $schedules->count() * $days * $routeDetails->count(),
+                    DB::table("jobs")->where("queue","UpdateSchedulesTime")->update([
+                        "total_time" => $schedules->count(),
                     ]);
 
                     ScheduleDetail::where([
@@ -83,10 +83,11 @@ class UpdateSchedulesTime implements ShouldQueue
                         'departure_date' => date('Y-m-d', strtotime($departureTime)),
                     ]);
 
-                    DB::table("jobs")->where("queue","default")->increment("passed_time");
+                    
                 }
 
             }
+            DB::table("jobs")->where("queue","UpdateSchedulesTime")->increment("passed_time");
             // get completion days of schedule
             $schedule_days = $this->getDays($scheduleStartDate, $scheduleEndDate);
             Schedule::where("id", $schedule->id)->update([
