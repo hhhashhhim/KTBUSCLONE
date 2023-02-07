@@ -16,37 +16,53 @@ class TerminalTimeDifferenceController extends Controller
         return City::withCount('terminal')->having('terminal_count', '>=', 2)->get(['id', 'name']);
     }
 
-    public function getTerminals(Request $request)
-    {
-        return Terminal::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city])->get();
-    }
 
     public function store(Request $request)
     {
+//        return (array)$request;
 //        dd($request->all());
-        if ($request->created == 0) {
-            TerminalTimeDifference::create([
-                'city_id' => $request->city,
-                'terminal_from_id' => $request->from,
-                'terminal_to_id' => $request->to,
+//        if ($request->created == 0) {
+//            TerminalTimeDifference::create([
+//                'city_id' => $request->city,
+//                'terminal_from_id' => $request->from,
+//                'terminal_to_id' => $request->to,
+//                'time_difference' => $request->time_difference,
+//                'company_id' => Auth::user()->company_id,
+//                'added_by' => Auth::user()->id,
+//            ]);
+//            TerminalTimeDifference::create([
+//                'city_id' => $request->city,
+//                'terminal_from_id' => $request->to,
+//                'terminal_to_id' => $request->from,
+//                'time_difference' => $request->time_difference,
+//                'company_id' => Auth::user()->company_id,
+//                'added_by' => Auth::user()->id,
+//            ]);
+//            return response()->json([
+//                "success" => ["Time Difference Added Successfully"],
+//                'returnData' => $this->generic($request->all()),
+//            ], 200);
+//        }
+        if ($request->created == 1) {
+            TerminalTimeDifference::where('id', $request->id)->update([
+                'city_id' => $request->city_id,
+                'terminal_from_id' => $request->terminal_from_id,
+                'terminal_to_id' => $request->terminal_to_id,
                 'time_difference' => $request->time_difference,
                 'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
             ]);
-            return response()->json([
-                "success" => [
-                    "message" => ["Time Difference Added Successfully"]
-                ]
-            ], 200);
-
-        }
-        if ($request->created == 1) {
-            TerminalTimeDifference::where(['city_id' => $request->city, 'terminal_from_id' => $request->from, 'terminal_to_id' => $request->to])->update([
+            TerminalTimeDifference::where(['id' => $request->id, 'terminal_from_id' => $request->to, 'terminal_to_id' => $request->from])->update([
+                'city_id' => $request->city_id,
+                'terminal_from_id' => $request->terminal_to_id,
+                'terminal_to_id' => $request->terminal_from_id,
                 'time_difference' => $request->time_difference,
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
             ]);
             return response()->json([
-                "success" => [
-                    "message" => ["Time Difference Updated Successfully"]
-                ]
+                "success" => ["Time Difference Added Successfully"],
+                'returnData' => $this->generic($request->all()),
             ], 200);
         }
     }
@@ -54,8 +70,37 @@ class TerminalTimeDifferenceController extends Controller
 
     public function check(Request $request)
     {
-//        dd($request->all());
-        $checkFare = TerminalTimeDifference::where(['company_id'=> Auth::user()->company_id, 'city_id'=>$request->city, 'terminal_from_id' => $request->from, 'terminal_to_id'=>$request->to])->select('id', 'time_difference')->first();
-        return response($checkFare, 200);
+        return TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city, 'terminal_from_id' => $request->from, 'terminal_to_id' => $request->to])->first();
+
+    }
+
+    public function getTerminals(Request $request)
+    {
+        return $this->generic($request->all());
+    }
+
+    public function generic($request)
+    {
+//        return ($request['city']);
+//        if(is_object($request)) {
+//            $test = json_decode(json_encode($request), true);
+//        }
+
+
+        $terminals = Terminal::where(['company_id' => Auth::user()->company_id, 'city_id' => $request['city']])->get(['city_id', 'id', 'name']);
+        return $terminals->map(function ($single) use ($request) {
+            $single->allTerminals = Terminal::where(['company_id' => Auth::user()->company_id, 'city_id' => $request['city']])->get(['city_id', 'id', 'name']);
+            foreach ($single->allTerminals as $key => $item) {
+                if ($single->id != $item->id) {
+                    $item['difference'] = TerminalTimeDifference::where('company_id', Auth::user()->company_id)->where('city_id', $request['city'])
+                        ->where('terminal_to_id', $single->id)
+                        ->where('terminal_from_id', $item->id)
+                        ->value('time_difference') ?? 'No Added';
+                } else {
+                    $item['difference'] = 'Not Added';
+                }
+            }
+            return $single;
+        });
     }
 }

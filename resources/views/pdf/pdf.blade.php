@@ -71,9 +71,9 @@
             window.print();
         });
 
-        setTimeout(function(){
-            window.close() ;
-        }, 1000); //Time before execution
+        // setTimeout(function(){
+        //     window.close() ;
+        // }, 1000); //Time before execution
     </script>
     <title>Print Ticket</title>
 </head>

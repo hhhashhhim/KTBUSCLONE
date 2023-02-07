@@ -44784,7 +44784,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       to: {},
       success: false,
       error: false,
-      icon: ' <i class="fa fa-arrow-right"></i>  '
+      icon: '   <i class="fas fa-route mx-1" style="font-size: 20px !important"></i>   '
     };
   },
   methods: {
@@ -44818,25 +44818,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 resTimeDiff = _context.sent;
+                console.log(resTimeDiff.data.success);
 
                 if (resTimeDiff.status == 200) {
-                  (function () {
-                    _this.loading = false;
-                    var Content = "";
-                    var count = 0;
-
-                    for (var key in resTimeDiff.data.success) {
-                      resTimeDiff.data.success[key].forEach(function (element) {
-                        Content += ++count + " - " + element + "\n";
-                      });
-                      swal({
-                        title: "Success",
-                        text: Content,
-                        icon: "success",
-                        timer: 2000
-                      });
-                    }
-                  })();
+                  _this.loading = false;
+                  _this.terminals = [];
+                  _this.data.city = resTimeDiff.data.returnData[0].city_id;
+                  _this.terminals = resTimeDiff.data.returnData;
+                  swal({
+                    title: "Success",
+                    text: resTimeDiff.data.success[0],
+                    icon: "success",
+                    timer: 2000
+                  });
                 }
 
                 if (resTimeDiff.status == 422) {
@@ -44859,7 +44853,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 9:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -44944,28 +44938,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _context4.next = 2;
+                _this4.data.time_difference = '';
+                _context4.next = 3;
                 return _this4.callApi("post", 'terminal_time/time/check', {
                   from: from.id,
                   city: _this4.data.city,
                   to: to.id
                 });
 
-              case 2:
+              case 3:
                 resGetTerminal = _context4.sent;
-                console.log(from, to, resGetTerminal); // if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
-                //     this.data = resGetTerminal.data;
-                //     this.data.created = 1;
-                // } else {
-                //     this.data.created = 0;
-                // }
+
+                if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
+                  _this4.data = resGetTerminal.data;
+                  _this4.data.city = resGetTerminal.data.city_id;
+                  _this4.data.created = 1;
+                } else {
+                  _this4.data.created = 0;
+                }
 
                 _this4.from = from.name;
                 _this4.to = to.name;
                 _this4.data.from = from.id;
                 _this4.data.to = to.id;
 
-              case 8:
+              case 9:
               case "end":
                 return _context4.stop();
             }
@@ -51722,6 +51719,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeyup: _cache[21] || (_cache[21] = function ($event) {
       return $options.calculateTotal();
     }),
+    readonly: "",
     "class": "form-control",
     id: "fareDiscount",
     "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
@@ -57867,8 +57865,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.data.fare_class]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary mt-4 ml-2",
     type: "button",
-    onClick: _cache[1] || (_cache[1] = function () {
-      return $options.fetchRecord && $options.fetchRecord.apply($options, arguments);
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return $options.fetchRecord();
     }),
     disabled: $data.loadingTable
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Fetch Record'), 9
@@ -71372,7 +71370,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ))]))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (single, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
-    }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (terminal, j) {
+    }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(single.allTerminals, function (terminal, j) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: j
       }, [j == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.terminals[i].name), 1
@@ -71385,10 +71383,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "data-target": '#' + $data.formID,
         "data-toggle": "modal",
         onClick: function onClick($event) {
-          return $options.changeInfo(single, terminal);
+          return $options.changeInfo(single, terminal, terminal.difference);
         },
         "class": "btn btn-success btn-block modal-btn d-flex flex-column justify-content-between"
-      }, null, 8
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Time Diff : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(terminal.difference), 1
+      /* TEXT */
+      )], 8
       /* PROPS */
       , _hoisted_34)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2
       /* CLASS */

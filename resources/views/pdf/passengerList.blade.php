@@ -81,7 +81,7 @@
 
         setTimeout(function(){
             window.close() ;
-        }, 1000); //Time before execution
+        // }, 1000); //Time before execution
     </script>
     <title> Print Passenger List </title>
 </head>

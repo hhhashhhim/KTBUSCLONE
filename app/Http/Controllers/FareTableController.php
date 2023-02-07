@@ -102,7 +102,7 @@ class FareTableController extends Controller
         // DB::table("jobs")->where("queue","default")->update([
         //     "progress" => 3233
         // ]);
-        
+
         // return UpdateSchedulesTime::dispatch(Auth::user());
         return $id;
     }

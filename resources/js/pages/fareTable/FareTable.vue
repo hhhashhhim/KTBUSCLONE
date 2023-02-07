@@ -16,7 +16,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord"
+                                <button class="btn btn-primary mt-4 ml-2" type="button" @click="fetchRecord()"
                                         :disabled="loadingTable">
                                     {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
                                 </button>

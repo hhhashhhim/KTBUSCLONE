@@ -61,20 +61,20 @@
                                                     <tbody>
                                                     <tr v-for="(single,i) in terminals" :key="i">
                                                         <template
-                                                            v-for="(terminal,j) in terminals"
+                                                            v-for="(terminal,j) in single.allTerminals"
                                                             :key="j">
                                                             <th v-if="j==0"> {{ terminals[i].name }}</th>
                                                             <td :class="terminal.id==single.id?'bg-danger':'modal-cell'">
                                                                 <a
                                                                     href="#" :data-target="'#'+formID"
                                                                     data-toggle="modal"
-                                                                    @click="changeInfo(single,terminal)"
+                                                                    @click="changeInfo(single,terminal, terminal.difference)"
                                                                     v-if="single.id!=terminal.id"
                                                                     class="btn btn-success btn-block modal-btn d-flex flex-column justify-content-between">
+                                                                    <span>Time Diff : {{ terminal.difference }}</span>
                                                                 </a>
                                                             </td>
                                                         </template>
-
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -162,7 +162,7 @@ export default {
             to: {},
             success: false,
             error: false,
-            icon: ' <i class="fa fa-arrow-right"></i>  ',
+            icon: '   <i class="fas fa-route mx-1" style="font-size: 20px !important"></i>   ',
 
         };
     },
@@ -178,26 +178,18 @@ export default {
                 });
             this.loading = true;
             const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
+            console.log(resTimeDiff.data.success);
             if (resTimeDiff.status == 200) {
                 this.loading = false;
-                let Content = "";
-                let count = 0;
-                for (const key in resTimeDiff.data.success) {
-                    resTimeDiff.data.success[key].forEach((element) => {
-                        Content += (
-                            (++count) + " - " +
-                            element +
-                            "\n"
-                        );
-                    });
-                    swal({
-                        title: "Success",
-                        text: Content,
-                        icon: "success",
-                        timer: 2000
-                    });
-
-                }
+                this.terminals = [];
+                this.data.city = resTimeDiff.data.returnData[0].city_id;
+                this.terminals = resTimeDiff.data.returnData;
+                swal({
+                    title: "Success",
+                    text: resTimeDiff.data.success[0],
+                    icon: "success",
+                    timer: 2000
+                });
             }
             if (resTimeDiff.status == 422) {
                 this.loading = false;
@@ -251,19 +243,19 @@ export default {
         },
 
         async changeInfo(from, to) {
+            this.data.time_difference = '';
             const resGetTerminal = await this.callApi("post", 'terminal_time/time/check', {
                 from: from.id,
                 city: this.data.city,
                 to: to.id,
             });
-
-            console.log(from, to, resGetTerminal);
-            // if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
-            //     this.data = resGetTerminal.data;
-            //     this.data.created = 1;
-            // } else {
-            //     this.data.created = 0;
-            // }
+            if (resGetTerminal.status == 200 && resGetTerminal.data !== '') {
+                this.data = resGetTerminal.data;
+                this.data.city = resGetTerminal.data.city_id;
+                this.data.created = 1;
+            } else {
+                this.data.created = 0;
+            }
             this.from = from.name;
             this.to = to.name;
             this.data.from = from.id
@@ -281,7 +273,6 @@ export default {
                 });
             }
             this.loadingTable = true;
-
             const resGetTerminals = await this.callApi("post", "terminal_time/cities/get", {city: this.data.city});
             if (resGetTerminals.status == 200) {
                 this.terminals = resGetTerminals.data
