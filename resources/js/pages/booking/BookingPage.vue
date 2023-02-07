@@ -217,6 +217,7 @@
                                                     <input
                                                         type="text" @keypress="isNumber($event)"
                                                         @keyup="calculateTotal()"
+                                                        readonly
                                                         class="form-control"
                                                         id="fareDiscount"
                                                         v-model="addForm.discount"
