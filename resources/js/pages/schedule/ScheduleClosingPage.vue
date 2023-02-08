@@ -1,7 +1,3 @@
-
-
-
-
 <template>
     <section class="section">
         <div class="section-body">
@@ -11,7 +7,8 @@
                         <div class="card-header">
                             <h4>Schdule Closing Detail</h4>
                             <div class="card-header-action">
-                                <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
+                                <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
+                                   @click="clearForm()">
                                     Close Booking
                                 </a>
                             </div>
@@ -33,19 +30,28 @@
                                                         <th>Schedule</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
-                                                       <th>Action</th>
-                                                       <!-- <th>Expense</th> -->
+                                                        <th>Action</th>
+                                                        <!-- <th>Expense</th> -->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <template v-for="(data, i,index) in closings" :key="i">
                                                         <tr v-for="(close, j) in data" :key="j">
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.bus.bus_number }}</td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule.name }}</td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule_date }}</td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule_time }}</td>
                                                             <td :class="j == 1 ? 'border-bottom border-success' : ''">
-                                                                <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                                {{ close.bus.bus_number }}
+                                                            </td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                                {{ close.schedule.name }}
+                                                            </td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                                {{ close.schedule_date }}
+                                                            </td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                                {{ close.schedule_time }}
+                                                            </td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                                <button :data-target="'#' + editFormID"
+                                                                        data-toggle="modal"
                                                                         @click="editSchedule(close)"
                                                                         class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
@@ -101,11 +107,11 @@
                     <div class="form-group col-md-6">
                         <label for="name">Date <span class="text-danger ml-1">*</span></label>
                         <input
-                        type="date"
-                        class="form-control"
-                        placeholder="Enter Bus Name"
-                        @change="getSchedule"
-                        v-model="addData.date"
+                            type="date"
+                            class="form-control"
+                            placeholder="Enter Bus Name"
+                            @change="getSchedule"
+                            v-model="addData.date"
                         />
                     </div>
                     <div class=" form-group col-md-6">
@@ -117,7 +123,9 @@
                                 :key="i"
                                 :value="schedule.id"
                             >
-                                {{ schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')') }}
+                                {{
+                                    schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')
+                                }}
                             </option>
                         </select>
                     </div>
@@ -211,12 +219,12 @@
                     <div class="form-group col-md-6">
                         <label for="name">Date <span class="text-danger ml-1">*</span></label>
                         <input
-                        type="date"
-                        class="form-control"
-                        placeholder="Enter Bus Name"
-                        @change="getSchedule"
-                        v-model="editData.date"
-                        disabled
+                            type="date"
+                            class="form-control"
+                            placeholder="Enter Bus Name"
+                            @change="getSchedule"
+                            v-model="editData.date"
+                            disabled
                         />
                     </div>
                     <div class=" form-group col-md-6">
@@ -228,7 +236,9 @@
                                 :key="i"
                                 :value="schedule.id"
                             >
-                                {{ schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')') }}
+                                {{
+                                    schedule.name + (schedule.schedule_detail.length == 0 ? '' : ' (' + schedule.schedule_detail[0].departure_time + ')')
+                                }}
                             </option>
                         </select>
                     </div>
@@ -304,23 +314,16 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             buses: [],
             closings: [],
-            // seatType: "0",
             schedules: [],
             editSchedules: [],
             drivers: [],
             hosts: [],
-            // updateSeatValue: [],
             validationErrors: "",
-            // records: "",
-            // columns: "",
-            // details: "",
-            // dataView: {},
             formID: "schedule_closing_form",
             editFormID: "edit_schedule_closing_form",
-            // deleteFormID: "delete_bus_form",
             seatNo: 0,
             addData: {
                 bus: "",
@@ -347,14 +350,14 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchData();
+        this.fetchData();
     },
 
     methods: {
-        clearForm:function(){
+        clearForm: function () {
             this.data = {};
         },
-        async fetchData(){
+        async fetchData() {
             const res = await this.callApi("post", "booking/schedule/closing");
             if (res.status == 200) {
                 this.closings = res.data.closings;
@@ -365,11 +368,16 @@ export default {
                 console.log(res);
             }
             setTimeout(() => {
-                $('#closing_table').DataTable();
+                $('#closing_table').DataTable({
+                    "columnDefs": [{
+                        "orderable": false,
+                        "targets": [1, 2, 3, 4, 5]
+                    }]
+                });
             }, 300);
             $(".select2").select2();
         },
-        async getSchedule(){
+        async getSchedule() {
             const data = {
                 date: this.addData.date
             }
@@ -381,7 +389,7 @@ export default {
                 console.log(res);
             }
         },
-        async getScheduleForEdit(date){
+        async getScheduleForEdit(date) {
             const data = {
                 date: date
             }
@@ -393,53 +401,40 @@ export default {
                 console.log(res);
             }
         },
-        isNumber: function (evt) {
-            evt = evt ? evt : window.event;
-            var charCode = evt.which ? evt.which : evt.keyCode;
-            if (
-                charCode > 31 &&
-                (charCode < 48 || charCode > 57) &&
-                charCode !== 46
-            ) {
-                evt.preventDefault();
-            } else {
-                return true;
-            }
-        },
 
         async closeSchedule() {
             // console.log(this.addData.drivers.length);return;
             this.validationErrors = [];
             if (!this.addData.bus)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Bus is required",
                     icon: 'error',
-                   timer: 2000
+                    timer: 2000
                 });
             if (!this.addData.date)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Date is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (!this.addData.schedule)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Schedule is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.addData.drivers.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Driver is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.addData.hosts.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Host is required",
                     icon: 'error',
@@ -448,21 +443,22 @@ export default {
             this.loadig = true;
             const res = await this.callApi("post", "booking/schedule/closing/store", this.addData);
             if (res.status == 201) {
-              swal({
+                this.loading = false;
+                swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
-                this.loading = false;
+                $('#closing_table').DataTable().destroy();
+                this.fetchData();
                 this.addData.bus = "";
                 this.addData.date = "";
                 this.addData.schedule = "";
                 this.addData.drivers = [];
                 this.addData.hosts = [];
                 this.addData.description = "";
-                $('#closing_table').DataTable().destroy();
-                this.fetchData();
+
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -480,7 +476,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
@@ -503,35 +499,35 @@ export default {
         async updateSchedule() {
             this.validationErrors = [];
             if (!this.editData.bus)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Bus is required",
                     icon: 'error',
-                   timer: 2000
+                    timer: 2000
                 });
             if (!this.editData.date)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Date is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (!this.editData.schedule)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Schedule is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.editData.drivers.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Driver is required",
                     icon: 'error',
                     timer: 2000
                 });
             if (this.editData.hosts.length == 0)
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Host is required",
                     icon: 'error',
@@ -541,11 +537,11 @@ export default {
 
             const res = await this.callApi("post", "booking/schedule/closing/update", this.editData);
             if (res.status === 200) {
-               swal({
+                swal({
                     title: "Success",
                     text: "Schedule Closing Updated Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 $('#closing_table').DataTable().destroy();
                 this.loading = false;

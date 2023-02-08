@@ -41109,20 +41109,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       buses: [],
       closings: [],
-      // seatType: "0",
       schedules: [],
       editSchedules: [],
       drivers: [],
       hosts: [],
-      // updateSeatValue: [],
       validationErrors: "",
-      // records: "",
-      // columns: "",
-      // details: "",
-      // dataView: {},
       formID: "schedule_closing_form",
       editFormID: "edit_schedule_closing_form",
-      // deleteFormID: "delete_bus_form",
       seatNo: 0,
       addData: {
         bus: "",
@@ -41156,10 +41149,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
-              _context.next = 4;
-              return _this.fetchData();
 
-            case 4:
+              _this.fetchData();
+
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -41196,7 +41189,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 setTimeout(function () {
-                  $('#closing_table').DataTable();
+                  $('#closing_table').DataTable({
+                    "columnDefs": [{
+                      "orderable": false,
+                      "targets": [1, 2, 3, 4, 5]
+                    }]
+                  });
                 }, 300);
                 $(".select2").select2();
 
@@ -41271,16 +41269,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee4);
       }))();
-    },
-    isNumber: function isNumber(evt) {
-      evt = evt ? evt : window.event;
-      var charCode = evt.which ? evt.which : evt.keyCode;
-
-      if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
-        evt.preventDefault();
-      } else {
-        return true;
-      }
     },
     closeSchedule: function closeSchedule() {
       var _this5 = this;
@@ -41367,22 +41355,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (res.status == 201) {
+                  _this5.loading = false;
                   swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
                     icon: "success",
                     timer: 2000
                   });
-                  _this5.loading = false;
+                  $('#closing_table').DataTable().destroy();
+
+                  _this5.fetchData();
+
                   _this5.addData.bus = "";
                   _this5.addData.date = "";
                   _this5.addData.schedule = "";
                   _this5.addData.drivers = [];
                   _this5.addData.hosts = [];
                   _this5.addData.description = "";
-                  $('#closing_table').DataTable().destroy();
-
-                  _this5.fetchData();
                 } else {
                   if (res.status == 422) {
                     (function () {
@@ -66680,10 +66669,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* PROPS */
       , _hoisted_18)], 2
       /* CLASS */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td v-if=\"(j / 2) == 0 && data[j+1]\" rowspan=\"2\">\r\n                                                                <router-link class=\"btn btn-success mx-2\" :to=\"{ name:'expense-page', params: { id:close.ticket_merge_id }}\">\r\n                                                                    <i class=\"fas fa-plus\"></i>\r\n                                                                </router-link>\r\n                                                            </td> ")]);
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td v-if=\"(j / 2) == 0 && data[j+1]\" rowspan=\"2\">\n                                                                <router-link class=\"btn btn-success mx-2\" :to=\"{ name:'expense-page', params: { id:close.ticket_merge_id }}\">\n                                                                    <i class=\"fas fa-plus\"></i>\n                                                                </router-link>\n                                                            </td> ")]);
     }), 128
     /* KEYED_FRAGMENT */
-    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <tr>\r\n                                                            <td class=\"border-bottom border-success\" colspan=\"6\" style=\"height:0 !important; \"></td>\r\n                                                        </tr> ")], 64
+    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <tr>\n                                                            <td class=\"border-bottom border-success\" colspan=\"6\" style=\"height:0 !important; \"></td>\n                                                        </tr> ")], 64
     /* STABLE_FRAGMENT */
     );
   }), 128
@@ -66751,7 +66740,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\r\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\r\n                        <Multiselect\r\n\r\n                            :options=\"options\"\r\n                            :multiple=\"true\"\r\n                            :searchable=\"true\"\r\n\r\n                        ></Multiselect>\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\" form-group col-md-6\">\n                        <label for=\"city_id\">Schedule <span class=\"text-danger ml-1\">*</span></label>\n                        <Multiselect\n\n                            :options=\"options\"\n                            :multiple=\"true\"\n                            :searchable=\"true\"\n\n                        ></Multiselect>\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.addData.drivers = $event;
@@ -66920,7 +66909,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\"\r\n                confirmationMessage=\"Are You Sure You want To Delete This Bus Record ???\"\r\n            /> ")])]);
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\"\n                confirmationMessage=\"Are You Sure You want To Delete This Bus Record ???\"\n            /> ")])]);
 }
 
 /***/ }),
