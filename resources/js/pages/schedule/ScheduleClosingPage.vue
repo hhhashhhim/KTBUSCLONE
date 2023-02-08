@@ -25,7 +25,7 @@
                                             <div class="table-responsive">
                                                 <table
                                                     class="table table-striped table-hover"
-
+                                                    id="closing_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -34,32 +34,32 @@
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
                                                        <th>Action</th>
-                                                       <th>Expense</th>
+                                                       <!-- <th>Expense</th> -->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <template v-for="(data, i) in closings" :key="i">
+                                                    <template v-for="(data, i,index) in closings" :key="i">
                                                         <tr v-for="(close, j) in data" :key="j">
-                                                            <td>{{ close.bus.bus_number }}</td>
-                                                            <td>{{ close.schedule.name }}</td>
-                                                            <td>{{ close.schedule_date }}</td>
-                                                            <td>{{ close.schedule_time }}</td>
-                                                            <td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.bus.bus_number }}</td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule.name }}</td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule_date }}</td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">{{ close.schedule_time }}</td>
+                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
                                                                 <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                         @click="editSchedule(close)"
                                                                         class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
                                                             </td>
-                                                            <td v-if="(j / 2) == 0 && data[j+1]" rowspan="2">
+                                                            <!-- <td v-if="(j / 2) == 0 && data[j+1]" rowspan="2">
                                                                 <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:close.ticket_merge_id }}">
                                                                     <i class="fas fa-plus"></i>
                                                                 </router-link>
-                                                            </td>
+                                                            </td> -->
                                                         </tr>
-                                                        <tr>
+                                                        <!-- <tr>
                                                             <td class="border-bottom border-success" colspan="6" style="height:0 !important; "></td>
-                                                        </tr>
+                                                        </tr> -->
                                                     </template>
                                                     </tbody>
                                                 </table>
@@ -463,9 +463,6 @@ export default {
                 this.addData.description = "";
                 $('#closing_table').DataTable().destroy();
                 this.fetchData();
-                setTimeout(() => {
-                        $('#closing_table').DataTable();
-                    }, 300);
             } else {
                 if (res.status == 422) {
                     this.loading = false;
