@@ -14,6 +14,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\DropSchedule;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -42,7 +43,8 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
-        // this for check time differrence added or not against these citis
+
+        // this for check time difference added or not against these cities
         $cityIds = array_column($request->cities, 'id');
         foreach ($cityIds as $first) {
             foreach ($cityIds as $second) {
@@ -57,13 +59,14 @@ class ScheduleController extends Controller
                     if ($checkTimeDiff) {
                         return response()->json([
                             "errors" => [
-                                "Time Error" => ["Time differrence should be added against these cities."]
+                                "Time Error" => ["Time difference should be added against these cities."]
                             ]
                         ], 422);
                     }
                 }
             }
         }
+
 
         $rules = [
             'name' => 'required',
@@ -96,6 +99,16 @@ class ScheduleController extends Controller
             'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
         ]);
+
+        foreach ($request->addTerminalsOnClick as $key => $single) {
+            ScheduleTerminalSequence::create([
+                'schedule_id' => $schedule->id,
+                'city_id' => $single['city_id'],
+                'terminal_id' => $single['terminal_id'],
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
         $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
         $days = $this->getDays($schedule->start_date, $schedule->end_date);
 
@@ -201,14 +214,14 @@ class ScheduleController extends Controller
             $data[] = $routeFare->destination_city_id;
         }
         $data = collect($data)->unique();
-        $cities = City::whereIn('id', $data)->get();
+        return City::with('terminal')->whereIn('id', $data)->get();
 
-        $finalData = [];
-        foreach ($cities as $key => $city) {
-            $finalData['cities'] = $cities;
-            $finalData['terminal'][$key] = Terminal::with('city')->where('city_id', $city->id)->where('company_id', Auth::user()->company_id)->get();
-        }
-        return $finalData;
+//        $finalData = [];
+//        foreach ($cities as $key => $city) {
+//            $finalData['cities'] = $cities;
+//            $finalData['terminal'][$key] = Terminal::with('city')->where('city_id', $city->id)->where('company_id', Auth::user()->company_id)->get();
+//        }
+//        return $finalData;
     }
 
     public function getRouteFareClass(Request $request)
@@ -422,6 +435,7 @@ class ScheduleController extends Controller
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
+
     public function dropCheck(Request $request)
     {
         $uniqueDate = ScheduleDetail::where([
@@ -431,16 +445,16 @@ class ScheduleController extends Controller
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
         ])->first()->schedule_date;
-        $found =  DropSchedule::where([
+        $found = DropSchedule::where([
             'company_id' => Auth::user()->company_id,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->id,
             'is_drop' => 1,
         ])->first();
-        if($found){
+        if ($found) {
             return response()->json(["success" => ["dropScheudle" => ["Data Found"]]], 200);
 
-        }else{
+        } else {
             return response()->json(["errors" => ["Error" => ["Not Found"]]], 422);
 
         }

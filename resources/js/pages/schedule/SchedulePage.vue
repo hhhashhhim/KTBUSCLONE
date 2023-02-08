@@ -53,7 +53,6 @@
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
                                                         <th>Time</th>
-<!--                                                        <th>Fare Class</th>-->
                                                         <th>Route</th>
                                                         <th>Bus Class</th>
                                                         <th>Added By</th>
@@ -67,10 +66,6 @@
                                                         <td>{{ schedule.start_date }}</td>
                                                         <td>{{ schedule.end_date }}</td>
                                                         <td>{{ tConvert(schedule.time) }}</td>
-<!--                                                        <td> {{-->
-<!--                                                                schedule.fare_class ? schedule.fare_class.name : "N/A"-->
-<!--                                                            }}-->
-<!--                                                        </td>-->
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
                                                                 schedule.bus_class ? schedule.bus_class.name : "N/A"
@@ -85,15 +80,15 @@
                                                                     @click="addDays(schedule)"
                                                                     data-target="#addDaysModal" data-toggle="modal"><i
                                                                 class="fas fa-plus"></i></button>
-                                                            <!-- <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click=" edit(schedule); genericData(); "
                                                                     class="btn btn-primary mr-1 btn-sm"><i
-                                                                class="far fa-edit"></i></button> -->
-<!--                                                            <button :data-target="'#' + deleteFormID"-->
-<!--                                                                    data-toggle="modal"-->
-<!--                                                                    @click="deleteSchedule(schedule, i)"-->
-<!--                                                                    class="btn btn-danger btn-sm"><i-->
-<!--                                                                class="far fa-trash-alt"></i></button>-->
+                                                                class="far fa-edit"></i></button>
+                                                            <!--                                                            <button :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                                    data-toggle="modal"-->
+                                                            <!--                                                                    @click="deleteSchedule(schedule, i)"-->
+                                                            <!--                                                                    class="btn btn-danger btn-sm"><i-->
+                                                            <!--                                                                class="far fa-trash-alt"></i></button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -109,6 +104,7 @@
                 </div>
             </div>
 
+            <!--Extend Schedule-->
             <div class="modal fade" id="addDaysModal" tabindex="-1" aria-labelledby="addDaysModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -277,23 +273,6 @@
                                 </option>
                             </select>
                         </div>
-<!--                        <div class="col-md-3 class form-group">-->
-<!--                            <label for="busCLass">Default Fare CLass <span class="text-danger ml-1">*</span></label>-->
-<!--                            <select-->
-<!--                                class="form-control"-->
-<!--                                id="busCLass"-->
-<!--                                v-model="data.fareClass"-->
-<!--                            >-->
-<!--                                <option value="0" selected>Select Default Fare CLass</option>-->
-<!--                                <option-->
-<!--                                    v-for="(type, i) in fareClasses"-->
-<!--                                    :value="type.id"-->
-<!--                                    :key="i"-->
-<!--                                >-->
-<!--                                    {{ type.name }}-->
-<!--                                </option>-->
-<!--                            </select>-->
-<!--                        </div>-->
                     </div>
                     <div
                         class="row d-flex justify-content-center"
@@ -314,27 +293,24 @@
                                     </thead>
                                     <tbody>
                                     <tr v-for="(city, i) in cities" :key="i">
-                                        <td>{{ i + 1 }}</td>
-                                        <td>{{ city.name }}</td>
-                                        <td>
-                        <span v-for="item in terminals[i]" :key="item.id">
-                          <label class="colorinput mx-3">
-                            <span>
-                              <input
-                                  type="checkbox"
-                                  class="colorinput-input"
-                                  @click="addTerminal($event, city.id)"
-                                  id="terminal"
-                                  :value="item.id"
-                              />
-                              <span class="colorinput-color bg-primary"></span>
-                            </span>
-                          </label>
-                          <label class="checkbox-inputs" for="terminal">{{
-                                  item.name
-                              }}</label>
-                        </span>
-                                        </td>
+                                        <template v-if="city.terminal.length >= 2">
+                                            <td>{{ i + 1 }}</td>
+                                            <td>{{ city.name }}</td>
+                                            <td><span v-for="item in city.terminal" :key="item.id">
+                                                    <label class="colorinput mx-3">
+                                                        <span>
+                                                            <input type="checkbox" class="colorinput-input"
+                                                                   @click="addTerminal($event, city.id)" id="terminal"
+                                                                   :value="item.id"/>
+                                                            <span class="colorinput-color bg-primary"></span>
+                                                        </span>
+                                                    </label>
+                                                    <label class="checkbox-inputs" for="terminal">{{
+                                                            item.name
+                                                        }}</label>
+                                                </span>
+                                            </td>
+                                        </template>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -451,10 +427,10 @@
                                     <th class="mr-3">Selected Bus Class</th>
                                     <td>{{ this.dataPreview.busClass }}</td>
                                 </tr>
-<!--                                <tr>-->
-<!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
-<!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
-<!--                                </tr>-->
+                                <!--                                <tr>-->
+                                <!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
+                                <!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
+                                <!--                                </tr>-->
                                 <tr>
                                     <th class="mr-3">Route</th>
                                     <td colspan="3">{{ this.dataPreview.route }}</td>
@@ -607,23 +583,6 @@
                                 </option>
                             </select>
                         </div>
-<!--                        <div class="col-md-3 class form-group">-->
-<!--                            <label for="fareClassEdit">Fare Class <span class="text-danger ml-1">*</span></label>-->
-<!--                            <select-->
-<!--                                class="form-control"-->
-<!--                                id="fareClassEdit"-->
-<!--                                v-model="dataEdit.schedules.fare_class_id"-->
-<!--                            >-->
-<!--                                <option value="0" selected>Select Fare Class</option>-->
-<!--                                <option-->
-<!--                                    v-for="(type, i) in fareClasses"-->
-<!--                                    :value="type.id"-->
-<!--                                    :key="i"-->
-<!--                                >-->
-<!--                                    {{ type.name }}-->
-<!--                                </option>-->
-<!--                            </select>-->
-<!--                        </div>-->
                     </div>
                     <div
                         class="row d-flex justify-content-center"
@@ -778,10 +737,10 @@
                                     <th class="mr-3">Selected Bus Class</th>
                                     <td>{{ this.dataPreview.busClass }}</td>
                                 </tr>
-<!--                                <tr>-->
-<!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
-<!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
-<!--                                </tr>-->
+                                <!--                                <tr>-->
+                                <!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
+                                <!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
+                                <!--                                </tr>-->
                                 <tr>
                                     <th class="mr-3">Route</th>
                                     <td colspan="3">{{ this.dataPreview.route }}</td>
@@ -915,7 +874,7 @@ export default {
             this.loading = true;
             const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
             console.log(resExtend);
-            if(resExtend.status == 200){
+            if (resExtend.status == 200) {
                 swal({
                     title: "Success",
                     text: "Schedule Extended successfully",
@@ -1059,10 +1018,10 @@ export default {
                     const resRoute = await this.callApi("post", "schedule/getCity", {
                         id: this.data.route,
                     });
-                    this.cities = resRoute.data.cities;
-                    this.dataEdit.cities = resRoute.data.cities;
-                    this.terminals = resRoute.data.terminal;
-                    this.dataEdit.terminals = resRoute.data.terminal;
+                    this.cities = resRoute.data;
+                    // this.dataEdit.cities = resRoute.data;
+                    // this.terminals = resRoute.data.terminal;
+                    // this.dataEdit.terminals = resRoute.data.terminal;
                 }
             }
             if (name == "routeEdit") {
@@ -1172,89 +1131,89 @@ export default {
         validateStep(nextBtnValue) {
             //Step 1
             if (nextBtnValue == 'step1') {
-                if (this.data.name == "" || typeof this.data.name == 'undefined')
-                    return swal({
-                        title: "Required!",
-                        text: "Name Field is Required ",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.data.StartDate == "" || typeof this.data.StartDate == 'undefined')
-                    return swal({
-                        title: "Required!",
-                        text: "Start Date is Required ",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.data.EndDate == "" || typeof this.data.EndDate == 'undefined')
-                    return swal({
-                        title: "Required!",
-                        text: "End Date is Required ",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.data.time == "" || typeof this.data.time == 'undefined')
-                    return swal({
-                        title: "Required!",
-                        text: "Time Field is Required ",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.data.name && this.data.StartDate && this.data.EndDate && this.data.time) {
-                    this.activeSection = nextBtnValue;
-                }
+                // if (this.data.name == "" || typeof this.data.name == 'undefined')
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Name Field is Required ",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // if (this.data.StartDate == "" || typeof this.data.StartDate == 'undefined')
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Start Date is Required ",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // if (this.data.EndDate == "" || typeof this.data.EndDate == 'undefined')
+                //     return swal({
+                //         title: "Required!",
+                //         text: "End Date is Required ",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // if (this.data.time == "" || typeof this.data.time == 'undefined')
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Time Field is Required ",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // if (this.data.name && this.data.StartDate && this.data.EndDate && this.data.time) {
+                this.activeSection = nextBtnValue;
+                // }
             }
             //Step 2
             if (nextBtnValue == 'step2') {
 
-                if (this.data.route == 0)
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Route",
-                        icon: "error",
-                        timer: 2000
-                    });
-
-                if (this.data.addTerminalsOnClick.length === 0) {
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Terminals of Selected Route",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
-
-                if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select at Least 2 Terminals of Selected Route",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
-
-                if (this.data.busClass == 0)
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Bus Class",
-                        icon: "error",
-                        timer: 2000
-                    });
-                // if (this.data.fareClass == 0)
+                // if (this.data.route == 0)
                 //     return swal({
                 //         title: "Required!",
-                //         text: "Please Select Fare Class",
+                //         text: "Please Select Route",
                 //         icon: "error",
                 //         timer: 2000
                 //     });
-                if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
-                    this.activeSection = nextBtnValue;
-                }
+                //
+                // if (this.data.addTerminalsOnClick.length === 0) {
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select Terminals of Selected Route",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
+                //
+                // if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select at Least 2 Terminals of Selected Route",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
+                //
+                // if (this.data.busClass == 0)
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select Bus Class",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // // if (this.data.fareClass == 0)
+                // //     return swal({
+                // //         title: "Required!",
+                // //         text: "Please Select Fare Class",
+                // //         icon: "error",
+                // //         timer: 2000
+                // //     });
+                // if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
+                this.activeSection = nextBtnValue;
+                // }
             }
             //Step3
-            if (nextBtnValue == 'step3') {
-                this.activeSection = nextBtnValue;
-            }
+            // if (nextBtnValue == 'step3') {
+            this.activeSection = nextBtnValue;
+            // }
         },
 
         async addSchedule() {
@@ -1332,7 +1291,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
