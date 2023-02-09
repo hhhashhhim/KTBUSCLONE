@@ -339,9 +339,9 @@
                                             <label for="seat_type">Seat Type</label>
                                             <select class="form-control" v-model="seatModify.type">
                                                 <option value="0" selected>Select Type</option>
-<!--                                                <option value="reserved_for_female">-->
-<!--                                                    Reserved for Female-->
-<!--                                                </option>-->
+                                                    <option value="reserved_for_female">
+                                                    Reserved for Female
+                                                </option>
                                                 <option value="not_for_sale">Not for Sale</option>
                                             </select>
                                         </div>
@@ -614,9 +614,9 @@
                                                 v-model="editSeatModify.type"
                                             >
                                                 <option value="0" selected>Select Type</option>
-<!--                                                <option value="reserved_for_female">-->
-<!--                                                    Reserved for Female-->
-<!--                                                </option>-->
+                                                <option value="reserved_for_female">
+                                                    Reserved for Female
+                                                </option>
                                                 <option value="not_for_sale">Not for Sale</option>
                                             </select>
                                         </div>

@@ -13,6 +13,8 @@ use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\Schedule\ScheduleTerminalSequence;
+use App\Models\Schedule\TicketClosingMember;
+use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalCommission;
 use App\Models\Customer;
@@ -449,12 +451,50 @@ class BookingController extends Controller
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
         ])->first()->schedule_date;
+
+        $tickets = Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])->first();
         $old = DropSchedule::where([
             'company_id' => Auth::user()->company_id,
             'date' => $request->date,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->schedule_id,
         ])->first();
+
+        if (isset($tickets) && $tickets->ticket_closing_id != null) {
+            TicketClosingMember::where([
+                'company_id' => Auth::user()->company_id,
+                'ticket_closing_id' => $tickets->ticket_closing_id,
+            ])->delete();
+
+            $mergeId = TicketClosing::where([
+                'company_id' => Auth::user()->company_id,
+                'id' => $tickets->ticket_closing_id,
+            ])->first()->ticket_merge_id;
+
+            TicketClosing::where([
+                'company_id' => Auth::user()->company_id,
+                'id' => $tickets->ticket_closing_id,
+            ])->delete();
+
+
+            $mergeRecord = TicketClosingMerge::find($mergeId);
+            if ($mergeRecord->schedule_complete == 1) {
+                TicketClosingMerge::where([
+                    'company_id' => Auth::user()->company_id,
+                    'id' => $mergeId,
+                ])->update([
+                    "schedule_complete" => 0,
+                    "schedule_return_date" => null,
+                ]);
+            } else {
+                $mergeRecord->delete();
+            }
+
+        }
         if (!$old) {
             DropSchedule::create([
                 'company_id' => Auth::user()->company_id,
@@ -702,28 +742,36 @@ class BookingController extends Controller
         } else {
             $ids = [$request->ticket_id];
         }
-        $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
-//        $tickets->map(function ($item) {
-////            dd($item);
-//            $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id])->orderBy('id', 'DESC')->get();
-//            if ($checkTerminal) {
-//                if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-//                    foreach ($checkTerminal as $key => $single) {
-////                        if($checkTerminal->last()->id != $single->id)
-////                        {
-//                           $item->abc = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key+1]->terminal_id])->get();
-////                        }
-//                    }
-//                }
-//            }
-//        });
+        $tickets = Ticket::with('customer', 'scheduleDetail:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+        $tickets->map(function ($item) {
+            $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id])->orderBy('id', 'DESC')->get();
+            $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
+//            Check departure city have more than one terminal
+            if ($checkTerminal) {
+//              if ticket terminal id at last of sequence it mean no need to calculation
+                if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
+//                    dd($checkTerminal);
+                    foreach ($checkTerminal as $key => $single) {
+                        if ($item->terminal_id == $single->terminal_id) {
+                            break;
+                        } else {
+                            $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+                            if ($terminalTime) {
+                                $time = explode(":", $terminalTime->time_difference);
+                                $subTime += ($time[0] * 60 * 60) + ($time[1] * 60);
+                            }
+                        }
+                    }
+                }
+            }
+            $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->scheduleDetail->departure_time) - $subTime);
+        });
         $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
         $finalData = [
             'tickets' => $tickets,
             'format' => $format,
             'duplicate' => (int)$request->duplicate,
         ];
-//        dd($finalData);
         return view('pdf/pdf', ['data' => $finalData]);
     }
 

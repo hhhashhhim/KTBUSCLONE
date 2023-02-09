@@ -124,7 +124,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row mt-2 mb-2">
+                                        <div class="row mt-2">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
@@ -141,10 +141,10 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="row text-center">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0 pl-3">
+                                            <div class="col-md-6 mt-3">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
                                                             <label class=" mr-3">Female : </label>
                                                             <label class="colorinput">
                                                                 <input name="gender" type="checkbox" value="0"
@@ -155,10 +155,8 @@
                                                             </label>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row text-center">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
                                                             <label class="mr-3">Advanced : </label>
                                                             <label class="colorinput">
                                                                 <input name="bookingType" type="checkbox"
@@ -256,14 +254,15 @@
                                                             v-on:click="add()"
                                                             v-on:keyup.enter="add()">
                                                         {{
-                                                            this.addForm.type == 'advance booking' ? 'Reserved Seat' : 'Generate Ticket'
+                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' :
+                                                        'Generate Ticket'
                                                         }}
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="text-center mb-2">
                                                 <button class="btn btn-secondary text-dark mr-2"
-                                                        @click="scheduleDrop()">
+                                                        @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
                                                 </button>
                                                 <button class="btn btn-secondary text-dark"
@@ -663,7 +662,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="dropScheduleData()">
+                                @click="dropScheduleData()" :disabled="dropScheduleButton">
                             Drop Schedule
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -749,7 +748,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize"><span
                                                         v-if="innerItem.is_partial == 1">Partial - </span>{{
-                                                            innerItem.type
+                                                        innerItem.type
                                                         }}</h4>
                                                 </div>
 
@@ -1106,6 +1105,7 @@ export default {
             eltIds: "",
             EltButton: false,
             loadingRescheduleButton: false,
+            dropScheduleButton: false,
             showRescheduleDiscountDiv: false,
             allRescheduleButton: false,
             labelDrop: '',
@@ -1590,12 +1590,12 @@ export default {
         },
         async fetchScheduleData() {
             this.resetingArrays();
-            this.addForm.customerName = '';
-            this.addForm.customerCNIC = '';
-            this.addForm.contact = '';
-            this.addForm.remarks = '';
-            this.addForm.type = 'booked';
-            this.addForm.gender = 1;
+            // this.addForm.customerName = '';
+            // this.addForm.customerCNIC = '';
+            // this.addForm.contact = '';
+            // this.addForm.remarks = '';
+            // this.addForm.type = 'booked';
+            // this.addForm.gender = 1;
             this.addForm.totalFare = 0;
             this.addForm.totalAmount = 0;
             this.addForm.discount = '';
@@ -1879,36 +1879,33 @@ export default {
         },
 
         reScheduleSelectSeat: function (row, col, data) {
-            let index = this.alreadyBookedSeat.indexOf(data.seatNo);
-            if (index != -1) {
-                this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
-                this.alreadyBookedSeat.splice(index, 1);
-                this.alreadyBookedSeatFare.splice(parseFloat(data.fare), 1);
-                this.totalAlreadyBookedSeatFare -= parseFloat(data.fare);
-                this.alreadyBookedSeatClassName.splice(index, 1);
-                this.alreadyBookedSeatClass.splice(index, 1);
+            if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0) {
+                let index = this.alreadyBookedSeat.indexOf(data.seatNo);
+                if (index != -1) {
+                    this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
+                    this.alreadyBookedSeat.splice(index, 1);
+                    this.alreadyBookedSeatFare.splice(parseFloat(data.fare), 1);
+                    this.totalAlreadyBookedSeatFare -= parseFloat(data.fare);
+                    this.alreadyBookedSeatClassName.splice(index, 1);
+                    this.alreadyBookedSeatClass.splice(index, 1);
+                } else {
+                    this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
+                    this.alreadyBookedSeat.push(data.seatNo);
+                    this.alreadyBookedSeatFare.push(parseFloat(data.fare));
+                    this.totalAlreadyBookedSeatFare += parseFloat(data.fare);
+                    this.alreadyBookedSeatClassName.push(data.class_name);
+                    this.alreadyBookedSeatClass.push(data.class);
+                }
             } else {
-                this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
-                this.alreadyBookedSeat.push(data.seatNo);
-                this.alreadyBookedSeatFare.push(parseFloat(data.fare));
-                this.totalAlreadyBookedSeatFare += parseFloat(data.fare);
-                this.alreadyBookedSeatClassName.push(data.class_name);
-                this.alreadyBookedSeatClass.push(data.class);
+                this.alreadyBookedSeat = [];
+                this.fetchReScheduleData();
+                return swal({
+                    title: "Oops",
+                    text: "Invalid Seat Combination",
+                    icon: "error",
+                    timer: 2000
+                });
             }
-
-            // if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
-            // } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
-            //
-            // }else{
-            //     this.fetchScheduleData();
-            //     this.resetingArrays();
-            //     return swal({
-            //         title: "Oops",
-            //         text: "Invalid Seat Combination",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // },
             this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
             this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
@@ -2413,8 +2410,10 @@ export default {
         },
 
         async dropScheduleData() {
+            this.dropScheduleButton = true;
             const resDropSchedule = await this.callApi("post", "booking/dropSchedule", this.dropScheduleFormData);
             if (resDropSchedule.status == 200) {
+                this.dropScheduleButton = false;
                 this.busDropCheck();
                 swal({
                     title: "Success",
@@ -2424,7 +2423,7 @@ export default {
                 });
             }
             if (resDropSchedule.status == 422) {
-                this.loadingRescheduleButton = false;
+                this.dropScheduleButton = false;
                 let errorContent = "";
                 let count = 0;
                 for (const key in resDropSchedule.data.errors) {

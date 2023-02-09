@@ -312,21 +312,11 @@ class ScheduleController extends Controller
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-//        return $ticketSeatNumbers;
-        // Getting Already Booked Tickets
-//        $scheduleDetail = ScheduleDetail::where('schedule_id', $request->id)->where('company_id', Auth::user()->company_id)->where('departure_id', $request->departureCity)->where('destination_id', $request->destinationCity)->first();
-
-
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
             ->select('id', 'route_id', 'bus_class_id', 'time')
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
-
-//        $start_datetime = new DateTime(date('Y-m-d H:i:s'));
-//        $end_datetime = new DateTime(date('Y-m-d') . ' ' . $scheduleDetail->departure_time);
-//        $diffInMins = ($end_datetime->getTimestamp() - $start_datetime->getTimestamp()) / 60;
-//        $leavingIn30Min = $diffInMins > 30 ? false : true;
 
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)
@@ -353,12 +343,10 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['fare'] = (int)$data->fare;
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-
                 if ($result !== false) {   /*&& $leavingIn30Min != true*/
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
-                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
@@ -368,7 +356,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
-
+                    $seatMap[$i][$j]['type'] = $seatMap[$i][$j]['type'] == 'reserved_for_female' ? 0 : $tickets[$result]['type'];
                     if ($tickets[$result]['is_partial'] == 1) {
 
                         // Condition for validation that departure city and destination city in the request should be "before" the partial seat's targeted cities
@@ -424,7 +412,6 @@ class ScheduleController extends Controller
                     }
                 }
             }
-
         }
         $schedule->bus_class->seat_map = $seatMap;
         unset($schedule->route);

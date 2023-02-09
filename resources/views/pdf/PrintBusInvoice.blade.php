@@ -70,13 +70,9 @@
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript">
 
-        // $(document).ready(function () {
-        //     window.print();
-        // });
-
-        // setTimeout(function(){
-        //     window.close() ;
-        // }, 1000); //Time before execution
+         $(document).ready(function () {
+             window.print();
+         });
     </script>
     <title>Print Bus Invoice</title>
 </head>
@@ -159,17 +155,17 @@
                 {{ $commission = 0; }}
             @endif
             @php
-                $totalCommission += $commission;   
+                $totalCommission += $commission;
             @endphp
         </td>
         <td>
             @if($destination[0]->commission)
-                {{ $adjustCommission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->adjustment_commission }}                
+                {{ $adjustCommission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->adjustment_commission }}
             @else
                 {{ $adjustCommission = 0; }}
             @endif
             @php
-                $totalAdjustCommission += $adjustCommission;   
+                $totalAdjustCommission += $adjustCommission;
             @endphp
         </td>
         <td>{{ $destination->sum("elt_price") }}</td>

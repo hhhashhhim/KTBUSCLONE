@@ -71,9 +71,9 @@
             window.print();
         });
 
-        // setTimeout(function(){
-        //     window.close() ;
-        // }, 1000); //Time before execution
+        setTimeout(function(){
+            window.close() ;
+        }, 1000); //Time before execution
     </script>
     <title>Print Ticket</title>
 </head>
@@ -120,12 +120,12 @@
 
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Departure Date :</p>
-                <p class="float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['date'])) }}</p>
+                <p class="float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
             </div>
 
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Departure Time :</p>
-                <p class="float-right">{{ date('H:i A', strtotime($data['tickets'][$key]->schedule->time)) }}</p>
+                <p class="float-right">{{ date('H:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
             </div>
 
             <div class="clear-both">
