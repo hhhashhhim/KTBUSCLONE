@@ -23,6 +23,8 @@
                                                 <table
                                                     class="table table-striped table-hover"
                                                     id="closing_table"
+                                                    style="border-collapse: separate;
+                                                    border-spacing: 0 10px;"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -31,25 +33,25 @@
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
                                                         <th>Action</th>
-                                                        <!-- <th>Expense</th> -->
+                                                        <th>Expense</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <template v-for="(data, i,index) in closings" :key="i">
+                                                    <template v-for="(data, i) in closings" :key="i">
                                                         <tr v-for="(close, j) in data" :key="j">
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-left border-bottom border-success' : 'border-left border-top border-success' : 'border-left border-bottom border-top border-danger'">
                                                                 {{ close.bus.bus_number }}
                                                             </td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule.name }}
                                                             </td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_date }}
                                                             </td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_time }}
                                                             </td>
-                                                            <td :class="j == 1 ? 'border-bottom border-success' : ''">
+                                                            <td :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 <button :data-target="'#' + editFormID"
                                                                         data-toggle="modal"
                                                                         @click="editSchedule(close)"
@@ -57,15 +59,13 @@
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
                                                             </td>
-                                                            <!-- <td v-if="(j / 2) == 0 && data[j+1]" rowspan="2">
+                                                            <td v-if="(j % 2) == 0 && data[j+1]" :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
                                                                 <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:close.ticket_merge_id }}">
                                                                     <i class="fas fa-plus"></i>
                                                                 </router-link>
-                                                            </td> -->
+                                                            </td>
+                                                            <td v-else :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'"></td>
                                                         </tr>
-                                                        <!-- <tr>
-                                                            <td class="border-bottom border-success" colspan="6" style="height:0 !important; "></td>
-                                                        </tr> -->
                                                     </template>
                                                     </tbody>
                                                 </table>
@@ -369,10 +369,7 @@ export default {
             }
             setTimeout(() => {
                 $('#closing_table').DataTable({
-                    "columnDefs": [{
-                        "orderable": false,
-                        "targets": [1, 2, 3, 4, 5]
-                    }]
+                    'order': []
                 });
             }, 300);
             $(".select2").select2();
@@ -451,13 +448,14 @@ export default {
                     timer: 2000
                 });
                 $('#closing_table').DataTable().destroy();
-                this.fetchData();
                 this.addData.bus = "";
                 this.addData.date = "";
                 this.addData.schedule = "";
                 this.addData.drivers = [];
                 this.addData.hosts = [];
                 this.addData.description = "";
+                // this.fetchData();
+                this.$router.go(0);
 
             } else {
                 if (res.status == 422) {
@@ -545,7 +543,8 @@ export default {
                 });
                 $('#closing_table').DataTable().destroy();
                 this.loading = false;
-                await this.fetchData();
+                // this.fetchData();
+                this.$router.go(0);
             } else {
                 if (res.status == 422) {
                     this.loading = false;
