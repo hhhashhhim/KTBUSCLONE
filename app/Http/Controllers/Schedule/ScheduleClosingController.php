@@ -38,8 +38,8 @@ class ScheduleClosingController extends Controller
     public function index()
     {
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type'=>2,'company_id'=>Auth::user()->company_id])->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type'=>1,'company_id'=>Auth::user()->company_id])->get(["id", "user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
         where('company_id', Auth::user()->company_id)
             ->with("bus:id,bus_number", "schedule:id,name")
@@ -76,19 +76,18 @@ class ScheduleClosingController extends Controller
         // this is for get schedule end city
         $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
         // this is for get schedule departure time
-        $depTime = ScheduleDetail::
-        where(["schedule_id" => $request->schedule,
+        $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
             "departure_id" => $departure->departure_city_id,
             "destination_id" => $departure->destination_city_id,
             "departure_date" => $request->date,
             "company_id" => Auth::user()->company_id
-        ])
-            ->first();
-
-        $checkMergeRecord = TicketClosingMerge::
-        where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
-            ->latest("id")->first();
-
+        ])->first();
+        $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date'=>$depTime->schedule_date])->get();
+        if(count($bookingAvailable) == 0){
+            return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
+        }
+        
+        $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])->latest("id")->first();
         if ($checkMergeRecord) {
             TicketClosingMerge::where("id", $checkMergeRecord->id)->update([
                 "schedule_return_date" => $request->date,
@@ -103,7 +102,6 @@ class ScheduleClosingController extends Controller
                 'added_by' => Auth::user()->id,
             ]);
         }
-
 
         $closingRecord = TicketClosing::create([
             "bus_id" => $request->bus,
@@ -148,11 +146,12 @@ class ScheduleClosingController extends Controller
         ]);
         return $closingRecord;
     }
+
     public function update(Request $request)
     {
         $prevMerge = TicketClosingMerge::
         where(["company_id" => Auth::user()->company_id, "id" => $request->mergeId])
-        ->first();
+            ->first();
 
         $checkMergeRecord = TicketClosingMerge::
         where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
@@ -175,22 +174,19 @@ class ScheduleClosingController extends Controller
         }
 
         // revert previous bus merge record
-        if($prevMerge->schedule_complete == 1)
-        {
+        if ($prevMerge->schedule_complete == 1) {
             TicketClosingMerge::where("id", $prevMerge->id)->update([
                 "schedule_return_date" => null,
                 "schedule_complete" => 0,
             ]);
-        }
-        else
-        {
+        } else {
             $prevMerge->delete();
         }
         // delete old members
-        TicketClosingMember::where(["company_id" => Auth::user()->company_id,"ticket_closing_id"=>$request->closingId])->delete();
+        TicketClosingMember::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->delete();
 
-        
-        TicketClosing::where("id",$request->closingId)->update([
+
+        TicketClosing::where("id", $request->closingId)->update([
             "bus_id" => $request->bus,
             "ticket_merge_id" => $checkMergeRecord ? $checkMergeRecord->id : $newRecord->id,
             "schedule_return" => $checkMergeRecord ? 1 : 0,
@@ -221,7 +217,7 @@ class ScheduleClosingController extends Controller
             ]);
         }
 
-        Ticket::where(["company_id" => Auth::user()->company_id,"ticket_closing_id" => $request->closingId])->update([
+        Ticket::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->update([
             "bus_id" => $request->bus,
         ]);
     }
