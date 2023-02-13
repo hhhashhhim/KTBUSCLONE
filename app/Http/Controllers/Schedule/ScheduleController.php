@@ -413,13 +413,8 @@ class ScheduleController extends Controller
             'schedule_id' => $request->id,
             'is_drop' => 1,
         ])->first();
-        if ($found) {
-            return response()->json(["success" => ["dropScheudle" => ["Data Found"]]], 200);
-
-        } else {
-            return response()->json(["errors" => ["Error" => ["Not Found"]]], 422);
-
-        }
+        
+        return $found;
     }
 
     public function allBuses(Request $request)
