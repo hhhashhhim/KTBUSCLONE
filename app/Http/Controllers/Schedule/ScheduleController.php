@@ -338,8 +338,9 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
                     $seatMap[$i][$j]['type'] = $seatMap[$i][$j]['type'] == 'reserved_for_female' ? 0 : $tickets[$result]['type'];
+                
                     if ($tickets[$result]['is_partial'] == 1) {
-
+                        
                         // Condition for validation that departure city and destination city in the request should be "before" the partial seat's targeted cities
                         $before = (array_search($request->departureCity, $allFaresOfRoute, true) < array_search($tickets[$result]['departure_city_id'], $allFaresOfRoute, true) &&
                             array_search($request->departureCity, $allFaresOfRoute, true) < array_search($tickets[$result]['destination_city_id'], $allFaresOfRoute, true) &&
@@ -356,7 +357,7 @@ class ScheduleController extends Controller
 
                         if ($before || $after) {
                             // removing partial tag for that seats which fulfill the conditions
-                            unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
+                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                             //                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
