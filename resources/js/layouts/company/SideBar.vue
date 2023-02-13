@@ -18,8 +18,9 @@
                             Ticketing
                         </span>
                     </a>
+<!--                    Permission just about terminals-->
                     <ul class="dropdown-menu">
-                        <li class="dropdown">
+                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'cities-page' }">
                                 <i class="fas fa-city"></i> Cities
                             </router-link>
@@ -34,6 +35,8 @@
                                 <i class="fas fa-clock"></i> Terminal Time
                             </router-link>
                         </li>
+
+<!--                        Permission Just For fare Table -->
                         <li class="dropdown" v-if="checkForSubmenu('fare-table')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'fare-class' }">
                                 <i class="fas fa-table"></i> Fare Class
@@ -44,12 +47,12 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'bus-class-page' }">
                                 <i class="fa fa-bus"></i> Bus Class
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
                             <router-link class="nav-link text-capitalize" :to="{ name:'buses-page' }">
                                 <i class="fa fa-bus"></i> Buses
                             </router-link>

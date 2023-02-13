@@ -24,17 +24,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleClosingController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
@@ -82,11 +71,10 @@ class ScheduleClosingController extends Controller
             "departure_date" => $request->date,
             "company_id" => Auth::user()->company_id
         ])->first();
-        $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date'=>$depTime->schedule_date])->get();
-        if(count($bookingAvailable) == 0){
+        $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
+        if (count($bookingAvailable) == 0) {
             return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
         }
-
         $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])->latest("id")->first();
         if ($checkMergeRecord) {
             TicketClosingMerge::where("id", $checkMergeRecord->id)->update([

@@ -46,13 +46,19 @@
                                                             <td>{{ phoneFormat(company.contact) }}</td>
                                                             <td>{{ company.location }}</td>
                                                             <td v-if="company.logo != null">
-                                                                <a :href="$store.state.app_url +'uploads/company/logo/'+(company.logo)" target="_blank">
-                                                                <img :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)" style="width:90px;height:100px;" alt="">
+                                                                <a :href="$store.state.app_url +'uploads/company/logo/'+(company.logo)"
+                                                                   target="_blank">
+                                                                    <img
+                                                                        :src="$store.state.app_url +'uploads/company/logo/'+(company.logo)"
+                                                                        style="width:90px;height:100px;" alt="">
                                                                 </a>
                                                             </td>
                                                             <td v-else>
-                                                                <a :href="$store.state.app_url +'uploads/no-user.png'" target="_blank">
-                                                                <img :src="$store.state.app_url +'uploads/no-user.png'" style="width:90px;height:100px;" alt="">
+                                                                <a :href="$store.state.app_url +'uploads/no-user.png'"
+                                                                   target="_blank">
+                                                                    <img
+                                                                        :src="$store.state.app_url +'uploads/no-user.png'"
+                                                                        style="width:90px;height:100px;" alt="">
                                                                 </a>
                                                             </td>
                                                             <td>
@@ -110,8 +116,10 @@
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo</label>
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input"  id="Logo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'add')">
-                                <label class="custom-file-label" for="logo">{{addLogoName != '' ? addLogoName : 'Choose.jpg, .png, .jpeg Image'}}</label>
+                                <input type="file" class="custom-file-input" id="Logo" accept=".jpg,.jpeg,.png"
+                                       @change="uploadLogo($event, 'add')">
+                                <label class="custom-file-label" for="logo">{{addLogoName != '' ? addLogoName :
+                                    'Choose.jpg, .png, .jpeg Image'}}</label>
                             </div>
                         </div>
                         <div class="form-group col-md-4">
@@ -243,7 +251,7 @@
                 >
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="name">Company Name  <span class="text-danger ml-1">*</span></label>
+                            <label for="name">Company Name <span class="text-danger ml-1">*</span></label>
                             <input
                                 type="text"
                                 class="form-control"
@@ -265,8 +273,10 @@
                         <div class="form-group col-md-4">
                             <label for="Logo">Logo <small>(Empty field will save logo same)</small></label>
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png" @change="uploadLogo($event, 'edit')">
-                                <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName : 'Choose.jpg, .png, .jpeg Image' }}</label>
+                                <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png"
+                                       @change="uploadLogo($event, 'edit')">
+                                <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName :
+                                    'Choose.jpg, .png, .jpeg Image' }}</label>
                             </div>
                         </div>
                         <div class="form-group col-md-4">
@@ -316,14 +326,14 @@
                     </div>
                     <table class="table table-striped">
                         <thead>
-                        <tr>
+                            <tr>
                             <th>Sr. No.</th>
                             <th>Module Name</th>
                             <th>Permission</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <template v-for="(moduleName, i) in dataEdit.modules" :key="i">
+                            <template v-for="(moduleName, i) in dataEdit.modules" :key="i">
                             <tr>
                                 <td>{{ i + 1 }}</td>
                                 <td>
@@ -333,43 +343,22 @@
                                 </td>
                                 <td>
                                     <label class="colorinput mx-3">
-                      <span v-if="i != 'name'">
-                        <input
-                            :checked="mod"
-                            type="checkbox"
-                            :value="true"
-                            class="colorinput-input"
-                            v-model="moduleName.allow"
-                        />
-                        <span class="colorinput-color bg-primary"></span>
-                      </span>
+                                          <span v-if="i != 'name'">
+                                            <input :checked="mod" type="checkbox" :value="true" class="colorinput-input" v-model="moduleName.allow" />
+                                            <span class="colorinput-color bg-primary"></span>
+                                          </span>
                                     </label>
                                 </td>
                             </tr>
                             <tr v-if="moduleName.allow">
                                 <td></td>
                                 <td colspan="2" class="py-5">
-                                    <label
-                                        class="colorinput mx-3"
-                                        v-for="(menus, j) in moduleName.childs"
-                                        :key="j"
-                                    >
-                      <span v-if="i != 'name'">
-                        <input
-                            :checked="menus"
-                            type="checkbox"
-                            :value="true"
-                            class="colorinput-input"
-                            v-model="menus.allow"
-                        />
-                        <span class="colorinput-color bg-primary"></span>
-                        <span
-                            style="position: relative; left: 5px; top: -10px"
-                            class="text-capitalize"
-                        >
-                          {{ menus.name }}
-                        </span>
-                      </span>
+                                    <label class="colorinput mx-3" v-for="(menus, j) in moduleName.childs" :key="j">
+                                        <span v-if="i != 'name'">
+                                            <input :checked="menus" type="checkbox" :value="true" class="colorinput-input" v-model="menus.allow" />
+                                            <span class="colorinput-color bg-primary"></span>
+                                            <span style="position: relative; left: 5px; top: -10px" class="text-capitalize" > {{ menus.name }} </span>
+                                        </span>
                                     </label>
                                 </td>
                             </tr>
@@ -377,7 +366,7 @@
                         </tbody>
                     </table>
                     <template v-slot:button>
-                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update" >
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                             {{ loading ? 'Loading...' : 'Update company' }}
                         </button>
                     </template>
@@ -427,7 +416,7 @@ export default {
             roles: [],
             formID: "newCompany",
             confirmModalID: "confirmModal",
-            editFormID:'edit_company_form',
+            editFormID: 'edit_company_form',
             loading: false,
             data: {
                 name: "",
@@ -525,7 +514,7 @@ export default {
                 const logoRes = await this.callApi("post", "company/logo-upload", formData, config);
                 logo = logoRes ? logoRes.data.name : ""
             }
-            const res = await this.callApi("post", "company/store", { ...this.data,  logo });
+            const res = await this.callApi("post", "company/store", {...this.data, logo});
             if (res.status == 201) {
                 this.loading = false
                 $("#company_table").DataTable().destroy();
@@ -651,11 +640,11 @@ export default {
                     this.dataEdit.logo = imageFile;
                 }
             } else {
-               return swal({
+                return swal({
                     title: "Invalid Format",
                     text: "Uploaded File must be in .jpg, .jpeg, .png",
                     icon: "error",
-                   timer: 2000
+                    timer: 2000
                 });
                 e.target.value = '';
             }
@@ -677,8 +666,8 @@ export default {
 </script>
 <style scoped>
 
-div.dataTables_length select{
+div.dataTables_length select {
     width: 90px !important;
-    display:inline-block;
+    display: inline-block;
 }
 </style>

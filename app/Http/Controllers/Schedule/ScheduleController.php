@@ -25,17 +25,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
         return Schedule::with('fare_class', 'route', 'bus_class', 'addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
@@ -188,7 +177,6 @@ class ScheduleController extends Controller
             'surcharge_id' => $req['surcharge_id'],
             'discount_id' => $req['discount_id'],
             'route_city_terminal' => !isset($request->updated_route_city_terminal) ? $existSchedule->route_city_terminal : $request->updated_route_city_terminal,
-//            'fare_class_id' => $req['fare_class_id'],
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -215,13 +203,6 @@ class ScheduleController extends Controller
         }
         $data = collect($data)->unique();
         return City::with('terminal')->whereIn('id', $data)->get();
-
-//        $finalData = [];
-//        foreach ($cities as $key => $city) {
-//            $finalData['cities'] = $cities;
-//            $finalData['terminal'][$key] = Terminal::with('city')->where('city_id', $city->id)->where('company_id', Auth::user()->company_id)->get();
-//        }
-//        return $finalData;
     }
 
     public function getRouteFareClass(Request $request)
