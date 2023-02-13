@@ -1160,7 +1160,8 @@ export default {
         };
     },
     async created() {
-        await this.fetchAllSchedules();
+        this.fetchAllSchedules();
+        this.resetingArrays();
         if (window.location.pathname.split("/").pop() == "booking") {
             window.addEventListener('keydown', this.enter);
             window.addEventListener('keydown', this.altM);
