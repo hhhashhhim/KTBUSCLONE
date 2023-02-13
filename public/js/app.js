@@ -41725,10 +41725,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 3:
                 resExtend = _context3.sent;
-                console.log(resExtend);
 
                 if (!(resExtend.status == 200)) {
-                  _context3.next = 10;
+                  _context3.next = 9;
                   break;
                 }
 
@@ -41741,10 +41740,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   _this3.loading = false;
                 }, 500);
-                _context3.next = 10;
+                _context3.next = 9;
                 return _this3.fetchSchedule();
 
-              case 10:
+              case 9:
               case "end":
                 return _context3.stop();
             }
@@ -41767,7 +41766,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 2:
                 res = _context4.sent;
 
-                if (res.status === 200) {
+                if (res.status == 200) {
                   _this4.schedules = res.data;
                 } else {
                   console.log(res);
@@ -41832,7 +41831,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 2:
                 terminalRes = _context5.sent;
 
-                if (terminalRes.status === 200) {
+                if (terminalRes.status == 200) {
                   _this5.terminals[index] = terminalRes.data;
                 }
 
@@ -41894,7 +41893,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     editGenerateMap: function editGenerateMap(val) {
-      if (val === "0") {
+      if (val == "0") {
         this.isShowEditDiv = false;
       }
 
@@ -41906,7 +41905,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (event.target.checked) {
         var index = this.data.addTerminalsOnClick.indexOf(value);
 
-        if (index === -1) {
+        if (index == -1) {
           this.data.addTerminalsOnClick.push({
             city_id: cityId,
             terminal_id: parseInt(value),
@@ -42133,7 +42132,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         //         timer: 2000
         //     });
         //
-        // if (this.data.addTerminalsOnClick.length === 0) {
+        // if (this.data.addTerminalsOnClick.length == 0) {
         //     return swal({
         //         title: "Required!",
         //         text: "Please Select Terminals of Selected Route",
@@ -42335,10 +42334,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                console.log(_this9.dataEdit.schedules);
-
                 if (!(_this9.dataEdit.schedules.name == "" || typeof _this9.dataEdit.schedules.name == "undefined")) {
-                  _context9.next = 3;
+                  _context9.next = 2;
                   break;
                 }
 
@@ -42349,9 +42346,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 3:
+              case 2:
                 if (!(_this9.dataEdit.schedules.start_date == "" || typeof _this9.dataEdit.schedules.start_date == "undefined")) {
-                  _context9.next = 5;
+                  _context9.next = 4;
                   break;
                 }
 
@@ -42362,9 +42359,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
+              case 4:
                 if (!(_this9.dataEdit.schedules.end_date == "" || typeof _this9.dataEdit.schedules.end_date == "undefined")) {
-                  _context9.next = 7;
+                  _context9.next = 6;
                   break;
                 }
 
@@ -42375,9 +42372,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 7:
+              case 6:
                 if (!(_this9.dataEdit.schedules.time == "" || typeof _this9.dataEdit.schedules.time == "undefined")) {
-                  _context9.next = 9;
+                  _context9.next = 8;
                   break;
                 }
 
@@ -42388,7 +42385,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 9:
+              case 8:
                 // if (this.dataEdit.schedules.bus_class_id == "0")
                 //     swal({
                 //         title: "Required!",
@@ -42404,34 +42401,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 //         timer: 2000
                 //     });
                 _this9.loading = true;
-                _context9.next = 12;
+                _context9.next = 11;
                 return _this9.callApi("post", "schedule/update", _this9.dataEdit);
 
-              case 12:
+              case 11:
                 resEdit = _context9.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context9.next = 21;
+                  _context9.next = 20;
                   break;
                 }
 
                 swal({
                   title: "Success",
-                  text: "Schedule Updated Successfully \n Go to Fare Table, Click Update Schedule Button to update all Schedule & Schedule Time   ",
+                  text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
                   icon: "success",
-                  timer: 2000
+                  timer: 4000
                 });
                 $("#schedule_table").DataTable().destroy();
                 _this9.loading = false;
-                _context9.next = 19;
+                _context9.next = 18;
                 return _this9.fetchSchedule();
 
-              case 19:
-                _context9.next = 22;
+              case 18:
+                _context9.next = 21;
                 break;
 
-              case 21:
-                if (resEdit.status === 422) {
+              case 20:
+                if (resEdit.status == 422) {
                   _this9.loading = false;
 
                   _loop = function _loop(key) {
@@ -42445,7 +42442,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 21:
               case "end":
                 return _context9.stop();
             }
@@ -42453,25 +42450,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee9);
       }))();
     },
-    edit: function edit(schedule_id) {
+    edit: function edit(schedule) {
       var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        var resEditSchedule;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                _context10.next = 2;
-                return _this10.callApi("post", "schedule/edit", schedule_id);
+                _this10.dataEdit.schedules = schedule; // const resEditSchedule = await this.callApi("post", "schedule/edit", schedule_id);
+                // this.dataEdit.compare_array = resEditSchedule.data.compare_array;
+                // this.dataEdit.cities = resEditSchedule.data.cities;
 
-              case 2:
-                resEditSchedule = _context10.sent;
-                _this10.dataEdit.schedules = resEditSchedule.data.schedules;
-                _this10.dataEdit.compare_array = resEditSchedule.data.compare_array;
-                _this10.dataEdit.cities = resEditSchedule.data.cities;
-
-              case 6:
+              case 1:
               case "end":
                 return _context10.stop();
             }
@@ -71840,9 +71831,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
