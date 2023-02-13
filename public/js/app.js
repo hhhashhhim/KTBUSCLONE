@@ -27694,7 +27694,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this12.addForm.discount = '';
                 _this12.validationErrors = [];
                 _this12.loading = true;
-                _context12.next = 8;
+
+                if (!(_this12.addForm.schedule && _this12.addForm.date && _this12.addForm.departureCity && _this12.addForm.destinationCity)) {
+                  _context12.next = 13;
+                  break;
+                }
+
+                _context12.next = 9;
                 return _this12.callApi("post", "schedule/selected", {
                   id: _this12.addForm.schedule,
                   date: _this12.addForm.date,
@@ -27702,7 +27708,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this12.addForm.destinationCity
                 });
 
-              case 8:
+              case 9:
                 resSelected = _context12.sent;
 
                 if (resSelected.status == 200 && _this12.addForm.schedule != 0 && _this12.addForm.departureCity != 0 && _this12.addForm.destinationCity != 0) {
@@ -27737,7 +27743,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 12:
+              case 13:
               case "end":
                 return _context12.stop();
             }

@@ -1609,42 +1609,45 @@ export default {
             this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true;
-            const resSelected = await this.callApi("post", "schedule/selected", {
-                id: this.addForm.schedule,
-                date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
-                destinationCity: this.addForm.destinationCity,
-            });
-            if (resSelected.status == 200 && this.addForm.schedule != 0 && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
-                this.loading = false
-                this.showBookingDiv = true;
-                this.schedule = resSelected.data;
-            }
+            if(this.addForm.schedule && this.addForm.date && this.addForm.departureCity && this.addForm.destinationCity)
+            {
+                const resSelected = await this.callApi("post", "schedule/selected", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                });
+                if (resSelected.status == 200 && this.addForm.schedule != 0 && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
+                    this.loading = false
+                    this.showBookingDiv = true;
+                    this.schedule = resSelected.data;
+                }
 
-            if (resSelected.status == 500 && this.addForm.schedule == 0) {
-                this.loading = true
-                this.showBookingDiv = false;
-            }
-            if (resSelected.status == 422) {
-                this.showBookingDiv = false;
-                this.loading = false;
-                let errorContent = "";
-                let count = 0;
-                for (const key in resSelected.data.errors) {
-                    resSelected.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " +
-                            element +
-                            "\n"
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                    });
+                if (resSelected.status == 500 && this.addForm.schedule == 0) {
+                    this.loading = true
+                    this.showBookingDiv = false;
+                }
+                if (resSelected.status == 422) {
+                    this.showBookingDiv = false;
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resSelected.data.errors) {
+                        resSelected.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
 
+                    }
                 }
             }
         },
