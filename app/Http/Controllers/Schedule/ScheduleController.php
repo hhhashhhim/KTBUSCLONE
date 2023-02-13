@@ -351,7 +351,7 @@ class ScheduleController extends Controller
 
                         if ($before || $after) {
                             // removing partial tag for that seats which fulfill the conditions
-                            unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
+                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                             //                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
