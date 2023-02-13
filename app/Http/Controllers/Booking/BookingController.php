@@ -422,7 +422,6 @@ class BookingController extends Controller
         $checkCustomers = [];
         foreach ($tickets as $key => $single) {
             foreach ($single as $key => $item) {
-//                dd($item->customer_id);
                 $checkCustomers[] = $item->customer_id;
                 $item->bookingDate = date('d/m/Y H:i A', strtotime($item->created_at));
             }
@@ -443,7 +442,6 @@ class BookingController extends Controller
 
     public function dropSchedule(Request $request)
     {
-//        dd($request->all());
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -747,7 +745,7 @@ class BookingController extends Controller
             $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id])->orderBy('id', 'DESC')->get();
             $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
 //            Check departure city have more than one terminal
-            
+
             if ($checkTerminal->count() > 0) {
 //              if ticket terminal id at last of sequence it mean no need to calculation
                 if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
