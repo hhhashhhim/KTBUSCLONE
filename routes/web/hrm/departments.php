@@ -10,4 +10,5 @@ Route::group(['prefix' => 'hrm/department', [CustomMiddleware::class]], function
     Route::post('/update', [DepartmentController::class, 'update']);
     Route::post('/delete', [DepartmentController::class, 'delete']);
     Route::post('/selective', [DepartmentController::class, 'selective']);
+    Route::post('/all/terminals', [DepartmentController::class, 'allTerminals']);
 });

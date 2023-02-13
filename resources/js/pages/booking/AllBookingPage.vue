@@ -14,7 +14,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="CNIC">CNIC</label>
                                                         <vue-mask id="CNIC"
@@ -27,7 +27,7 @@
                                                         </vue-mask>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="phone">Cell #</label>
                                                         <vue-mask id="phone"
@@ -40,14 +40,14 @@
                                                         </vue-mask>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="name">Name</label>
                                                         <input id="name" type="text" class="form-control"
                                                                v-model="filterForm.nameFilter">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label>Route</label>
                                                         <select id="routeFilter" class="form-control"
@@ -60,7 +60,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="terminalsFilter">Terminals</label>
                                                         <select id="terminalsFilter" class="form-control"
@@ -73,7 +73,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="busFilter">Bus #</label>
                                                         <select id="busFilter" class="form-control"
@@ -86,14 +86,14 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="dateFilter">Date</label>
                                                         <input type="date" class="form-control" id="dateFilter"
                                                                v-model="filterForm.dateFilter">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label for="statusFilter">Status</label>
                                                         <select id="statusFilter" class="form-control"
@@ -108,7 +108,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div v-if="showAllBooking">
+                                            <div>
                                                 <div class="table-responsive">
                                                     <table
                                                         class="table table-striped table-hover"

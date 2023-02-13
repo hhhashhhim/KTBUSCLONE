@@ -55,17 +55,17 @@ class TerminalController extends Controller
 //            'percentageCommission.required' => 'Please Enter Percentage Commission',
         ];
         $this->validate($request, $rules, $customMessages);
-        if ($request->is_main) {
-            $main = Terminal::where('city_id', $request->city_id)
-                ->where('company_id', Auth::user()->company_id)
-                ->where('is_main', 1)
-                ->first();
-            if ($main) {
-                return response()->json([
-                    'is_main' => 'City can have only One terminal as its main'
-                ], 423);
-            }
-        }
+//        if ($request->is_main) {
+//            $main = Terminal::where('city_id', $request->city_id)
+//                ->where('company_id', Auth::user()->company_id)
+//                ->where('is_main', 1)
+//                ->first();
+//            if ($main) {
+//                return response()->json([
+//                    'is_main' => 'City can have only One terminal as its main'
+//                ], 423);
+//            }
+//        }
         Terminal::create([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),
@@ -101,18 +101,18 @@ class TerminalController extends Controller
             'name' => 'required',
             'contact' => 'required',
         ]);
-        if ($request->is_main) {
-            $main = Terminal::where('city_id', $request->city_id)
-                ->where('company_id', Auth::user()->company_id)
-                ->where('is_main', 1)
-                ->where('id', '!=', $request->id)
-                ->first();
-            if ($main) {
-                return response()->json([
-                    'is_main' => 'City can have only One terminal as its main'
-                ], 423);
-            }
-        }
+//        if ($request->is_main) {
+//            $main = Terminal::where('city_id', $request->city_id)
+//                ->where('company_id', Auth::user()->company_id)
+//                ->where('is_main', 1)
+//                ->where('id', '!=', $request->id)
+//                ->first();
+//            if ($main) {
+//                return response()->json([
+//                    'is_main' => 'City can have only One terminal as its main'
+//                ], 423);
+//            }
+//        }
         Terminal::find($request->id)->update([
             'name' => $request->name,
             'contact' => plainContactAndCnic($request->contact),

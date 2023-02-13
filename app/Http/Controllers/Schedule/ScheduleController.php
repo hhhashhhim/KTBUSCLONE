@@ -167,16 +167,11 @@ class ScheduleController extends Controller
     public function updateSchedule(Request $request)
     {
         $req = $request->schedules;
-        $existSchedule = Schedule::where('id', $req['id'])->where('company_id', Auth::user()->company_id)->first();
         return Schedule::where('id', $req['id'])->update([
             'name' => $req['name'],
             'start_date' => $req['start_date'],
             'end_date' => $req['end_date'],
-            'bus_class_id' => $req['bus_class_id'],
-            'route_id' => $req['route_id'],
-            'surcharge_id' => $req['surcharge_id'],
-            'discount_id' => $req['discount_id'],
-            'route_city_terminal' => !isset($request->updated_route_city_terminal) ? $existSchedule->route_city_terminal : $request->updated_route_city_terminal,
+            'time' => $req['time'],
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -337,7 +332,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
-                    $seatMap[$i][$j]['type'] = $seatMap[$i][$j]['type'] == 'reserved_for_female' ? 0 : $tickets[$result]['type'];
+                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     if ($tickets[$result]['is_partial'] == 1) {
 
                         // Condition for validation that departure city and destination city in the request should be "before" the partial seat's targeted cities

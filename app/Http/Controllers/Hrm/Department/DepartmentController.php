@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hrm\Department;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hrm\Department\Department;
+use App\Models\Terminal;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,5 +76,10 @@ class DepartmentController extends Controller
     public function selective(Request $request)
     {
         return Department::where('terminal_id', $request->id)->get(['id', 'name', 'terminal_id']);
+    }
+
+    public function allTerminals()
+    {
+        return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']);
     }
 }

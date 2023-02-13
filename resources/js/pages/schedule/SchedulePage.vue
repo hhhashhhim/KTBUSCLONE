@@ -472,317 +472,317 @@
                     </div>
                 </section>
             </Add>
-
             <!-- Add Modal End -->
+
+
             <!--            Edit Model-->
             <Edit heading="Edit Schedule" :errors="this.validationErrors" :success="success" :editForm="editFormID">
-                <div class="row mb-3">
-                    <div class="col-md-3 text-center"
-                         :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' ">
-                        Step 1
+                <!--                <div class="row mb-3">-->
+                <!--                    <div class="col-md-3 text-center"-->
+                <!--                         :class=" editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary' ">-->
+                <!--                        Step 1-->
+                <!--                    </div>-->
+                <!--                    <div class="col-md-3 text-center"-->
+                <!--                         :class=" editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info' ">-->
+                <!--                        Step 2-->
+                <!--                    </div>-->
+                <!--                    <div class="col-md-3 text-center"-->
+                <!--                         :class=" editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success' ">-->
+                <!--                        Step 3-->
+                <!--                    </div>-->
+                <!--                    <div class="col-md-3 text-center"-->
+                <!--                         :class=" editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning' ">-->
+                <!--                        Step 4-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+                <!--                <section-->
+                <!--                    class="section1"-->
+                <!--                    :class="editActiveSection != 0 ? 'd-none' : ''"-->
+                <!--                >-->
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="name">Name <span class="text-danger ml-1">*</span></label>
+                        <input
+                            type="text"
+                            id="name"
+                            class="form-control"
+                            v-model="dataEdit.schedules.name"
+                        />
                     </div>
-                    <div class="col-md-3 text-center"
-                         :class=" editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info' ">
-                        Step 2
-                    </div>
-                    <div class="col-md-3 text-center"
-                         :class=" editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success' ">
-                        Step 3
-                    </div>
-                    <div class="col-md-3 text-center"
-                         :class=" editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning' ">
-                        Step 4
+                    <div class="col-md-6 class form-group">
+                        <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
+                        <input
+                            type="date"
+                            id="start"
+                            class="form-control"
+                            v-model="dataEdit.schedules.start_date"
+                        />
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6 class form-group">
+                        <label for="end">End Date <span class="text-danger ml-1">*</span></label>
+                        <input
+                            type="date"
+                            id="end"
+                            class="form-control"
+                            v-model="dataEdit.schedules.end_date"
+                        />
+                    </div>
+                    <div class="col-md-6 class form-group">
+                        <label for="time">Time<span class="text-danger ml-1">*</span></label>
+                        <input type="time" id="time" class="form-control" v-model="dataEdit.schedules.time"
+                        />
+                    </div>
+                </div>
+<!--                <div class="row">-->
+<!--                    <div class="col-md-6"></div>-->
+<!--                    <div class="col-md-6">-->
+<!--                        <button-->
+<!--                            class="btn btn-success step1 float-right"-->
+<!--                            @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">-->
+<!--                            Next<i class="fas fa-arrow-right pr-1"></i>-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <!--                </section>-->
 
-                <section
-                    class="section1"
-                    :class="editActiveSection != 0 ? 'd-none' : ''"
-                >
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="text"
-                                id="name"
-                                class="form-control"
-                                v-model="dataEdit.schedules.name"
-                            />
-                        </div>
-                        <div class="col-md-6 class form-group">
-                            <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="date"
-                                id="start"
-                                class="form-control"
-                                v-model="dataEdit.schedules.start_date"
-                            />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 class form-group">
-                            <label for="end">End Date <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="date"
-                                id="end"
-                                class="form-control"
-                                v-model="dataEdit.schedules.end_date"
-                            />
-                        </div>
-                        <div class="col-md-6 class form-group">
-                            <label for="time">Time<span class="text-danger ml-1">*</span></label>
-                            <input type="time" id="time" class="form-control" v-model="dataEdit.schedules.time"
-                            />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-success step1 float-right"
-                                @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">
-                                Next<i class="fas fa-arrow-right pr-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                <!--                <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">-->
+                <!--                    <div class="row">-->
+                <!--                        <div class="col-md-8 class form-group">-->
+                <!--                            <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>-->
+                <!--                            <select-->
+                <!--                                class="form-control"-->
+                <!--                                id="route" @change="getSelectiveData('routeEdit', $event)"-->
+                <!--                                v-model="dataEdit.schedules.route_id"-->
+                <!--                            >-->
+                <!--                                <option value="0" selected>Select Route</option>-->
+                <!--                                <option-->
+                <!--                                    v-for="(route, i) in editRoutes"-->
+                <!--                                    :value="route.id"-->
+                <!--                                    :key="i"-->
+                <!--                                >-->
+                <!--                                    {{ route.name }}-->
+                <!--                                </option>-->
+                <!--                            </select>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-md-4 class form-group">-->
+                <!--                            <label for="busClassEdit">Bus Class <span class="text-danger ml-1">*</span></label>-->
+                <!--                            <select-->
+                <!--                                class="form-control"-->
+                <!--                                id="busClassEdit"-->
+                <!--                                v-model="dataEdit.schedules.bus_class_id"-->
+                <!--                            >-->
+                <!--                                <option value="0" selected>Select Bus Class</option>-->
+                <!--                                <option-->
+                <!--                                    v-for="(type, i) in busClasses"-->
+                <!--                                    :value="type.id"-->
+                <!--                                    :key="i"-->
+                <!--                                >-->
+                <!--                                    {{ type.name }}-->
+                <!--                                </option>-->
+                <!--                            </select>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div-->
+                <!--                        class="row d-flex justify-content-center"-->
+                <!--                        v-if="stepTwoAddSchedule"-->
+                <!--                    >-->
+                <!--                        <div class="col-md-12 class form-group mx-2">-->
+                <!--                            <div class="table-responsive">-->
+                <!--                                <table-->
+                <!--                                    class="table table-striped table-hover"-->
+                <!--                                    id="addScheduleStep2"-->
+                <!--                                >-->
+                <!--                                    <thead>-->
+                <!--                                    <tr>-->
+                <!--                                        <th>Sr No.</th>-->
+                <!--                                        <th>City Name</th>-->
+                <!--                                        <th>Terminals</th>-->
+                <!--                                    </tr>-->
+                <!--                                    </thead>-->
+                <!--                                    <tbody>-->
+                <!--                                    <tr v-for="(city, i) in dataEdit.cities" :key="i">-->
+                <!--                                        <td>{{ i + 1 }}</td>-->
+                <!--                                        <td>{{ city.name }}</td>-->
+                <!--                                        <td>-->
+                <!--                                            <span v-for="item in city.terminal" :key="item.id">-->
+                <!--                                            <label class="colorinput mx-3">-->
+                <!--                                                <span> <input type="checkbox" class="colorinput-input"-->
+                <!--                                                              @click="editTerminal($event, city.id)"-->
+                <!--                                                              v-bind:checked=" checkedSelectedTerminals(item.id) "-->
+                <!--                                                              id="terminal" :value="item.id"/>-->
+                <!--                                                    <span class="colorinput-color bg-primary"></span>-->
+                <!--                                                </span>-->
+                <!--                                            </label>-->
+                <!--                                                <label class="checkbox-inputs" for="terminal">{{ item.name }}</label>\-->
+                <!--                                            </span>-->
+                <!--                                        </td>-->
+                <!--                                    </tr>-->
+                <!--                                    </tbody>-->
+                <!--                                </table>-->
+                <!--                            </div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="row">-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                class="btn btn-info back1 float-left"-->
+                <!--                                @click="editPreviousSection(0)"-->
+                <!--                            >-->
+                <!--                                <i class="fas fa-arrow-left mr-1"></i>Previous-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                class="btn btn-success step2 float-right"-->
+                <!--                                @click="editNextSection('step2')"-->
+                <!--                            >-->
+                <!--                                Next<i class="fas fa-arrow-right mr-1"></i>-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </section>-->
 
-                <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">
-                    <div class="row">
-                        <div class="col-md-8 class form-group">
-                            <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
-                            <select
-                                class="form-control"
-                                id="route" @change="getSelectiveData('routeEdit', $event)"
-                                v-model="dataEdit.schedules.route_id"
-                            >
-                                <option value="0" selected>Select Route</option>
-                                <option
-                                    v-for="(route, i) in editRoutes"
-                                    :value="route.id"
-                                    :key="i"
-                                >
-                                    {{ route.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 class form-group">
-                            <label for="busClassEdit">Bus Class <span class="text-danger ml-1">*</span></label>
-                            <select
-                                class="form-control"
-                                id="busClassEdit"
-                                v-model="dataEdit.schedules.bus_class_id"
-                            >
-                                <option value="0" selected>Select Bus Class</option>
-                                <option
-                                    v-for="(type, i) in busClasses"
-                                    :value="type.id"
-                                    :key="i"
-                                >
-                                    {{ type.name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div
-                        class="row d-flex justify-content-center"
-                        v-if="stepTwoAddSchedule"
-                    >
-                        <div class="col-md-12 class form-group mx-2">
-                            <div class="table-responsive">
-                                <table
-                                    class="table table-striped table-hover"
-                                    id="addScheduleStep2"
-                                >
-                                    <thead>
-                                    <tr>
-                                        <th>Sr No.</th>
-                                        <th>City Name</th>
-                                        <th>Terminals</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(city, i) in dataEdit.cities" :key="i">
-                                        <td>{{ i + 1 }}</td>
-                                        <td>{{ city.name }}</td>
-                                        <td>
-                                            <span v-for="item in city.terminal" :key="item.id">
-                                            <label class="colorinput mx-3">
-                                                <span> <input type="checkbox" class="colorinput-input"
-                                                              @click="editTerminal($event, city.id)"
-                                                              v-bind:checked=" checkedSelectedTerminals(item.id) "
-                                                              id="terminal" :value="item.id"/>
-                                                    <span class="colorinput-color bg-primary"></span>
-                                                </span>
-                    </label>
-                          <label class="checkbox-inputs" for="terminal">{{
-                                  item.name
-                              }}</label>
-                        </span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-info back1 float-left"
-                                @click="editPreviousSection(0)"
-                            >
-                                <i class="fas fa-arrow-left mr-1"></i>Previous
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-success step2 float-right"
-                                @click="editNextSection('step2')"
-                            >
-                                Next<i class="fas fa-arrow-right mr-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                <!--                <section-->
+                <!--                    class="section3"-->
+                <!--                    :class="editActiveSection != 'step2' ? 'd-none' : ''"-->
+                <!--                >-->
+                <!--                    <div class="row">-->
+                <!--                        <div class="col-md-6 class form-group">-->
+                <!--                            <label for="surcharge">Surcharge</label>-->
+                <!--                            <select-->
+                <!--                                class="form-control"-->
+                <!--                                id="surcharge"-->
+                <!--                                v-model="dataEdit.schedules.surcharge_id"-->
+                <!--                            >-->
+                <!--                                <option value="0" selected>Select Surcharge</option>-->
+                <!--                                <option-->
+                <!--                                    v-for="(surcharge, i) in editSurcharges"-->
+                <!--                                    :value="surcharge.id"-->
+                <!--                                    :key="i"-->
+                <!--                                > {{ surcharge.name }} - -->
+                <!--                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}-->
+                <!--                                </option>-->
+                <!--                            </select>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-md-6 class form-group">-->
+                <!--                            <label for="discount">Discount</label>-->
+                <!--                            <select-->
+                <!--                                class="form-control"-->
+                <!--                                id="discount"-->
+                <!--                                v-model="dataEdit.schedules.discount_id"-->
+                <!--                            >-->
+                <!--                                <option value="0" selected>Select Discount</option>-->
+                <!--                                <option-->
+                <!--                                    v-for="(discount, i) in editDiscounts"-->
+                <!--                                    :value="discount.id"-->
+                <!--                                    :key="i"-->
+                <!--                                >-->
+                <!--                                    {{ discount.name }} - -->
+                <!--                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}-->
+                <!--                                </option>-->
+                <!--                            </select>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="row">-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                class="btn btn-info back2 float-left"-->
+                <!--                                @click="editPreviousSection('step1')"-->
+                <!--                            >-->
+                <!--                                <i class="fas fa-arrow-left mr-1 border-dark"></i> Previous-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                class="btn btn-success step2 float-right"-->
+                <!--                                @click="editNextSection('step3')"-->
+                <!--                            >-->
+                <!--                                Next<i class="fas fa-arrow-right mr-1"></i>-->
+                <!--                            </button>-->
+                <!--                        </div>-->
 
-                <section
-                    class="section3"
-                    :class="editActiveSection != 'step2' ? 'd-none' : ''"
-                >
-                    <div class="row">
-                        <div class="col-md-6 class form-group">
-                            <label for="surcharge">Surcharge</label>
-                            <select
-                                class="form-control"
-                                id="surcharge"
-                                v-model="dataEdit.schedules.surcharge_id"
-                            >
-                                <option value="0" selected>Select Surcharge</option>
-                                <option
-                                    v-for="(surcharge, i) in editSurcharges"
-                                    :value="surcharge.id"
-                                    :key="i"
-                                > {{ surcharge.name }} -
-                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 class form-group">
-                            <label for="discount">Discount</label>
-                            <select
-                                class="form-control"
-                                id="discount"
-                                v-model="dataEdit.schedules.discount_id"
-                            >
-                                <option value="0" selected>Select Discount</option>
-                                <option
-                                    v-for="(discount, i) in editDiscounts"
-                                    :value="discount.id"
-                                    :key="i"
-                                >
-                                    {{ discount.name }} -
-                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-info back2 float-left"
-                                @click="editPreviousSection('step1')"
-                            >
-                                <i class="fas fa-arrow-left mr-1 border-dark"></i> Previous
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-success step2 float-right"
-                                @click="editNextSection('step3')"
-                            >
-                                Next<i class="fas fa-arrow-right mr-1"></i>
-                            </button>
-                        </div>
+                <!--                    </div>-->
+                <!--                </section>-->
 
-                    </div>
-                </section>
-
-                <section
-                    class="section4"
-                    :class="editActiveSection != 'step3' ? 'd-none' : ''"
-                >
-                    <div class="row my-3 py-2">
-                        <div class="col-md-12 text-center">
-                            <span class="h3 font-weight-bold text-muted"> Review </span>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-12 form-group table-responsive">
-                            <table class="table table-striped table-bordered text-dark">
-                                <tbody>
-                                <tr>
-                                    <th class="mr-3">Name</th>
-                                    <td colspan="3">{{ this.dataPreview.Name }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="mr-3">Start Date</th>
-                                    <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
-                                    <th class="mr-3">End Date</th>
-                                    <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Time</th>
-                                    <td> {{ this.dataPreview.time }}</td>
-                                    <th class="mr-3">Selected Bus Class</th>
-                                    <td>{{ this.dataPreview.busClass }}</td>
-                                </tr>
-                                <!--                                <tr>-->
-                                <!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
-                                <!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
-                                <!--                                </tr>-->
-                                <tr>
-                                    <th class="mr-3">Route</th>
-                                    <td colspan="3">{{ this.dataPreview.route }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="mr-3">Discount</th>
-                                    <td> {{
-                                            this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
-                                        }}
-                                    </td>
-                                    <th class="mr-3">Surcharge</th>
-                                    <td> {{
-                                            this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
-                                        }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <button
-                                class="btn btn-info back2 float-left"
-                                @click="editPreviousSection('step2')"
-                            >
-                                <i class="fas fa-arrow-left mr-1"></i> Previous
-                            </button>
-                        </div>
-                        <div class="col-md-6">
-                            <button
-                                id="submitFormButton"
-                                class="btn btn-success float-right"
-                                @click="updateSchedule" :disabled="loading"
-                            >
-                                {{ loading ? 'Loading...' : 'Update Schedule' }}
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                <!--                <section-->
+                <!--                    class="section4"-->
+                <!--                    :class="editActiveSection != 'step3' ? 'd-none' : ''"-->
+                <!--                >-->
+                <!--                    <div class="row my-3 py-2">-->
+                <!--                        <div class="col-md-12 text-center">-->
+                <!--                            <span class="h3 font-weight-bold text-muted"> Review </span>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="row justify-content-center">-->
+                <!--                        <div class="col-md-12 form-group table-responsive">-->
+                <!--                            <table class="table table-striped table-bordered text-dark">-->
+                <!--                                <tbody>-->
+                <!--                                <tr>-->
+                <!--                                    <th class="mr-3">Name</th>-->
+                <!--                                    <td colspan="3">{{ this.dataPreview.Name }}</td>-->
+                <!--                                </tr>-->
+                <!--                                <tr>-->
+                <!--                                    <th class="mr-3">Start Date</th>-->
+                <!--                                    <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>-->
+                <!--                                    <th class="mr-3">End Date</th>-->
+                <!--                                    <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>-->
+                <!--                                </tr>-->
+                <!--                                <tr>-->
+                <!--                                    <th>Time</th>-->
+                <!--                                    <td> {{ this.dataPreview.time }}</td>-->
+                <!--                                    <th class="mr-3">Selected Bus Class</th>-->
+                <!--                                    <td>{{ this.dataPreview.busClass }}</td>-->
+                <!--                                </tr>-->
+                <!--                                <tr>-->
+                <!--                                    <th class="mr-3">Route</th>-->
+                <!--                                    <td colspan="3">{{ this.dataPreview.route }}</td>-->
+                <!--                                </tr>-->
+                <!--                                <tr>-->
+                <!--                                    <th class="mr-3">Discount</th>-->
+                <!--                                    <td> {{-->
+                <!--                                            this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"-->
+                <!--                                        }}-->
+                <!--                                    </td>-->
+                <!--                                    <th class="mr-3">Surcharge</th>-->
+                <!--                                    <td> {{-->
+                <!--                                            this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"-->
+                <!--                                        }}-->
+                <!--                                    </td>-->
+                <!--                                </tr>-->
+                <!--                                </tbody>-->
+                <!--                            </table>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="row">-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                class="btn btn-info back2 float-left"-->
+                <!--                                @click="editPreviousSection('step2')"-->
+                <!--                            >-->
+                <!--                                <i class="fas fa-arrow-left mr-1"></i> Previous-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                        <div class="col-md-6">-->
+                <!--                            <button-->
+                <!--                                id="submitFormButton"-->
+                <!--                                class="btn btn-success float-right"-->
+                <!--                                @click="updateSchedule" :disabled="loading"-->
+                <!--                            >-->
+                <!--                                {{ loading ? 'Loading...' : 'Update Schedule' }}-->
+                <!--                            </button>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </section>-->
+                <template v-slot:button>
+                    <button id="submitFormButton" class="btn btn-success" @click="updateSchedule"
+                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Schedule' }}
+                    </button>
+                </template>
             </Edit>
-            <!--            Edit Model End-->
+            <!-- Edit Model End -->
             <Delete :deleteForm="deleteFormID"
                     confirmationMessage="Are You Sure You want To Delete This Schedule ???"
             />
@@ -1019,9 +1019,6 @@ export default {
                         id: this.data.route,
                     });
                     this.cities = resRoute.data;
-                    // this.dataEdit.cities = resRoute.data;
-                    // this.terminals = resRoute.data.terminal;
-                    // this.dataEdit.terminals = resRoute.data.terminal;
                 }
             }
             if (name == "routeEdit") {
@@ -1044,7 +1041,6 @@ export default {
             };
             this.data.route = 0;
             this.data.busClass = 0;
-            // this.data.fareClass = 0;
             this.data.discount = 0;
             this.data.surcharge = 0;
             this.stepTwoAddSchedule = false;
@@ -1102,14 +1098,7 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
-                // if (this.dataEdit.schedules.fare_class_id == 0)
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Please Select Fare Class",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                if (this.dataEdit.schedules.route_id != 0 && this.dataEdit.schedules.bus_class_id != 0 /*&& this.dataEdit.schedules.fare_class_id != 0*/) {
+                if (this.dataEdit.schedules.route_id != 0 && this.dataEdit.schedules.bus_class_id != 0) {
                     this.editActiveSection = nextBtn;
                 }
             }
@@ -1300,42 +1289,49 @@ export default {
         },
 
         async updateSchedule() {
-            this.validationErrors = [];
-            if (this.dataEdit.schedules.name == "")
+            console.log(this.dataEdit.schedules);
+            if (this.dataEdit.schedules.name == "" || typeof this.dataEdit.schedules.name == "undefined")
                 return swal({
                     title: "Required!",
                     text: "name is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.schedules.startDate == "")
+            if (this.dataEdit.schedules.start_date == "" || typeof this.dataEdit.schedules.start_date == "undefined")
                 return swal({
                     title: "Required!",
-                    text: "Start Date id Required",
+                    text: "Start Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.schedules.endDate == "")
+            if (this.dataEdit.schedules.end_date == "" || typeof  this.dataEdit.schedules.end_date == "undefined")
                 return swal({
                     title: "Required!",
                     text: "End Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.schedules.bus_class_id == "0")
-                swal({
-                    title: "Required!",
-                    text: "Bus Class is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (this.dataEdit.schedules.route_id == "0")
+            if (this.dataEdit.schedules.time     == "" || typeof  this.dataEdit.schedules.time   == "undefined")
                 return swal({
                     title: "Required!",
-                    text: "Route is Required",
+                    text: "Schedule Time is Required",
                     icon: "error",
                     timer: 2000
                 });
+            // if (this.dataEdit.schedules.bus_class_id == "0")
+            //     swal({
+            //         title: "Required!",
+            //         text: "Bus Class is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (this.dataEdit.schedules.route_id == "0")
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Route is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             this.loading = true;
             const resEdit = await this.callApi(
                 "post",
@@ -1345,7 +1341,7 @@ export default {
             if (resEdit.status == 200) {
                 swal({
                     title: "Success",
-                    text: "Schedule Updated Succesfully",
+                    text: "Schedule Updated Successfully \n Go to Fare Table, Click Update Schedule Button to update all Schedule & Schedule Time   ",
                     icon: "success",
                     timer: 2000
                 });

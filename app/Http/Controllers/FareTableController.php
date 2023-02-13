@@ -46,11 +46,6 @@ class FareTableController extends Controller
 
     public function record(Request $request)
     {
-
-        $request->validate([
-            'fare_class' => 'required',
-        ]);
-
         return $this->getFarePrices($request->fare_class);
     }
 

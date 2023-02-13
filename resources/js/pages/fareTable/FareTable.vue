@@ -23,14 +23,17 @@
                             </div>
                         </div>
                         <div class="bg-secondary mx-4 border rounded" v-if="queueProgress">
-                            <div class="bg-success rounded text-center text-white" :style="{'width':(progressPercent > 1 ? progressPercent : 2) +'%'}">
-                                {{ progressPercent > 100 ? Progressing : progressPercent }}% 
+                            <div class="bg-success rounded text-center text-white"
+                                 :style="{'width':(progressPercent > 1 ? progressPercent : 2) +'%'}">
+                                {{ progressPercent > 100 ? Progressing : progressPercent }}%
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between px-4 border"  v-else>
-                            <p>After updating time differrence press button this will check and update your schedule. This can take time.</p>
-                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes" :disabled="loadingTable">
-                                {{loadingTable ? 'Loading...' : 'Update Schedule' }}
+                        <div class="d-flex justify-content-between px-4 border" v-else>
+                            <p>After updating time differrence press button this will check and update your schedule.
+                                This can take time.</p>
+                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes"
+                                    :disabled="loadingTable">
+                                {{ loadingTable ? 'Loading...' : 'Update Schedule' }}
                             </button>
                         </div>
                         <div class="card-body">
@@ -55,7 +58,7 @@
                                 <div class="col-12" v-else>
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="table-responsive" v-if="cities">
+                                            <div class="table-responsive" v-if="cities.length == 0 || showDivOrHide">
                                                 <table class="table table-striped table-hover table-bordered">
                                                     <thead>
                                                     <tr v-if="cities.length == 0">
@@ -188,6 +191,7 @@ export default {
     data() {
         return {
             loading: false,
+            showDivOrHide: false,
             loadingTable: false,
             date: null,
             options: {
@@ -296,17 +300,16 @@ export default {
             const res = await this.callApi("post", 'fare-table/schedules/times/update/progress');
             if (res.status == 200) {
                 this.queueProgress = res.data
-                this.progressPercent = parseFloat(parseFloat(res.data.passed_time) / parseFloat(res.data.total_time == 0 ? 1 : res.data.total_time ) * 100).toFixed(0);
+                this.progressPercent = parseFloat(parseFloat(res.data.passed_time) / parseFloat(res.data.total_time == 0 ? 1 : res.data.total_time) * 100).toFixed(0);
             } else {
                 console.log(res);
             }
         },
-        
+
         async updateScheduleTimes() {
             this.loadingTable = true;
             const res = await this.callApi("post", 'fare-table/schedules/times/update');
             if (res.status == 200) {
-                // this.fareClasses = res.data
                 this.getScheduleProgress();
                 swal({
                     title: "Success",
@@ -343,24 +346,30 @@ export default {
             this.data.to = to.id;
         },
         async fetchRecord() {
-            if (!this.data.fare_class) {
-                this.error = true;
-                return
+            if (this.data.fare_class == 0) {
+                this.showDivOrHide = false;
+                this.cities = [];
+                return swal({
+                    title: "Required!!",
+                    text: "Select Any Fare Class",
+                    icon: "error",
+                    timer: 2000
+                });
             }
             this.loadingTable = true;
-
+            this.showDivOrHide = false;
             const res = await this.callApi("post", "fare-table", {
                 company_id: this.data.company_id, fare_class: this.data.fare_class
             });
             if (res.status == 200) {
-
                 this.msg = 2;
                 this.cities = res.data
+                this.showDivOrHide = true;
                 setTimeout(() => {
                     this.loadingTable = false;
                 }, 500);
             } else {
-                alert("Something Went Wrong")
+                console.log("Something Went Wrong");
             }
             // }
         },

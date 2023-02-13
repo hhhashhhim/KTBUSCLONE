@@ -147,7 +147,7 @@ const routes = [
         name:"booking-schedule-closing"
     },
     {
-        path: url + "all-booking",
+        path: url + "all/booking",
         component : AllBookingPage,
         name:"all-booking-page"
     },

@@ -13,7 +13,7 @@ class TerminalTimeDifferenceController extends Controller
 {
     public function index()
     {
-        return City::withCount('terminal')->having('terminal_count', '>=', 2)->get(['id', 'name']);
+        return City::where('company_id', Auth::user()->company_id)->withCount('terminal')->having('terminal_count', '>=', 2)->get(['id', 'name']);
     }
 
     public function store(Request $request)

@@ -102,11 +102,8 @@
                         <select class="form-control" id="terminals"
                                 v-model="addForm.terminal">
                             <option value="0">Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i" >
+                                {{ terminal.name }} - {{ terminal.city.name}}
                             </option>
                         </select>
                     </div>
@@ -138,11 +135,8 @@
                         <select class="form-control" id="terminals"
                                 v-model="dataEdit.terminal_id">
                             <option value="0">Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i" >
+                                {{ terminal.name }} - {{ terminal.city.name}}
                             </option>
                         </select>
                     </div>
@@ -208,7 +202,8 @@ export default {
     methods: {
 
         async fetchDepartments() {
-            const resAllTerminals = await this.callApi("post", 'terminals/all');
+            const resAllTerminals = await this.callApi("post", 'hrm/department/all/terminals');
+            console.log(resAllTerminals)
             if (resAllTerminals.status == 200) {
                 this.terminals = resAllTerminals.data
             } else {

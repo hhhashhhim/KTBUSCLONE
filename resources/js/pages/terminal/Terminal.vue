@@ -98,7 +98,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group col-md-8" v-if="showDivComma">
+                    <div class="form-group col-md-4" v-if="showDivComma">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -108,7 +108,7 @@
                             :options="optionComma">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-8" v-if="showDivDash">
+                    <div class="form-group col-md-4" v-if="showDivDash">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -118,45 +118,45 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-3 mt-4 pt-3">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime"
-                                   checked="" value="positiveTime" v-model="dataTime.time"
-                                   @click="applyTimeMaks('positive')">
-                            <label class="form-check-label" for="positive_time">
-                                Positive
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime"
-                                   value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">
-                            <label class="form-check-label" for="negative_time">
-                                Negative
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-5" v-if="showDivPositive">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="data.time_difference"
-                            mask="00:00"
-                            :raw="false"
-                            :options="optionsPositive">
-                        </vue-mask>
-                    </div>
-                    <div class="form-group col-md-5" v-if="showDivNegative">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="data.time_difference"
-                            mask="-00:00"
-                            :raw="false"
-                            :options="optionsNegative">
-                        </vue-mask>
-                    </div>
+<!--                </div>-->
+<!--                <div class="row">-->
+<!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
+<!--                        <div class="form-check form-check-inline">-->
+<!--                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime"-->
+<!--                                   checked="" value="positiveTime" v-model="dataTime.time"-->
+<!--                                   @click="applyTimeMaks('positive')">-->
+<!--                            <label class="form-check-label" for="positive_time">-->
+<!--                                Positive-->
+<!--                            </label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check form-check-inline">-->
+<!--                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime"-->
+<!--                                   value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">-->
+<!--                            <label class="form-check-label" for="negative_time">-->
+<!--                                Negative-->
+<!--                            </label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-5" v-if="showDivPositive">-->
+<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+<!--                        <vue-mask-->
+<!--                            class="form-control"-->
+<!--                            v-model="data.time_difference"-->
+<!--                            mask="00:00"-->
+<!--                            :raw="false"-->
+<!--                            :options="optionsPositive">-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-5" v-if="showDivNegative">-->
+<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+<!--                        <vue-mask-->
+<!--                            class="form-control"-->
+<!--                            v-model="data.time_difference"-->
+<!--                            mask="-00:00"-->
+<!--                            :raw="false"-->
+<!--                            :options="optionsNegative">-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
@@ -171,8 +171,8 @@
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
-                        <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="45"
-                                  placeholder="Address Must be less then 45 characters"></textarea>
+                        <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="140"
+                                  placeholder="Address Must be less then 140 characters or 21 words"></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -190,21 +190,6 @@
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="data.latitude" placeholder="Enter Latitude">
                     </div>
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Fixed Commission <span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="data.commission"-->
-                    <!--                               placeholder="Enter Terminal Fixed Commission">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Commission in Flat<span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
-                    <!--                               v-model="data.flatCommission" placeholder="Enter Ticket Commission In Flat Amount">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Commission in Percentage <span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
-                    <!--                               v-model="data.percentageCommission" placeholder="Enter Ticket Commission In Percentage">-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
@@ -212,41 +197,30 @@
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability</label>
                         <label class="colorinput mx-3 mt-3">
-            <span><input
-                type="checkbox"
-                class="colorinput-input"
-                v-model="data.active"
-            />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="data.active"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
                         </label>
                     </div>
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="sms">SMS</label>
                         <label class="colorinput mx-3 mt-3">
-              <span>
-                <input
-                    type="checkbox"
-                    class="colorinput-input"
-                    v-model="data.active_sms"
-                />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="data.active_sms"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
                         </label>
                     </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">Main Terminal</label>
-                        <label class="colorinput mx-3 mt-3">
-              <span>
-                <input
-                    type="checkbox"
-                    class="colorinput-input"
-                    v-model="data.is_main"
-                />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
-                        </label>
-                    </div>
+<!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
+<!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
+<!--                        <label class="colorinput mx-3 mt-3">-->
+<!--                            <span>-->
+<!--                                <input type="checkbox" class="colorinput-input" v-model="data.is_main"/>-->
+<!--                                <span class="colorinput-color bg-primary"></span>-->
+<!--                            </span>-->
+<!--                        </label>-->
+<!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
@@ -294,7 +268,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group col-md-8" v-if="showEditDivComma">
+                    <div class="form-group col-md-4" v-if="showEditDivComma">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -304,7 +278,7 @@
                             :options="optionComma">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-8" v-if="showEditDivDash">
+                    <div class="form-group col-md-4" v-if="showEditDivDash">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -314,46 +288,46 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-3 mt-4 pt-3">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime"
-                                   checked="" value="positiveTimeEdit" v-model="dataEditTime.time"
-                                   @click="editApplyMaks('positive')">
-                            <label class="form-check-label" for="positive_edit_time">
-                                Positive
-                            </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime"
-                                   value="negativeTimeEdit" v-model="dataEditTime.time"
-                                   @click="editApplyMaks('negative')">
-                            <label class="form-check-label" for="negative_edit_time">
-                                Negative
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-5" v-if="showEditDivPositive">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="dataEdit.time_difference"
-                            mask="00:00"
-                            :raw="false"
-                            :options="optionsPositive">
-                        </vue-mask>
-                    </div>
-                    <div class="form-group col-md-5" v-if="showEditDivNegative">
-                        <label for="time_difference">Time Difference ( eg HH:MM )</label>
-                        <vue-mask
-                            class="form-control"
-                            v-model="dataEdit.time_difference"
-                            mask="-00:00"
-                            :raw="false"
-                            :options="optionsNegative">
-                        </vue-mask>
-                    </div>
+<!--                </div>-->
+<!--                <div class="row">-->
+<!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
+<!--                        <div class="form-check form-check-inline">-->
+<!--                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime"-->
+<!--                                   checked="" value="positiveTimeEdit" v-model="dataEditTime.time"-->
+<!--                                   @click="editApplyMaks('positive')">-->
+<!--                            <label class="form-check-label" for="positive_edit_time">-->
+<!--                                Positive-->
+<!--                            </label>-->
+<!--                        </div>-->
+<!--                        <div class="form-check form-check-inline">-->
+<!--                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime"-->
+<!--                                   value="negativeTimeEdit" v-model="dataEditTime.time"-->
+<!--                                   @click="editApplyMaks('negative')">-->
+<!--                            <label class="form-check-label" for="negative_edit_time">-->
+<!--                                Negative-->
+<!--                            </label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-5" v-if="showEditDivPositive">-->
+<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+<!--                        <vue-mask-->
+<!--                            class="form-control"-->
+<!--                            v-model="dataEdit.time_difference"-->
+<!--                            mask="00:00"-->
+<!--                            :raw="false"-->
+<!--                            :options="optionsPositive">-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
+<!--                    <div class="form-group col-md-5" v-if="showEditDivNegative">-->
+<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+<!--                        <vue-mask-->
+<!--                            class="form-control"-->
+<!--                            v-model="dataEdit.time_difference"-->
+<!--                            mask="-00:00"-->
+<!--                            :raw="false"-->
+<!--                            :options="optionsNegative">-->
+<!--                        </vue-mask>-->
+<!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
@@ -368,7 +342,7 @@
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
-                        <textarea class="form-control" spellcheck="false" v-model="dataEdit.address"></textarea>
+                        <textarea class="form-control" spellcheck="false" v-model="dataEdit.address" maxlength="140" placeholder="Address Must be less then 140 characters or 21 words"></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -385,21 +359,6 @@
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="dataEdit.latitude">
                     </div>
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Fixed Commission <span class=""></span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control" v-model="dataEdit.fixed_commission"-->
-                    <!--                               placeholder="Enter Terminal Fixed Commission">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Commission in Flat<span class=""></span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
-                    <!--                               v-model="dataEdit.ticket_flat_commission" placeholder="Enter Ticket Commission In Flat Amount ">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="terminal">Commission in Percentage <span class=""></span></label>-->
-                    <!--                        <input type="text" @keypress="isNumber($event)" class="form-control"-->
-                    <!--                               v-model="dataEdit.ticket_percentage_commission" placeholder="Enter Ticket Commission In Percentage">-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="dataEdit.online_terminal_name">
@@ -407,45 +366,30 @@
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability </label>
                         <label class="colorinput mx-3 mt-3">
-            <span><input
-                type="checkbox"
-                class="colorinput-input"
-                v-model="dataEdit.active"
-                v-bind:checked="parseInt(dataEdit.status) === 1 "
-            />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active" v-bind:checked="parseInt(dataEdit.status) === 1 " />
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
                         </label>
                     </div>
                     <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="sms">SMS</label>
                         <label class="colorinput mx-3 mt-3">
-              <span>
-                <input
-                    type="checkbox"
-                    class="colorinput-input"
-                    v-model="dataEdit.active_sms"
-                    v-bind:checked="dataEdit.active_sms === 1"
-                />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active_sms" v-bind:checked="dataEdit.active_sms === 1" />
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
                         </label>
                     </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
-                        <label class="mt-4" for="sms">Main Terminal</label>
-                        <label class="colorinput mx-3 mt-3">
-              <span>
-                <input
-                    type="checkbox"
-                    class="colorinput-input"
-
-                    @change="checkBoxEdit($event)"
-                    v-bind:checked="dataEdit.is_main == 1"
-                />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
-                        </label>
-                    </div>
+<!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
+<!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
+<!--                        <label class="colorinput mx-3 mt-3">-->
+<!--                            <span>-->
+<!--                                <input type="checkbox" class="colorinput-input" @change="checkBoxEdit($event)" v-bind:checked="dataEdit.is_main == 1"/>-->
+<!--                                <span class="colorinput-color bg-primary"></span>-->
+<!--                            </span>-->
+<!--                        </label>-->
+<!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">

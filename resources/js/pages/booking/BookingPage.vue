@@ -143,30 +143,38 @@
                                             </div>
                                             <div class="col-md-6 mt-3">
                                                 <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class=" mr-3">Female : </label>
-                                                            <label class="colorinput">
-                                                                <input name="gender" type="checkbox" value="0"
-                                                                       class="colorinput-input"
-                                                                       @click="changeGender($event)"
-                                                                       v-bind:checked="addForm.gender == 0">
-                                                                <span class="colorinput-color bg-primary"></span>
-                                                            </label>
-                                                        </div>
+                                                    <div class="col-md-6 align-self-center">
+<!--                                                        <div class="form-group">-->
+<!--                                                            <label class=" mr-3">Female : </label>-->
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" id="femaleCheckBox" v-bind:checked="addForm.gender == 0" @click="changeGender($event)" value="0" name="gender">
+                                                                <label class="custom-control-label" for="femaleCheckBox">Female</label>
+                                                            </div>
+<!--                                                            <label class="colorinput">-->
+<!--                                                                <input name="gender" type="checkbox" value="0"-->
+<!--                                                                       class="custom-control-input"-->
+<!--                                                                       @click="changeGender($event)"-->
+<!--                                                                       v-bind:checked="addForm.gender == 0">-->
+<!--                                                                <span class="colorinput-color bg-primary"></span>-->
+<!--                                                            </label>-->
+<!--                                                        </div>-->
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="mr-3">Advanced : </label>
-                                                            <label class="colorinput">
-                                                                <input name="bookingType" type="checkbox"
-                                                                       value="advance booking"
-                                                                       class="colorinput-input bookingCheck"
-                                                                       @click="changeType($event)"
-                                                                       v-bind:checked="addForm.type == 'advance booking'">
-                                                                <span class="colorinput-color bg-primary"></span>
-                                                            </label>
+                                                    <div class="col-md-6 align-self-center">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="bookingTypeCheckBox" v-bind:checked="addForm.type == 'advance booking'" @click="changeType($event)"  value="advance booking" name="bookingType">
+                                                            <label class="custom-control-label" for="bookingTypeCheckBox">Advanced</label>
                                                         </div>
+<!--                                                        <div class="form-group">-->
+<!--                                                            <label class="mr-3">Advanced : </label>-->
+<!--                                                            <label class="colorinput">-->
+<!--                                                                <input name="bookingType" type="checkbox"-->
+<!--                                                                       value="advance booking"-->
+<!--                                                                       class="colorinput-input bookingCheck"-->
+<!--                                                                       @click="changeType($event)"-->
+<!--                                                                       v-bind:checked="addForm.type == 'advance booking'">-->
+<!--                                                                <span class="colorinput-color bg-primary"></span>-->
+<!--                                                            </label>-->
+<!--                                                        </div>-->
                                                     </div>
                                                 </div>
                                             </div>
@@ -338,7 +346,7 @@
                                                     <div class="my-1" style="padding-bottom: 10px !important;">
                                                         <div class="bg-danger text-dark circles mr-1 border shadow"><i
                                                             class="fas fa-minus-circle"></i></div>
-                                                        <span class="text-wrap">Not For Sale Badge</span>
+                                                        <span class="text-wrap">Not For Sale</span>
                                                     </div>
                                                     <div class="my-1">
                                                         <div
@@ -1214,7 +1222,7 @@ export default {
         },
 
         async altM(e) {
-            if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() === 'm')) {
+            if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
                 if (this.addForm.departureCity == 0) {
                     return swal({
                         title: "OOPS!!",
