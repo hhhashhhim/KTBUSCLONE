@@ -26941,10 +26941,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _this.fetchAllSchedules();
+              _context.next = 2;
+              return _this.fetchAllSchedules();
 
-              _this.resetingArrays();
-
+            case 2:
               if (window.location.pathname.split("/").pop() == "booking") {
                 window.addEventListener('keydown', _this.enter);
                 window.addEventListener('keydown', _this.altM);
@@ -71840,9 +71840,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
