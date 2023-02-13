@@ -536,16 +536,16 @@
                         />
                     </div>
                 </div>
-<!--                <div class="row">-->
-<!--                    <div class="col-md-6"></div>-->
-<!--                    <div class="col-md-6">-->
-<!--                        <button-->
-<!--                            class="btn btn-success step1 float-right"-->
-<!--                            @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">-->
-<!--                            Next<i class="fas fa-arrow-right pr-1"></i>-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                <div class="row">-->
+                <!--                    <div class="col-md-6"></div>-->
+                <!--                    <div class="col-md-6">-->
+                <!--                        <button-->
+                <!--                            class="btn btn-success step1 float-right"-->
+                <!--                            @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">-->
+                <!--                            Next<i class="fas fa-arrow-right pr-1"></i>-->
+                <!--                        </button>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <!--                </section>-->
 
                 <!--                <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">-->
@@ -873,7 +873,6 @@ export default {
         async extendedDate() {
             this.loading = true;
             const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
-            console.log(resExtend);
             if (resExtend.status == 200) {
                 swal({
                     title: "Success",
@@ -890,7 +889,7 @@ export default {
         async fetchSchedule() {
 
             const res = await this.callApi("post", "schedule");
-            if (res.status === 200) {
+            if (res.status == 200) {
                 this.schedules = res.data;
             } else {
                 console.log(res);
@@ -918,7 +917,7 @@ export default {
             const terminalRes = await this.callApi("post", "cities/terminals", {
                 id: value,
             });
-            if (terminalRes.status === 200) {
+            if (terminalRes.status == 200) {
                 this.terminals[index] = terminalRes.data;
             }
         },
@@ -962,7 +961,7 @@ export default {
         },
 
         editGenerateMap: function (val) {
-            if (val === "0") {
+            if (val == "0") {
                 this.isShowEditDiv = false;
             }
             this.isShowEditDiv = true;
@@ -972,7 +971,7 @@ export default {
             const value = event.target.value
             if (event.target.checked) {
                 const index = this.data.addTerminalsOnClick.indexOf(value);
-                if (index === -1) {
+                if (index == -1) {
                     this.data.addTerminalsOnClick.push({
                         city_id: cityId,
                         terminal_id: parseInt(value),
@@ -1163,7 +1162,7 @@ export default {
                 //         timer: 2000
                 //     });
                 //
-                // if (this.data.addTerminalsOnClick.length === 0) {
+                // if (this.data.addTerminalsOnClick.length == 0) {
                 //     return swal({
                 //         title: "Required!",
                 //         text: "Please Select Terminals of Selected Route",
@@ -1289,7 +1288,6 @@ export default {
         },
 
         async updateSchedule() {
-            console.log(this.dataEdit.schedules);
             if (this.dataEdit.schedules.name == "" || typeof this.dataEdit.schedules.name == "undefined")
                 return swal({
                     title: "Required!",
@@ -1304,14 +1302,14 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.schedules.end_date == "" || typeof  this.dataEdit.schedules.end_date == "undefined")
+            if (this.dataEdit.schedules.end_date == "" || typeof this.dataEdit.schedules.end_date == "undefined")
                 return swal({
                     title: "Required!",
                     text: "End Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.schedules.time     == "" || typeof  this.dataEdit.schedules.time   == "undefined")
+            if (this.dataEdit.schedules.time == "" || typeof this.dataEdit.schedules.time == "undefined")
                 return swal({
                     title: "Required!",
                     text: "Schedule Time is Required",
@@ -1341,15 +1339,15 @@ export default {
             if (resEdit.status == 200) {
                 swal({
                     title: "Success",
-                    text: "Schedule Updated Successfully \n Go to Fare Table, Click Update Schedule Button to update all Schedule & Schedule Time   ",
+                    text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
                     icon: "success",
-                    timer: 2000
+                    timer: 4000
                 });
                 $("#schedule_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchSchedule();
             } else {
-                if (resEdit.status === 422) {
+                if (resEdit.status == 422) {
                     this.loading = false;
                     for (const key in res.data.errors) {
                         res.data.errors.percentage.forEach((element) => {
@@ -1360,11 +1358,11 @@ export default {
             }
         },
 
-        async edit(schedule_id) {
-            const resEditSchedule = await this.callApi("post", "schedule/edit", schedule_id);
-            this.dataEdit.schedules = resEditSchedule.data.schedules;
-            this.dataEdit.compare_array = resEditSchedule.data.compare_array;
-            this.dataEdit.cities = resEditSchedule.data.cities;
+        async edit(schedule) {
+            this.dataEdit.schedules = schedule;
+            // const resEditSchedule = await this.callApi("post", "schedule/edit", schedule_id);
+            // this.dataEdit.compare_array = resEditSchedule.data.compare_array;
+            // this.dataEdit.cities = resEditSchedule.data.cities;
         },
 
         async genericData() {

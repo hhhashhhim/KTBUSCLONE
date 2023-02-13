@@ -130,7 +130,6 @@ class ScheduleController extends Controller
                     'schedule_date' => $scheduleStartDate,// schedule departure date
                 ]);
             }
-
         }
         // get completion days of schedule
         $schedule_days = $this->getDays($scheduleStartDate, $scheduleEndDate);
@@ -140,29 +139,29 @@ class ScheduleController extends Controller
 
         return $schedule;
     }
-
-    public function editSchedule(Request $request)
-    {
-        $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-        $dataArr = [];
-        if (!is_null($schedule->route_city_terminal)) {
-            foreach ($schedule->route_city_terminal as $key => $item) {
-                $dataArr['city'][$key] = $item['city_id'];
-                $dataArr['terminal'][$key] = $item['terminal_id'];
-            }
-            $cities_id = array_unique($dataArr['city']);
-            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
-            return [
-                'cities' => $city,
-                'schedules' => $schedule,
-                'compare_array' => $schedule->route_city_terminal,
-            ];
-        } else {
-            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
-        }
-
-
-    }
+//
+//    public function editSchedule(Request $request)
+//    {
+//        $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
+//        $dataArr = [];
+//        if (!is_null($schedule->route_city_terminal)) {
+//            foreach ($schedule->route_city_terminal as $key => $item) {
+//                $dataArr['city'][$key] = $item['city_id'];
+//                $dataArr['terminal'][$key] = $item['terminal_id'];
+//            }
+//            $cities_id = array_unique($dataArr['city']);
+//            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
+//            return [
+//                'cities' => $city,
+//                'schedules' => $schedule,
+//                'compare_array' => $schedule->route_city_terminal,
+//            ];
+//        } else {
+//            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
+//        }
+//
+//
+//    }
 
     public function updateSchedule(Request $request)
     {
@@ -323,6 +322,7 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
+                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
@@ -332,7 +332,6 @@ class ScheduleController extends Controller
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                     $seatMap[$i][$j]['fare'] = 0;
-                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
                     if ($tickets[$result]['is_partial'] == 1) {
 
                         // Condition for validation that departure city and destination city in the request should be "before" the partial seat's targeted cities
