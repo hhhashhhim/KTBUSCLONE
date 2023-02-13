@@ -296,9 +296,7 @@
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
                                         <div v-if="showBookingDiv"
                                              class="d-flex justify-content-center seat-img p-0 m-0"
-                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                             :key="rowIndex"
-                                        >
+                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div
                                                     v-if="col.reserved"
@@ -308,7 +306,7 @@
                                                     :title="getTitle(col)"
                                                     :style="getStyle(col)"
                                                 >
-                                                    <small>{{ col.seatNo }} </small>
+                                                    <small>{{ col.seatNo }}</small>
                                                     <br/>
                                                     <small v-if="col.type && col.type == 'booked'">
                                                         <i class="type-icons fas fa-check-double"></i>
@@ -329,7 +327,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!--                                    side bar-->
+                                    <!-- side bar -->
                                     <div class="col-md-2 pl-3 " style="overflow-x: hidden; overflow-y: auto;">
                                         <div class="">
                                             <div class="col-md-12 mb-2 px-0 d-flex flex-wrap">
@@ -1618,12 +1616,19 @@ export default {
             this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true;
-            if (this.addForm.schedule != 0  && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
-                const resSelected = await this.callApi("post", "schedule/selected", { id: this.addForm.schedule, date: this.addForm.date, departureCity: this.addForm.departureCity, destinationCity: this.addForm.destinationCity,});
+            if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
+                const resSelected = await this.callApi("post", "schedule/selected", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                });
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
-                    this.schedule = resSelected.data;
+                    setTimeout(function () {
+                        this.schedule = resSelected.data;
+                    }, 2000); //Time before execution
                 }
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
