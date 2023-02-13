@@ -1702,13 +1702,18 @@ export default {
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            if (resDropCheck.status == 200 && resDropCheck.data) {
-                this.labelDrop = 'This Schedule is Dropped';
-                this.hideDivButtonsDrop = false;
-            }
-            if (resDropCheck.status == 422) {
-                this.hideDivButtonsDrop = true;
-                this.labelDrop = '';
+            if (resDropCheck.status == 200) {
+                
+                if(resDropCheck.data)
+                { 
+                    this.labelDrop = 'This Schedule is Dropped';
+                    this.hideDivButtonsDrop = false;
+                }
+                else
+                {
+                    this.hideDivButtonsDrop = true;
+                    this.labelDrop = '';
+                }
             }
 
         },

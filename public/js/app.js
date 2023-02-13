@@ -27813,17 +27813,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 4:
                 resDropCheck = _context13.sent;
 
-                if (resDropCheck.status == 200 && resDropCheck.data) {
-                  _this13.labelDrop = 'This Schedule is Dropped';
-                  _this13.hideDivButtonsDrop = false;
+                if (resDropCheck.status == 200) {
+                  if (resDropCheck.data) {
+                    _this13.labelDrop = 'This Schedule is Dropped';
+                    _this13.hideDivButtonsDrop = false;
+                  } else {
+                    _this13.hideDivButtonsDrop = true;
+                    _this13.labelDrop = '';
+                  }
                 }
 
-                if (resDropCheck.status == 422) {
-                  _this13.hideDivButtonsDrop = true;
-                  _this13.labelDrop = '';
-                }
-
-              case 7:
+              case 6:
               case "end":
                 return _context13.stop();
             }
@@ -71840,9 +71840,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
