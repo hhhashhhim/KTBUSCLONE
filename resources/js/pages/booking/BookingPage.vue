@@ -815,7 +815,8 @@
                                             <!--Buttons-->
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
-                                                    <button type="button" class="btn btn-secondary text-dark" v-if="innerItem.type == 'booked' "
+                                                    <button type="button" class="btn btn-secondary text-dark"
+                                                            v-if="innerItem.type == 'booked' "
                                                             @click="duplicateTicket(innerItem)">Duplicate Ticket
                                                     </button>
                                                     <button type="button" class="btn btn-success ml-2">Resend SMS
@@ -1605,6 +1606,7 @@ export default {
         },
         async fetchScheduleData() {
             this.resetingArrays();
+            this.schedule = [];
             // this.addForm.customerName = '';
             // this.addForm.customerCNIC = '';
             // this.addForm.contact = '';
@@ -1617,6 +1619,9 @@ export default {
             this.validationErrors = [];
             this.loading = true;
             if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
+                // setTimeout(function () {
+                //     this.getScheduleDelay();
+                // }, 900); //Time before execution
                 const resSelected = await this.callApi("post", "schedule/selected", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
@@ -1657,7 +1662,6 @@ export default {
                 }
             }
         },
-
         scheduleDrop: function () {
 
             if (this.addForm.departureCity == 0) {
@@ -1724,6 +1728,7 @@ export default {
         },
 
         async fetchReScheduleData() {
+            this.reScheduleSeatMap = [];
             this.reScheduleSchedule = '';
             this.reScheduleDepart = '';
             this.reScheduleDest = '';
@@ -1733,6 +1738,7 @@ export default {
             this.alreadyBookedSeatFare = [];
             this.totalAlreadyBookedSeatFare = 0;
             this.alreadyBookedSeat = [];
+            this.seatMapReschedule = false;
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
             }
@@ -2103,6 +2109,7 @@ export default {
 
         async resetingArrays() {
             this.selectedSeats = [];
+            this.schedule = [];
             this.selectedBookedSeats = [];
             this.selectedOverIssueSeats = [];
             this.selectedBookedOverIssueSeats = [];
@@ -2563,7 +2570,7 @@ export default {
             setTimeout(() => {
                 if (data.type == "booked") {
                     this.$refs.refDuplicateTicket.submit();
-                }else{
+                } else {
                     swal({
                         title: "OOppss!!!",
                         text: "Please Confirm Seat for Duplicate Ticket",

@@ -748,13 +748,12 @@ class BookingController extends Controller
         $tickets = Ticket::with('customer', 'scheduleDetail:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
             $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id])->orderBy('id', 'DESC')->get();
-            $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
+            $subTime = 0;
+            // how many times difference will affect to departure time according to terminal time difference
 //            Check departure city have more than one terminal
-
             if ($checkTerminal->count() > 0) {
 //              if ticket terminal id at last of sequence it mean no need to calculation
                 if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-//                    dd($checkTerminal);
                     foreach ($checkTerminal as $key => $single) {
                         if ($item->terminal_id == $single->terminal_id) {
                             break;

@@ -27679,13 +27679,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                _this12.resetingArrays(); // this.addForm.customerName = '';
+                _this12.resetingArrays();
+
+                _this12.schedule = []; // this.addForm.customerName = '';
                 // this.addForm.customerCNIC = '';
                 // this.addForm.contact = '';
                 // this.addForm.remarks = '';
                 // this.addForm.type = 'booked';
                 // this.addForm.gender = 1;
-
 
                 _this12.addForm.totalFare = 0;
                 _this12.addForm.totalAmount = 0;
@@ -27694,11 +27695,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this12.loading = true;
 
                 if (!(_this12.addForm.schedule != 0 && _this12.addForm.date && _this12.addForm.departureCity != 0 && _this12.addForm.destinationCity != 0)) {
-                  _context12.next = 13;
+                  _context12.next = 14;
                   break;
                 }
 
-                _context12.next = 9;
+                _context12.next = 10;
                 return _this12.callApi("post", "schedule/selected", {
                   id: _this12.addForm.schedule,
                   date: _this12.addForm.date,
@@ -27706,7 +27707,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this12.addForm.destinationCity
                 });
 
-              case 9:
+              case 10:
                 resSelected = _context12.sent;
 
                 if (resSelected.status == 200) {
@@ -27741,7 +27742,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 13:
+              case 14:
               case "end":
                 return _context12.stop();
             }
@@ -27844,6 +27845,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
+                _this14.reScheduleSeatMap = [];
                 _this14.reScheduleSchedule = '';
                 _this14.reScheduleDepart = '';
                 _this14.reScheduleDest = '';
@@ -27853,12 +27855,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this14.alreadyBookedSeatFare = [];
                 _this14.totalAlreadyBookedSeatFare = 0;
                 _this14.alreadyBookedSeat = [];
+                _this14.seatMapReschedule = false;
 
                 if (_this14.rescheduleData.rescheduleSchedule == 0) {
                   _this14.seatMapReschedule = false;
                 }
 
-                _context14.next = 12;
+                _context14.next = 14;
                 return _this14.callApi("post", "schedule/selected", {
                   id: _this14.rescheduleData.rescheduleSchedule,
                   date: _this14.rescheduleData.rescheduleDate,
@@ -27866,7 +27869,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this14.rescheduleData.rescheduleDestinationCity
                 });
 
-              case 12:
+              case 14:
                 res = _context14.sent;
 
                 if (res.status == 200) {
@@ -27893,7 +27896,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 16:
               case "end":
                 return _context14.stop();
             }
@@ -28391,6 +28394,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context18.prev = _context18.next) {
               case 0:
                 _this18.selectedSeats = [];
+                _this18.schedule = [];
                 _this18.selectedBookedSeats = [];
                 _this18.selectedOverIssueSeats = [];
                 _this18.selectedBookedOverIssueSeats = [];
@@ -28410,7 +28414,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 //     console.log(res);
                 // }
 
-              case 10:
+              case 11:
               case "end":
                 return _context18.stop();
             }
@@ -71733,35 +71737,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var format;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                format = /^\/[a-z]+$/i;
-                _context.prev = 1;
-                _context.next = 4;
+                _context.prev = 0;
+                _context.next = 3;
                 return axios__WEBPACK_IMPORTED_MODULE_0___default()({
                   method: method,
-                  // url: format.test(url) ? '/api'+url : '/api/'+url,
                   url: _this.$store.state.app_url + url,
                   data: data
                 });
 
-              case 4:
+              case 3:
                 return _context.abrupt("return", _context.sent);
 
-              case 7:
-                _context.prev = 7;
-                _context.t0 = _context["catch"](1);
+              case 6:
+                _context.prev = 6;
+                _context.t0 = _context["catch"](0);
                 return _context.abrupt("return", _context.t0.response);
 
-              case 10:
+              case 9:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[1, 7]]);
+        }, _callee, null, [[0, 6]]);
       }))();
     },
     errorsArray: function errorsArray(desc) {
