@@ -27712,9 +27712,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (resSelected.status == 200) {
                   _this12.loading = false;
                   _this12.showBookingDiv = true;
-                  setTimeout(function () {
-                    this.schedule = resSelected.data;
-                  }, 2000); //Time before execution
+                  _this12.schedule = resSelected.data;
                 }
 
                 if (resSelected.status == 500 && _this12.addForm.schedule == 0) {
