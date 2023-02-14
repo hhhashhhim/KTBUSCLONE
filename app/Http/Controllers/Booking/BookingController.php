@@ -747,28 +747,35 @@ class BookingController extends Controller
         }
         $tickets = Ticket::with('customer', 'scheduleDetail:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
-            $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id])->orderBy('id', 'DESC')->get();
+            $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id, 'schedule_id' => $item->schedule_id])->orderBy('id', 'DESC')->get();
             $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
-//            Check departure city have more than one terminal
+            //            Check departure city have more than one terminal
+            
+            $item->acutal_time = $item->date . " " . $item->scheduleDetail->departure_time; //if ticket booked from another terminal
 
-            if ($checkTerminal->count() > 0) {
-//              if ticket terminal id at last of sequence it mean no need to calculation
-                if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-//                    dd($checkTerminal);
-                    foreach ($checkTerminal as $key => $single) {
-                        if ($item->terminal_id == $single->terminal_id) {
-                            break;
-                        } else {
-                            $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
-                            if ($terminalTime) {
-                                $time = explode(":", $terminalTime->time_difference);
-                                $subTime += ($time[0] * 60 * 60) + ($time[1] * 60);
+            $ticketTerminal = Terminal::find($item->terminal_id);
+            // dd($ticketTerminal);
+            if($ticketTerminal->city_id == $item->departure_city_id)
+            {
+                if ($checkTerminal->count() > 0) {
+    //              if ticket terminal id at last of sequence it mean no need to calculation
+                    if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
+    //                    dd($checkTerminal);
+                        foreach ($checkTerminal as $key => $single) {
+                            if ($item->terminal_id == $single->terminal_id) {
+                                break;
+                            } else {
+                                $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+                                if ($terminalTime) {
+                                    $time = explode(":", $terminalTime->time_difference);
+                                    $subTime += ($time[0] * 60 * 60) + ($time[1] * 60);
+                                }
                             }
                         }
                     }
                 }
+                $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->scheduleDetail->departure_time) - $subTime);
             }
-            $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->scheduleDetail->departure_time) - $subTime);
         });
         $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
         $finalData = [
