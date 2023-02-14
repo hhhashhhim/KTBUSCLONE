@@ -1626,9 +1626,7 @@ export default {
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
-                    setTimeout(function () {
-                        this.schedule = resSelected.data;
-                    }, 2000); //Time before execution
+                    this.schedule = resSelected.data;
                 }
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
@@ -2114,16 +2112,16 @@ export default {
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
             this.bookedOverIssueSeats = [];
-            let resBooking = await this.callApi("post", "booking");
-            if (resBooking.status == 200) {
-                this.allBookings = resBooking.data
-                $("#booking_table").DataTable().destroy();
-                setTimeout(() => {
-                    $("#booking_table").DataTable();
-                }, 300);
-            } else {
-                console.log(res);
-            }
+            // let resBooking = await this.callApi("post", "booking");
+            // if (resBooking.status == 200) {
+            //     this.allBookings = resBooking.data
+            //     $("#booking_table").DataTable().destroy();
+            //     setTimeout(() => {
+            //         $("#booking_table").DataTable();
+            //     }, 300);
+            // } else {
+            //     console.log(res);
+            // }
         }
         ,
 

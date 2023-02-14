@@ -27712,9 +27712,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (resSelected.status == 200) {
                   _this12.loading = false;
                   _this12.showBookingDiv = true;
-                  setTimeout(function () {
-                    this.schedule = resSelected.data;
-                  }, 2000); //Time before execution
+                  _this12.schedule = resSelected.data;
                 }
 
                 if (resSelected.status == 500 && _this12.addForm.schedule == 0) {
@@ -28388,7 +28386,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this18 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
-        var resBooking;
         return _regeneratorRuntime().wrap(function _callee18$(_context18) {
           while (1) {
             switch (_context18.prev = _context18.next) {
@@ -28402,24 +28399,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this18.addForm.selectedOverIssueSeats = [];
                 _this18.addForm.selectedBookedOverIssueSeats = [];
                 _this18.bookedSeats = [];
-                _this18.bookedOverIssueSeats = [];
-                _context18.next = 12;
-                return _this18.callApi("post", "booking");
+                _this18.bookedOverIssueSeats = []; // let resBooking = await this.callApi("post", "booking");
+                // if (resBooking.status == 200) {
+                //     this.allBookings = resBooking.data
+                //     $("#booking_table").DataTable().destroy();
+                //     setTimeout(() => {
+                //         $("#booking_table").DataTable();
+                //     }, 300);
+                // } else {
+                //     console.log(res);
+                // }
 
-              case 12:
-                resBooking = _context18.sent;
-
-                if (resBooking.status == 200) {
-                  _this18.allBookings = resBooking.data;
-                  $("#booking_table").DataTable().destroy();
-                  setTimeout(function () {
-                    $("#booking_table").DataTable();
-                  }, 300);
-                } else {
-                  console.log(res);
-                }
-
-              case 14:
+              case 10:
               case "end":
                 return _context18.stop();
             }
