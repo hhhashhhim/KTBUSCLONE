@@ -815,7 +815,7 @@
                                             <!--Buttons-->
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
-                                                    <button type="button" class="btn btn-secondary text-dark"
+                                                    <button type="button" class="btn btn-secondary text-dark" v-if="innerItem.type == 'booked' "
                                                             @click="duplicateTicket(innerItem)">Duplicate Ticket
                                                     </button>
                                                     <button type="button" class="btn btn-success ml-2">Resend SMS
@@ -2563,6 +2563,13 @@ export default {
             setTimeout(() => {
                 if (data.type == "booked") {
                     this.$refs.refDuplicateTicket.submit();
+                }else{
+                    swal({
+                        title: "OOppss!!!",
+                        text: "Please Confirm Seat for Duplicate Ticket",
+                        icon: "error",
+                        timer: 2000
+                    });
                 }
             }, 700);
         }

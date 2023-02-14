@@ -65,11 +65,9 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+//            dd($request->all());
         if (is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
-        }
-        if (count($request->selectedSeats) == 0) {
-            return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
         }
 
 //        try {
@@ -85,8 +83,15 @@ class BookingController extends Controller
         $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id']);
         $allTicket = [];
         if (isset($request->flag) && $request->flag == 1) {
+
+//            if (count($request->selectedSeats) == 0  && isset($request->flag) && $request->flag == 1) {
+//                return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
+//            }
             $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
         } else {
+            if (count($request->selectedSeats) == 0) {
+                return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
+            }
 //            $oldBooking = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule, 'departure_city_id' => $request->departureCity, 'destination_city_id' => $request->destinationCity])->whereIn('seat_no', count($request->selectedSeats) == 0 ? $request->selectedBookedSeats : $request->selectedSeats)->get();
 //            if($oldBooking){
 //
