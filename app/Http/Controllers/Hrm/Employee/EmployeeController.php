@@ -13,16 +13,6 @@ use function PHPUnit\Framework\isNull;
 
 class EmployeeController extends Controller
 {
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
         return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where('company_id', Auth::user()->company_id)->get();
@@ -31,10 +21,11 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        dd($request->all());
         $rules = [
             'EmployeeName' => 'required',
-            "email" => 'required|email|unique:users',
-            "password" => 'required',
+            "email" => ['required|email|unique:users', Rule::requiredIf($request->createAccount == 1)],
+            "password" => ['required', Rule::requiredIf($request->createAccount == 1)],
             'EmployeeFatherName' => 'required',
             'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
@@ -65,13 +56,13 @@ class EmployeeController extends Controller
             'profile.required' => 'Employee Profile is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-        
+
         $user = User::create([
             "name" => $request->EmployeeName,
             "email" => $request->email,
             "password" => Hash::make($request->password),
             "terminal_id" => $request->EmployeeTerminal,
-            "contact" =>  plainContactAndCnic($request->EmployeeContact),
+            "contact" => plainContactAndCnic($request->EmployeeContact),
             "role_id" => 0,
             'company_id' => Auth::user()->company_id,
         ]);

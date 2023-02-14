@@ -144,37 +144,46 @@
                                             <div class="col-md-6 mt-3">
                                                 <div class="row">
                                                     <div class="col-md-6 align-self-center">
-<!--                                                        <div class="form-group">-->
-<!--                                                            <label class=" mr-3">Female : </label>-->
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" class="custom-control-input" id="femaleCheckBox" v-bind:checked="addForm.gender == 0" @click="changeGender($event)" value="0" name="gender">
-                                                                <label class="custom-control-label" for="femaleCheckBox">Female</label>
-                                                            </div>
-<!--                                                            <label class="colorinput">-->
-<!--                                                                <input name="gender" type="checkbox" value="0"-->
-<!--                                                                       class="custom-control-input"-->
-<!--                                                                       @click="changeGender($event)"-->
-<!--                                                                       v-bind:checked="addForm.gender == 0">-->
-<!--                                                                <span class="colorinput-color bg-primary"></span>-->
-<!--                                                            </label>-->
-<!--                                                        </div>-->
+                                                        <!--                                                        <div class="form-group">-->
+                                                        <!--                                                            <label class=" mr-3">Female : </label>-->
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                   id="femaleCheckBox"
+                                                                   v-bind:checked="addForm.gender == 0"
+                                                                   @click="changeGender($event)" value="0"
+                                                                   name="gender">
+                                                            <label class="custom-control-label" for="femaleCheckBox">Female</label>
+                                                        </div>
+                                                        <!--                                                            <label class="colorinput">-->
+                                                        <!--                                                                <input name="gender" type="checkbox" value="0"-->
+                                                        <!--                                                                       class="custom-control-input"-->
+                                                        <!--                                                                       @click="changeGender($event)"-->
+                                                        <!--                                                                       v-bind:checked="addForm.gender == 0">-->
+                                                        <!--                                                                <span class="colorinput-color bg-primary"></span>-->
+                                                        <!--                                                            </label>-->
+                                                        <!--                                                        </div>-->
                                                     </div>
                                                     <div class="col-md-6 align-self-center">
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="bookingTypeCheckBox" v-bind:checked="addForm.type == 'advance booking'" @click="changeType($event)"  value="advance booking" name="bookingType">
-                                                            <label class="custom-control-label" for="bookingTypeCheckBox">Advanced</label>
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                   id="bookingTypeCheckBox"
+                                                                   v-bind:checked="addForm.type == 'advance booking'"
+                                                                   @click="changeType($event)" value="advance booking"
+                                                                   name="bookingType">
+                                                            <label class="custom-control-label"
+                                                                   for="bookingTypeCheckBox">Advanced</label>
                                                         </div>
-<!--                                                        <div class="form-group">-->
-<!--                                                            <label class="mr-3">Advanced : </label>-->
-<!--                                                            <label class="colorinput">-->
-<!--                                                                <input name="bookingType" type="checkbox"-->
-<!--                                                                       value="advance booking"-->
-<!--                                                                       class="colorinput-input bookingCheck"-->
-<!--                                                                       @click="changeType($event)"-->
-<!--                                                                       v-bind:checked="addForm.type == 'advance booking'">-->
-<!--                                                                <span class="colorinput-color bg-primary"></span>-->
-<!--                                                            </label>-->
-<!--                                                        </div>-->
+                                                        <!--                                                        <div class="form-group">-->
+                                                        <!--                                                            <label class="mr-3">Advanced : </label>-->
+                                                        <!--                                                            <label class="colorinput">-->
+                                                        <!--                                                                <input name="bookingType" type="checkbox"-->
+                                                        <!--                                                                       value="advance booking"-->
+                                                        <!--                                                                       class="colorinput-input bookingCheck"-->
+                                                        <!--                                                                       @click="changeType($event)"-->
+                                                        <!--                                                                       v-bind:checked="addForm.type == 'advance booking'">-->
+                                                        <!--                                                                <span class="colorinput-color bg-primary"></span>-->
+                                                        <!--                                                            </label>-->
+                                                        <!--                                                        </div>-->
                                                     </div>
                                                 </div>
                                             </div>
@@ -262,8 +271,8 @@
                                                             v-on:click="add()"
                                                             v-on:keyup.enter="add()">
                                                         {{
-                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' :
-                                                        'Generate Ticket'
+                                                            this.addForm.type == 'advance booking' ? 'Reserved Seat' :
+                                                                'Generate Ticket'
                                                         }}
                                                     </button>
                                                 </div>
@@ -287,9 +296,7 @@
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
                                         <div v-if="showBookingDiv"
                                              class="d-flex justify-content-center seat-img p-0 m-0"
-                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map"
-                                             :key="rowIndex"
-                                        >
+                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div
                                                     v-if="col.reserved"
@@ -299,11 +306,10 @@
                                                     :title="getTitle(col)"
                                                     :style="getStyle(col)"
                                                 >
-                                                    <small>{{ col.seatNo }} </small>
+                                                    <small>{{ col.seatNo }}</small>
                                                     <br/>
                                                     <small v-if="col.type && col.type == 'booked'">
-                                                        <i class="type-icons fas fa-check-double">
-                                                        </i>
+                                                        <i class="type-icons fas fa-check-double"></i>
                                                     </small>
                                                     <small v-if="col.type && col.type == 'advance booking'">
                                                         <i class="type-icons fas fa-check">
@@ -321,7 +327,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!--                                    side bar-->
+                                    <!-- side bar -->
                                     <div class="col-md-2 pl-3 " style="overflow-x: hidden; overflow-y: auto;">
                                         <div class="">
                                             <div class="col-md-12 mb-2 px-0 d-flex flex-wrap">
@@ -756,7 +762,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize"><span
                                                         v-if="innerItem.is_partial == 1">Partial - </span>{{
-                                                        innerItem.type
+                                                            innerItem.type
                                                         }}</h4>
                                                 </div>
 
@@ -1160,7 +1166,7 @@ export default {
         };
     },
     async created() {
-        await this.fetchAllSchedules();
+        this.fetchAllSchedules();
         if (window.location.pathname.split("/").pop() == "booking") {
             window.addEventListener('keydown', this.enter);
             window.addEventListener('keydown', this.altM);
@@ -1171,6 +1177,7 @@ export default {
         openAdvanceModel() {
             this.closeAdvanceCashModel = true;
         },
+
         closeAdvanceModel() {
             this.closeAdvanceCashModel = false;
         },
@@ -1571,7 +1578,7 @@ export default {
                 this.addForm.totalAmount = parseFloat(this.addForm.totalFare);
                 return swal({
                     title: "Ops",
-                    text: "Discount Can't be more then Amount Recieveable",
+                    text: "Discount Cannot be more than Amount Receivable",
                     icon: "error",
                     timer: 2000
                 });
@@ -1609,18 +1616,19 @@ export default {
             this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true;
-            if(this.addForm.schedule && this.addForm.date && this.addForm.departureCity && this.addForm.destinationCity)
-            {
+            if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
                 const resSelected = await this.callApi("post", "schedule/selected", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                 });
-                if (resSelected.status == 200 && this.addForm.schedule != 0 && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
+                if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
-                    this.schedule = resSelected.data;
+                    setTimeout(function () {
+                        this.schedule = resSelected.data;
+                    }, 2000); //Time before execution
                 }
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
@@ -1706,14 +1714,10 @@ export default {
                 destinationCity: this.addForm.destinationCity,
             });
             if (resDropCheck.status == 200) {
-                
-                if(resDropCheck.data)
-                { 
+                if (resDropCheck.data) {
                     this.labelDrop = 'This Schedule is Dropped';
                     this.hideDivButtonsDrop = false;
-                }
-                else
-                {
+                } else {
                     this.hideDivButtonsDrop = true;
                     this.labelDrop = '';
                 }

@@ -67,7 +67,8 @@
                                                         <td v-if="employee.profile_Img != null"><a
                                                             :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
                                                             target="_blank">
-                                                            <img :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                            <img
+                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
                                                                 style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
@@ -75,7 +76,7 @@
                                                             :href="$store.state.app_url +'uploads/no-user.png'"
                                                             target="_blank">
                                                             <img :src="$store.state.app_url +'uploads/no-user.png'"
-                                                                style="width:90px;height:100px;" alt="">
+                                                                 style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
                                                         <td>{{ employee.name }}</td>
@@ -125,6 +126,13 @@
                 :success="success"
                 :formID="formID"
             >
+                <div class="m-3 row">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="createAccount"
+                               @click="accountCreate($event)" value="0" name="createAccount">
+                        <label class="custom-control-label" for="createAccount">Want to Create An Account For Employee</label>
+                    </div>
+                </div>
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
                         <label for="email">Email <span class="text-danger ml-1">*</span></label>
@@ -545,7 +553,6 @@
             <Delete :deleteForm="deleteFormID"
                     confirmationMessage='Are You Sure You want To Delete This Employee Record ???'
             />
-
         </div>
     </section>
 </template>
@@ -580,6 +587,7 @@ export default {
                 profile: null,
                 attachments: null,
                 email: null,
+                createAccount: 0,
                 password: null,
                 EmployeeName: null,
                 EmployeeFatherName: null,
@@ -607,7 +615,7 @@ export default {
                 attachments: null,
                 email: null,
                 password: null,
-                EmployeeName: null,
+                EmpyeeName: null,
                 EmployeeFatherName: null,
                 EmployeeCNIC: null,
                 EmployeeContact: null,
@@ -663,6 +671,13 @@ export default {
     },
 
     methods: {
+        accountCreate: function (e) {
+            if (e.target.checked) {
+                this.addForm.createAccount = 1;
+            } else {
+                this.addForm.createAccount = 0;
+            }
+        },
         minDateFilter: function () {
             var dtToday = new Date();
             var month = dtToday.getMonth() + 1;
@@ -699,7 +714,7 @@ export default {
                 this.departments = '';
             }
             const resSelectiveDesignation = await this.callApi("post", 'hrm/department/selective', {id: this.addForm.EmployeeTerminal});
-            console.log(resSelectiveDesignation.data);
+
             if (resSelectiveDesignation.status == 200) {
                 if (resSelectiveDesignation.data.length == 0) {
                     this.addForm.EmployeeDesignation = 0;
@@ -886,7 +901,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
@@ -1165,7 +1180,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
@@ -1345,7 +1360,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
