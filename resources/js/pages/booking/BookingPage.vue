@@ -284,7 +284,7 @@
                                                 </button>
                                                 <button class="btn btn-secondary text-dark"
                                                         @click="fetchScheduleData()" :disabled="getSchedule">
-                                                    {{ getSchedule ? "Loading.." : 'Refresh' }}
+                                                    {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
                                         </div>
@@ -294,8 +294,7 @@
                                     </div>
                                     <!--                                        Seat Map-->
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
-                                        <div v-if="showBookingDiv"
-                                             class="d-flex justify-content-center seat-img p-0 m-0"
+                                        <div v-if="showBookingDiv" class="d-flex justify-content-center seat-img p-0 m-0"
                                              v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div
@@ -326,6 +325,7 @@
                                                 <span v-else></span>
                                             </div>
                                         </div>
+                                        <div v-else style="position: absolute;left: 40%; top: 40%;" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                                     </div>
                                     <!-- side bar -->
                                     <div class="col-md-2 pl-3 " style="overflow-x: hidden; overflow-y: auto;">
@@ -1168,6 +1168,7 @@ export default {
     },
     async created() {
         this.fetchAllSchedules();
+        this.showBookingDiv = false;
         if (window.location.pathname.split("/").pop() == "booking") {
             window.addEventListener('keydown', this.enter);
             window.addEventListener('keydown', this.altM);
@@ -1618,6 +1619,7 @@ export default {
             this.addForm.discount = '';
             this.validationErrors = [];
             this.loading = true;
+            this.showBookingDiv = false;
             if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
                 // setTimeout(function () {
                 //     this.getScheduleDelay();
@@ -2839,4 +2841,90 @@ img {
 .mrn {
     top: -10px !important;
 }
+
+.lds-roller {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.lds-roller div {
+    animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    transform-origin: 40px 40px;
+}
+.lds-roller div:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6777ef;
+    margin: -4px 0 0 -4px;
+}
+.lds-roller div:nth-child(1) {
+    animation-delay: -0.036s;
+}
+.lds-roller div:nth-child(1):after {
+    top: 63px;
+    left: 63px;
+}
+.lds-roller div:nth-child(2) {
+    animation-delay: -0.072s;
+}
+.lds-roller div:nth-child(2):after {
+    top: 68px;
+    left: 56px;
+}
+.lds-roller div:nth-child(3) {
+    animation-delay: -0.108s;
+}
+.lds-roller div:nth-child(3):after {
+    top: 71px;
+    left: 48px;
+}
+.lds-roller div:nth-child(4) {
+    animation-delay: -0.144s;
+}
+.lds-roller div:nth-child(4):after {
+    top: 72px;
+    left: 40px;
+}
+.lds-roller div:nth-child(5) {
+    animation-delay: -0.18s;
+}
+.lds-roller div:nth-child(5):after {
+    top: 71px;
+    left: 32px;
+}
+.lds-roller div:nth-child(6) {
+    animation-delay: -0.216s;
+}
+.lds-roller div:nth-child(6):after {
+    top: 68px;
+    left: 24px;
+}
+.lds-roller div:nth-child(7) {
+    animation-delay: -0.252s;
+}
+.lds-roller div:nth-child(7):after {
+    top: 63px;
+    left: 17px;
+}
+.lds-roller div:nth-child(8) {
+    animation-delay: -0.288s;
+}
+.lds-roller div:nth-child(8):after {
+    top: 56px;
+    left: 12px;
+}
+@keyframes lds-roller {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 </style>
