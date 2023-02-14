@@ -350,8 +350,7 @@ class ScheduleController extends Controller
 
                         if ($before || $after) {
                             // removing partial tag for that seats which fulfill the conditions
-                            unset($iValue[$j]['partial'], $iValue[$j]['type'], $iValue[$j]['gender']);
-//                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
+                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                             //                            unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
                         }
                         $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->name;
@@ -408,12 +407,14 @@ class ScheduleController extends Controller
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
         ])->first()->schedule_date;
-        return DropSchedule::where([
+        $found = DropSchedule::where([
             'company_id' => Auth::user()->company_id,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->id,
             'is_drop' => 1,
         ])->first();
+        
+        return $found;
     }
 
     public function allBuses(Request $request)
