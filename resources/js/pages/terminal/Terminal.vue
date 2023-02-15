@@ -40,7 +40,7 @@
                                                 <td>{{ terminal.terminal_count }}</td>
                                                 <td>{{ terminal.added_by.name }}</td>
                                                 <td>
-                                                    <button
+                                                    <button title="View Terminals"
                                                         data-target="#detail-modal"
                                                         data-toggle="modal"
                                                         @click="terminalDetail(terminal.id); datatableReset()"
@@ -439,7 +439,7 @@
                                                     <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                     <td v-else>N/A</td>
                                                     <td style="width:200px;">
-                                                        <button
+                                                        <button title="Edit"
                                                             :data-target="'#' + editFormID"
                                                             data-toggle="modal"
                                                             @click="editTerminal(single)"
@@ -447,11 +447,11 @@
                                                         >
                                                             <i class="far fa-edit"></i>
                                                         </button>
-                                                        <router-link class="btn btn-success mx-2"
+                                                        <router-link class="btn btn-success mx-2" title="Commission"
                                                                      :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                             <i class="fas fa-percent"></i>
                                                         </router-link>
-                                                        <router-link class="btn btn-primary mx-2"
+                                                        <router-link class="btn btn-primary mx-2" title="Discount"
                                                                      :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                             <i class="fas fa-tag"></i>
                                                         </router-link>

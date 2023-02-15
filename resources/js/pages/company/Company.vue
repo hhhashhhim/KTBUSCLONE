@@ -118,8 +118,10 @@
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="Logo" accept=".jpg,.jpeg,.png"
                                        @change="uploadLogo($event, 'add')">
-                                <label class="custom-file-label" for="logo">{{addLogoName != '' ? addLogoName :
-                                    'Choose.jpg, .png, .jpeg Image'}}</label>
+                                <label class="custom-file-label" for="logo">{{
+                                        addLogoName != '' ? addLogoName :
+                                            'Choose.jpg, .png, .jpeg Image'
+                                    }}</label>
                             </div>
                         </div>
                         <div class="form-group col-md-4">
@@ -140,6 +142,7 @@
                                 placeholder="Enter Email"
                                 id="email"
                                 v-model="data.email"
+                                autocomplete="off"
                             />
                         </div>
                         <div class="form-group col-md-4">
@@ -150,6 +153,7 @@
                                 placeholder="Enter Password"
                                 id="password"
                                 v-model="data.password"
+                                autocomplete="off"
                             />
                         </div>
                         <div class="form-group col-md-12">
@@ -235,7 +239,7 @@
                             type="button"
                             class="btn btn-primary"
                             :disabled="loading"
-                            @click="add"
+                            @click="add()"
                         >
                             {{ loading ? "Loading...." : "Add company" }}
                         </button>
@@ -275,8 +279,10 @@
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="editLogo" accept=".jpg,.jpeg,.png"
                                        @change="uploadLogo($event, 'edit')">
-                                <label class="custom-file-label" for="editLogo">{{editLogoName != '' ? editLogoName :
-                                    'Choose.jpg, .png, .jpeg Image' }}</label>
+                                <label class="custom-file-label" for="editLogo">{{
+                                        editLogoName != '' ? editLogoName :
+                                            'Choose.jpg, .png, .jpeg Image'
+                                    }}</label>
                             </div>
                         </div>
                         <div class="form-group col-md-4">
@@ -326,14 +332,14 @@
                     </div>
                     <table class="table table-striped">
                         <thead>
-                            <tr>
+                        <tr>
                             <th>Sr. No.</th>
                             <th>Module Name</th>
                             <th>Permission</th>
                         </tr>
                         </thead>
                         <tbody>
-                            <template v-for="(moduleName, i) in dataEdit.modules" :key="i">
+                        <template v-for="(moduleName, i) in dataEdit.modules" :key="i">
                             <tr>
                                 <td>{{ i + 1 }}</td>
                                 <td>
@@ -344,7 +350,8 @@
                                 <td>
                                     <label class="colorinput mx-3">
                                           <span v-if="i != 'name'">
-                                            <input :checked="mod" type="checkbox" :value="true" class="colorinput-input" v-model="moduleName.allow" />
+                                            <input :checked="mod" type="checkbox" :value="true" class="colorinput-input"
+                                                   v-model="moduleName.allow"/>
                                             <span class="colorinput-color bg-primary"></span>
                                           </span>
                                     </label>
@@ -355,9 +362,11 @@
                                 <td colspan="2" class="py-5">
                                     <label class="colorinput mx-3" v-for="(menus, j) in moduleName.childs" :key="j">
                                         <span v-if="i != 'name'">
-                                            <input :checked="menus" type="checkbox" :value="true" class="colorinput-input" v-model="menus.allow" />
+                                            <input :checked="menus" type="checkbox" :value="true"
+                                                   class="colorinput-input" v-model="menus.allow"/>
                                             <span class="colorinput-color bg-primary"></span>
-                                            <span style="position: relative; left: 5px; top: -10px" class="text-capitalize" > {{ menus.name }} </span>
+                                            <span style="position: relative; left: 5px; top: -10px"
+                                                  class="text-capitalize"> {{ menus.name }} </span>
                                         </span>
                                     </label>
                                 </td>
@@ -519,10 +528,16 @@ export default {
                 this.loading = false
                 $("#company_table").DataTable().destroy();
                 this.success = "Company Created Successfully";
-                await this.fetchCompany();
-                this.data.name = this.data.contact = this.data.location = "";
+                this.fetchCompany();
+                this.data.name = "";
+                this.data.logo = "";
+                this.data.name = "";
+                this.data.contact = "";
+                this.data.userName = "";
+                this.data.email = "";
+                this.data.password = "";
+                this.data.location = "";
                 this.data.modules = this.defaultModules;
-                this.data = "";
                 window.scrollTo(0, 0);
                 setTimeout(() => {
                     this.success = "";

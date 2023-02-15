@@ -21,7 +21,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        dd($request->all());
+//        dd($request->all());
         $rules = [
             "email" => ['required|email|unique:users', Rule::requiredIf($request->createAccount == 1)],
             "password" => ['required', Rule::requiredIf($request->createAccount == 1)],

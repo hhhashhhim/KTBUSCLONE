@@ -31981,45 +31981,44 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 23:
                 res = _context3.sent;
 
-                if (!(res.status == 201)) {
-                  _context3.next = 37;
-                  break;
-                }
-
-                _this3.loading = false;
-                $("#company_table").DataTable().destroy();
-                _this3.success = "Company Created Successfully";
-                _context3.next = 30;
-                return _this3.fetchCompany();
-
-              case 30:
-                _this3.data.name = _this3.data.contact = _this3.data.location = "";
-                _this3.data.modules = _this3.defaultModules;
-                _this3.data = "";
-                window.scrollTo(0, 0);
-                setTimeout(function () {
-                  _this3.success = "";
-                  $("#add-modal").modal("hide");
-                }, 2000);
-                _context3.next = 38;
-                break;
-
-              case 37:
-                if (res.status == 422) {
+                if (res.status == 201) {
                   _this3.loading = false;
+                  $("#company_table").DataTable().destroy();
+                  _this3.success = "Company Created Successfully";
 
-                  _loop = function _loop(key) {
-                    res.data.errors[key].forEach(function (element) {
-                      _this3.errorsArray(element, key);
-                    });
-                  };
+                  _this3.fetchCompany();
 
-                  for (key in res.data.errors) {
-                    _loop(key);
+                  _this3.data.name = "";
+                  _this3.data.logo = "";
+                  _this3.data.name = "";
+                  _this3.data.contact = "";
+                  _this3.data.userName = "";
+                  _this3.data.email = "";
+                  _this3.data.password = "";
+                  _this3.data.location = "";
+                  _this3.data.modules = _this3.defaultModules;
+                  window.scrollTo(0, 0);
+                  setTimeout(function () {
+                    _this3.success = "";
+                    $("#add-modal").modal("hide");
+                  }, 2000);
+                } else {
+                  if (res.status == 422) {
+                    _this3.loading = false;
+
+                    _loop = function _loop(key) {
+                      res.data.errors[key].forEach(function (element) {
+                        _this3.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.data.errors) {
+                      _loop(key);
+                    }
                   }
                 }
 
-              case 38:
+              case 25:
               case "end":
                 return _context3.stop();
             }
@@ -55810,8 +55809,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-primary",
         disabled: $data.loading,
-        onClick: _cache[7] || (_cache[7] = function () {
-          return $options.add && $options.add.apply($options, arguments);
+        onClick: _cache[7] || (_cache[7] = function ($event) {
+          return $options.add();
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Loading...." : "Add company"), 9
       /* TEXT, PROPS */
@@ -55868,7 +55867,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: "email",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.data.email = $event;
-        })
+        }),
+        autocomplete: "off"
       }, null, 512
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.email]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -55878,7 +55878,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: "password",
         "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.data.password = $event;
-        })
+        }),
+        autocomplete: "off"
       }, null, 512
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.password]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
@@ -69472,6 +69473,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(terminal.added_by.name), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      title: "View Terminals",
       "data-target": "#detail-modal",
       "data-toggle": "modal",
       onClick: function onClick($event) {
@@ -69865,6 +69867,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_120, "N/A")), single.added_by ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.added_by.name), 1
         /* TEXT */
         )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_122, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          title: "Edit",
           "data-target": '#' + $data.editFormID,
           "data-toggle": "modal",
           onClick: function onClick($event) {
@@ -69875,6 +69878,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* PROPS */
         , _hoisted_124), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
           "class": "btn btn-success mx-2",
+          title: "Commission",
           to: {
             name: 'terminal-commission',
             params: {
@@ -69892,6 +69896,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* PROPS, DYNAMIC_SLOTS */
         , ["to"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
           "class": "btn btn-primary mx-2",
+          title: "Discount",
           to: {
             name: 'terminal-discount',
             params: {
