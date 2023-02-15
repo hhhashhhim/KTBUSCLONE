@@ -69,7 +69,7 @@
                                                         <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button title="Edit Fare Class" :data-target="'#' + editFormID" data-toggle="modal"
                                                                @click="edit(fareClass)" class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>

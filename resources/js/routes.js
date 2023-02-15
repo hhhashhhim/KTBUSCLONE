@@ -41,9 +41,9 @@ import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
 
 
-// const url = '/kt/'
-
-const url = '/'
+const url = '/kt/'
+//
+// const url = '/'
 
 
 const routes = [

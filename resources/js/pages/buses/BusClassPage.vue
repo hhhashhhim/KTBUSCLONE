@@ -75,12 +75,12 @@
                                                         <td>{{ busClass.added_by.name }}</td>
 
                                                         <td>
-                                                            <button
+                                                            <button title="Duplicate Bus Class"
                                                                 @click="duplicate(busClass.id, i+1)"
                                                                 class="btn btn-info mx-1"
                                                             ><i class="fas fa-clone"></i>
                                                             </button>
-                                                            <button
+                                                            <button title="Edit Bus Class"
                                                                 :data-target="'#' + editFormID"
                                                                 data-toggle="modal"
                                                                 @click="edit(busClass)"

@@ -47,7 +47,7 @@
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
-                                                            <button
+                                                            <button title="Edit Bus"
                                                                 :data-target="'#' + editFormID"
                                                                 data-toggle="modal"
                                                                 @click="editBus(bus)"
