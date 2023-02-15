@@ -1624,6 +1624,10 @@ export default {
                 // setTimeout(function () {
                 //     this.getScheduleDelay();
                 // }, 900); //Time before execution
+                console.log(this.addForm.schedule);
+                console.log(this.addForm.date);
+                console.log(this.addForm.departureCity);
+                console.log(this.addForm.destinationCity);
                 const resSelected = await this.callApi("post", "schedule/selected", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
