@@ -21,10 +21,15 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-//        dd($request->all());
+        if ($request->createAccount == 1) {
+            $rulesAcc = [
+                "email" => 'required|email|unique:users',
+                "password" => 'required',
+            ];
+            $this->validate($request, $rulesAcc);
+        }
+
         $rules = [
-            "email" => ['required|email|unique:users', Rule::requiredIf($request->createAccount == 1)],
-            "password" => ['required', Rule::requiredIf($request->createAccount == 1)],
             'EmployeeName' => 'required',
 //            'EmployeeFatherName' => 'required',
             'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
@@ -56,7 +61,7 @@ class EmployeeController extends Controller
             'profile.required' => 'Employee Profile is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-        if($request->createAccount == 1) {
+        if ($request->createAccount == 1) {
             $user = User::create([
                 "name" => $request->EmployeeName,
                 "email" => $request->email,

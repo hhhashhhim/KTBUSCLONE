@@ -303,7 +303,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addEmployee()"> <!--:disabled="loading"-->
+                    <button type="button" class="btn btn-primary" @click="addEmployee()" :disabled="loading">
                         {{ loading ? 'Loading...' : 'Add Employee' }}
                     </button>
                 </template>
