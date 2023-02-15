@@ -270,7 +270,7 @@ class ScheduleController extends Controller
     }
 
     public function selected(Request $request)
-    {return $request;
+    {
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
@@ -349,18 +349,18 @@ class ScheduleController extends Controller
                             $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                             $seatMap[$i][$j]['fare'] = 0;
 
-                            $before = (array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) <= array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false));
+                            $before = (array_search($request->departureCity, $allFaresOfRoute, true) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->departureCity, $allFaresOfRoute, true) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, true) <= array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, true) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, true));
 
 
                             // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
                             $after = (
-                                array_search($request->departureCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->departureCity, $allFaresOfRoute, false) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false)
+                                array_search($request->departureCity, $allFaresOfRoute, true) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->departureCity, $allFaresOfRoute, true) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, true) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, true) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, true) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, true)
                             );
 
                             if ($before || $after) {
