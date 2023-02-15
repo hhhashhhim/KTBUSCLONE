@@ -2068,8 +2068,8 @@ export default {
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
                 this.addForm.schedule = res.data.ticket[0].schedule_id;
-                this.addForm.destinationCity = res.data.ticket[0].destination_city_id;
-                this.addForm.departureCity = res.data.ticket[0].departure_city_id;
+                this.addForm.destinationCity =  parseInt(res.data.ticket[0].destination_city_id);
+                this.addForm.departureCity =  parseInt(res.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
                 this.fetchScheduleData();
                 this.resetingArrays();

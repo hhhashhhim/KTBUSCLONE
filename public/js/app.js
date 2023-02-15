@@ -28346,8 +28346,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this17.addForm.gender = 1;
                   _this17.addForm.type = 'booked';
                   _this17.addForm.schedule = res.data.ticket[0].schedule_id;
-                  _this17.addForm.destinationCity = res.data.ticket[0].destination_city_id;
-                  _this17.addForm.departureCity = res.data.ticket[0].departure_city_id;
+                  _this17.addForm.destinationCity = parseInt(res.data.ticket[0].destination_city_id);
+                  _this17.addForm.departureCity = parseInt(res.data.ticket[0].departure_city_id);
                   _this17.selectedSeats.length = 0;
 
                   _this17.fetchScheduleData();
