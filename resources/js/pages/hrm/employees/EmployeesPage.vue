@@ -130,10 +130,11 @@
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="createAccount"
                                @click="accountCreate($event)" value="0" name="createAccount">
-                        <label class="custom-control-label" for="createAccount">Want to Create An Account For Employee</label>
+                        <label class="custom-control-label" for="createAccount">Want to Create An Account For
+                            Employee</label>
                     </div>
                 </div>
-                <div class="row mt-3">
+                <div v-if="createDiv" class="row mt-3">
                     <div class="form-group col-md-6">
                         <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input type="email" id="email" class="form-control" v-model="addForm.email"/>
@@ -142,6 +143,8 @@
                         <label for="password">Password <span class="text-danger ml-1">*</span></label>
                         <input type="password" id="password" class="form-control" v-model="addForm.password"/>
                     </div>
+                </div>
+                <div class="row mt-3">
                     <div class="form-group col-md-4">
                         <label for="EmployeeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="addForm.EmployeeName"/>
@@ -191,26 +194,26 @@
                         <input type="text" id="refOfHiring" class="form-control" v-model="addForm.RefHiring">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="hiringDate">Hiring Date<span class="text-danger ml-1">*</span></label>
+                        <label for="hiringDate">Hiring Date</label>
                         <input type="date" id="hiringDate" class="form-control" v-model="addForm.HiringDate">
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="jobDesp">Job Description</label>
-                        <input type="text" id="jobDesp" class="form-control" v-model="addForm.jobDescription">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="emergencyContact">Emergency Contact #</label>
-                        <vue-mask id="emergencyContact"
-                                  class="form-control"
-                                  v-model="addForm.EmergencyContact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
-                        </vue-mask>
-                    </div>
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="jobDesp">Job Description</label>-->
+                    <!--                        <input type="text" id="jobDesp" class="form-control" v-model="addForm.jobDescription">-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="emergencyContact">Emergency Contact #</label>-->
+                    <!--                        <vue-mask id="emergencyContact"-->
+                    <!--                                  class="form-control"-->
+                    <!--                                  v-model="addForm.EmergencyContact"-->
+                    <!--                                  mask="0000-0000000"-->
+                    <!--                                  :raw="false"-->
+                    <!--                                  :options="optionsContact"-->
+                    <!--                        >-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-12">
-                        <label for="address">Address <span class="text-danger ml-1">*</span></label>
+                        <label for="address">Address</label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="addForm.EmployeeAddress"></textarea>
                     </div>
@@ -253,21 +256,21 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="workingDays">Working Days<span class="text-danger ml-1">*</span></label>
+                        <label for="workingDays">Working Days</label>
                         <input type="text" class="form-control" id="workingDays" maxlength="3"
                                v-model="addForm.workingDays" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="paidLeaves">Paid Leaves<span class="text-danger ml-1">*</span></label>
+                        <label for="paidLeaves">Paid Leaves</label>
                         <input type="text" class="form-control" id="paidLeaves" maxlength="3"
                                v-model="addForm.paidLeaves" @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="bloodGroup">Blood Group<span class="text-danger ml-1">*</span></label>
+                        <label for="bloodGroup">Blood Group</label>
                         <input type="text" class="form-control" id="bloodGroup" v-model="addForm.bloodGroup"/>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="salary">Salary<span class="text-danger ml-1">*</span></label>
+                        <label for="salary">Salary</label>
                         <input type="text" class="form-control" id="salary" v-model="addForm.EmployeeSalary"/>
                     </div>
                     <div class="form-group col-md-6">
@@ -283,7 +286,7 @@
 
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture</label>
+                        <label for="salary">Employee Picture <span class="text-danger mr-1">*</span></label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
                             <img v-if="urlProfile" class="img-responsive thumbnail rounded "
@@ -300,7 +303,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addEmployee" :disabled="loading">
+                    <button type="button" class="btn btn-primary" @click="addEmployee()"> <!--:disabled="loading"-->
                         {{ loading ? 'Loading...' : 'Add Employee' }}
                     </button>
                 </template>
@@ -374,20 +377,20 @@
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
-                    <div class="form-group col-md-6">
-                        <label for="email">Email <span class="text-danger ml-1">*</span></label>
-                        <input type="email" id="email" class="form-control" v-model="editEmp.email"/>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="password">Password <small>(Empty field will save password same)</small></label>
-                        <input type="password" id="password" class="form-control" v-model="editEmp.password"/>
-                    </div>
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="email">Email <span class="text-danger ml-1">*</span></label>-->
+                    <!--                        <input type="email" id="email" class="form-control" v-model="editEmp.email"/>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="password">Password <small>(Empty field will save password same)</small></label>-->
+                    <!--                        <input type="password" id="password" class="form-control" v-model="editEmp.password"/>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="EmployeeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="editEmp.EmployeeName"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="FatherName">Father Name <span class="text-danger ml-1">*</span></label>
+                        <label for="FatherName">Father Name </label>
                         <input type="text" id="FatherName" class="form-control" v-model="editEmp.EmployeeFatherName"/>
                     </div>
                     <div class="form-group col-md-4">
@@ -430,26 +433,26 @@
                         <input type="text" id="refOfHiring" class="form-control" v-model="editEmp.RefHiring">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="hiringDate">Hiring Date<span class="text-danger ml-1">*</span></label>
+                        <label for="hiringDate">Hiring Date</label>
                         <input type="date" id="hiringDate" class="form-control" v-model="editEmp.HiringDate">
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="jobDesp">Job Description</label>
-                        <input type="text" id="jobDesp" class="form-control" v-model="editEmp.jobDescription">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="emergencyContact">Emergency Contact #</label>
-                        <vue-mask id="emergencyContact"
-                                  class="form-control"
-                                  v-model="editEmp.EmergencyContact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
-                        </vue-mask>
-                    </div>
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="jobDesp">Job Description</label>-->
+                    <!--                        <input type="text" id="jobDesp" class="form-control" v-model="editEmp.jobDescription">-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="emergencyContact">Emergency Contact #</label>-->
+                    <!--                        <vue-mask id="emergencyContact"-->
+                    <!--                                  class="form-control"-->
+                    <!--                                  v-model="editEmp.EmergencyContact"-->
+                    <!--                                  mask="0000-0000000"-->
+                    <!--                                  :raw="false"-->
+                    <!--                                  :options="optionsContact"-->
+                    <!--                        >-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-12">
-                        <label for="address">Address <span class="text-danger ml-1">*</span></label>
+                        <label for="address">Address</label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="editEmp.EmployeeAddress"></textarea>
                     </div>
@@ -485,21 +488,21 @@
                         </select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="workingDays">Working Days<span class="text-danger ml-1">*</span></label>
+                        <label for="workingDays">Working Days</label>
                         <input type="text" class="form-control" id="workingDays" v-model="editEmp.workingDays"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="paidLeaves">Paid Leaves<span class="text-danger ml-1">*</span></label>
+                        <label for="paidLeaves">Paid Leaves</label>
                         <input type="text" class="form-control" id="paidLeaves" v-model="editEmp.paidLeaves"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="bloodGroup">Blood Group<span class="text-danger ml-1">*</span></label>
+                        <label for="bloodGroup">Blood Group</label>
                         <input type="text" class="form-control" id="bloodGroup" v-model="editEmp.bloodGroup"/>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Salary<span class="text-danger ml-1">*</span></label>
+                        <label for="salary">Salary</label>
                         <input type="text" class="form-control" id="salary" v-model="editEmp.EmployeeSalary"/>
                     </div>
                     <div class="form-group col-md-4">
@@ -525,7 +528,8 @@
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture <small>(Empty field will save picture same)</small></label>
+                        <label for="salary">Employee Picture <span class="text-danger mr-1">*</span> <small>(Empty field
+                            will save picture same)</small></label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
                             <img v-if="urlProfileEdit" class="img-responsive thumbnail rounded "
@@ -543,9 +547,9 @@
                 </div>
 
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateEmployees"
+                    <button type="button" class="btn btn-primary" @click="updateEmployees()"
                             :disabled="loading">
-                        {{ loading ? 'Loading...' : 'Update Employees Record' }}
+                        {{ loading ? 'Loading...' : 'Update Employees' }}
                     </button>
                 </template>
             </Edit>
@@ -659,6 +663,7 @@ export default {
             validationErrors: [],
             success: false,
             error: false,
+            createDiv: false,
             delId: "",
             dataEdit: {},
             editImg: {},
@@ -674,8 +679,10 @@ export default {
         accountCreate: function (e) {
             if (e.target.checked) {
                 this.addForm.createAccount = 1;
+                this.createDiv = true;
             } else {
                 this.addForm.createAccount = 0;
+                this.createDiv = false;
             }
         },
         minDateFilter: function () {
@@ -1000,14 +1007,14 @@ export default {
             }
 
             this.validationErrors = [];
-            if (!this.addForm.email)
+            if (this.addForm.createAccount == 1 && !this.addForm.email)
                 return swal({
                     title: "Required!",
                     text: "Email Field is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.addForm.password)
+            if (this.addForm.createAccount == 1 && !this.addForm.password)
                 return swal({
                     title: "Required!",
                     text: "Password's Father Name Field is Required",
@@ -1149,6 +1156,7 @@ export default {
             formData.append('jobDescription', this.addForm.jobDescription);
             formData.append('EmployeeDepartment', this.addForm.EmployeeDepartment);
             formData.append('EmployeeDesignation', this.addForm.EmployeeDesignation);
+            formData.append('createAccount', this.addForm.createAccount);
             this.loading = true;
             const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", formData, config);
             if (resEmployeeAdd.status == 201) {
@@ -1215,13 +1223,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.editEmp.EmployeeFatherName)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Father Name Field is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.editEmp.EmployeeFatherName)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Father Name Field is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (!this.editEmp.EmployeeCNIC)
                 return swal({
                     title: "Required!",
@@ -1243,13 +1251,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.editEmp.HiringDate)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Hiring Date  is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.editEmp.HiringDate)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Hiring Date  is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (!this.editEmp.EmployeeAddress)
                 return swal({
                     title: "Required!",
@@ -1271,34 +1279,34 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.editEmp.workingDays)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Working Days is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.editEmp.paidLeaves)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.editEmp.bloodGroup)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Paid Leaves is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.editEmp.EmployeeSalary)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Salary is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.editEmp.workingDays)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Working Days is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.editEmp.paidLeaves)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Paid Leaves is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.editEmp.bloodGroup)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Paid Leaves is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // if (!this.editEmp.EmployeeSalary)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Salary is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (!this.editEmp.status)
                 return swal({
                     title: "Required!",
@@ -1308,6 +1316,7 @@ export default {
                 });
 
             formData.append('userId', this.editEmp.userId);
+            formData.append('id', this.editEmp.id);
             formData.append('email', this.editEmp.email);
             formData.append('password', this.editEmp.password);
             formData.append('EmployeeName', this.editEmp.EmployeeName);
@@ -1326,6 +1335,7 @@ export default {
             formData.append('EmergencyContact', this.editEmp.EmergencyContact);
             formData.append('jobDescription', this.editEmp.jobDescription);
             formData.append('EmployeeDepartment', this.editEmp.EmployeeDepartment);
+            formData.append('EmployeeTerminal', this.editEmp.EmployeeTerminal);
             formData.append('EmployeeDesignation', this.editEmp.EmployeeDesignation);
             formData.append('status', this.editEmp.status);
 
@@ -1382,6 +1392,7 @@ export default {
 
         async editEmployee(employ) {
             this.editEmp.userId = employ.user_id;
+            this.editEmp.id = employ.id;
             this.editEmp.paidLeaves = employ.paid_leaves;
             this.editEmp.RadioSalaryTypeAdd = employ.salary_type;
             this.editEmp.email = employ.user.email;

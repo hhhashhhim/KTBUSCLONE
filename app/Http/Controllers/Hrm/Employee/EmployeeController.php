@@ -23,52 +23,52 @@ class EmployeeController extends Controller
     {
         dd($request->all());
         $rules = [
-            'EmployeeName' => 'required',
             "email" => ['required|email|unique:users', Rule::requiredIf($request->createAccount == 1)],
             "password" => ['required', Rule::requiredIf($request->createAccount == 1)],
-            'EmployeeFatherName' => 'required',
+            'EmployeeName' => 'required',
+//            'EmployeeFatherName' => 'required',
             'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeDob' => 'required',
-            'HiringDate' => 'required',
-            'EmployeeAddress' => 'required',
-            'workingDays' => 'required',
-            'paidLeaves' => 'required',
-            'bloodGroup' => 'required',
-            'EmployeeSalary' => 'required',
+//            'HiringDate' => 'required',
+//            'EmployeeAddress' => 'required',
+//            'workingDays' => 'required',
+//            'paidLeaves' => 'required',
+//            'bloodGroup' => 'required',
+//            'EmployeeSalary' => 'required',
             'profile' => 'required',
         ];
 
         $customMessages = [
             'EmployeeName.required' => 'Employee Name is Required!',
-            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
+//            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
             'EmployeeContact.required' => 'Employee Contact Number is Required!',
             'EmployeeContact.unique' => 'Employee Contact Number Already Taken!',
             'EmployeeCNIC.required' => 'Employee CNIC Number  is Required!',
             'EmployeeCNIC.unique' => 'Every Employee Must Have Unique CNIC NUmber',
             'EmployeeDob.required' => 'Employee Date of Birth is Required!',
-            'HiringDate.required' => 'Employee Hiring Date is Required!',
-            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
-            'workingDays.required' => 'Working Days is Required!',
-            'paidLeaves.required' => 'Paid Leaves is Required!',
-            'bloodGroup.required' => 'Blood Group is Required!',
-            'EmployeeSalary.required' => 'Employee Salary is Required!',
+//            'HiringDate.required' => 'Employee Hiring Date is Required!',
+//            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
+//            'workingDays.required' => 'Working Days is Required!',
+//            'paidLeaves.required' => 'Paid Leaves is Required!',
+//            'bloodGroup.required' => 'Blood Group is Required!',
+//            'EmployeeSalary.required' => 'Employee Salary is Required!',
             'profile.required' => 'Employee Profile is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
-
-        $user = User::create([
-            "name" => $request->EmployeeName,
-            "email" => $request->email,
-            "password" => Hash::make($request->password),
-            "terminal_id" => $request->EmployeeTerminal,
-            "contact" => plainContactAndCnic($request->EmployeeContact),
-            "role_id" => 0,
-            'company_id' => Auth::user()->company_id,
-        ]);
-
+        if($request->createAccount == 1) {
+            $user = User::create([
+                "name" => $request->EmployeeName,
+                "email" => $request->email,
+                "password" => Hash::make($request->password),
+                "terminal_id" => $request->EmployeeTerminal,
+                "contact" => plainContactAndCnic($request->EmployeeContact),
+                "role_id" => 0,
+                'company_id' => Auth::user()->company_id,
+            ]);
+        }
         return Employee::create([
-            'user_id' => $user->id,
+            'user_id' => $request->createAccount == 1 ? $user->id : 0,
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
             'cnic' => plainContactAndCnic($request->EmployeeCNIC),
@@ -98,33 +98,34 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
+//        dd($request->all());
         $rules = [
             'EmployeeName' => 'required',
-            "email" => 'required|email|unique:users,email,' . $request->userId,
-            'EmployeeFatherName' => 'required',
+//            "email" => 'required|email|unique:users,email,' . $request->userId,
+//            'EmployeeFatherName' => 'required',
             'EmployeeContact' => 'required',
             'EmployeeCNIC' => 'required',
             'EmployeeDob' => 'required',
-            'HiringDate' => 'required',
-            'EmployeeAddress' => 'required',
-            'workingDays' => 'required',
-            'paidLeaves' => 'required',
-            'bloodGroup' => 'required',
-            'EmployeeSalary' => 'required',
+//            'HiringDate' => 'required',
+//            'EmployeeAddress' => 'required',
+//            'workingDays' => 'required',
+//            'paidLeaves' => 'required',
+//            'bloodGroup' => 'required',
+//            'EmployeeSalary' => 'required',
         ];
 
         $customMessages = [
             'EmployeeName.required' => 'Employee Name is Required!',
-            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
+//            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
             'EmployeeContact.required' => 'Employee Contact Number is Required!',
             'EmployeeCNIC.required' => 'Employee CNIC Number  is Required!',
             'EmployeeDob.required' => 'Employee Date of Birth is Required!',
-            'HiringDate.required' => 'Employee Hiring Date is Required!',
-            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
-            'workingDays.required' => 'Working Days is Required!',
-            'paidLeaves.required' => 'Paid Leaves is Required!',
-            'bloodGroup.required' => 'Blood Group is Required!',
-            'EmployeeSalary.required' => 'Employee Salary is Required!',
+//            'HiringDate.required' => 'Employee Hiring Date is Required!',
+//            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
+//            'workingDays.required' => 'Working Days is Required!',
+//            'paidLeaves.required' => 'Paid Leaves is Required!',
+//            'bloodGroup.required' => 'Blood Group is Required!',
+//            'EmployeeSalary.required' => 'Employee Salary is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
 
@@ -132,6 +133,7 @@ class EmployeeController extends Controller
             "name" => $request->EmployeeName,
             "email" => $request->email,
             "contact" => plainContactAndCnic($request->EmployeeContact),
+            "terminal_id" => $request->EmployeeTerminal,
             "role_id" => 0,
         ]);
 
@@ -141,7 +143,7 @@ class EmployeeController extends Controller
             ]);
         }
 
-        Employee::where("user_id", $request->userId)->update([
+        Employee::find($request->id)->update([
             'name' => $request->EmployeeName,
             'f_name' => $request->EmployeeFatherName,
             'cnic' => plainContactAndCnic($request->EmployeeCNIC),
@@ -160,6 +162,7 @@ class EmployeeController extends Controller
             'department_id' => $request->EmployeeDepartment,
             'designation_id' => $request->EmployeeDesignation,
             'status' => $request->status,
+            "terminal_id" => $request->EmployeeTerminal,
         ]);
 
         if ($request->profile) {

@@ -66,10 +66,9 @@ class BookingController extends Controller
     public function store(Request $request)
     {
 //            dd($request->all());
-        if (is_null(Auth::user()->terminal_id)) {
+        if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
-
 //        try {
 //            DB::beginTransaction();
 
@@ -710,7 +709,10 @@ class BookingController extends Controller
         $infoData->current_terminal = Terminal::where([
             'company_id' => Auth::user()->company_id,
             'id' => Auth::user()->terminal_id,
-        ])->first()->name;
+        ])->first() ? Terminal::where([
+            'company_id' => Auth::user()->company_id,
+            'id' => Auth::user()->terminal_id,
+        ])->first()->name : "Not Assigned Terminal";
 
         $mainData = Ticket::where([
             'tickets.company_id' => Auth::user()->company_id,
@@ -755,12 +757,11 @@ class BookingController extends Controller
 
             $ticketTerminal = Terminal::find($item->terminal_id);
             // dd($ticketTerminal);
-            if($ticketTerminal->city_id == $item->departure_city_id)
-            {
+            if ($ticketTerminal->city_id == $item->departure_city_id) {
                 if ($checkTerminal->count() > 0) {
-    //              if ticket terminal id at last of sequence it mean no need to calculation
+                    //              if ticket terminal id at last of sequence it mean no need to calculation
                     if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-    //                    dd($checkTerminal);
+                        //                    dd($checkTerminal);
                         foreach ($checkTerminal as $key => $single) {
                             if ($item->terminal_id == $single->terminal_id) {
                                 break;
