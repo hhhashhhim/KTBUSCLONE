@@ -6,7 +6,7 @@ use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
 use App\Models\Company;
-use App\Models\Discount\Discount;
+use App\Models\Hrm\Employee\Employee;
 use App\Models\FareClass;
 use App\Models\Route\Route;
 use App\Models\Surcharge\Surcharge;
@@ -27,9 +27,14 @@ class TicketClosingMember extends Model
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
     
-    public function member_name()
+    public function host_name()
     {
         return $this->hasOne( User::class, 'id', 'user_id' );
+    }
+    
+    public function driver_name()
+    {
+        return $this->hasOne( Employee::class, 'id', 'user_id' );
     }
 
 }
