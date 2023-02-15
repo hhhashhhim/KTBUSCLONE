@@ -750,7 +750,7 @@ class BookingController extends Controller
             $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id, 'schedule_id' => $item->schedule_id])->orderBy('id', 'DESC')->get();
             $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
             //            Check departure city have more than one terminal
-            
+
             $item->acutal_time = $item->date . " " . $item->scheduleDetail->departure_time; //if ticket booked from another terminal
 
             $ticketTerminal = Terminal::find($item->terminal_id);
