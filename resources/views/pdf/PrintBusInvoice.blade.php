@@ -72,7 +72,7 @@
 
          $(document).ready(function () {
              window.print();
-         });
+        });
     </script>
     <title>Print Bus Invoice</title>
 </head>
