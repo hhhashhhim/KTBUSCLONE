@@ -145,7 +145,7 @@
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
-                                :value="driver.user_id"
+                                :value="driver.id"
                             >
                                 {{ driver.name }}
                             </option>
@@ -248,7 +248,7 @@
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
-                                :value="driver.user_id"
+                                :value="driver.id"
                             >
                                 {{ driver.name }}
                             </option>

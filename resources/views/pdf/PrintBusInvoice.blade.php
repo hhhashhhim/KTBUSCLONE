@@ -211,7 +211,7 @@
     @if($infoData->bus_data)
         @foreach($infoData->bus_data->members as $data)
             @if($data->type == 1)
-                {{ $data->member_name->name . " (". $data->member_name->contact .") |" }}
+                {{ $data->driver_name->name . " (". $data->driver_name->contact .") |" }}
             @endif
         @endforeach
     @else
@@ -225,7 +225,7 @@
     @if($infoData->bus_data)
         @foreach($infoData->bus_data->members as $data)
             @if($data->type == 2)
-                {{ $data->member_name->name . " (". $data->member_name->contact .") |" }}
+                {{ $data->host_name->name . " (". $data->host_name->contact .") |" }}
             @endif
         @endforeach
     @else

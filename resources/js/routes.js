@@ -42,7 +42,6 @@ import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferenceP
 
 
 // const url = '/kt/'
-
 const url = '/'
 
 

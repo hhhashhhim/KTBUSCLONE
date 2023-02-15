@@ -732,7 +732,7 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])
-            ->with("bus:id,bus_number", "members:id,user_id,ticket_closing_id,type", "members.member_name:id,name,contact")
+            ->with("bus:id,bus_number", "members:id,user_id,ticket_closing_id,type", "members.driver_name:id,name,contact", "members.host_name:id,name,contact")
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
