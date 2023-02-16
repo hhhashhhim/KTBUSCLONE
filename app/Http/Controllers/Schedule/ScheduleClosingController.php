@@ -42,6 +42,19 @@ class ScheduleClosingController extends Controller
         ];
         return $data;
     }
+    
+    public function merges()
+    {
+        $merges = TicketClosingMerge::
+        where(['company_id'=>Auth::user()->company_id,'schedule_complete'=>1])
+        ->with("bus:id,bus_number")
+        ->with("closing:id,ticket_merge_id,schedule_id","closing.schedule:id,name")
+        ->get();
+        $data = [
+            "merges" => $merges,
+        ];
+        return $data;
+    }
 
     public function fetchSchedule(Request $request)
     {

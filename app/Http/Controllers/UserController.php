@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\User;
+use App\Models\UserPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -50,13 +51,21 @@ class UserController extends Controller
             'departure_city_ids' => json_encode($request->departure),
             'company_id' => Auth::user()->company_id,
         ]);
+
+        UserPassword::create([
+            'user_id' => $user->id,
+            'user_password' => $request->password,
+            'added_by' => Auth::user()->id,
+            'company_id' => Auth::user()->company_id,
+        ]);
+
         return $this->index();
 
     }
 
     public function edit(Request $request)
     {
-        $user = User::find($request->id);
+        $user = User::with('userpass')->find($request->id);
         $user->departure_city_ids = json_decode($user->departure_city_ids);
         $user->destination_city_ids = json_decode($user->destination_city_ids);
         return $user;
@@ -84,6 +93,10 @@ class UserController extends Controller
         if ($request->password != "") {
             User::find($request->id)->update([
                 'password' => Hash::make($request->password),
+            ]);
+
+            UserPassword::where("user_id",$request->id)->update([
+                'user_password' => $request->password,
             ]);
         }
         return response()->json([

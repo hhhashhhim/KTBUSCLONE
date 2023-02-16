@@ -33,7 +33,7 @@
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
                                                         <th>Action</th>
-                                                        <th>Expense</th>
+                                                        <!-- <th>Expense</th> -->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -51,7 +51,7 @@
                                                             <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_time }}
                                                             </td>
-                                                            <td :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                            <td :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
                                                                 <button :data-target="'#' + editFormID"
                                                                         data-toggle="modal"
                                                                         @click="editSchedule(close)"
@@ -59,12 +59,12 @@
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
                                                             </td>
-                                                            <td v-if="(j % 2) == 0 && data[j+1]" :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
+                                                            <!-- <td v-if="(j % 2) == 0 && data[j+1]" :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
                                                                 <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:close.ticket_merge_id }}">
                                                                     <i class="fas fa-plus"></i>
                                                                 </router-link>
                                                             </td>
-                                                            <td v-else :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'"></td>
+                                                            <td v-else :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'"></td> -->
                                                         </tr>
                                                     </template>
                                                     </tbody>
