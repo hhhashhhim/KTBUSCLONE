@@ -109,7 +109,6 @@ if (!function_exists('formatUAN')) {
 if (!function_exists('priceDiff')) {
     function priceDiff(int $old, int $new)
     {
-
         if ($new == $old) {
             return [
                 'diff' => $new - $old,

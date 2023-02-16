@@ -203,7 +203,6 @@ class BookingController extends Controller
 
     public function singleReschedule(Request $request)
     {
-//        dd($request->all());
         foreach ($request->data as $key => $item) {
             $ticket = $item['dataAll'];
             if ($item['existingDate'] == $item['rescheduleDate']) {
@@ -300,8 +299,7 @@ class BookingController extends Controller
 
     }
 
-    public
-    function deleteBooking(Request $request)
+    public function deleteBooking(Request $request)
     {
         return Ticket::find($request->id)->delete();
     }

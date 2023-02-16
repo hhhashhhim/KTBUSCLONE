@@ -118,10 +118,7 @@
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="Logo" accept=".jpg,.jpeg,.png"
                                        @change="uploadLogo($event, 'add')">
-                                <label class="custom-file-label" for="logo">{{
-                                        addLogoName != '' ? addLogoName :
-                                            'Choose.jpg, .png, .jpeg Image'
-                                    }}</label>
+                                <label class="custom-file-label" for="logo">{{ addLogoName != '' ? addLogoName : 'Choose.jpg, .png, .jpeg Image' }}</label>
                             </div>
                         </div>
                         <div class="form-group col-md-4">
