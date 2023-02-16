@@ -82,19 +82,11 @@ class BookingController extends Controller
         $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id']);
         $allTicket = [];
         if (isset($request->flag) && $request->flag == 1) {
-
-//            if (count($request->selectedSeats) == 0  && isset($request->flag) && $request->flag == 1) {
-//                return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
-//            }
             $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
         } else {
             if (count($request->selectedSeats) == 0) {
                 return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
             }
-//            $oldBooking = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule, 'departure_city_id' => $request->departureCity, 'destination_city_id' => $request->destinationCity])->whereIn('seat_no', count($request->selectedSeats) == 0 ? $request->selectedBookedSeats : $request->selectedSeats)->get();
-//            if($oldBooking){
-//
-//            }
 //            dd($oldBooking, $request->all());
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
@@ -196,11 +188,6 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-//            if($request->type == 'booked') {
-//                $printers = Printing::printers();
-//                Session::put('printerId', $printers->first()->id());
-//                printTicket($allTicket, Auth::user()->company_id);
-//            }
         }
         return [
             'ids' => implode('-', $allTicket),
@@ -279,7 +266,7 @@ class BookingController extends Controller
                 'date' => $item['rescheduleDate'],
                 'schedule_details_id' => $scheduleDetail->id,
                 'customer_id' => $item['dataCustomer'],
-                'schedule_id' => $item['dataSchedule'],
+                'schedule_id' => $item['newDepartureTime'],
                 'remarks' => $ticket['remarks'],
                 'gender' => $ticket['gender'],
                 'type' => $item['rescheduleType'],

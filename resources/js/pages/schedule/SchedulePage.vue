@@ -337,10 +337,7 @@
                     </div>
                 </section>
 
-                <section
-                    class="section3"
-                    :class="activeSection != 'step2' ? 'd-none' : ''"
-                >
+                <section class="section3" :class="activeSection != 'step2' ? 'd-none' : ''">
                     <div class="row">
                         <div class="col-md-6 class form-group">
                             <label for="surcharge">Surcharge</label>
@@ -409,31 +406,27 @@
                     </div>
                     <div class="row justify-content-center">
                         <div class="col-md-12 form-group table-responsive">
-                            <table class="table table-striped table-bordered text-dark">
+                            <table class="table text-dark" id="tableSchedulePreview">
                                 <tbody>
                                 <tr>
-                                    <th class="mr-3">Name</th>
-                                    <td colspan="3">{{ this.dataPreview.Name }}</td>
+                                    <th colspan="2" class="mr-3">Name</th>
+                                    <td colspan="2" class="border-left">{{ this.dataPreview.Name ?? "N/A" }}</td>
                                 </tr>
                                 <tr>
                                     <th class="mr-3">Start Date</th>
                                     <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
-                                    <th class="mr-3">End Date</th>
+                                    <th class="mr-3 border-left">End Date</th>
                                     <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
                                 </tr>
                                 <tr>
                                     <th>Time</th>
-                                    <td> {{ this.dataPreview.time }}</td>
-                                    <th class="mr-3">Selected Bus Class</th>
-                                    <td>{{ this.dataPreview.busClass }}</td>
+                                    <td> {{ this.dataPreview.time ?? "N/A" }}</td>
+                                    <th class="mr-3 border-left">Selected Bus Class</th>
+                                    <td>{{ this.dataPreview.busClass ?? "N/A" }}</td>
                                 </tr>
-                                <!--                                <tr>-->
-                                <!--                                    <th class="mr-3">Default Bus Fare Class</th>-->
-                                <!--                                    <td colspan="3">{{ this.dataPreview.fareClass }}</td>-->
-                                <!--                                </tr>-->
                                 <tr>
-                                    <th class="mr-3">Route</th>
-                                    <td colspan="3">{{ this.dataPreview.route }}</td>
+                                    <th colspan="2" class="mr-3">Route</th>
+                                    <td colspan="2" class="border-left">{{ this.dataPreview.route ?? "N/A" }}</td>
                                 </tr>
                                 <tr>
                                     <th class="mr-3">Discount</th>
@@ -441,7 +434,7 @@
                                             this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
                                         }}
                                     </td>
-                                    <th class="mr-3">Surcharge</th>
+                                    <th class="mr-3 border-left">Surcharge</th>
                                     <td> {{
                                             this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
                                         }}
@@ -1396,3 +1389,8 @@ export default {
     },
 };
 </script>
+<!--<style scoped>-->
+<!--#tableSchedulePreview, th, td{-->
+<!--    border: 3px solid;-->
+<!--}-->
+<!--</style>-->

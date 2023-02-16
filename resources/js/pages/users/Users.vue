@@ -10,7 +10,8 @@
                                 <a
                                     data-toggle="modal" @click="getAuthTerminal()"
                                     data-target="#assignTerminalUser"
-                                    class="btn btn-primary text-light mr-2"
+                                    class="btn text-light mr-2"
+                                    :class="$store.state.user.terminal_id == null ? 'btn-danger' :'btn-primary'"
                                 >
                                     Assign Terminal To Company Admin (Yourself)
                                 </a>

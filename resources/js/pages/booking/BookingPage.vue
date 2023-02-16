@@ -8,6 +8,70 @@
                             <div class="row">
                                 <div class="col-md-12 row">  <!--v-if="showBookingDiv"-->
                                     <div class="col-md-6">
+                                        <div class="p-3" style="background-color: #eceeef !important;">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-0">
+                                                        <label for="departureCity" class="mb-0">Departure City <span
+                                                            class="text-danger">*</span></label>
+                                                        <select class="form-control" id="departureCity"
+                                                                @change="fetchSpecificSchedules(); getDestinationCity()"
+                                                                v-model="addForm.departureCity">
+                                                            <option value="0" selected>Select Departure City</option>
+                                                            <option v-for="(city, i) in cities"
+                                                                    :value="city.id"
+                                                                    :key="i"
+                                                            >
+                                                                {{ changeToUpperCase(city.name) }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-0">
+                                                        <label for="destinationCity" class="mb-0">Destination
+                                                            City<span class="text-danger ml-1">*</span></label>
+                                                        <select class="form-control" id="destinationCity"
+                                                                @change="fetchSpecificSchedules()"
+                                                                v-model="addForm.destinationCity">
+                                                            <option value="0" selected>Select Destination City</option>
+                                                            <option v-for="(city, i) in specificCities" :value="city.id"
+                                                                    :key="i">
+                                                                {{ changeToUpperCase(city.name) }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-0">
+                                                        <label for="date" class="mb-0">Date <span
+                                                            class="text-danger ml-1">*</span></label>
+                                                        <input type="date" :min="minDateFilter()" class="form-control"
+                                                               id="dynamicDate"
+                                                               v-model="addForm.date"
+                                                               @change="fetchSpecificSchedules()"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-0">
+                                                        <label for="scheduleName" class="mb-0">Departure Time <span
+                                                            class="text-danger">*</span></label>
+                                                        <select class="form-control" id="scheduleName"
+                                                                @change="fetchScheduleData(); busDropCheck()"
+                                                                v-model="addForm.schedule">
+                                                            <option value="0">Select Departure Time</option>
+                                                            <option v-for="(schedule, i) in allSchedules"
+                                                                    :value="schedule.schedule_id" :key="i">
+                                                                {{ scheduleDropdown(schedule) }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-1"></div>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
@@ -63,67 +127,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label for="departureCity" class="mb-0">Departure City <span
-                                                        class="text-danger">*</span></label>
-                                                    <select class="form-control" id="departureCity"
-                                                            @change="fetchSpecificSchedules(); getDestinationCity()"
-                                                            v-model="addForm.departureCity">
-                                                        <option value="0" selected>Select Departure City</option>
-                                                        <option v-for="(city, i) in cities"
-                                                                :value="city.id"
-                                                                :key="i"
-                                                        >
-                                                            {{ changeToUpperCase(city.name) }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label for="destinationCity" class="mb-0">Destination
-                                                        City<span class="text-danger ml-1">*</span></label>
-                                                    <select class="form-control" id="destinationCity"
-                                                            @change="fetchSpecificSchedules()"
-                                                            v-model="addForm.destinationCity">
-                                                        <option value="0" selected>Select Destination City</option>
-                                                        <option v-for="(city, i) in specificCities" :value="city.id"
-                                                                :key="i">
-                                                            {{ changeToUpperCase(city.name) }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label for="date" class="mb-0">Date <span
-                                                        class="text-danger ml-1">*</span></label>
-                                                    <input type="date" :min="minDateFilter()" class="form-control"
-                                                           id="dynamicDate"
-                                                           v-model="addForm.date"
-                                                           @change="fetchSpecificSchedules()"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group mb-0">
-                                                    <label for="scheduleName" class="mb-0">Departure Time <span
-                                                        class="text-danger">*</span></label>
-                                                    <select class="form-control" id="scheduleName"
-                                                            @change="fetchScheduleData(); busDropCheck()"
-                                                            v-model="addForm.schedule">
-                                                        <option value="0">Select Departure Time</option>
-                                                        <option v-for="(schedule, i) in allSchedules"
-                                                                :value="schedule.schedule_id" :key="i">
-                                                            {{ scheduleDropdown(schedule) }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="row mt-2">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
@@ -152,7 +155,8 @@
                                                                    v-bind:checked="addForm.gender == 0"
                                                                    @click="changeGender($event)" value="0"
                                                                    name="gender">
-                                                            <label class="custom-control-label" for="femaleCheckBox">Female</label>
+                                                            <label class="custom-control-label"
+                                                                   for="femaleCheckBox">Female</label>
                                                         </div>
                                                         <!--                                                            <label class="colorinput">-->
                                                         <!--                                                                <input name="gender" type="checkbox" value="0"-->
@@ -168,7 +172,8 @@
                                                             <input type="checkbox" class="custom-control-input"
                                                                    id="bookingTypeCheckBox"
                                                                    v-bind:checked="addForm.type == 'advance booking'"
-                                                                   @click="changeType($event)" value="advance booking"
+                                                                   @click="changeType($event)"
+                                                                   value="advance booking"
                                                                    name="bookingType">
                                                             <label class="custom-control-label"
                                                                    for="bookingTypeCheckBox">Advanced</label>
@@ -278,6 +283,10 @@
                                                 </div>
                                             </div>
                                             <div class="text-center mb-2">
+                                                <button class="btn btn-outline-secondary text-dark mr-2"
+                                                        @click="seatDetails()">
+                                                    Seat Details
+                                                </button>
                                                 <button class="btn btn-secondary text-dark mr-2"
                                                         @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
@@ -294,7 +303,8 @@
                                     </div>
                                     <!--                                        Seat Map-->
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
-                                        <div v-if="showBookingDiv" class="d-flex justify-content-center seat-img p-0 m-0"
+                                        <div v-if="showBookingDiv"
+                                             class="d-flex justify-content-center seat-img p-0 m-0"
                                              v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div
@@ -325,7 +335,16 @@
                                                 <span v-else></span>
                                             </div>
                                         </div>
-                                        <div v-else style="position: absolute;left: 40%; top: 40%;" class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                                        <div v-else style="position: absolute;left: 40%; top: 40%;" class="lds-roller">
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                        </div>
                                     </div>
                                     <!-- side bar -->
                                     <div class="col-md-2 pl-3 " style="overflow-x: hidden; overflow-y: auto;">
@@ -1232,77 +1251,79 @@ export default {
 
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
-                if (this.addForm.departureCity == 0) {
-                    return swal({
-                        title: "OOPS!!",
-                        text: "Please Select Departure City First",
-                        icon: "error",
-                        timer: 2000,
-                    });
-                }
-                if (this.addForm.destinationCity == 0) {
-                    return swal({
-                        title: "OOPS!!",
-                        text: "Please Select Destination City First",
-                        icon: "error",
-                        timer: 2000,
-                    });
-                }
-                if (this.addForm.schedule == 0) {
-                    return swal({
-                        title: "OOPS!!",
-                        text: "Please Select Departure Time First ",
-                        icon: "error",
-                        timer: 2000,
-                    });
-                }
-                if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
-
-                    const dataSeats = {
-                        seatNO: (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
-                        scheduleId: this.addForm.schedule,
-                        date: this.addForm.date,
-                        departureCity: this.addForm.departureCity,
-                        destinationCity: this.addForm.destinationCity,
-
-                    }
-                    const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
-                    if (resSeatData.status == 200) {
-                        this.selectedSeatDataBackEnd = resSeatData.data.tickets;
-                        this.allRescheduleButton = resSeatData.data.showButton;
-                        $('#seatAllDetailsModal').modal('show');
-                    }
-                    if (resSeatData.status == 422) {
-                        let errorContent = "";
-                        let count = 0;
-                        for (const key in resSeatData.data.errors) {
-                            resSeatData.data.errors[key].forEach((element) => {
-                                errorContent += (
-                                    (++count) + " - " +
-                                    element +
-                                    "\n"
-                                );
-                            });
-                            swal({
-                                title: "Error",
-                                text: errorContent,
-                                icon: "error",
-                                timer: 2000
-                            });
-
-                        }
-                    }
-                } else {
-                    return swal({
-                        title: "OOPS!!",
-                        text: "Please Select Already Booked Seat",
-                        icon: "error",
-                        timer: 2000,
-                    });
-                }
+                this.seatDetails();
             }
         },
+        async seatDetails() {
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Destination City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure Time First ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.selectedBookedSeats.length != 0 || this.selectedBookedOverIssueSeats.length != 0) {
 
+                const dataSeats = {
+                    seatNO: (this.selectedBookedSeats.length != 0 && this.selectedBookedOverIssueSeats.length == 0) ? this.selectedBookedSeats : this.selectedBookedOverIssueSeats,
+                    scheduleId: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+
+                }
+                const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
+                if (resSeatData.status == 200) {
+                    this.selectedSeatDataBackEnd = resSeatData.data.tickets;
+                    this.allRescheduleButton = resSeatData.data.showButton;
+                    $('#seatAllDetailsModal').modal('show');
+                }
+                if (resSeatData.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resSeatData.data.errors) {
+                        resSeatData.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            } else {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Already Booked Seat",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+        },
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
         },
@@ -1621,10 +1642,6 @@ export default {
             this.loading = true;
             this.showBookingDiv = false;
             if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
-                // setTimeout(function () {
-                //     this.getScheduleDelay();
-                // }, 900); //Time before execution
-                console.log(this.addForm);
                 const resSelected = await this.callApi("post", "schedule/selected", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
@@ -2068,8 +2085,8 @@ export default {
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
                 this.addForm.schedule = res.data.ticket[0].schedule_id;
-                this.addForm.destinationCity =  parseInt(res.data.ticket[0].destination_city_id);
-                this.addForm.departureCity =  parseInt(res.data.ticket[0].departure_city_id);
+                this.addForm.destinationCity = parseInt(res.data.ticket[0].destination_city_id);
+                this.addForm.departureCity = parseInt(res.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
                 this.fetchScheduleData();
                 this.resetingArrays();
@@ -2132,8 +2149,7 @@ export default {
             // } else {
             //     console.log(res);
             // }
-        }
-        ,
+        },
 
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
@@ -2525,6 +2541,7 @@ export default {
                 single.rescheduleDate = this.rescheduleData.rescheduleDate;
                 single.rescheduleType = this.rescheduleSeatType;
                 single.overIssueReschedule = this.overIssueScheduleCheckBox;
+                single.newDepartureTime = this.rescheduleData.rescheduleSchedule;
                 single.rescheduleDiscount = this.rescheduleDiscount;
                 single.dataDepartureCity = this.rescheduleData.dataDepartureCity;
                 single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
@@ -2849,10 +2866,12 @@ img {
     width: 80px;
     height: 80px;
 }
+
 .lds-roller div {
     animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     transform-origin: 40px 40px;
 }
+
 .lds-roller div:after {
     content: " ";
     display: block;
@@ -2863,62 +2882,79 @@ img {
     background: #6777ef;
     margin: -4px 0 0 -4px;
 }
+
 .lds-roller div:nth-child(1) {
     animation-delay: -0.036s;
 }
+
 .lds-roller div:nth-child(1):after {
     top: 63px;
     left: 63px;
 }
+
 .lds-roller div:nth-child(2) {
     animation-delay: -0.072s;
 }
+
 .lds-roller div:nth-child(2):after {
     top: 68px;
     left: 56px;
 }
+
 .lds-roller div:nth-child(3) {
     animation-delay: -0.108s;
 }
+
 .lds-roller div:nth-child(3):after {
     top: 71px;
     left: 48px;
 }
+
 .lds-roller div:nth-child(4) {
     animation-delay: -0.144s;
 }
+
 .lds-roller div:nth-child(4):after {
     top: 72px;
     left: 40px;
 }
+
 .lds-roller div:nth-child(5) {
     animation-delay: -0.18s;
 }
+
 .lds-roller div:nth-child(5):after {
     top: 71px;
     left: 32px;
 }
+
 .lds-roller div:nth-child(6) {
     animation-delay: -0.216s;
 }
+
 .lds-roller div:nth-child(6):after {
     top: 68px;
     left: 24px;
 }
+
 .lds-roller div:nth-child(7) {
     animation-delay: -0.252s;
 }
+
 .lds-roller div:nth-child(7):after {
     top: 63px;
     left: 17px;
 }
+
 .lds-roller div:nth-child(8) {
     animation-delay: -0.288s;
 }
+
 .lds-roller div:nth-child(8):after {
     top: 56px;
     left: 12px;
 }
+
 @keyframes lds-roller {
     0% {
         transform: rotate(0deg);
