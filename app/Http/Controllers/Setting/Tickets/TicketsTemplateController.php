@@ -12,12 +12,12 @@ class TicketsTemplateController extends Controller
 {
     public function index()
     {
-        return TicketsTemplate::with('terminal.city')->where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
+        return TicketsTemplate::with('terminal.city')->where(['company_id' => Auth::user()->company_id])->get();
     }
 
     public function store(Request $request)
     {
-        if(Auth::user()->terminal_id == null){
+        if (Auth::user()->terminal_id == null) {
             return response()->json(["errors" => ["users Error" => ["Your Account Don't Have Default Terminal, Assign Terminal First"]]], 422);
         }
         $rules = [
@@ -37,7 +37,7 @@ class TicketsTemplateController extends Controller
         return TicketsTemplate::create([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal ?? Auth::user()->terminal_id,
-            'uan' =>  '03111777333',
+            'uan' => '03111777333',
             'phone' => $request->phoneNumber,
             'address' => $request->address,
             'terms_condition' => $request->termsCondition,
