@@ -26,5 +26,15 @@ class TicketClosingMerge extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
+    
+    public function bus()
+    {
+        return $this->hasOne( Bus::class, 'id', 'bus_id' );
+    }
+    
+    public function closing()
+    {
+        return $this->hasMany( TicketClosing::class, 'ticket_merge_id', 'id' );
+    }
 
 }

@@ -88,6 +88,11 @@
                                 <i class="fas fa-bookmark"></i> Close Booking
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'booking-schedule-merges' }">
+                                <i class="fas fa-bookmark"></i> Merges
+                            </router-link>
+                        </li>
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name:'expense-category-page' }">
                                 <i class="fas fa-city"></i> Expense Categories

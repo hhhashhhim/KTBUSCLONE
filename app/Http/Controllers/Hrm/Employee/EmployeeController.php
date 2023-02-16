@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Hrm\Employee;
 use App\Http\Controllers\Controller;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\User;
+use App\Models\UserPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +70,12 @@ class EmployeeController extends Controller
                 "terminal_id" => $request->EmployeeTerminal,
                 "contact" => plainContactAndCnic($request->EmployeeContact),
                 "role_id" => 0,
+                'company_id' => Auth::user()->company_id,
+            ]);
+            UserPassword::create([
+                'user_id' => $user->id,
+                'user_password' => $request->password,
+                'added_by' => Auth::user()->id,
                 'company_id' => Auth::user()->company_id,
             ]);
         }
@@ -145,6 +152,10 @@ class EmployeeController extends Controller
         if ($request->password) {
             $user = User::where("id", $request->userId)->update([
                 "password" => Hash::make($request->password),
+            ]);
+
+            UserPassword::where("user_id",$request->id)->update([
+                'user_password' => $request->password,
             ]);
         }
 

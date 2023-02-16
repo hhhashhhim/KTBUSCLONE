@@ -316,6 +316,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password">Password<span class="text-danger ml-1">*</span></label>
+                        <i class="ml-2 far fa-eye" :title="userPass"></i>
                         <input
                             type="password"
                             class="form-control"
@@ -419,6 +420,7 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             roles: [],
+            userPass: "N/A",
             users: [],
             departureCities: [],
             destinationCities: [],
@@ -678,6 +680,7 @@ export default {
             const resEditUser = await this.callApi("post", "user/edit", {'id' : user.id});
             if(resEditUser.status == 200){
                 this.dataEdit = resEditUser.data;
+                this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
             }else{
                 console.log(resEditUser);
             }

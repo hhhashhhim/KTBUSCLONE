@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(City::class, 'id', 'destination_city_id');
     }
+    
+    public function userpass()
+    {
+        return $this->hasOne(UserPassword::class, 'user_id', 'id');
+    }
 }

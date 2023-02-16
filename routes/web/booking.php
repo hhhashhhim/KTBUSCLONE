@@ -29,10 +29,15 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     // Schedule Closing
     Route::group(['prefix' => '/schedule', [CustomMiddleware::class]], function () {
         Route::post('/fetch', [ScheduleClosingController::class, 'fetchSchedule']);
+        
         Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'index']);
             Route::post('/store', [ScheduleClosingController::class, 'store']);
             Route::post('/update', [ScheduleClosingController::class, 'update']);
+        });
+
+        Route::group(['prefix' => '/merges', [CustomMiddleware::class]], function () {
+            Route::post('/', [ScheduleClosingController::class, 'merges']);
         });
     });
 
