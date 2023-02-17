@@ -300,7 +300,7 @@
                                                     <label class="colorinput mx-3">
                                                         <span>
                                                             <input type="checkbox" class="colorinput-input"
-                                                                   @click="addTerminal($event, city.id)" id="terminal"
+                                                                   @click="addTerminal($event, city.id)" id="routeTerminalName"
                                                                    :value="item.id"/>
                                                             <span class="colorinput-color bg-primary"></span>
                                                         </span>
@@ -308,7 +308,10 @@
                                                     <label class="checkbox-inputs" for="terminal">{{
                                                             item.name
                                                         }}</label>
-                                                </span>
+                                            </span>
+<!--                                                <span v-if="groupByCategory[city.id]">-->
+<!--                                                    {{ allTerminalsIds }}-->
+<!--                                                </span>-->
                                             </td>
                                         </template>
                                     </tr>
@@ -817,6 +820,8 @@ export default {
             editDiscounts: [],
             editSurcharges: [],
             editTerminals: [],
+            groupByCategory: [],
+            allTerminalsIds : [],
             editRoutes: [],
             success: false,
             error: false,
@@ -971,9 +976,22 @@ export default {
                         allow: true,
                     });
                 }
+                this.groupByCategory = this.data.addTerminalsOnClick.reduce((group, product) => {
+                    const {city_id} = product;
+                    group[city_id] = group[city_id] ?? [];
+                    group[city_id].push(product);
+                    return group;
+                }, {});
+                Object.entries(this.groupByCategory[cityId]).forEach(function(item){
+                    this.allTerminalsIds.push(item.terminal_id);
+                });
+                console.log(typeof this.groupByCategory[cityId])
             } else {
                 const index = this.data.addTerminalsOnClick.indexOf(value);
                 this.data.addTerminalsOnClick.splice(index, 1);
+                const abc = this.groupByCategory[cityId];
+                const index1 = abc.findIndex(x => x.terminal_id == value);
+                this.groupByCategory[cityId].splice(index1, 1);
             }
         },
 
