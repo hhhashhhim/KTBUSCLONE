@@ -404,45 +404,84 @@
                             <span class="h3 font-weight-bold text-muted"> Review </span>
                         </div>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-12 form-group table-responsive">
-                            <table class="table text-dark" id="tableSchedulePreview">
-                                <tbody>
-                                <tr>
-                                    <th colspan="2" class="mr-3">Name</th>
-                                    <td colspan="2" class="border-left">{{ this.dataPreview.Name ?? "N/A" }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="mr-3">Start Date</th>
-                                    <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
-                                    <th class="mr-3 border-left">End Date</th>
-                                    <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Time</th>
-                                    <td> {{ this.dataPreview.time ?? "N/A" }}</td>
-                                    <th class="mr-3 border-left">Selected Bus Class</th>
-                                    <td>{{ this.dataPreview.busClass ?? "N/A" }}</td>
-                                </tr>
-                                <tr>
-                                    <th colspan="2" class="mr-3">Route</th>
-                                    <td colspan="2" class="border-left">{{ this.dataPreview.route ?? "N/A" }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="mr-3">Discount</th>
-                                    <td> {{
-                                            this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
-                                        }}
-                                    </td>
-                                    <th class="mr-3 border-left">Surcharge</th>
-                                    <td> {{
-                                            this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
-                                        }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                    <div class="row justify-content-center mb-2">
+                        <div class="col-md-6 border py-4">
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">Name</div>
+                                <div>{{ this.dataPreview.Name ?? "N/A" }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">Start Date</div>
+                                <div>{{ this.dataPreview.start_date ?? "N/A" }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">End Date</div>
+                                <div>{{ this.dataPreview.end_date ?? "N/A" }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto">
+                                <div class="font-weight-bold">Time</div>
+                                <div>{{ this.dataPreview.time ?? "N/A" }}</div>
+                            </div>
                         </div>
+
+                        <div class="col-md-6 border py-4">
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">Route</div>
+                                <div>{{ this.dataPreview.route ?? "N/A" }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">Selected Bus Class</div>
+                                <div>{{ this.dataPreview.busClass ?? "N/A" }}</div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto mb-4">
+                                <div class="font-weight-bold">Discount</div>
+                                <div>
+                                    {{this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"}}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between w-75 mx-auto">
+                                <div class="font-weight-bold">Surcharge</div>
+                                <div>
+                                    {{this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"}}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <table class="table text-dark" id="tableSchedulePreview">
+                            <tbody>
+                            <tr>
+                                <th colspan="2" class="mr-3">Name</th>
+                                <td colspan="2" class="border-left">{{ this.dataPreview.Name ?? "N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="mr-3">Start Date</th>
+                                <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
+                                <th class="mr-3 border-left">End Date</th>
+                                <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Time</th>
+                                <td> {{ this.dataPreview.time ?? "N/A" }}</td>
+                                <th class="mr-3 border-left">Selected Bus Class</th>
+                                <td>{{ this.dataPreview.busClass ?? "N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="mr-3">Route</th>
+                                <td colspan="2" class="border-left">{{ this.dataPreview.route ?? "N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th class="mr-3">Discount</th>
+                                <td> {{
+                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
+                                    }}
+                                </td>
+                                <th class="mr-3 border-left">Surcharge</th>
+                                <td> {{
+                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
+                                    }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table> -->
                     </div>
                     <div class="row">
                         <div class="col-md-6">
