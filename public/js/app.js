@@ -49543,7 +49543,7 @@ var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "password",
   "class": "control-label"
-}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\n                            Forgot Password?\n                          </a>\n                        </div> ")], -1
+}, "Password"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"float-right\">\r\n                          <a href=\"auth-forgot-password.html\" class=\"text-small\">\r\n                            Forgot Password?\r\n                          </a>\r\n                        </div> ")], -1
 /* HOISTED */
 );
 
@@ -54688,7 +54688,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 128
       /* KEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#setSeatClass\"\n                                @click=\"resetAttributes()\">Set Attributes\n                        </button> ")])])];
+      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#setSeatClass\"\r\n                                @click=\"resetAttributes()\">Set Attributes\r\n                        </button> ")])])];
     }),
     _: 1
     /* STABLE */
@@ -57190,7 +57190,7 @@ var _hoisted_5 = {
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\n                                    Add New Category\n                                </a>\n                            </div> ")], -1
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\r\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\r\n                                    Add New Category\r\n                                </a>\r\n                            </div> ")], -1
 /* HOISTED */
 );
 
@@ -57341,7 +57341,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[3] || (_cache[3] = function ($event) {
       return $data.editAble = true;
     })
-  }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\n            heading=\"Add New Category\"\n            :errors=\"this.validationErrors\"\n            :success=\"success\"\n            :formID=\"formID\"\n            >\n                <div class=\"form-group\">\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\n                </div>\n                <template v-slot:button>\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\n                </template>\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\n            heading=\"Edit Category Name\"\n            :errors=\"this.validationErrors\"\n            :success=\"success\"\n            :editForm=\"editFormID\"\n            >\n                <div class=\"form-group\">\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\n                </div>\n\n                <template v-slot:button>\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\n                </template>\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
+  }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\r\n            heading=\"Add New Category\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :formID=\"formID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\r\n                </template>\r\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n            heading=\"Edit Category Name\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\r\n                </div>\r\n\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
 }
 
 /***/ }),
@@ -60009,7 +60009,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_30, 8
     /* PROPS */
-    , _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button :data-target=\"'#' + deleteFormID\"\n                                                                    data-toggle=\"modal\"\n                                                                    @click=\"deleteModal(employee,i)\"\n                                                                    class=\"btn btn-danger\">\n                                                                <i class=\"far fa-trash-alt\"></i>\n                                                            </button> ")])]);
+    , _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button :data-target=\"'#' + deleteFormID\"\r\n                                                                    data-toggle=\"modal\"\r\n                                                                    @click=\"deleteModal(employee,i)\"\r\n                                                                    class=\"btn btn-danger\">\r\n                                                                <i class=\"far fa-trash-alt\"></i>\r\n                                                            </button> ")])]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -61584,7 +61584,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
           return $data.postData.detail = $event;
         })
-      }, "\n                    ", 512
+      }, "\r\n                    ", 512
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.detail]])])])];
     }),
@@ -62840,7 +62840,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.partId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-6\">\n                    <label for=\"name\">Current Reading <span class=\"text-danger ml-1\">*</span></label>\n                    <input\n                        type=\"number\"\n                        class=\"form-control\"\n                        placeholder=\"Meter Reading\"\n                        v-model=\"postData.currentReading\"\n                    />\n                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.partId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-6\">\r\n                    <label for=\"name\">Current Reading <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input\r\n                        type=\"number\"\r\n                        class=\"form-control\"\r\n                        placeholder=\"Meter Reading\"\r\n                        v-model=\"postData.currentReading\"\r\n                    />\r\n                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "number",
         "class": "form-control",
         placeholder: "Total Amount",
@@ -62887,7 +62887,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
           return $data.postData.detail = $event;
         })
-      }, "\n                    ", 512
+      }, "\r\n                    ", 512
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.detail]])])])];
     }),
@@ -65300,7 +65300,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\n                heading=\"Edit\"\n                :errors=\"this.validationErrors\"\n                :success=\"success\"\n                :editForm=\"editFormID\"\n            >\n                <div class=\"row\">\n                    <div class=\"form-group col-md-6\">\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\n                            <option value=\"\" selected>Select Bus</option>\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\n                                {{ fleet.bus_number }}\n                            </option>\n                        </select>\n                    </div>\n\n                    <div class=\"form-group col-md-6\">\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\n                    </div>\n                    <div class=\"col-md-12 d-flex align-items-center\">\n                        <div class=\"col-md-6\">\n                            <h5>Select Part For Maintenance</h5>\n                        </div>\n                    </div>\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\n                        <table class=\"table table-striped\">\n                            <thead>\n                            <tr>\n                                <th>Part</th>\n                                <th>Maintenance Required After (km)</th>\n                                <th>Last Maintenance At (km)</th>\n                                <th>Action</th>\n                            </tr>\n                            </thead>\n                            <tbody>\n\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\n                                <td>\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\"\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\n                                        <option value=\"\" selected>Select Part </option>\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\n                                            {{ part.name }}\n                                        </option>\n                                    </select>\n                                </td>\n                                <td>\n\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\"\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\n                                </td>\n                                <td>\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\"\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\n                                </td>\n                                <td>\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\n                                </td>\n                            </tr>\n                            </tbody>\n                        </table>\n                    </div>\n                </div>\n                <template v-slot:button>\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\n                    </button>\n                </template>\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hotelFoods, function (food, i) {
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row\">\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Select Bus <span class=\"text-danger\">*</span></label>\r\n                        <select class=\"form-control rounded-0\" v-model=\"edit.fleetId\">\r\n                            <option value=\"\" selected>Select Bus</option>\r\n                            <option v-for=\"(fleet, i) in fleets\" :value=\"fleet.id\" :key=\"i\">\r\n                                {{ fleet.bus_number }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Current Reading (km) <span class=\"text-danger\">*</span></label>\r\n                        <input type=\"number\" class=\"form-control\" min=\"0\" v-model=\"edit.currentReading\"/>\r\n                    </div>\r\n                    <div class=\"col-md-12 d-flex align-items-center\">\r\n                        <div class=\"col-md-6\">\r\n                            <h5>Select Part For Maintenance</h5>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group col-md-12 d-flex align-items-center\">\r\n                        <table class=\"table table-striped\">\r\n                            <thead>\r\n                            <tr>\r\n                                <th>Part</th>\r\n                                <th>Maintenance Required After (km)</th>\r\n                                <th>Last Maintenance At (km)</th>\r\n                                <th>Action</th>\r\n                            </tr>\r\n                            </thead>\r\n                            <tbody>\r\n\r\n                            <tr v-for=\"index in edit.loop\" :key=\"index\" v-if=\"edit.fleetDetails.maintenance_part_link\">\r\n                                <td>\r\n                                    <select class=\"form-control rounded-0\" @change=\"editSaveRow($event,'rowPart')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : '' \" >\r\n                                        <option value=\"\" selected>Select Part </option>\r\n                                        <option v-for=\"(part, i) in parts\" :value=\"part.id\" :key=\"i\">\r\n                                            {{ part.name }}\r\n                                        </option>\r\n                                    </select>\r\n                                </td>\r\n                                <td>\r\n\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowAfter')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''\" />\r\n                                </td>\r\n                                <td>\r\n                                    <input type=\"number\" class=\"form-control\" min=\"0\" @keyup=\"editSaveRow($event,'rowLast')\"\r\n                                    :value=\"edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : '' \" />\r\n                                </td>\r\n                                <td>\r\n                                    <button class=\"btn btn-outline-primary mx-2\" @click=\"editAddRow\">Add</button>\r\n                                    <button class=\"btn btn-outline-danger\" @click=\"editRemoveRow($event)\">Remove</button>\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateLinkMaintenance\" :disabled=\"loading\" >{{loading ? 'Loading...' : 'Link' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.hotelFoods, function (food, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
       "class": "border-bottom"
@@ -67637,13 +67637,16 @@ var _hoisted_115 = {
 };
 var _hoisted_116 = ["disabled"];
 var _hoisted_117 = {
-  "class": "row"
+  "class": "row mb-3"
 };
 var _hoisted_118 = {
+  "class": "row"
+};
+var _hoisted_119 = {
   "class": "col-md-6"
 };
 
-var _hoisted_119 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_120 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -67651,11 +67654,11 @@ var _hoisted_119 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 /* HOISTED */
 );
 
-var _hoisted_120 = {
+var _hoisted_121 = {
   "class": "col-md-6 class form-group"
 };
 
-var _hoisted_121 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_122 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "start"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Start Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -67663,14 +67666,14 @@ var _hoisted_121 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 /* HOISTED */
 );
 
-var _hoisted_122 = {
+var _hoisted_123 = {
   "class": "row"
 };
-var _hoisted_123 = {
+var _hoisted_124 = {
   "class": "col-md-6 class form-group"
 };
 
-var _hoisted_124 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_125 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "end"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("End Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -67678,11 +67681,11 @@ var _hoisted_124 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 /* HOISTED */
 );
 
-var _hoisted_125 = {
+var _hoisted_126 = {
   "class": "col-md-6 class form-group"
 };
 
-var _hoisted_126 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_127 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "time"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -67690,7 +67693,279 @@ var _hoisted_126 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 /* HOISTED */
 );
 
-var _hoisted_127 = ["disabled"];
+var _hoisted_128 = {
+  "class": "row"
+};
+
+var _hoisted_129 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "col-md-6"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_130 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_131 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-right pr-1"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_132 = {
+  "class": "row"
+};
+var _hoisted_133 = {
+  "class": "col-md-8 class form-group"
+};
+
+var _hoisted_134 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "DiscountName"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Routes "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_135 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "0",
+  selected: ""
+}, "Select Route", -1
+/* HOISTED */
+);
+
+var _hoisted_136 = ["value"];
+var _hoisted_137 = {
+  "class": "col-md-4 class form-group"
+};
+
+var _hoisted_138 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "busClassEdit"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Class "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_139 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "0",
+  selected: ""
+}, "Select Bus Class", -1
+/* HOISTED */
+);
+
+var _hoisted_140 = ["value"];
+var _hoisted_141 = {
+  key: 0,
+  "class": "row d-flex justify-content-center"
+};
+var _hoisted_142 = {
+  "class": "col-md-12 class form-group mx-2"
+};
+var _hoisted_143 = {
+  "class": "table-responsive"
+};
+var _hoisted_144 = {
+  "class": "table table-striped table-hover",
+  id: "addScheduleStep2"
+};
+
+var _hoisted_145 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminals")])], -1
+/* HOISTED */
+);
+
+var _hoisted_146 = {
+  "class": "colorinput mx-3"
+};
+var _hoisted_147 = ["onClick", "checked", "value"];
+
+var _hoisted_148 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "colorinput-color bg-primary"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_149 = {
+  "class": "checkbox-inputs",
+  "for": "terminal"
+};
+var _hoisted_150 = {
+  "class": "row"
+};
+var _hoisted_151 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_152 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-left mr-1"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_153 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_154 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-right mr-1"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_155 = {
+  "class": "row"
+};
+var _hoisted_156 = {
+  "class": "col-md-6 class form-group"
+};
+
+var _hoisted_157 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "surcharge"
+}, "Surcharge", -1
+/* HOISTED */
+);
+
+var _hoisted_158 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "0",
+  selected: ""
+}, "Select Surcharge", -1
+/* HOISTED */
+);
+
+var _hoisted_159 = ["value"];
+var _hoisted_160 = {
+  "class": "col-md-6 class form-group"
+};
+
+var _hoisted_161 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "discount"
+}, "Discount", -1
+/* HOISTED */
+);
+
+var _hoisted_162 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "0",
+  selected: ""
+}, "Select Discount", -1
+/* HOISTED */
+);
+
+var _hoisted_163 = ["value"];
+var _hoisted_164 = {
+  "class": "row"
+};
+var _hoisted_165 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_166 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-left mr-1 border-dark"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_167 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_168 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-right mr-1"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_169 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "row my-3 py-2"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "col-md-12 text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "h3 font-weight-bold text-muted"
+}, " Review ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_170 = {
+  "class": "row justify-content-center"
+};
+var _hoisted_171 = {
+  "class": "col-md-12 form-group table-responsive"
+};
+var _hoisted_172 = {
+  "class": "table table-striped table-bordered text-dark"
+};
+
+var _hoisted_173 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Name", -1
+/* HOISTED */
+);
+
+var _hoisted_174 = {
+  colspan: "3"
+};
+
+var _hoisted_175 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Start Date", -1
+/* HOISTED */
+);
+
+var _hoisted_176 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "End Date", -1
+/* HOISTED */
+);
+
+var _hoisted_177 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time", -1
+/* HOISTED */
+);
+
+var _hoisted_178 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Selected Bus Class", -1
+/* HOISTED */
+);
+
+var _hoisted_179 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Route", -1
+/* HOISTED */
+);
+
+var _hoisted_180 = {
+  colspan: "3"
+};
+
+var _hoisted_181 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Discount", -1
+/* HOISTED */
+);
+
+var _hoisted_182 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  "class": "mr-3"
+}, "Surcharge", -1
+/* HOISTED */
+);
+
+var _hoisted_183 = {
+  "class": "row"
+};
+var _hoisted_184 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_185 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-arrow-left mr-1"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_186 = {
+  "class": "col-md-6"
+};
+var _hoisted_187 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
@@ -68009,7 +68284,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [_hoisted_111, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.surcharge != null ? _this.dataPreview.surcharge.type == "percentage" ? _this.dataPreview.surcharge.percentage != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.percentage + "%" : "N/A" : _this.dataPreview.surcharge.flat != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.flat : "N/A" : "N/A"), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <table class=\"table text-dark\" id=\"tableSchedulePreview\">\r\n                            <tbody>\r\n                            <tr>\r\n                                <th colspan=\"2\" class=\"mr-3\">Name</th>\r\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.Name ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th class=\"mr-3\">Start Date</th>\r\n                                <td>{{ this.dataPreview.start_date ?? \"N/A\" }}</td>\r\n                                <th class=\"mr-3 border-left\">End Date</th>\r\n                                <td>{{ this.dataPreview.end_date ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th>Time</th>\r\n                                <td> {{ this.dataPreview.time ?? \"N/A\" }}</td>\r\n                                <th class=\"mr-3 border-left\">Selected Bus Class</th>\r\n                                <td>{{ this.dataPreview.busClass ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th colspan=\"2\" class=\"mr-3\">Route</th>\r\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.route ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th class=\"mr-3\">Discount</th>\r\n                                <td> {{\r\n                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == \"percentage\" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.percentage + \"%\" : \"N/A\") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.flat : \"N/A\")) : \"N/A\"\r\n                                    }}\r\n                                </td>\r\n                                <th class=\"mr-3 border-left\">Surcharge</th>\r\n                                <td> {{\r\n                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == \"percentage\" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.percentage + \"%\" : \"N/A\") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.flat : \"N/A\")) : \"N/A\"\r\n                                    }}\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <table class=\"table text-dark\" id=\"tableSchedulePreview\">\n                            <tbody>\n                            <tr>\n                                <th colspan=\"2\" class=\"mr-3\">Name</th>\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.Name ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th class=\"mr-3\">Start Date</th>\n                                <td>{{ this.dataPreview.start_date ?? \"N/A\" }}</td>\n                                <th class=\"mr-3 border-left\">End Date</th>\n                                <td>{{ this.dataPreview.end_date ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th>Time</th>\n                                <td> {{ this.dataPreview.time ?? \"N/A\" }}</td>\n                                <th class=\"mr-3 border-left\">Selected Bus Class</th>\n                                <td>{{ this.dataPreview.busClass ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th colspan=\"2\" class=\"mr-3\">Route</th>\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.route ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th class=\"mr-3\">Discount</th>\n                                <td> {{\n                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == \"percentage\" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.percentage + \"%\" : \"N/A\") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.flat : \"N/A\")) : \"N/A\"\n                                    }}\n                                </td>\n                                <th class=\"mr-3 border-left\">Surcharge</th>\n                                <td> {{\n                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == \"percentage\" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.percentage + \"%\" : \"N/A\") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.flat : \"N/A\")) : \"N/A\"\n                                    }}\n                                </td>\n                            </tr>\n                            </tbody>\n                        </table> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "btn btn-info back2 float-left",
         onClick: _cache[18] || (_cache[18] = function ($event) {
           return $options.previousSection('step2');
@@ -68038,20 +68313,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     success: $data.success,
     editForm: $data.editFormID
   }, {
-    button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-        id: "submitFormButton",
-        "class": "btn btn-success",
-        onClick: _cache[24] || (_cache[24] = function () {
-          return $options.updateSchedule && $options.updateSchedule.apply($options, arguments);
-        }),
-        disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Schedule'), 9
-      /* TEXT, PROPS */
-      , _hoisted_127)];
-    }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [_hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      var _this$dataPreview$sta2, _this$dataPreview$end2;
+
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["col-md-3 text-center", $data.editActiveSection != 0 ? '' : 'border p-3  text-light bg-primary'])
+      }, " Step 1 ", 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["col-md-3 text-center", $data.editActiveSection != 'step1' ? '' : 'border p-3  text-light bg-info'])
+      }, " Step 2 ", 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["col-md-3 text-center", $data.editActiveSection != 'step2' ? '' : 'border p-3  text-light bg-success'])
+      }, " Step 3 ", 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["col-md-3 text-center", $data.editActiveSection != 'step3' ? '' : 'border p-3  text-light bg-warning'])
+      }, " Step 4 ", 2
+      /* CLASS */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["section1", $data.editActiveSection != 0 ? 'd-none' : ''])
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_119, [_hoisted_120, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         id: "name",
         "class": "form-control",
@@ -68060,7 +68343,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [_hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [_hoisted_122, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         id: "start",
         "class": "form-control",
@@ -68069,7 +68352,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.start_date]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [_hoisted_124, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.start_date]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [_hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         id: "end",
         "class": "form-control",
@@ -68078,7 +68361,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.end_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [_hoisted_126, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.end_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "time",
         id: "time",
         "class": "form-control",
@@ -68087,7 +68370,177 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.time]])])])];
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.schedules.time]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_128, [_hoisted_129, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-success step1 float-right",
+        onClick: _cache[24] || (_cache[24] = function ($event) {
+          $options.editNextSection('step1');
+          _this.stepTwoAddSchedule = true;
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Next"), _hoisted_131])])])], 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["section2", $data.editActiveSection != 'step1' ? 'd-none' : ''])
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_133, [_hoisted_134, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        id: "route",
+        onChange: _cache[25] || (_cache[25] = function ($event) {
+          return $options.getSelectiveData('routeEdit', $event);
+        }),
+        "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
+          return $data.dataEdit.schedules.route_id = $event;
+        })
+      }, [_hoisted_135, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editRoutes, function (route, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          value: route.id,
+          key: i
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_136);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.schedules.route_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_137, [_hoisted_138, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        id: "busClassEdit",
+        "onUpdate:modelValue": _cache[27] || (_cache[27] = function ($event) {
+          return $data.dataEdit.schedules.bus_class_id = $event;
+        })
+      }, [_hoisted_139, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.busClasses, function (type, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          value: type.id,
+          key: i
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(type.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_140);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.schedules.bus_class_id]])])]), $data.stepTwoAddSchedule ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_141, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_142, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_143, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_144, [_hoisted_145, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.dataEdit.cities, function (city, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+          key: i
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(city.terminal, function (item) {
+          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+            key: item.id
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_146, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+            type: "checkbox",
+            "class": "colorinput-input",
+            onClick: function onClick($event) {
+              return $options.editTerminal($event, city.id);
+            },
+            checked: $options.checkedSelectedTerminals(item.id),
+            id: "terminal",
+            value: item.id
+          }, null, 8
+          /* PROPS */
+          , _hoisted_147), _hoisted_148])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_149, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.name), 1
+          /* TEXT */
+          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("\\ ")]);
+        }), 128
+        /* KEYED_FRAGMENT */
+        ))])]);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_150, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_151, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-info back1 float-left",
+        onClick: _cache[28] || (_cache[28] = function ($event) {
+          return $options.editPreviousSection(0);
+        })
+      }, [_hoisted_152, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Previous ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-success step2 float-right",
+        onClick: _cache[29] || (_cache[29] = function ($event) {
+          return $options.editNextSection('step2');
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Next"), _hoisted_154])])])], 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["section3", $data.editActiveSection != 'step2' ? 'd-none' : ''])
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_155, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_156, [_hoisted_157, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        id: "surcharge",
+        "onUpdate:modelValue": _cache[30] || (_cache[30] = function ($event) {
+          return $data.dataEdit.schedules.surcharge_id = $event;
+        })
+      }, [_hoisted_158, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editSurcharges, function (surcharge, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          value: surcharge.id,
+          key: i
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat), 9
+        /* TEXT, PROPS */
+        , _hoisted_159);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.schedules.surcharge_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_160, [_hoisted_161, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        id: "discount",
+        "onUpdate:modelValue": _cache[31] || (_cache[31] = function ($event) {
+          return $data.dataEdit.schedules.discount_id = $event;
+        })
+      }, [_hoisted_162, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editDiscounts, function (discount, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          value: discount.id,
+          key: i
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(discount.percentage != null ? discount.percentage + '%' : discount.flat), 9
+        /* TEXT, PROPS */
+        , _hoisted_163);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.schedules.discount_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_164, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_165, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-info back2 float-left",
+        onClick: _cache[32] || (_cache[32] = function ($event) {
+          return $options.editPreviousSection('step1');
+        })
+      }, [_hoisted_166, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Previous ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_167, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-success step2 float-right",
+        onClick: _cache[33] || (_cache[33] = function ($event) {
+          return $options.editNextSection('step3');
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Next"), _hoisted_168])])])], 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["section4", $data.editActiveSection != 'step3' ? 'd-none' : ''])
+      }, [_hoisted_169, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_170, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_171, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_172, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_173, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_174, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.Name), 1
+      /* TEXT */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_175, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_this$dataPreview$sta2 = _this.dataPreview.start_date) !== null && _this$dataPreview$sta2 !== void 0 ? _this$dataPreview$sta2 : "N/A"), 1
+      /* TEXT */
+      ), _hoisted_176, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_this$dataPreview$end2 = _this.dataPreview.end_date) !== null && _this$dataPreview$end2 !== void 0 ? _this$dataPreview$end2 : "N/A"), 1
+      /* TEXT */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_177, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.time), 1
+      /* TEXT */
+      ), _hoisted_178, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.busClass), 1
+      /* TEXT */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_179, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_180, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.route), 1
+      /* TEXT */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_181, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.discount != null ? _this.dataPreview.discount.type == "percentage" ? _this.dataPreview.discount.percentage != null ? _this.dataPreview.discount.name + "-" + _this.dataPreview.discount.percentage + "%" : "N/A" : _this.dataPreview.discount.flat != null ? _this.dataPreview.discount.name + "-" + _this.dataPreview.discount.flat : "N/A" : "N/A"), 1
+      /* TEXT */
+      ), _hoisted_182, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.surcharge != null ? _this.dataPreview.surcharge.type == "percentage" ? _this.dataPreview.surcharge.percentage != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.percentage + "%" : "N/A" : _this.dataPreview.surcharge.flat != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.flat : "N/A" : "N/A"), 1
+      /* TEXT */
+      )])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_183, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_184, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "btn btn-info back2 float-left",
+        onClick: _cache[34] || (_cache[34] = function ($event) {
+          return $options.editPreviousSection('step2');
+        })
+      }, [_hoisted_185, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Previous ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_186, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        id: "submitFormButton",
+        "class": "btn btn-success float-right",
+        onClick: _cache[35] || (_cache[35] = function () {
+          return $options.updateSchedule && $options.updateSchedule.apply($options, arguments);
+        }),
+        disabled: $data.loading
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Schedule'), 9
+      /* TEXT, PROPS */
+      , _hoisted_187)])])], 2
+      /* CLASS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                <template v-slot:button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    <button id=\"submitFormButton\" class=\"btn btn-success\" @click=\"updateSchedule\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            :disabled=\"loading\"> {{ loading ? 'Loading...' : 'Update Schedule' }}"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    </button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                </template>")];
     }),
     _: 1
     /* STABLE */
@@ -77694,7 +78147,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\n    background-color: #a2a3a7;\n    border-radius: 10px;\n    cursor: pointer;\n    position: relative;\n    isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\n    background-color: #6db131;\n}\n#seatMapDiv[data-v-03b302d9] {\n    border-radius: 10px;\n    border: 3px #c5c3c3 groove;\n    max-height: 100% !important;\n    margin: 10px 0 10px 0 !important;\n}\n.economy[data-v-03b302d9] {\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\n    border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\n    border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\n    background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\n    background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\n    background-color: #D40B0BFF !important;\n}\n.selected[data-v-03b302d9] {\n    background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: -1;\n    height: 100%;\n    width: 50%;\n    border-top-right-radius: 10px;\n    border-bottom-right-radius: 10px;\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.femaleReserve[data-v-03b302d9]::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: -1;\n    height: 100%;\n    width: 50%;\n    border-top-right-radius: 10px;\n    border-bottom-right-radius: 10px;\n    background-color: hotpink !important;\n}\n.seat-img[data-v-03b302d9] {\n    height: 47px;\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\n.seat-img span[data-v-03b302d9] {\n    height: 45px;\n    width: 45px;\n    display: inline-block;\n    cursor: pointer !important;\n    margin: 2px;\n}\nimg[data-v-03b302d9] {\n    cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\n    width: 15px;\n    height: 15px;\n    border-radius: 50px;\n    display: inline-block;\n    box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\n    position: relative;\n    bottom: 12px;\n    color: rgb(62, 61, 61);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\n    position: relative;\n    top: -4px;\n    padding: 5px;\n    color: black;\n}\n.type-icons[data-v-03b302d9] {\n    position: relative;\n    z-index: 10;\n}\n.partial-seat[data-v-03b302d9] {\n    width: 15px;\n    height: 15px;\n    background: linear-gradient(90deg, white 50%, black 50%);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: content-box;\n    -moz-border-radius: 25px;\n    -webkit-border-radius: 25px;\n}\n.mrn[data-v-03b302d9] {\n    top: -10px !important;\n}\n.lds-roller[data-v-03b302d9] {\n    display: inline-block;\n    position: relative;\n    width: 80px;\n    height: 80px;\n}\n.lds-roller div[data-v-03b302d9] {\n    -webkit-animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\n            animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\n    transform-origin: 40px 40px;\n}\n.lds-roller div[data-v-03b302d9]:after {\n    content: \" \";\n    display: block;\n    position: absolute;\n    width: 7px;\n    height: 7px;\n    border-radius: 50%;\n    background: #6777ef;\n    margin: -4px 0 0 -4px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1) {\n    -webkit-animation-delay: -0.036s;\n            animation-delay: -0.036s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1):after {\n    top: 63px;\n    left: 63px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2) {\n    -webkit-animation-delay: -0.072s;\n            animation-delay: -0.072s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2):after {\n    top: 68px;\n    left: 56px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3) {\n    -webkit-animation-delay: -0.108s;\n            animation-delay: -0.108s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3):after {\n    top: 71px;\n    left: 48px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4) {\n    -webkit-animation-delay: -0.144s;\n            animation-delay: -0.144s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4):after {\n    top: 72px;\n    left: 40px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5) {\n    -webkit-animation-delay: -0.18s;\n            animation-delay: -0.18s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5):after {\n    top: 71px;\n    left: 32px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6) {\n    -webkit-animation-delay: -0.216s;\n            animation-delay: -0.216s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6):after {\n    top: 68px;\n    left: 24px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7) {\n    -webkit-animation-delay: -0.252s;\n            animation-delay: -0.252s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7):after {\n    top: 63px;\n    left: 17px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8) {\n    -webkit-animation-delay: -0.288s;\n            animation-delay: -0.288s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8):after {\n    top: 56px;\n    left: 12px;\n}\n@-webkit-keyframes lds-roller-03b302d9 {\n0% {\n        transform: rotate(0deg);\n}\n100% {\n        transform: rotate(360deg);\n}\n}\n@keyframes lds-roller-03b302d9 {\n0% {\n        transform: rotate(0deg);\n}\n100% {\n        transform: rotate(360deg);\n}\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n    background-color: #a2a3a7;\r\n    border-radius: 10px;\r\n    cursor: pointer;\r\n    position: relative;\r\n    isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n    background-color: #6db131;\n}\n#seatMapDiv[data-v-03b302d9] {\r\n    border-radius: 10px;\r\n    border: 3px #c5c3c3 groove;\r\n    max-height: 100% !important;\r\n    margin: 10px 0 10px 0 !important;\n}\n.economy[data-v-03b302d9] {\r\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n    border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n    border: 3px solid gold !important;\n}\n.for-female[data-v-03b302d9] {\r\n    background-color: hotpink !important;\n}\n.for-male[data-v-03b302d9] {\r\n    background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n    background-color: #D40B0BFF !important;\n}\n.selected[data-v-03b302d9] {\r\n    background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: -1;\r\n    height: 100%;\r\n    width: 50%;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\r\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.femaleReserve[data-v-03b302d9]::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: -1;\r\n    height: 100%;\r\n    width: 50%;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\r\n    background-color: hotpink !important;\n}\n.seat-img[data-v-03b302d9] {\r\n    height: 47px;\r\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n    height: 45px;\r\n    width: 45px;\r\n    display: inline-block;\r\n    cursor: pointer !important;\r\n    margin: 2px;\n}\nimg[data-v-03b302d9] {\r\n    cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n    width: 15px;\r\n    height: 15px;\r\n    border-radius: 50px;\r\n    display: inline-block;\r\n    box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n    position: relative;\r\n    bottom: 12px;\r\n    color: rgb(62, 61, 61);\r\n    display: inline-flex;\r\n    align-items: center;\r\n    justify-content: center;\n}\n.circles + span[data-v-03b302d9] {\r\n    position: relative;\r\n    top: -4px;\r\n    padding: 5px;\r\n    color: black;\n}\n.type-icons[data-v-03b302d9] {\r\n    position: relative;\r\n    z-index: 10;\n}\n.partial-seat[data-v-03b302d9] {\r\n    width: 15px;\r\n    height: 15px;\r\n    background: linear-gradient(90deg, white 50%, black 50%);\r\n    border-radius: 50%;\r\n    display: inline-block;\r\n    box-sizing: content-box;\r\n    -moz-border-radius: 25px;\r\n    -webkit-border-radius: 25px;\n}\n.mrn[data-v-03b302d9] {\r\n    top: -10px !important;\n}\n.lds-roller[data-v-03b302d9] {\r\n    display: inline-block;\r\n    position: relative;\r\n    width: 80px;\r\n    height: 80px;\n}\n.lds-roller div[data-v-03b302d9] {\r\n    -webkit-animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\r\n            animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\r\n    transform-origin: 40px 40px;\n}\n.lds-roller div[data-v-03b302d9]:after {\r\n    content: \" \";\r\n    display: block;\r\n    position: absolute;\r\n    width: 7px;\r\n    height: 7px;\r\n    border-radius: 50%;\r\n    background: #6777ef;\r\n    margin: -4px 0 0 -4px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1) {\r\n    -webkit-animation-delay: -0.036s;\r\n            animation-delay: -0.036s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1):after {\r\n    top: 63px;\r\n    left: 63px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2) {\r\n    -webkit-animation-delay: -0.072s;\r\n            animation-delay: -0.072s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2):after {\r\n    top: 68px;\r\n    left: 56px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3) {\r\n    -webkit-animation-delay: -0.108s;\r\n            animation-delay: -0.108s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3):after {\r\n    top: 71px;\r\n    left: 48px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4) {\r\n    -webkit-animation-delay: -0.144s;\r\n            animation-delay: -0.144s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4):after {\r\n    top: 72px;\r\n    left: 40px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5) {\r\n    -webkit-animation-delay: -0.18s;\r\n            animation-delay: -0.18s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5):after {\r\n    top: 71px;\r\n    left: 32px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6) {\r\n    -webkit-animation-delay: -0.216s;\r\n            animation-delay: -0.216s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6):after {\r\n    top: 68px;\r\n    left: 24px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7) {\r\n    -webkit-animation-delay: -0.252s;\r\n            animation-delay: -0.252s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7):after {\r\n    top: 63px;\r\n    left: 17px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8) {\r\n    -webkit-animation-delay: -0.288s;\r\n            animation-delay: -0.288s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8):after {\r\n    top: 56px;\r\n    left: 12px;\n}\n@-webkit-keyframes lds-roller-03b302d9 {\n0% {\r\n        transform: rotate(0deg);\n}\n100% {\r\n        transform: rotate(360deg);\n}\n}\n@keyframes lds-roller-03b302d9 {\n0% {\r\n        transform: rotate(0deg);\n}\n100% {\r\n        transform: rotate(360deg);\n}\n}\r\n\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77718,7 +78171,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4214f1ee] {\n  background-color: #b9dea0;\n  border-radius: 10px;\n  cursor: pointer;\n  position: relative;\n  isolation: isolate;\n}\n.image-span[data-v-4214f1ee]:hover {\n  background-color: #6db131;\n}\n.economy[data-v-4214f1ee] {\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4214f1ee] {\n  border: 3px solid orangered !important;\n}\n.executive[data-v-4214f1ee] {\n  border: 3px solid gold !important;\n}\n.for-female[data-v-4214f1ee] {\n  background-color: hotpink !important;\n}\n.for-male[data-v-4214f1ee] {\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4214f1ee] {\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4214f1ee] {\n  background-color: #6db131 !important;\n}\n.partial[data-v-4214f1ee]::after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  z-index: -1;\n  height: 100%;\n  width: 50%;\n  border-top-right-radius: 10px;\n  border-bottom-right-radius: 10px;\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4214f1ee] {\n  height: 55px;\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4214f1ee],\n.seat-img span[data-v-4214f1ee] {\n  height: 50px;\n  width: 50px;\n  display: inline-block;\n  cursor: pointer !important;\n  margin: 5px;\n}\nimg[data-v-4214f1ee] {\n  cursor: pointer !important;\n}\n.circles[data-v-4214f1ee] {\n  width: 30px;\n  height: 30px;\n  border-radius: 50px;\n  display: inline-block;\n  box-sizing: content-box;\n}\n.icons-legend[data-v-4214f1ee] {\n  position: relative;\n  bottom: 12px;\n  color: rgb(62, 61, 61);\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.circles + span[data-v-4214f1ee] {\n  position: relative;\n  top: -10px;\n  padding: 5px;\n  color: black;\n}\n.type-icons[data-v-4214f1ee] {\n  position: relative;\n  z-index: 10;\n}\n.partial-seat[data-v-4214f1ee] {\n  width: 30px;\n  height: 30px;\n  background: linear-gradient(90deg, white 50%, black 50%);\n  border-radius: 50%;\n  display: inline-block;\n  box-sizing: content-box;\n  -moz-border-radius: 25px;\n  -webkit-border-radius: 25px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4214f1ee] {\r\n  background-color: #b9dea0;\r\n  border-radius: 10px;\r\n  cursor: pointer;\r\n  position: relative;\r\n  isolation: isolate;\n}\n.image-span[data-v-4214f1ee]:hover {\r\n  background-color: #6db131;\n}\n.economy[data-v-4214f1ee] {\r\n  border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4214f1ee] {\r\n  border: 3px solid orangered !important;\n}\n.executive[data-v-4214f1ee] {\r\n  border: 3px solid gold !important;\n}\n.for-female[data-v-4214f1ee] {\r\n  background-color: hotpink !important;\n}\n.for-male[data-v-4214f1ee] {\r\n  background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4214f1ee] {\r\n  background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4214f1ee] {\r\n  background-color: #6db131 !important;\n}\n.partial[data-v-4214f1ee]::after {\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  right: 0;\r\n  z-index: -1;\r\n  height: 100%;\r\n  width: 50%;\r\n  border-top-right-radius: 10px;\r\n  border-bottom-right-radius: 10px;\r\n  background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4214f1ee] {\r\n  height: 55px;\r\n  margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4214f1ee],\r\n.seat-img span[data-v-4214f1ee] {\r\n  height: 50px;\r\n  width: 50px;\r\n  display: inline-block;\r\n  cursor: pointer !important;\r\n  margin: 5px;\n}\nimg[data-v-4214f1ee] {\r\n  cursor: pointer !important;\n}\n.circles[data-v-4214f1ee] {\r\n  width: 30px;\r\n  height: 30px;\r\n  border-radius: 50px;\r\n  display: inline-block;\r\n  box-sizing: content-box;\n}\n.icons-legend[data-v-4214f1ee] {\r\n  position: relative;\r\n  bottom: 12px;\r\n  color: rgb(62, 61, 61);\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.circles + span[data-v-4214f1ee] {\r\n  position: relative;\r\n  top: -10px;\r\n  padding: 5px;\r\n  color: black;\n}\n.type-icons[data-v-4214f1ee] {\r\n  position: relative;\r\n  z-index: 10;\n}\n.partial-seat[data-v-4214f1ee] {\r\n  width: 30px;\r\n  height: 30px;\r\n  background: linear-gradient(90deg, white 50%, black 50%);\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n  box-sizing: content-box;\r\n  -moz-border-radius: 25px;\r\n  -webkit-border-radius: 25px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77742,7 +78195,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4399e1a0] {\n    background-color: #b9dea0;\n    border-radius: 10px;\n    cursor: pointer;\n    position: relative;\n    isolation: isolate;\n}\n.image-span[data-v-4399e1a0]:hover {\n    background-color: #6db131;\n}\n.economy[data-v-4399e1a0] {\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4399e1a0] {\n    border: 3px solid orangered !important;\n}\n.executive[data-v-4399e1a0] {\n    border: 3px solid gold !important;\n}\n.for-female[data-v-4399e1a0] {\n    background-color: hotpink !important;\n}\n.for-male[data-v-4399e1a0] {\n    background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4399e1a0] {\n    background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4399e1a0] {\n    background-color: #6db131 !important;\n}\n.partial[data-v-4399e1a0]::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: -1;\n    height: 100%;\n    width: 50%;\n    border-top-right-radius: 10px;\n    border-bottom-right-radius: 10px;\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4399e1a0] {\n    height: 55px;\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4399e1a0],\n.seat-img span[data-v-4399e1a0] {\n    height: 50px;\n    width: 50px;\n    display: inline-block;\n    cursor: pointer !important;\n    margin: 5px;\n}\nimg[data-v-4399e1a0] {\n    cursor: pointer !important;\n}\n.circles[data-v-4399e1a0] {\n    width: 30px;\n    height: 30px;\n    border-radius: 50px;\n    display: inline-block;\n    box-sizing: content-box;\n}\n.icons-legend[data-v-4399e1a0] {\n    position: relative;\n    bottom: 12px;\n    color: rgb(62, 61, 61);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n}\n.circles + span[data-v-4399e1a0] {\n    position: relative;\n    top: -10px;\n    padding: 5px;\n    color: black;\n}\n.type-icons[data-v-4399e1a0] {\n    position: relative;\n    z-index: 10;\n}\n.partial-seat[data-v-4399e1a0] {\n    width: 30px;\n    height: 30px;\n    background: linear-gradient(90deg, white 50%, black 50%);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: content-box;\n    -moz-border-radius: 25px;\n    -webkit-border-radius: 25px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-4399e1a0] {\r\n    background-color: #b9dea0;\r\n    border-radius: 10px;\r\n    cursor: pointer;\r\n    position: relative;\r\n    isolation: isolate;\n}\n.image-span[data-v-4399e1a0]:hover {\r\n    background-color: #6db131;\n}\n.economy[data-v-4399e1a0] {\r\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-4399e1a0] {\r\n    border: 3px solid orangered !important;\n}\n.executive[data-v-4399e1a0] {\r\n    border: 3px solid gold !important;\n}\n.for-female[data-v-4399e1a0] {\r\n    background-color: hotpink !important;\n}\n.for-male[data-v-4399e1a0] {\r\n    background-color: #3d8ff2 !important;\n}\n.not-for-sale[data-v-4399e1a0] {\r\n    background-color: rgb(140, 109, 109) !important;\n}\n.selected[data-v-4399e1a0] {\r\n    background-color: #6db131 !important;\n}\n.partial[data-v-4399e1a0]::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: -1;\r\n    height: 100%;\r\n    width: 50%;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\r\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.seat-img[data-v-4399e1a0] {\r\n    height: 55px;\r\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-4399e1a0],\r\n.seat-img span[data-v-4399e1a0] {\r\n    height: 50px;\r\n    width: 50px;\r\n    display: inline-block;\r\n    cursor: pointer !important;\r\n    margin: 5px;\n}\nimg[data-v-4399e1a0] {\r\n    cursor: pointer !important;\n}\n.circles[data-v-4399e1a0] {\r\n    width: 30px;\r\n    height: 30px;\r\n    border-radius: 50px;\r\n    display: inline-block;\r\n    box-sizing: content-box;\n}\n.icons-legend[data-v-4399e1a0] {\r\n    position: relative;\r\n    bottom: 12px;\r\n    color: rgb(62, 61, 61);\r\n    display: inline-flex;\r\n    align-items: center;\r\n    justify-content: center;\n}\n.circles + span[data-v-4399e1a0] {\r\n    position: relative;\r\n    top: -10px;\r\n    padding: 5px;\r\n    color: black;\n}\n.type-icons[data-v-4399e1a0] {\r\n    position: relative;\r\n    z-index: 10;\n}\n.partial-seat[data-v-4399e1a0] {\r\n    width: 30px;\r\n    height: 30px;\r\n    background: linear-gradient(90deg, white 50%, black 50%);\r\n    border-radius: 50%;\r\n    display: inline-block;\r\n    box-sizing: content-box;\r\n    -moz-border-radius: 25px;\r\n    -webkit-border-radius: 25px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77766,7 +78219,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected[data-v-0a8ddc11] {\n    background-color: rgba(127, 164, 31, 0.64) !important;\n}\n.seat-img img[data-v-0a8ddc11],\n.seat-img span[data-v-0a8ddc11] {\n    height: 40px;\n    width: 40px;\n    display: inline-block;\n    cursor: pointer;\n}\n.circles[data-v-0a8ddc11] {\n    width: 30px;\n    height: 30px;\n    border-radius: 50px;\n    display: inline-block;\n    box-sizing: content-box;\n}\n[tooltip][data-v-0a8ddc11] {\n    position: relative; /* opinion 1 */\n}\n\n/* Applies to all tooltips */\n[tooltip][data-v-0a8ddc11]::before,\n[tooltip][data-v-0a8ddc11]::after {\n    text-transform: none; /* opinion 2 */\n    font-size: .9em; /* opinion 3 */\n    line-height: 1;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n    pointer-events: none;\n    position: absolute;\n    display: none;\n    opacity: 0;\n}\n[tooltip][data-v-0a8ddc11]::before {\n    content: '';\n    border: 5px solid transparent; /* opinion 4 */\n    z-index: 1001; /* absurdity 1 */\n}\n[tooltip][data-v-0a8ddc11]::after {\n    content: attr(tooltip); /* magic! */\n\n    /* most of the rest of this is opinion */\n    font-family: Helvetica, sans-serif;\n    text-align: center;\n\n    /*\n      Let the content set the size of the tooltips\n      but this will also keep them from being obnoxious\n      */\n    min-width: 3em;\n    max-width: 21em;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    padding: 1ch 1.5ch;\n    border-radius: .3ch;\n    box-shadow: 0 1em 2em -.5em rgba(0, 0, 0, 0.35);\n    background: #333;\n    color: #fff;\n    z-index: 1000; /* absurdity 2 */\n}\n\n/* Make the tooltips respond to hover */\n[tooltip][data-v-0a8ddc11]:hover::before,\n[tooltip][data-v-0a8ddc11]:hover::after {\n    display: block;\n}\n\n/* don't show empty tooltips */\n[tooltip=''][data-v-0a8ddc11]::before,\n[tooltip=''][data-v-0a8ddc11]::after {\n    display: none !important;\n}\n\n/* FLOW: UP */\n[tooltip][data-v-0a8ddc11]:not([flow])::before,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::before {\n    bottom: 100%;\n    border-bottom-width: 0;\n    border-top-color: #333;\n}\n[tooltip][data-v-0a8ddc11]:not([flow])::after,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::after {\n    bottom: calc(100% + 5px);\n}\n[tooltip][data-v-0a8ddc11]:not([flow])::before,\n[tooltip][data-v-0a8ddc11]:not([flow])::after,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::before,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::after {\n    left: 50%;\n    transform: translate(-50%, -.5em);\n}\n\n/* FLOW: DOWN */\n\n\n/* KEYFRAMES */\n@-webkit-keyframes tooltips-vert-0a8ddc11 {\nto {\n        opacity: .9;\n        transform: translate(-50%, 0);\n}\n}\n@keyframes tooltips-vert-0a8ddc11 {\nto {\n        opacity: .9;\n        transform: translate(-50%, 0);\n}\n}\n@-webkit-keyframes tooltips-horz-0a8ddc11 {\nto {\n        opacity: .9;\n        transform: translate(0, -50%);\n}\n}\n@keyframes tooltips-horz-0a8ddc11 {\nto {\n        opacity: .9;\n        transform: translate(0, -50%);\n}\n}\n\n/* FX All The Things */\n[tooltip][data-v-0a8ddc11]:not([flow]):hover::before,\n[tooltip][data-v-0a8ddc11]:not([flow]):hover::after,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]:hover::before,\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]:hover::after {\n    -webkit-animation: tooltips-vert-0a8ddc11 300ms ease-out forwards;\n            animation: tooltips-vert-0a8ddc11 300ms ease-out forwards;\n}\n\n\n/* UNRELATED to tooltips */\n#mytolltip[data-v-0a8ddc11] {\n    flex: 1 1 100vh;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n}\n#mytolltip div[data-v-0a8ddc11] {\n    text-align: center;\n    color: #353539;\n}\n#mytolltip span[data-v-0a8ddc11] {\n    padding: .5em 1em;\n    margin: .5em;\n    display: inline-block;\n    background: #dedede;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected[data-v-0a8ddc11] {\r\n    background-color: rgba(127, 164, 31, 0.64) !important;\n}\n.seat-img img[data-v-0a8ddc11],\r\n.seat-img span[data-v-0a8ddc11] {\r\n    height: 40px;\r\n    width: 40px;\r\n    display: inline-block;\r\n    cursor: pointer;\n}\n.circles[data-v-0a8ddc11] {\r\n    width: 30px;\r\n    height: 30px;\r\n    border-radius: 50px;\r\n    display: inline-block;\r\n    box-sizing: content-box;\n}\n[tooltip][data-v-0a8ddc11] {\r\n    position: relative; /* opinion 1 */\n}\r\n\r\n/* Applies to all tooltips */\n[tooltip][data-v-0a8ddc11]::before,\r\n[tooltip][data-v-0a8ddc11]::after {\r\n    text-transform: none; /* opinion 2 */\r\n    font-size: .9em; /* opinion 3 */\r\n    line-height: 1;\r\n    -webkit-user-select: none;\r\n       -moz-user-select: none;\r\n            user-select: none;\r\n    pointer-events: none;\r\n    position: absolute;\r\n    display: none;\r\n    opacity: 0;\n}\n[tooltip][data-v-0a8ddc11]::before {\r\n    content: '';\r\n    border: 5px solid transparent; /* opinion 4 */\r\n    z-index: 1001; /* absurdity 1 */\n}\n[tooltip][data-v-0a8ddc11]::after {\r\n    content: attr(tooltip); /* magic! */\r\n\r\n    /* most of the rest of this is opinion */\r\n    font-family: Helvetica, sans-serif;\r\n    text-align: center;\r\n\r\n    /*\r\n      Let the content set the size of the tooltips\r\n      but this will also keep them from being obnoxious\r\n      */\r\n    min-width: 3em;\r\n    max-width: 21em;\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    padding: 1ch 1.5ch;\r\n    border-radius: .3ch;\r\n    box-shadow: 0 1em 2em -.5em rgba(0, 0, 0, 0.35);\r\n    background: #333;\r\n    color: #fff;\r\n    z-index: 1000; /* absurdity 2 */\n}\r\n\r\n/* Make the tooltips respond to hover */\n[tooltip][data-v-0a8ddc11]:hover::before,\r\n[tooltip][data-v-0a8ddc11]:hover::after {\r\n    display: block;\n}\r\n\r\n/* don't show empty tooltips */\n[tooltip=''][data-v-0a8ddc11]::before,\r\n[tooltip=''][data-v-0a8ddc11]::after {\r\n    display: none !important;\n}\r\n\r\n/* FLOW: UP */\n[tooltip][data-v-0a8ddc11]:not([flow])::before,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::before {\r\n    bottom: 100%;\r\n    border-bottom-width: 0;\r\n    border-top-color: #333;\n}\n[tooltip][data-v-0a8ddc11]:not([flow])::after,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::after {\r\n    bottom: calc(100% + 5px);\n}\n[tooltip][data-v-0a8ddc11]:not([flow])::before,\r\n[tooltip][data-v-0a8ddc11]:not([flow])::after,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::before,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]::after {\r\n    left: 50%;\r\n    transform: translate(-50%, -.5em);\n}\r\n\r\n/* FLOW: DOWN */\r\n\r\n\r\n/* KEYFRAMES */\n@-webkit-keyframes tooltips-vert-0a8ddc11 {\nto {\r\n        opacity: .9;\r\n        transform: translate(-50%, 0);\n}\n}\n@keyframes tooltips-vert-0a8ddc11 {\nto {\r\n        opacity: .9;\r\n        transform: translate(-50%, 0);\n}\n}\n@-webkit-keyframes tooltips-horz-0a8ddc11 {\nto {\r\n        opacity: .9;\r\n        transform: translate(0, -50%);\n}\n}\n@keyframes tooltips-horz-0a8ddc11 {\nto {\r\n        opacity: .9;\r\n        transform: translate(0, -50%);\n}\n}\r\n\r\n/* FX All The Things */\n[tooltip][data-v-0a8ddc11]:not([flow]):hover::before,\r\n[tooltip][data-v-0a8ddc11]:not([flow]):hover::after,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]:hover::before,\r\n[tooltip][flow^=\"up\"][data-v-0a8ddc11]:hover::after {\r\n    -webkit-animation: tooltips-vert-0a8ddc11 300ms ease-out forwards;\r\n            animation: tooltips-vert-0a8ddc11 300ms ease-out forwards;\n}\r\n\r\n\r\n/* UNRELATED to tooltips */\n#mytolltip[data-v-0a8ddc11] {\r\n    flex: 1 1 100vh;\r\n    display: flex;\r\n    flex-direction: column;\r\n    align-items: center;\r\n    justify-content: center;\n}\n#mytolltip div[data-v-0a8ddc11] {\r\n    text-align: center;\r\n    color: #353539;\n}\n#mytolltip span[data-v-0a8ddc11] {\r\n    padding: .5em 1em;\r\n    margin: .5em;\r\n    display: inline-block;\r\n    background: #dedede;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77790,7 +78243,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c] {\n    width: 90px !important;\n    display: inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c] {\r\n    width: 90px !important;\r\n    display: inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77814,7 +78267,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-946b5df6],\ntable *[data-v-946b5df6] {\n    font-size: 10px;\n}\n.modal-cell[data-v-946b5df6] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-946b5df6] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-946b5df6] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-946b5df6] {\n    width: 35%;\n}\n.fade-enter-active[data-v-946b5df6],\n.fade-leave-active[data-v-946b5df6] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-946b5df6], .fade-leave-to[data-v-946b5df6] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-946b5df6], tr[data-v-946b5df6], th[data-v-946b5df6], td[data-v-946b5df6], option[data-v-946b5df6], select[data-v-946b5df6], label[data-v-946b5df6], button[data-v-946b5df6], a[data-v-946b5df6], div[data-v-946b5df6], p[data-v-946b5df6] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-946b5df6] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-946b5df6],\r\ntable *[data-v-946b5df6] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-946b5df6] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-946b5df6] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-946b5df6] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-946b5df6] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-946b5df6],\r\n.fade-leave-active[data-v-946b5df6] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-946b5df6], .fade-leave-to[data-v-946b5df6] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-946b5df6], tr[data-v-946b5df6], th[data-v-946b5df6], td[data-v-946b5df6], option[data-v-946b5df6], select[data-v-946b5df6], label[data-v-946b5df6], button[data-v-946b5df6], a[data-v-946b5df6], div[data-v-946b5df6], p[data-v-946b5df6] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-946b5df6] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77838,7 +78291,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\n.seat-img span[data-v-b6676e8a] {\n    height: 40px;\n    width: 40px;\n    display: inline-block;\n    cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.selected-row[data-v-b6676e8a] {\r\n    background-color: yellow !important;\n}\n.booked_Seat[data-v-b6676e8a] {\r\n    background-color: rgb(255, 0, 0) !important;\n}\n.notForSale[data-v-b6676e8a] {\r\n    background-color: rgb(140, 109, 109) !important;\n}\n.reservedForFemale[data-v-b6676e8a] {\r\n    background-color: rgb(250, 185, 250) !important;\n}\n.economy[data-v-b6676e8a] {\r\n    background-color: rgb(250, 97, 64) !important;\n}\n.exective[data-v-b6676e8a] {\r\n    background-color: rgb(64, 250, 81) !important;\n}\n.business[data-v-b6676e8a] {\r\n    background-color: rgb(31, 126, 91) !important;\n}\n.anyElseClass[data-v-b6676e8a] {\r\n    background-color: rgb(131, 163, 199) !important;\n}\n.seat-img[data-v-b6676e8a] {\r\n    height: 40px;\n}\n.seat-img img[data-v-b6676e8a],\r\n.seat-img span[data-v-b6676e8a] {\r\n    height: 40px;\r\n    width: 40px;\r\n    display: inline-block;\r\n    cursor: pointer;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77862,7 +78315,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-16c99290], table *[data-v-16c99290] {\n    font-size: 10px;\n}\n.modal-cell[data-v-16c99290] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-16c99290] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n\n/*.modal-cell:hover .modal-btn {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}*/\n.header-select[data-v-16c99290] {\n    width: 35%;\n}\n.fade-enter-active[data-v-16c99290],\n.fade-leave-active[data-v-16c99290] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-16c99290], .fade-leave-to[data-v-16c99290] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-16c99290], table *[data-v-16c99290] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-16c99290] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-16c99290] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\r\n\r\n/*.modal-cell:hover .modal-btn {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\r\n}*/\n.header-select[data-v-16c99290] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-16c99290],\r\n.fade-leave-active[data-v-16c99290] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-16c99290], .fade-leave-to[data-v-16c99290] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77886,7 +78339,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-3122fe2e],\ntable *[data-v-3122fe2e] {\n    font-size: 10px;\n}\n.modal-cell[data-v-3122fe2e] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-3122fe2e] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-3122fe2e] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-3122fe2e] {\n    width: 35%;\n}\n.fade-enter-active[data-v-3122fe2e],\n.fade-leave-active[data-v-3122fe2e] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-3122fe2e], .fade-leave-to[data-v-3122fe2e] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-3122fe2e], tr[data-v-3122fe2e], th[data-v-3122fe2e], td[data-v-3122fe2e], option[data-v-3122fe2e], select[data-v-3122fe2e], label[data-v-3122fe2e], button[data-v-3122fe2e], a[data-v-3122fe2e], div[data-v-3122fe2e], p[data-v-3122fe2e] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-3122fe2e] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-3122fe2e],\r\ntable *[data-v-3122fe2e] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-3122fe2e] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-3122fe2e] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-3122fe2e] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-3122fe2e] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-3122fe2e],\r\n.fade-leave-active[data-v-3122fe2e] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-3122fe2e], .fade-leave-to[data-v-3122fe2e] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-3122fe2e], tr[data-v-3122fe2e], th[data-v-3122fe2e], td[data-v-3122fe2e], option[data-v-3122fe2e], select[data-v-3122fe2e], label[data-v-3122fe2e], button[data-v-3122fe2e], a[data-v-3122fe2e], div[data-v-3122fe2e], p[data-v-3122fe2e] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-3122fe2e] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77910,7 +78363,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-52d4ebae],\ntable *[data-v-52d4ebae] {\n    font-size: 10px;\n}\n.modal-cell[data-v-52d4ebae] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-52d4ebae] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-52d4ebae] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-52d4ebae] {\n    width: 35%;\n}\n.fade-enter-active[data-v-52d4ebae],\n.fade-leave-active[data-v-52d4ebae] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-52d4ebae], .fade-leave-to[data-v-52d4ebae] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-52d4ebae], tr[data-v-52d4ebae], th[data-v-52d4ebae], td[data-v-52d4ebae], option[data-v-52d4ebae], select[data-v-52d4ebae], label[data-v-52d4ebae], button[data-v-52d4ebae], a[data-v-52d4ebae], div[data-v-52d4ebae], p[data-v-52d4ebae] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-52d4ebae] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-52d4ebae],\r\ntable *[data-v-52d4ebae] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-52d4ebae] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-52d4ebae] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-52d4ebae] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-52d4ebae] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-52d4ebae],\r\n.fade-leave-active[data-v-52d4ebae] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-52d4ebae], .fade-leave-to[data-v-52d4ebae] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-52d4ebae], tr[data-v-52d4ebae], th[data-v-52d4ebae], td[data-v-52d4ebae], option[data-v-52d4ebae], select[data-v-52d4ebae], label[data-v-52d4ebae], button[data-v-52d4ebae], a[data-v-52d4ebae], div[data-v-52d4ebae], p[data-v-52d4ebae] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-52d4ebae] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77934,7 +78387,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-3161cc76],\ntable *[data-v-3161cc76] {\n    font-size: 10px;\n}\n.modal-cell[data-v-3161cc76] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-3161cc76] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-3161cc76] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-3161cc76] {\n    width: 35%;\n}\n.fade-enter-active[data-v-3161cc76],\n.fade-leave-active[data-v-3161cc76] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-3161cc76], .fade-leave-to[data-v-3161cc76] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-3161cc76], tr[data-v-3161cc76], th[data-v-3161cc76], td[data-v-3161cc76], option[data-v-3161cc76], select[data-v-3161cc76], label[data-v-3161cc76], button[data-v-3161cc76], a[data-v-3161cc76], div[data-v-3161cc76], p[data-v-3161cc76] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-3161cc76] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-3161cc76],\r\ntable *[data-v-3161cc76] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-3161cc76] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-3161cc76] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-3161cc76] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-3161cc76] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-3161cc76],\r\n.fade-leave-active[data-v-3161cc76] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-3161cc76], .fade-leave-to[data-v-3161cc76] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-3161cc76], tr[data-v-3161cc76], th[data-v-3161cc76], td[data-v-3161cc76], option[data-v-3161cc76], select[data-v-3161cc76], label[data-v-3161cc76], button[data-v-3161cc76], a[data-v-3161cc76], div[data-v-3161cc76], p[data-v-3161cc76] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-3161cc76] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77958,7 +78411,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-2dff5c38]{\n    width: 90px !important;\n    display:inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-2dff5c38]{\r\n    width: 90px !important;\r\n    display:inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -77982,7 +78435,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-3fbef22c]{\n    width: 90px !important;\n    display:inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-3fbef22c]{\r\n    width: 90px !important;\r\n    display:inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -78006,7 +78459,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-e74dc358]{\n    width: 90px !important;\n    display:inline-block;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-e74dc358]{\r\n    width: 90px !important;\r\n    display:inline-block;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -78030,7 +78483,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-412f7fb7],\ntable *[data-v-412f7fb7] {\n    font-size: 10px;\n}\n.modal-cell[data-v-412f7fb7] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-412f7fb7] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-412f7fb7] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-412f7fb7] {\n    width: 35%;\n}\n.fade-enter-active[data-v-412f7fb7],\n.fade-leave-active[data-v-412f7fb7] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-412f7fb7], .fade-leave-to[data-v-412f7fb7] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-412f7fb7], tr[data-v-412f7fb7], th[data-v-412f7fb7], td[data-v-412f7fb7], option[data-v-412f7fb7], select[data-v-412f7fb7], label[data-v-412f7fb7], button[data-v-412f7fb7], a[data-v-412f7fb7], div[data-v-412f7fb7], p[data-v-412f7fb7] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-412f7fb7] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-412f7fb7],\r\ntable *[data-v-412f7fb7] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-412f7fb7] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-412f7fb7] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-412f7fb7] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-412f7fb7] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-412f7fb7],\r\n.fade-leave-active[data-v-412f7fb7] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-412f7fb7], .fade-leave-to[data-v-412f7fb7] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-412f7fb7], tr[data-v-412f7fb7], th[data-v-412f7fb7], td[data-v-412f7fb7], option[data-v-412f7fb7], select[data-v-412f7fb7], label[data-v-412f7fb7], button[data-v-412f7fb7], a[data-v-412f7fb7], div[data-v-412f7fb7], p[data-v-412f7fb7] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-412f7fb7] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -78054,7 +78507,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\ntable *[data-v-66b5e4b9] {\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\n.fade-leave-active[data-v-66b5e4b9] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-66b5e4b9],\r\ntable *[data-v-66b5e4b9] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-66b5e4b9] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-66b5e4b9] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-66b5e4b9] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-66b5e4b9] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-66b5e4b9],\r\n.fade-leave-active[data-v-66b5e4b9] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-66b5e4b9], .fade-leave-to[data-v-66b5e4b9] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-66b5e4b9], tr[data-v-66b5e4b9], th[data-v-66b5e4b9], td[data-v-66b5e4b9], option[data-v-66b5e4b9], select[data-v-66b5e4b9], label[data-v-66b5e4b9], button[data-v-66b5e4b9], a[data-v-66b5e4b9], div[data-v-66b5e4b9], p[data-v-66b5e4b9] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-66b5e4b9] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -78078,7 +78531,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-57b22b22],\ntable *[data-v-57b22b22] {\n    font-size: 10px;\n}\n.modal-cell[data-v-57b22b22] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-57b22b22] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-57b22b22] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-57b22b22] {\n    width: 35%;\n}\n.fade-enter-active[data-v-57b22b22],\n.fade-leave-active[data-v-57b22b22] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-57b22b22], .fade-leave-to[data-v-57b22b22] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-57b22b22], tr[data-v-57b22b22], th[data-v-57b22b22], td[data-v-57b22b22], option[data-v-57b22b22], select[data-v-57b22b22], label[data-v-57b22b22], button[data-v-57b22b22], a[data-v-57b22b22], div[data-v-57b22b22], p[data-v-57b22b22] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-57b22b22] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-57b22b22],\r\ntable *[data-v-57b22b22] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-57b22b22] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-57b22b22] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-57b22b22] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-57b22b22] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-57b22b22],\r\n.fade-leave-active[data-v-57b22b22] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-57b22b22], .fade-leave-to[data-v-57b22b22] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-57b22b22], tr[data-v-57b22b22], th[data-v-57b22b22], td[data-v-57b22b22], option[data-v-57b22b22], select[data-v-57b22b22], label[data-v-57b22b22], button[data-v-57b22b22], a[data-v-57b22b22], div[data-v-57b22b22], p[data-v-57b22b22] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-57b22b22] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -78102,7 +78555,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-0cb820ef], table *[data-v-0cb820ef] {\n    font-size: 10px;\n}\n.modal-cell[data-v-0cb820ef] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-0cb820ef] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.header-select[data-v-0cb820ef] {\n    width: 35%;\n}\n.fade-enter-active[data-v-0cb820ef],\n.fade-leave-active[data-v-0cb820ef] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-0cb820ef], .fade-leave-to[data-v-0cb820ef] {\n    opacity: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-0cb820ef], table *[data-v-0cb820ef] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-0cb820ef] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-0cb820ef] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.header-select[data-v-0cb820ef] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-0cb820ef],\r\n.fade-leave-active[data-v-0cb820ef] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-0cb820ef], .fade-leave-to[data-v-0cb820ef] {\r\n    opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
