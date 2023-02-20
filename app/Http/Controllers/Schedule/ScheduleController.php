@@ -164,7 +164,7 @@ class ScheduleController extends Controller
 //    }
 
     public function updateSchedule(Request $request)
-    {return $request;
+    {
         $req = $request->schedules;
         return Schedule::where('id', $req['id'])->update([
             'name' => $req['name'],
