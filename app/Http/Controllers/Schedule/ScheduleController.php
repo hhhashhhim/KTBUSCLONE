@@ -139,29 +139,27 @@ class ScheduleController extends Controller
 
         return $schedule;
     }
-//
-//    public function editSchedule(Request $request)
-//    {
-//        $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-//        $dataArr = [];
-//        if (!is_null($schedule->route_city_terminal)) {
-//            foreach ($schedule->route_city_terminal as $key => $item) {
-//                $dataArr['city'][$key] = $item['city_id'];
-//                $dataArr['terminal'][$key] = $item['terminal_id'];
-//            }
-//            $cities_id = array_unique($dataArr['city']);
-//            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
-//            return [
-//                'cities' => $city,
-//                'schedules' => $schedule,
-//                'compare_array' => $schedule->route_city_terminal,
-//            ];
-//        } else {
-//            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
-//        }
-//
-//
-//    }
+
+    public function editSchedule(Request $request)
+    {
+        $schedule = Schedule::find($request->id);
+        $dataArr = [];
+        if (!is_null($schedule->route_city_terminal)) {
+            foreach ($schedule->route_city_terminal as $key => $item) {
+                $dataArr['city'][$key] = $item['city_id'];
+                $dataArr['terminal'][$key] = $item['terminal_id'];
+            }
+            $cities_id = array_unique($dataArr['city']);
+            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
+            return [
+                'cities' => $city,
+                'schedules' => $schedule,
+                'compare_array' => $schedule->route_city_terminal,
+            ];
+        } else {
+            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
+        }
+    }
 
     public function updateSchedule(Request $request)
     {

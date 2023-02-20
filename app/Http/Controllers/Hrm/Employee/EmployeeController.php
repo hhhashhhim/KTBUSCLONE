@@ -211,7 +211,7 @@ class EmployeeController extends Controller
         $extension = $image->extension();
         $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
         //Move to folder
-        $path = $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
+        $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
         return $nameToStore;
     }
 

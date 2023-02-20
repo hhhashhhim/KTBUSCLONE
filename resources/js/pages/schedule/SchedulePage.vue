@@ -588,7 +588,7 @@
                     <div class="row">
                         <div class="col-md-8 class form-group">
                             <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
-                            <select
+                            <select disabled
                                 class="form-control"
                                 id="route" @change="getSelectiveData('routeEdit', $event)"
                                 v-model="dataEdit.schedules.route_id"
