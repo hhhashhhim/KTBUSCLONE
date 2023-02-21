@@ -14,20 +14,21 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="CNIC">CNIC</label>
                                                         <vue-mask id="CNIC"
                                                                   class="form-control"
                                                                   v-model="filterForm.cnicFilter"
                                                                   mask="00000-0000000-0"
+                                                                  @keypress="filterFunction()"
                                                                   :raw="false"
                                                                   :options="options"
                                                         >
                                                         </vue-mask>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="phone">Cell #</label>
                                                         <vue-mask id="phone"
@@ -35,23 +36,26 @@
                                                                   v-model="filterForm.phoneFilter"
                                                                   mask="0000-0000000"
                                                                   :raw="false"
+                                                                  @keypress="filterFunction()"
                                                                   :options="optionsContact"
                                                         >
                                                         </vue-mask>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="name">Name</label>
                                                         <input id="name" type="text" class="form-control"
-                                                               v-model="filterForm.nameFilter">
+                                                               v-model="filterForm.nameFilter"
+                                                               @keypress="filterFunction()">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label>Route</label>
                                                         <select id="routeFilter" class="form-control"
-                                                                v-model="filterForm.routeFilter">
+                                                                v-model="filterForm.routeFilter"
+                                                                @change="filterFunction()">
                                                             <option value="0">---Select Route---</option>
                                                             <option v-for="(route, i) in routes" :key="i"
                                                                     :value="route.id">
@@ -60,11 +64,12 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="terminalsFilter">Terminals</label>
                                                         <select id="terminalsFilter" class="form-control"
-                                                                v-model="filterForm.terminalFilter">
+                                                                v-model="filterForm.terminalFilter"
+                                                                @change="filterFunction()">
                                                             <option value="0">---Select Terminal---</option>
                                                             <option v-for="(terminal, i) in terminals" :key="i"
                                                                     :value="terminal.id">
@@ -73,11 +78,12 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="busFilter">Bus #</label>
                                                         <select id="busFilter" class="form-control"
-                                                                v-model="filterForm.busFilter">
+                                                                v-model="filterForm.busFilter"
+                                                                @change="filterFunction()">
                                                             <option value="0">---Select Bus #---</option>
                                                             <option v-for="(bus, i) in buses" :key="i"
                                                                     :value="bus.id">
@@ -86,20 +92,22 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="dateFilter">Date</label>
                                                         <input type="date" class="form-control" id="dateFilter"
-                                                               v-model="filterForm.dateFilter">
+                                                               v-model="filterForm.dateFilter"
+                                                               @change="filterFunction()">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
                                                         <label for="statusFilter">Status</label>
                                                         <select id="statusFilter" class="form-control"
-                                                                v-model="filterForm.statusFilter">
+                                                                v-model="filterForm.statusFilter"
+                                                                @change="filterFunction()">
                                                             <option value="0">---Select Status---</option>
-                                                                    <option value="advanced booking">Booked</option>
+                                                            <option value="advanced booking">Booked</option>
                                                             <option value="booked">Issued</option>
                                                             <option value="cancel">Cancelled</option>
                                                             <option value="reschedule">Reschedule Ticket</option>
@@ -110,51 +118,42 @@
                                             </div>
                                             <div>
                                                 <div class="table-responsive">
-                                                    <table
-                                                        class="table table-striped table-hover"
-                                                        id="discount_table"
-                                                    >
+                                                    <table style=" width:100%; margin:0; overflow:auto; font-size: 12px"
+                                                           class="table table-striped table-hover" id="filterTable">
                                                         <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
-                                                            <th>Name</th>
-                                                            <th>Percentage</th>
-                                                            <th>Flat Amount</th>
+                                                            <th>Route</th>
+                                                            <th>Bus No</th>
+                                                            <th>Bus Time</th>
+                                                            <th>Terminal name</th>
+                                                            <th>Booked By</th>
+                                                            <th>Seat No</th>
+                                                            <th>Passenger Name</th>
+                                                            <th>CNIC</th>
+                                                            <th>Fare</th>
+                                                            <th>Booking Date</th>
+                                                            <th>Canceled By</th>
+                                                            <th>Canceled Date</th>
                                                             <th>Status</th>
-                                                            <th>Added By</th>
-                                                            <th>Action</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr v-for="(discount, i) in discounts" :key="i">
-                                                            <td>{{ i + 1 }}</td>
-                                                            <td>{{ discount.name }}</td>
-                                                            <td v-if="discount.percentage">{{
-                                                                    discount.percentage
-                                                                }}{{ discount.type == 'percentage' ? '%' : '' }}
-                                                            </td>
-                                                            <td v-else>N/A</td>
-                                                            <td v-if="discount.flat">{{ discount.flat }}</td>
-                                                            <td v-else>N/A</td>
-                                                            <td>{{
-                                                                    discount.is_active == 1 ? 'Active' : 'InActive'
-                                                                }}
-                                                            </td>
-                                                            <td>{{ discount.added_by.name }}</td>
-                                                            <td>
-                                                                <button :data-target="'#' + editFormID"
-                                                                        data-toggle="modal"
-                                                                        @click="edit(discount)"
-                                                                        class="btn btn-primary mx-1">
-                                                                    <i class="far fa-edit"></i>
-                                                                </button>
-                                                                <button :data-target="'#' + deleteFormID"
-                                                                        data-toggle="modal"
-                                                                        @click="deleteModal(discount,i)"
-                                                                        class="btn btn-danger">
-                                                                    <i class="far fa-trash-alt"></i>
-                                                                </button>
-                                                            </td>
+                                                        <tr v-for="(record, i) in allRecords" :key="i">
+                                                            <td>Sr No.</td>
+                                                            <td>Route</td>
+                                                            <td>Bus No</td>
+                                                            <td>Bus Time</td>
+                                                            <td>Terminal name</td>
+                                                            <td>Booked By</td>
+                                                            <td>Seat No</td>
+                                                            <td>Passenger Name</td>
+                                                            <td>CNIC</td>
+                                                            <td>Fare</td>
+                                                            <td>Booking Date</td>
+                                                            <td>Canceled By</td>
+                                                            <td>Canceled Date</td>
+                                                            <td>Status</td>
                                                         </tr>
                                                         </tbody>
                                                     </table>
@@ -202,7 +201,12 @@ export default {
             terminals: [],
             buses: [],
             validationErrors: [],
+            allRecords: [],
             filterForm: {
+                cnicFilter: "",
+                dateFilter: "",
+                nameFilter: "",
+                phoneFilter: "",
                 terminalFilter: 0,
                 routeFilter: 0,
                 busFilter: 0,
@@ -213,38 +217,56 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchRoutes();
-        await this.fetchTerminals();
-        await this.fetchBus();
+        this.fetchRoutes();
+        this.fetchTerminals();
+        this.fetchBus();
+        setTimeout(() => {
+            $("#filterTable").DataTable();
+        }, 300);
     },
     methods: {
         async fetchRoutes() {
             const resRoute = await this.callApi("post", "allBooking/routes");
-            console.log(resRoute);
             if (resRoute.status == 200) {
                 this.routes = resRoute.data;
 
-            } else {
-                this.filterForm.routeFilter = 0;
             }
+            // else {
+            //     this.filterForm.routeFilter = 0;
+            // }
         },
         async fetchTerminals() {
             const resTerminal = await this.callApi("post", "allBooking/terminals");
-            console.log(resTerminal);
             if (resTerminal.status == 200) {
                 this.terminals = resTerminal.data;
-            } else {
-                this.filterForm.terminalFilter = 0;
             }
+            // else {
+            //     this.filterForm.terminalFilter = 0;
+            // }
         },
         async fetchBus() {
             const resBuses = await this.callApi("post", "allBooking/buses");
-            console.log(resBuses);
             if (resBuses.status == 200) {
                 this.buses = resBuses.data;
-            } else {
-                this.filterForm.busFilter = 0;
             }
+            // else {
+            //     this.filterForm.busFilter = 0;
+            // }
+
+        },
+
+        async filterFunction() {
+            const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
+            if (resFilter.status == 200) {
+                $("#booking_table").DataTable().destroy();
+                this.allRecords = resFilter.data;
+                setTimeout(() => {
+                    $("#booking_table").DataTable();
+                }, 900);
+            }
+            // else {
+            //     this.filterForm.busFilter = 0;
+            // }
 
         },
     },

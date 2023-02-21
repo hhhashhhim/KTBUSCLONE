@@ -8,4 +8,5 @@ Route::group(['prefix' => 'allBooking', [CustomMiddleware::class]], function () 
     Route::post('/routes', [AllBookingController::class, 'routes']);
     Route::post('/terminals', [AllBookingController::class, 'terminals']);
     Route::post('/buses', [AllBookingController::class, 'buses']);
+    Route::post('/filter', [AllBookingController::class, 'filter']);
 });

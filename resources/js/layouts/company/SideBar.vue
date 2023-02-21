@@ -98,12 +98,11 @@
                                 <i class="fas fa-city"></i> Expense Categories
                             </router-link>
                         </li>
-
-<!--                        <li class="dropdown" v-if="checkForSubmenu('route')">-->
-<!--                            <router-link class="nav-link text-capitalize" :to="{ name:'all-booking-page' }">-->
-<!--                                <i class="fas fa-bookmark"></i> All Booking-->
-<!--                            </router-link>-->
-<!--                        </li>-->
+                        <li class="dropdown" v-if="checkForSubmenu('route')">
+                            <router-link class="nav-link text-capitalize" :to="{ name:'all-booking-page' }">
+                                <i class="fas fa-bookmark"></i> All Booking
+                            </router-link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('users')">
