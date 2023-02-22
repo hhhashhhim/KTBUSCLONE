@@ -1,0 +1,10 @@
+<?php
+
+use App\Http\Controllers\Account\AccountController;
+use App\Http\Middleware\CustomMiddleware;
+use Illuminate\Support\Facades\Route;
+
+Route::group(['prefix' => 'accounts', [CustomMiddleware::class]], function () {
+    Route::post('/coa/getSecondLevel', [AccountController::class, 'getSecondLevel']);
+    Route::post('/coa/category/store', [AccountController::class, 'categoryStore']);
+});
