@@ -21,7 +21,7 @@
                                                                   class="form-control"
                                                                   v-model="filterForm.cnicFilter"
                                                                   mask="00000-0000000-0"
-                                                                  @keypress="filterFunction()"
+                                                                  @keyup="filterFunction()"
                                                                   :raw="false"
                                                                   :options="options"
                                                         >
@@ -36,7 +36,7 @@
                                                                   v-model="filterForm.phoneFilter"
                                                                   mask="0000-0000000"
                                                                   :raw="false"
-                                                                  @keypress="filterFunction()"
+                                                                  @keyup="filterFunction()"
                                                                   :options="optionsContact"
                                                         >
                                                         </vue-mask>
@@ -47,7 +47,7 @@
                                                         <label for="name">Name</label>
                                                         <input id="name" type="text" class="form-control"
                                                                v-model="filterForm.nameFilter"
-                                                               @keypress="filterFunction()">
+                                                               @keyup="filterFunction()">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
@@ -220,9 +220,9 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        setTimeout(() => {
-            $("#filterTable").DataTable();
-        }, 300);
+        // setTimeout(() => {
+        //     $("#filterTable").DataTable();
+        // }, 300);
     },
     methods: {
         async fetchRoutes() {
@@ -258,11 +258,11 @@ export default {
         async filterFunction() {
             const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
             if (resFilter.status == 200) {
-                $("#booking_table").DataTable().destroy();
+                // $("#booking_table").DataTable().destroy();
                 this.allRecords = resFilter.data;
-                setTimeout(() => {
-                    $("#booking_table").DataTable();
-                }, 900);
+                // setTimeout(() => {
+                //     $("#booking_table").DataTable();
+                // }, 900);
             }
             // else {
             //     this.filterForm.busFilter = 0;

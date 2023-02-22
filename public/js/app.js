@@ -26634,13 +26634,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.fetchTerminals();
 
-              _this.fetchBus();
+              _this.fetchBus(); // setTimeout(() => {
+              //     $("#filterTable").DataTable();
+              // }, 300);
 
-              setTimeout(function () {
-                $("#filterTable").DataTable();
-              }, 300);
 
-            case 6:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -26755,11 +26754,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resFilter = _context5.sent;
 
                 if (resFilter.status == 200) {
-                  $("#booking_table").DataTable().destroy();
-                  _this5.allRecords = resFilter.data;
-                  setTimeout(function () {
-                    $("#booking_table").DataTable();
-                  }, 900);
+                  // $("#booking_table").DataTable().destroy();
+                  _this5.allRecords = resFilter.data; // setTimeout(() => {
+                  //     $("#booking_table").DataTable();
+                  // }, 900);
                 } // else {
                 //     this.filterForm.busFilter = 0;
                 // }
@@ -49948,7 +49946,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.filterForm.cnicFilter = $event;
     }),
     mask: "00000-0000000-0",
-    onKeypress: _cache[1] || (_cache[1] = function ($event) {
+    onKeyup: _cache[1] || (_cache[1] = function ($event) {
       return $options.filterFunction();
     }),
     raw: false,
@@ -49964,7 +49962,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     mask: "0000-0000000",
     raw: false,
-    onKeypress: _cache[3] || (_cache[3] = function ($event) {
+    onKeyup: _cache[3] || (_cache[3] = function ($event) {
       return $options.filterFunction();
     }),
     options: $data.optionsContact
@@ -49977,7 +49975,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $data.filterForm.nameFilter = $event;
     }),
-    onKeypress: _cache[5] || (_cache[5] = function ($event) {
+    onKeyup: _cache[5] || (_cache[5] = function ($event) {
       return $options.filterFunction();
     })
   }, null, 544
