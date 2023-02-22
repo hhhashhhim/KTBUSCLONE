@@ -66,6 +66,8 @@ require_once('web/hrm/departments.php');
 require_once('web/hrm/designation.php');
 //Hrm Tickets Route
 require_once('web/hrm/tickets.php');
+//Account
+require_once('web/accounts.php');
 // Profile Routes
 require_once('web/profile/profile.php');
 // Expenses Routes

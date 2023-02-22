@@ -40,6 +40,7 @@ import ExpensePage from "./pages/expense/ExpensePage.vue";
 import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue";
 import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
+import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 
 
 const url = '/kt/'
@@ -252,6 +253,11 @@ const routes = [
         path: url + "terminal/time/difference",
         component : TerminalTimeDifferencePage,
         name:"terminal-difference"
+    },
+    {
+        path: url + "accounts/coa/categories",
+        component : AccountCategoryPage,
+        name:"accounts-categories"
     },
 ]
 const router = createRouter({

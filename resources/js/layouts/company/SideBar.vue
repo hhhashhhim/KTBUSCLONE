@@ -222,6 +222,30 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="dropdown" v-if="checkPermission('hrm')">
+
+                    <a href="#" class="menu-toggle nav-link has-dropdown">
+                        <i class="fas fa-sitemap"></i>
+                        <span>
+                            Accounts
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown">
+                            <a href="#" class="has-dropdown">Chart Of Account</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <router-link class="nav-link text-capitalize" :to="{ name:'accounts-categories' }"
+                                                v-if="checkForSubmenu('employee')">
+                                        <i class="fas fa-street-view"></i> Tier 3
+                                    </router-link>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                
                 <li class="dropdown" v-if="checkPermission('hrm')">
 
                     <a href="#" class="menu-toggle nav-link has-dropdown">
