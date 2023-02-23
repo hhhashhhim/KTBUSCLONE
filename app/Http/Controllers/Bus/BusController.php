@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Bus;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
+use App\Models\Bus\BusClass;
 use App\Models\Bus\BusSeatMap;
 use App\Models\FareClass;
 use App\Models\Schedule\TicketClosing;
@@ -15,15 +16,15 @@ use Illuminate\Validation\Rule;
 class BusController extends Controller
 {
 
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
+    //    public $company_id;
+    //
+    //    public function __construct()
+    //    {
+    //        $this->middleware(function ($request, $next) {
+    //            Auth::user()->company_id = Auth::user()->company_id;
+    //            return $next($request);
+    //        });
+    //    }
 
     public function index()
     {
@@ -35,9 +36,9 @@ class BusController extends Controller
         $rules = [
             'busNumber' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'fare_class' => 'required|integer',
-//            'chassisNumber' => 'required',
-//            'insuranceNumber' => 'required',
-//            'routePermit' => 'required',
+            //            'chassisNumber' => 'required',
+            //            'insuranceNumber' => 'required',
+            //            'routePermit' => 'required',
         ];
 
         $customMessages = [
@@ -92,27 +93,12 @@ class BusController extends Controller
         return Bus::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
     }
 
-    public function saveFareClass(Request $request)
-    {
-        $rules = [
-            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
-
-        $customMessages = [
-            'FareClassName.required' => 'Fare Class Name is Required!',
-            'FareClassName.unique' => 'This Fare Class Name is Already Exist!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return FareClass::create([
-            'name' => $request->FareClassName,
-            'is_active' => 1,
-            'company_id' => Auth::user()->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
-    }
-
     public function getBusSchedule(Request $request)
     {
-        return TicketClosing::where('bus_id', $request->id)->where('company_id', Auth::user()->company_id)->latest()->first(['id','schedule_id','schedule_date','schedule_time']);
+        return TicketClosing::where('bus_id', $request->id)->where('company_id', Auth::user()->company_id)->latest()->first(['id', 'schedule_id', 'schedule_date', 'schedule_time']);
+    }
+    public function busClasses()
+    {
+        return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 }

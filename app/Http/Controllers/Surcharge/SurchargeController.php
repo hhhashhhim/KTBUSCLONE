@@ -73,9 +73,4 @@ class SurchargeController extends Controller
     {
         return Surcharge::find($request->id)->delete();
     }
-
-    public function selectiveSurcharge()
-    {
-        return Surcharge::where('company_id', Auth::user()->company_id)/*->where('is_active', 1)*/->get();
-    }
 }

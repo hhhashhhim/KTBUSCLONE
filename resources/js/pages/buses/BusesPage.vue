@@ -357,7 +357,7 @@ export default {
                 console.log(res);
             }
 
-            const resFareClass = await this.callApi("post", "bus_classes");
+            const resFareClass = await this.callApi("post", "buses/bus_classes");
             if (resFareClass.status == 200) {
                 this.fareClasses = resFareClass.data;
             } else {

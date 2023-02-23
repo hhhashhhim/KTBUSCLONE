@@ -400,7 +400,6 @@ export default {
         },
 
         async closeSchedule() {
-            // console.log(this.addData.drivers.length);return;
             this.validationErrors = [];
             if (!this.addData.bus)
                 return swal({

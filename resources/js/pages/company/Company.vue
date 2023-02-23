@@ -123,8 +123,8 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Sr. No.</th>
-                                <th>Module Name</th>
+                                <th style="width: 7% !important">Sr. No.</th>
+                                <th style="width: 15% !important">Module Name</th>
                                 <th>Permission</th>
                             </tr>
                         </thead>
@@ -225,8 +225,8 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Sr. No.</th>
-                                <th>Module Name</th>
+                                <th style="width: 10% !important;">Sr. No.</th>
+                                <th style="width: 15% !important">Module Name</th>
                                 <th>Permission</th>
                             </tr>
                         </thead>

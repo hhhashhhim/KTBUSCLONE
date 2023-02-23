@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Bus;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\BusClass;
+use App\Models\FareClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -81,5 +82,28 @@ class BusClassController extends Controller
         $new->created_at  = now();
         $new->save();
         return $new;
+    }
+    public function fareClasses(){
+        return FareClass::with('addedBy')
+        ->where('company_id', Auth::user()->company_id)->orderBy('id')
+        ->get();
+    }
+    public function saveFareClass(Request $request)
+    {
+        $rules = [
+            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        ];
+
+        $customMessages = [
+            'FareClassName.required' => 'Fare Class Name is Required!',
+            'FareClassName.unique' => 'This Fare Class Name is Already Exist!',
+        ];
+        $this->validate($request, $rules, $customMessages);
+        return FareClass::create([
+            'name' => $request->FareClassName,
+            'is_active' => 1,
+            'company_id' => Auth::user()->company_id,
+            'added_by' => Auth::user()->id,
+        ]);
     }
 }

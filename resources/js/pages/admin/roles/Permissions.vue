@@ -27,14 +27,12 @@
                       </div>
 
                       <div class="table-responsive">
-                        <table
-                          class="table table-striped table-hover"
-                          id="edit_loc"
+                        <table class="table table-striped table-hover"
                         >
                           <thead>
                             <tr>
-                              <th>Sr No.</th>
-                              <th>Module Name</th>
+                              <th style="width: 7% !important;">Sr No.</th>
+                              <th style="width: 15% !important">Module Name</th>
                               <th>Permissions</th>
                             </tr>
                           </thead>
@@ -43,7 +41,7 @@
                               <td>{{ (parseInt(index)+11) }}</td>
                               <td>{{ permission.name }}</td>
                               <td>
-                                <label class="colorinput mx-3" v-for="(operation,i) in permission" :key="i">
+                                <label class="colorinput m-3" v-for="(operation,i) in permission" :key="i">
                                   <span v-if="i!='name'">
                                         <input
                                           :checked="permission[i]"

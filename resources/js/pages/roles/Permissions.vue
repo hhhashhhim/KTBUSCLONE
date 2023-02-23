@@ -33,8 +33,8 @@
                         >
                           <thead>
                             <tr>
-                              <th>Sr No.</th>
-                              <th>Module Name</th>
+                              <th style="width: 7% !important;">Sr No.</th>
+                              <th style="width: 15% !important;">Module Name</th>
                               <th>Permissions</th>
                             </tr>
                           </thead>
@@ -65,7 +65,7 @@
                             <tr v-if="moduleName.allow">
                               <td colspan="2"></td>
                                 <td class="py-5">
-                                <label class="colorinput mx-3" v-for="(menus,j) in moduleName.childs" :key="j">
+                                <label class="colorinput m-3" v-for="(menus,j) in moduleName.childs" :key="j">
                                   <span v-if="i!='name'">
                                         <input
                                           :checked="menus"

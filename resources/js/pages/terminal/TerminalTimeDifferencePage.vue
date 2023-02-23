@@ -216,25 +216,6 @@ export default {
             }
         },
 
-        async updateScheduleTimes() {
-            this.loadingTable = true;
-            const res = await this.callApi("post", 'fare-table/schedules/times/update');
-            if (res.status == 200) {
-                this.cities = res.data
-                swal({
-                    title: "Success",
-                    text: "Schedule Times Updated",
-                    icon: "success",
-                    timer: 4000
-                });
-                setTimeout(() => {
-                    this.loadingTable = false;
-                }, 500);
-            } else {
-                console.log(res);
-            }
-        },
-
         async changeInfo(from, to) {
             this.data.time_difference = '';
             this.from = from.name;

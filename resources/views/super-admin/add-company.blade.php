@@ -33,8 +33,8 @@
                                                 <table class="table table-striped table-hover" id="edit_loc">
                                                     <thead>
                                                         <tr>
-                                                            <th>Sr No.</th>
-                                                            <th>Module Name</th>
+                                                            <th style="width: 7% !important">Sr No.</th>
+                                                            <th style="width: 15% !important">Module Name</th>
                                                             <th>Permissions</th>
                                                         </tr>
                                                     </thead>

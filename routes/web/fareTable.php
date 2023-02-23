@@ -10,6 +10,6 @@ Route::group(['prefix' => 'fare-table', [CustomMiddleware::class]], function () 
     Route::post('/fare_class/get', [FareTableController::class, 'getFareClass']);
     Route::post('/check', [FareTableController::class, 'check']);
     Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
-    
+
     Route::post('/schedules/times/update/progress', [FareTableController::class, 'updateScheduleTimesProgress']);
 });

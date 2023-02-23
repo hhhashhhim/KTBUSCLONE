@@ -10,8 +10,7 @@ Route::group(['prefix' => 'buses', [CustomMiddleware::class]], function () {
     Route::post('/update', [BusController::class, 'updateBus']);
     Route::post('/delete', [BusController::class, 'deleteBus']);
     Route::post('/getBusData', [BusController::class, 'getBusData']);
-    Route::post('/storeFareClass', [BusController::class, 'saveFareClass']);
-
     Route::post('/single/schedule/latest', [BusController::class, 'getBusSchedule']);
+    Route::post('/bus_classes', [BusController::class, 'busClasses']);
 
 });

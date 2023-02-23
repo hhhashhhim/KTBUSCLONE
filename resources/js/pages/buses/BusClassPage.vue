@@ -747,7 +747,7 @@ export default {
         },
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
-            const resClass = await this.callApi("post", "fare-class")
+            const resClass = await this.callApi("post", "bus_classes/fare-class")
             if (resBusClass.status == 200 && resClass.status == 200) {
                 this.busClasses = resBusClass.data;
                 this.allSeatClasses = resClass.data;
@@ -755,7 +755,7 @@ export default {
             } else {
                 console.log(resBusClass);
             }
-            const resFareClass = await this.callApi("post", "fare-class");
+            const resFareClass = await this.callApi("post", "bus_classes/fare-class");
             if (resFareClass.status == 200) {
                 this.fareClasses = resFareClass.data;
             } else {
@@ -786,11 +786,7 @@ export default {
         },
         async saveFareClass() {
             this.loading = true;
-            const resSaveFareClass = await this.callApi(
-                "post",
-                "buses/storeFareClass",
-                this.addData
-            );
+            const resSaveFareClass = await this.callApi( "post", "bus_classes/storeFareClass", this.addData);
             if (resSaveFareClass.status == 201) {
                 swal({
                     title: "Success",
@@ -817,7 +813,6 @@ export default {
 
                 })
                 this.selectedSeats = [];
-                // this.getBorderSelected(this)
                 return swal({
                     title: "Success",
                     text: "Seats Modified Successfully !!!!",

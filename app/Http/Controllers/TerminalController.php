@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\Company;
 use App\Models\Terminal;
 use App\Models\TerminalCommission;
 use App\Models\TerminalDiscount;
@@ -16,6 +17,13 @@ class TerminalController extends Controller
     public function index()
     {
         return City::withCount('terminal')->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+    }
+
+    public function companies(){
+        return Company::orderBy('id', 'desc')->get();
+    }
+    public function cities(){
+        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function allTerminals()
