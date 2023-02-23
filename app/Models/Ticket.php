@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Models\Booking\TicketELT;
 use App\Models\Bus\BusClass;
+use App\Models\Bus\Bus;
+use App\Models\Booking\BookingCancel;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\TerminalCommission;
@@ -80,5 +82,15 @@ class Ticket extends Model
     public function commission()
     {
         return $this->hasOne(TerminalCommission::class,"terminal_id","terminal_id");
+    }
+    
+    public function bus()
+    {
+        return $this->hasOne(Bus::class,"id","bus_id");
+    }
+    
+    public function cancel()
+    {
+        return $this->hasOne(BookingCancel::class, 'ticket_id', 'id');
     }
 }

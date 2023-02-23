@@ -33,26 +33,58 @@ class AllBookingController extends Controller
 
     public function filter(Request $request)
     {
-        $query = Ticket::query();
-//        $tickets_ids = [];
-        if (!is_null($request->cnicFilter)) {
-            $query->with('customer');
-//            $customers = Customer::where('cnic', str_replace('-', '', $request->cnicFilter))->pluck('id')->toArray();
-//            $tickets = Ticket::whereIn('customer_id', $customers)->pluck('id')->toArray();
-//            count($tickets_ids) > 0 ? array_push($tickets_ids, $tickets) : $tickets_ids = $tickets;
+        
+        $data = Ticket::
+        where(["tickets.company_id"=>Auth::user()->company_id])
+
+        // Within Customer Table
+        ->where("customers.cnic",'like','%' . str_replace("-", "", $request->cnicFilter) . '%')
+        ->where("customers.contact",'like','%' . str_replace("-", "", $request->phoneFilter) . '%')
+        ->where("customers.name",'like','%' . $request->nameFilter . '%')
+        ->join("customers","customers.id","tickets.customer_id")
+
+        ->where(function($q) use ($request){
+            // Within Ticket Table
+            if($request->terminalFilter)
+            {
+                $q->where("terminal_id",$request->terminalFilter);
+            }
+            if($request->busFilter)
+            {
+                $q->where("bus_id",$request->busFilter);
+            }
+            if($request->dateFilter)
+            {
+                $q->where("date",$request->dateFilter);
+            }
+            if($request->statusFilter == "reschedule")
+            {
+                $q->where("reschedule_type", '!=',$request->statusFilter);
+            }
+            elseif($request->statusFilter)
+            {
+                $q->where("type",$request->statusFilter);
+            }
+            return $q;
+        });
+        
+        // with route filter
+        if($request->routeFilter)
+        {
+            $data->join("schedules","schedules.id","tickets.schedule_id");
+            $data->where("schedules.route_id",$request->routeFilter);
         }
-//        if (!is_null($request->phoneFilter)) {
-//            $customers = Customer::where('contact', str_replace('-', '', $request->phoneFilter))->pluck('id')->toArray();
-//            $tickets = Ticket::whereIn('customer_id', $customers)->pluck('id')->toArray();
-//            count($tickets_ids) > 0 ? array_push($tickets_ids, $tickets) : $tickets_ids = $tickets;
-//        }
-//            if (!is_null($request->phoneFilter)) {
-//                $q->where('contact', str_replace('-', '', $request->cnicFilter));
-//            }
-//            if (!is_null($request->nameFilter)) {
-//                $q->where('name', 'like', '%' . $request->nameFilter . '%');
-        return $query->get();
-//        return Ticket::with('terminal', 'schedule', 'customer')->whereIn('id', array_unique($tickets_ids))->get();
+        // Within Ticket Table
+        if($request->statusFilter == "canceled")
+        {
+            $data->where("type",$request->statusFilter)->withTrashed();
+        }
+
+        return $data
+        ->with("schedule:id,route_id","schedule.route:id,name","bus:id,bus_number",
+        "terminal:id,name","addedBy:id,name","scheduleDetail:id,departure_time",
+        "cancel:id,ticket_id,added_by,created_at","cancel.addedBy:id,name")
+        ->select("tickets.*","customers.name","customers.cnic","customers.contact")->get();
     }
 
 }

@@ -56,7 +56,7 @@
                                                         <select id="routeFilter" class="form-control"
                                                                 v-model="filterForm.routeFilter"
                                                                 @change="filterFunction()">
-                                                            <option value="0">---Select Route---</option>
+                                                            <option value="">---Select Route---</option>
                                                             <option v-for="(route, i) in routes" :key="i"
                                                                     :value="route.id">
                                                                 {{ route.name }}
@@ -70,7 +70,7 @@
                                                         <select id="terminalsFilter" class="form-control"
                                                                 v-model="filterForm.terminalFilter"
                                                                 @change="filterFunction()">
-                                                            <option value="0">---Select Terminal---</option>
+                                                            <option value="">---Select Terminal---</option>
                                                             <option v-for="(terminal, i) in terminals" :key="i"
                                                                     :value="terminal.id">
                                                                 {{ terminal.name }}
@@ -84,7 +84,7 @@
                                                         <select id="busFilter" class="form-control"
                                                                 v-model="filterForm.busFilter"
                                                                 @change="filterFunction()">
-                                                            <option value="0">---Select Bus #---</option>
+                                                            <option value="">---Select Bus #---</option>
                                                             <option v-for="(bus, i) in buses" :key="i"
                                                                     :value="bus.id">
                                                                 {{ bus.bus_number }}
@@ -106,10 +106,10 @@
                                                         <select id="statusFilter" class="form-control"
                                                                 v-model="filterForm.statusFilter"
                                                                 @change="filterFunction()">
-                                                            <option value="0">---Select Status---</option>
-                                                            <option value="advanced booking">Booked</option>
-                                                            <option value="booked">Issued</option>
-                                                            <option value="cancel">Cancelled</option>
+                                                            <option value="">---Select Status---</option>
+                                                            <option value="booked">Booked</option>
+                                                            <option value="advance booking">Advance Booked</option>
+                                                            <option value="canceled">Cancelled</option>
                                                             <option value="reschedule">Reschedule Ticket</option>
                                                             <option value="over-issue">Over Issue Ticket</option>
                                                         </select>
@@ -131,6 +131,7 @@
                                                             <th>Seat No</th>
                                                             <th>Passenger Name</th>
                                                             <th>CNIC</th>
+                                                            <th>Contact</th>
                                                             <th>Fare</th>
                                                             <th>Booking Date</th>
                                                             <th>Canceled By</th>
@@ -140,20 +141,21 @@
                                                         </thead>
                                                         <tbody>
                                                         <tr v-for="(record, i) in allRecords" :key="i">
-                                                            <td>Sr No.</td>
-                                                            <td>Route</td>
-                                                            <td>Bus No</td>
-                                                            <td>Bus Time</td>
-                                                            <td>Terminal name</td>
-                                                            <td>Booked By</td>
-                                                            <td>Seat No</td>
-                                                            <td>Passenger Name</td>
-                                                            <td>CNIC</td>
-                                                            <td>Fare</td>
-                                                            <td>Booking Date</td>
-                                                            <td>Canceled By</td>
-                                                            <td>Canceled Date</td>
-                                                            <td>Status</td>
+                                                            <td>{{ ++i }}</td>
+                                                            <td>{{ record.schedule.route.name }}</td>
+                                                            <td>{{ record.bus ? record.bus.bus_number : 'N/A' }}</td>
+                                                            <td>{{ record.schedule_detail ? record.schedule_detail.departure_time : 'N/A' }}</td>
+                                                            <td>{{ record.terminal.name }}</td>
+                                                            <td>{{ record.added_by.name }}</td>
+                                                            <td>{{ record.seat_no }}</td>
+                                                            <td>{{ record.name}}</td>
+                                                            <td>{{ record.cnic}}</td>
+                                                            <td>{{ record.contact}}</td>
+                                                            <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount??0)}}</td>
+                                                            <td>{{ record.created_at}}</td>
+                                                            <td>{{ record.cancel ? record.cancel.added_by.name : 'N/A' }}</td>
+                                                            <td>{{ record.cancel ? record.cancel.created_at : 'N/A' }}</td>
+                                                            <td>{{ record.type }}</td>
                                                         </tr>
                                                         </tbody>
                                                     </table>
@@ -207,10 +209,10 @@ export default {
                 dateFilter: "",
                 nameFilter: "",
                 phoneFilter: "",
-                terminalFilter: 0,
-                routeFilter: 0,
-                busFilter: 0,
-                statusFilter: 0,
+                terminalFilter: "",
+                routeFilter: "",
+                busFilter: "",
+                statusFilter: "",
             }
         };
     },
@@ -220,9 +222,16 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
+<<<<<<< HEAD
+        this.filterFunction();
+        setTimeout(() => {
+            $("#filterTable").DataTable();
+        }, 300);
+=======
         // setTimeout(() => {
         //     $("#filterTable").DataTable();
         // }, 300);
+>>>>>>> bc0b64180a01a4972bebca60f3c3c13c85a8e9c3
     },
     methods: {
         async fetchRoutes() {
