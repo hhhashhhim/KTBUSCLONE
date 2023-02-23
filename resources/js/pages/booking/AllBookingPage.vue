@@ -144,17 +144,24 @@
                                                             <td>{{ ++i }}</td>
                                                             <td>{{ record.schedule.route.name }}</td>
                                                             <td>{{ record.bus ? record.bus.bus_number : 'N/A' }}</td>
-                                                            <td>{{ record.schedule_detail ? record.schedule_detail.departure_time : 'N/A' }}</td>
+                                                            <td>{{ record.schedule_detail ?
+                                                                record.schedule_detail.departure_time : 'N/A' }}
+                                                            </td>
                                                             <td>{{ record.terminal.name }}</td>
                                                             <td>{{ record.added_by.name }}</td>
                                                             <td>{{ record.seat_no }}</td>
                                                             <td>{{ record.name}}</td>
                                                             <td>{{ record.cnic}}</td>
                                                             <td>{{ record.contact}}</td>
-                                                            <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount??0)}}</td>
+                                                            <td>{{ parseFloat(record.seat_fare) -
+                                                                parseFloat(record.discount??0)}}
+                                                            </td>
                                                             <td>{{ record.created_at}}</td>
-                                                            <td>{{ record.cancel ? record.cancel.added_by.name : 'N/A' }}</td>
-                                                            <td>{{ record.cancel ? record.cancel.created_at : 'N/A' }}</td>
+                                                            <td>{{ record.cancel ? record.cancel.added_by.name : 'N/A'
+                                                                }}
+                                                            </td>
+                                                            <td>{{ record.cancel ? record.cancel.created_at : 'N/A' }}
+                                                            </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>
                                                         </tbody>
@@ -222,16 +229,10 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-<<<<<<< HEAD
         this.filterFunction();
         setTimeout(() => {
             $("#filterTable").DataTable();
         }, 300);
-=======
-        // setTimeout(() => {
-        //     $("#filterTable").DataTable();
-        // }, 300);
->>>>>>> bc0b64180a01a4972bebca60f3c3c13c85a8e9c3
     },
     methods: {
         async fetchRoutes() {
