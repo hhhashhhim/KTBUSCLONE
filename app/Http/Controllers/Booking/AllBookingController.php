@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Booking;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
+use App\Models\Customer;
 use App\Models\Route\Route;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -84,8 +85,7 @@ class AllBookingController extends Controller
         "terminal:id,name","addedBy:id,name","scheduleDetail:id,departure_time",
         "cancel:id,ticket_id,added_by,created_at","cancel.addedBy:id,name")
         ->select("tickets.*","customers.name","customers.cnic","customers.contact")->get();
-
-       
     }
 
 }
+

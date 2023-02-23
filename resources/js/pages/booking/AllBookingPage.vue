@@ -222,10 +222,16 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
+<<<<<<< HEAD
         this.filterFunction();
         setTimeout(() => {
             $("#filterTable").DataTable();
         }, 300);
+=======
+        // setTimeout(() => {
+        //     $("#filterTable").DataTable();
+        // }, 300);
+>>>>>>> bc0b64180a01a4972bebca60f3c3c13c85a8e9c3
     },
     methods: {
         async fetchRoutes() {
@@ -261,11 +267,11 @@ export default {
         async filterFunction() {
             const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
             if (resFilter.status == 200) {
-                $("#booking_table").DataTable().destroy();
+                // $("#booking_table").DataTable().destroy();
                 this.allRecords = resFilter.data;
-                setTimeout(() => {
-                    $("#booking_table").DataTable();
-                }, 900);
+                // setTimeout(() => {
+                //     $("#booking_table").DataTable();
+                // }, 900);
             }
             // else {
             //     this.filterForm.busFilter = 0;
