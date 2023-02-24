@@ -222,16 +222,10 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-<<<<<<< HEAD
         this.filterFunction();
         setTimeout(() => {
             $("#filterTable").DataTable();
         }, 300);
-=======
-        // setTimeout(() => {
-        //     $("#filterTable").DataTable();
-        // }, 300);
->>>>>>> bc0b64180a01a4972bebca60f3c3c13c85a8e9c3
     },
     methods: {
         async fetchRoutes() {
