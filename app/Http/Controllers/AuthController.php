@@ -18,6 +18,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
+        // return Auth::user()->role->permissions;
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

@@ -127,7 +127,7 @@ class ScheduleController extends Controller
                     'destination_id' => $detail->destination_city_id,
                     'departure_time' => date('H:i', strtotime($departureTime)),
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
-                    'schedule_date' => $scheduleStartDate,// schedule departure date
+                    'schedule_date' => $scheduleStartDate, // schedule departure date
                 ]);
             }
         }
@@ -258,10 +258,9 @@ class ScheduleController extends Controller
                     'destination_id' => $detail->destination_city_id,
                     'departure_time' => date('H:i', strtotime($departureTime)),
                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
-                    'schedule_date' => $scheduleStartDate,// schedule departure date
+                    'schedule_date' => $scheduleStartDate, // schedule departure date
                 ]);
             }
-
         };
 
         return $schedule;
@@ -354,8 +353,7 @@ class ScheduleController extends Controller
 
 
                             // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
-                            $after = (
-                                array_search($request->departureCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
+                            $after = (array_search($request->departureCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                 array_search($request->departureCity, $allFaresOfRoute, false) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
                                 array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                 array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false)
@@ -372,20 +370,20 @@ class ScheduleController extends Controller
                         }
                     }
                 }
-//                if ($result !== false && $leavingIn30Min) {
-//                    $seatMap[$i][$j]['over_issue'] = true;
-//                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
-//                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
-//                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
-//                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
-//                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
-//                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-//                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
-//                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
-//                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
-//                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
-//                }
-//                 print_r($column);
+                //                if ($result !== false && $leavingIn30Min) {
+                //                    $seatMap[$i][$j]['over_issue'] = true;
+                //                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
+                //                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
+                //                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
+                //                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
+                //                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                //                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                //                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                //                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+                //                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                //                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                //                }
+                //                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
@@ -438,4 +436,20 @@ class ScheduleController extends Controller
         return Bus::where('company_id', Auth::user()->company_id)->where('fare_class_id', $busClassId)->get(['id', 'bus_number']);
     }
 
+    public function fareClasses()
+    {
+        return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+    }
+    public function busClasses()
+    {
+        return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
+    }
+    public function surchargeSelective()
+    {
+        return Surcharge::where('company_id', Auth::user()->company_id)->get();
+    }
+    public function discountSelective()
+    {
+        return Discount::where('company_id', Auth::user()->company_id)->get();
+    }
 }

@@ -939,34 +939,30 @@ export default {
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
 
-            const resGetAllClasses = await this.callApi("post", "fare-class");
+            const resGetAllClasses = await this.callApi("post", "schedule/fare-class");
             this.fareClasses = resGetAllClasses.data;
 
-            const resGetBusClasses = await this.callApi("post", "bus_classes");
+            const resGetBusClasses = await this.callApi("post", "schedule/bus_classes");
             this.busClasses = resGetBusClasses.data;
 
-            const resSurcharge = await this.callApi("post", "surcharge/getSelective");
+            const resSurcharge = await this.callApi("post", "schedule/surcharge/getSelective");
             this.surcharges = resSurcharge.data;
 
-            const resDiscount = await this.callApi("post", "discount/getSelective");
+            const resDiscount = await this.callApi("post", "schedule/discount/getSelective");
             this.discounts = resDiscount.data;
         },
 
-        async fetchTerminals(event, index) {
-            const terminalRes = await this.callApi("post", "cities/terminals", {
-                id: value,
-            });
-            if (terminalRes.status == 200) {
-                this.terminals[index] = terminalRes.data;
-            }
-        },
+        // async fetchTerminals(event, index) {
+        //     const terminalRes = await this.callApi("post", "cities/terminals", {
+        //         id: value,
+        //     });
+        //     if (terminalRes.status == 200) {
+        //         this.terminals[index] = terminalRes.data;
+        //     }
+        // },
 
         async getEntireForm() {
-            const resEntire = await this.callApi(
-                "post",
-                "schedule/getEntire",
-                this.data
-            );
+            const resEntire = await this.callApi( "post", "schedule/getEntire", this.data );
             this.dataPreview = resEntire.data;
             this.dataPreview.start_date = this.data.StartDate;
             this.dataPreview.end_date = this.data.EndDate;
@@ -1368,20 +1364,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (this.dataEdit.schedules.bus_class_id == "0")
-            //     swal({
-            //         title: "Required!",
-            //         text: "Bus Class is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (this.dataEdit.schedules.route_id == "0")
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Route is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
             this.loading = true;
             const resEdit = await this.callApi(
                 "post",

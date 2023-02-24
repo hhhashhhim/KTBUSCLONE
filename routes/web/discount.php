@@ -9,5 +9,4 @@ Route::group(['prefix' => 'discount', [CustomMiddleware::class]], function () {
     Route::post('/store', [DiscountController::class, 'storeDiscount']);
     Route::post('/update', [DiscountController::class, 'updateDiscount']);
     Route::post('/delete', [DiscountController::class, 'deleteDiscount']);
-    Route::post('/getSelective', [DiscountController::class, 'selectiveDiscount']);
 });

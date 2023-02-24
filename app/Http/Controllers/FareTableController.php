@@ -3,12 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
-use App\Models\Job;
 use App\Models\FareClass;
 use App\Models\FareTable;
-use App\Models\Schedule\Schedule;
-use App\Models\Schedule\ScheduleDetail;
-use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,11 +14,11 @@ class FareTableController extends Controller
 {
 
 //    public $company_id;
-//
+
 //    public function __construct()
 //    {
 //        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
+//            Auth::user()->r = Auth::user()->company_id;
 //            return $next($request);
 //        });
 //    }

@@ -10,4 +10,6 @@ Route::group(['prefix' => 'bus_classes', [CustomMiddleware::class]], function ()
     Route::post('/update', [BusClassController::class, 'updateBusClass']);
     Route::post('/delete', [BusClassController::class, 'deleteBusClass']);
     Route::post('/duplicate', [BusClassController::class, 'duplicateBusClass']);
+    Route::post('/fare-class', [BusClassController::class, 'fareClasses']);
+    Route::post('/storeFareClass', [BusClassController::class, 'saveFareClass']);
 });

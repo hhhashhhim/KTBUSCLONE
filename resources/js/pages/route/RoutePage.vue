@@ -280,7 +280,7 @@ export default {
         this.fetchCities();
     },
     methods: {
-        clearForm: function () {
+        clearForm: function () {route
             this.data = {};
             this.reverseRoute = 1;
             this.loop = 1;
@@ -331,7 +331,7 @@ export default {
                 terminals: this.addTerminalsOnClick
             }
             this.loading = true;
-            const res = await this.callApi("post", "cities/routes", data);
+            const res = await this.callApi("post", "routes/store", data);
             if (res.status === 200) {
                 this.loading = false;
                 $('#route_table').DataTable().destroy();
@@ -393,7 +393,7 @@ export default {
                 });
             }
             this.editLoading = true;
-            const res = await this.callApi("post", "cities/routes/update", this.dataEdit);
+            const res = await this.callApi("post", "routes/update", this.dataEdit);
             if (res.status == 200) {
                 this.editLoading = false;
                 $('#route_table').DataTable().destroy();
@@ -435,42 +435,6 @@ export default {
                 this.reverseRoute = 0;
             }
         },
-        async add() {
-            this.validationErrors = [];
-            this.loading = true;
-
-            const res = await this.callApi("post", "fare-table/store", this.data);
-            if (res.status === 200) {
-                this.loading = false;
-
-                // this.success = "Fare Table Updated Created Successfully";
-                swal({
-                    title: "Success",
-                    text: "Fare Table Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-                // Object.keys(obj).forEach((i) => obj[i] = null);
-                this.data = {};
-
-                this.cities = res.data;
-                window.scrollTo(0, 0);
-                this.setTimeout(() => {
-                    this.success = "";
-                    $("#add-modal").modal("hide");
-                }, 3000);
-            } else {
-                if (res.status === 422) {
-                    this.loading = false;
-
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-            }
-        },
         addRow() {
             this.loop++;
         },
@@ -497,7 +461,7 @@ export default {
             }
         },
         async fetchCities() {
-            const cityRes = await this.callApi("post", "cities/routes/list");
+            const cityRes = await this.callApi("post", "routes/list");
             if (cityRes.status === 200) {
                 this.cities = cityRes.data.cities;
                 this.routes = cityRes.data.routes;
@@ -515,30 +479,12 @@ export default {
         },
         async fetchRouteDetails(id) {
 
-            const routeDetailRes = await this.callApi("post", "cities/routes/details", {
+            const routeDetailRes = await this.callApi("post", "routes/details", {
                 id: id
             });
             if (routeDetailRes.status === 200) {
                 this.routeDetails = routeDetailRes.data.data;
                 this.th = routeDetailRes.data.th;
-            }
-        },
-        async fetchRecord() {
-            if (!this.data.fare_class) {
-                this.error = true;
-                return;
-            }
-            const res = await this.callApi("post", "fare-table", {
-                company_id: this.data.company_id,
-                fare_class: this.data.fare_class,
-            });
-            if (res.status === 200) {
-                this.cities = res.data;
-                setTimeout(() => {
-                    this.success = "";
-                }, 3000);
-            } else {
-                alert("Something Went Wrong");
             }
         },
 

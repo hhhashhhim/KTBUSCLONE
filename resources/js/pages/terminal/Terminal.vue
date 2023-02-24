@@ -642,8 +642,8 @@ export default {
         },
         async fetchTerminals() {
             const terminalRes = await this.callApi("post", "terminals");
-            const compRes = await this.callApi("post", "company");
-            const cities = await this.callApi("post", "cities");
+            const compRes = await this.callApi("post", "terminals/company");
+            const cities = await this.callApi("post", "terminals/cities");
             this.terminals = terminalRes.data;
             this.companies = compRes.data;
             this.cities = cities.data;
@@ -700,28 +700,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.data.commission)
-            //     return swal({
-            //         title: "Required",
-            //         text: "Commission is required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.data.flatCommission)
-            //     return swal({
-            //         title: "Required",
-            //         text: "Flat Commission Value is required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.data.percentageCommission)
-            //     return swal({
-            //         title: "Required",
-            //         text: "Percentage Commission Value is required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-
             this.loading = true;
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status == 200) {
@@ -742,7 +720,6 @@ export default {
                     this.success = "";
                     $("#add-modal").modal("hide");
                     empty(this.errorsArray);
-                    // window.location.reload(
                 }, 2000);
             } else {
                 if (res.status === 422) {
@@ -801,28 +778,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-
-            // if (!this.dataEdit.fixed_commission)
-            // return swal({
-            //     title: "Required",
-            //     text: "Commission is required",
-            //     icon: "error",
-            //     timer: 2000
-            // });
-            // if (!this.dataEdit.ticket_flat_commission)
-            //     return swal({
-            //         title: "Required",
-            //         text: "Flat Commission Value is required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.dataEdit.ticket_percentage_commission)
-            //     return swal({
-            //         title: "Required",
-            //         text: "Percentage Commission Value is required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
             this.loading = true;
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {

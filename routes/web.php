@@ -28,6 +28,8 @@ require_once('web/refreshment.php');
 require_once('web/role.php');
 //company Routes
 require_once('web/company.php');
+// Routes Panel Routes
+require_once('web/routes.php');
 //users Routes
 require_once('web/users.php');
 //Terminals Route
