@@ -213,6 +213,9 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
+        setTimeout(() => {
+            $("#filterTable").DataTable();
+        }, 300);
     },
     methods: {
         async fetchRoutes() {
