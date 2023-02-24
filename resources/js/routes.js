@@ -266,8 +266,4 @@ const router = createRouter({
     routes,
 })
 
-// router.beforeEach(()=>{
-//     console.log(this.$store);
-// })
-
 export default router

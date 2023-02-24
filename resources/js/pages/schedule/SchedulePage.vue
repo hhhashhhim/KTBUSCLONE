@@ -1167,89 +1167,89 @@ export default {
         validateStep(nextBtnValue) {
             //Step 1
             if (nextBtnValue == 'step1') {
-                // if (this.data.name == "" || typeof this.data.name == 'undefined')
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Name Field is Required ",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // if (this.data.StartDate == "" || typeof this.data.StartDate == 'undefined')
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Start Date is Required ",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // if (this.data.EndDate == "" || typeof this.data.EndDate == 'undefined')
-                //     return swal({
-                //         title: "Required!",
-                //         text: "End Date is Required ",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // if (this.data.time == "" || typeof this.data.time == 'undefined')
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Time Field is Required ",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // if (this.data.name && this.data.StartDate && this.data.EndDate && this.data.time) {
+                if (this.data.name == "" || typeof this.data.name == 'undefined')
+                    return swal({
+                        title: "Required!",
+                        text: "Name Field is Required ",
+                        icon: "error",
+                        timer: 2000
+                    });
+                if (this.data.StartDate == "" || typeof this.data.StartDate == 'undefined')
+                    return swal({
+                        title: "Required!",
+                        text: "Start Date is Required ",
+                        icon: "error",
+                        timer: 2000
+                    });
+                if (this.data.EndDate == "" || typeof this.data.EndDate == 'undefined')
+                    return swal({
+                        title: "Required!",
+                        text: "End Date is Required ",
+                        icon: "error",
+                        timer: 2000
+                    });
+                if (this.data.time == "" || typeof this.data.time == 'undefined')
+                    return swal({
+                        title: "Required!",
+                        text: "Time Field is Required ",
+                        icon: "error",
+                        timer: 2000
+                    });
+                if (this.data.name && this.data.StartDate && this.data.EndDate && this.data.time) {
                 this.activeSection = nextBtnValue;
-                // }
+                }
             }
             //Step 2
             if (nextBtnValue == 'step2') {
 
-                // if (this.data.route == 0)
+                if (this.data.route == 0)
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select Route",
+                        icon: "error",
+                        timer: 2000
+                    });
+
+                if (this.data.addTerminalsOnClick.length == 0) {
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select Terminals of Selected Route",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
+                if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select at Least 2 Terminals of Selected Route",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
+                if (this.data.busClass == 0)
+                    return swal({
+                        title: "Required!",
+                        text: "Please Select Bus Class",
+                        icon: "error",
+                        timer: 2000
+                    });
+                // if (this.data.fareClass == 0)
                 //     return swal({
                 //         title: "Required!",
-                //         text: "Please Select Route",
+                //         text: "Please Select Fare Class",
                 //         icon: "error",
                 //         timer: 2000
                 //     });
-                //
-                // if (this.data.addTerminalsOnClick.length == 0) {
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Please Select Terminals of Selected Route",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
-                //
-                // if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Please Select at Least 2 Terminals of Selected Route",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
-                //
-                // if (this.data.busClass == 0)
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Please Select Bus Class",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // // if (this.data.fareClass == 0)
-                // //     return swal({
-                // //         title: "Required!",
-                // //         text: "Please Select Fare Class",
-                // //         icon: "error",
-                // //         timer: 2000
-                // //     });
-                // if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
+                if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
                 this.activeSection = nextBtnValue;
-                // }
+                }
             }
             //Step3
-            // if (nextBtnValue == 'step3') {
+            if (nextBtnValue == 'step3') {
             this.activeSection = nextBtnValue;
-            // }
+            }
         },
 
         async addSchedule() {

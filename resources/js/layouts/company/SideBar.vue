@@ -8,18 +8,17 @@
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
-                <li class="dropdown active" v-if="checkPermission('dashboard')">
+                <li class="dropdown active">
                     <a :href="$store.state.app_url + 'admin/dashboard'" class="nav-link">
                         <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
-                <!-- Tickting panel -->
-                <li class="dropdown" v-if="checkPermission('ticketing')">
+                <!-- Admin Panel -->
+                <li class="dropdown" v-if="checkPermission('admin')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
-                            Ticketing
+                            Admin
                         </span>
                     </a>
-                    <!--                    Permission just about terminals-->
                     <ul class="dropdown-menu">
                         <li class="dropdown" v-if="checkForSubmenu('cities')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'cities-page' }">
@@ -36,8 +35,6 @@
                                 <i class="fas fa-clock"></i> Terminal Time
                             </router-link>
                         </li>
-
-                        <!--                        Permission Just For fare Table -->
                         <li class="dropdown" v-if="checkForSubmenu('fare-class')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'fare-class' }">
                                 <i class="fas fa-table"></i> Fare Class
@@ -48,17 +45,6 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('bus-class')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'bus-class-page' }">
-                                <i class="fa fa-bus"></i> Bus Class
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('buses')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'buses-page' }">
-                                <i class="fa fa-bus"></i> Buses
-                            </router-link>
-                        </li>
-
                         <li class="dropdown" v-if="checkForSubmenu('routes')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'routes-page' }">
                                 <i class="fas fa-route"></i> Routes
@@ -74,41 +60,85 @@
                                 <i class="fas fa-table"></i> Surcharge
                             </router-link>
                         </li>
+                    </ul>
+                </li>
+                <!-- Reporting panel -->
+                <!-- <li class="dropdown" v-if="checkPermission('ticketing')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Reports
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fas fa-city"></i> Confirmed Canceled
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fa fa-landmark"></i> Sales Report
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal-time')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fas fa-clock"></i> Closed Trip Report
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('fare-class')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fas fa-table"></i> Commission Reports
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fas fa-table"></i> Complaints Reports
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('bus-class')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fa fa-bus"></i> Over-Issue Reports
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('buses')">
+                            <router-link class="nav-link text-capitalize" >
+                                <i class="fa fa-bus"></i> Expenses Report
+                            </router-link>
+                        </li>
+                    </ul>
+                </li> -->
+                <!-- Buses panel -->
+                <li class="dropdown" v-if="checkPermission('buses')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Buses
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown" v-if="checkForSubmenu('bus-class')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'bus-class-page' }">
+                                <i class="fa fa-bus"></i> Bus Class
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('buses')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'buses-page' }">
+                                <i class="fa fa-bus"></i> Buses
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('schedules')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'schedule-page' }">
                                 <i class="fas fa-table"></i> Schedule
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('bookings')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-page' }">
-                                <i class="fas fa-bookmark"></i> Booking
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('close-bookings')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-schedule-closing' }">
-                                <i class="fas fa-bookmark"></i> Close Booking
-                            </router-link>
-                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('merges')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'booking-schedule-merges' }">
-                                <i class="fas fa-bookmark"></i> Merges
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('expence-categories')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'expense-category-page' }">
-                                <i class="fas fa-city"></i> Expense Categories
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('all-booking')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'all-booking-page' }">
-                                <i class="fas fa-bookmark"></i> All Booking
+                                <i class="fas fa-bookmark"></i> Merge Buses
                             </router-link>
                         </li>
                     </ul>
                 </li>
                 <!-- Users Panel -->
                 <li class="dropdown" v-if="checkPermission('users')">
-
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fa fa-users"></i>
                         <span>
                             Users
@@ -129,6 +159,48 @@
                         </li>
                     </ul>
                 </li>
+                <!-- Tickting panel -->
+                <li class="dropdown" v-if="checkPermission('ticketing')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Ticketing
+                        </span>
+                    </a>
+                    <!--                    Permission just about terminals-->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown" v-if="checkForSubmenu('bookings')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-page' }">
+                                <i class="fas fa-bookmark"></i> Booking
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('close-bookings')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-schedule-closing' }">
+                                <i class="fas fa-bookmark"></i> Close Booking
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('all-booking')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'all-booking-page' }">
+                                <i class="fas fa-bookmark"></i> All Booking
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Expenses panel -->
+                <li class="dropdown" v-if="checkPermission('expenses')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Expenses
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown" v-if="checkForSubmenu('expence-categories')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'expense-category-page' }">
+                                <i class="fas fa-city"></i> Expense Categories
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
+
                 <!-- Hrm -->
                 <li class="dropdown" v-if="checkPermission('hrm')">
 

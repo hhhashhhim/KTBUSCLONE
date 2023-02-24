@@ -1491,7 +1491,7 @@ export default {
 
         async fetchAllSchedules() {
             const resBooking = await this.callApi("post", "booking");
-            const resClass = await this.callApi("post", "fare-class")
+            const resClass = await this.callApi("post", "booking/fare_class")
             const resCity = await this.callApi("post", "booking/cities")
             const resTerminals = await this.callApi("post", "booking/terminals")
             if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
@@ -1642,7 +1642,7 @@ export default {
             this.loading = true;
             this.showBookingDiv = false;
             if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
-                const resSelected = await this.callApi("post", "schedule/selected", {
+                const resSelected = await this.callApi("post", "booking/schedule/selected", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
                     departureCity: this.addForm.departureCity,
@@ -1729,7 +1729,7 @@ export default {
         async busDropCheck() {
             this.labelDrop = '';
             this.hideDivButtonsDrop = true;
-            const resDropCheck = await this.callApi("post", "schedule/dropCheck", {
+            const resDropCheck = await this.callApi("post", "booking/schedule/dropCheck", {
                 id: this.addForm.schedule,
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
@@ -1762,7 +1762,7 @@ export default {
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
             }
-            const res = await this.callApi("post", "schedule/selected", {
+            const res = await this.callApi("post", "booking/schedule/selected", {
                 id: this.rescheduleData.rescheduleSchedule,
                 date: this.rescheduleData.rescheduleDate,
                 departureCity: this.rescheduleData.dataDepartureCity,

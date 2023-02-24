@@ -321,9 +321,9 @@ export default {
                 modules: [],
             },
             defaultModules: [
-                // Tickting Panel
+                // Admin Panel
                 {
-                    name: "ticketing",
+                    name: "admin",
                     allow: false,
                     childs: [
                         { name: "cities", allow: false },
@@ -331,17 +331,20 @@ export default {
                         { name: "terminal-time", allow: false },
                         { name: "fare-class", allow: false },
                         { name: "fare-table", allow: false },
-                        { name: "bus-class", allow: false },
-                        { name: "buses", allow: false },
                         { name: "routes", allow: false },
                         { name: "discounts", allow: false },
-                        { name: "surcharges", allow: false },
+                        { name: "surcharges", allow: false }
+                    ],
+                },
+                // buses Panel
+                {
+                    name: "buses",
+                    allow: false,
+                    childs: [
+                        { name: "bus-class", allow: false },
+                        { name: "buses", allow: false },
                         { name: "schedules", allow: false },
-                        { name: "bookings", allow: false },
-                        { name: "close-bookings", allow: false },
-                        { name: "merges", allow: false },
-                        { name: "expence-categories", allow: false },
-                        { name: "all-booking", allow: false },
+                        { name: "merges", allow: false }
                     ],
                 },
                 // Users panel
@@ -350,7 +353,27 @@ export default {
                     allow: false,
                     childs: [
                         { name: "user", allow: false },
-                        { name: "roles", allow: false },
+                        { name: "roles", allow: false }
+                    ],
+                },
+
+                // Tickting Panel
+                {
+                    name: "ticketing",
+                    allow: false,
+                    childs: [
+                        { name: "bookings", allow: false },
+                        { name: "close-bookings", allow: false },
+                        { name: "all-booking", allow: false }
+                    ],
+                },
+
+                // Expenses Panel
+                {
+                    name: "expenses",
+                    allow: false,
+                    childs: [
+                        { name: "expence-categories", allow: false }
                     ],
                 },
                 // HRm Panel
@@ -361,7 +384,7 @@ export default {
                         { name: "employees", allow: false },
                         { name: "leave-management", allow: false },
                         { name: "departments", allow: false },
-                        { name: "designations", allow: false },
+                        { name: "designations", allow: false }
                     ],
                 },
                 // Fleet Maintenance Panel
@@ -372,7 +395,7 @@ export default {
                         { name: "maintenance-part", allow: false },
                         { name: "maintenance-linking", allow: false },
                         { name: "maintenance-due", allow: false },
-                        { name: "maintenance-record", allow: false },
+                        { name: "maintenance-record", allow: false }
                     ],
                 },
                 // Refreshment Panel
@@ -381,7 +404,7 @@ export default {
                     allow: false,
                     childs: [
                         { name: "hotels", allow: false },
-                        { name: "food-order", allow: false },
+                        { name: "food-order", allow: false }
                     ],
                 },
                 // Acounts Panel
@@ -389,7 +412,7 @@ export default {
                     name: "accounts",
                     allow: false,
                     childs: [
-                        { name: "chart-of-accounts", allow: false },
+                        { name: "chart-of-accounts", allow: false }
                     ],
                 },
                 // Settings Panel
@@ -397,7 +420,7 @@ export default {
                     name: "settings",
                     allow: false,
                     childs: [
-                        { name: "ticket-format", allow: false },
+                        { name: "ticket-format", allow: false }
                     ],
                 },
             ],
@@ -582,7 +605,7 @@ export default {
                 swal({
                     title: "Success",
                     text: "Company Updated Succesfully",
-                    icon: "error",
+                    icon: "success",
                     timer: 2000
                 });
                 const companyRes = await this.callApi("post", "company");
