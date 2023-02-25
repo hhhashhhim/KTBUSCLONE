@@ -143,6 +143,15 @@ export default {
             if (resCity.status == 200) {
                 this.cities=resCity.data;
             }
+            if(resCity.status == 403){
+                window.history.back();
+                return swal({
+                    title: "OOPS!!!!!",
+                    text: "ACCESS DENIED",
+                    icon: "error",
+                   timer: 2000
+                });
+            }
             setTimeout(function(){
                 $("#city_table").DataTable();
             }, 300);

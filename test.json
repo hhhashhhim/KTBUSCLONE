@@ -1,0 +1,92 @@
+[
+    {
+        "name": "admin",
+        "allow": true,
+        "childs": [
+            { "name": "cities", "allow": true },
+            { "name": "terminal", "allow": true },
+            { "name": "terminal-time", "allow": true },
+            { "name": "fare-class", "allow": true },
+            { "name": "fare-table", "allow": true },
+            { "name": "routes", "allow": true },
+            { "name": "discounts", "allow": true },
+            { "name": "surcharges", "allow": true }
+        ]
+    },
+    {
+        "name": "buses",
+        "allow": true,
+        "childs": [
+            { "name": "bus-class", "allow": true },
+            { "name": "buses", "allow": true },
+            { "name": "schedules", "allow": true },
+            { "name": "merges", "allow": true }
+        ]
+    },
+    {
+        "name": "users",
+        "allow": true,
+        "childs": [
+            { "name": "user", "allow": true },
+            { "name": "roles", "allow": true }
+        ]
+    },
+    {
+        "name": "ticketing",
+        "allow": true,
+        "childs": [
+            { "name": "bookings", "allow": true },
+            { "name": "close-bookings", "allow": true },
+            { "name": "all-booking", "allow": true }
+        ]
+    },
+    {
+        "name": "expenses",
+        "allow": true,
+        "childs": [
+            { "name": "expence-categories", "allow": true }
+        ]
+    },
+    {
+        "name": "hrm",
+        "allow": true,
+        "childs": [
+            { "name": "employees", "allow": true },
+            { "name": "leave-management", "allow": true },
+            { "name": "departments", "allow": true },
+            { "name": "designations", "allow": true }
+        ]
+    },
+    {
+        "name": "fleet-maintenance",
+        "allow": true,
+        "childs": [
+            { "name": "maintenance-part", "allow": true },
+            { "name": "maintenance-linking", "allow": true },
+            { "name": "maintenance-due", "allow": true },
+            { "name": "maintenance-record", "allow": true }
+        ]
+    },
+    {
+        "name": "refreshment",
+        "allow": true,
+        "childs": [
+            { "name": "hotels", "allow": true },
+            { "name": "food-order", "allow": true }
+        ]
+    },
+    {
+        "name": "accounts",
+        "allow": true,
+        "childs": [
+            { "name": "chart-of-accounts", "allow": true }
+        ]
+    },
+    {
+        "name": "settings",
+        "allow": true,
+        "childs": [
+            { "name": "ticket-format", "allow": true }
+        ]
+    }
+]

@@ -119,8 +119,49 @@
                             <h3>Modular Permissions</h3>
                         </div>
                     </div>
+                    <div v-for="(moduleName, i) in data.modules" :key="i">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input :checked="mod" type="checkbox" :value="true" v-model="moduleName.allow"
+                                                :id="moduleName.name" />
+                                            <label class="text-capitalize text-bold ml-1" :for="moduleName.name"
+                                                style="color: black"> {{
+                                                    moduleName.name }}</label>
+                                        </div>
+                                        <div class="col-md-10" v-if="moduleName.allow">
+                                            <div class="alert alert-success" v-for="(menus, j) in moduleName.childs"
+                                                :key="j">
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <input :checked="menus" type="checkbox" :value="true"
+                                                            v-model="menus.allow" :id="menus.name" />
+                                                        <label class="text-capitalize text-bold ml-1" :for="menus.name"
+                                                            style="color: black"> {{
+                                                                menus.name }}</label>
+                                                    </div>
+                                                    <div class="col-md-10" v-if="menus.allow">
+                                                        <div class="alert alert-danger">
+                                                            <input id="9374" class="CheckedMenu" type="checkbox"> <b>Create
+                                                                Officer</b>
+                                                            <input id="9375" class="CheckedMenu" type="checkbox"> <b>Edit
+                                                                Officer</b>
+                                                            <input id="9376" class="CheckedMenu" type="checkbox"> <b>Delete
+                                                                Officer</b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <table class="table table-striped">
+                    <!-- <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th style="width: 7% !important">Sr. No.</th>
@@ -165,7 +206,7 @@
                                 </tr>
                             </template>
                         </tbody>
-                    </table>
+                    </table> -->
                     <template v-slot:button>
                         <button type="button" class="btn btn-primary" :disabled="loading" @click="add()">
                             {{ loading ? "Loading...." : "Add company" }}
@@ -222,7 +263,48 @@
                             <h3>Modular Permissions</h3>
                         </div>
                     </div>
-                    <table class="table table-striped">
+                    <div v-for="(moduleName, i) in dataEdit.modules" :key="i">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input :checked="mod" type="checkbox" :value="true" v-model="moduleName.allow"
+                                                :id="moduleName.name" />
+                                            <label class="text-capitalize text-bold ml-1" :for="moduleName.name"
+                                                style="color: black"> {{
+                                                    moduleName.name }}</label>
+                                        </div>
+                                        <div class="col-md-10" v-if="moduleName.allow">
+                                            <div class="alert alert-success" v-for="(menus, j) in moduleName.childs"
+                                                :key="j">
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <input :checked="menus.allow" type="checkbox" :value="true"
+                                                            v-model="menus.allow" :id="menus.name" />
+                                                        <label class="text-capitalize text-bold ml-1" :for="menus.name"
+                                                            style="color: black"> {{
+                                                                menus.name }}</label>
+                                                    </div>
+                                                    <div class="col-md-10" v-if="menus.allow">
+                                                        <div class="alert alert-danger">
+                                                            <input id="9374" class="CheckedMenu" type="checkbox"> <b>Create
+                                                                Officer</b>
+                                                            <input id="9375" class="CheckedMenu" type="checkbox"> <b>Edit
+                                                                Officer</b>
+                                                            <input id="9376" class="CheckedMenu" type="checkbox"> <b>Delete
+                                                                Officer</b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th style="width: 10% !important;">Sr. No.</th>
@@ -254,8 +336,8 @@
                                     <td colspan="2" class="py-5">
                                         <label class="colorinput m-3" v-for="(menus, j) in moduleName.childs" :key="j">
                                             <span v-if="i != 'name'">
-                                                <input :checked="menus" type="checkbox" :value="true"
-                                                    class="colorinput-input" v-model="menus.allow" />
+                                                <input :checked="menus.allow" type="checkbox" class="colorinput-input"
+                                                    v-model="menus.allow" />
                                                 <span class="colorinput-color bg-primary"></span>
                                                 <span style="position: relative; left: 5px; top: -10px"
                                                     class="text-capitalize"> {{ menus.name }} </span>
@@ -265,7 +347,7 @@
                                 </tr>
                             </template>
                         </tbody>
-                    </table>
+                    </table> -->
                     <template v-slot:button>
                         <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                             {{ loading ? 'Loading...' : 'Update company' }}
@@ -327,13 +409,13 @@ export default {
                     allow: false,
                     childs: [
                         { name: "cities", allow: false },
-                        { name: "terminal", allow: false },
-                        { name: "terminal-time", allow: false },
+                        { name: "terminals", allow: false },
+                        { name: "difference", allow: false },
                         { name: "fare-class", allow: false },
                         { name: "fare-table", allow: false },
                         { name: "routes", allow: false },
                         { name: "discounts", allow: false },
-                        { name: "surcharges", allow: false }
+                        { name: "surcharge", allow: false }
                     ],
                 },
                 // buses Panel
@@ -352,7 +434,7 @@ export default {
                     name: "users",
                     allow: false,
                     childs: [
-                        { name: "user", allow: false },
+                        { name: "users", allow: false },
                         { name: "roles", allow: false }
                     ],
                 },
@@ -363,8 +445,8 @@ export default {
                     allow: false,
                     childs: [
                         { name: "bookings", allow: false },
-                        { name: "close-bookings", allow: false },
-                        { name: "all-booking", allow: false }
+                        { name: "closing", allow: false },
+                        { name: "all", allow: false }
                     ],
                 },
 
@@ -373,7 +455,7 @@ export default {
                     name: "expenses",
                     allow: false,
                     childs: [
-                        { name: "expence-categories", allow: false }
+                        { name: "categories", allow: false }
                     ],
                 },
                 // HRm Panel
@@ -382,7 +464,7 @@ export default {
                     allow: false,
                     childs: [
                         { name: "employees", allow: false },
-                        { name: "leave-management", allow: false },
+                        { name: "leaves", allow: false },
                         { name: "departments", allow: false },
                         { name: "designations", allow: false }
                     ],
@@ -392,10 +474,10 @@ export default {
                     name: "fleet-maintenance",
                     allow: false,
                     childs: [
-                        { name: "maintenance-part", allow: false },
-                        { name: "maintenance-linking", allow: false },
-                        { name: "maintenance-due", allow: false },
-                        { name: "maintenance-record", allow: false }
+                        { name: "part", allow: false },
+                        { name: "link", allow: false },
+                        { name: "due", allow: false },
+                        { name: "record", allow: false }
                     ],
                 },
                 // Refreshment Panel
@@ -404,7 +486,7 @@ export default {
                     allow: false,
                     childs: [
                         { name: "hotels", allow: false },
-                        { name: "food-order", allow: false }
+                        { name: "order", allow: false }
                     ],
                 },
                 // Acounts Panel
@@ -420,7 +502,7 @@ export default {
                     name: "settings",
                     allow: false,
                     childs: [
-                        { name: "ticket-format", allow: false }
+                        { name: "tickets", allow: false }
                     ],
                 },
             ],
@@ -439,7 +521,7 @@ export default {
         };
     },
     async created() {
-        await this.fetchCompany();
+        this.fetchCompany();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
     },
@@ -576,7 +658,7 @@ export default {
             if (this.dataEdit.name == "") {
                 return swal({
                     title: "Required",
-                    text: "Company name is Required",
+                    text: "Company Name is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -608,18 +690,8 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                const companyRes = await this.callApi("post", "company");
-                if (companyRes.status == 200) {
-                    this.companies = companyRes.data;
-                }
+                this.fetchCompany();
                 $("#company_table").DataTable();
-                this.dataEdit.name = "";
-                this.modules = [
-                    { hrm: false },
-                    { accounts: false },
-                    { booking: false },
-                ];
-
                 setTimeout(() => {
                     this.success = "";
                     $("#edit-modal").modal("hide");
