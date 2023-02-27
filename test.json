@@ -5,35 +5,147 @@
         "childs": [
             {
                 "name": "cities",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "terminals",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "difference",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "fare-class",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "fare-table",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "routes",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "discounts",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             },
             {
-                "name": "surcharges",
-                "allow": true
+                "name": "surcharge",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "Add-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Edit-Button",
+                        "allow": true
+                    },
+                    {
+                        "name": "Delete-Button",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -106,19 +218,19 @@
         "allow": true,
         "childs": [
             {
-                "name": "employee",
+                "name": "employees",
                 "allow": true
             },
             {
-                "name": "leave",
+                "name": "leaves",
                 "allow": true
             },
             {
-                "name": "department",
+                "name": "departments",
                 "allow": true
             },
             {
-                "name": "designation",
+                "name": "designations",
                 "allow": true
             }
         ]

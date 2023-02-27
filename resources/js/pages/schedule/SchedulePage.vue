@@ -80,10 +80,10 @@
                                                                     @click="addDays(schedule)"
                                                                     data-target="#addDaysModal" data-toggle="modal"><i
                                                                 class="fas fa-plus"></i></button>
-<!--                                                            <button :data-target="'#' + editFormID" data-toggle="modal"-->
-<!--                                                                    @click=" edit(schedule); genericData(); "-->
-<!--                                                                    class="btn btn-primary mr-1 btn-sm"><i-->
-<!--                                                                class="far fa-edit"></i></button>-->
+                                                            <!--                                                            <button :data-target="'#' + editFormID" data-toggle="modal"-->
+                                                            <!--                                                                    @click=" edit(schedule); genericData(); "-->
+                                                            <!--                                                                    class="btn btn-primary mr-1 btn-sm"><i-->
+                                                            <!--                                                                class="far fa-edit"></i></button>-->
                                                             <!--                                                            <button :data-target="'#' + deleteFormID"-->
                                                             <!--                                                                    data-toggle="modal"-->
                                                             <!--                                                                    @click="deleteSchedule(schedule, i)"-->
@@ -310,9 +310,6 @@
                                                             item.name
                                                         }}</label>
                                             </span>
-                                                <!--                                                <span v-if="groupByCategory[city.id]">-->
-                                                <!--                                                    {{ allTerminalsIds }}-->
-                                                <!--                                                </span>-->
                                             </td>
                                         </template>
                                     </tr>
@@ -440,13 +437,17 @@
                             <div class="d-flex justify-content-between w-75 mx-auto mb-4">
                                 <div class="font-weight-bold">Discount</div>
                                 <div>
-                                    {{ this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A" }}
+                                    {{
+                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
+                                    }}
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between w-75 mx-auto">
                                 <div class="font-weight-bold">Surcharge</div>
                                 <div>
-                                    {{ this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A" }}
+                                    {{
+                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
+                                    }}
                                 </div>
                             </div>
                         </div>
@@ -589,9 +590,9 @@
                         <div class="col-md-8 class form-group">
                             <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
                             <select disabled
-                                class="form-control"
-                                id="route" @change="getSelectiveData('routeEdit', $event)"
-                                v-model="dataEdit.schedules.route_id"
+                                    class="form-control"
+                                    id="route" @change="getSelectiveData('routeEdit', $event)"
+                                    v-model="dataEdit.schedules.route_id"
                             >
                                 <option value="0" selected>Select Route</option>
                                 <option
@@ -813,11 +814,11 @@
                         </div>
                     </div>
                 </section>
-<!--                <template v-slot:button>-->
-<!--                    <button id="submitFormButton" class="btn btn-success" @click="updateSchedule"-->
-<!--                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Schedule' }}-->
-<!--                    </button>-->
-<!--                </template>-->
+                <!--                <template v-slot:button>-->
+                <!--                    <button id="submitFormButton" class="btn btn-success" @click="updateSchedule"-->
+                <!--                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Schedule' }}-->
+                <!--                    </button>-->
+                <!--                </template>-->
             </Edit>
             <!-- Edit Model End -->
             <Delete :deleteForm="deleteFormID"
@@ -962,7 +963,7 @@ export default {
         // },
 
         async getEntireForm() {
-            const resEntire = await this.callApi( "post", "schedule/getEntire", this.data );
+            const resEntire = await this.callApi("post", "schedule/getEntire", this.data);
             this.dataPreview = resEntire.data;
             this.dataPreview.start_date = this.data.StartDate;
             this.dataPreview.end_date = this.data.EndDate;
@@ -1196,7 +1197,7 @@ export default {
                         timer: 2000
                     });
                 if (this.data.name && this.data.StartDate && this.data.EndDate && this.data.time) {
-                this.activeSection = nextBtnValue;
+                    this.activeSection = nextBtnValue;
                 }
             }
             //Step 2
@@ -1243,12 +1244,12 @@ export default {
                 //         timer: 2000
                 //     });
                 if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
-                this.activeSection = nextBtnValue;
+                    this.activeSection = nextBtnValue;
                 }
             }
             //Step3
             if (nextBtnValue == 'step3') {
-            this.activeSection = nextBtnValue;
+                this.activeSection = nextBtnValue;
             }
         },
 

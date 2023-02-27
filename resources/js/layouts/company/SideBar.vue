@@ -153,7 +153,7 @@
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'users' }"
-                                v-if="checkForSubmenu('user')">
+                                v-if="checkForSubmenu('users')">
                                 <i class="fa fa-user"></i> Users
                             </router-link>
                         </li>
@@ -363,6 +363,7 @@ export default {
         this.permissions = this.$store.state.permissions
     },
     methods: {
+        // main menu
         checkPermission(name) {
             let permissions = this.permissions;
             let module = permissions.find(obj => obj.name === name);
@@ -373,12 +374,12 @@ export default {
             }
 
         },
+        // Sub menu
         checkForSubmenu(moduleName) {
 
             let permissions = this.permissions;
             let valid = false;
             for (var i = 0; i < permissions.length; i++) {
-
                 permissions[i].childs.forEach(subMenuItem => {
                     if (subMenuItem.name == moduleName) {
                         valid = subMenuItem.allow;
@@ -389,13 +390,11 @@ export default {
             return valid;
 
         },
-
+        // pages buttons
         checkForSubmenuButtons(moduleName) {
-            
             let permissions = this.permissions;
             let valid = false;
             for (var i = 0; i < permissions.length; i++) {
-
                 permissions[i].childs.forEach(subMenuItem => {
                     if (subMenuItem.name == moduleName) {
                         valid = subMenuItem.allow;
