@@ -138,7 +138,7 @@ export default {
         clearForm : function(){
             this.data = {};
         },
-        async fetchCities() {
+        async   fetchCities() {
             const resCity = await this.callApi("post",'cities');
             if (resCity.status == 200) {
                 this.cities=resCity.data;

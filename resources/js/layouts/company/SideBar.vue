@@ -391,7 +391,7 @@ export default {
         },
 
         checkForSubmenuButtons(moduleName) {
-
+            
             let permissions = this.permissions;
             let valid = false;
             for (var i = 0; i < permissions.length; i++) {
@@ -404,7 +404,6 @@ export default {
                 });
             }
             return valid;
-
         }
     }
 }

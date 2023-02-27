@@ -45,8 +45,13 @@
                                                                         <div class="row">
                                                                             <div class="col-md-2">
                                                                                 <input :checked="menus" type="checkbox"
-                                                                                    :value="true" v-model="menus.allow" :id="menus.name" />
-                                                                                    <label class="text-capitalize text-bold ml-1"  :for="menus.name" style="color: black">{{ menus.name }}</label>
+                                                                                    :value="true" v-model="menus.allow"
+                                                                                    :id="menus.name" />
+                                                                                <label
+                                                                                    class="text-capitalize text-bold ml-1"
+                                                                                    :for="menus.name"
+                                                                                    style="color: black">{{ menus.name
+                                                                                    }}</label>
                                                                             </div>
                                                                             <div class="col-md-10">
                                                                                 <div class="alert alert-danger">
@@ -54,7 +59,7 @@
                                                                                         type="checkbox"> <b>Create
                                                                                         Officer</b>
                                                                                     <input id="9375" class="CheckedMenu"
-                                                                                        type="checkbox"> <b>Edit Officer</b>
+                                                                                        type="checkbox" > <b>Edit Officer</b>
                                                                                     <input id="9376" class="CheckedMenu"
                                                                                         type="checkbox"> <b>Delete
                                                                                         Officer</b>
