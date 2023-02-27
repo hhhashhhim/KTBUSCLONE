@@ -44,35 +44,29 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table dataTables table-striped table-hover"
-                                                       id="designation_table">
+                                                       id="category_table">
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
-                                                        <th>City Name</th>
-                                                        <th>Terminal Name</th>
-                                                        <th>Department Name</th>
-                                                        <th>No. Of Designations</th>
-                                                        <th>Added By</th>
+                                                        <th>Name</th>
+                                                        <th>Tier 2</th>
+                                                        <th>Tier 1</th>
                                                         <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(designation, i) in designations" :key="i">
+                                                    <tr v-for="(category, i) in categories" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ designation.terminal.city.name}}</td>
-                                                        <td>{{ designation.terminal.name}}</td>
-                                                        <td>{{ designation.name }}</td>
-                                                        <td>{{ designation.designation_count }}</td>
-                                                        <td>{{ designation.added_by.name }}</td>
+                                                        <td>{{ category.name}}</td>
+                                                        <td>{{ category.second_level.name}}</td>
+                                                        <td>{{ category.first_level.name }}</td>
                                                         <td>
-                                                            <button
-                                                                data-target="#detail-modal"
-                                                                data-toggle="modal"
-                                                                @click="designationDetail(designation.id)"
-                                                                class="btn btn-info mx-2"
-                                                            >
-                                                                <i class="far fa-eye"></i>
-                                                            </button>
+                                                           <!-- <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="editCategory(category)"
+                                                                    class="btn btn-primary mx-1">
+                                                                <i class="far fa-edit"></i>
+                                                            </button> -->
+                                                            N/A
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -136,51 +130,49 @@
             
             <!-- Add Modal End -->
             <!--            Edit Model-->
-            <!-- <Edit
-                heading="Edit Designation"
+            <Edit
+                heading="Edit Category"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
-                    <div class="form-group col-md-12">
-                        <label for="terminals">Terminals <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="dataEdit.terminal_id"  @change="getEditDepartment(dataEdit.terminal_id)">
-                            <option value="0">Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} ({{ terminal.city.name }})
-                            </option>
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Tier 1 <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" @change="getSecondLevel(updatedForm.firstLevel)" v-model="updatedForm.firstLevel">
+                            <option value="" selected>Select Tier 1</option>
+                            <option value="1">Assets</option>
+                            <option value="2">Liabilities</option>
+                            <option value="3">Equity</option>
+                            <option value="4">Revenue</option>
+                            <option value="5">Expenses</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="departmentName">Department<span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" v-model="dataEdit.department_id">
-                            <option value="0" selected>Select Department</option>
+                        <label for="departmentName">Tier 2<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="updatedForm.secondLevel">
+                            <option value="" selected>Select Tier 2</option>
                             <option
-                                v-for="(department, i) in editDepartments"
+                                v-for="(second, i) in secondLevels"
                                 :key="i"
-                                :value="department.id"
+                                :value="second.id"
                             >
-                                {{ department.name }}
+                                {{ second.name }}
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Name<span class="text-danger ml-1">*</span></label>
-                        <input type="text" id="name" class="form-control" v-model="dataEdit.name"/>
+                        <input type="text" id="name" class="form-control" v-model="updatedForm.name"/>
                     </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateDesignation"
                             :disabled="loading">
-                        {{ loading ? 'Loading...' : 'Update Designation' }}
+                        {{ loading ? 'Loading...' : 'Update Category' }}
                     </button>
                 </template>
-            </Edit> -->
+            </Edit>
             <!--            Edit modal End-->
 
         </div>
@@ -207,53 +199,41 @@ export default {
                 secondLevel: "",
                 name: "",
             },
-            designations: [],
-            departmentsDetails: [],
+            updatedForm: {
+                categoryId: "",
+                firstLevel: "",
+                secondLevel: "",
+                name: "",
+            },
+            categories: [],
             secondLevels: [],
-            editDepartments: [],
             loading: false,
-            formID: "category_form",
-            editFormID: "edit_designation_form",
-            deleteFormID: "delete_designation_form",
+            formID: "category_account",
+            editFormID: "edit_category_account",
             validationErrors: [],
-            terminals: [],
             success: false,
             error: false,
-            delId: "",
-            dataEdit: {},
         };
     },
     async created() {
-        await this.fetchDesignations();
+        await this.fetchCategories();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
     },
     methods: {
 
-        async fetchDesignations() {
-            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
-            if (resAllTerminals.status == 200) {
-                this.terminals = resAllTerminals.data
+        async fetchCategories() {
+           
+            const resCategories = await this.callApi("post", 'accounts/coa/categories');
+            console.log(resCategories.data);
+            if (resCategories.status == 200) {
+                this.categories = resCategories.data
             } else {
-                console.log(resAllTerminals);
+                console.log(resCategories);
             }
-            const resDesig = await this.callApi("post", 'hrm/designation');
-            console.log(resDesig.data);
-            if (resDesig.status == 200) {
-                this.designations = resDesig.data
-            } else {
-                console.log(resDesig);
-            }
-            const resDepart = await this.callApi("post", 'hrm/department');
-            console.log(resDepart);
-            if (resDepart.status == 200) {
-                this.editDepartments = resDepart.data
-            } else {
-                console.log(resDepart);
-            }
+           
             setTimeout(function () {
-                $("#designation_table").DataTable();
-                $("#show_designation").DataTable();
+                $("#category_table").DataTable();
             }, 300);
         },
         clearForm: function () {
@@ -263,44 +243,16 @@ export default {
                 name: "",
             };
         },
-        async getEditDepartment(id){
-            // this.dataEdit = []
-            const resDepartment = await this.callApi("post", 'hrm/designation/getTerminal', {'id': id});
-            console.log(resDepartment);
-            if (resDepartment.status == 200 && resDepartment.data.length > 0) {
-                this.editDepartments = resDepartment.data;
-            }else{
-                this.dataEdit.department_id = 0;
-            }
-            if (resDepartment.status == 422) {
-
-                let errorContent = "";
-                let count = 0;
-                for (const key in resDepartment.data.errors) {
-                    resDepartment.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                    });
-
-                }
-            }
-        },
         async getSecondLevel(id) {
             const resSecondLevel = await this.callApi("post", 'accounts/coa/getSecondLevel', {'id': id});
            
             if (resSecondLevel.status == 200 && resSecondLevel.data.length > 0) {
                 this.secondLevels = resSecondLevel.data;
+                this.addForm.secondLevel = "";
+                this.updatedForm.secondLevel = "";
             }else{
                 this.addForm.secondLevel = "";
+                this.updatedForm.secondLevel = "";
             }
             if (resSecondLevel.status == 422) {
 
@@ -358,9 +310,8 @@ export default {
                     timer: 2000
                 });
                 this.clearForm();
-                $("#designation_table").DataTable().destroy();
-                $("#show_designation").DataTable().destroy();
-                await this.fetchDesignations();
+                $("#category_table").DataTable().destroy();
+                await this.fetchCategories();
             } else {
                 if (resCategory.status == 422) {
                     this.loading = false;
@@ -385,63 +336,74 @@ export default {
             }
         },
 
-        // async updateDesignation() {
-        //     this.validationErrors = [];
-        //     if (this.dataEdit.department_id == "0")
-        //         return swal({
-        //             title: "Required!",
-        //             text: "Please Select Department",
-        //             icon: "error",
-        //             timer: 2000
-        //         });
-        //     if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
-        //         return swal({
-        //             title: "Required!",
-        //             text: "Name is Required",
-        //             icon: "error",
-        //             timer: 2000
-        //         });
-        //     this.loading = true;
-        //     const resDepartmentEdit = await this.callApi("post", 'hrm/designation/update', this.dataEdit);
-        //     if (resDepartmentEdit.status == 200) {
-        //         this.loading = false;
-        //         swal({
-        //             title: "Success!",
-        //             text: "Designation Updated Successfully",
-        //             icon: "success",
-        //             timer: 2000
-        //         });
-        //         $("#designation_table").DataTable().destroy();
-        //         $("#show_designation").DataTable().destroy();
-        //         await this.fetchDesignations();
-        //     } else {
-        //         if (resDepartmentEdit.status == 422) {
-        //             this.loading = false;
-        //             let errorContent = "";
-        //             let count = 0;
-        //             for (const key in resDepartmentEdit.data.errors) {
-        //                 resDepartmentEdit.data.errors[key].forEach((element) => {
-        //                     errorContent += (
-        //                         (++count) + " - " + //creating serial no.
-        //                         element + // main error
-        //                         "\n" // creating new line
-        //                     );
-        //                 });
-        //                 swal({
-        //                     title: "Error",
-        //                     text: errorContent,
-        //                     icon: "error",
-        //             timer: 2000
-        //                 });
+        async updateDesignation() {
+            this.validationErrors = [];
+            if (this.updatedForm.firstLevel == "")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Tier 1",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.updatedForm.secondLevel == "")
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Tier 2",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.updatedForm.name)
+                return swal({
+                    title: "Required!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            
+            const resCategory = await this.callApi("post", "accounts/coa/category/update", this.updatedForm);
+            if (resCategory.status == 200) {
+                this.loading = false;
+                swal({
+                    title: "Success",
+                    text: "Category Updated Successfully!",
+                    icon: "success",
+                    timer: 2000
+                });
+                $("#category_table").DataTable().destroy();
+                await this.fetchCategories();
+            } else {
+                if (resCategory.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resCategory.data.errors) {
+                        resCategory.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                    timer: 2000
+                        });
+                    }
+                }
+            }
+        },
 
-        //             }
-        //         }
-        //     }
-        // },
-
-        // editDesignation(designation) {
-        //     this.dataEdit = designation
-        // },
+        editCategory(category) {
+            this.updatedForm.categoryId = category.id;
+            this.updatedForm.firstLevel = category.first_level_id;
+            this.updatedForm.name = category.name;
+            this.getSecondLevel(category.first_level_id);
+            setTimeout(() => {
+                this.updatedForm.secondLevel = category.second_level_id;
+            },500);
+        },
     },
     computed: {
         ...mapGetters(['getDeletingObj'])
@@ -450,9 +412,8 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.departmentsDetails.splice(obj.index, 1)
-                $("#designation_table").DataTable().destroy();
-                $("#show_designation").DataTable().destroy();
-                this.fetchDesignations();
+                $("#category_table").DataTable().destroy();
+                this.fetchCategories();
             }
         }
     }
