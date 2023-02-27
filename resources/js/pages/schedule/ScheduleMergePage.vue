@@ -30,7 +30,7 @@
                                                         <th>Departure Schedule</th>
                                                         <th>Departure Date</th>
                                                         <th>Return Date</th>
-                                                        <th>Return Schedule</th>
+                                                        <th>Return Schedule</th>``
                                                         <th>Expense</th>
                                                     </tr>
                                                     </thead>
@@ -111,7 +111,7 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", "booking/schedule/merges");
+            const res = await this.callApi("post", "booking/close/schedule/merges");
             if (res.status == 200) {
                 this.merges = res.data.merges;
             } else {

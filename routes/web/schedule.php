@@ -15,7 +15,6 @@ Route::group(['prefix' => 'schedule', [CustomMiddleware::class]], function () {
     Route::post('/getEntire', [ScheduleController::class, 'getEntire']);
     Route::post('/getRouteFare', [ScheduleController::class, 'getRouteFareClass']);
     Route::post('/genericCommon', [ScheduleController::class, 'genericCommon']);
-    Route::post('/selected', [ScheduleController::class, 'selected']);
     Route::post('/dropCheck', [ScheduleController::class, 'dropCheck']);
     Route::post('/extend', [ScheduleController::class, 'extend']);
     Route::post('/allBuses', [ScheduleController::class, 'allBuses']);

@@ -2,23 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Setting\Tickets\TicketsTemplate;
-use App\Models\Terminal;
-use DateTime;
-use Illuminate\Support\Facades\Session;
-use Rawilk\Printing\Receipts\ReceiptPrinter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Rawilk\Printing\Facades\Printing;
-
+use Illuminate\Support\Facades\Redirect;
 
 class AuthController extends Controller
 {
 
     public function index(Request $request)
     {
-        // return Auth::user()->role->permissions;
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

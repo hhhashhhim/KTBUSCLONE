@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h4>Schdule Closing Detail</h4>
+                            <h4>Schedule Closing Detail</h4>
                             <div class="card-header-action">
                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
                                    @click="clearForm()">
@@ -358,7 +358,7 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", "booking/schedule/closing");
+            const res = await this.callApi("post", "booking/close/schedule/closing");
             if (res.status == 200) {
                 this.closings = res.data.closings;
                 this.buses = res.data.buses;
@@ -378,7 +378,7 @@ export default {
             const data = {
                 date: this.addData.date
             }
-            const res = await this.callApi("post", "booking/schedule/fetch", data);
+            const res = await this.callApi("post", "booking/close/schedule/fetch", data);
 
             if (res.status == 200) {
                 this.schedules = res.data;
@@ -390,7 +390,7 @@ export default {
             const data = {
                 date: date
             }
-            const res = await this.callApi("post", "booking/schedule/fetch", data);
+            const res = await this.callApi("post", "booking/close/schedule/fetch", data);
 
             if (res.status == 200) {
                 this.editSchedules = res.data;
@@ -437,7 +437,7 @@ export default {
                     timer: 2000
                 });
             this.loadig = true;
-            const res = await this.callApi("post", "booking/schedule/closing/store", this.addData);
+            const res = await this.callApi("post", "booking/close/schedule/closing/store", this.addData);
             if (res.status == 201) {
                 this.loading = false;
                 swal({
@@ -532,7 +532,7 @@ export default {
                 });
             this.loading = true;
 
-            const res = await this.callApi("post", "booking/schedule/closing/update", this.editData);
+            const res = await this.callApi("post", "booking/close/schedule/closing/update", this.editData);
             if (res.status === 200) {
                 swal({
                     title: "Success",

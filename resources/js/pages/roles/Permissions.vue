@@ -1,33 +1,73 @@
 <template>
-  <section class="section">
-    <div class="section-body">
-      <div class="row">
-        <div class="col-12 col-md-12 col-lg-12">
-          <div class="card card-primary">
-            <div class="card-header">
-              <h4>Permissions</h4>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                      <h4>{{ role.name }} of {{ role.company?role.company.name:"Not Found" }}</h4>
-                      <button class="btn btn-primary" @click="save">SAVE</button>
-                    </div>
-                    <div class="card-body">
+    <section class="section">
+        <div class="section-body">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h4>Permissions</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between">
+                                            <h4>{{ role.name }} of {{ role.company ? role.company.name : "Not Found" }}</h4>
+                                            <button class="btn btn-primary" @click="save">SAVE</button>
+                                        </div>
+                                        <div class="card-body">
 
 
-                      <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="success">
-                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                              <span class="sr-only">Close</span>
-                          </button>
-                          {{ success }}
-                      </div>
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert"
+                                                v-if="success">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                    <span class="sr-only">Close</span>
+                                                </button>
+                                                {{ success }}
+                                            </div>
 
-                      <div class="table-responsive">
-                        <table
+                                            <div v-for="(moduleName, i) in permissions" :key="i">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="alert alert-info">
+                                                            <div class="row">
+                                                                <div class="col-md-2">
+                                                                    <input :checked="mod" type="checkbox" :value="true"
+                                                                        v-model="moduleName.allow" :id="moduleName.name" />
+                                                                    <label class="text-capitalize text-bold ml-1"
+                                                                        :for="moduleName.name" style="color: black"> {{
+                                                                            moduleName.name }}</label>
+                                                                </div>
+                                                                <div class="col-md-10" v-if="moduleName.allow">
+                                                                    <div class="alert alert-success"
+                                                                        v-for="(menus, j) in moduleName.childs" :key="j">
+                                                                        <div class="row">
+                                                                            <div class="col-md-2">
+                                                                                <input :checked="menus" type="checkbox"
+                                                                                    :value="true" v-model="menus.allow" :id="menus.name" />
+                                                                                    <label class="text-capitalize text-bold ml-1"  :for="menus.name" style="color: black">{{ menus.name }}</label>
+                                                                            </div>
+                                                                            <div class="col-md-10">
+                                                                                <div class="alert alert-danger">
+                                                                                    <input id="9374" class="CheckedMenu"
+                                                                                        type="checkbox"> <b>Create
+                                                                                        Officer</b>
+                                                                                    <input id="9375" class="CheckedMenu"
+                                                                                        type="checkbox"> <b>Edit Officer</b>
+                                                                                    <input id="9376" class="CheckedMenu"
+                                                                                        type="checkbox"> <b>Delete
+                                                                                        Officer</b>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <table
                           class="table table-striped table-hover"
                           id="edit_loc"
                         >
@@ -82,65 +122,65 @@
                             </tr>
                             </template>
                           </tbody>
-                        </table>
-                      </div>
+                        </table> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 </template>
 
 <script>
 
 export default {
-  name: "Role",
-  data() {
-    return {
-      role: "",
-      permissions: [],
-      success: false,
-    };
-  },
-  async created() {
-      window.removeEventListener('keydown', this.enter);
-      window.removeEventListener('keydown', this.altM);
-    const res = await this.callApi("post", "role/get", { id: this.$route.params.id });
-    if (res.status == 200) {
-      this.role = res.data.role;
-      this.permissions = res.data.permissions;
-    } else {
-      console.log(res);
-    }
-  },
-  methods: {
-    async save() {
-      const res = await this.callApi("post", "role/update",{
-        ...this.role,
-        permissions:this.permissions,
-      })
-      if (res.status == 201) {
-        this.success = "Role and Permissions Updated Successfully";
-        setTimeout(() => {
-          this.success = "";
-        }, 3000);
-      }
-      else {
-        if (res.status == 422) {
-          for (const key in res.data.errors) {
-            res.data.errors[key].forEach((element) => {
-              this.errorsArray(element, key);
-            });
-          }
+    name: "Role",
+    data() {
+        return {
+            role: "",
+            permissions: [],
+            success: false,
+        };
+    },
+    async created() {
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
+        const res = await this.callApi("post", "role/get", { id: this.$route.params.id });
+        if (res.status == 200) {
+            this.role = res.data.role;
+            this.permissions = res.data.permissions;
+        } else {
+            console.log(res);
         }
-      }
-    }
-  },
+    },
+    methods: {
+        async save() {
+            const res = await this.callApi("post", "role/update", {
+                ...this.role,
+                permissions: this.permissions,
+            })
+            if (res.status == 201) {
+                this.success = "Role and Permissions Updated Successfully";
+                setTimeout(() => {
+                    this.success = "";
+                }, 3000);
+            }
+            else {
+                if (res.status == 422) {
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        }
+    },
 
 };
 </script>

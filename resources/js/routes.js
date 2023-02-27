@@ -140,7 +140,7 @@ const routes = [
         name:"bus-class-page"
     },
     {
-        path: url + "booking",
+        path: url + "bookings",
         component : BookingPage,
         name:"booking-page"
     },
@@ -155,27 +155,27 @@ const routes = [
         name:"booking-schedule-merges"
     },
     {
-        path: url + "all/booking",
+        path: url + "booking/all",
         component : AllBookingPage,
         name:"all-booking-page"
     },
     {
-        path: url + "hrm/employee",
+        path: url + "hrm/employees",
         component : EmployeesPage,
         name:"employees"
     },
     {
-        path: url + "hrm/leave",
+        path: url + "hrm/leaves",
         component : LeavePage,
         name:"leaves"
     },
     {
-        path: url + "hrm/department",
+        path: url + "hrm/departments",
         component : DepartmentPage,
         name:"departments"
     },
     {
-        path: url + "hrm/designation",
+        path: url + "hrm/designations",
         component : DesignationPage,
         name:"designations"
     },
@@ -265,9 +265,5 @@ const router = createRouter({
     mode:history,
     routes,
 })
-
-// router.beforeEach(()=>{
-//     console.log(this.$store);
-// })
 
 export default router

@@ -18,6 +18,8 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalCommission;
 use App\Models\Customer;
+use App\Models\FareClass;
+use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\DropSchedule;
 use App\Models\Schedule\Schedule;
@@ -65,12 +67,12 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-//            dd($request->all());
+        //            dd($request->all());
         if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
-//        try {
-//            DB::beginTransaction();
+        //        try {
+        //            DB::beginTransaction();
 
         // this is for get actual schedule date
         $detail = ScheduleDetail::where("departure_id", $request->departureCity)
@@ -87,7 +89,7 @@ class BookingController extends Controller
             if (count($request->selectedSeats) == 0) {
                 return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
             }
-//            dd($oldBooking, $request->all());
+            //            dd($oldBooking, $request->all());
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -194,11 +196,11 @@ class BookingController extends Controller
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
             'authTerminalId' => Auth::user()->terminal_id,
         ];
-//        } catch (\Exception $e) {
-//            DB::rollBack();
-//            return response()->json(["errors" => ["Error" => ["OOPS!! Something Went Wrong Please Try Again"]]], 422);
-////            return response()->json(["errors" => ["Error" => [$e->getMessage()]]], 422);
-//        }
+        //        } catch (\Exception $e) {
+        //            DB::rollBack();
+        //            return response()->json(["errors" => ["Error" => ["OOPS!! Something Went Wrong Please Try Again"]]], 422);
+        ////            return response()->json(["errors" => ["Error" => [$e->getMessage()]]], 422);
+        //        }
     }
 
     public function singleReschedule(Request $request)
@@ -296,7 +298,6 @@ class BookingController extends Controller
             $old_ticket->delete();
         }
         return response()->json(['success' => 'Success'], 200);
-
     }
 
     public function deleteBooking(Request $request)
@@ -399,7 +400,7 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-//        dd($request->all());
+        //        dd($request->all());
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
@@ -427,6 +428,168 @@ class BookingController extends Controller
                 'tickets' => $tickets,
             ];
         }
+    }
+    public function getFareClass()
+    {
+        return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+    }
+    public function dropCheck(Request $request)
+    {
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+        ])->first()->schedule_date;
+        $found = DropSchedule::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_date' => $uniqueDate,
+            'schedule_id' => $request->id,
+            'is_drop' => 1,
+        ])->first();
+
+        return $found;
+    }
+
+    public function selected(Request $request)
+    {
+        if (!$request->departureCity || !$request->destinationCity || !$request->date) {
+            echo "Error";
+            return [];
+        }
+        $uniqueDate = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->id,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+        ])->first(['schedule_date']);
+        // Getting Already Booked Tickets
+        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
+            ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
+            ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
+        $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+        $schedule = Schedule::where('id', $request->id)
+            ->where('company_id', Auth::user()->company_id)
+            ->select('id', 'route_id', 'bus_class_id', 'time')
+            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+            ->first();
+
+        $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()->unique('fare_class');
+        // getting cities sequence for checking which city will be after other one
+        $lastFare = $schedule->route->fares->last();
+        $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+        array_push($allFaresOfRoute, $lastFare->destination_city_id);
+        $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
+        if (count($fareClasses) != count($fareForAllClasses)) {
+            return response()->json([
+                "errors" => [
+                    "Fare Error" => ["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
+                ]
+            ], 422);
+        }
+        // Looping Through the seat of the bus
+        $seatMap = $schedule->bus_class->seat_map;
+        foreach ($seatMap as $i => $iValue) {
+            foreach ($iValue as $j => $column) {
+                // adding fare to each seat
+                if ($column['reserved']) {
+                    $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
+                    $seatMap[$i][$j]['fare'] = (int)$data->fare;
+                }
+                $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
+                if ($result !== false) {   /*&& $leavingIn30Min != true*/
+                    $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
+                    $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
+                    $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
+                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
+                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
+                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                    $seatMap[$i][$j]['fare'] = 0;
+                    if ($tickets[$result]['is_partial'] == 1) {
+                        $resultPartials = isset($column['seatNo']) ? array_keys($ticketSeatNumbers, $column['seatNo']) : false;
+                        foreach ($resultPartials as $singlePartial) {
+                            $seatMap[$i][$j]['id'] = $tickets[$singlePartial]['id'];
+                            $seatMap[$i][$j]['gender'] = $tickets[$singlePartial]['gender'];
+                            $seatMap[$i][$j]['partial'] = $tickets[$singlePartial]['is_partial'];
+                            $seatMap[$i][$j]['type'] = $tickets[$singlePartial]['type'];
+                            $seatMap[$i][$j]['remarks'] = $tickets[$singlePartial]['remarks'] == null ? 'N/A' : $tickets[$singlePartial]['remarks'];
+                            $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
+                            $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
+                            $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
+                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['addedBy']['name'];
+                            $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
+                            $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
+                            $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                            $seatMap[$i][$j]['fare'] = 0;
+
+                            $before = (array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, false) <= array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false));
+
+
+                            // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
+                            $after = (array_search($request->departureCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->departureCity, $allFaresOfRoute, false) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
+                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false)
+                            );
+
+                            if ($before || $after) {
+                                // removing partial tag for that seats which fulfill the conditions
+                                unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
+                            } else {
+                                break;
+                            }
+                            $seatMap[$i][$j]['departure_city'] = $tickets[$singlePartial]['departure_city']->name;
+                            $seatMap[$i][$j]['destination_city'] = $tickets[$singlePartial]['destination_city']->name;
+                        }
+                    }
+                }
+                //                if ($result !== false && $leavingIn30Min) {
+                //                    $seatMap[$i][$j]['over_issue'] = true;
+                //                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
+                //                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
+                //                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
+                //                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
+                //                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                //                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                //                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                //                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
+                //                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
+                //                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                //                }
+                //                 print_r($column);
+                if (isset($column['class'])) {
+                    $class = $fareClasses->where('id', $column['class'])->first();
+                    $seatMap[$i][$j]['color'] = $class ? $class->color : '';
+                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                    if ($class && $class->is_active == 0) {
+                        return response()->json([
+                            "errors" => [
+                                "Fare Error" => ["This Bus Class Includes a Class Which isn't Active Please Active That Class First !!!"]
+                            ]
+                        ], 422);
+                    }
+                    if ($class) {
+                        $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                    }
+                }
+            }
+        }
+        $schedule->bus_class->seat_map = $seatMap;
+        unset($schedule->route);
+        return $schedule;
     }
 
     public function dropSchedule(Request $request)
@@ -480,7 +643,6 @@ class BookingController extends Controller
             } else {
                 $mergeRecord->delete();
             }
-
         }
         if (!$old) {
             DropSchedule::create([
@@ -496,7 +658,6 @@ class BookingController extends Controller
             return response()->json(['success' => 'Success'], 200);
         }
         return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
-
     }
 
     public function getClosingData(Request $request)
@@ -553,8 +714,8 @@ class BookingController extends Controller
         if (is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
         }
-//        try {
-//            DB::beginTransaction();
+        //        try {
+        //            DB::beginTransaction();
         $ticket = Ticket::where([
             'company_id' => Auth::user()->company_id,
             'date' => $request->date,
@@ -591,11 +752,11 @@ class BookingController extends Controller
         }
         return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
 
-//            printEltTicket($elt->id, Auth::user()->company_id);
-//        } catch (\Exception $e) {
-//            DB::rollBack();
-//            return response()->json(["errors" => ["Booking Error" => [$e->getMessage()]]], 422);
-//        }
+        //            printEltTicket($elt->id, Auth::user()->company_id);
+        //        } catch (\Exception $e) {
+        //            DB::rollBack();
+        //            return response()->json(["errors" => ["Booking Error" => [$e->getMessage()]]], 422);
+        //        }
     }
 
     public
@@ -842,5 +1003,4 @@ class BookingController extends Controller
         $remainData = ['passengerCount' => $countPassenger, 'actualDepart' => $actualDeparture, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'scheduleName' => $scheduleName, 'busNo' => $busNo];
         return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup, 'remain' => $remainData]);
     }
-
 }

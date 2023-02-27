@@ -25,11 +25,14 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
     Route::post('/getClosingData', [BookingController::class, 'getClosingData']);
     Route::post('/dropSchedule', [BookingController::class, 'dropSchedule']);
+    Route::post('/fare_class', [BookingController::class, 'getFareClass']);
+    Route::post('/schedule/selected', [BookingController::class, 'selected']);
+    Route::post('/schedule/dropCheck', [BookingController::class, 'dropCheck']);
 
     // Schedule Closing
-    Route::group(['prefix' => '/schedule', [CustomMiddleware::class]], function () {
+    Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {
         Route::post('/fetch', [ScheduleClosingController::class, 'fetchSchedule']);
-        
+
         Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'index']);
             Route::post('/store', [ScheduleClosingController::class, 'store']);
