@@ -1,0 +1,35 @@
+Date : 2023-02-27 15:40:56
+Directory : c:\xampp\htdocs\kt\app\Http\Middleware
+Total : 11 files,  146 codes, 59 comments, 47 blanks, all 252 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| PHP      |         11 |        146 |         59 |         47 |        252 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                        | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                           |         11 |        146 |         59 |         47 |        252 |
++-----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                    | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\xampp\htdocs\kt\app\Http\Middleware\Authenticate.php                     | PHP      |         12 |          6 |          4 |         22 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\CustomMiddleware.php                 | PHP      |         17 |          0 |          4 |         21 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\EncryptCookies.php                   | PHP      |          8 |          6 |          4 |         18 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\HttpsProtocol.php                    | PHP      |         16 |          0 |          4 |         20 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\PreventRequestsDuringMaintenance.php | PHP      |          8 |          6 |          4 |         18 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\RedirectIfAuthenticated.php          | PHP      |         19 |          8 |          6 |         33 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\TrimStrings.php                      | PHP      |         11 |          5 |          4 |         20 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\TrustHosts.php                       | PHP      |         12 |          5 |          4 |         21 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\TrustProxies.php                     | PHP      |         14 |         10 |          5 |         29 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\UserAccess.php                       | PHP      |         21 |          7 |          4 |         32 |
+| c:\xampp\htdocs\kt\app\Http\Middleware\VerifyCsrfToken.php                  | PHP      |          8 |          6 |          4 |         18 |
+| Total                                                                       |          |        146 |         59 |         47 |        252 |
++-----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
