@@ -26475,20 +26475,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         secondLevel: "",
         name: ""
       },
-      designations: [],
-      departmentsDetails: [],
+      updatedForm: {
+        categoryId: "",
+        firstLevel: "",
+        secondLevel: "",
+        name: ""
+      },
+      categories: [],
       secondLevels: [],
-      editDepartments: [],
       loading: false,
-      formID: "category_form",
-      editFormID: "edit_designation_form",
-      deleteFormID: "delete_designation_form",
+      formID: "category_account",
+      editFormID: "edit_category_account",
       validationErrors: [],
-      terminals: [],
       success: false,
-      error: false,
-      delId: "",
-      dataEdit: {}
+      error: false
     };
   },
   created: function created() {
@@ -26500,7 +26500,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _this.fetchDesignations();
+              return _this.fetchCategories();
 
             case 2:
               window.removeEventListener('keydown', _this.enter);
@@ -26515,59 +26515,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    fetchDesignations: function fetchDesignations() {
+    fetchCategories: function fetchCategories() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var resAllTerminals, resDesig, resDepart;
+        var resCategories;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'settings/tickets/terminals');
+                return _this2.callApi("post", 'accounts/coa/categories');
 
               case 2:
-                resAllTerminals = _context2.sent;
+                resCategories = _context2.sent;
+                console.log(resCategories.data);
 
-                if (resAllTerminals.status == 200) {
-                  _this2.terminals = resAllTerminals.data;
+                if (resCategories.status == 200) {
+                  _this2.categories = resCategories.data;
                 } else {
-                  console.log(resAllTerminals);
-                }
-
-                _context2.next = 6;
-                return _this2.callApi("post", 'hrm/designation');
-
-              case 6:
-                resDesig = _context2.sent;
-                console.log(resDesig.data);
-
-                if (resDesig.status == 200) {
-                  _this2.designations = resDesig.data;
-                } else {
-                  console.log(resDesig);
-                }
-
-                _context2.next = 11;
-                return _this2.callApi("post", 'hrm/department');
-
-              case 11:
-                resDepart = _context2.sent;
-                console.log(resDepart);
-
-                if (resDepart.status == 200) {
-                  _this2.editDepartments = resDepart.data;
-                } else {
-                  console.log(resDepart);
+                  console.log(resCategories);
                 }
 
                 setTimeout(function () {
-                  $("#designation_table").DataTable();
-                  $("#show_designation").DataTable();
+                  $("#category_table").DataTable();
                 }, 300);
 
-              case 15:
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -26582,81 +26556,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         name: ""
       };
     },
-    getEditDepartment: function getEditDepartment(id) {
+    getSecondLevel: function getSecondLevel(id) {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var resDepartment;
+        var resSecondLevel;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this3.callApi("post", 'hrm/designation/getTerminal', {
+                return _this3.callApi("post", 'accounts/coa/getSecondLevel', {
                   'id': id
                 });
 
               case 2:
-                resDepartment = _context3.sent;
-                console.log(resDepartment);
-
-                if (resDepartment.status == 200 && resDepartment.data.length > 0) {
-                  _this3.editDepartments = resDepartment.data;
-                } else {
-                  _this3.dataEdit.department_id = 0;
-                }
-
-                if (resDepartment.status == 422) {
-                  (function () {
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in resDepartment.data.errors) {
-                      resDepartment.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 6:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }))();
-    },
-    getSecondLevel: function getSecondLevel(id) {
-      var _this4 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var resSecondLevel;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return _this4.callApi("post", 'accounts/coa/getSecondLevel', {
-                  'id': id
-                });
-
-              case 2:
-                resSecondLevel = _context4.sent;
+                resSecondLevel = _context3.sent;
 
                 if (resSecondLevel.status == 200 && resSecondLevel.data.length > 0) {
-                  _this4.secondLevels = resSecondLevel.data;
+                  _this3.secondLevels = resSecondLevel.data;
+                  _this3.addForm.secondLevel = "";
+                  _this3.updatedForm.secondLevel = "";
                 } else {
-                  _this4.addForm.secondLevel = "";
+                  _this3.addForm.secondLevel = "";
+                  _this3.updatedForm.secondLevel = "";
                 }
 
                 if (resSecondLevel.status == 422) {
@@ -26683,13 +26606,124 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    addCategory: function addCategory() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var resCategory;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _this4.validationErrors = [];
+
+                if (!(_this4.addForm.firstLevel == "")) {
+                  _context4.next = 3;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Tier 1",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 3:
+                if (!(_this4.addForm.secondLevel == "")) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Tier 2",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
+                if (_this4.addForm.name) {
+                  _context4.next = 7;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Name is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 7:
+                _context4.next = 9;
+                return _this4.callApi("post", "accounts/coa/category/store", _this4.addForm);
+
+              case 9:
+                resCategory = _context4.sent;
+
+                if (!(resCategory.status == 201)) {
+                  _context4.next = 19;
+                  break;
+                }
+
+                _this4.loading = false;
+                swal({
+                  title: "Success",
+                  text: "Category Added Successfully!",
+                  icon: "success",
+                  timer: 2000
+                });
+
+                _this4.clearForm();
+
+                $("#category_table").DataTable().destroy();
+                _context4.next = 17;
+                return _this4.fetchCategories();
+
+              case 17:
+                _context4.next = 20;
+                break;
+
+              case 19:
+                if (resCategory.status == 422) {
+                  (function () {
+                    _this4.loading = false;
+                    var errorContent = "";
+                    var count = 0;
+
+                    for (var key in resCategory.data.errors) {
+                      resCategory.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
+                }
+
+              case 20:
+              case "end":
                 return _context4.stop();
             }
           }
         }, _callee4);
       }))();
     },
-    addCategory: function addCategory() {
+    updateDesignation: function updateDesignation() {
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
@@ -26700,7 +26734,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this5.validationErrors = [];
 
-                if (!(_this5.addForm.firstLevel == "")) {
+                if (!(_this5.updatedForm.firstLevel == "")) {
                   _context5.next = 3;
                   break;
                 }
@@ -26713,7 +26747,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (!(_this5.addForm.secondLevel == "")) {
+                if (!(_this5.updatedForm.secondLevel == "")) {
                   _context5.next = 5;
                   break;
                 }
@@ -26726,7 +26760,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (_this5.addForm.name) {
+                if (_this5.updatedForm.name) {
                   _context5.next = 7;
                   break;
                 }
@@ -26740,36 +26774,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
                 _context5.next = 9;
-                return _this5.callApi("post", "accounts/coa/category/store", _this5.addForm);
+                return _this5.callApi("post", "accounts/coa/category/update", _this5.updatedForm);
 
               case 9:
                 resCategory = _context5.sent;
 
-                if (!(resCategory.status == 201)) {
-                  _context5.next = 20;
+                if (!(resCategory.status == 200)) {
+                  _context5.next = 18;
                   break;
                 }
 
                 _this5.loading = false;
                 swal({
                   title: "Success",
-                  text: "Category Added Successfully!",
+                  text: "Category Updated Successfully!",
                   icon: "success",
                   timer: 2000
                 });
+                $("#category_table").DataTable().destroy();
+                _context5.next = 16;
+                return _this5.fetchCategories();
 
-                _this5.clearForm();
-
-                $("#designation_table").DataTable().destroy();
-                $("#show_designation").DataTable().destroy();
-                _context5.next = 18;
-                return _this5.fetchDesignations();
-
-              case 18:
-                _context5.next = 21;
+              case 16:
+                _context5.next = 19;
                 break;
 
-              case 20:
+              case 18:
                 if (resCategory.status == 422) {
                   (function () {
                     _this5.loading = false;
@@ -26793,78 +26823,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 21:
+              case 19:
               case "end":
                 return _context5.stop();
             }
           }
         }, _callee5);
       }))();
-    } // async updateDesignation() {
-    //     this.validationErrors = [];
-    //     if (this.dataEdit.department_id == "0")
-    //         return swal({
-    //             title: "Required!",
-    //             text: "Please Select Department",
-    //             icon: "error",
-    //             timer: 2000
-    //         });
-    //     if (this.dataEdit.name == "" || typeof this.dataEdit.name == 'undefined')
-    //         return swal({
-    //             title: "Required!",
-    //             text: "Name is Required",
-    //             icon: "error",
-    //             timer: 2000
-    //         });
-    //     this.loading = true;
-    //     const resDepartmentEdit = await this.callApi("post", 'hrm/designation/update', this.dataEdit);
-    //     if (resDepartmentEdit.status == 200) {
-    //         this.loading = false;
-    //         swal({
-    //             title: "Success!",
-    //             text: "Designation Updated Successfully",
-    //             icon: "success",
-    //             timer: 2000
-    //         });
-    //         $("#designation_table").DataTable().destroy();
-    //         $("#show_designation").DataTable().destroy();
-    //         await this.fetchDesignations();
-    //     } else {
-    //         if (resDepartmentEdit.status == 422) {
-    //             this.loading = false;
-    //             let errorContent = "";
-    //             let count = 0;
-    //             for (const key in resDepartmentEdit.data.errors) {
-    //                 resDepartmentEdit.data.errors[key].forEach((element) => {
-    //                     errorContent += (
-    //                         (++count) + " - " + //creating serial no.
-    //                         element + // main error
-    //                         "\n" // creating new line
-    //                     );
-    //                 });
-    //                 swal({
-    //                     title: "Error",
-    //                     text: errorContent,
-    //                     icon: "error",
-    //             timer: 2000
-    //                 });
-    //             }
-    //         }
-    //     }
-    // },
-    // editDesignation(designation) {
-    //     this.dataEdit = designation
-    // },
+    },
+    editCategory: function editCategory(category) {
+      var _this6 = this;
 
+      this.updatedForm.categoryId = category.id;
+      this.updatedForm.firstLevel = category.first_level_id;
+      this.updatedForm.name = category.name;
+      this.getSecondLevel(category.first_level_id);
+      setTimeout(function () {
+        _this6.updatedForm.secondLevel = category.second_level_id;
+      }, 500);
+    }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(['getDeletingObj'])),
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.departmentsDetails.splice(obj.index, 1);
-        $("#designation_table").DataTable().destroy();
-        $("#show_designation").DataTable().destroy();
-        this.fetchDesignations();
+        $("#category_table").DataTable().destroy();
+        this.fetchCategories();
       }
     }
   }
@@ -48185,30 +48170,25 @@ var _hoisted_19 = {
 };
 var _hoisted_20 = {
   "class": "table dataTables table-striped table-hover",
-  id: "designation_table"
+  id: "category_table"
 };
 
-var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Department Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No. Of Designations"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Added By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Tier 2"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Tier 1"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
 /* HOISTED */
 );
 
-var _hoisted_22 = ["onClick"];
-
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye"
-}, null, -1
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button :data-target=\"'#' + editFormID\" data-toggle=\"modal\"\r\n                                                                    @click=\"editCategory(category)\"\r\n                                                                    class=\"btn btn-primary mx-1\">\r\n                                                                <i class=\"far fa-edit\"></i>\r\n                                                            </button> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" N/A ")], -1
 /* HOISTED */
 );
 
-var _hoisted_24 = [_hoisted_23];
-var _hoisted_25 = {
+var _hoisted_23 = {
   "class": "row mt-3"
 };
-var _hoisted_26 = {
+var _hoisted_24 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "terminals"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tier 1 "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -48216,49 +48196,49 @@ var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   selected: ""
 }, "Select Tier 1", -1
 /* HOISTED */
 );
 
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "1"
 }, "Assets", -1
 /* HOISTED */
 );
 
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "2"
 }, "Liabilities", -1
 /* HOISTED */
 );
 
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "3"
 }, "Equity", -1
 /* HOISTED */
 );
 
-var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "4"
 }, "Revenue", -1
 /* HOISTED */
 );
 
-var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "5"
 }, "Expenses", -1
 /* HOISTED */
 );
 
-var _hoisted_34 = [_hoisted_28, _hoisted_29, _hoisted_30, _hoisted_31, _hoisted_32, _hoisted_33];
-var _hoisted_35 = {
+var _hoisted_32 = [_hoisted_26, _hoisted_27, _hoisted_28, _hoisted_29, _hoisted_30, _hoisted_31];
+var _hoisted_33 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "departmentName"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tier 2"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -48266,19 +48246,19 @@ var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   selected: ""
 }, "Select Tier 2", -1
 /* HOISTED */
 );
 
-var _hoisted_38 = ["value"];
-var _hoisted_39 = {
+var _hoisted_36 = ["value"];
+var _hoisted_37 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "name"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -48286,8 +48266,96 @@ var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
+var _hoisted_39 = {
+  "class": "row mt-3"
+};
+var _hoisted_40 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "terminals"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tier 1 "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "",
+  selected: ""
+}, "Select Tier 1", -1
+/* HOISTED */
+);
+
+var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "1"
+}, "Assets", -1
+/* HOISTED */
+);
+
+var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "2"
+}, "Liabilities", -1
+/* HOISTED */
+);
+
+var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "3"
+}, "Equity", -1
+/* HOISTED */
+);
+
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "4"
+}, "Revenue", -1
+/* HOISTED */
+);
+
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "5"
+}, "Expenses", -1
+/* HOISTED */
+);
+
+var _hoisted_48 = [_hoisted_42, _hoisted_43, _hoisted_44, _hoisted_45, _hoisted_46, _hoisted_47];
+var _hoisted_49 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "departmentName"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tier 2"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "",
+  selected: ""
+}, "Select Tier 2", -1
+/* HOISTED */
+);
+
+var _hoisted_52 = ["value"];
+var _hoisted_53 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_54 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "name"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-danger ml-1"
+}, "*")], -1
+/* HOISTED */
+);
+
+var _hoisted_55 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
+
+  var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     href: "#",
@@ -48316,31 +48384,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.designations, function (designation, i) {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (category, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(designation.terminal.city.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(category.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(designation.terminal.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(category.second_level.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(designation.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(category.first_level.name), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(designation.designation_count), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(designation.added_by.name), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-      "data-target": "#detail-modal",
-      "data-toggle": "modal",
-      onClick: function onClick($event) {
-        return _ctx.designationDetail(designation.id);
-      },
-      "class": "btn btn-info mx-2"
-    }, _hoisted_24, 8
-    /* PROPS */
-    , _hoisted_22)])]);
+    ), _hoisted_22]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -48361,7 +48416,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         onChange: _cache[2] || (_cache[2] = function ($event) {
           return $options.getSecondLevel($data.addForm.firstLevel);
@@ -48369,25 +48424,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
           return $data.addForm.firstLevel = $event;
         })
-      }, _hoisted_34, 544
+      }, _hoisted_32, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.firstLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [_hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.firstLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.addForm.secondLevel = $event;
         })
-      }, [_hoisted_37, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.secondLevels, function (second, i) {
+      }, [_hoisted_35, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.secondLevels, function (second, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: second.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(second.name), 9
         /* TEXT, PROPS */
-        , _hoisted_38);
+        , _hoisted_36);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.secondLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.secondLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [_hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         id: "name",
         "class": "form-control",
@@ -48403,7 +48458,68 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal End "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n                heading=\"Edit Designation\"\r\n                :errors=\"this.validationErrors\"\r\n                :success=\"success\"\r\n                :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"row mt-3\">\r\n                    <div class=\"form-group col-md-12\">\r\n                        <label for=\"terminals\">Terminals <span class=\"text-danger ml-1\">*</span></label>\r\n                        <select class=\"form-control\" id=\"terminals\"\r\n                                v-model=\"dataEdit.terminal_id\"  @change=\"getEditDepartment(dataEdit.terminal_id)\">\r\n                            <option value=\"0\">Select Terminal</option>\r\n                            <option\r\n                                v-for=\"(terminal, i) in terminals\"\r\n                                :value=\"terminal.id\"\r\n                                :key=\"i\"\r\n                            >{{ terminal.name }} ({{ terminal.city.name }})\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"departmentName\">Department<span class=\"text-danger ml-1\">*</span></label>\r\n                        <select class=\"form-control\" v-model=\"dataEdit.department_id\">\r\n                            <option value=\"0\" selected>Select Department</option>\r\n                            <option\r\n                                v-for=\"(department, i) in editDepartments\"\r\n                                :key=\"i\"\r\n                                :value=\"department.id\"\r\n                            >\r\n                                {{ department.name }}\r\n                            </option>\r\n                        </select>\r\n                    </div>\r\n                    <div class=\"form-group col-md-6\">\r\n                        <label for=\"name\">Name<span class=\"text-danger ml-1\">*</span></label>\r\n                        <input type=\"text\" id=\"name\" class=\"form-control\" v-model=\"dataEdit.name\"/>\r\n                    </div>\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" @click=\"updateDesignation\"\r\n                            :disabled=\"loading\">\r\n                        {{ loading ? 'Loading...' : 'Update Designation' }}\r\n                    </button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit modal End")])]);
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal End "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
+    heading: "Edit Category",
+    errors: this.validationErrors,
+    success: $data.success,
+    editForm: $data.editFormID
+  }, {
+    button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-primary",
+        onClick: _cache[11] || (_cache[11] = function () {
+          return $options.updateDesignation && $options.updateDesignation.apply($options, arguments);
+        }),
+        disabled: $data.loading
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Category'), 9
+      /* TEXT, PROPS */
+      , _hoisted_55)];
+    }),
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        onChange: _cache[7] || (_cache[7] = function ($event) {
+          return $options.getSecondLevel($data.updatedForm.firstLevel);
+        }),
+        "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+          return $data.updatedForm.firstLevel = $event;
+        })
+      }, _hoisted_48, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.updatedForm.firstLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "class": "form-control",
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+          return $data.updatedForm.secondLevel = $event;
+        })
+      }, [_hoisted_51, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.secondLevels, function (second, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: i,
+          value: second.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(second.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_52);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.updatedForm.secondLevel]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        id: "name",
+        "class": "form-control",
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+          return $data.updatedForm.name = $event;
+        })
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.updatedForm.name]])])])];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit modal End")])]);
 }
 
 /***/ }),

@@ -8,6 +8,7 @@ use App\Models\CityToCity;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
+use App\Models\Account\AccountCategory;
 use App\Models\Expense\ExpenseCategory;
 use App\Models\Route\RouteFare;
 use App\Models\Terminal;
@@ -36,7 +37,8 @@ class ExpenseCategoryController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at'),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            
         ];
 
         $customMessages = [
@@ -44,10 +46,19 @@ class ExpenseCategoryController extends Controller
             'name.unique' => 'Category Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);
+        
         $category = ExpenseCategory::create([
             'name' => $request->name,
             'company_id' => Auth::user()->company_id,
             'added_by' => Auth::user()->id,
+        ]);
+
+        AccountCategory::create([
+            "name" => $request->name,
+            "second_level_id" => 18,
+            "first_level_id" => 5,
+            "company_id" => Auth::user()->company_id,
+            "added_by" => Auth::user()->id,
         ]);
 
         return $category;
@@ -56,7 +67,8 @@ class ExpenseCategoryController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->where("first_level_id",5)->where("second_level_id",18)->whereNull('deleted_at'),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            
         ];
 
         $customMessages = [
@@ -64,7 +76,12 @@ class ExpenseCategoryController extends Controller
             'name.unique' => 'Category Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);
-        return ExpenseCategory::find($request->id)->update([
+        $expCtg = ExpenseCategory::find($request->id);
+        $accCtg = AccountCategory::where(["name"=>$expCtg->name,"first_level_id"=>5,"second_level_id"=>18])->update([
+            'name' => $request->name,
+        ]);
+
+        return $expCtg->update([
             'name' => $request->name,
         ]);
     }
