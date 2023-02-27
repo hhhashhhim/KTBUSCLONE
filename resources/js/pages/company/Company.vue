@@ -524,6 +524,7 @@ export default {
         this.fetchCompany();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
+        $("input[type='search']").attr("autocomplete", "off");
     },
     methods: {
         async fetchCompany() {
@@ -758,6 +759,7 @@ export default {
             }
         },
     },
+
 };
 </script>
 <style scoped>

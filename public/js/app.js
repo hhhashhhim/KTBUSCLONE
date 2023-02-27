@@ -32436,8 +32436,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
+              $("input[type='search']").attr("autocomplete", "off");
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
