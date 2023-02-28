@@ -7,11 +7,11 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Discount</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-discount')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Discount
                                 </a>
@@ -55,7 +55,9 @@
                                                         <th>Flat Amount</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-discount') || checkForSubmenuButtons('delete-discount')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -71,18 +73,20 @@
                                                         <td v-else>N/A</td>
                                                         <td>{{ discount.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ discount.added_by.name }}</td>
-                                                        <td>
+                                                        <td v-if="checkForSubmenuButtons('edit-discount') || checkForSubmenuButtons('delete-discount')">
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(discount)"
+                                                                    v-if="checkForSubmenuButtons('edit-discount')"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button class="btn btn-danger">
+                                                            <button class="btn btn-danger text-light"
+                                                                    v-if="checkForSubmenuButtons('delete-discount')">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
-<!--                                                            :data-target="'#' + deleteFormID"-->
-<!--                                                            data-toggle="modal"-->
-<!--                                                            @click="deleteModal(discount,i)"-->
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(discount,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -262,6 +266,7 @@ export default {
             editFormID: "edit_discount_form",
             deleteFormID: "delete_discount_form",
             validationErrors: [],
+            permissions: [],
             success: false,
             showDiscountDivPercentage: true,
             showDiscountDivFlat: false,
@@ -284,6 +289,7 @@ export default {
         await this.fetchDiscount();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         numberRange: function (evt) {

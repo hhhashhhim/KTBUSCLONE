@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Routes</h4>
                             <div class="card-header-action">
-                                <a
+                                <a v-if="checkForSubmenuButtons('add-routes')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -55,7 +55,7 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -63,19 +63,19 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ route.name }}</td>
                                                         <td>{{ route.added_by.name }}</td>
-                                                        <td>
-                                                            <button title="Show Route Details"
+                                                        <td v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">
+                                                            <button title="Show Route Details" v-if="checkForSubmenuButtons('details-routes')"
                                                                     class="btn btn-outline-primary"
                                                                     data-toggle="modal"
                                                                     data-target="#showDetails"
                                                                     @click="fetchRouteDetails( route.id )">See Details
                                                             </button>
-                                                            <button class="btn btn-primary mx-1" title="Edit Routes"
+                                                            <button class="btn btn-primary mx-1" title="Edit Routes" v-if="checkForSubmenuButtons('edit-routes')"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(route)"
                                                             ><i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Route"
+                                                            <button title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
@@ -281,11 +281,14 @@ export default {
             reverseRoute: 1,
             routeDetails: [],
             th: [],
+            permissions: [],
             classFareName: ''
         };
     },
     created() {
         this.fetchCities();
+        this.permissions = this.$store.state.permissions;
+
     },
     methods: {
         clearForm: function () {

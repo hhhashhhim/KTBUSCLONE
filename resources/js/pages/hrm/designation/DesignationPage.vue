@@ -166,19 +166,20 @@
                                                 <td>{{ single.name }}</td>
                                                 <td>{{ single.added_by.name }}</td>
                                                 <td>
-                                                    <button class="btn btn-primary mx-1" title="Edit Designation"><i class="far fa-edit"></i></button>
-                                                    <button class="btn btn-danger mx-1" title="Delete Designation"><i class="far fa-trash-alt"></i></button>
-<!--                                                    <button :data-target="'#' + editFormID" data-toggle="modal"-->
-<!--                                                            @click="editDesignation(single)"-->
-<!--                                                            class="btn btn-primary mx-1">-->
-<!--                                                        <i class="far fa-edit"></i>-->
-<!--                                                    </button>-->
-<!--                                                    <button :data-target="'#' + deleteFormID"-->
-<!--                                                            data-toggle="modal"-->
-<!--                                                            @click="deleteModal(single,i)"-->
-<!--                                                            class="btn btn-danger">-->
-<!--                                                        <i class="far fa-trash-alt"></i>-->
-<!--                                                    </button>-->
+<!--                                                    <button class="btn btn-primary mx-1" title="Edit Designation"><i class="far fa-edit"></i></button>-->
+<!--                                                    <button class="btn btn-danger mx-1" title="Delete Designation"><i class="far fa-trash-alt"></i></button>-->
+                                                    <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            @click="editDesignation(single)"
+                                                            class="btn btn-primary mx-1">
+                                                        <i class="far fa-edit"></i>
+                                                    </button>
+                                                    <button title="Delete Designation"
+                                                            class="btn btn-danger">
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </button>
+<!--                                                    :data-target="'#' + deleteFormID"-->
+<!--                                                    data-toggle="modal"-->
+<!--                                                    @click="deleteModal(single,i)"-->
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -299,14 +300,12 @@ export default {
                 console.log(resAllTerminals);
             }
             const resDesig = await this.callApi("post", 'hrm/designation');
-            console.log(resDesig.data);
             if (resDesig.status == 200) {
                 this.designations = resDesig.data
             } else {
                 console.log(resDesig);
             }
             const resDepart = await this.callApi("post", 'hrm/department');
-            console.log(resDepart);
             if (resDepart.status == 200) {
                 this.editDepartments = resDepart.data
             } else {

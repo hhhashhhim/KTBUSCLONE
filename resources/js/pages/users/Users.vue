@@ -7,18 +7,18 @@
                         <div class="card-header">
                             <h4>Users</h4>
                             <div class="card-header-action">
-                                <a
-                                    data-toggle="modal" @click="getAuthTerminal()"
-                                    data-target="#assignTerminalUser"
-                                    class="btn text-light mr-2"
-                                    :class="$store.state.user.terminal_id == null ? 'btn-danger' :'btn-primary'"
+                                <a v-if="checkForSubmenuButtons('assign-terminal-admin')"
+                                   data-toggle="modal" @click="getAuthTerminal()"
+                                   data-target="#assignTerminalUser"
+                                   class="btn text-light mr-2"
+                                   :class="$store.state.user.terminal_id == null ? 'btn-danger' :'btn-primary'"
                                 >
                                     Assign Terminal To Company Admin (Yourself)
                                 </a>
-                                <a
-                                    data-toggle="modal"
-                                    :data-target="'#'+formID"
-                                    class="btn btn-primary text-light" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-users')" title="Add User"
+                                   data-toggle="modal"
+                                   :data-target="'#'+formID"
+                                   class="btn btn-primary text-light" @click="clearForm()"
                                 >
                                     Add New
                                 </a>
@@ -46,7 +46,9 @@
                                                         <th>Contact</th>
                                                         <th>Terminal Name</th>
                                                         <th>Role</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -60,24 +62,25 @@
                                                         </td>
                                                         <td v-else>N/A</td>
                                                         <th>{{ user.role ? user.role.name : "Not Found" }}</th>
-                                                        <td>
-                                                            <a
-                                                                :data-target="'#'+editFormID"
-                                                                data-toggle="modal"
-                                                                @click="edit(user)"
-                                                                class="btn btn-primary text-light mx-1"
-                                                                title="Edit User"
+                                                        <td v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
+                                                            <a v-if="checkForSubmenuButtons('edit-users')"
+                                                               :data-target="'#'+editFormID"
+                                                               data-toggle="modal"
+                                                               @click="edit(user)"
+                                                               class="btn btn-primary text-light mx-1"
+                                                               title="Edit User"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <!--                                <a-->
-                                                            <!--                                  href="#delete-modal"-->
-                                                            <!--                                  data-toggle="modal"-->
-                                                            <!--                                  @click="deleteModal(user, i)"-->
-                                                            <!--                                  class="btn btn-danger"-->
-                                                            <!--                                >-->
-                                                            <!--                                  <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                </a>-->
+                                                            <a v-if="checkForSubmenuButtons('delete-user')"
+                                                               title="Delete User"
+                                                               class="btn btn-danger text-light"
+                                                            >
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </a>
+                                                            <!--                                                            href="#delete-modal"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(user, i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -423,6 +426,7 @@ export default {
             roles: [],
             userPass: "N/A",
             users: [],
+            permissions: [],
             departureCities: [],
             destinationCities: [],
             formID: 'user_form',
@@ -437,8 +441,8 @@ export default {
                 role: 0,
                 company_id: "",
                 terminal_id: 0,
-                destination : [],
-                departure : [],
+                destination: [],
+                departure: [],
             },
             dataEdit: {
                 terminal_id: 0,
@@ -459,6 +463,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         await this.fetchUsers();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         phoneFormat: function (string) {
@@ -472,7 +477,7 @@ export default {
         showButton: function () {
             return this.authCheck == 0;
         },
-        async getAuthTerminal () {
+        async getAuthTerminal() {
             const resDepart = await this.callApi("post", 'terminals/all');
             if (resDepart.status == 200) {
                 this.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
@@ -587,7 +592,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
                     }
                 }
@@ -678,11 +683,11 @@ export default {
         },
 
         async edit(user) {
-            const resEditUser = await this.callApi("post", "user/edit", {'id' : user.id});
-            if(resEditUser.status == 200){
+            const resEditUser = await this.callApi("post", "user/edit", {'id': user.id});
+            if (resEditUser.status == 200) {
                 this.dataEdit = resEditUser.data;
                 this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
-            }else{
+            } else {
                 console.log(resEditUser);
             }
         },

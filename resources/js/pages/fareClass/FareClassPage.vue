@@ -8,7 +8,7 @@
                             <h4>Fare Class</h4>
                             <div class="card-header-action">
                                 <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary"
-                                   @click="clearForm()">
+                                   @click="clearForm()" v-if="checkForSubmenuButtons('add-class')">
                                     Add Fare Class
                                 </a>
                             </div>
@@ -50,7 +50,9 @@
                                                         <th>Color</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-class') || checkForSubmenuButtons('delete-class')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -69,15 +71,17 @@
                                                         </td>
                                                         <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
-                                                        <td>
+                                                        <td v-if="checkForSubmenuButtons('edit-class') || checkForSubmenuButtons('delete-class')">
                                                             <button title="Edit Fare Class"
+                                                                    v-if="checkForSubmenuButtons('edit-class')"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(fareClass)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                             <button title="Delete Fare Class"
-                                                                class="btn btn-danger">
+                                                                    v-if="checkForSubmenuButtons('delete-class')"
+                                                                    class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#' + deleteFormID "-->
@@ -221,6 +225,8 @@ export default {
             success: false,
             error: false,
             FareClassName: '',
+            permissions: [],
+
             delId: "",
             data: {
                 isActive: 1,
@@ -236,6 +242,8 @@ export default {
         await this.fetchFareClasses();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
+        this.permissions = this.$store.state.permissions;
+
 
     },
     methods: {

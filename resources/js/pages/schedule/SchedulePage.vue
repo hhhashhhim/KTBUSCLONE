@@ -7,12 +7,12 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Schedule</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary"
-                                    @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-schedule')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary"
+                                   @click="clearForm()"
                                 >
                                     Add Schedule
                                 </a>
@@ -56,7 +56,9 @@
                                                         <th>Route</th>
                                                         <th>Bus Class</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-schedule') || checkForSubmenuButtons('extend-schedule') || checkForSubmenuButtons('delete-schedule')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -77,11 +79,13 @@
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-info btn-sm mr-1"
+                                                                    v-if="checkForSubmenuButtons('extend-schedule')"
                                                                     @click="addDays(schedule)"
                                                                     data-target="#addDaysModal" data-toggle="modal"
                                                                     title="Extend Schedule Range"><i
                                                                 class="fas fa-plus"></i></button>
                                                             <button title="Edit Schedule"
+                                                                    v-if="checkForSubmenuButtons('edit-schedule')"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click=" edit(schedule); genericData(); "
                                                                     class="btn btn-primary mr-1 btn-sm"><i
@@ -89,6 +93,7 @@
                                                             </button>
 
                                                             <button title="Delete Schedule"
+                                                                    v-if="checkForSubmenuButtons('delete-schedule')"
                                                                     class="btn btn-danger btn-sm"><i
                                                                 class="far fa-trash-alt"></i>
                                                             </button>
@@ -450,8 +455,7 @@
                             </div>
                             <div class="d-flex justify-content-between w-75 mx-auto">
                                 <div class="font-weight-bold">Surcharge</div>
-                                <div>
-                                    {{
+                                <div> {{
                                         this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
                                     }}
                                 </div>
@@ -860,6 +864,7 @@ export default {
             busClasses: [],
             discounts: [],
             surcharges: [],
+            permissions: [],
             formID: "schedule_form",
             editFormID: "edit_schedule_form",
             deleteFormID: "delete_schedule_form",
@@ -911,6 +916,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         await this.fetchSchedule();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         async addDays(sche) {

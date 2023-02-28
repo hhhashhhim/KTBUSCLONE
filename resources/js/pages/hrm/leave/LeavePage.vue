@@ -99,17 +99,18 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center" v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button title="Edit Leave" :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editLeave(leave)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(leave,i)"
-                                                                    class="btn btn-danger">
+                                                            <button title="Delete Leave"
+                                                                    class="btn btn-danger text-light">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
+<!--                                                            :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(leave,i)"-->
                                                         </td>
                                                         <td v-else class="text-center">
                                                             <div class="badge badge-info text-wrap text-break"> You can not

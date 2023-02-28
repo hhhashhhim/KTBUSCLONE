@@ -219,7 +219,7 @@
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'leaves' }"
-                                v-if="checkForSubmenu('leave-management')">
+                                v-if="checkForSubmenu('leaves')">
                                 <i class="fas fa-street-view"></i> Leave Management
                             </router-link>
                         </li>
@@ -249,7 +249,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'parts' }"
-                                v-if="checkForSubmenu('maintenance-part')">
+                                v-if="checkForSubmenu('part')">
                                 <i class="fas fa-users"></i> Maintenance Parts
                             </router-link>
                         </li>

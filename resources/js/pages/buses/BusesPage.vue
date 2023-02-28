@@ -7,7 +7,8 @@
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#addBus" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
+                                <a href="#addBus" data-toggle="modal" class="btn btn-primary" @click="clearForm()"
+                                   v-if="checkForSubmenuButtons('add-buses')">
                                     Add New Bus
                                 </a>
                             </div>
@@ -32,7 +33,9 @@
                                                         <th>Insurance Number</th>
                                                         <th>Route Permit</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-buses') || checkForSubmenuButtons('delete-buses')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -52,8 +55,9 @@
                                                         </td>
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
-                                                        <td>
+                                                        <td v-if="checkForSubmenuButtons('edit-buses') || checkForSubmenuButtons('delete-buses')">
                                                             <button title="Edit Bus"
+                                                                    v-if="checkForSubmenuButtons('edit-buses')"
                                                                     :data-target="'#' + editFormID"
                                                                     data-toggle="modal"
                                                                     @click="editBus(bus)"
@@ -61,8 +65,8 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button
-                                                                class="btn btn-danger"
+                                                            <button v-if="checkForSubmenuButtons('delete-buses')"
+                                                                    class="btn btn-danger"
                                                             >
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
@@ -312,6 +316,7 @@ export default {
             seatType: "0",
             fareClasses: [],
             updateSeatValue: [],
+            permissions: [],
             validationErrors: "",
             records: "",
             columns: "",
@@ -349,6 +354,7 @@ export default {
         await this.fetchBuses()
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
+        this.permissions = this.$store.state.permissions;
     },
 
     methods: {

@@ -65,15 +65,16 @@
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editDepartment(department)"
-                                                                    class="btn btn-primary mx-1" title="Edit Department">
+                                                                    class="btn btn-primary mx-1"
+                                                                    title="Edit Department">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <!--                                                            <button :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                                    data-toggle="modal"-->
-                                                            <!--                                                                    @click="deleteModal(department,i)"-->
-                                                            <!--                                                                    class="btn btn-danger">-->
-                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
+                                                            <button title="Delete Department"                                                                    class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+<!--                                                            :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(department,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -102,8 +103,8 @@
                         <select class="form-control" id="terminals"
                                 v-model="addForm.terminal">
                             <option value="0">Select Terminal</option>
-                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i" >
-                                {{ terminal.name }} - {{ terminal.city.name}}
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">
+                                {{ terminal.name }} - {{ terminal.city.name }}
                             </option>
                         </select>
                     </div>
@@ -135,8 +136,8 @@
                         <select class="form-control" id="terminals"
                                 v-model="dataEdit.terminal_id">
                             <option value="0">Select Terminal</option>
-                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i" >
-                                {{ terminal.name }} - {{ terminal.city.name}}
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">
+                                {{ terminal.name }} - {{ terminal.city.name }}
                             </option>
                         </select>
                     </div>
@@ -272,7 +273,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
@@ -325,7 +326,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }

@@ -7,12 +7,12 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Bus Class</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary"
-                                    @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-bus-class')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary"
+                                   @click="clearForm()"
 
                                 >
                                     Add Bus Class
@@ -56,7 +56,9 @@
                                                         <th>Color</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-bus-Class') || checkForSubmenuButtons('duplicate-bus-Class') || checkForSubmenuButtons('delete-bus-class')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -66,21 +68,19 @@
                                                         <td>
                                                             <div
                                                                 style=" border-radius: 50%; height: 50px; width: 50px; "
-                                                                :style="{ backgroundColor: busClass.color }"
-                                                            ></div>
+                                                                :style="{ backgroundColor: busClass.color }"></div>
                                                         </td>
-                                                        <td>
-                                                            {{ busClass.is_active == 1 ? "Active" : "InActive" }}
-                                                        </td>
+                                                        <td> {{ busClass.is_active == 1 ? "Active" : "InActive" }}</td>
                                                         <td>{{ busClass.added_by.name }}</td>
-
-                                                        <td>
+                                                        <td v-if="checkForSubmenuButtons('edit-bus-Class') || checkForSubmenuButtons('duplicate-bus-Class') || checkForSubmenuButtons('delete-bus-class')">
                                                             <button title="Duplicate Bus Class"
+                                                                    v-if="checkForSubmenuButtons('duplicate-bus-Class')"
                                                                     @click="duplicate(busClass.id, i+1)"
                                                                     class="btn btn-info mx-1"
                                                             ><i class="fas fa-clone"></i>
                                                             </button>
                                                             <button title="Edit Bus Class"
+                                                                    v-if="checkForSubmenuButtons('edit-bus-Class')"
                                                                     :data-target="'#' + editFormID"
                                                                     data-toggle="modal"
                                                                     @click="edit(busClass)"
@@ -88,10 +88,8 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button
-
-                                                                class="btn btn-danger"
-                                                            >
+                                                            <button class="btn btn-danger"
+                                                                    v-if="checkForSubmenuButtons('delete-bus-class')">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#' + deleteFormID"-->
@@ -665,6 +663,7 @@ export default {
         return {
             busClasses: [],
             fareClasses: [],
+            permissions: [],
             formID: "busClass_form",
             editFormID: "edit_busClass_form",
             deleteFormID: "delete_busClass_form",
@@ -710,6 +709,12 @@ export default {
             },
             selectedSeats: [],
         };
+    },
+    async created() {
+        await this.fetchBussClasses();
+        window.removeEventListener('keydown', this.enter);
+        window.removeEventListener('keydown', this.altM);
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         resetAttributes: function () {
@@ -1212,11 +1217,7 @@ export default {
 
         }
     },
-    async created() {
-        await this.fetchBussClasses();
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
-    },
+
     computed: {
         ...mapGetters(["getDeletingObj"]),
     },

@@ -7,11 +7,11 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Surcharge</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-surcharge')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add Surcharge
                                 </a>
@@ -53,7 +53,9 @@
                                                         <th>Amount</th>
                                                         <th>Status</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -66,14 +68,15 @@
                                                         <td v-else>N/A</td>
                                                         <td>{{ surcharge.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ surcharge.added_by.name }}</td>
-                                                        <td>
+                                                        <td v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')">
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(surcharge)"
+                                                                    v-if="checkForSubmenuButtons('edit-surcharge')"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button
-                                                                class="btn btn-danger">
+                                                            <button v-if="checkForSubmenuButtons('delete-surcharge')"
+                                                                    class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#' + deleteFormID"-->
@@ -252,6 +255,7 @@ export default {
         return {
             loading: false,
             surcharges: [],
+            permissions: [],
             isActive: 1,
             showDivPercentage: true,
             showDivFlat: false,
@@ -277,6 +281,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         await this.fetchSurcharges();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         numberRange: function (evt) {

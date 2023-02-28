@@ -98,12 +98,13 @@
                                                                     class="btn btn-primary mx-1" title="Edit Employee">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <!-- <button :data-target="'#' + deleteFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="deleteModal(employee,i)"
+                                                            <button title="Delete Employee"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </button> -->
+                                                            </button>
+<!--                                                            :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(employee,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

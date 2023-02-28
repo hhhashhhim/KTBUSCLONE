@@ -7,11 +7,11 @@
                         <div class="card-header">
                             <h4>Terminals</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#add-modal"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-terminal')"
+                                   href="#add-modal"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Terminal
                                 </a>
@@ -30,7 +30,9 @@
                                                 <th>City Name</th>
                                                 <th>No.of Terminals</th>
                                                 <th>Added By</th>
-                                                <th>Action</th>
+                                                <th v-if="checkForSubmenuButtons('view-terminal') || checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                    Action
+                                                </th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -39,12 +41,13 @@
                                                 <td>{{ terminal.name }}</td>
                                                 <td>{{ terminal.terminal_count }}</td>
                                                 <td>{{ terminal.added_by.name }}</td>
-                                                <td>
+                                                <td v-if="checkForSubmenuButtons('view-terminal') || checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
                                                     <button title="View Terminals"
-                                                        data-target="#detail-modal"
-                                                        data-toggle="modal"
-                                                        @click="terminalDetail(terminal.id); datatableReset()"
-                                                        class="btn btn-info mx-2"
+                                                            data-target="#detail-modal"
+                                                            data-toggle="modal"
+                                                            @click="terminalDetail(terminal.id); datatableReset()"
+                                                            class="btn btn-info mx-2"
+                                                            v-if="checkForSubmenuButtons('view-terminal')"
                                                     >
                                                         <i class="far fa-eye"></i>
                                                     </button>
@@ -118,45 +121,45 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
-<!--                        <div class="form-check form-check-inline">-->
-<!--                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime"-->
-<!--                                   checked="" value="positiveTime" v-model="dataTime.time"-->
-<!--                                   @click="applyTimeMaks('positive')">-->
-<!--                            <label class="form-check-label" for="positive_time">-->
-<!--                                Positive-->
-<!--                            </label>-->
-<!--                        </div>-->
-<!--                        <div class="form-check form-check-inline">-->
-<!--                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime"-->
-<!--                                   value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">-->
-<!--                            <label class="form-check-label" for="negative_time">-->
-<!--                                Negative-->
-<!--                            </label>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-5" v-if="showDivPositive">-->
-<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-<!--                        <vue-mask-->
-<!--                            class="form-control"-->
-<!--                            v-model="data.time_difference"-->
-<!--                            mask="00:00"-->
-<!--                            :raw="false"-->
-<!--                            :options="optionsPositive">-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-5" v-if="showDivNegative">-->
-<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-<!--                        <vue-mask-->
-<!--                            class="form-control"-->
-<!--                            v-model="data.time_difference"-->
-<!--                            mask="-00:00"-->
-<!--                            :raw="false"-->
-<!--                            :options="optionsNegative">-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
+                    <!--                </div>-->
+                    <!--                <div class="row">-->
+                    <!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
+                    <!--                        <div class="form-check form-check-inline">-->
+                    <!--                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime"-->
+                    <!--                                   checked="" value="positiveTime" v-model="dataTime.time"-->
+                    <!--                                   @click="applyTimeMaks('positive')">-->
+                    <!--                            <label class="form-check-label" for="positive_time">-->
+                    <!--                                Positive-->
+                    <!--                            </label>-->
+                    <!--                        </div>-->
+                    <!--                        <div class="form-check form-check-inline">-->
+                    <!--                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime"-->
+                    <!--                                   value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">-->
+                    <!--                            <label class="form-check-label" for="negative_time">-->
+                    <!--                                Negative-->
+                    <!--                            </label>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-5" v-if="showDivPositive">-->
+                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+                    <!--                        <vue-mask-->
+                    <!--                            class="form-control"-->
+                    <!--                            v-model="data.time_difference"-->
+                    <!--                            mask="00:00"-->
+                    <!--                            :raw="false"-->
+                    <!--                            :options="optionsPositive">-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-5" v-if="showDivNegative">-->
+                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+                    <!--                        <vue-mask-->
+                    <!--                            class="form-control"-->
+                    <!--                            v-model="data.time_difference"-->
+                    <!--                            mask="-00:00"-->
+                    <!--                            :raw="false"-->
+                    <!--                            :options="optionsNegative">-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
@@ -212,15 +215,15 @@
                             </span>
                         </label>
                     </div>
-<!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
-<!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
-<!--                        <label class="colorinput mx-3 mt-3">-->
-<!--                            <span>-->
-<!--                                <input type="checkbox" class="colorinput-input" v-model="data.is_main"/>-->
-<!--                                <span class="colorinput-color bg-primary"></span>-->
-<!--                            </span>-->
-<!--                        </label>-->
-<!--                    </div>-->
+                    <!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
+                    <!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
+                    <!--                        <label class="colorinput mx-3 mt-3">-->
+                    <!--                            <span>-->
+                    <!--                                <input type="checkbox" class="colorinput-input" v-model="data.is_main"/>-->
+                    <!--                                <span class="colorinput-color bg-primary"></span>-->
+                    <!--                            </span>-->
+                    <!--                        </label>-->
+                    <!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
@@ -288,46 +291,46 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
-<!--                        <div class="form-check form-check-inline">-->
-<!--                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime"-->
-<!--                                   checked="" value="positiveTimeEdit" v-model="dataEditTime.time"-->
-<!--                                   @click="editApplyMaks('positive')">-->
-<!--                            <label class="form-check-label" for="positive_edit_time">-->
-<!--                                Positive-->
-<!--                            </label>-->
-<!--                        </div>-->
-<!--                        <div class="form-check form-check-inline">-->
-<!--                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime"-->
-<!--                                   value="negativeTimeEdit" v-model="dataEditTime.time"-->
-<!--                                   @click="editApplyMaks('negative')">-->
-<!--                            <label class="form-check-label" for="negative_edit_time">-->
-<!--                                Negative-->
-<!--                            </label>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-5" v-if="showEditDivPositive">-->
-<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-<!--                        <vue-mask-->
-<!--                            class="form-control"-->
-<!--                            v-model="dataEdit.time_difference"-->
-<!--                            mask="00:00"-->
-<!--                            :raw="false"-->
-<!--                            :options="optionsPositive">-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
-<!--                    <div class="form-group col-md-5" v-if="showEditDivNegative">-->
-<!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-<!--                        <vue-mask-->
-<!--                            class="form-control"-->
-<!--                            v-model="dataEdit.time_difference"-->
-<!--                            mask="-00:00"-->
-<!--                            :raw="false"-->
-<!--                            :options="optionsNegative">-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
+                    <!--                </div>-->
+                    <!--                <div class="row">-->
+                    <!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
+                    <!--                        <div class="form-check form-check-inline">-->
+                    <!--                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime"-->
+                    <!--                                   checked="" value="positiveTimeEdit" v-model="dataEditTime.time"-->
+                    <!--                                   @click="editApplyMaks('positive')">-->
+                    <!--                            <label class="form-check-label" for="positive_edit_time">-->
+                    <!--                                Positive-->
+                    <!--                            </label>-->
+                    <!--                        </div>-->
+                    <!--                        <div class="form-check form-check-inline">-->
+                    <!--                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime"-->
+                    <!--                                   value="negativeTimeEdit" v-model="dataEditTime.time"-->
+                    <!--                                   @click="editApplyMaks('negative')">-->
+                    <!--                            <label class="form-check-label" for="negative_edit_time">-->
+                    <!--                                Negative-->
+                    <!--                            </label>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-5" v-if="showEditDivPositive">-->
+                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+                    <!--                        <vue-mask-->
+                    <!--                            class="form-control"-->
+                    <!--                            v-model="dataEdit.time_difference"-->
+                    <!--                            mask="00:00"-->
+                    <!--                            :raw="false"-->
+                    <!--                            :options="optionsPositive">-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="form-group col-md-5" v-if="showEditDivNegative">-->
+                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
+                    <!--                        <vue-mask-->
+                    <!--                            class="form-control"-->
+                    <!--                            v-model="dataEdit.time_difference"-->
+                    <!--                            mask="-00:00"-->
+                    <!--                            :raw="false"-->
+                    <!--                            :options="optionsNegative">-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
@@ -342,7 +345,8 @@
                 <div class="row">
                     <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
-                        <textarea class="form-control" spellcheck="false" v-model="dataEdit.address" maxlength="140" placeholder="Address Must be less then 140 characters or 21 words"></textarea>
+                        <textarea class="form-control" spellcheck="false" v-model="dataEdit.address" maxlength="140"
+                                  placeholder="Address Must be less then 140 characters or 21 words"></textarea>
                     </div>
                 </div>
                 <div class="row">
@@ -367,7 +371,8 @@
                         <label class="mt-4" for="active">Online Availability </label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active" v-bind:checked="parseInt(dataEdit.status) === 1 " />
+                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active"
+                                       v-bind:checked="parseInt(dataEdit.status) === 1 "/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
@@ -376,20 +381,21 @@
                         <label class="mt-4" for="sms">SMS</label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active_sms" v-bind:checked="dataEdit.active_sms === 1" />
+                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.active_sms"
+                                       v-bind:checked="dataEdit.active_sms === 1"/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
                     </div>
-<!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
-<!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
-<!--                        <label class="colorinput mx-3 mt-3">-->
-<!--                            <span>-->
-<!--                                <input type="checkbox" class="colorinput-input" @change="checkBoxEdit($event)" v-bind:checked="dataEdit.is_main == 1"/>-->
-<!--                                <span class="colorinput-color bg-primary"></span>-->
-<!--                            </span>-->
-<!--                        </label>-->
-<!--                    </div>-->
+                    <!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
+                    <!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
+                    <!--                        <label class="colorinput mx-3 mt-3">-->
+                    <!--                            <span>-->
+                    <!--                                <input type="checkbox" class="colorinput-input" @change="checkBoxEdit($event)" v-bind:checked="dataEdit.is_main == 1"/>-->
+                    <!--                                <span class="colorinput-color bg-primary"></span>-->
+                    <!--                            </span>-->
+                    <!--                        </label>-->
+                    <!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
@@ -424,7 +430,9 @@
                                                     <th>Address</th>
                                                     <th>Contact Number</th>
                                                     <th>Added By</th>
-                                                    <th>Action</th>
+                                                    <th v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                        Action
+                                                    </th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -438,20 +446,34 @@
                                                     <td v-else>N/A</td>
                                                     <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                     <td v-else>N/A</td>
-                                                    <td style="width:200px;">
-                                                        <button title="Edit"
-                                                            :data-target="'#' + editFormID"
-                                                            data-toggle="modal"
-                                                            @click="editTerminal(single)"
-                                                            class="btn btn-warning mx-2"
+                                                    <td style="width:200px;"
+                                                        v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                        <button title="Edit Terminal"
+                                                                :data-target="'#' + editFormID"
+                                                                data-toggle="modal"
+                                                                @click="editTerminal(single)"
+                                                                class="btn btn-warning mx-2"
+                                                                v-if="checkForSubmenuButtons('edit-terminal')"
                                                         >
                                                             <i class="far fa-edit"></i>
                                                         </button>
+                                                        <button title="Delete Terminal"
+
+                                                                class="btn btn-danger mx-2"
+                                                                v-if="checkForSubmenuButtons('delete-terminal')"
+                                                        >
+                                                            <i class="far fa-trash-alt"></i>
+                                                        </button>
+                                                        <!--                                                        :data-target="'#' + editFormID"-->
+                                                        <!--                                                        data-toggle="modal"-->
+                                                        <!--                                                        @click="editTerminal(single)"-->
                                                         <router-link class="btn btn-success mx-2" title="Commission"
+                                                                     v-if="checkForSubmenuButtons('commission')"
                                                                      :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                             <i class="fas fa-percent"></i>
                                                         </router-link>
                                                         <router-link class="btn btn-primary mx-2" title="Discount"
+                                                                     v-if="checkForSubmenuButtons('discount')"
                                                                      :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                             <i class="fas fa-tag"></i>
                                                         </router-link>
@@ -528,6 +550,7 @@ export default {
             editFormID: "edit_terminal_form",
             deleteFormID: "delete_terminal_form",
             cities: [],
+            permissions: [],
             dataEditCheck: {},
             dataCheck: {},
             dataTime: {},
@@ -561,6 +584,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         await this.fetchTerminals();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         datatableReset: function () {

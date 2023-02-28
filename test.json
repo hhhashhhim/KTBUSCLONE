@@ -8,15 +8,15 @@
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-city",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "edit-city",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "delete-city",
                         "allow": true
                     }
                 ]
@@ -26,87 +26,75 @@
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-terminal",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "view-terminal",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "edit-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "commission",
+                        "allow": true
+                    },
+                    {
+                        "name": "",
                         "allow": true
                     }
                 ]
             },
             {
                 "name": "difference",
-                "allow": true,
-                "buttons": [
-                    {
-                        "name": "Add-Button",
-                        "allow": true
-                    },
-                    {
-                        "name": "Edit-Button",
-                        "allow": true
-                    },
-                    {
-                        "name": "Delete-Button",
-                        "allow": true
-                    }
-                ]
+                "allow": true
             },
             {
                 "name": "fare-class",
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-class",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "edit-class",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "delete-class",
                         "allow": true
                     }
                 ]
             },
             {
                 "name": "fare-table",
-                "allow": true,
-                "buttons": [
-                    {
-                        "name": "Add-Button",
-                        "allow": true
-                    },
-                    {
-                        "name": "Edit-Button",
-                        "allow": true
-                    },
-                    {
-                        "name": "Delete-Button",
-                        "allow": true
-                    }
-                ]
+                "allow": true
             },
             {
                 "name": "routes",
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-routes",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "edit-routes",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "details-routes",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-routes",
                         "allow": true
                     }
                 ]
@@ -116,15 +104,15 @@
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-discount",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "edit-discount",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "delete-discount",
                         "allow": true
                     }
                 ]
@@ -134,15 +122,15 @@
                 "allow": true,
                 "buttons": [
                     {
-                        "name": "Add-Button",
+                        "name": "add-surcharge",
                         "allow": true
                     },
                     {
-                        "name": "Edit-Button",
+                        "name": "edit-surcharge",
                         "allow": true
                     },
                     {
-                        "name": "Delete-Button",
+                        "name": "delete-surcharge",
                         "allow": true
                     }
                 ]
@@ -155,19 +143,75 @@
         "childs": [
             {
                 "name": "bus-class",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-bus-class",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-bus-Class",
+                        "allow": true
+                    },
+                    {
+                        "name": "duplicate-bus-Class",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-bus-class",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "buses",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-buses",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-buses",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-buses",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "schedules",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "extend-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-schedule",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "merges",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-expense",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -177,11 +221,47 @@
         "childs": [
             {
                 "name": "users",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-users",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-users",
+                        "allow": true
+                    },
+                    {
+                        "name": "assign-terminal-admin",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-user",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "roles",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "assign-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-role",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -191,11 +271,79 @@
         "childs": [
             {
                 "name": "bookings",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "assign-bus",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "bus-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "pax-list",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details",
+                        "allow": true
+                    },
+                    {
+                        "name": "drop-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details-shortcut",
+                        "allow": true
+                    },
+                    {
+                        "name": "advance-booking",
+                        "allow": true
+                    },
+                    {
+                        "name": "duplicate-ticket",
+                        "allow": true
+                    },
+                    {
+                        "name": "resend-sms",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-elt",
+                        "allow": true
+                    },
+                    {
+                        "name": "reschedule-seats",
+                        "allow": true
+                    },
+                    {
+                        "name": "overissue-seat",
+                        "allow": true
+                    },
+                    {
+                        "name": "cancel-ticket",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "closing",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-close-booking",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-close-booking",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "all",
@@ -209,7 +357,21 @@
         "childs": [
             {
                 "name": "categories",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-category",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-category",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-category",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -219,19 +381,71 @@
         "childs": [
             {
                 "name": "employees",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-employee",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-employee",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-employee",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "leaves",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "apply-leave",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-leave",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-leave",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "departments",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-department",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-department",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-department",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "designations",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-designation",
+                        "allow": true
+                    },
+                    {
+                        "name": "view-designation",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },

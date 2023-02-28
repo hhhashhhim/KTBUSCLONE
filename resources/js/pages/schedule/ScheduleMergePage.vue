@@ -30,33 +30,37 @@
                                                         <th>Departure Schedule</th>
                                                         <th>Departure Date</th>
                                                         <th>Return Date</th>
-                                                        <th>Return Schedule</th>``
-                                                        <th>Expense</th>
+                                                        <th>Return Schedule</th>
+                                                        ``
+                                                        <th v-if="checkForSubmenuButtons('add-expense')">Expense</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="(merge, i) in merges" :key="i">
-                                                            <td>
-                                                                {{ merge.bus.bus_number }}
-                                                            </td>
-                                                            <td class="bg-blue-grey">
-                                                                {{ merge.closing[0].schedule.name }}
-                                                            </td>
-                                                            <td class="bg-blue-grey">
-                                                                {{ merge.schedule_departure_date }}
-                                                            </td>
-                                                            <td class="bg-dark-gray">
-                                                                {{ merge.closing[1].schedule.name }}
-                                                            </td>
-                                                            <td class="bg-dark-gray">
-                                                                {{ merge.schedule_return_date }}
-                                                            </td>
-                                                            <td>
-                                                                <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:merge.id }}" title="Add Expense">
-                                                                    <i class="fas fa-plus"></i>
-                                                                </router-link>
-                                                            </td>
-                                                        </tr>
+                                                    <tr v-for="(merge, i) in merges" :key="i">
+                                                        <td>
+                                                            {{ merge.bus.bus_number }}
+                                                        </td>
+                                                        <td class="bg-blue-grey">
+                                                            {{ merge.closing[0].schedule.name }}
+                                                        </td>
+                                                        <td class="bg-blue-grey">
+                                                            {{ merge.schedule_departure_date }}
+                                                        </td>
+                                                        <td class="bg-dark-gray">
+                                                            {{ merge.closing[1].schedule.name }}
+                                                        </td>
+                                                        <td class="bg-dark-gray">
+                                                            {{ merge.schedule_return_date }}
+                                                        </td>
+                                                        <td v-if="checkForSubmenuButtons('add-expense')">
+                                                            <router-link v-if="checkForSubmenuButtons('add-expense')"
+                                                                         class="btn btn-success mx-2"
+                                                                         :to="{ name:'expense-page', params: { id:merge.id }}"
+                                                                         title="Add Expense">
+                                                                <i class="fas fa-plus"></i>
+                                                            </router-link>
+                                                        </td>
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -98,12 +102,14 @@ export default {
             // editFormID: "edit_schedule_closing_form",
             success: false,
             errors: false,
+            permissions: [],
         };
     },
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
 
     methods: {

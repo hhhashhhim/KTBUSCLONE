@@ -59,6 +59,9 @@
                                                                         class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
+                                                                <button class="btn btn-danger text-light mx-1">
+                                                                    <i class="far fa-trash-alt"></i>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -420,7 +423,8 @@ export default {
                     name: "buses",
                     allow: true,
                     childs: [
-                        {   name: "bus-class",
+                        {
+                            name: "bus-class",
                             allow: true,
                             buttons: [
                                 {name: "add-bus-class", allow: true},
@@ -448,7 +452,13 @@ export default {
                                 {name: "delete-schedule", allow: true}
                             ],
                         },
-                        {name: "merges", allow: true}
+                        {
+                            name: "merges",
+                            allow: true,
+                            buttons: [
+                                {name: "add-expense", allow: true}
+                            ],
+                        }
                     ],
                 },
                 // Users panel
@@ -456,8 +466,26 @@ export default {
                     name: "users",
                     allow: true,
                     childs: [
-                        {name: "users", allow: true},
-                        {name: "roles", allow: true}
+                        {
+                            name: "users",
+                            allow: true,
+                            buttons: [
+                                {name: "add-users", allow: true},
+                                {name: "edit-users", allow: true},
+                                {name: "assign-terminal-admin", allow: true},
+                                {name: "delete-user", allow: true}
+                            ],
+                        },
+                        {
+                            name: "roles",
+                            allow: true,
+                            buttons: [
+                                {name: "add-role", allow: true},
+                                {name: "edit-role", allow: true},
+                                {name: "assign-role", allow: true},
+                                {name: "delete-role", allow: true}
+                            ],
+                        }
                     ],
                 },
 
@@ -466,8 +494,34 @@ export default {
                     name: "ticketing",
                     allow: true,
                     childs: [
-                        {name: "bookings", allow: true},
-                        {name: "closing", allow: true},
+                        {
+                            name: "bookings",
+                            allow: true,
+                            buttons:[
+                                { name: "assign-bus", allow: true},
+                                { name: "terminal-invoice", allow: true},
+                                { name: "bus-invoice", allow: true},
+                                { name: "pax-list", allow: true},
+                                { name: "seat-details", allow: true},
+                                { name: "drop-schedule", allow: true},
+                                { name: "seat-details-shortcut", allow: true},
+                                { name: "advance-booking", allow: true},
+                                { name: "duplicate-ticket", allow: true},
+                                { name: "resend-sms", allow: true},
+                                { name: "add-elt", allow: true},
+                                { name: "reschedule-seats", allow: true},
+                                { name: "overissue-seat", allow: true},
+                                { name: "cancel-ticket", allow: true},
+                            ]
+                        },
+                        {
+                            name: "closing",
+                            allow: true,
+                            buttons: [
+                                {name: "add-close-booking", allow: true},
+                                {name: "edit-close-booking", allow: true},
+                            ]
+                        },
                         {name: "all", allow: true}
                     ],
                 },
@@ -477,7 +531,15 @@ export default {
                     name: "expenses",
                     allow: true,
                     childs: [
-                        {name: "categories", allow: true}
+                        {
+                            name: "categories",
+                            allow: true,
+                            buttons: [
+                                {name: "add-category", allow: true},
+                                {name: "edit-category", allow: true},
+                                {name: "delete-category", allow: true},
+                            ]
+                        }
                     ],
                 },
                 // HRm Panel
@@ -485,10 +547,41 @@ export default {
                     name: "hrm",
                     allow: true,
                     childs: [
-                        {name: "employees", allow: true},
-                        {name: "leaves", allow: true},
-                        {name: "departments", allow: true},
-                        {name: "designations", allow: true}
+                        {
+                            name: "employees",
+                            allow: true,
+                            buttons: [
+                                {name: "add-employee", allow: true},
+                                {name: "edit-employee", allow: true},
+                                {name: "delete-employee", allow: true},
+                            ]
+                        },
+                        {
+                            name: "leaves",
+                            allow: true,
+                            buttons: [
+                                {name: "apply-leave", allow: true},
+                                {name: "edit-leave", allow: true},
+                                {name: "delete-leave", allow: true}
+                            ]
+                        },
+                        {
+                            name: "departments",
+                            allow: true,
+                            buttons:[
+                                {name: "add-department", allow: true},
+                                {name: "edit-department", allow: true},
+                                {name: "delete-department", allow: true}
+                            ]
+                        },
+                        {
+                            name: "designations",
+                            allow: true,
+                            buttons:[
+                                {name: "add-designation", allow: true},
+                                {name: "view-designation", allow: true},
+                            ]
+                        }
                     ],
                 },
                 // Fleet Maintenance Panel
