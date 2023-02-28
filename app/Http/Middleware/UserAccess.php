@@ -22,10 +22,9 @@ class UserAccess
             foreach ($single['childs'] as $index => $item) {
                 if ($item['name']  == $urlName && !$item['allow']) {
                     return response()->json(['error' => 'Not authorized.'], 403);
-                } else {
-                    return $next($request);
                 }
             }
         }
+        return $next($request);
     }
 }
