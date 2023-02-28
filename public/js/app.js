@@ -54594,7 +54594,8 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_24 = [_hoisted_23];
 var _hoisted_25 = {
   key: 1,
-  "class": "text-light btn btn-danger"
+  "class": "text-light btn btn-danger",
+  title: "Delete City"
 };
 
 var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -56068,7 +56069,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(discount);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Discount"
     }, _hoisted_28, 8
     /* PROPS */
     , _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <button :data-target = \"'#' + deleteFormID\" data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                               @click=\"deleteModal(discount,i)\" class=\"btn btn-danger\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            </button>")])]);
@@ -56417,7 +56419,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(category);
       },
-      "class": "text-light btn btn-primary mx-1"
+      "class": "text-light btn btn-primary mx-1",
+      title: "Edit Category"
     }, _hoisted_20, 8
     /* PROPS */
     , _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <button :data-target=\"'#'+ deleteFormID\" data-toggle=\"modal\" @click=\"deleteModal(city,i)\" class=\" text-light btn btn-danger\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                </button>")])]);
@@ -56564,7 +56567,7 @@ var _hoisted_15 = ["onChange", "value", "disabled"];
 var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   selected: ""
-}, "Select Food ", -1
+}, "Select Category ", -1
 /* HOISTED */
 );
 
@@ -57768,7 +57771,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.editDepartment(department);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Department"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <button :data-target=\"'#' + deleteFormID\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    @click=\"deleteModal(department,i)\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    class=\"btn btn-danger\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            </button>")])]);
@@ -58089,13 +58093,15 @@ var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_49 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-  "class": "btn btn-primary mx-1"
+  "class": "btn btn-primary mx-1",
+  title: "Edit Designation"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "far fa-edit"
 })]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-  "class": "btn btn-danger mx-1"
+  "class": "btn btn-danger mx-1",
+  title: "Delete Designation"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-edit"
+  "class": "far fa-trash-alt"
 })]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    <button :data-target=\"'#' + editFormID\" data-toggle=\"modal\""), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"editDesignation(single)\""), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            class=\"btn btn-primary mx-1\">"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        <i class=\"far fa-edit\"></i>"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    </button>"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    <button :data-target=\"'#' + deleteFormID\""), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            data-toggle=\"modal\""), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"deleteModal(single,i)\""), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            class=\"btn btn-danger\">"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        <i class=\"far fa-trash-alt\"></i>"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    </button>")], -1
 /* HOISTED */
 );
@@ -58220,7 +58226,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.designationDetail(designation.id);
       },
-      "class": "btn btn-info mx-2"
+      "class": "btn btn-info mx-2",
+      title: "View Designation"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22)])]);
@@ -59345,7 +59352,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.editEmployee(employee);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Employee"
     }, _hoisted_30, 8
     /* PROPS */
     , _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button :data-target=\"'#' + deleteFormID\"\r\n                                                                    data-toggle=\"modal\"\r\n                                                                    @click=\"deleteModal(employee,i)\"\r\n                                                                    class=\"btn btn-danger\">\r\n                                                                <i class=\"far fa-trash-alt\"></i>\r\n                                                            </button> ")])]);
@@ -60822,7 +60830,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.dueMaintenanceFrom(data, 0);
-      }
+      },
+      title: "Add Maintenance"
     }, _hoisted_25, 8
     /* PROPS */
     , _hoisted_23)])]);
@@ -61340,7 +61349,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.editFleetDetails(data.id);
-      }
+      },
+      title: "Edit Link Part"
     }, _hoisted_21, 8
     /* PROPS */
     , _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -61349,7 +61359,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "data-target": "#showDetails",
       onClick: function onClick($event) {
         return $options.fetchFleetDetails(data.id);
-      }
+      },
+      title: "View Link Part"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22)])]);
@@ -61758,7 +61769,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.editpart(part);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Part"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22)])]);
@@ -62120,7 +62132,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "data-toggle": "modal",
       onClick: function onClick($event) {
         return $options.updateMaintenanceFrom(data);
-      }
+      },
+      title: "Edit Maintenance"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22)])]);
@@ -62676,7 +62689,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(deal);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Deal"
     }, _hoisted_50, 8
     /* PROPS */
     , _hoisted_48)])]);
@@ -63280,7 +63294,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(food);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Food"
     }, _hoisted_47, 8
     /* PROPS */
     , _hoisted_45)])]);
@@ -63819,7 +63834,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(hotel);
       },
-      "class": "btn btn-primary mx-1"
+      "class": "btn btn-primary mx-1",
+      title: "Edit Hotel"
     }, _hoisted_22, 8
     /* PROPS */
     , _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
@@ -64968,7 +64984,8 @@ var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-user-shield"
+  "class": "fas fa-user-shield",
+  title: "User Roles"
 }, null, -1
 /* HOISTED */
 );
@@ -65056,7 +65073,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(role);
       },
-      "class": "btn btn-primary mx-2"
+      "class": "btn btn-primary mx-2",
+      title: "Edit Role"
     }, _hoisted_21, 8
     /* PROPS */
     , _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <a href=\"#delete-modal\" data-toggle=\"modal\" @click=\"deleteModal(role,i)\" class=\"btn btn-danger\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                </a>")])]);
@@ -65509,6 +65527,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* PROPS */
     , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-primary mx-1",
+      title: "Edit Route",
       "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
@@ -65873,7 +65892,8 @@ var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_18 = ["data-target", "onClick"];
 
 var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-edit"
+  "class": "far fa-edit",
+  title: "Edit Closing"
 }, null, -1
 /* HOISTED */
 );
@@ -66472,7 +66492,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         params: {
           id: merge.id
         }
-      }
+      },
+      title: "Add Expense"
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
         return [_hoisted_19];
@@ -67393,7 +67414,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.addDays(schedule);
       },
       "data-target": "#addDaysModal",
-      "data-toggle": "modal"
+      "data-toggle": "modal",
+      title: "Extend Schedule Range"
     }, _hoisted_24, 8
     /* PROPS */
     , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <button :data-target=\"'#' + editFormID\" data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    @click=\" edit(schedule); genericData(); \""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    class=\"btn btn-primary mr-1 btn-sm\"><i"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                class=\"far fa-edit\"></i></button>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <button :data-target=\"'#' + deleteFormID\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    @click=\"deleteSchedule(schedule, i)\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                    class=\"btn btn-danger btn-sm\"><i"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                class=\"far fa-trash-alt\"></i></button>")])]);
@@ -68214,7 +68236,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(template);
       },
-      "class": "text-light btn btn-primary mx-1"
+      "class": "text-light btn btn-primary mx-1",
+      title: "Edit Template"
     }, _hoisted_30, 8
     /* PROPS */
     , _hoisted_28)])]);
@@ -71349,7 +71372,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(user);
       },
-      "class": "btn btn-primary text-light mx-1"
+      "class": "btn btn-primary text-light mx-1",
+      title: "Edit User"
     }, _hoisted_23, 8
     /* PROPS */
     , _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <a"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  href=\"#delete-modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  @click=\"deleteModal(user, i)\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  class=\"btn btn-danger\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                >"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                  <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </a>")])]);

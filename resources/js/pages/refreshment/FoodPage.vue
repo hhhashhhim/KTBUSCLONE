@@ -96,6 +96,7 @@
                                                                     data-toggle="modal"
                                                                     @click="edit(food)"
                                                                     class="btn btn-primary mx-1"
+                                                                    title="Edit Food"
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>

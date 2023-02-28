@@ -42,7 +42,7 @@
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                             <button v-if="checkForSubmenuButtons('Delete-Button')"
-                                                                    class=" text-light btn btn-danger">
+                                                                    class=" text-light btn btn-danger" title="Delete City">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
 <!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->

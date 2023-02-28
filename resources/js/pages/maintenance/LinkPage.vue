@@ -48,13 +48,13 @@
                                                             <button class="btn btn-primary mx-1"
                                                                     data-target="#editLinking_form"
                                                                     data-toggle="modal"
-                                                                    @click="editFleetDetails( data.id )">
+                                                                    @click="editFleetDetails( data.id )" title="Edit Link Part">
                                                                     <i class="far fa-edit"></i>
                                                             </button>
                                                             <button class="btn btn-primary"
                                                                     data-toggle="modal"
                                                                     data-target="#showDetails"
-                                                                    @click="fetchFleetDetails( data.id )">
+                                                                    @click="fetchFleetDetails( data.id )" title="View Link Part">
                                                                     <i class="far fa-eye"></i>
                                                             </button>
                                                         </td>

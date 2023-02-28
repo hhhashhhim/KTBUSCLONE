@@ -61,7 +61,7 @@
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editpart(part)"
-                                                                    class="btn btn-primary mx-1">
+                                                                    class="btn btn-primary mx-1" title="Edit Part">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                         </td>

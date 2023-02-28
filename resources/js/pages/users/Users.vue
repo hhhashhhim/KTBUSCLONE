@@ -66,6 +66,7 @@
                                                                 data-toggle="modal"
                                                                 @click="edit(user)"
                                                                 class="btn btn-primary text-light mx-1"
+                                                                title="Edit User"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>

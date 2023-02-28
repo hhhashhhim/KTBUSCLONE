@@ -70,7 +70,7 @@
                                                         <td>{{ discount.added_by.name }}</td>
                                                         <td>
                                                             <button :data-target = "'#' + editFormID" data-toggle="modal"
-                                                               @click="edit(discount)" class="btn btn-primary mx-1">
+                                                               @click="edit(discount)" class="btn btn-primary mx-1" title="Edit Discount">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
 <!--                                                            <button :data-target = "'#' + deleteFormID" data-toggle="modal"-->

@@ -35,7 +35,7 @@
                                                         <td>
                                                             <!-- {{ items[0] ? items[0].price : '' }} -->
                                                             <select class="form-control rounded-0" @change="saveRow($event,'first',index)" :value="postData.category[index]" :disabled="editAble">
-                                                                <option value="" selected>Select Food </option>
+                                                                <option value="" selected>Select Category </option>
                                                                 <option v-for="(category, i) in categories" :value="category.id" :key="i" >
                                                                     {{ category.name }}
                                                                 </option>

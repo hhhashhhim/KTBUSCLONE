@@ -69,7 +69,7 @@
                                                                     data-target="#showDetails"
                                                                     @click="fetchRouteDetails( route.id )">See Details
                                                             </button>
-                                                            <button class="btn btn-primary mx-1"
+                                                            <button class="btn btn-primary mx-1" title="Edit Route"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(route)"
                                                             ><i class="far fa-edit"></i>

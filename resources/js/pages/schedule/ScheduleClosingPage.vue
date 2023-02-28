@@ -56,7 +56,7 @@
                                                                         data-toggle="modal"
                                                                         @click="editSchedule(close)"
                                                                         class="btn btn-primary mx-1">
-                                                                    <i class="far fa-edit"></i>
+                                                                    <i class="far fa-edit" title="Edit Closing"></i>
                                                                 </button>
                                                             </td>
                                                             <!-- <td v-if="(j % 2) == 0 && data[j+1]" :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">

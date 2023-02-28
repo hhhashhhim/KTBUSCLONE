@@ -59,7 +59,7 @@
                                                         <td>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(template)"
-                                                                    class=" text-light btn btn-primary mx-1">
+                                                                    class=" text-light btn btn-primary mx-1" title="Edit Template">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                         </td>

@@ -52,7 +52,7 @@
                                                                 {{ merge.schedule_return_date }}
                                                             </td>
                                                             <td>
-                                                                <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:merge.id }}">
+                                                                <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:merge.id }}" title="Add Expense">
                                                                     <i class="fas fa-plus"></i>
                                                                 </router-link>
                                                             </td>
