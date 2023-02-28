@@ -4,7 +4,7 @@ use App\Http\Controllers\TerminalController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'terminals', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'terminals', 'middleware' => 'UserAccess', [CustomMiddleware::class]], function () {
     Route::post('/', [TerminalController::class, 'index']);
     Route::post('/company', [TerminalController::class, 'companies']);
     Route::post('/cities', [TerminalController::class, 'cities']);
