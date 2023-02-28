@@ -138,7 +138,9 @@
                                                 }}</label>
                                         </div>
                                         <div class="col-md-10" v-if="moduleName.allow">
-                                            <div class="alert alert-success" style="background-color: #dff0d8 !important" v-for="(menus, j) in moduleName.childs"
+                                            <div class="alert alert-success"
+                                                 style="background-color: #dff0d8 !important"
+                                                 v-for="(menus, j) in moduleName.childs"
                                                  :key="j">
                                                 <div class="row">
                                                     <div class="col-md-2">
@@ -150,18 +152,22 @@
                                                             }}</label>
                                                     </div>
                                                     <div class="col-md-10" v-if="menus.allow">
-                                                        <div class="alert alert-danger" style="background-color: #f2dede !important">
+                                                        <div class="alert alert-danger"
+                                                             style="background-color: #f2dede !important">
                                                             <div v-if="menus.buttons">
                                                                 <span v-for="(button, k) in menus.buttons" :key="j">
                                                                     <input :checked="button.allow" type="checkbox"
                                                                            :value="true"
                                                                            v-model="button.allow" :id="button.name"/>
-                                                                    <label class="text-capitalize text-bold mx-2"
+                                                                    <label class="text-capitalize text-bold ml-1 mr-3"
                                                                            :for="button.name"
-                                                                           style="color: black"> {{ button.name }}</label>
+                                                                           style="color: black"> {{
+                                                                            button.name
+                                                                        }}</label>
                                                                 </span>
                                                             </div>
-                                                            <div v-else><span style="color: black">NO PAGE ACTION</span></div>
+                                                            <div v-else><span style="color: black">NO PAGE ACTION</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -172,53 +178,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th style="width: 7% !important">Sr. No.</th>
-                                <th style="width: 15% !important">Module Name</th>
-                                <th>Permission</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template v-for="(moduleName, i) in data.modules" :key="i">
-                                <tr>
-                                    <td>{{ i + 1 }}</td>
-                                    <td>
-                                        <div class="text-capitalize">
-                                            {{ moduleName.name }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <label class="colorinput m-3">
-                                            <span v-if="i != 'name'">
-                                                <input :checked="mod" type="checkbox" :value="true" class="colorinput-input"
-                                                    v-model="moduleName.allow" />
-                                                <span class="colorinput-color bg-primary"></span>
-                                            </span>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr v-if="moduleName.allow">
-                                    <td></td>
-                                    <td colspan="2" class="py-5">
-                                        <label class="colorinput m-3" v-for="(menus, j) in moduleName.childs" :key="j">
-                                            <span v-if="i != 'name'">
-                                                <input :checked="menus" type="checkbox" :value="true"
-                                                    class="colorinput-input" v-model="menus.allow" />
-                                                <span class="colorinput-color bg-primary"></span>
-                                                <span style="position: relative; left: 5px; top: -10px"
-                                                    class="text-capitalize">
-                                                    {{ menus.name }}
-                                                </span>
-                                            </span>
-                                        </label>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table> -->
                     <template v-slot:button>
                         <button type="button" class="btn btn-primary" :disabled="loading" @click="add()">
                             {{ loading ? "Loading...." : "Add company" }}
@@ -290,7 +249,9 @@
                                                 }}</label>
                                         </div>
                                         <div class="col-md-10" v-if="moduleName.allow">
-                                            <div class="alert alert-success" style="background-color: #dff0d8 !important" v-for="(menus, j) in moduleName.childs"
+                                            <div class="alert alert-success"
+                                                 style="background-color: #dff0d8 !important"
+                                                 v-for="(menus, j) in moduleName.childs"
                                                  :key="j">
                                                 <div class="row">
                                                     <div class="col-md-2">
@@ -302,9 +263,10 @@
                                                             }}</label>
                                                     </div>
                                                     <div class="col-md-10" v-if="menus.allow">
-                                                        <div class="alert alert-danger" style="background-color: #f2dede !important">
+                                                        <div class="alert alert-danger"
+                                                             style="background-color: #f2dede !important">
                                                             <div v-if="menus.buttons">
-                                                            <span v-for="(button, k) in menus.buttons" :key="j">
+                                                            <span v-for="(button, k) in menus.buttons" :key="k">
                                                                 <input :checked="button.allow" type="checkbox"
                                                                        :value="true"
                                                                        v-model="button.allow" :id="button.name"/>
@@ -313,7 +275,8 @@
                                                                        style="color: black"> {{ button.name }}</label>
                                                             </span>
                                                             </div>
-                                                            <div v-else><span style="color: black">NO PAGE ACTION</span></div>
+                                                            <div v-else><span style="color: black">NO PAGE ACTION</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -324,50 +287,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th style="width: 10% !important;">Sr. No.</th>
-                                <th style="width: 15% !important">Module Name</th>
-                                <th>Permission</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template v-for="(moduleName, i) in dataEdit.modules" :key="i">
-                                <tr>
-                                    <td>{{ i + 1 }}</td>
-                                    <td>
-                                        <div class="text-capitalize">
-                                            {{ moduleName.name }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <label class="colorinput m-3">
-                                            <span v-if="i != 'name'">
-                                                <input :checked="mod" type="checkbox" :value="true" class="colorinput-input"
-                                                    v-model="moduleName.allow" />
-                                                <span class="colorinput-color bg-primary"></span>
-                                            </span>
-                                        </label>
-                                    </td>
-                                </tr>
-                                <tr v-if="moduleName.allow">
-                                    <td></td>
-                                    <td colspan="2" class="py-5">
-                                        <label class="colorinput m-3" v-for="(menus, j) in moduleName.childs" :key="j">
-                                            <span v-if="i != 'name'">
-                                                <input :checked="menus.allow" type="checkbox" class="colorinput-input"
-                                                    v-model="menus.allow" />
-                                                <span class="colorinput-color bg-primary"></span>
-                                                <span style="position: relative; left: 5px; top: -10px"
-                                                    class="text-capitalize"> {{ menus.name }} </span>
-                                            </span>
-                                        </label>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table> -->
                     <template v-slot:button>
                         <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                             {{ loading ? 'Loading...' : 'Update company' }}
@@ -432,28 +351,26 @@ export default {
                             name: "cities",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-city", allow: true},
+                                {name: "edit-city", allow: true},
+                                {name: "delete-city", allow: true}
                             ],
                         },
                         {
                             name: "terminals",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-terminal", allow: true},
+                                {name: "view-terminal", allow: true},
+                                {name: "edit-terminal", allow: true},
+                                {name: "delete-terminal", allow: true},
+                                {name: "commission", allow: true},
+                                {name: "discount", allow: true}
                             ],
                         },
                         {
                             name: "difference",
                             allow: true,
-                            buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
-                            ],
                         },
                         {
                             name: "fare-class",
