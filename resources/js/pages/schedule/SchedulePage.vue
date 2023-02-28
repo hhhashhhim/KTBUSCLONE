@@ -560,6 +560,7 @@
                             id="start"
                             class="form-control"
                             v-model="dataEdit.schedules.start_date"
+                            disabled
                         />
                     </div>
                 </div>
@@ -571,6 +572,7 @@
                             id="end"
                             class="form-control"
                             v-model="dataEdit.schedules.end_date"
+                            disabled
                         />
                     </div>
                     <div class="col-md-6 class form-group">
