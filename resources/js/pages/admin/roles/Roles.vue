@@ -8,8 +8,8 @@
                         <div class="card-header">
                             <h4>Roles</h4>
                             <div class="card-header-action">
-                                <a href="#add-modal" data-toggle="modal" class="btn btn-primary">
-                                    Add New Admin Route
+                                <a href="#add-modal" title="Add New Admin Roles" data-toggle="modal" class="btn btn-primary">
+                                    Add New Admin Roles
                                 </a>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                                                                 <router-link :to="{name: 'role.permission', params: { id:role.id }}" class="btn btn-primary">
                                                                     <i class="fas fa-user-shield"></i>
                                                                 </router-link>
-                                                                <a href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-primary mx-1">
+                                                                <a title="Edit Role" href="#edit-modal" data-toggle="modal" @click="edit(role)" class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </a>
 <!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">-->

@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Food Order Page</h4>
                             <div class="card-header-action">
-                                <a
+                                <a title="Order"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

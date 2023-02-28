@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Expenses</h4>
                             <!-- <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
+                                <a title="Add New Category" href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
                                     Add New Category
                                 </a>
                             </div> -->

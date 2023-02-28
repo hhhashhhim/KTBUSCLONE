@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Buses</h4>
                             <div class="card-header-action">
-                                <a href="#addBus" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
+                                <a title="Add New Bus" href="#addBus" data-toggle="modal" class="btn btn-primary" @click="clearForm()">
                                     Add New Bus
                                 </a>
                             </div>

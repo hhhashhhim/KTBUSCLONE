@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Food Order Page</h4>
                             <div class="card-header-action">
-                                <a
+                                <a title="Order"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -45,7 +45,7 @@
                                                         <td>{{ data.current_reading??'N/A' }} </td>
                                                         <td>{{ data.reading_date??'N/A' }} </td>
                                                         <td>
-                                                            <button class="btn btn-primary mx-1"
+                                                            <button title="Edit Food Order" class="btn btn-primary mx-1"
                                                                     data-target="#editLinking_form"
                                                                     data-toggle="modal"
                                                                     @click="editFleetDetails( data.id )">

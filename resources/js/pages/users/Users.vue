@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Users</h4>
                             <div class="card-header-action">
-                                <a
+                                <a title="Assign Terminal To Company Admin (Yourself)"
                                     data-toggle="modal" @click="getAuthTerminal()"
                                     data-target="#assignTerminalUser"
                                     class="btn text-light mr-2"

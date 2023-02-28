@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Employees</h4>
                             <div class="card-header-action">
-                                <a
+                                <a title="Add New Employee"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

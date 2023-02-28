@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Cities</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
+                                <a title="Add New City" href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
                                    class="btn btn-primary" v-if="checkForSubmenuButtons('Add-Button')">
                                     Add New City
                                 </a>

@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Roles</h4>
                             <div class="card-header-action">
-                                <a href="#add-modal" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary">
+                                <a title="Add New Role" href="#add-modal" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary">
                                     Add New Role
                                 </a>
                             </div>
