@@ -55,7 +55,7 @@
                                 <i class="fas fa-table"></i> Discount
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('surcharges')">
+                        <li class="dropdown" v-if="checkForSubmenu('surcharge')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'surcharge-page' }">
                                 <i class="fas fa-table"></i> Surcharge
                             </router-link>

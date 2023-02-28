@@ -64,16 +64,24 @@
                                                         <td>{{ route.name }}</td>
                                                         <td>{{ route.added_by.name }}</td>
                                                         <td>
-                                                            <button class="btn btn-outline-primary"
+                                                            <button title="Show Route Details"
+                                                                    class="btn btn-outline-primary"
                                                                     data-toggle="modal"
                                                                     data-target="#showDetails"
                                                                     @click="fetchRouteDetails( route.id )">See Details
                                                             </button>
-                                                            <button class="btn btn-primary mx-1"
+                                                            <button class="btn btn-primary mx-1" title="Edit Routes"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(route)"
                                                             ><i class="far fa-edit"></i>
                                                             </button>
+                                                            <button title="Delete Route"
+                                                                    class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID "-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(fareClass,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -280,7 +288,8 @@ export default {
         this.fetchCities();
     },
     methods: {
-        clearForm: function () {route
+        clearForm: function () {
+            route
             this.data = {};
             this.reverseRoute = 1;
             this.loop = 1;
@@ -306,8 +315,8 @@ export default {
             }
         },
         async addRoute() {
-            if(this.routeStartName == '' || typeof this.routeStartName == 'undefined'){
-                 return swal({
+            if (this.routeStartName == '' || typeof this.routeStartName == 'undefined') {
+                return swal({
                     title: "Required!!",
                     text: "Route Start Name is Required",
                     icon: "error",
@@ -315,7 +324,7 @@ export default {
                 });
             }
 
-            if(this.routeEndName == '' || typeof this.routeEndName == 'undefined'){
+            if (this.routeEndName == '' || typeof this.routeEndName == 'undefined') {
                 return swal({
                     title: "Required!!",
                     text: "Route End Name is Required",
@@ -365,7 +374,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }
@@ -375,7 +384,7 @@ export default {
 
         async updateRoute() {
 
-            if(this.dataEdit.routeStartName == '' || typeof this.dataEdit.routeStartName == 'undefined'){
+            if (this.dataEdit.routeStartName == '' || typeof this.dataEdit.routeStartName == 'undefined') {
                 return swal({
                     title: "Required!!",
                     text: "Route Start Name is Required",
@@ -384,7 +393,7 @@ export default {
                 });
             }
 
-            if(this.dataEdit.routeEndName == '' || typeof this.dataEdit.routeEndName == 'undefined'){
+            if (this.dataEdit.routeEndName == '' || typeof this.dataEdit.routeEndName == 'undefined') {
                 return swal({
                     title: "Required!!",
                     text: "Route End Name is Required",
@@ -421,7 +430,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }

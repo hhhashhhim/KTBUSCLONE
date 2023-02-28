@@ -28,11 +28,11 @@ export default {
         checkForSubmenuButtons(ButtonName) {
             let permissions = this.permissions;
             for (let i = 0; i < permissions.length; i++) {
-                let innerChilds = permissions[i].childs;
-                for (let j = 0; j < innerChilds.length; j++) {
-                    if (innerChilds[j].buttons) {
-                        for (let k = 0; k < innerChilds[j].buttons.length; k++) {
-                            let innerButtons = innerChilds[j].buttons;
+                let innerChildren = permissions[i].childs;
+                for (let j = 0; j < innerChildren.length; j++) {
+                    if (innerChildren[j].buttons) {
+                        for (let k = 0; k < innerChildren[j].buttons.length; k++) {
+                            let innerButtons = innerChildren[j].buttons;
                             if (innerButtons[k].name == ButtonName) {
                                 return innerButtons[k].allow;
                             }

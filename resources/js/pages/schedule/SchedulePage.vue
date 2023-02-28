@@ -80,15 +80,19 @@
                                                                     @click="addDays(schedule)"
                                                                     data-target="#addDaysModal" data-toggle="modal"><i
                                                                 class="fas fa-plus"></i></button>
-                                                            <!--                                                            <button :data-target="'#' + editFormID" data-toggle="modal"-->
-                                                            <!--                                                                    @click=" edit(schedule); genericData(); "-->
-                                                            <!--                                                                    class="btn btn-primary mr-1 btn-sm"><i-->
-                                                            <!--                                                                class="far fa-edit"></i></button>-->
-                                                            <!--                                                            <button :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                                    data-toggle="modal"-->
-                                                            <!--                                                                    @click="deleteSchedule(schedule, i)"-->
-                                                            <!--                                                                    class="btn btn-danger btn-sm"><i-->
-                                                            <!--                                                                class="far fa-trash-alt"></i></button>-->
+                                                            <button
+                                                                class="btn btn-primary mr-1 btn-sm"><i
+                                                                class="far fa-edit"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + editFormID" data-toggle="modal"-->
+                                                            <!--                                                            @click=" edit(schedule); genericData(); "-->
+                                                            <button
+                                                                class="btn btn-danger btn-sm"><i
+                                                                class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteSchedule(schedule, i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

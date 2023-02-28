@@ -7,7 +7,8 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Fare Class</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary" @click="clearForm()">
+                                <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary"
+                                   @click="clearForm()">
                                     Add Fare Class
                                 </a>
                             </div>
@@ -41,7 +42,7 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" id="fare_class_table" >
+                                                <table class="table table-striped table-hover" id="fare_class_table">
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
@@ -54,7 +55,7 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(fareClass, i) in fareClasses" :key="i">
-                                                        <td>{{ i+1 }}</td>
+                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ fareClass.name }}</td>
                                                         <td>
                                                             <div
@@ -69,14 +70,19 @@
                                                         <td>{{ fareClass.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ fareClass.added_by.name }}</td>
                                                         <td>
-                                                            <button title="Edit Fare Class" :data-target="'#' + editFormID" data-toggle="modal"
-                                                               @click="edit(fareClass)" class="btn btn-primary mx-1">
+                                                            <button title="Edit Fare Class"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(fareClass)"
+                                                                    class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-<!--                                                            <button :data-target="'#' + deleteFormID " data-toggle="modal"-->
-<!--                                                               @click="deleteModal(fareClass,i)" class="btn btn-danger">-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
+                                                            <button title="Delete Fare Class"
+                                                                class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID "-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(fareClass,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -136,7 +142,7 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="addFareClass" :disabled="loading" >{{loading ? 'Loading...' :  'Add Fare Class' }}
+                        @click="addFareClass" :disabled="loading">{{ loading ? 'Loading...' : 'Add Fare Class' }}
                     </button>
                 </template>
             </Add>
@@ -167,7 +173,7 @@
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
                             <span>
-                               <input type="checkbox"  class="colorinput-input" id="editCheckBox"
+                               <input type="checkbox" class="colorinput-input" id="editCheckBox"
                                       @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active == 1"/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
@@ -176,12 +182,14 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                        <button type="button" class="btn btn-primary" @click="updateFareClass" :disabled="loading"> {{loading ? 'Loading...' : 'Update Fare Class' }} </button>
+                    <button type="button" class="btn btn-primary" @click="updateFareClass" :disabled="loading">
+                        {{ loading ? 'Loading...' : 'Update Fare Class' }}
+                    </button>
                 </template>
             </Edit>
             <!--            Edit MOdel End-->
             <Delete :deleteForm="deleteFormID"
-                confirmationMessage='Are You Sure You want To Delete This Fare Class ???'
+                    confirmationMessage='Are You Sure You want To Delete This Fare Class ???'
             />
 
         </div>
@@ -204,7 +212,7 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             fareClasses: [],
             formID: "fareClass_form",
             editFormID: "edit_fareClass_form",
@@ -212,12 +220,12 @@ export default {
             validationErrors: [],
             success: false,
             error: false,
-            FareClassName:'',
-            delId:"",
-            data:{
-                isActive:1,
-                FareClassName:"",
-                FareClassColor : "#000000",
+            FareClassName: '',
+            delId: "",
+            data: {
+                isActive: 1,
+                FareClassName: "",
+                FareClassColor: "#000000",
             },
             dataEdit: {
                 FareClassName: '',
@@ -231,17 +239,17 @@ export default {
 
     },
     methods: {
-        clearForm: function(){
-          this.data = {};
-          this.data.FareClassColor = "#000000";
-          this.data.isActive = 1
+        clearForm: function () {
+            this.data = {};
+            this.data.FareClassColor = "#000000";
+            this.data.isActive = 1
         },
-        async fetchFareClasses(){
+        async fetchFareClasses() {
             const res = await this.callApi("post", 'fare-class');
             if (res.status == 200) {
                 this.fareClasses = res.data
             }
-            setTimeout(function(){
+            setTimeout(function () {
                 $("#fare_class_table").DataTable();
             }, 300);
 
@@ -272,23 +280,23 @@ export default {
         async addFareClass() {
             this.validationErrors = [];
             if (this.data.FareClassName === "")
-          return swal({
-                title: "Required!",
-                text: "Fare Class Name is Required",
-                icon: "error",
-                timer: 2000
-            });
+                return swal({
+                    title: "Required!",
+                    text: "Fare Class Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.data.FareClassColor === "")
-          return swal({
-                title: "Required!",
-                text: "Fare Class Color is Required",
-                icon: "error",
-                timer: 2000
-            });
-                this.loading = true;
+                return swal({
+                    title: "Required!",
+                    text: "Fare Class Color is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loading = true;
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status == 201) {
-               swal({
+                swal({
                     title: "Success!",
                     text: "Fare Class Added Successfully",
                     icon: "success",
@@ -297,9 +305,9 @@ export default {
                 $("#fare_class_table").DataTable().destroy();
                 this.loading = false
                 this.data = {
-                    isActive:1,
-                    FareClassName:"",
-                    FareClassColor : "#000000",
+                    isActive: 1,
+                    FareClassName: "",
+                    FareClassColor: "#000000",
                 };
                 await this.fetchFareClasses();
                 window.scrollTo(0, 0);
@@ -321,24 +329,24 @@ export default {
         async updateFareClass() {
             this.validationErrors = [];
             if (this.dataEdit.FareClassName === "")
-              return swal({
+                return swal({
                     title: "Required!",
                     text: "Fare Class Name is Required",
                     icon: "error",
                     timer: 2000
                 });
-                if (this.dataEdit.FareClassColor === "")
-              return swal({
+            if (this.dataEdit.FareClassColor === "")
+                return swal({
                     title: "Required!",
                     text: "Fare Class Color is Required",
                     icon: "error",
                     timer: 2000
                 });
 
-                this.loading = true;
+            this.loading = true;
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status == 200) {
-               swal({
+                swal({
                     title: "Success!",
                     text: "Fare Class Updated Successfully",
                     icon: "success",
@@ -362,26 +370,26 @@ export default {
         },
 
 
-        async deleteModal( fare_class,i ){
+        async deleteModal(fare_class, i) {
             const deletingObj = {
-                url:"fare-class/delete",
-                data:fare_class,
-                index:i,
+                url: "fare-class/delete",
+                data: fare_class,
+                index: i,
             }
-            this.$store.commit("setDeleteObj",deletingObj);
+            this.$store.commit("setDeleteObj", deletingObj);
         },
 
         edit(fare_clases) {
             this.dataEdit = {...fare_clases, busClassColor: fare_clases.color};
         },
     },
-    computed:{
+    computed: {
         ...mapGetters(['getDeletingObj'])
     },
-    watch:{
-        getDeletingObj(obj){
+    watch: {
+        getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.fareClasses.splice(obj.index,1)
+                this.fareClasses.splice(obj.index, 1)
                 $("#fare_class_table").DataTable().destroy();
                 this.fetchFareClasses();
             }

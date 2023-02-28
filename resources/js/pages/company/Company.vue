@@ -376,45 +376,41 @@ export default {
                             name: "fare-class",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-class", allow: true},
+                                {name: "edit-class", allow: true},
+                                {name: "delete-class", allow: true}
                             ],
                         },
                         {
                             name: "fare-table",
                             allow: true,
-                            buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
-                            ],
                         },
                         {
                             name: "routes",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-routes", allow: true},
+                                {name: "edit-routes", allow: true},
+                                {name: "details-routes", allow: true},
+                                {name: "delete-routes", allow: true}
                             ],
                         },
                         {
                             name: "discounts",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-discount", allow: true},
+                                {name: "edit-discount", allow: true},
+                                {name: "delete-discount", allow: true}
                             ],
                         },
                         {
                             name: "surcharge",
                             allow: true,
                             buttons: [
-                                {name: "Add-Button", allow: true},
-                                {name: "Edit-Button", allow: true},
-                                {name: "Delete-Button", allow: true}
+                                {name: "add-surcharge", allow: true},
+                                {name: "edit-surcharge", allow: true},
+                                {name: "delete-surcharge", allow: true}
                             ],
                         }
                     ],
@@ -424,9 +420,34 @@ export default {
                     name: "buses",
                     allow: true,
                     childs: [
-                        {name: "bus-class", allow: true},
-                        {name: "buses", allow: true},
-                        {name: "schedules", allow: true},
+                        {   name: "bus-class",
+                            allow: true,
+                            buttons: [
+                                {name: "add-bus-class", allow: true},
+                                {name: "edit-bus-Class", allow: true},
+                                {name: "duplicate-bus-Class", allow: true},
+                                {name: "delete-bus-class", allow: true}
+                            ],
+                        },
+                        {
+                            name: "buses",
+                            allow: true,
+                            buttons: [
+                                {name: "add-buses", allow: true},
+                                {name: "edit-buses", allow: true},
+                                {name: "delete-buses", allow: true}
+                            ],
+                        },
+                        {
+                            name: "schedules",
+                            allow: true,
+                            buttons: [
+                                {name: "add-schedule", allow: true},
+                                {name: "edit-schedule", allow: true},
+                                {name: "extend-schedule", allow: true},
+                                {name: "delete-schedule", allow: true}
+                            ],
+                        },
                         {name: "merges", allow: true}
                     ],
                 },

@@ -27,7 +27,9 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('Edit-Button')  || checkForSubmenuButtons('Delete-Button')">Action</th>
+                                                        <th v-if="checkForSubmenuButtons('Edit-Button')  || checkForSubmenuButtons('Delete-Button')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -36,17 +38,18 @@
                                                         <td>{{ city.name }}</td>
                                                         <td>{{ city.added_by.name }}</td>
                                                         <td v-if="checkForSubmenuButtons('Edit-Button')  || checkForSubmenuButtons('Delete-Button')">
-                                                            <button v-if="checkForSubmenuButtons('Edit-Button')" title="Edit City" :data-target="'#' + editFormID"
+                                                            <button v-if="checkForSubmenuButtons('Edit-Button')"
+                                                                    title="Edit City" :data-target="'#' + editFormID"
                                                                     data-toggle="modal" @click="edit(city)"
                                                                     class=" text-light btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button v-if="checkForSubmenuButtons('Delete-Button')"
+                                                            <button title="Delete City" v-if="checkForSubmenuButtons('Delete-Button')"
                                                                     class=" text-light btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
-<!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->
-<!--                                                            @click="deleteModal(city,i)"-->
+                                                            <!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(city,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

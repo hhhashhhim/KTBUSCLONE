@@ -62,21 +62,27 @@
                                                     <tr v-for="(discount, i) in discounts" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ discount.name }}</td>
-                                                        <td v-if="discount.percentage">{{ discount.percentage }}{{discount.type == 'percentage' ? '%' : ''}}</td>
+                                                        <td v-if="discount.percentage">{{
+                                                                discount.percentage
+                                                            }}{{ discount.type == 'percentage' ? '%' : '' }}
+                                                        </td>
                                                         <td v-else>N/A</td>
                                                         <td v-if="discount.flat">{{ discount.flat }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>{{ discount.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ discount.added_by.name }}</td>
                                                         <td>
-                                                            <button :data-target = "'#' + editFormID" data-toggle="modal"
-                                                               @click="edit(discount)" class="btn btn-primary mx-1">
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(discount)"
+                                                                    class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-<!--                                                            <button :data-target = "'#' + deleteFormID" data-toggle="modal"-->
-<!--                                                               @click="deleteModal(discount,i)" class="btn btn-danger">-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
+                                                            <button class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+<!--                                                            :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(discount,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -106,18 +112,22 @@
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="discountPercentage" name="percentageAmount" class="custom-control-input" checked="" value="percentage" v-model="discountPercentageRadio" @click="discountApply('percentage')" >
+                            <input type="radio" id="discountPercentage" name="percentageAmount"
+                                   class="custom-control-input" checked="" value="percentage"
+                                   v-model="discountPercentageRadio" @click="discountApply('percentage')">
                             <label class="custom-control-label" for="discountPercentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="discountFlat" name="flatAmount" class="custom-control-input" value="flat" v-model="discountPercentageRadio" @click="discountApply('flat')">
+                            <input type="radio" id="discountFlat" name="flatAmount" class="custom-control-input"
+                                   value="flat" v-model="discountPercentageRadio" @click="discountApply('flat')">
                             <label class="custom-control-label" for="discountFlat">Flat Amount</label>
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDiscountDivPercentage">
                         <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="DiscountPercentage" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="DiscountPercentage"
+                                   placeholder="Enter Percentage"
                                    @keypress="isNumber($event);  numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -125,8 +135,10 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDiscountDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span class="text-muted">max: 10K</span> </label>
-                        <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat" placeholder="Enter Flat Amount"
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span
+                            class="text-muted">max: 10K</span> </label>
+                        <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat"
+                               placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
 
                     </div>
@@ -145,7 +157,8 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addDiscount" :disabled="loading">{{loading ? 'Loading...' : 'Save Discount' }}
+                    <button type="button" class="btn btn-primary" @click="addDiscount" :disabled="loading">
+                        {{ loading ? 'Loading...' : 'Save Discount' }}
                     </button>
                 </template>
             </Add>
@@ -162,22 +175,28 @@
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="DiscountName">Name <span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="dataEdit.name" />
+                        <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editPercentage" name="editPercentageAmount" class="custom-control-input" :checked="dataEdit.type == 'percentage'" value="percentage" v-model="dataEdit.discountPercentageRadio" @click="discountApply('editPercentage')" >
+                            <input type="radio" id="editPercentage" name="editPercentageAmount"
+                                   class="custom-control-input" :checked="dataEdit.type == 'percentage'"
+                                   value="percentage" v-model="dataEdit.discountPercentageRadio"
+                                   @click="discountApply('editPercentage')">
                             <label class="custom-control-label" for="editPercentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editFlat" name="editFlatAmount" class="custom-control-input" :checked="dataEdit.type == 'flat'" value="flat" v-model="dataEdit.discountPercentageRadio" @click="discountApply('editFlat')">
+                            <input type="radio" id="editFlat" name="editFlatAmount" class="custom-control-input"
+                                   :checked="dataEdit.type == 'flat'" value="flat"
+                                   v-model="dataEdit.discountPercentageRadio" @click="discountApply('editFlat')">
                             <label class="custom-control-label" for="editFlat">Flat Amount</label>
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
                         <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage" placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
+                                   placeholder="Enter Percentage"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -185,8 +204,10 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span><span class="text-muted">max: 10K</span></label>
-                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat" placeholder="Enter Flat Amount"
+                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span><span
+                            class="text-muted">max: 10K</span></label>
+                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat"
+                               placeholder="Enter Flat Amount"
                                @keypress="isNumber($event)">
                     </div>
                     <div class="col-md-12">
@@ -211,7 +232,7 @@
             </Edit>
             <!--            Edit modal End-->
             <Delete :deleteForm="deleteFormID"
-                confirmationMessage='Are You Sure You want To Delete This Discount ???'
+                    confirmationMessage='Are You Sure You want To Delete This Discount ???'
             />
 
         </div>
@@ -234,7 +255,7 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             discounts: [],
             isActive: 1,
             formID: "discount_form",
@@ -260,12 +281,12 @@ export default {
         };
     },
     async created() {
-       await this.fetchDiscount();
+        await this.fetchDiscount();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
     },
     methods: {
-        numberRange: function(evt) {
+        numberRange: function (evt) {
             const val = parseInt(evt.target.value + evt.key);
             if (!isNaN(val) && val > 100) {
                 evt.preventDefault();
@@ -280,23 +301,23 @@ export default {
         },
 
         discountApply(value) {
-            if(value == "percentage"){
+            if (value == "percentage") {
                 this.showDiscountDivPercentage = true;
                 this.showDiscountDivFlat = false;
             }
-            if(value == "flat"){
+            if (value == "flat") {
                 this.showDiscountDivPercentage = false;
                 this.showDiscountDivFlat = true;
             }
-            if(value == "editPercentage"){
+            if (value == "editPercentage") {
                 this.dataEdit.type = 'percentage';
             }
-            if(value == "editFlat"){
+            if (value == "editFlat") {
                 this.dataEdit.type = 'flat';
 
             }
         },
-        async fetchDiscount(){
+        async fetchDiscount() {
             const res = await this.callApi("post", 'discount');
             if (res.status == 200) {
                 this.discounts = res.data
@@ -308,7 +329,7 @@ export default {
                 $('#discount_table').DataTable();
             }, 300);
         },
-        clearForm:function(){
+        clearForm: function () {
             this.DiscountName = '';
             this.DiscountPercentage = '';
             this.DiscountFlat = '';
@@ -345,14 +366,14 @@ export default {
         async addDiscount() {
             this.validationErrors = [];
             if (this.DiscountName == "")
-           return swal({
-                title: "Required!",
-                text: "Name Field is Required",
-                icon: "error",
-                timer: 2000
-            });
-            if(this.discountPercentageRadio == "percentage"){
-                if(this.DiscountPercentage == "" || typeof   this.DiscountPercentage == "undefined"){
+                return swal({
+                    title: "Required!",
+                    text: "Name Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.discountPercentageRadio == "percentage") {
+                if (this.DiscountPercentage == "" || typeof this.DiscountPercentage == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -361,8 +382,8 @@ export default {
                     });
                 }
             }
-            if(this.discountPercentageRadio == "flat"){
-                if(this.DiscountFlat == "" || typeof   this.DiscountFlat == "undefined"){
+            if (this.discountPercentageRadio == "flat") {
+                if (this.DiscountFlat == "" || typeof this.DiscountFlat == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",
@@ -422,8 +443,8 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if(this.dataEdit.type == "percentage" || this.dataEdit.discountPercentageRadio == 'percentage'){
-                if(this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined"){
+            if (this.dataEdit.type == "percentage" || this.dataEdit.discountPercentageRadio == 'percentage') {
+                if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -432,8 +453,8 @@ export default {
                     });
                 }
             }
-            if(this.dataEdit.type == 'flat' || this.dataEdit.discountPercentageRadio == "flat"){
-                if(this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined"){
+            if (this.dataEdit.type == 'flat' || this.dataEdit.discountPercentageRadio == "flat") {
+                if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",
@@ -442,7 +463,7 @@ export default {
                     });
                 }
             }
-                this.loading = true;
+            this.loading = true;
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200) {
                 this.loading = false;

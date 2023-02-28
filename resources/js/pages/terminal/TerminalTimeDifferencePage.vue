@@ -111,7 +111,9 @@
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="add()" :disabled="loading">
-                        {{ loading ? 'Loading... ' : ( this.data.created ? 'Update Terminals Time': 'Save Terminal Time') }}
+                        {{
+                            loading ? 'Loading... ' : (this.data.created ? 'Update Terminals Time' : 'Save Terminal Time')
+                        }}
                     </button>
                 </template>
             </Add>

@@ -11,16 +11,16 @@ class UserAccess
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse) $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next)
     {
-        $urlName =  request()->segment(count(request()->segments()));
-        foreach (Auth::user()->role->permissions as $key => $single) {
-            foreach ($single['childs'] as $index => $item) {
-                if ($item['name']  == $urlName && !$item['allow']) {
+        $urlName = request()->segment(count(request()->segments()));
+        foreach (Auth::user()->role->permissions as $single) {
+            foreach ($single['childs'] as $item) {
+                if ($item['name'] == $urlName && !$item['allow']) {
                     return response()->json(['error' => 'Not authorized.'], 403);
                 }
             }

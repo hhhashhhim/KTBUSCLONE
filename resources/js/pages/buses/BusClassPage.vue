@@ -76,27 +76,27 @@
 
                                                         <td>
                                                             <button title="Duplicate Bus Class"
-                                                                @click="duplicate(busClass.id, i+1)"
-                                                                class="btn btn-info mx-1"
+                                                                    @click="duplicate(busClass.id, i+1)"
+                                                                    class="btn btn-info mx-1"
                                                             ><i class="fas fa-clone"></i>
                                                             </button>
                                                             <button title="Edit Bus Class"
-                                                                :data-target="'#' + editFormID"
-                                                                data-toggle="modal"
-                                                                @click="edit(busClass)"
-                                                                class="btn btn-primary mx-1"
+                                                                    :data-target="'#' + editFormID"
+                                                                    data-toggle="modal"
+                                                                    @click="edit(busClass)"
+                                                                    class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
+                                                            <button
 
-                                                            <!--                                                            <button-->
-                                                            <!--                                                                :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                                data-toggle="modal"-->
-                                                            <!--                                                                @click="deleteModal(busClass, i)"-->
-                                                            <!--                                                                class="btn btn-danger"-->
-                                                            <!--                                                            >-->
-                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
+                                                                class="btn btn-danger"
+                                                            >
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(busClass, i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -339,7 +339,7 @@
                                             <label for="seat_type">Seat Type</label>
                                             <select class="form-control" v-model="seatModify.type">
                                                 <option value="0" selected>Select Type</option>
-                                                    <option value="reserved_for_female">
+                                                <option value="reserved_for_female">
                                                     Reserved for Female
                                                 </option>
                                                 <option value="not_for_sale">Not for Sale</option>
@@ -786,7 +786,7 @@ export default {
         },
         async saveFareClass() {
             this.loading = true;
-            const resSaveFareClass = await this.callApi( "post", "bus_classes/storeFareClass", this.addData);
+            const resSaveFareClass = await this.callApi("post", "bus_classes/storeFareClass", this.addData);
             if (resSaveFareClass.status == 201) {
                 swal({
                     title: "Success",
@@ -1203,7 +1203,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
 
                     }

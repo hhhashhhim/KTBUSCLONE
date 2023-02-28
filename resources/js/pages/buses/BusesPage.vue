@@ -42,27 +42,33 @@
                                                         <td v-else>N/A</td>
                                                         <td>{{ bus.bus_number }}</td>
                                                         <td>{{ bus.chassis_number ? bus.chassis_number : "N/A" }}</td>
-                                                        <td>{{ bus.insurance_number ? bus.insurance_number : "N/A" }}</td>
-                                                        <td>{{ bus.route_permit_number ? bus.route_permit_number : "N/A" }}</td>
+                                                        <td>{{
+                                                                bus.insurance_number ? bus.insurance_number : "N/A"
+                                                            }}
+                                                        </td>
+                                                        <td>{{
+                                                                bus.route_permit_number ? bus.route_permit_number : "N/A"
+                                                            }}
+                                                        </td>
                                                         <td v-if="bus.added_by">{{ bus.added_by.name }}</td>
                                                         <td v-else>N/A</td>
                                                         <td>
                                                             <button title="Edit Bus"
-                                                                :data-target="'#' + editFormID"
-                                                                data-toggle="modal"
-                                                                @click="editBus(bus)"
-                                                                class="btn btn-primary mx-1"
+                                                                    :data-target="'#' + editFormID"
+                                                                    data-toggle="modal"
+                                                                    @click="editBus(bus)"
+                                                                    class="btn btn-primary mx-1"
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-<!--                                                            <button-->
-<!--                                                                :data-target="'#' + deleteFormID"-->
-<!--                                                                data-toggle="modal"-->
-<!--                                                                @click="deleteBus(bus, i)"-->
-<!--                                                                class="btn btn-danger"-->
-<!--                                                            >-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
+                                                            <button
+                                                                class="btn btn-danger"
+                                                            >
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteBus(bus, i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -192,7 +198,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-primary" @click="addBuses" :disabled="loading">
-                                    {{loading ? 'Loading...' : 'Add Bus' }}</button>
+                                    {{ loading ? 'Loading...' : 'Add Bus' }}
+                                </button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
                         </div>
@@ -277,7 +284,7 @@
             </Edit>
             <!-- Add Modal -->
             <Delete :deleteForm="deleteFormID"
-                confirmationMessage="Are You Sure You want To Delete This Bus Record ???"
+                    confirmationMessage="Are You Sure You want To Delete This Bus Record ???"
             />
         </div>
     </section>
@@ -299,7 +306,7 @@ export default {
     },
     data() {
         return {
-            loading : false,
+            loading: false,
             buses: [],
             seatClass: "0",
             seatType: "0",
@@ -345,11 +352,11 @@ export default {
     },
 
     methods: {
-        clearForm:function(){
+        clearForm: function () {
             this.data = {};
             this.data.fare_class = 0;
         },
-        async fetchBuses(){
+        async fetchBuses() {
             const res = await this.callApi("post", "buses");
             if (res.status == 200) {
                 this.buses = res.data;
@@ -384,11 +391,11 @@ export default {
         async addBuses() {
             this.validationErrors = [];
             if (this.data.busNumber === "")
-              return swal({
+                return swal({
                     title: "Required",
                     text: "Bus Number is required",
                     type: 'error',
-                   timer: 2000
+                    timer: 2000
                 });
             if (this.data.fare_class === "")
                 return swal({
@@ -400,11 +407,11 @@ export default {
             this.loadig = true;
             const res = await this.callApi("post", "buses/store", this.data);
             if (res.status === 201) {
-              swal({
+                swal({
                     title: "Success",
                     text: "Bus Created Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 $('#buses_table').DataTable().destroy();
                 this.loading = false;
@@ -442,11 +449,11 @@ export default {
 
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
-               swal({
+                swal({
                     title: "Success",
                     text: "Bus Record updated Successfully",
                     icon: "success",
-                   timer: 2000
+                    timer: 2000
                 });
                 $('#buses_table').DataTable().destroy();
                 this.loading = false;

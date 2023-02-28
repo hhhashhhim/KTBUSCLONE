@@ -72,12 +72,13 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-<!--                                                            <button :data-target="'#' + deleteFormID"-->
-<!--                                                                    data-toggle="modal"-->
-<!--                                                                    @click="deleteModal(surcharge,i)"-->
-<!--                                                                    class="btn btn-danger">-->
-<!--                                                                <i class="far fa-trash-alt"></i>-->
-<!--                                                            </button>-->
+                                                            <button
+                                                                class="btn btn-danger">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(surcharge,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -151,7 +152,7 @@
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addSurcharge" :disabled="loading" >
+                    <button type="button" class="btn btn-primary" @click="addSurcharge" :disabled="loading">
                         {{ loading ? 'Loading...' : 'Save Surcharge' }}
                     </button>
                 </template>
