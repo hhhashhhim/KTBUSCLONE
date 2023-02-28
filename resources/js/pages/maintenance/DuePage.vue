@@ -80,7 +80,7 @@
                                                             <button class="btn btn-primary mx-1"
                                                                     data-target="#maintenance_add"
                                                                     data-toggle="modal"
-                                                                    @click="dueMaintenanceFrom( data , 0)">
+                                                                    @click="dueMaintenanceFrom( data , 0)" title="Add Maintenance">
                                                                     <i class="fas fa-plus"></i>
                                                             </button>
                                                         </td>

@@ -100,6 +100,7 @@
                                                                     data-toggle="modal"
                                                                     @click="edit(deal)"
                                                                     class="btn btn-primary mx-1"
+                                                                    title="Edit Deal"
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>

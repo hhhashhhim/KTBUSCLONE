@@ -35,7 +35,7 @@
                                                             <td>{{ category.name }}</td>
                                                             <td>{{ category.added_by.name }}</td>
                                                             <td>
-                                                                <button :data-target="'#' + editFormID" data-toggle="modal" @click="edit(category)" class=" text-light btn btn-primary mx-1">
+                                                                <button :data-target="'#' + editFormID" data-toggle="modal" @click="edit(category)" class=" text-light btn btn-primary mx-1" title="Edit Category">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
 <!--                                                                <button :data-target="'#'+ deleteFormID" data-toggle="modal" @click="deleteModal(city,i)" class=" text-light btn btn-danger">-->

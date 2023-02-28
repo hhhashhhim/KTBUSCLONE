@@ -70,6 +70,7 @@
                                                                 data-toggle="modal"
                                                                 @click="designationDetail(designation.id)"
                                                                 class="btn btn-info mx-2"
+                                                                title="View Designation"
                                                             >
                                                                 <i class="far fa-eye"></i>
                                                             </button>
@@ -165,8 +166,8 @@
                                                 <td>{{ single.name }}</td>
                                                 <td>{{ single.added_by.name }}</td>
                                                 <td>
-                                                    <button class="btn btn-primary mx-1"><i class="far fa-edit"></i></button>
-                                                    <button class="btn btn-danger mx-1"><i class="far fa-edit"></i></button>
+                                                    <button class="btn btn-primary mx-1" title="Edit Designation"><i class="far fa-edit"></i></button>
+                                                    <button class="btn btn-danger mx-1" title="Delete Designation"><i class="far fa-trash-alt"></i></button>
 <!--                                                    <button :data-target="'#' + editFormID" data-toggle="modal"-->
 <!--                                                            @click="editDesignation(single)"-->
 <!--                                                            class="btn btn-primary mx-1">-->

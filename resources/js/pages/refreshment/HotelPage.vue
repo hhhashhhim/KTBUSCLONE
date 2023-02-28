@@ -60,6 +60,7 @@
                                                                     data-toggle="modal"
                                                                     @click="edit(hotel)"
                                                                     class="btn btn-primary mx-1"
+                                                                    title="Edit Hotel"
                                                                 >
                                                                     <i class="far fa-edit"></i>
                                                                 </button>

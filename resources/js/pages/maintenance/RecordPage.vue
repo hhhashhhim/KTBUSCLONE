@@ -76,7 +76,7 @@
                                                             <button class="btn btn-primary mx-1"
                                                                     data-target="#maintenance_udpate"
                                                                     data-toggle="modal"
-                                                                    @click="updateMaintenanceFrom( data )">
+                                                                    @click="updateMaintenanceFrom( data )" title="Edit Maintenance">
                                                                     <i class="far fa-edit"></i>
                                                             </button>
                                                         </td>

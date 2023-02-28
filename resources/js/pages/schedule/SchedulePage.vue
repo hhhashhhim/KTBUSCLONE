@@ -78,7 +78,7 @@
                                                         <td>
                                                             <button class="btn btn-info btn-sm mr-1"
                                                                     @click="addDays(schedule)"
-                                                                    data-target="#addDaysModal" data-toggle="modal"><i
+                                                                    data-target="#addDaysModal" data-toggle="modal" title="Extend Schedule Range"><i
                                                                 class="fas fa-plus"></i></button>
                                                             <button
                                                                 class="btn btn-primary mr-1 btn-sm"><i

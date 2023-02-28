@@ -35,10 +35,10 @@
                                                                 <router-link
                                                                     :to="{ name: 'role.permission', params: { id: role.id } }"
                                                                     class="btn btn-warning">
-                                                                    <i class="fas fa-user-shield"></i>
+                                                                    <i class="fas fa-user-shield" title="User Roles"></i>
                                                                 </router-link>
                                                                 <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="edit(role)" class="btn btn-primary mx-2">
+                                                                    @click="edit(role)" class="btn btn-primary mx-2" title="Edit Role">
                                                                     <i class="far fa-edit"></i>
                                                             </button>
                                                                 <!--                                                                <a href="#delete-modal" data-toggle="modal" @click="deleteModal(role,i)" class="btn btn-danger">-->
