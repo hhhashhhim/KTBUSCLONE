@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Routes</h4>
                             <div class="card-header-action">
-                                <a title="Add New Route"
+                                <a
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

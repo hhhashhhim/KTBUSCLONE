@@ -7,11 +7,11 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Designations</h4>
                             <div class="card-header-action">
-                                <a title="Add New Designation"
-                                   href="#"
-                                   data-toggle="modal"
-                                   :data-target="'#' + formID"
-                                   class="btn btn-primary" @click="clearForm()"
+                                <a
+                                    href="#"
+                                    data-toggle="modal"
+                                    :data-target="'#' + formID"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Designation
                                 </a>
@@ -59,8 +59,8 @@
                                                     <tbody>
                                                     <tr v-for="(designation, i) in designations" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ designation.terminal.city.name }}</td>
-                                                        <td>{{ designation.terminal.name }}</td>
+                                                        <td>{{ designation.terminal.city.name}}</td>
+                                                        <td>{{ designation.terminal.name}}</td>
                                                         <td>{{ designation.name }}</td>
                                                         <td>{{ designation.designation_count }}</td>
                                                         <td>{{ designation.added_by.name }}</td>
@@ -166,21 +166,19 @@
                                                 <td>{{ single.name }}</td>
                                                 <td>{{ single.added_by.name }}</td>
                                                 <td>
-                                                    <!--                                                    <button class="btn btn-primary mx-1" title="Edit Designation"><i class="far fa-edit"></i></button>-->
-                                                    <!--                                                    <button class="btn btn-danger mx-1" title="Delete Designation"><i class="far fa-trash-alt"></i></button>-->
-                                                    <button title="Edit Department"
-                                                            class="btn btn-primary mx-1">
-                                                        <i class="far fa-edit"></i>
-                                                    </button>
-<!--                                                    :data-target="'#' + editFormID" data-toggle="modal"-->
-<!--                                                    @click="editDesignation(single)"-->
-                                                    <button title="Delete Department"
-                                                            class="btn btn-danger">
-                                                        <i class="far fa-trash-alt"></i>
-                                                    </button>
-<!--                                                    :data-target="'#' + deleteFormID"-->
-<!--                                                    data-toggle="modal"-->
-<!--                                                    @click="deleteModal(single,i)"-->
+                                                    <button class="btn btn-primary mx-1" title="Edit Designation"><i class="far fa-edit"></i></button>
+                                                    <button class="btn btn-danger mx-1" title="Delete Designation"><i class="far fa-trash-alt"></i></button>
+<!--                                                    <button :data-target="'#' + editFormID" data-toggle="modal"-->
+<!--                                                            @click="editDesignation(single)"-->
+<!--                                                            class="btn btn-primary mx-1">-->
+<!--                                                        <i class="far fa-edit"></i>-->
+<!--                                                    </button>-->
+<!--                                                    <button :data-target="'#' + deleteFormID"-->
+<!--                                                            data-toggle="modal"-->
+<!--                                                            @click="deleteModal(single,i)"-->
+<!--                                                            class="btn btn-danger">-->
+<!--                                                        <i class="far fa-trash-alt"></i>-->
+<!--                                                    </button>-->
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -208,7 +206,7 @@
                     <div class="form-group col-md-12">
                         <label for="terminals">Terminals <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals"
-                                v-model="dataEdit.terminal_id" @change="getEditDepartment(dataEdit.terminal_id)">
+                                v-model="dataEdit.terminal_id"  @change="getEditDepartment(dataEdit.terminal_id)">
                             <option value="0">Select Terminal</option>
                             <option
                                 v-for="(terminal, i) in terminals"
@@ -333,13 +331,13 @@ export default {
                 $("#show_designation").DataTable();
             }, 300);
         },
-        async getEditDepartment(id) {
+        async getEditDepartment(id){
             // this.dataEdit = []
             const resDepartment = await this.callApi("post", 'hrm/designation/getTerminal', {'id': id});
             console.log(resDepartment);
             if (resDepartment.status == 200 && resDepartment.data.length > 0) {
                 this.editDepartments = resDepartment.data;
-            } else {
+            }else{
                 this.dataEdit.department_id = 0;
             }
             if (resDepartment.status == 422) {
@@ -369,7 +367,7 @@ export default {
             console.log(resDepartment);
             if (resDepartment.status == 200 && resDepartment.data.length > 0) {
                 this.departments = resDepartment.data;
-            } else {
+            }else{
                 this.addForm.department = 0;
             }
             if (resDepartment.status == 422) {
@@ -448,7 +446,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 2000
+                    timer: 2000
                         });
                     }
                 }
@@ -501,7 +499,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 2000
+                    timer: 2000
                         });
 
                     }

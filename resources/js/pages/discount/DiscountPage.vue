@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Discount</h4>
                             <div class="card-header-action">
-                                <a title="Add Discount"
+                                <a
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -72,7 +72,7 @@
                                                         <td>{{ discount.is_active == 1 ? 'Active' : 'InActive' }}</td>
                                                         <td>{{ discount.added_by.name }}</td>
                                                         <td>
-                                                            <button title="Edit Discount" :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(discount)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>

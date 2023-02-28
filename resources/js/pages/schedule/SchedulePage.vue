@@ -13,7 +13,6 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary"
                                     @click="clearForm()"
-                                    title="Add Schedule"
                                 >
                                     Add Schedule
                                 </a>

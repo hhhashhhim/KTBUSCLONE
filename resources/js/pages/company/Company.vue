@@ -8,7 +8,7 @@
                             <div class="card-header">
                                 <h4>Companies</h4>
                                 <div class="card-header-action">
-                                    <a title="Add New Company" href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary">
+                                    <a href="#" data-toggle="modal" :data-target="'#' + formID" class="btn btn-primary">
                                         Add New Company
                                     </a>
                                 </div>
@@ -54,7 +54,7 @@
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <button title="Edit Company" :data-target="'#' + editFormID"
+                                                                <button :data-target="'#' + editFormID"
                                                                         data-toggle="modal" @click="edit(company.id, i)"
                                                                         class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>

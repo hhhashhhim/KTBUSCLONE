@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Departments</h4>
                             <div class="card-header-action">
-                                <a title="Add New Department"
+                                <a
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

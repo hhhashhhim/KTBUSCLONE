@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Leaves</h4>
                             <div class="card-header-action">
-                                <a title="Apply to Leave"
+                                <a
                                     href="#"
                                     v-if="$store.state.user.role.name == 'admin'"
                                     data-toggle="modal"
@@ -99,7 +99,7 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center" v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
-                                                            <button title="Edit Leave" :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editLeave(leave)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>

@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Terminals</h4>
                             <div class="card-header-action">
-                                <a title="Add new Terminal"
+                                <a
                                     href="#add-modal"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

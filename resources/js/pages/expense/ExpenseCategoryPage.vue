@@ -7,8 +7,8 @@
                         <div class="card-header">
                             <h4>Expense Categories</h4>
                             <div class="card-header-action">
-                                <a title="Add Expense Category" href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
-                                    Add Expense Category
+                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
+                                    Add New Category
                                 </a>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                                                             <td>{{ category.name }}</td>
                                                             <td>{{ category.added_by.name }}</td>
                                                             <td>
-                                                                <button title="Edit Expense Category" :data-target="'#' + editFormID" data-toggle="modal" @click="edit(category)" class=" text-light btn btn-primary mx-1" title="Edit Category">
+                                                                <button :data-target="'#' + editFormID" data-toggle="modal" @click="edit(category)" class=" text-light btn btn-primary mx-1" title="Edit Category">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
 <!--                                                                <button :data-target="'#'+ deleteFormID" data-toggle="modal" @click="deleteModal(city,i)" class=" text-light btn btn-danger">-->

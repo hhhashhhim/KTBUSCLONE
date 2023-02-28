@@ -8,7 +8,7 @@
                             <div class="card-header">
                                 <h4>Hotels</h4>
                                 <div class="card-header-action">
-                                    <a title="Add Hotel"
+                                    <a
                                         href="#"
                                         data-toggle="modal"
                                         :data-target="'#' + formID"

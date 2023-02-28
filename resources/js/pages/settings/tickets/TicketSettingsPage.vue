@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Tickets Template</h4>
                             <div class="card-header-action">
-                                <a title="Add New Template"
+                                <a
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"

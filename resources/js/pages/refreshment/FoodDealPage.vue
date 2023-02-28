@@ -52,7 +52,7 @@
                             <div class="card-header">
                                 <h4>Food Deals</h4>
                                 <div class="card-header-action">
-                                    <a title="Add Deal"
+                                    <a
                                         href="#"
                                         data-toggle="modal"
                                         :data-target="'#' + formID"

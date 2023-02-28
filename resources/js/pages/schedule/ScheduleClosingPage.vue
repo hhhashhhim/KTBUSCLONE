@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Schedule Closing Detail</h4>
                             <div class="card-header-action">
-                                <a title="Close Booking" href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
+                                <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
                                    @click="clearForm()">
                                     Close Booking
                                 </a>
