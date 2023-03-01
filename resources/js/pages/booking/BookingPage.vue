@@ -128,7 +128,7 @@
                                             </div>
                                         </div>
                                         <div class="row mt-2">
-                                            <div class="col-md-6">
+                                            <div v-if="checkForSubmenuButtons('terminal-id')" class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
@@ -144,11 +144,11 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 mt-3">
+                                            <div :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-12 mt-3 mb-3' : 'col-md-6 mt-3'">
                                                 <div class="row">
-                                                    <div class="col-md-6 align-self-center">
-                                                        <!--                                                        <div class="form-group">-->
-                                                        <!--                                                            <label class=" mr-3">Female : </label>-->
+                                                    <div
+                                                        :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
+                                                        class="align-self-center">
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
                                                                    id="femaleCheckBox"
@@ -158,37 +158,21 @@
                                                             <label class="custom-control-label"
                                                                    for="femaleCheckBox">Female</label>
                                                         </div>
-                                                        <!--                                                            <label class="colorinput">-->
-                                                        <!--                                                                <input name="gender" type="checkbox" value="0"-->
-                                                        <!--                                                                       class="custom-control-input"-->
-                                                        <!--                                                                       @click="changeGender($event)"-->
-                                                        <!--                                                                       v-bind:checked="addForm.gender == 0">-->
-                                                        <!--                                                                <span class="colorinput-color bg-primary"></span>-->
-                                                        <!--                                                            </label>-->
-                                                        <!--                                                        </div>-->
                                                     </div>
-                                                    <div class="col-md-6 align-self-center">
+                                                    <div
+                                                        :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
+                                                        class="align-self-center">
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
                                                                    id="bookingTypeCheckBox"
-                                                                   v-bind:checked="addForm.type == 'advance booking'"
+                                                                   v-bind:checked="addForm.type == 'advance booking'  || checkForSubmenuButtons('advance-booking')"
                                                                    @click="changeType($event)"
                                                                    value="advance booking"
+                                                                   :disabled="checkForSubmenuButtons('advance-booking')"
                                                                    name="bookingType">
                                                             <label class="custom-control-label"
                                                                    for="bookingTypeCheckBox">Advanced</label>
                                                         </div>
-                                                        <!--                                                        <div class="form-group">-->
-                                                        <!--                                                            <label class="mr-3">Advanced : </label>-->
-                                                        <!--                                                            <label class="colorinput">-->
-                                                        <!--                                                                <input name="bookingType" type="checkbox"-->
-                                                        <!--                                                                       value="advance booking"-->
-                                                        <!--                                                                       class="colorinput-input bookingCheck"-->
-                                                        <!--                                                                       @click="changeType($event)"-->
-                                                        <!--                                                                       v-bind:checked="addForm.type == 'advance booking'">-->
-                                                        <!--                                                                <span class="colorinput-color bg-primary"></span>-->
-                                                        <!--                                                            </label>-->
-                                                        <!--                                                        </div>-->
                                                     </div>
                                                 </div>
                                             </div>
@@ -259,17 +243,21 @@
                                             <div class="row">
                                                 <div class="form-group mt-2 mb-2"
                                                 >
-                                                    <a href="#" :data-target="'#' + formID" data-toggle="modal"
+                                                    <a v-if="checkForSubmenuButtons('assign-bus')" href="#"
+                                                       :data-target="'#' + formID" data-toggle="modal"
                                                        class="btn btn-primary" @click="closingData()">
                                                         Assign Bus
                                                     </a>
-                                                    <button class="btn btn-info mx-1" @click="getTerminalInvoice()">
+                                                    <button v-if="checkForSubmenuButtons('terminal-invoice')"
+                                                            class="btn btn-info mx-1" @click="getTerminalInvoice()">
                                                         Terminal Invoice
                                                     </button>
-                                                    <button class="btn btn-warning mx-1" @click="getBusInvoice()">
+                                                    <button v-if="checkForSubmenuButtons('bus-invoice')"
+                                                            class="btn btn-warning mx-1" @click="getBusInvoice()">
                                                         Bus Invoice
                                                     </button>
-                                                    <button class="btn btn-danger mx-1" @click="getCustomerList()">
+                                                    <button v-if="checkForSubmenuButtons('pax-list')"
+                                                            class="btn btn-danger mx-1" @click="getCustomerList()">
                                                         Pax List
                                                     </button>
                                                     <button class="btn btn-success mx-1"
@@ -283,11 +271,13 @@
                                                 </div>
                                             </div>
                                             <div class="text-center mb-2">
-                                                <button class="btn btn-outline-secondary text-dark mr-2"
+                                                <button v-if="checkForSubmenuButtons('seat-details')"
+                                                        class="btn btn-outline-secondary text-dark mr-2"
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
-                                                <button class="btn btn-secondary text-dark mr-2"
+                                                <button v-if="checkForSubmenuButtons('drop-schedule')"
+                                                        class="btn btn-secondary text-dark mr-2"
                                                         @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
                                                 </button>
@@ -762,7 +752,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <button type="button" class=" shadow-style btn btn-primary ml-2"
-                                            v-if="this.allRescheduleButton"
+                                            v-if="this.allRescheduleButton && checkForSubmenuButtons('reschedule-seats')"
                                             @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                     >Reschedule All
                                     </button>
@@ -835,24 +825,29 @@
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
                                                     <button type="button" class="btn btn-secondary text-dark"
-                                                            v-if="innerItem.type == 'booked' "
+                                                            v-if="innerItem.type == 'booked'  && checkForSubmenuButtons('duplicate-ticket')"
                                                             @click="duplicateTicket(innerItem)">Duplicate Ticket
                                                     </button>
-                                                    <button type="button" class="btn btn-success ml-2">Resend SMS
+                                                    <button v-if="checkForSubmenuButtons('resend-sms')" type="button"
+                                                            class="btn btn-success ml-2">Resend SMS
                                                     </button>
-                                                    <button type="button" class="btn btn-info ml-2"
+                                                    <button v-if="checkForSubmenuButtons('add-elt')" type="button"
+                                                            class="btn btn-info ml-2"
                                                             @click="passDataToEltModel(innerItem)">
                                                         Add ELT
                                                     </button>
-                                                    <button type="button" class="btn btn-primary ml-2"
+                                                    <button v-if="checkForSubmenuButtons('reschedule-seats')"
+                                                            type="button" class="btn btn-primary ml-2"
                                                             @click="passDataToRescheduleModel(innerItem); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                                     >Reschedule
                                                     </button>
-                                                    <button type="button" class="btn btn-warning ml-2"
+                                                    <button v-if="checkForSubmenuButtons('overissue-seat')"
+                                                            type="button" class="btn btn-warning ml-2"
                                                             @click="passDataToOverIssueModel(innerItem);this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
-                                                    <button type="button" class="btn btn-danger ml-2"
+                                                    <button v-if="checkForSubmenuButtons('cancel-ticket')" type="button"
+                                                            class="btn btn-danger ml-2"
                                                             @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0 ">
                                                         Cancel Ticket
                                                     </button>
@@ -1054,6 +1049,7 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             buses: [],
+            permissions: [],
             drivers: [],
             hosts: [],
             assignBus: 0,
@@ -1183,11 +1179,13 @@ export default {
                 ticket: [],
                 customer: [],
             },
+
         };
     },
     async created() {
         this.fetchAllSchedules();
         this.showBookingDiv = false;
+        this.permissions = this.$store.state.permissions;
         if (window.location.pathname.split("/").pop() == "booking") {
             window.addEventListener('keydown', this.enter);
             window.addEventListener('keydown', this.altM);
@@ -1251,7 +1249,16 @@ export default {
 
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
+                // if(checkForSubmenuButtons('seat-details-shortcut')) {
                 this.seatDetails();
+                // }else{
+                //     swal({
+                //         title: "OOPS!!",
+                //         text: "Access Denied",
+                //         icon: "error",
+                //         timer: 2000,
+                //     });
+                // }
             }
         },
         async seatDetails() {

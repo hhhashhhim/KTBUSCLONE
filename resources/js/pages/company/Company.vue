@@ -500,6 +500,7 @@ export default {
                             buttons:[
                                 { name: "assign-bus", allow: true},
                                 { name: "terminal-invoice", allow: true},
+                                { name: "terminal-id", allow: true},
                                 { name: "bus-invoice", allow: true},
                                 { name: "pax-list", allow: true},
                                 { name: "seat-details", allow: true},

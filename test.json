@@ -282,6 +282,10 @@
                         "allow": true
                     },
                     {
+                        "name": "terminal-id",
+                        "allow": true
+                    },
+                    {
                         "name": "bus-invoice",
                         "allow": true
                     },

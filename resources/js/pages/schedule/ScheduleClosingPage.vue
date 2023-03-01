@@ -8,7 +8,7 @@
                             <h4>Schedule Closing Detail</h4>
                             <div class="card-header-action">
                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
-                                   @click="clearForm()">
+                                   @click="clearForm()" v-if="checkForSubmenuButtons('add-close-booking')">
                                     Close Booking
                                 </a>
                             </div>
@@ -32,39 +32,41 @@
                                                         <th>Schedule</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-close-booking')">Action
+                                                        </th>
                                                         <!-- <th>Expense</th> -->
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <template v-for="(data, i) in closings" :key="i">
                                                         <tr v-for="(close, j) in data" :key="j">
-                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-left border-bottom border-success' : 'border-left border-top border-success' : 'border-left border-bottom border-top border-danger'">
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-left border-bottom border-success' : 'border-left border-top border-success' : 'border-left border-bottom border-top border-danger'">
                                                                 {{ close.bus.bus_number }}
                                                             </td>
-                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule.name }}
                                                             </td>
-                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_date }}
                                                             </td>
-                                                            <td class="h5" :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_time }}
                                                             </td>
-                                                            <td :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
-                                                                <button :data-target="'#' + editFormID"
-                                                                        data-toggle="modal"
-                                                                        @click="editSchedule(close)"
-                                                                        class="btn btn-primary mx-1">
+                                                            <td v-if="checkForSubmenuButtons('edit-close-booking')"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
+                                                                <button
+                                                                    v-if="checkForSubmenuButtons('edit-close-booking')"
+                                                                    :data-target="'#' + editFormID"
+                                                                    data-toggle="modal"
+                                                                    @click="editSchedule(close)"
+                                                                    class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit" title="Edit Closing"></i>
                                                                 </button>
                                                             </td>
-                                                            <!-- <td v-if="(j % 2) == 0 && data[j+1]" :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
-                                                                <router-link class="btn btn-success mx-2" :to="{ name:'expense-page', params: { id:close.ticket_merge_id }}">
-                                                                    <i class="fas fa-plus"></i>
-                                                                </router-link>
-                                                            </td>
-                                                            <td v-else :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'"></td> -->
                                                         </tr>
                                                     </template>
                                                     </tbody>
@@ -129,16 +131,6 @@
                             </option>
                         </select>
                     </div>
-                    <!-- <div class=" form-group col-md-6">
-                        <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
-                        <Multiselect
-
-                            :options="options"
-                            :multiple="true"
-                            :searchable="true"
-
-                        ></Multiselect>
-                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
                         <select class="form-control rounded-0" v-model="addData.drivers" multiple>
@@ -231,8 +223,7 @@
                         <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editData.schedule" disabled>
                             <option value="">Select Schedule</option>
-                            <option
-                                v-for="(schedule, i) in editSchedules"
+                            <option v-for="(schedule, i) in editSchedules"
                                 :key="i"
                                 :value="schedule.id"
                             >
@@ -319,6 +310,7 @@ export default {
             closings: [],
             schedules: [],
             editSchedules: [],
+            permissions: [],
             drivers: [],
             hosts: [],
             validationErrors: "",
@@ -351,6 +343,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
 
     methods: {
