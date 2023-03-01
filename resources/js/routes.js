@@ -43,8 +43,8 @@ import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferenceP
 import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 
 
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 
 const routes = [
