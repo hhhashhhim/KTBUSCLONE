@@ -1441,7 +1441,7 @@ export default {
                     timer: 2000
                 });
             this.loadig = true;
-            const res = await this.callApi("post", "booking/schedule/closing/store", this.dataForClose);
+            const res = await this.callApi("post", "booking/close/schedule/closing/store", this.dataForClose);
             if (res.status == 201) {
                 swal({
                     title: "Success",

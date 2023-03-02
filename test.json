@@ -563,7 +563,13 @@
             },
             {
                 "name": "order",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-order",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -573,7 +579,13 @@
         "childs": [
             {
                 "name": "chart-of-accounts",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-category",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -583,7 +595,17 @@
         "childs": [
             {
                 "name": "tickets",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-template",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-template",
+                        "allow": true
+                    }
+                ]
             }
         ]
     }

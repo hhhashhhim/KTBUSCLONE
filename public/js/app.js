@@ -27798,7 +27798,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 11:
                 _this7.loadig = true;
                 _context7.next = 14;
-                return _this7.callApi("post", "booking/schedule/closing/store", _this7.dataForClose);
+                return _this7.callApi("post", "booking/close/schedule/closing/store", _this7.dataForClose);
 
               case 14:
                 res = _context7.sent;
