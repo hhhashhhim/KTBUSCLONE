@@ -248,26 +248,26 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'parts' }"
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-parts' }"
                                 v-if="checkForSubmenu('part')">
                                 <i class="fas fa-users"></i> Maintenance Parts
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'link' }"
-                                v-if="checkForSubmenu('maintenance-linking')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-link' }"
+                                v-if="checkForSubmenu('linking')">
                                 <i class="fas fa-users"></i> Maintenance Linking
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'due' }"
-                                v-if="checkForSubmenu('maintenance-due')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due' }"
+                                v-if="checkForSubmenu('dues')">
                                 <i class="fas fa-users"></i> Maintenance Due
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'record' }"
-                                v-if="checkForSubmenu('maintenance-record')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-record' }"
+                                v-if="checkForSubmenu('records')">
                                 <i class="fas fa-users"></i> Maintenance Record
                             </router-link>
                         </li>

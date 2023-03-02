@@ -462,15 +462,15 @@
                 "allow": true
             },
             {
-                "name": "link",
+                "name": "linking",
                 "allow": true
             },
             {
-                "name": "due",
+                "name": "dues",
                 "allow": true
             },
             {
-                "name": "record",
+                "name": "records",
                 "allow": true
             }
         ]

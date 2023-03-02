@@ -165,10 +165,9 @@
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
                                                                    id="bookingTypeCheckBox"
-                                                                   v-bind:checked="addForm.type == 'advance booking'  || checkForSubmenuButtons('advance-booking')"
+                                                                   v-bind:checked="addForm.type == 'advance booking'"
                                                                    @click="changeType($event)"
                                                                    value="advance booking"
-                                                                   :disabled="checkForSubmenuButtons('advance-booking')"
                                                                    name="bookingType">
                                                             <label class="custom-control-label"
                                                                    for="bookingTypeCheckBox">Advanced</label>

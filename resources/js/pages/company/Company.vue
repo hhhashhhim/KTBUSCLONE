@@ -591,9 +591,9 @@ export default {
                     allow: true,
                     childs: [
                         {name: "part", allow: true},
-                        {name: "link", allow: true},
-                        {name: "due", allow: true},
-                        {name: "record", allow: true}
+                        {name: "linking", allow: true},
+                        {name: "dues", allow: true},
+                        {name: "records", allow: true}
                     ],
                 },
                 // Refreshment Panel

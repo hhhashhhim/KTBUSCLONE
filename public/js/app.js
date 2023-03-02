@@ -32618,13 +32618,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           name: "part",
           allow: true
         }, {
-          name: "link",
+          name: "linking",
           allow: true
         }, {
-          name: "due",
+          name: "dues",
           allow: true
         }, {
-          name: "record",
+          name: "records",
           allow: true
         }]
       }, // Refreshment Panel
@@ -48331,7 +48331,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
-      name: 'parts'
+      name: 'maintenance-parts'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -48340,11 +48340,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('maintenance-linking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('linking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
-      name: 'link'
+      name: 'maintenance-link'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -48353,11 +48353,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('maintenance-due') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('dues') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
-      name: 'due'
+      name: 'maintenance-due'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -48366,11 +48366,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('maintenance-record') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [$options.checkForSubmenu('records') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
     key: 0,
     "class": "nav-link text-capitalize",
     to: {
-      name: 'record'
+      name: 'maintenance-record'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -49711,7 +49711,7 @@ var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_57 = {
   "class": "custom-control custom-checkbox"
 };
-var _hoisted_58 = ["checked", "disabled"];
+var _hoisted_58 = ["checked"];
 
 var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
@@ -51261,12 +51261,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "checkbox",
     "class": "custom-control-input",
     id: "bookingTypeCheckBox",
-    checked: $data.addForm.type == 'advance booking' || _ctx.checkForSubmenuButtons('advance-booking'),
+    checked: $data.addForm.type == 'advance booking',
     onClick: _cache[16] || (_cache[16] = function ($event) {
       return $options.changeType($event);
     }),
     value: "advance booking",
-    disabled: _ctx.checkForSubmenuButtons('advance-booking'),
     name: "bookingType"
   }, null, 8
   /* PROPS */
@@ -72403,7 +72402,7 @@ var routes = [{
 }, {
   path: url + "fleet/maintenance/part",
   component: _pages_maintenance_PartPage_vue__WEBPACK_IMPORTED_MODULE_26__["default"],
-  name: "parts"
+  name: "maintenance-parts"
 }, {
   path: url + "fleet/maintenance/link",
   component: _pages_maintenance_LinkPage_vue__WEBPACK_IMPORTED_MODULE_27__["default"],

@@ -181,7 +181,7 @@ const routes = [
     {
         path: url + "fleet/maintenance/part",
         component : MaintenancePartPage,
-        name:"parts"
+        name:"maintenance-parts"
     },
     {
         path: url + "fleet/maintenance/link",
