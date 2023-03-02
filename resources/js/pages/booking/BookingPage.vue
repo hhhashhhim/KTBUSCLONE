@@ -144,7 +144,8 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-12 mt-3 mb-3' : 'col-md-6 mt-3'">
+                                            <div
+                                                :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-12 mt-3 mb-3' : 'col-md-6 mt-3'">
                                                 <div class="row">
                                                     <div
                                                         :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
@@ -1185,7 +1186,7 @@ export default {
         this.fetchAllSchedules();
         this.showBookingDiv = false;
         this.permissions = this.$store.state.permissions;
-        if (window.location.pathname.split("/").pop() == "booking") {
+        if (window.location.pathname.split("/").pop() == "bookings") {
             window.addEventListener('keydown', this.enter);
             window.addEventListener('keydown', this.altM);
         }
@@ -1248,18 +1249,19 @@ export default {
 
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
-                // if(checkForSubmenuButtons('seat-details-shortcut')) {
-                this.seatDetails();
-                // }else{
-                //     swal({
-                //         title: "OOPS!!",
-                //         text: "Access Denied",
-                //         icon: "error",
-                //         timer: 2000,
-                //     });
-                // }
+                if (this.checkForSubmenuButtons('seat-details-shortcut')) {
+                    this.seatDetails();
+                } else {
+                    swal({
+                        title: "OOPS!!",
+                        text: "Access Denied",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
             }
         },
+
         async seatDetails() {
             if (this.addForm.departureCity == 0) {
                 return swal({
