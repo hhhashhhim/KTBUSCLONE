@@ -291,8 +291,8 @@
                     </ul>
                     <ul class="dropdown-menu">
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'order' }"
-                                v-if="checkForSubmenu('food-order')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'foodOrder' }"
+                                v-if="checkForSubmenu('order')">
                                 <i class="fas fa-users"></i> Food Order
                             </router-link>
                         </li>
