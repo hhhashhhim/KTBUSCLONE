@@ -42,9 +42,9 @@
                                                                     title="Edit Category">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Category"  class=" text-light btn btn-danger">
+                                                            <!-- <button title="Delete Category"  class=" text-light btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
-                                                            </button>
+                                                            </button> -->
 <!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->
 <!--                                                            @click="deleteModal(city,i)"-->
                                                         </td>
