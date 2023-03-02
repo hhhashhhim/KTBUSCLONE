@@ -459,19 +459,63 @@
         "childs": [
             {
                 "name": "part",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-part",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-part",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "linking",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "view-link-maintenance",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "dues",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "update-meter-reading",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-irregular-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-maintenance",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "records",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "edit-maintenance",
+                        "allow": true
+                    }
+                ]
             }
         ]
     },
@@ -481,7 +525,41 @@
         "childs": [
             {
                 "name": "hotels",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-hotel",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-hotel",
+                        "allow": true
+                    },
+                    {
+                        "name": "food",
+                        "allow": true
+                    },
+                    {
+                        "name": "food-add-food",
+                        "allow": true
+                    },
+                    {
+                        "name": "food-edit-food",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal-add-deal",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal-edit-deal",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "order",
