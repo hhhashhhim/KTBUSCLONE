@@ -468,6 +468,10 @@
                     {
                         "name": "edit-part",
                         "allow": true
+                    },
+                    {
+                        "name": "delete-part",
+                        "allow": true
                     }
                 ]
             },
@@ -485,6 +489,10 @@
                     },
                     {
                         "name": "view-link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-link-maintenance",
                         "allow": true
                     }
                 ]

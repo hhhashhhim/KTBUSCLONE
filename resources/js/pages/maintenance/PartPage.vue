@@ -7,11 +7,11 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Maintenance Parts</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-part')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Part
                                 </a>
@@ -50,7 +50,9 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-part') || checkForSubmenuButtons('delete-part')">
+                                                            Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -58,11 +60,16 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ part.name }}</td>
                                                         <td>{{ part.added_by.name }}</td>
-                                                        <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                        <td v-if="checkForSubmenuButtons('edit-part') || checkForSubmenuButtons('delete-part')">
+                                                            <button v-if="checkForSubmenuButtons('edit-part')"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editpart(part)"
                                                                     class="btn btn-primary mx-1" title="Edit Part">
                                                                 <i class="far fa-edit"></i>
+                                                            </button>
+                                                            <button v-if="checkForSubmenuButtons('delete-part')"
+                                                                    class="btn btn-danger mx-1" title="Delete Part">
+                                                                <i class="far fa-trash-alt"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -145,6 +152,7 @@ export default {
     data() {
         return {
             addForm: {},
+            permissions: [],
             parts: [],
             loading: false,
             formID: "part_form",
@@ -158,6 +166,7 @@ export default {
     },
     async created() {
         await this.fetchParts();
+        this.permissions = this.$store.state.permissions;
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
     },

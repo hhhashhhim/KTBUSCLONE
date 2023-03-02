@@ -497,22 +497,22 @@ export default {
                         {
                             name: "bookings",
                             allow: true,
-                            buttons:[
-                                { name: "assign-bus", allow: true},
-                                { name: "terminal-invoice", allow: true},
-                                { name: "terminal-id", allow: true},
-                                { name: "bus-invoice", allow: true},
-                                { name: "pax-list", allow: true},
-                                { name: "seat-details", allow: true},
-                                { name: "drop-schedule", allow: true},
-                                { name: "seat-details-shortcut", allow: true},
-                                { name: "advance-booking", allow: true},
-                                { name: "duplicate-ticket", allow: true},
-                                { name: "resend-sms", allow: true},
-                                { name: "add-elt", allow: true},
-                                { name: "reschedule-seats", allow: true},
-                                { name: "overissue-seat", allow: true},
-                                { name: "cancel-ticket", allow: true},
+                            buttons: [
+                                {name: "assign-bus", allow: true},
+                                {name: "terminal-invoice", allow: true},
+                                {name: "terminal-id", allow: true},
+                                {name: "bus-invoice", allow: true},
+                                {name: "pax-list", allow: true},
+                                {name: "seat-details", allow: true},
+                                {name: "drop-schedule", allow: true},
+                                {name: "seat-details-shortcut", allow: true},
+                                {name: "advance-booking", allow: true},
+                                {name: "duplicate-ticket", allow: true},
+                                {name: "resend-sms", allow: true},
+                                {name: "add-elt", allow: true},
+                                {name: "reschedule-seats", allow: true},
+                                {name: "overissue-seat", allow: true},
+                                {name: "cancel-ticket", allow: true},
                             ]
                         },
                         {
@@ -563,22 +563,22 @@ export default {
                             buttons: [
                                 {name: "apply-leave", allow: true},
                                 {name: "edit-leave", allow: true},
-                                {name: "delete-leave", allow: true}
+                                {name: "delete-leave", allow: true},
                             ]
                         },
                         {
                             name: "departments",
                             allow: true,
-                            buttons:[
+                            buttons: [
                                 {name: "add-department", allow: true},
                                 {name: "edit-department", allow: true},
-                                {name: "delete-department", allow: true}
+                                {name: "delete-department", allow: true},
                             ]
                         },
                         {
                             name: "designations",
                             allow: true,
-                            buttons:[
+                            buttons: [
                                 {name: "add-designation", allow: true},
                                 {name: "view-designation", allow: true},
                             ]
@@ -590,10 +590,70 @@ export default {
                     name: "fleet-maintenance",
                     allow: true,
                     childs: [
-                        {name: "part", allow: true},
-                        {name: "linking", allow: true},
-                        {name: "dues", allow: true},
-                        {name: "records", allow: true}
+                        {
+                            name: "part",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-part",
+                                    allow: true
+                                },
+                                {
+                                    name: "edit-part",
+                                    allow: true
+                                },
+                                {
+                                    name: "delete-part",
+                                    allow: true
+                                }
+                            ]
+                        },
+                        {
+                            name: "linking",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "link-maintenance",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-link-maintenance",
+                                    allow: true,
+                                },
+                                {
+                                    name: "view-link-maintenance",
+                                    allow: true
+                                },
+                            ]
+                        },
+                        {
+                            name: "dues",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "update-meter-reading",
+                                    allow: true,
+                                },
+                                {
+                                    name: "add-irregular-maintenance",
+                                    allow: true,
+                                },
+                                {
+                                    name: "add-maintenance",
+                                    allow: true
+                                },
+                            ]
+                        },
+                        {
+                            name: "records",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "edit-maintenance",
+                                    allow: true
+                                },
+                            ]
+                        }
                     ],
                 },
                 // Refreshment Panel
@@ -601,8 +661,54 @@ export default {
                     name: "refreshment",
                     allow: true,
                     childs: [
-                        {name: "hotels", allow: true},
-                        {name: "order", allow: true}
+                        {
+                            name: "hotels",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-hotel",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-hotel",
+                                    allow: true,
+                                },
+                                {
+                                    name: "food",
+                                    allow: true,
+                                },
+                                {
+                                    name: "food-add-food",
+                                    allow: true,
+                                },
+                                {
+                                    name: "food-edit-food",
+                                    allow: true,
+                                },
+                                {
+                                    name: "deal",
+                                    allow: true,
+                                },
+                                {
+                                    name: "deal-add-deal",
+                                    allow: true,
+                                },
+                                {
+                                    name: "deal-edit-deal",
+                                    allow: true,
+                                }
+                            ]
+                        },
+                        {
+                            name: "order",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-order",
+                                    allow: true,
+                                }
+                            ]
+                        }
                     ],
                 },
                 // Acounts Panel
@@ -610,7 +716,16 @@ export default {
                     name: "accounts",
                     allow: true,
                     childs: [
-                        {name: "chart-of-accounts", allow: true}
+                        {
+                            name: "chart-of-accounts",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-category",
+                                    allow: true,
+                                }
+                            ]
+                        }
                     ],
                 },
                 // Settings Panel
@@ -618,7 +733,20 @@ export default {
                     name: "settings",
                     allow: true,
                     childs: [
-                        {name: "tickets", allow: true}
+                        {
+                            name: "tickets",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-template",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-template",
+                                    allow: true,
+                                }
+                            ]
+                        }
                     ],
                 },
             ],
