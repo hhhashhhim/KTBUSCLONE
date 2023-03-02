@@ -37,8 +37,10 @@
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <div>
-                                        <a :href="$store.state.app_url +'uploads/refreshment/hotel/'+(hotelData.logo)" target="_blank">
-                                            <img :src="$store.state.app_url +'uploads/refreshment/hotel/'+(hotelData.logo)" style="width:180px;height:180px;" alt="">
+                                        <a :href="$store.state.app_url + 'uploads/refreshment/hotel/' + (hotelData.logo)"
+                                            target="_blank">
+                                            <img :src="$store.state.app_url + 'uploads/refreshment/hotel/' + (hotelData.logo)"
+                                                style="width:180px;height:180px;" alt="">
                                         </a>
                                     </div>
                                 </div>
@@ -52,12 +54,8 @@
                             <div class="card-header">
                                 <h4>Food Deals</h4>
                                 <div class="card-header-action">
-                                    <a
-                                        href="#"
-                                        data-toggle="modal"
-                                        :data-target="'#' + formID"
-                                        class="btn btn-primary"
-                                    >
+                                    <a v-if="checkForSubmenuButtons('deal-add-deal')" href="#" data-toggle="modal"
+                                        :data-target="'#' + formID" class="btn btn-primary">
                                         Add Deal
                                     </a>
                                 </div>
@@ -69,43 +67,40 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table
-                                                        class="table table-striped table-hover text-capitalize"
-                                                        id="deal_table"
-                                                    >
+                                                    <table class="table table-striped table-hover text-capitalize"
+                                                        id="deal_table">
                                                         <thead>
-                                                        <tr>
-                                                            <th>Sr No.</th>
-                                                            <th>Name</th>
-                                                            <th>Price</th>
-                                                            <th>Description</th>
-                                                            <th>Action</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>Sr No.</th>
+                                                                <th>Name</th>
+                                                                <th>Price</th>
+                                                                <th>Description</th>
+                                                                <th>Action</th>
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr v-for="(deal, i) in hotelData.deals" :key="i">
-                                                            <td>{{ i + 1 }}</td>
-                                                            <td>
-                                                                <h6 class="mb-0">{{ deal.name }}</h6>
-                                                                <div class="d-flex" v-for="(detail, i) in deal.deal_details" :key="i">
-                                                                    <p class="mb-0">{{ detail.food.name}} :</p>
-                                                                    <p class="mb-0">{{ detail.quantity}} ({{detail.food.unit}})</p>
-                                                                </div>
-                                                            </td>
-                                                            <td>{{ deal.price }}</td>
-                                                            <td>{{ deal.description??'N/A' }}</td>
-                                                            <td>
-                                                                <button
-                                                                    :data-target="'#'+ editFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="edit(deal)"
-                                                                    class="btn btn-primary mx-1"
-                                                                    title="Edit Deal"
-                                                                >
-                                                                    <i class="far fa-edit"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
+                                                            <tr v-for="(deal, i) in hotelData.deals" :key="i">
+                                                                <td>{{ i + 1 }}</td>
+                                                                <td>
+                                                                    <h6 class="mb-0">{{ deal.name }}</h6>
+                                                                    <div class="d-flex"
+                                                                        v-for="(detail, i) in deal.deal_details" :key="i">
+                                                                        <p class="mb-0">{{ detail.food.name }} :</p>
+                                                                        <p class="mb-0">{{ detail.quantity }}
+                                                                            ({{ detail.food.unit }})</p>
+                                                                    </div>
+                                                                </td>
+                                                                <td>{{ deal.price }}</td>
+                                                                <td>{{ deal.description ?? 'N/A' }}</td>
+                                                                <td>
+                                                                    <button v-if="checkForSubmenuButtons('deal-edit-deal')"
+                                                                        :data-target="'#' + editFormID" data-toggle="modal"
+                                                                        @click="edit(deal)" class="btn btn-primary mx-1"
+                                                                        title="Edit Deal">
+                                                                        <i class="far fa-edit"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -120,44 +115,23 @@
                 </div>
 
                 <!-- Add Modal -->
-                <Add
-                    heading="Add Deal"
-                    :errors="this.validationErrors"
-                    :success="success"
-                    :formID="formID"
-                >
+                <Add heading="Add Deal" :errors="this.validationErrors" :success="success" :formID="formID">
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="name">Deal Name <span class="text-danger ml-1">*</span></label>
-                            <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Deal Name"
-                            id="name"
-                            v-model="postData.name"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Deal Name" id="name"
+                                v-model="postData.name" />
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="userName">Price <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                placeholder="Price"
-                                id="userName"
-                                v-model="postData.price"
-                            />
+                            <input type="number" class="form-control" placeholder="Price" id="userName"
+                                v-model="postData.price" />
                         </div>
                         <div class="form-group col-md-12">
                             <label for="location">Description</label>
-                            <textarea
-                                class="form-control"
-                                placeholder="Enter Description"
-                                id="location"
-                                v-model="postData.description"
-                                cols="30"
-                                rows="10"
-                            ></textarea>
+                            <textarea class="form-control" placeholder="Enter Description" id="location"
+                                v-model="postData.description" cols="30" rows="10"></textarea>
                         </div>
 
                         <div class="col-md-12 d-flex align-items-center">
@@ -168,30 +142,32 @@
                         <div class="form-group col-md-12 d-flex align-items-center">
                             <table class="table table-striped">
                                 <thead>
-                                <tr>
-                                    <th>Food</th>
-                                    <th>Quantity</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th>Food</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="index in loop" :key="index">
-                                    <td>
-                                        <select class="form-control rounded-0" @change="saveRow($event,'rowFood')">
-                                            <option value="" selected>Select Food </option>
-                                            <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
-                                                {{ food.name }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control" min="1" @keyup="saveRow($event,'rowQty')" />
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                        <button class="btn btn-outline-danger" v-if="index != 1" @click="removeRow($event)">Remove</button>
-                                    </td>
-                                </tr>
+                                    <tr v-for="index in loop" :key="index">
+                                        <td>
+                                            <select class="form-control rounded-0" @change="saveRow($event, 'rowFood')">
+                                                <option value="" selected>Select Food </option>
+                                                <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
+                                                    {{ food.name }}
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" min="1"
+                                                @keyup="saveRow($event, 'rowQty')" />
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
+                                            <button class="btn btn-outline-danger" v-if="index != 1"
+                                                @click="removeRow($event)">Remove</button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -199,56 +175,30 @@
 
 
                     <template v-slot:button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            :disabled="loading"
-                            @click="add"
-                        >
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
                             {{ loading ? "Loading...." : "Add Deal" }}
                         </button>
                     </template>
                 </Add>
 
                 <!-- Add Modal -->
-                <Edit
-                    heading="Edit Deal"
-                    :errors="this.validationErrors"
-                    :success="success"
-                    :editForm="editFormID"
-                >
+                <Edit heading="Edit Deal" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="name">Deal Name <span class="text-danger ml-1">*</span></label>
-                            <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Deal Name"
-                            id="name"
-                            v-model="editData.name"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Deal Name" id="name"
+                                v-model="editData.name" />
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="userName">Price <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                placeholder="Price"
-                                id="userName"
-                                v-model="editData.price"
-                            />
+                            <input type="number" class="form-control" placeholder="Price" id="userName"
+                                v-model="editData.price" />
                         </div>
                         <div class="form-group col-md-12">
                             <label for="location">Description</label>
-                            <textarea
-                                class="form-control"
-                                placeholder="Enter Description"
-                                id="location"
-                                v-model="editData.description"
-                                cols="30"
-                                rows="10"
-                            ></textarea>
+                            <textarea class="form-control" placeholder="Enter Description" id="location"
+                                v-model="editData.description" cols="30" rows="10"></textarea>
                         </div>
 
                         <div class="col-md-12 d-flex align-items-center">
@@ -259,32 +209,34 @@
                         <div class="form-group col-md-12 d-flex align-items-center">
                             <table class="table table-striped">
                                 <thead>
-                                <tr>
-                                    <th>Food</th>
-                                    <th>Quantity</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th>Food</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="index in editLoop" :key="index">
-                                    <td>
-                                        <select class="form-control rounded-0" @change="editSaveRow($event,'rowFood')"
-                                        :value="editData.foods[index - 1] ? editData.foods[index - 1] : '' ">
-                                            <option value="" selected>Select Part </option>
-                                            <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
-                                                {{ food.name }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control" min="1" @keyup="editSaveRow($event,'rowQty')"
-                                        :value="editData.qtys[index - 1] ? editData.qtys[index - 1] : '' "/>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
-                                        <button class="btn btn-outline-danger" v-if="index != 1" @click="editRemoveRow($event)">Remove </button>
-                                    </td>
-                                </tr>
+                                    <tr v-for="index in editLoop" :key="index">
+                                        <td>
+                                            <select class="form-control rounded-0" @change="editSaveRow($event, 'rowFood')"
+                                                :value="editData.foods[index - 1] ? editData.foods[index - 1] : ''">
+                                                <option value="" selected>Select Part </option>
+                                                <option v-for="(food, i) in allFoods" :value="food.id" :key="i">
+                                                    {{ food.name }}
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" min="1"
+                                                @keyup="editSaveRow($event, 'rowQty')"
+                                                :value="editData.qtys[index - 1] ? editData.qtys[index - 1] : ''" />
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
+                                            <button class="btn btn-outline-danger" v-if="index != 1"
+                                                @click="editRemoveRow($event)">Remove </button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -292,12 +244,7 @@
 
 
                     <template v-slot:button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            :disabled="loading"
-                            @click="update"
-                        >
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                             {{ loading ? "Loading...." : "Update Deal" }}
                         </button>
                     </template>
@@ -312,7 +259,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import vueMask from 'vue-jquery-mask';
 
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     name: "HotelPage",
@@ -329,13 +276,14 @@ export default {
                 // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
             formID: "newDeal",
-            editFormID:'edit_deal_form',
+            editFormID: 'edit_deal_form',
             loading: false,
             loop: 1,
             editLoop: 1,
             hotelId: "",
             allFoods: [],
             hotelData: [],
+            permissions: [],
             postData: {
                 hotelId: "",
                 name: "",
@@ -362,14 +310,15 @@ export default {
         await this.setData();
         await this.fetchData();
         await this.fetchFoods();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         async fetchData() {
             const data = {
-                hotelId : this.hotelId
+                hotelId: this.hotelId
             }
 
-            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods/deals",data);
+            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods/deals", data);
             if (hotelRes.status == 200) {
                 this.hotelData = hotelRes.data;
                 setTimeout(() => {
@@ -379,10 +328,10 @@ export default {
         },
         async fetchFoods() {
             const data = {
-                hotelId : this.hotelId
+                hotelId: this.hotelId
             }
 
-            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods",data);
+            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods", data);
             if (hotelRes.status == 200) {
                 this.allFoods = hotelRes.data.foods;
                 setTimeout(() => {
@@ -401,9 +350,8 @@ export default {
         async add() {
 
             // validation for empty data
-            if(!this.postData.hotelId || !this.postData.name || !this.postData.price ||
-                this.postData.foods == 0 || this.postData.qtys == 0)
-            {
+            if (!this.postData.hotelId || !this.postData.name || !this.postData.price ||
+                this.postData.foods == 0 || this.postData.qtys == 0) {
                 return swal({
                     title: "Error",
                     text: "Please Fill Required Field",
@@ -413,10 +361,8 @@ export default {
             }
 
             // check if any index is empty or null in object
-            for(var i = 0; i < this.postData.foods.length; i++)
-            {
-                if(!this.postData.foods[i] || !this.postData.qtys[i])
-                {
+            for (var i = 0; i < this.postData.foods.length; i++) {
+                if (!this.postData.foods[i] || !this.postData.qtys[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
@@ -475,8 +421,7 @@ export default {
                 this.editData.price = deal.price;
                 this.editData.description = deal.description;
 
-                for(var i = 0; i < deal.deal_details.length; i++)
-                {
+                for (var i = 0; i < deal.deal_details.length; i++) {
                     this.editData.foods.push(deal.deal_details[i].food_id);
                     this.editData.qtys.push(deal.deal_details[i].quantity);
                 }
@@ -488,9 +433,8 @@ export default {
         async update() {
 
             // validation for empty data
-            if(!this.editData.dealId || !this.editData.name || !this.editData.price ||
-                this.editData.foods == 0 || this.editData.qtys == 0)
-            {
+            if (!this.editData.dealId || !this.editData.name || !this.editData.price ||
+                this.editData.foods == 0 || this.editData.qtys == 0) {
                 return swal({
                     title: "Error",
                     text: "Please Fill Required Field",
@@ -500,10 +444,8 @@ export default {
             }
 
             // check if any index is empty or null in object
-            for(var i = 0; i < this.editData.foods.length; i++)
-            {
-                if(!this.editData.foods[i] || !this.editData.qtys[i])
-                {
+            for (var i = 0; i < this.editData.foods.length; i++) {
+                if (!this.editData.foods[i] || !this.editData.qtys[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
@@ -547,45 +489,41 @@ export default {
                 }
             }
         },
-        saveRow(event,fieldName) {
-           const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-           if(fieldName == "rowFood")
-           {
-               this.postData.foods[getRowNumber-1] = event.target.value;
-           }
-           if(fieldName == "rowQty")
-           {
-               this.postData.qtys[getRowNumber-1] = event.target.value;
-           }
-       },
+        saveRow(event, fieldName) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            if (fieldName == "rowFood") {
+                this.postData.foods[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowQty") {
+                this.postData.qtys[getRowNumber - 1] = event.target.value;
+            }
+        },
         addRow() {
             this.loop++;
         },
         removeRow(event) {
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            this.postData.foods.splice((getRowNumber-1), 1);
-            this.postData.qtys.splice((getRowNumber-1), 1);
+            this.postData.foods.splice((getRowNumber - 1), 1);
+            this.postData.qtys.splice((getRowNumber - 1), 1);
             event.target.parentElement.parentElement.remove();
         },
         // this is for update
-        editSaveRow(event,fieldName) {
-           const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-           if(fieldName == "rowFood")
-           {
-               this.editData.foods[getRowNumber-1] = event.target.value;
-           }
-           if(fieldName == "rowQty")
-           {
-               this.editData.qtys[getRowNumber-1] = event.target.value;
-           }
-       },
+        editSaveRow(event, fieldName) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            if (fieldName == "rowFood") {
+                this.editData.foods[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowQty") {
+                this.editData.qtys[getRowNumber - 1] = event.target.value;
+            }
+        },
         editAddRow() {
             this.editLoop++;
         },
         editRemoveRow(event) {
             const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            this.editData.foods.splice((getRowNumber-1), 1);
-            this.editData.qtys.splice((getRowNumber-1), 1);
+            this.editData.foods.splice((getRowNumber - 1), 1);
+            this.editData.qtys.splice((getRowNumber - 1), 1);
             // event.target.parentElement.parentElement.remove();
             this.editLoop--;
         },
@@ -603,9 +541,8 @@ export default {
 };
 </script>
 <style scoped>
-
-div.dataTables_length select{
+div.dataTables_length select {
     width: 90px !important;
-    display:inline-block;
+    display: inline-block;
 }
 </style>

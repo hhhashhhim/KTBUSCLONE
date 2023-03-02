@@ -37,8 +37,10 @@
                                 </div>
                                 <div class="col-md-4 text-center">
                                     <div>
-                                        <a :href="$store.state.app_url +'uploads/refreshment/hotel/'+(hotelData.logo)" target="_blank">
-                                            <img :src="$store.state.app_url +'uploads/refreshment/hotel/'+(hotelData.logo)" style="width:180px;height:180px;" alt="">
+                                        <a :href="$store.state.app_url + 'uploads/refreshment/hotel/' + (hotelData.logo)"
+                                            target="_blank">
+                                            <img :src="$store.state.app_url + 'uploads/refreshment/hotel/' + (hotelData.logo)"
+                                                style="width:180px;height:180px;" alt="">
                                         </a>
                                     </div>
                                 </div>
@@ -52,12 +54,8 @@
                             <div class="card-header">
                                 <h4>Foods</h4>
                                 <div class="card-header-action">
-                                    <a
-                                        href="#"
-                                        data-toggle="modal"
-                                        :data-target="'#' + formID"
-                                        class="btn btn-primary"
-                                    >
+                                    <a v-if="checkForSubmenuButtons('food-add-food')" href="#" data-toggle="modal"
+                                        :data-target="'#' + formID" class="btn btn-primary">
                                         Add Food
                                     </a>
                                 </div>
@@ -69,39 +67,34 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="table-responsive">
-                                                    <table
-                                                        class="table table-striped table-hover"
-                                                        id="food_table"
-                                                    >
+                                                    <table class="table table-striped table-hover" id="food_table">
                                                         <thead>
-                                                        <tr>
-                                                            <th>Sr No.</th>
-                                                            <th>Name</th>
-                                                            <th>Price</th>
-                                                            <th>Unit</th>
-                                                            <th>Description</th>
-                                                            <th>Action</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>Sr No.</th>
+                                                                <th>Name</th>
+                                                                <th>Price</th>
+                                                                <th>Unit</th>
+                                                                <th>Description</th>
+                                                                <th v-if="checkForSubmenuButtons('food-edit-food')">Action
+                                                                </th>
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr v-for="(food, i) in hotelData.foods" :key="i">
-                                                            <td>{{ i + 1 }}</td>
-                                                            <td>{{ food.name }}</td>
-                                                            <td>{{ food.price }}</td>
-                                                            <td>{{ food.unit }}</td>
-                                                            <td>{{ food.description??'N/A' }}</td>
-                                                            <td>
-                                                                <button
-                                                                    :data-target="'#'+ editFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="edit(food)"
-                                                                    class="btn btn-primary mx-1"
-                                                                    title="Edit Food"
-                                                                >
-                                                                    <i class="far fa-edit"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
+                                                            <tr v-for="(food, i) in hotelData.foods" :key="i">
+                                                                <td>{{ i + 1 }}</td>
+                                                                <td>{{ food.name }}</td>
+                                                                <td>{{ food.price }}</td>
+                                                                <td>{{ food.unit }}</td>
+                                                                <td>{{ food.description ?? 'N/A' }}</td>
+                                                                <td v-if="checkForSubmenuButtons('food-edit-food')">
+                                                                    <button v-if="checkForSubmenuButtons('food-edit-food')"
+                                                                        :data-target="'#' + editFormID" data-toggle="modal"
+                                                                        @click="edit(food)" class="btn btn-primary mx-1"
+                                                                        title="Edit Food">
+                                                                        <i class="far fa-edit"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -116,22 +109,12 @@
                 </div>
 
                 <!-- Add Modal -->
-                <Add
-                    heading="Add Food"
-                    :errors="this.validationErrors"
-                    :success="success"
-                    :formID="formID"
-                >
+                <Add heading="Add Food" :errors="this.validationErrors" :success="success" :formID="formID">
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="name">Food Name <span class="text-danger ml-1">*</span></label>
-                            <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Food Name"
-                            id="name"
-                            v-model="postData.name"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Food Name" id="name"
+                                v-model="postData.name" />
                         </div>
 
                         <div class="col-md-6">
@@ -140,67 +123,36 @@
 
                         <div class="form-group col-md-6">
                             <label for="userName">Price <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                placeholder="Price"
-                                id="userName"
-                                v-model="postData.price"
-                            />
+                            <input type="number" class="form-control" placeholder="Price" id="userName"
+                                v-model="postData.price" />
                         </div>
                         <div class="form-group col-md-6">
                             <label for="email">Unit <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Unit"
-                                id="email"
-                                v-model="postData.unit"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Unit" id="email"
+                                v-model="postData.unit" />
                         </div>
                         <div class="form-group col-md-12">
                             <label for="location">Description</label>
-                            <textarea
-                                class="form-control"
-                                placeholder="Enter Description"
-                                id="location"
-                                v-model="postData.description"
-                                cols="30"
-                                rows="10"
-                            ></textarea>
+                            <textarea class="form-control" placeholder="Enter Description" id="location"
+                                v-model="postData.description" cols="30" rows="10"></textarea>
                         </div>
                     </div>
 
 
                     <template v-slot:button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            :disabled="loading"
-                            @click="add"
-                        >
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
                             {{ loading ? "Loading...." : "Add Food" }}
                         </button>
                     </template>
                 </Add>
 
                 <!-- Add Modal -->
-                <Edit
-                    heading="Edit Food"
-                    :errors="this.validationErrors"
-                    :success="success"
-                    :editForm="editFormID"
-                >
+                <Edit heading="Edit Food" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="name">Food Name <span class="text-danger ml-1">*</span></label>
-                            <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Hotel Name"
-                            id="name"
-                            v-model="editData.name"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Hotel Name" id="name"
+                                v-model="editData.name" />
                         </div>
 
                         <div class="col-md-6">
@@ -209,45 +161,24 @@
 
                         <div class="form-group col-md-6">
                             <label for="userName">Price <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="number"
-                                class="form-control"
-                                placeholder="Price"
-                                id="userName"
-                                v-model="editData.price"
-                            />
+                            <input type="number" class="form-control" placeholder="Price" id="userName"
+                                v-model="editData.price" />
                         </div>
                         <div class="form-group col-md-6">
                             <label for="email">Unit <span class="text-danger ml-1">*</span></label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Email"
-                                id="email"
-                                v-model="editData.unit"
-                            />
+                            <input type="text" class="form-control" placeholder="Enter Email" id="email"
+                                v-model="editData.unit" />
                         </div>
                         <div class="form-group col-md-12">
                             <label for="location">Description</label>
-                            <textarea
-                                class="form-control"
-                                placeholder="Enter Location"
-                                id="location"
-                                v-model="editData.description"
-                                cols="30"
-                                rows="10"
-                            ></textarea>
+                            <textarea class="form-control" placeholder="Enter Location" id="location"
+                                v-model="editData.description" cols="30" rows="10"></textarea>
                         </div>
                     </div>
 
 
                     <template v-slot:button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            :disabled="loading"
-                            @click="update"
-                        >
+                        <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
                             {{ loading ? "Loading...." : "Update Food" }}
                         </button>
                     </template>
@@ -262,7 +193,7 @@ import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import vueMask from 'vue-jquery-mask';
 
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     name: "HotelPage",
@@ -279,7 +210,7 @@ export default {
                 // http://igorescobar.github.io/jQuery-Mask-Plugin/docs.html
             },
             formID: "newFood",
-            editFormID:'edit_food_form',
+            editFormID: 'edit_food_form',
             loading: false,
             hotelId: "",
             hotelData: [],
@@ -298,6 +229,7 @@ export default {
                 description: "",
                 hotelId: "",
             },
+            permissions: [],
             success: false,
         };
     },
@@ -306,14 +238,15 @@ export default {
         window.removeEventListener('keydown', this.altM);
         await this.setData();
         await this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         async fetchData() {
             const data = {
-                hotelId : this.hotelId
+                hotelId: this.hotelId
             }
 
-            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods",data);
+            const hotelRes = await this.callApi("post", "refreshments/hotels/specific/foods", data);
             if (hotelRes.status == 200) {
                 this.hotelData = hotelRes.data;
                 setTimeout(() => {
@@ -333,9 +266,8 @@ export default {
 
             // validation for empty data
 
-            if(!this.postData.hotelId || !this.postData.name || !this.postData.price ||
-                !this.postData.unit)
-            {
+            if (!this.postData.hotelId || !this.postData.name || !this.postData.price ||
+                !this.postData.unit) {
                 return swal({
                     title: "Error",
                     text: "Please Fill Required Field",
@@ -391,9 +323,8 @@ export default {
         async update() {
 
             // validation for empty data
-            if(!this.editData.foodId || !this.editData.hotelId || !this.editData.name ||
-                !this.editData.price || !this.editData.unit)
-            {
+            if (!this.editData.foodId || !this.editData.hotelId || !this.editData.name ||
+                !this.editData.price || !this.editData.unit) {
                 return swal({
                     title: "Error",
                     text: "Please Fill Required Field",
@@ -446,9 +377,8 @@ export default {
 };
 </script>
 <style scoped>
-
-div.dataTables_length select{
+div.dataTables_length select {
     width: 90px !important;
-    display:inline-block;
+    display: inline-block;
 }
 </style>

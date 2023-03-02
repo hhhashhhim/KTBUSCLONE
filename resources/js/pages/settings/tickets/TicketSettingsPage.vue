@@ -7,12 +7,8 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Tickets Template</h4>
                             <div class="card-header-action">
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
-                                >
+                                <a v-if="checkForSubmenuButtons('add-template')" href="#" data-toggle="modal"
+                                    :data-target="'#' + formID" class="btn btn-primary" @click="clearForm()">
                                     Add New Template
                                 </a>
                             </div>
@@ -25,45 +21,47 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table dataTables table-striped table-hover"
-                                                       id="ticket_templates">
+                                                    id="ticket_templates">
                                                     <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Terminal</th>
-                                                        <th>Address</th>
-                                                        <th>UAN #</th>
-                                                        <th>Phone #</th>
-                                                        <th>Terms & Condition</th>
-                                                        <th>status</th>
-                                                        <th>Action</th>
-                                                    </tr>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Terminal</th>
+                                                            <th>Address</th>
+                                                            <th>UAN #</th>
+                                                            <th>Phone #</th>
+                                                            <th>Terms & Condition</th>
+                                                            <th>status</th>
+                                                            <th v-if="checkForSubmenuButtons('edit-template')">Action</th>
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(template, i) in templates" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td v-if="template.terminal_id != null">
-                                                            {{ template.terminal.city.name }} -
-                                                            {{ template.terminal.name }}
-                                                        </td>
-                                                        <td v-else>N/A</td>
-                                                        <td class="text-break">{{ template.address }}</td>
-                                                        <td>{{ template.uan }}</td>
-                                                        <td>{{ template.phone }}</td>
-                                                        <td class="text-break">{{ template.terms_condition }}</td>
-                                                        <td v-if="template.status == 1">
-                                                            <div class="badge badge-success">Active</div>
-                                                        </td>
-                                                        <td v-else>
-                                                            <div class="badge badge-danger">InActive</div>
-                                                        </td>
-                                                        <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                        <tr v-for="(template, i) in templates" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td v-if="template.terminal_id != null">
+                                                                {{ template.terminal.city.name }} -
+                                                                {{ template.terminal.name }}
+                                                            </td>
+                                                            <td v-else>N/A</td>
+                                                            <td class="text-break">{{ template.address }}</td>
+                                                            <td>{{ template.uan }}</td>
+                                                            <td>{{ template.phone }}</td>
+                                                            <td class="text-break">{{ template.terms_condition }}</td>
+                                                            <td v-if="template.status == 1">
+                                                                <div class="badge badge-success">Active</div>
+                                                            </td>
+                                                            <td v-else>
+                                                                <div class="badge badge-danger">InActive</div>
+                                                            </td>
+                                                            <td v-if="checkForSubmenuButtons('edit-template')">
+                                                                <button v-if="checkForSubmenuButtons('edit-template')"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(template)"
-                                                                    class=" text-light btn btn-primary mx-1" title="Edit Template">
-                                                                <i class="far fa-edit"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                                    class=" text-light btn btn-primary mx-1"
+                                                                    title="Edit Template">
+                                                                    <i class="far fa-edit"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -78,54 +76,41 @@
             </div>
 
             <!-- Add Modal -->
-            <Add
-                :heading="'Add Template'"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
+            <Add :heading="'Add Template'" :errors="this.validationErrors" :success="success" :formID="formID">
                 <div class="row mt-3">
                     <div class="form-group col-md-6">
-                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="addForm.terminal">
+                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company
+                                Admin)</span></label>
+                        <select class="form-control" id="terminals" v-model="addForm.terminal">
                             <option value="0" selected>Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} - ({{ terminal.city.name }})
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }} -
+                                ({{ terminal.city.name }})
                             </option>
                         </select>
                     </div>
-<!--                    <div class="form-group col-md-4">-->
-<!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
-<!--                        <vue-mask id="uanNumber"-->
-<!--                                  class="form-control"-->
-<!--                                  v-model="addForm.uanNumber"-->
-<!--                                  mask="00-000-000-000"-->
-<!--                                  :raw="false"-->
-<!--                                  :options="optionsUan"-->
-<!--                        >-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
+                    <!--                    <div class="form-group col-md-4">-->
+                    <!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
+                    <!--                        <vue-mask id="uanNumber"-->
+                    <!--                                  class="form-control"-->
+                    <!--                                  v-model="addForm.uanNumber"-->
+                    <!--                                  mask="00-000-000-000"-->
+                    <!--                                  :raw="false"-->
+                    <!--                                  :options="optionsUan"-->
+                    <!--                        >-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-6">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
-                        <vue-mask id="phoneNumber"
-                                  class="form-control"
-                                  v-model="addForm.phoneNumber"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsPhone"
-                        >
+                        <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber" mask="0000-0000000"
+                            :raw="false" :options="optionsPhone">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
-                                  @keypress="countWords(this.addForm.address.length, 'address', 45)"
-                                  v-model="addForm.address"></textarea>
+                            @keypress="countWords(this.addForm.address.length, 'address', 45)"
+                            v-model="addForm.address"></textarea>
                         <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>
                     </div>
                 </div>
@@ -133,9 +118,8 @@
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
-                                  @keypress="countWords(this.addForm.termsCondition.length, 'terms', 140)"
-                                  maxlength="140"
-                                  v-model="addForm.termsCondition"></textarea>
+                            @keypress="countWords(this.addForm.termsCondition.length, 'terms', 140)" maxlength="140"
+                            v-model="addForm.termsCondition"></textarea>
                         <span class="text-danger">Length : {{ this.countWordsLength }}/140</span>
                     </div>
                 </div>
@@ -145,65 +129,50 @@
                     </button>
                 </template>
             </Add>
-            <Edit
-                heading="Edit Template"
-                :errors="this.validationErrors"
-                :success="success"
-                :editForm="editFormID"
-            >
+            <Edit heading="Edit Template" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company Admin)</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="dataEdit.terminal_id">
+                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company
+                                Admin)</span></label>
+                        <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
                             <option value="0" selected>Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.city.name }} - {{ terminal.name }}
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.city.name
+                            }} - {{ terminal.name }}
                             </option>
                         </select>
                     </div>
-<!--                    <div class="form-group col-md-6">-->
-<!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
-<!--                        <vue-mask id="uanNumber"-->
-<!--                                  class="form-control"-->
-<!--                                  v-model="dataEdit.uan"-->
-<!--                                  mask="00-000-000-000"-->
-<!--                                  :raw="false"-->
-<!--                                  :options="optionsUan"-->
-<!--                        >-->
-<!--                        </vue-mask>-->
-<!--                    </div>-->
+                    <!--                    <div class="form-group col-md-6">-->
+                    <!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
+                    <!--                        <vue-mask id="uanNumber"-->
+                    <!--                                  class="form-control"-->
+                    <!--                                  v-model="dataEdit.uan"-->
+                    <!--                                  mask="00-000-000-000"-->
+                    <!--                                  :raw="false"-->
+                    <!--                                  :options="optionsUan"-->
+                    <!--                        >-->
+                    <!--                        </vue-mask>-->
+                    <!--                    </div>-->
                     <div class="form-group col-md-6">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
-                        <vue-mask id="phoneNumber"
-                                  class="form-control"
-                                  v-model="dataEdit.phone"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsPhone"
-                        >
+                        <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
+                            :raw="false" :options="optionsPhone">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
-                                  v-model="dataEdit.address"></textarea>
+                            v-model="dataEdit.address"></textarea>
 
                     </div>
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
-                        <textarea id="refOfHiring" class="form-control" spellcheck="false"
-                                  maxlength="140"
-                                  v-model="dataEdit.terms_condition"></textarea>
+                        <textarea id="refOfHiring" class="form-control" spellcheck="false" maxlength="140"
+                            v-model="dataEdit.terms_condition"></textarea>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="status">Status</label>
-                        <select class="form-control" id="status"
-                                v-model="dataEdit.status">
+                        <select class="form-control" id="status" v-model="dataEdit.status">
                             <option value="1">Active</option>
                             <option value="0">In Active</option>
                         </select>
@@ -224,7 +193,7 @@
 import Add from "../../../components/Add.vue";
 import Edit from "../../../components/Edit.vue";
 import Delete from "../../../components/Delete.vue";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
 
 export default {
@@ -240,6 +209,7 @@ export default {
             optionsUan: {
                 placeholder: "xx-xxx-xxx-xxx",
             },
+            permissions: [],
             optionsPhone: {
                 placeholder: "03xx-xxxxxxx",
             },
@@ -263,6 +233,7 @@ export default {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
         this.fetchTemplates();
+        this.permissions = this.$store.state.permissions;
     },
 
     methods: {
@@ -468,6 +439,4 @@ export default {
     },
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Due Maintenance</h4>
                             <div class="card-header-action">
-                                <a
+                                <a v-if="checkForSubmenuButtons('update-meter-reading')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + readingFormID"
@@ -16,7 +16,7 @@
                                     Update Meter Reading
                                 </a>
 
-                                <a
+                                <a v-if="checkForSubmenuButtons('add-irregular-maintenance')"
                                     href="#"
                                     data-target="#maintenance_add"
                                     data-toggle="modal"
@@ -66,7 +66,7 @@
                                                         <th>Current Reading</th>
                                                         <th>Required Maintenance At</th>
                                                         <th>Last Maintenance Date</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('add-maintenance')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -76,8 +76,8 @@
                                                         <td>{{ data.current_reading }} (km)</td>
                                                         <td>{{ parseFloat(data.maintenance_after) + parseFloat(data.maintenance_at) }} (km)</td>
                                                         <td>{{ data.maintenance_date??'N/A' }} </td>
-                                                        <td>
-                                                            <button class="btn btn-primary mx-1"
+                                                        <td v-if="checkForSubmenuButtons('add-maintenance')">
+                                                            <button v-if="checkForSubmenuButtons('add-maintenance')" class="btn btn-primary mx-1"
                                                                     data-target="#maintenance_add"
                                                                     data-toggle="modal"
                                                                     @click="dueMaintenanceFrom( data , 0)" title="Add Maintenance">
@@ -246,6 +246,7 @@ export default {
             mainData: [],
             fleets: [],
             parts: [],
+            permissions: [],
             postData: {
                 fleetId: '',
                 partId: '',
@@ -264,6 +265,7 @@ export default {
     },
     created() {
         this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         clearForm: function () {

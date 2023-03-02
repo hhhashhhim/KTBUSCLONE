@@ -7,7 +7,7 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Account Categories</h4>
                             <div class="card-header-action">
-                                <a
+                                <a v-if="checkForSubmenuButtons('add-category')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -61,11 +61,6 @@
                                                         <td>{{ category.second_level.name}}</td>
                                                         <td>{{ category.first_level.name }}</td>
                                                         <td>
-                                                           <!-- <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="editCategory(category)"
-                                                                    class="btn btn-primary mx-1">
-                                                                <i class="far fa-edit"></i>
-                                                            </button> -->
                                                             N/A
                                                         </td>
                                                     </tr>
@@ -127,7 +122,7 @@
                 </template>
             </Add>
 
-            
+
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
@@ -205,6 +200,7 @@ export default {
                 secondLevel: "",
                 name: "",
             },
+            permissions: [],
             categories: [],
             secondLevels: [],
             loading: false,
@@ -219,11 +215,12 @@ export default {
         await this.fetchCategories();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
 
         async fetchCategories() {
-           
+
             const resCategories = await this.callApi("post", 'accounts/coa/categories');
             console.log(resCategories.data);
             if (resCategories.status == 200) {
@@ -231,7 +228,7 @@ export default {
             } else {
                 console.log(resCategories);
             }
-           
+
             setTimeout(function () {
                 $("#category_table").DataTable();
             }, 300);
@@ -245,7 +242,7 @@ export default {
         },
         async getSecondLevel(id) {
             const resSecondLevel = await this.callApi("post", 'accounts/coa/getSecondLevel', {'id': id});
-           
+
             if (resSecondLevel.status == 200 && resSecondLevel.data.length > 0) {
                 this.secondLevels = resSecondLevel.data;
                 this.addForm.secondLevel = "";
@@ -299,7 +296,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            
+
             const resCategory = await this.callApi("post", "accounts/coa/category/store", this.addForm);
             if (resCategory.status == 201) {
                 this.loading = false;
@@ -359,7 +356,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            
+
             const resCategory = await this.callApi("post", "accounts/coa/category/update", this.updatedForm);
             if (resCategory.status == 200) {
                 this.loading = false;
