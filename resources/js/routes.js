@@ -260,7 +260,7 @@ const routes = [
         name:"accounts-categories"
     },
     {
-        path: url + "loyality/card/categories",
+        path: url + "loyality/card",
         component : loyalityCardPage,
         name:"loyality-card-categories"
     },

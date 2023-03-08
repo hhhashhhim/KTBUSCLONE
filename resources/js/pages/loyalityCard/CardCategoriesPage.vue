@@ -5,16 +5,16 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Loyality Card Categories</h4>
+                            <h4>Loyality Card</h4>
                             <div class="card-header-action">
                                 <!-- v-if="checkForSubmenuButtons('add-surcharge')" -->
                                 <a
-                                   href="#"
-                                   data-toggle="modal"
-                                   :data-target="'#' + formID"
-                                   class="btn btn-primary" @click="clearForm()"
+                                    href="#"
+                                    data-toggle="modal"
+                                    :data-target="'#' + formID"
+                                    class="btn btn-primary" @click="clearForm()"
                                 >
-                                    Add Card Category
+                                    Add Card
                                 </a>
                             </div>
                         </div>
@@ -143,15 +143,37 @@
                     </div>
                     <div class="col-md-12">
                         <h5>Addition of Points Via</h5>
-                        <div class="form-group d-flex align-items-center ">
-                            <label class="mt-4" for="active">Is Active</label>
-                            <label class="colorinput mx-3 mt-3">
-                            <span>
-                                <input type="checkbox" value="1" checked class="colorinput-input"
-                                       @change="checkBox($event)"/>
-                                <span class="colorinput-color bg-primary"></span>
-                            </span>
-                            </label>
+                        <div class="form-group col-md-3 mt-4 pt-2">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
+                                       checked="" value="percentage" v-model="percentageRadio"
+                                       @click="surchargeApply('percentage')">
+                                <label class="custom-control-label" for="percentage">Percentage</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="flat" name="flatAmount" class="custom-control-input"
+                                       value="flat"
+                                       v-model="percentageRadio" @click="surchargeApply('flat')">
+                                <label class="custom-control-label" for="flat">Flat Amount</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-5" v-if="showDivPercentage">
+                            <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
+                                       placeholder="Enter Percentage"
+                                       @keypress="isNumber($event); numberRange($event)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-5" v-if="showDivFlat">
+                            <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span
+                                class="text-muted">max: 10K</span> </label>
+                            <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
+                                   placeholder="Enter Flat Amount"
+                                   @keypress="isNumber($event)">
                         </div>
                     </div>
                 </div>
