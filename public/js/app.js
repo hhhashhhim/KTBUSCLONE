@@ -61543,7 +61543,7 @@ var _hoisted_6 = {
 };
 
 var _hoisted_7 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Loyality Card", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Loyality Card Categories", -1
   /* HOISTED */
   );
 });
@@ -62001,7 +62001,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $options.clearForm();
     })
-  }, " Add Card ", 8
+  }, " Add Card Category ", 8
   /* PROPS */
   , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
     name: "fade"
@@ -74087,7 +74087,7 @@ var routes = [{
   component: _pages_account_AccountCategoryPage_vue__WEBPACK_IMPORTED_MODULE_40__["default"],
   name: "accounts-categories"
 }, {
-  path: url + "loyality/card",
+  path: url + "loyality/card/categories",
   component: _pages_loyalityCard_CardCategoriesPage_vue__WEBPACK_IMPORTED_MODULE_41__["default"],
   name: "loyality-card-categories"
 }];

@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Loyality Card</h4>
+                            <h4>Loyality Card Categories</h4>
                             <div class="card-header-action">
                                 <!-- v-if="checkForSubmenuButtons('add-surcharge')" -->
                                 <a
@@ -14,7 +14,7 @@
                                     :data-target="'#' + formID"
                                     class="btn btn-primary" @click="clearForm()"
                                 >
-                                    Add Card
+                                    Add Card Category
                                 </a>
                             </div>
                         </div>
