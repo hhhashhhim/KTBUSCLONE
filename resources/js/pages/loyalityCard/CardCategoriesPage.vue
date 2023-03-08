@@ -124,10 +124,10 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivPercentage">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
+                        <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
-                                   placeholder="Enter Percentage"
+                                   placeholder="Enter Percentage Applied Per Point"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
@@ -135,46 +135,46 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivFlat">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span
+                        <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span> <span
                             class="text-muted">max: 10K</span> </label>
                         <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
-                               placeholder="Enter Flat Amount"
+                               placeholder="Enter Flat Amount Applied Per Point"
                                @keypress="isNumber($event)">
                     </div>
                     <div class="col-md-12">
-                        <h5>Addition of Points Via</h5>
+                        <h5>Addition of Points Via Type</h5>
                         <div class="form-group col-md-3 mt-4 pt-2">
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
-                                       checked="" value="percentage" v-model="percentageRadio"
+                                <input type="radio" id="percentagePoints" name="percentageAmountPoints" class="custom-control-input"
+                                       checked="" value="percentage" v-model="pointsRadio"
                                        @click="surchargeApply('percentage')">
                                 <label class="custom-control-label" for="percentage">Percentage</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="flat" name="flatAmount" class="custom-control-input"
+                                <input type="radio" id="flatPoints" name="flatAmountPoints" class="custom-control-input"
                                        value="flat"
-                                       v-model="percentageRadio" @click="surchargeApply('flat')">
+                                       v-model="pointsRadio" @click="surchargeApply('flat')">
                                 <label class="custom-control-label" for="flat">Flat Amount</label>
                             </div>
                         </div>
-                        <div class="form-group col-md-5" v-if="showDivPercentage">
-                            <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
-                                       placeholder="Enter Percentage"
-                                       @keypress="isNumber($event); numberRange($event)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-5" v-if="showDivFlat">
-                            <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span
-                                class="text-muted">max: 10K</span> </label>
-                            <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
-                                   placeholder="Enter Flat Amount"
-                                   @keypress="isNumber($event)">
-                        </div>
+<!--                        <div class="form-group col-md-5" v-if="showDivPercentage">-->
+<!--                            <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>-->
+<!--                            <div class="input-group">-->
+<!--                                <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"-->
+<!--                                       placeholder="Enter Percentage"-->
+<!--                                       @keypress="isNumber($event); numberRange($event)">-->
+<!--                                <div class="input-group-append">-->
+<!--                                    <span class="input-group-text">%</span>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group col-md-5" v-if="showDivFlat">-->
+<!--                            <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span-->
+<!--                                class="text-muted">max: 10K</span> </label>-->
+<!--                            <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"-->
+<!--                                   placeholder="Enter Flat Amount"-->
+<!--                                   @keypress="isNumber($event)">-->
+<!--                        </div>-->
                     </div>
                 </div>
                 <template v-slot:button>
