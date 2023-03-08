@@ -16,8 +16,12 @@ class CreateCardCategoriesTable extends Migration
         Schema::create('card_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->string('type')->nullable();
-            $table->integer('amount')->nullable();
+            $table->integer('discount_type')->comment("1/flat,2/percentage")->nullable();
+            $table->decimal('flat_discount',12,2)->comment("per point")->nullable();
+            $table->decimal('percentage_discount',12,2)->comment("per point")->nullable();
+            $table->string('point_type')->comment("1/on amount,2/on distance")->nullable();
+            $table->decimal('point_flat',12,2)->comment("rupee for 1 point")->nullable();
+            $table->decimal('point_distance',12,2)->comment("km for 1 point")->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
