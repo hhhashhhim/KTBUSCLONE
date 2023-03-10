@@ -88,7 +88,7 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button class="btn btn-danger"
+                                                            <button style="display:none;" class="btn btn-danger"
                                                                     v-if="checkForSubmenuButtons('delete-bus-class')">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

@@ -173,7 +173,7 @@
                                                             class="btn btn-primary mx-1">
                                                         <i class="far fa-edit"></i>
                                                     </button>
-                                                    <button title="Delete Designation"
+                                                    <button style="display:none;" title="Delete Designation"
                                                             class="btn btn-danger">
                                                         <i class="far fa-trash-alt"></i>
                                                     </button>

@@ -42,7 +42,7 @@
                                                                     title="Edit Category">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Category"
+                                                            <button style="display:none;" title="Delete Category"
                                                                     class=" text-light btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

@@ -1004,3 +1004,16 @@ class BookingController extends Controller
         return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup, 'remain' => $remainData]);
     }
 }
+
+
+
+
+// try{
+//     DB::transaction(function() use ($request){
+//      //your query
+//      });
+// } 
+// catch (\Exception $e){
+//     return 'Opps! Some thing went wrong';  
+//     // return "error------->".$e->getMessage();
+// }

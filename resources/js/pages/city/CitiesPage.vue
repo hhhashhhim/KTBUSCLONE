@@ -44,7 +44,7 @@
                                                                     class=" text-light btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete City" v-if="checkForSubmenuButtons('delete-city')"
+                                                            <button style="display:none;" title="Delete City" v-if="checkForSubmenuButtons('delete-city')"
                                                                     class=" text-light btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

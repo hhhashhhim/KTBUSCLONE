@@ -57,7 +57,7 @@
                                                                     title="View Link Part">
                                                                     <i class="far fa-eye"></i>
                                                                 </button>
-                                                                <button
+                                                                <button style="display:none;"
                                                                     v-if="checkForSubmenuButtons('delete-link-maintenance')"
                                                                     class="btn btn-danger" title="Delete Link Part">
                                                                     <i class="far fa-trash-alt"></i>

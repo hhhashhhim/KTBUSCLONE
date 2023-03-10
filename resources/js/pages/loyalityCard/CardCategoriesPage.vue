@@ -7,7 +7,6 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Loyality Card Categories</h4>
                             <div class="card-header-action">
-
                                 <a v-if="checkForSubmenuButtons('add-card-category')"
                                     href="#"
                                     data-toggle="modal"
@@ -59,7 +58,6 @@
                                                         <th>Points per Discount</th>
                                                         <th>Points In Flat</th>
                                                         <th>Added By</th>
-
                                                         <th v-if="checkForSubmenuButtons('edit-card-category')">Action</th>
                                                     </tr>
                                                     </thead>

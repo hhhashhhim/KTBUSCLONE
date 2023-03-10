@@ -80,7 +80,7 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button class="btn btn-danger text-light"
+                                                            <button style="display:none;" class="btn btn-danger text-light"
                                                                     v-if="checkForSubmenuButtons('delete-discount')">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

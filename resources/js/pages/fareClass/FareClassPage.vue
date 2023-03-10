@@ -79,7 +79,7 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Fare Class"
+                                                            <button style="display:none;" title="Delete Fare Class"
                                                                     v-if="checkForSubmenuButtons('delete-class')"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>

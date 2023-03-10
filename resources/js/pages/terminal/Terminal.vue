@@ -457,7 +457,7 @@
                                                         >
                                                             <i class="far fa-edit"></i>
                                                         </button>
-                                                        <button title="Delete Terminal"
+                                                        <button style="display:none;" title="Delete Terminal"
 
                                                                 class="btn btn-danger mx-2"
                                                                 v-if="checkForSubmenuButtons('delete-terminal')"

@@ -72,7 +72,7 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <a v-if="checkForSubmenuButtons('delete-user')"
+                                                            <a style="display:none;" v-if="checkForSubmenuButtons('delete-user')"
                                                                title="Delete User"
                                                                class="btn btn-danger text-light"
                                                             >

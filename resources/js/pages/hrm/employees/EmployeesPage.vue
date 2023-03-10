@@ -98,7 +98,7 @@
                                                                     class="btn btn-primary mx-1" title="Edit Employee">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Employee"
+                                                            <button style="display:none;" title="Delete Employee"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
