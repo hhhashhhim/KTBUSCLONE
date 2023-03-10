@@ -183,7 +183,7 @@
                                 <i class="fas fa-bookmark"></i> All Booking
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('all')">
+                        <li class="dropdown" v-if="checkForSubmenu('loyaltyCard')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'loyality-card-categories' }">
                                 <i class="fas fa-bookmark"></i> Loyality Card
                             </router-link>

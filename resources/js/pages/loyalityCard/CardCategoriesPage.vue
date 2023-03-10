@@ -7,8 +7,8 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Loyality Card Categories</h4>
                             <div class="card-header-action">
-                                <!-- v-if="checkForSubmenuButtons('add-surcharge')" -->
-                                <a
+
+                                <a v-if="checkForSubmenuButtons('add-card-category')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -44,45 +44,47 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" id="surcharge_table"
+                                                <table class="table table-striped table-hover"
+                                                       style="overflow-x: auto; white-space: nowrap;"
+                                                       id="cardCategory_table"
                                                 >
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
-                                                        <th>Percentage</th>
-                                                        <th>Amount</th>
-                                                        <th>Status</th>
+                                                        <th>Discount Type</th>
+                                                        <th>Percentage Discount</th>
+                                                        <th>Flat Discount</th>
+                                                        <th>Points Type</th>
+                                                        <th>Points per Discount</th>
+                                                        <th>Points In Flat</th>
                                                         <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')">
-                                                            Action
-                                                        </th>
+
+                                                        <th v-if="checkForSubmenuButtons('edit-card-category')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(surcharge, i) in surcharges" :key="i">
+                                                    <tr v-for="(card, i) in cards" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ surcharge.name }}</td>
-                                                        <td v-if="surcharge.percentage">{{ surcharge.percentage }}%</td>
-                                                        <td v-else>N/A</td>
-                                                        <td v-if="surcharge.flat">{{ surcharge.flat }}</td>
-                                                        <td v-else>N/A</td>
-                                                        <td>{{ surcharge.is_active == 1 ? 'Active' : 'InActive' }}</td>
-                                                        <td>{{ surcharge.added_by.name }}</td>
-                                                        <td v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')">
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="edit(surcharge)"
-                                                                    v-if="checkForSubmenuButtons('edit-surcharge')"
+                                                        <td>{{ card.name }}</td>
+                                                        <td class="text-capitalize">{{ card.discount_type }}</td>
+                                                        <td>{{ card.percentage_discount }}</td>
+                                                        <td>{{ card.flat_discount }}</td>
+                                                        <td class="text-capitalize">{{ card.point_type }}</td>
+                                                        <td>{{ card.point_distance }}</td>
+                                                        <td>{{ card.point_flat }}</td>
+                                                        <td>{{ card.added_by.name }}</td>
+                                                        <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')"-->
+                                                        <td v-if="checkForSubmenuButtons('edit-card-category')">
+                                                            <button v-if="checkForSubmenuButtons('edit-card-category')" :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(card)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button v-if="checkForSubmenuButtons('delete-surcharge')"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
-                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                            data-toggle="modal"-->
-                                                            <!--                                                            @click="deleteModal(surcharge,i)"-->
+                                                            <!--                                                            <button-->
+                                                            <!--                                                                class="btn btn-danger d-none">-->
+                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -100,33 +102,36 @@
 
             <!-- Add Modal -->
             <Add
-                :heading="'ADD Card Category'"
+                :heading="'Add Card Category'"
                 :errors="this.validationErrors"
                 :success="success"
                 :formID="formID"
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="SurchargeName">Name <span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="SurchargeName"/>
+                        <label for="CardName">Name <span class="text-danger ml-1">*</span></label>
+                        <input type="text" class="form-control" v-model="CardName"/>
                     </div>
+                    <!--                    Discount-->
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
                                    checked="" value="percentage" v-model="percentageRadio"
-                                   @click="surchargeApply('percentage')">
+                                   @click="ChangeRadioValue('percentage')">
                             <label class="custom-control-label" for="percentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" id="flat" name="flatAmount" class="custom-control-input" value="flat"
-                                   v-model="percentageRadio" @click="surchargeApply('flat')">
+                                   v-model="percentageRadio" @click="ChangeRadioValue('flat')">
                             <label class="custom-control-label" for="flat">Flat Amount</label>
                         </div>
                     </div>
+
+
                     <div class="form-group col-md-5" v-if="showDivPercentage">
                         <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="DiscountPercentage"
                                    placeholder="Enter Percentage Applied Per Point"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
@@ -135,51 +140,57 @@
                         </div>
                     </div>
                     <div class="form-group col-md-5" v-if="showDivFlat">
-                        <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span> <span
-                            class="text-muted">max: 10K</span> </label>
-                        <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"
+                        <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span>
+                            <span
+                                class="text-muted">max: 10K</span> </label>
+                        <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat"
                                placeholder="Enter Flat Amount Applied Per Point"
                                @keypress="isNumber($event)">
                     </div>
+
                     <div class="col-md-12">
                         <h5>Addition of Points Via Type</h5>
-                        <div class="form-group col-md-3 mt-4 pt-2">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="percentagePoints" name="percentageAmountPoints" class="custom-control-input"
-                                       checked="" value="percentage" v-model="pointsRadio"
-                                       @click="surchargeApply('percentage')">
-                                <label class="custom-control-label" for="percentage">Percentage</label>
+                        <!--points-->
+                        <div class="row">
+                            <div class="form-group col-md-3 mt-4 pt-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="distancePoints" name="percentageAmountPoints"
+                                           class="custom-control-input"
+                                           checked="" value="distancePoints" v-model="pointsRadio"
+                                           @click="ChangeRadioValue('distancePoints')">
+                                    <label class="custom-control-label" for="distancePoints">Distance</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="flatPoints" name="flatAmountPoints"
+                                           class="custom-control-input"
+                                           value="flatPoints"
+                                           v-model="pointsRadio" @click="ChangeRadioValue('flatPoints')">
+                                    <label class="custom-control-label" for="flatPoints">Flat</label>
+                                </div>
                             </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="flatPoints" name="flatAmountPoints" class="custom-control-input"
-                                       value="flat"
-                                       v-model="pointsRadio" @click="surchargeApply('flat')">
-                                <label class="custom-control-label" for="flat">Flat Amount</label>
+                            <div class="form-group col-md-9" v-if="showDivDistancePoints">
+                                <label for="SurchargePercentage">Distance <span
+                                    class="text-danger ml-1">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" maxlength="3" v-model="DistancePoints"
+                                           placeholder="How Many Points Set after 1 KiloMeter?"
+                                           @keypress="isNumber($event)">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-9" v-if="showDivFlatPoints">
+                                <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>
+                                    <span
+                                        class="text-muted">max: 10K</span> </label>
+                                <input type="text" class="form-control" maxlength="5" v-model="FlatPoints"
+                                       placeholder="How many Points Set of Amount?"
+                                       @keypress="isNumber($event)">
                             </div>
                         </div>
-<!--                        <div class="form-group col-md-5" v-if="showDivPercentage">-->
-<!--                            <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>-->
-<!--                            <div class="input-group">-->
-<!--                                <input type="text" class="form-control" maxlength="3" v-model="SurchargePercentage"-->
-<!--                                       placeholder="Enter Percentage"-->
-<!--                                       @keypress="isNumber($event); numberRange($event)">-->
-<!--                                <div class="input-group-append">-->
-<!--                                    <span class="input-group-text">%</span>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="form-group col-md-5" v-if="showDivFlat">-->
-<!--                            <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span> <span-->
-<!--                                class="text-muted">max: 10K</span> </label>-->
-<!--                            <input type="text" class="form-control" maxlength="5" v-model="SurchargeFlat"-->
-<!--                                   placeholder="Enter Flat Amount"-->
-<!--                                   @keypress="isNumber($event)">-->
-<!--                        </div>-->
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="addSurcharge" :disabled="loading">
-                        {{ loading ? 'Loading...' : 'Save Surcharge' }}
+                    <button type="button" class="btn btn-primary" @click="storeCardDetails" :disabled="loading">
+                        {{ loading ? 'Loading...' : 'Save Card Category' }}
                     </button>
                 </template>
             </Add>
@@ -188,73 +199,107 @@
             <!-- Add Modal End -->
             <!--            Edit Model-->
             <Edit
-                heading="Edit Surcharge"
+                heading="Edit Card Category"
                 :errors="this.validationErrors"
                 :success="success"
                 :editForm="editFormID"
             >
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="SurchargeName">Name <span class="text-danger ml-1">*</span></label>
+                        <label for="CardName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
+                    <!--                    Discount-->
                     <div class="form-group col-md-3 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editPercentage" name="editPercentageAmount"
-                                   class="custom-control-input" :checked="dataEdit.type == 'percentage'"
-                                   value="percentage" v-model="dataEdit.percentageRadio"
-                                   @click="surchargeApply('editPercentage')">
-                            <label class="custom-control-label" for="editPercentage">Percentage</label>
+                            <input type="radio" id="Editpercentage" name="percentageAmount" class="custom-control-input"
+                                   :checked="dataEdit.discount_type == 'percentage'" value="percentage"
+                                   v-model="dataEdit.discount_type"
+                                   @click="ChangeRadioValue('Editpercentage')">
+                            <label class="custom-control-label" for="Editpercentage">Percentage</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="editFlat" name="editFlatAmount" class="custom-control-input"
-                                   :checked="dataEdit.type == 'flat'" value="flat" v-model="dataEdit.percentageRadio"
-                                   @click="surchargeApply('editFlat')">
-                            <label class="custom-control-label" for="editFlat">Flat Amount</label>
+                            <input type="radio" id="Editflat" name="flatAmount" class="custom-control-input"
+                                   value="flat" :checked="dataEdit.discount_type == 'flat'"
+                                   v-model="dataEdit.discount_type" @click="ChangeRadioValue('Editflat')">
+                            <label class="custom-control-label" for="Editflat">Flat Amount</label>
                         </div>
                     </div>
-                    <div class="form-group col-md-5" v-if="dataEdit.type == 'percentage'">
-                        <label for="SurchargePercentage">Percentage <span class="text-danger ml-1">*</span></label>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
-                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage"
-                                   placeholder="Enter Percentage"
+                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage_discount"
+                                   placeholder="Enter Percentage Applied Per Point"
                                    @keypress="isNumber($event); numberRange($event)">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-5" v-if="dataEdit.type == 'flat'">
-                        <label for="SurchargePercentage">Flat Amount <span class="text-danger ml-1">*</span><span
-                            class="text-muted">max: 10K</span></label>
-                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat"
-                               placeholder="Enter Flat Amount"
+                    <div class="form-group col-md-6">
+                        <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span>
+                            <span
+                                class="text-muted">max: 10K</span> </label>
+                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat_discount"
+                               placeholder="Enter Flat Amount Applied Per Point"
                                @keypress="isNumber($event)">
                     </div>
+
                     <div class="col-md-12">
-                        <h5>Status</h5>
-                        <div class="form-group d-flex align-items-center ">
-                            <label class="mt-4" for="active">Is Active</label>
-                            <label class="colorinput mx-3 mt-3">
-                            <span>
-                               <input type="checkbox" class="colorinput-input" id="editCheckBox"
-                                      @change="editCheckBox($event)" v-bind:checked="dataEdit.is_active == 1"/>
-                                <span class="colorinput-color bg-primary"></span>
-                            </span>
-                            </label>
+                        <h5>Addition of Points Via Type</h5>
+                        <!--points-->
+                        <div class="row">
+                            <div class="form-group col-md-4 mt-4 pt-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="EditdistancePoints" name="percentageAmountPoints"
+                                           class="custom-control-input"
+                                           :checked="dataEdit.point_type == 'distancePoints'" value="distancePoints"
+                                           v-model="dataEdit.point_type"
+                                           @click="ChangeRadioValue('distancePoints')">
+                                    <label class="custom-control-label" for="EditdistancePoints">Distance</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="EditflatPoints" name="flatAmountPoints"
+                                           class="custom-control-input"
+                                           value="flatPoints"
+                                           :checked="dataEdit.point_type == 'flatPoints'"
+                                           v-model="dataEdit.point_type" @click="ChangeRadioValue('flatPoints')">
+                                    <label class="custom-control-label" for="EditflatPoints">Flat</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="SurchargePercentage">Distance <span
+                                    class="text-danger ml-1">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" maxlength="3"
+                                           v-model="dataEdit.point_distance"
+                                           placeholder="How Many Points Set after 1 KiloMeter?"
+                                           @keypress="isNumber($event)">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>
+                                    <span
+                                        class="text-muted">max: 10K</span> </label>
+                                <input type="text" class="form-control" maxlength="5" v-model="dataEdit.point_flat"
+                                       placeholder="How many Points Set of Amount?"
+                                       @keypress="isNumber($event)">
+                            </div>
                         </div>
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button type="button" class="btn btn-primary" @click="updateSurcharge"
-                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Surcharge' }}
+                    <button type="button" class="btn btn-primary" @click="updateCard()"
+                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Card Category' }}
                     </button>
                 </template>
             </Edit>
             <!--            Edit MOdel End-->
-            <Delete :deleteForm="deleteFormID"
-                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'
-            />
+<!--            <Delete :deleteForm="deleteFormID"-->
+<!--                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'-->
+<!--            />-->
 
         </div>
     </section>
@@ -277,27 +322,27 @@ export default {
     data() {
         return {
             loading: false,
-            surcharges: [],
+            cards: [],
             permissions: [],
-            isActive: 1,
             showDivPercentage: true,
             showDivFlat: false,
+            showDivFlatPoints: true,
+            showDivDistancePoints: false,
             formID: "card_category",
             editFormID: "edit_card_category",
             deleteFormID: "delete_card_category",
             validationErrors: [],
             success: false,
             error: false,
-            SurchargeName: '',
+            CardName: '',
             delId: "",
-            SurchargePercentage: '',
-            SurchargeFlat: '',
+            DiscountPercentage: '',
+            FlatPoints: '',
+            DistancePoints: '',
+            DiscountFlat: '',
             percentageRadio: 'percentage',
-            dataEdit: {
-                id: "",
-                name: "",
-                percentage: "",
-            },
+            pointsRadio: 'distancePoints',
+            dataEdit: {},
         };
     },
     async created() {
@@ -320,43 +365,67 @@ export default {
             }
 
         },
-        surchargeApply(value) {
+        ChangeRadioValue(value) {
             if (value == "percentage") {
                 this.showDivPercentage = true;
                 this.showDivFlat = false;
+            }
+            if (value == "Editpercentage") {
+                if (this.dataEdit.discount_type == 'percentage') {
+                    this.showDivPercentageEdit = true;
+                    this.showDivFlatEdit = false
+                } else {
+                    this.showDivPercentageEdit = false;
+                    this.showDivFlatEdit = true;
+                }
+            }
+            if (value == "Editflat") {
+                if (this.dataEdit.discount_type == 'flat') {
+                    this.showDivPercentageEdit = false;
+                    this.showDivFlatEdit = true;
+                } else {
+                    this.showDivPercentageEdit = true;
+                    this.showDivFlatEdit = true;
+                }
+
             }
             if (value == "flat") {
                 this.showDivPercentage = false;
                 this.showDivFlat = true;
             }
-            if (value == "editPercentage") {
-                this.dataEdit.type = 'percentage';
+            if (value == "distancePoints") {
+                this.showDivDistancePoints = true;
+                this.showDivFlatPoints = false;
             }
-            if (value == "editFlat") {
-                this.dataEdit.type = 'flat';
-
+            if (value == "flatPoints") {
+                this.showDivDistancePoints = false;
+                this.showDivFlatPoints = true;
             }
         },
         async fetchCardCategories() {
-            const res = await this.callApi("post", 'surcharge');
+            const res = await this.callApi("post", 'loyaltyCard');
             if (res.status == 200) {
-                this.surcharges = res.data
+                this.cards = res.data
             } else {
                 console.log(res);
             }
 
             setTimeout(() => {
-                $("#surcharge_table").DataTable();
+                $("#cardCategory_table").DataTable();
             }, 300);
         },
         clearForm: function () {
-            this.SurchargeName = "";
-            this.SurchargePercentage = "";
+            this.CardName = "";
+            this.DiscountPercentage = "";
+            this.DistancePoints = "";
+            this.FlatPoints = "";
             this.percentageRadio = 'percentage';
-            this.SurchargeFlat = "";
-            this.isActive = 1;
+            this.pointsRadio = 'distancePoints';
+            this.DiscountFlat = "";
             this.showDivFlat = false;
             this.showDivPercentage = true;
+            this.showDivDistancePoints = true;
+            this.showDivFlatPoints = false;
         },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
@@ -388,17 +457,17 @@ export default {
             }
         },
 
-        async addSurcharge() {
+        async storeCardDetails() {
             this.validationErrors = [];
-            if (this.SurchargeName == "")
-                swal({
+            if (this.CardName == "" || typeof this.CardName == "undefined")
+                return swal({
                     title: "Required!",
                     text: "Name is Required",
                     icon: "error",
                     timer: 2000
                 });
             if (this.percentageRadio == "percentage") {
-                if (this.SurchargePercentage == "" || typeof this.SurchargePercentage == "undefined") {
+                if (this.DiscountPercentage == "" || typeof this.DiscountPercentage == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Percentage Field is Required",
@@ -408,7 +477,7 @@ export default {
                 }
             }
             if (this.percentageRadio == "flat") {
-                if (this.SurchargeFlat == "" || typeof this.SurchargeFlat == "undefined") {
+                if (this.DiscountFlat == "" || typeof this.DiscountFlat == "undefined") {
                     return swal({
                         title: "Required!",
                         text: "Flat Amount Field is Required",
@@ -417,34 +486,54 @@ export default {
                     });
                 }
             }
-
+            if (this.pointsRadio == "distancePoints") {
+                if (this.DistancePoints == "" || typeof this.DistancePoints == "undefined") {
+                    return swal({
+                        title: "Required!",
+                        text: "Distance Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+            if (this.pointsRadio == "flatPoints") {
+                if (this.FlatPoints == "" || typeof this.FlatPoints == "undefined") {
+                    return swal({
+                        title: "Required!",
+                        text: "Flat Field is Required",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
             this.loading = true;
             const data = {
-                name: this.SurchargeName,
-                type: this.percentageRadio,
-                percentage: this.SurchargePercentage,
-                flat: this.SurchargeFlat,
-                active: this.isActive,
+                name: this.CardName,
+                discountType: this.percentageRadio,
+                discountPercentage: this.DiscountPercentage,
+                discountFlat: this.DiscountFlat,
+                pointsType: this.pointsRadio,
+                pointsDistance: this.DistancePoints,
+                pointsFlat: this.FlatPoints,
             }
 
-            const res = await this.callApi("post", "surcharge/store", data);
-            if (res.status == 201) {
+            const resCard = await this.callApi("post", "loyaltyCard/store", data);
+            if (resCard.status == 201) {
                 swal({
                     title: "Success",
-                    text: "Surcharge Created Successfully",
+                    text: "Card Category Created Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                this.SurchargeName = '';
+                this.CardName = '';
                 this.percentageRadio = 'percentage';
-                this.SurchargePercentage = '';
-                this.SurchargeFlat = '';
+                this.DiscountPercentage = '';
+                this.DiscountFlat = '';
                 this.showDivFlat = false;
                 this.showDivPercentage = true;
-                this.isActive = 1;
-                $("#surcharge_table").DataTable().destroy();
+                $("#cardCategory_table").DataTable().destroy();
                 this.loading = false;
-                await this.fetchCardCategories();
+                this.fetchCardCategories();
             } else {
                 if (res.status === 422) {
                     this.loading = false;
@@ -457,48 +546,48 @@ export default {
             }
         },
 
-        async updateSurcharge() {
+        async updateCard() {
             this.validationErrors = [];
-            if (this.dataEdit.name === "")
-                swal({
-                    title: "Required!",
-                    text: "Name Field is Required ",
-                    icon: "error",
-                    timer: 2000
-                });
-
-            if (this.dataEdit.type == "percentage" || this.dataEdit.percentageRadio == 'percentage') {
-                if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
-                    return swal({
-                        title: "Required!",
-                        text: "Percentage Field is Required",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
-            }
-            if (this.dataEdit.type == 'flat' || this.dataEdit.percentageRadio == "flat") {
-                if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
-                    return swal({
-                        title: "Required!",
-                        text: "Flat Amount Field is Required",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
-            }
+            // if (this.dataEdit.name === ""|| typeof this.dataEdit.name == 'undefined')
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Name Field is Required ",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            //
+            // if (this.dataEdit.discount_type == "percentage" || this.dataEdit.percentageRadio == 'percentage') {
+            //     if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
+            //         return swal({
+            //             title: "Required!",
+            //             text: "Percentage Field is Required",
+            //             icon: "error",
+            //             timer: 2000
+            //         });
+            //     }
+            // }
+            // if (this.dataEdit.discount_type == 'flat' || this.dataEdit.percentageRadio == "flat") {
+            //     if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
+            //         return swal({
+            //             title: "Required!",
+            //             text: "Flat Amount Field is Required",
+            //             icon: "error",
+            //             timer: 2000
+            //         });
+            //     }
+            // }
 
 
             this.loading = true;
-            const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
+            const res = await this.callApi("post", 'loyaltyCard/update', this.dataEdit);
             if (res.status === 200) {
                 swal({
                     title: "Success",
-                    text: "Surcharge Updated Successfully",
+                    text: "Card Category Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
-                $("#surcharge_table").DataTable().destroy();
+                $("#cardCategory_table").DataTable().destroy();
                 this.loading = false;
                 await this.fetchCardCategories();
             } else {
@@ -524,8 +613,9 @@ export default {
             this.$store.commit("setDeleteObj", deletingObj);
         },
 
-        edit(sur) {
-            this.dataEdit = sur;
+        edit(cardList) {
+            this.dataEdit = cardList;
+            console.log(this.dataEdit);
 
 
         },
@@ -536,8 +626,8 @@ export default {
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.surcharges.splice(obj.index, 1)
-                $("#surcharge_table").DataTable().destroy();
+                this.cards.splice(obj.index, 1)
+                $("#cardCategory_table").DataTable().destroy();
                 this.fetchCardCategories();
             }
         }

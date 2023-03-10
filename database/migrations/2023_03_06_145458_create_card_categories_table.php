@@ -16,7 +16,7 @@ class CreateCardCategoriesTable extends Migration
         Schema::create('card_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->integer('discount_type')->comment("1/flat,2/percentage")->nullable();
+            $table->string('discount_type')->comment("1/flat,2/percentage")->nullable();
             $table->decimal('flat_discount',12,2)->comment("per point")->nullable();
             $table->decimal('percentage_discount',12,2)->comment("per point")->nullable();
             $table->string('point_type')->comment("1/on amount,2/on distance")->nullable();

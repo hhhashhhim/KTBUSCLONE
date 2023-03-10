@@ -523,7 +523,19 @@ export default {
                                 {name: "edit-close-booking", allow: true},
                             ]
                         },
-                        {name: "all", allow: true}
+                        {name: "all", allow: true},
+                        {name: "loyaltyCard", allow: true,
+                            buttons:[
+                                {
+                                    name: "add-card-category",
+                                    allow: true
+                                },
+                                {
+                                    name: "edit-card-category",
+                                    allow: true
+                                }
+                            ]
+                        }
                     ],
                 },
 

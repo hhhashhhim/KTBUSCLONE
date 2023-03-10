@@ -32523,6 +32523,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, {
           name: "all",
           allow: true
+        }, {
+          name: "loyaltyCard",
+          allow: true,
+          buttons: [{
+            name: "add-card-category",
+            allow: true
+          }, {
+            name: "edit-card-category",
+            allow: true
+          }]
         }]
       }, // Expenses Panel
       {
@@ -37729,27 +37739,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       loading: false,
-      surcharges: [],
+      cards: [],
       permissions: [],
-      isActive: 1,
       showDivPercentage: true,
       showDivFlat: false,
+      showDivFlatPoints: true,
+      showDivDistancePoints: false,
       formID: "card_category",
       editFormID: "edit_card_category",
       deleteFormID: "delete_card_category",
       validationErrors: [],
       success: false,
       error: false,
-      SurchargeName: '',
+      CardName: '',
       delId: "",
-      SurchargePercentage: '',
-      SurchargeFlat: '',
+      DiscountPercentage: '',
+      FlatPoints: '',
+      DistancePoints: '',
+      DiscountFlat: '',
       percentageRadio: 'percentage',
-      dataEdit: {
-        id: "",
-        name: "",
-        percentage: ""
-      }
+      pointsRadio: 'distancePoints',
+      dataEdit: {}
     };
   },
   created: function created() {
@@ -37790,10 +37800,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         });
       }
     },
-    surchargeApply: function surchargeApply(value) {
+    ChangeRadioValue: function ChangeRadioValue(value) {
       if (value == "percentage") {
         this.showDivPercentage = true;
         this.showDivFlat = false;
+      }
+
+      if (value == "Editpercentage") {
+        if (this.dataEdit.discount_type == 'percentage') {
+          this.showDivPercentageEdit = true;
+          this.showDivFlatEdit = false;
+        } else {
+          this.showDivPercentageEdit = false;
+          this.showDivFlatEdit = true;
+        }
+      }
+
+      if (value == "Editflat") {
+        if (this.dataEdit.discount_type == 'flat') {
+          this.showDivPercentageEdit = false;
+          this.showDivFlatEdit = true;
+        } else {
+          this.showDivPercentageEdit = true;
+          this.showDivFlatEdit = true;
+        }
       }
 
       if (value == "flat") {
@@ -37801,12 +37831,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.showDivFlat = true;
       }
 
-      if (value == "editPercentage") {
-        this.dataEdit.type = 'percentage';
+      if (value == "distancePoints") {
+        this.showDivDistancePoints = true;
+        this.showDivFlatPoints = false;
       }
 
-      if (value == "editFlat") {
-        this.dataEdit.type = 'flat';
+      if (value == "flatPoints") {
+        this.showDivDistancePoints = false;
+        this.showDivFlatPoints = true;
       }
     },
     fetchCardCategories: function fetchCardCategories() {
@@ -37819,19 +37851,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'surcharge');
+                return _this2.callApi("post", 'loyaltyCard');
 
               case 2:
                 res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this2.surcharges = res.data;
+                  _this2.cards = res.data;
                 } else {
                   console.log(res);
                 }
 
                 setTimeout(function () {
-                  $("#surcharge_table").DataTable();
+                  $("#cardCategory_table").DataTable();
                 }, 300);
 
               case 5:
@@ -37843,13 +37875,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     clearForm: function clearForm() {
-      this.SurchargeName = "";
-      this.SurchargePercentage = "";
+      this.CardName = "";
+      this.DiscountPercentage = "";
+      this.DistancePoints = "";
+      this.FlatPoints = "";
       this.percentageRadio = 'percentage';
-      this.SurchargeFlat = "";
-      this.isActive = 1;
+      this.pointsRadio = 'distancePoints';
+      this.DiscountFlat = "";
       this.showDivFlat = false;
       this.showDivPercentage = true;
+      this.showDivDistancePoints = true;
+      this.showDivFlatPoints = false;
     },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
@@ -37881,31 +37917,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.dataEdit.is_active = 0;
       }
     },
-    addSurcharge: function addSurcharge() {
+    storeCardDetails: function storeCardDetails() {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var data, res, _loop, key;
+        var data, resCard, _loop, key;
 
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.validationErrors = [];
-                if (_this3.SurchargeName == "") swal({
+
+                if (!(_this3.CardName == "" || typeof _this3.CardName == "undefined")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
                   title: "Required!",
                   text: "Name is Required",
                   icon: "error",
                   timer: 2000
-                });
+                }));
 
+              case 3:
                 if (!(_this3.percentageRadio == "percentage")) {
-                  _context3.next = 5;
+                  _context3.next = 6;
                   break;
                 }
 
-                if (!(_this3.SurchargePercentage == "" || typeof _this3.SurchargePercentage == "undefined")) {
-                  _context3.next = 5;
+                if (!(_this3.DiscountPercentage == "" || typeof _this3.DiscountPercentage == "undefined")) {
+                  _context3.next = 6;
                   break;
                 }
 
@@ -37916,14 +37959,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
+              case 6:
                 if (!(_this3.percentageRadio == "flat")) {
-                  _context3.next = 8;
+                  _context3.next = 9;
                   break;
                 }
 
-                if (!(_this3.SurchargeFlat == "" || typeof _this3.SurchargeFlat == "undefined")) {
-                  _context3.next = 8;
+                if (!(_this3.DiscountFlat == "" || typeof _this3.DiscountFlat == "undefined")) {
+                  _context3.next = 9;
                   break;
                 }
 
@@ -37934,64 +37977,93 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 8:
-                _this3.loading = true;
-                data = {
-                  name: _this3.SurchargeName,
-                  type: _this3.percentageRadio,
-                  percentage: _this3.SurchargePercentage,
-                  flat: _this3.SurchargeFlat,
-                  active: _this3.isActive
-                };
-                _context3.next = 12;
-                return _this3.callApi("post", "surcharge/store", data);
-
-              case 12:
-                res = _context3.sent;
-
-                if (!(res.status == 201)) {
-                  _context3.next = 28;
+              case 9:
+                if (!(_this3.pointsRadio == "distancePoints")) {
+                  _context3.next = 12;
                   break;
                 }
 
-                swal({
-                  title: "Success",
-                  text: "Surcharge Created Successfully",
-                  icon: "success",
+                if (!(_this3.DistancePoints == "" || typeof _this3.DistancePoints == "undefined")) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Distance Field is Required",
+                  icon: "error",
                   timer: 2000
-                });
-                _this3.SurchargeName = '';
-                _this3.percentageRadio = 'percentage';
-                _this3.SurchargePercentage = '';
-                _this3.SurchargeFlat = '';
-                _this3.showDivFlat = false;
-                _this3.showDivPercentage = true;
-                _this3.isActive = 1;
-                $("#surcharge_table").DataTable().destroy();
-                _this3.loading = false;
-                _context3.next = 26;
-                return _this3.fetchCardCategories();
+                }));
 
-              case 26:
-                _context3.next = 29;
-                break;
+              case 12:
+                if (!(_this3.pointsRadio == "flatPoints")) {
+                  _context3.next = 15;
+                  break;
+                }
 
-              case 28:
-                if (res.status === 422) {
+                if (!(_this3.FlatPoints == "" || typeof _this3.FlatPoints == "undefined")) {
+                  _context3.next = 15;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Flat Field is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 15:
+                _this3.loading = true;
+                data = {
+                  name: _this3.CardName,
+                  discountType: _this3.percentageRadio,
+                  discountPercentage: _this3.DiscountPercentage,
+                  discountFlat: _this3.DiscountFlat,
+                  pointsType: _this3.pointsRadio,
+                  pointsDistance: _this3.DistancePoints,
+                  pointsFlat: _this3.FlatPoints
+                };
+                _context3.next = 19;
+                return _this3.callApi("post", "loyaltyCard/store", data);
+
+              case 19:
+                resCard = _context3.sent;
+
+                if (resCard.status == 201) {
+                  swal({
+                    title: "Success",
+                    text: "Card Category Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this3.CardName = '';
+                  _this3.percentageRadio = 'percentage';
+                  _this3.DiscountPercentage = '';
+                  _this3.DiscountFlat = '';
+                  _this3.showDivFlat = false;
+                  _this3.showDivPercentage = true;
+                  $("#cardCategory_table").DataTable().destroy();
                   _this3.loading = false;
 
-                  _loop = function _loop(key) {
-                    res.data.errors[key].forEach(function (element) {
-                      _this3.errorsArray(element, key);
-                    });
-                  };
+                  _this3.fetchCardCategories();
+                } else {
+                  if (res.status === 422) {
+                    _this3.loading = false;
 
-                  for (key in res.data.errors) {
-                    _loop(key);
+                    _loop = function _loop(key) {
+                      res.data.errors[key].forEach(function (element) {
+                        _this3.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.data.errors) {
+                      _loop(key);
+                    }
                   }
                 }
 
-              case 29:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -37999,7 +38071,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    updateSurcharge: function updateSurcharge() {
+    updateCard: function updateCard() {
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
@@ -38009,78 +38081,63 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _this4.validationErrors = [];
-                if (_this4.dataEdit.name === "") swal({
-                  title: "Required!",
-                  text: "Name Field is Required ",
-                  icon: "error",
-                  timer: 2000
-                });
+                _this4.validationErrors = []; // if (this.dataEdit.name === ""|| typeof this.dataEdit.name == 'undefined')
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Name Field is Required ",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                //
+                // if (this.dataEdit.discount_type == "percentage" || this.dataEdit.percentageRadio == 'percentage') {
+                //     if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
+                //         return swal({
+                //             title: "Required!",
+                //             text: "Percentage Field is Required",
+                //             icon: "error",
+                //             timer: 2000
+                //         });
+                //     }
+                // }
+                // if (this.dataEdit.discount_type == 'flat' || this.dataEdit.percentageRadio == "flat") {
+                //     if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
+                //         return swal({
+                //             title: "Required!",
+                //             text: "Flat Amount Field is Required",
+                //             icon: "error",
+                //             timer: 2000
+                //         });
+                //     }
+                // }
 
-                if (!(_this4.dataEdit.type == "percentage" || _this4.dataEdit.percentageRadio == 'percentage')) {
-                  _context4.next = 5;
-                  break;
-                }
-
-                if (!(_this4.dataEdit.percentage == "" || _this4.dataEdit.percentage == null || typeof _this4.dataEdit.percentage == "undefined")) {
-                  _context4.next = 5;
-                  break;
-                }
-
-                return _context4.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Percentage Field is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 5:
-                if (!(_this4.dataEdit.type == 'flat' || _this4.dataEdit.percentageRadio == "flat")) {
-                  _context4.next = 8;
-                  break;
-                }
-
-                if (!(_this4.dataEdit.flat == "" || _this4.dataEdit.flat == null || typeof _this4.dataEdit.flat == "undefined")) {
-                  _context4.next = 8;
-                  break;
-                }
-
-                return _context4.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Flat Amount Field is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
                 _this4.loading = true;
-                _context4.next = 11;
-                return _this4.callApi("post", 'surcharge/update', _this4.dataEdit);
+                _context4.next = 4;
+                return _this4.callApi("post", 'loyaltyCard/update', _this4.dataEdit);
 
-              case 11:
+              case 4:
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 20;
+                  _context4.next = 13;
                   break;
                 }
 
                 swal({
                   title: "Success",
-                  text: "Surcharge Updated Successfully",
+                  text: "Card Category Updated Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                $("#surcharge_table").DataTable().destroy();
+                $("#cardCategory_table").DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 18;
+                _context4.next = 11;
                 return _this4.fetchCardCategories();
 
-              case 18:
-                _context4.next = 21;
+              case 11:
+                _context4.next = 14;
                 break;
 
-              case 20:
+              case 13:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -38095,7 +38152,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 14:
               case "end":
                 return _context4.stop();
             }
@@ -38128,16 +38185,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee5);
       }))();
     },
-    edit: function edit(sur) {
-      this.dataEdit = sur;
+    edit: function edit(cardList) {
+      this.dataEdit = cardList;
+      console.log(this.dataEdit);
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(['getDeletingObj'])),
   watch: {
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
-        this.surcharges.splice(obj.index, 1);
-        $("#surcharge_table").DataTable().destroy();
+        this.cards.splice(obj.index, 1);
+        $("#cardCategory_table").DataTable().destroy();
         this.fetchCardCategories();
       }
     }
@@ -48819,7 +48877,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('all') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('loyaltyCard') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     "class": "nav-link text-capitalize",
     to: {
       name: 'loyality-card-categories'
@@ -61595,7 +61653,11 @@ var _hoisted_19 = {
 };
 var _hoisted_20 = {
   "class": "table table-striped table-hover",
-  id: "surcharge_table"
+  style: {
+    "overflow-x": "auto",
+    "white-space": "nowrap"
+  },
+  id: "cardCategory_table"
 };
 
 var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
@@ -61611,50 +61673,62 @@ var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Percentage", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Discount Type", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Percentage Discount", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_25 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Flat Discount", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Points Type", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Points per Discount", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Points In Flat", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Added By", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_27 = {
-  key: 0
-};
-var _hoisted_28 = {
-  key: 0
-};
-var _hoisted_29 = {
-  key: 1
-};
 var _hoisted_30 = {
-  key: 2
+  key: 0
 };
 var _hoisted_31 = {
-  key: 3
+  "class": "text-capitalize"
 };
 var _hoisted_32 = {
-  key: 4
+  "class": "text-capitalize"
 };
-var _hoisted_33 = ["data-target", "onClick"];
+var _hoisted_33 = {
+  key: 0
+};
+var _hoisted_34 = ["data-target", "onClick"];
 
-var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-edit"
   }, null, -1
@@ -61662,31 +61736,17 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_35 = [_hoisted_34];
-var _hoisted_36 = {
-  key: 1,
-  "class": "btn btn-danger"
-};
-
-var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-trash-alt"
-  }, null, -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_38 = [_hoisted_37];
-var _hoisted_39 = {
+var _hoisted_36 = [_hoisted_35];
+var _hoisted_37 = {
   "class": "row"
 };
-var _hoisted_40 = {
+var _hoisted_38 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "SurchargeName"
+    "for": "CardName"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-danger ml-1"
   }, "*")], -1
@@ -61694,14 +61754,14 @@ var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_42 = {
+var _hoisted_40 = {
   "class": "form-group col-md-3 mt-4 pt-2"
 };
-var _hoisted_43 = {
+var _hoisted_41 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
 
-var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "percentage"
@@ -61710,11 +61770,11 @@ var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_45 = {
+var _hoisted_43 = {
   "class": "custom-control custom-radio custom-control-inline"
 };
 
-var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "custom-control-label",
     "for": "flat"
@@ -61723,12 +61783,12 @@ var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_47 = {
+var _hoisted_45 = {
   key: 0,
   "class": "form-group col-md-5"
 };
 
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Discount In Percentage "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -61738,163 +61798,29 @@ var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_49 = {
+var _hoisted_47 = {
   "class": "input-group"
+};
+
+var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "input-group-append"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "input-group-text"
+  }, "%")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_49 = {
+  key: 1,
+  "class": "form-group col-md-5"
 };
 
 var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "input-group-append"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "input-group-text"
-  }, "%")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_51 = {
-  key: 1,
-  "class": "form-group col-md-5"
-};
-
-var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "SurchargePercentage"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Discount In Flat Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger ml-1"
-  }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-muted"
-  }, "max: 10K")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_53 = {
-  "class": "col-md-12"
-};
-
-var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Addition of Points Via Type", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_55 = {
-  "class": "form-group col-md-3 mt-4 pt-2"
-};
-var _hoisted_56 = {
-  "class": "custom-control custom-radio custom-control-inline"
-};
-
-var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "custom-control-label",
-    "for": "percentage"
-  }, "Percentage", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_58 = {
-  "class": "custom-control custom-radio custom-control-inline"
-};
-
-var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "custom-control-label",
-    "for": "flat"
-  }, "Flat Amount", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_60 = ["disabled"];
-var _hoisted_61 = {
-  "class": "row"
-};
-var _hoisted_62 = {
-  "class": "form-group col-md-4"
-};
-
-var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "SurchargeName"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger ml-1"
-  }, "*")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_64 = {
-  "class": "form-group col-md-3 mt-4 pt-2"
-};
-var _hoisted_65 = {
-  "class": "custom-control custom-radio custom-control-inline"
-};
-var _hoisted_66 = ["checked"];
-
-var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "custom-control-label",
-    "for": "editPercentage"
-  }, "Percentage", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_68 = {
-  "class": "custom-control custom-radio custom-control-inline"
-};
-var _hoisted_69 = ["checked"];
-
-var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "custom-control-label",
-    "for": "editFlat"
-  }, "Flat Amount", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_71 = {
-  key: 0,
-  "class": "form-group col-md-5"
-};
-
-var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "SurchargePercentage"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Percentage "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger ml-1"
-  }, "*")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_73 = {
-  "class": "input-group"
-};
-
-var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "input-group-append"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "input-group-text"
-  }, "%")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_75 = {
-  key: 1,
-  "class": "form-group col-md-5"
-};
-
-var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "SurchargePercentage"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Flat Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-danger ml-1"
   }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-muted"
@@ -61903,51 +61829,264 @@ var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_77 = {
+var _hoisted_51 = {
   "class": "col-md-12"
 };
 
-var _hoisted_78 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Status", -1
+var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Addition of Points Via Type", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_79 = {
-  "class": "form-group d-flex align-items-center"
+var _hoisted_53 = {
+  "class": "row"
+};
+var _hoisted_54 = {
+  "class": "form-group col-md-3 mt-4 pt-2"
+};
+var _hoisted_55 = {
+  "class": "custom-control custom-radio custom-control-inline"
 };
 
-var _hoisted_80 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "mt-4",
-    "for": "active"
-  }, "Is Active", -1
+    "class": "custom-control-label",
+    "for": "distancePoints"
+  }, "Distance", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_81 = {
-  "class": "colorinput mx-3 mt-3"
+var _hoisted_57 = {
+  "class": "custom-control custom-radio custom-control-inline"
 };
-var _hoisted_82 = ["checked"];
+
+var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "custom-control-label",
+    "for": "flatPoints"
+  }, "Flat", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_59 = {
+  key: 0,
+  "class": "form-group col-md-9"
+};
+
+var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Distance "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_61 = {
+  "class": "input-group"
+};
+var _hoisted_62 = {
+  key: 1,
+  "class": "form-group col-md-9"
+};
+
+var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Flat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger mx-1"
+  }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-muted"
+  }, "max: 10K")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_64 = ["disabled"];
+var _hoisted_65 = {
+  "class": "row"
+};
+var _hoisted_66 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "CardName"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_68 = {
+  "class": "form-group col-md-3 mt-4 pt-2"
+};
+var _hoisted_69 = {
+  "class": "custom-control custom-radio custom-control-inline"
+};
+var _hoisted_70 = ["checked"];
+
+var _hoisted_71 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "custom-control-label",
+    "for": "Editpercentage"
+  }, "Percentage", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_72 = {
+  "class": "custom-control custom-radio custom-control-inline"
+};
+var _hoisted_73 = ["checked"];
+
+var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "custom-control-label",
+    "for": "Editflat"
+  }, "Flat Amount", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_75 = {
+  "class": "row"
+};
+var _hoisted_76 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Discount In Percentage "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_78 = {
+  "class": "input-group"
+};
+
+var _hoisted_79 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "input-group-append"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "input-group-text"
+  }, "%")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_80 = {
+  "class": "form-group col-md-6"
+};
+
+var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Discount In Flat Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-muted"
+  }, "max: 10K")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_82 = {
+  "class": "col-md-12"
+};
 
 var _hoisted_83 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "colorinput-color bg-primary"
-  }, null, -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Addition of Points Via Type", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_84 = ["disabled"];
+var _hoisted_84 = {
+  "class": "row"
+};
+var _hoisted_85 = {
+  "class": "form-group col-md-4 mt-4 pt-2"
+};
+var _hoisted_86 = {
+  "class": "custom-control custom-radio custom-control-inline"
+};
+var _hoisted_87 = ["checked"];
+
+var _hoisted_88 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "custom-control-label",
+    "for": "EditdistancePoints"
+  }, "Distance", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_89 = {
+  "class": "custom-control custom-radio custom-control-inline"
+};
+var _hoisted_90 = ["checked"];
+
+var _hoisted_91 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "custom-control-label",
+    "for": "EditflatPoints"
+  }, "Flat", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_92 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_93 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Distance "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_94 = {
+  "class": "input-group"
+};
+var _hoisted_95 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "SurchargePercentage"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Flat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger mx-1"
+  }, "*"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-muted"
+  }, "max: 10K")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_97 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
 
   var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
 
-  var _component_Delete = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Delete");
-
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" v-if=\"checkForSubmenuButtons('add-surcharge')\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_ctx.checkForSubmenuButtons('add-card-category') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    key: 0,
     href: "#",
     "data-toggle": "modal",
     "data-target": '#' + $data.formID,
@@ -61957,7 +62096,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, " Add Card Category ", 8
   /* PROPS */
-  , _hoisted_9)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
+  , _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
     name: "fade"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -61974,36 +62113,42 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_21, _hoisted_22, _hoisted_23, _hoisted_24, _hoisted_25, _hoisted_26, _ctx.checkForSubmenuButtons('edit-surcharge') || _ctx.checkForSubmenuButtons('delete-surcharge') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_27, " Action ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.surcharges, function (surcharge, i) {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_21, _hoisted_22, _hoisted_23, _hoisted_24, _hoisted_25, _hoisted_26, _hoisted_27, _hoisted_28, _hoisted_29, _ctx.checkForSubmenuButtons('edit-card-category') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_30, "Action")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cards, function (card, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.name), 1
     /* TEXT */
-    ), surcharge.percentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.percentage) + "%", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.discount_type), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_29, "N/A")), surcharge.flat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.flat), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.percentage_discount), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_31, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.is_active == 1 ? 'Active' : 'InActive'), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.flat_discount), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(surcharge.added_by.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.point_type), 1
     /* TEXT */
-    ), _ctx.checkForSubmenuButtons('edit-surcharge') || _ctx.checkForSubmenuButtons('delete-surcharge') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_32, [_ctx.checkForSubmenuButtons('edit-surcharge') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.point_distance), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.point_flat), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(card.added_by.name), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                        v-if=\"checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')\""), _ctx.checkForSubmenuButtons('edit-card-category') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_33, [_ctx.checkForSubmenuButtons('edit-card-category') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "data-target": '#' + $data.editFormID,
       "data-toggle": "modal",
       onClick: function onClick($event) {
-        return $options.edit(surcharge);
+        return $options.edit(card);
       },
       "class": "btn btn-primary mx-1"
-    }, _hoisted_35, 8
+    }, _hoisted_36, 8
     /* PROPS */
-    , _hoisted_33)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('delete-surcharge') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", _hoisted_36, _hoisted_38)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            :data-target=\"'#' + deleteFormID\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"deleteModal(surcharge,i)\"")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    , _hoisted_34)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            <button"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                class=\"btn btn-danger d-none\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                                <i class=\"far fa-trash-alt\"></i>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            </button>")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
-    heading: 'ADD Card Category',
+    heading: 'Add Card Category',
     errors: this.validationErrors,
     success: $data.success,
     formID: $data.formID
@@ -62012,24 +62157,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[15] || (_cache[15] = function () {
-          return $options.addSurcharge && $options.addSurcharge.apply($options, arguments);
+        onClick: _cache[19] || (_cache[19] = function () {
+          return $options.storeCardDetails && $options.storeCardDetails.apply($options, arguments);
         }),
         disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save Surcharge'), 9
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save Card Category'), 9
       /* TEXT, PROPS */
-      , _hoisted_60)];
+      , _hoisted_64)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-          return $data.SurchargeName = $event;
+          return $data.CardName = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.CardName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Discount"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "percentage",
         name: "percentageAmount",
@@ -62040,11 +62185,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return $data.percentageRadio = $event;
         }),
         onClick: _cache[4] || (_cache[4] = function ($event) {
-          return $options.surchargeApply('percentage');
+          return $options.ChangeRadioValue('percentage');
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_44]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_42]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "flat",
         name: "flatAmount",
@@ -62054,16 +62199,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return $data.percentageRadio = $event;
         }),
         onClick: _cache[6] || (_cache[6] = function ($event) {
-          return $options.surchargeApply('flat');
+          return $options.ChangeRadioValue('flat');
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_46])]), $data.showDivPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.percentageRadio]]), _hoisted_44])]), $data.showDivPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "3",
         "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
-          return $data.SurchargePercentage = $event;
+          return $data.DiscountPercentage = $event;
         }),
         placeholder: "Enter Percentage Applied Per Point",
         onKeypress: _cache[8] || (_cache[8] = function ($event) {
@@ -62072,12 +62217,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargePercentage]]), _hoisted_50])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountPercentage]]), _hoisted_48])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDivFlat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "5",
         "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
-          return $data.SurchargeFlat = $event;
+          return $data.DiscountFlat = $event;
         }),
         placeholder: "Enter Flat Amount Applied Per Point",
         onKeypress: _cache[10] || (_cache[10] = function ($event) {
@@ -62085,36 +62230,62 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.SurchargeFlat]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DiscountFlat]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("points"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
-        id: "percentagePoints",
+        id: "distancePoints",
         name: "percentageAmountPoints",
         "class": "custom-control-input",
         checked: "",
-        value: "percentage",
+        value: "distancePoints",
         "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
-          return _ctx.pointsRadio = $event;
+          return $data.pointsRadio = $event;
         }),
         onClick: _cache[12] || (_cache[12] = function ($event) {
-          return $options.surchargeApply('percentage');
+          return $options.ChangeRadioValue('distancePoints');
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, _ctx.pointsRadio]]), _hoisted_57]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.pointsRadio]]), _hoisted_56]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
         id: "flatPoints",
         name: "flatAmountPoints",
         "class": "custom-control-input",
-        value: "flat",
+        value: "flatPoints",
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
-          return _ctx.pointsRadio = $event;
+          return $data.pointsRadio = $event;
         }),
         onClick: _cache[14] || (_cache[14] = function ($event) {
-          return $options.surchargeApply('flat');
+          return $options.ChangeRadioValue('flatPoints');
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, _ctx.pointsRadio]]), _hoisted_59])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"form-group col-md-5\" v-if=\"showDivPercentage\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <label for=\"SurchargePercentage\">Percentage <span class=\"text-danger ml-1\">*</span></label>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <div class=\"input-group\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <input type=\"text\" class=\"form-control\" maxlength=\"3\" v-model=\"SurchargePercentage\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                       placeholder=\"Enter Percentage\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                       @keypress=\"isNumber($event); numberRange($event)\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                <div class=\"input-group-append\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                    <span class=\"input-group-text\">%</span>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        <div class=\"form-group col-md-5\" v-if=\"showDivFlat\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <label for=\"SurchargePercentage\">Flat Amount <span class=\"text-danger ml-1\">*</span> <span"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                class=\"text-muted\">max: 10K</span> </label>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                            <input type=\"text\" class=\"form-control\" maxlength=\"5\" v-model=\"SurchargeFlat\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                   placeholder=\"Enter Flat Amount\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                   @keypress=\"isNumber($event)\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                        </div>")])])];
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.pointsRadio]]), _hoisted_58])]), $data.showDivDistancePoints ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control",
+        maxlength: "3",
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+          return $data.DistancePoints = $event;
+        }),
+        placeholder: "How Many Points Set after 1 KiloMeter?",
+        onKeypress: _cache[16] || (_cache[16] = function ($event) {
+          return $options.isNumber($event);
+        })
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.DistancePoints]])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showDivFlatPoints ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control",
+        maxlength: "5",
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+          return $data.FlatPoints = $event;
+        }),
+        placeholder: "How many Points Set of Amount?",
+        onKeypress: _cache[18] || (_cache[18] = function ($event) {
+          return $options.isNumber($event);
+        })
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.FlatPoints]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])];
     }),
     _: 1
     /* STABLE */
@@ -62122,7 +62293,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, 8
   /* PROPS */
   , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal End "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
-    heading: "Edit Surcharge",
+    heading: "Edit Card Category",
     errors: this.validationErrors,
     success: $data.success,
     editForm: $data.editFormID
@@ -62131,103 +62302,144 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[26] || (_cache[26] = function () {
-          return $options.updateSurcharge && $options.updateSurcharge.apply($options, arguments);
+        onClick: _cache[37] || (_cache[37] = function ($event) {
+          return $options.updateCard();
         }),
         disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Surcharge'), 9
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Card Category'), 9
       /* TEXT, PROPS */
-      , _hoisted_84)];
+      , _hoisted_97)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
           return $data.dataEdit.name = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    Discount"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
-        id: "editPercentage",
-        name: "editPercentageAmount",
+        id: "Editpercentage",
+        name: "percentageAmount",
         "class": "custom-control-input",
-        checked: $data.dataEdit.type == 'percentage',
+        checked: $data.dataEdit.discount_type == 'percentage',
         value: "percentage",
-        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
-          return $data.dataEdit.percentageRadio = $event;
+        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+          return $data.dataEdit.discount_type = $event;
         }),
-        onClick: _cache[18] || (_cache[18] = function ($event) {
-          return $options.surchargeApply('editPercentage');
+        onClick: _cache[22] || (_cache[22] = function ($event) {
+          return $options.ChangeRadioValue('Editpercentage');
         })
       }, null, 8
       /* PROPS */
-      , _hoisted_66), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_67]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , _hoisted_70), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.discount_type]]), _hoisted_71]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "radio",
-        id: "editFlat",
-        name: "editFlatAmount",
+        id: "Editflat",
+        name: "flatAmount",
         "class": "custom-control-input",
-        checked: $data.dataEdit.type == 'flat',
         value: "flat",
-        "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
-          return $data.dataEdit.percentageRadio = $event;
+        checked: $data.dataEdit.discount_type == 'flat',
+        "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+          return $data.dataEdit.discount_type = $event;
         }),
-        onClick: _cache[20] || (_cache[20] = function ($event) {
-          return $options.surchargeApply('editFlat');
+        onClick: _cache[24] || (_cache[24] = function ($event) {
+          return $options.ChangeRadioValue('Editflat');
         })
       }, null, 8
       /* PROPS */
-      , _hoisted_69), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.percentageRadio]]), _hoisted_70])]), $data.dataEdit.type == 'percentage' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_71, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , _hoisted_73), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.discount_type]]), _hoisted_74])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_75, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_76, [_hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "3",
-        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
-          return $data.dataEdit.percentage = $event;
+        "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
+          return $data.dataEdit.percentage_discount = $event;
         }),
-        placeholder: "Enter Percentage",
-        onKeypress: _cache[22] || (_cache[22] = function ($event) {
+        placeholder: "Enter Percentage Applied Per Point",
+        onKeypress: _cache[26] || (_cache[26] = function ($event) {
           $options.isNumber($event);
           $options.numberRange($event);
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.percentage]]), _hoisted_74])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.dataEdit.type == 'flat' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_75, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.percentage_discount]]), _hoisted_79])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [_hoisted_81, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         maxlength: "5",
-        "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
-          return $data.dataEdit.flat = $event;
+        "onUpdate:modelValue": _cache[27] || (_cache[27] = function ($event) {
+          return $data.dataEdit.flat_discount = $event;
         }),
-        placeholder: "Enter Flat Amount",
-        onKeypress: _cache[24] || (_cache[24] = function ($event) {
+        placeholder: "Enter Flat Amount Applied Per Point",
+        onKeypress: _cache[28] || (_cache[28] = function ($event) {
           return $options.isNumber($event);
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.flat]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_77, [_hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_79, [_hoisted_80, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "checkbox",
-        "class": "colorinput-input",
-        id: "editCheckBox",
-        onChange: _cache[25] || (_cache[25] = function ($event) {
-          return $options.editCheckBox($event);
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.flat_discount]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [_hoisted_83, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("points"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "radio",
+        id: "EditdistancePoints",
+        name: "percentageAmountPoints",
+        "class": "custom-control-input",
+        checked: $data.dataEdit.point_type == 'distancePoints',
+        value: "distancePoints",
+        "onUpdate:modelValue": _cache[29] || (_cache[29] = function ($event) {
+          return $data.dataEdit.point_type = $event;
         }),
-        checked: $data.dataEdit.is_active == 1
-      }, null, 40
-      /* PROPS, HYDRATE_EVENTS */
-      , _hoisted_82), _hoisted_83])])])])])];
+        onClick: _cache[30] || (_cache[30] = function ($event) {
+          return $options.ChangeRadioValue('distancePoints');
+        })
+      }, null, 8
+      /* PROPS */
+      , _hoisted_87), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.point_type]]), _hoisted_88]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "radio",
+        id: "EditflatPoints",
+        name: "flatAmountPoints",
+        "class": "custom-control-input",
+        value: "flatPoints",
+        checked: $data.dataEdit.point_type == 'flatPoints',
+        "onUpdate:modelValue": _cache[31] || (_cache[31] = function ($event) {
+          return $data.dataEdit.point_type = $event;
+        }),
+        onClick: _cache[32] || (_cache[32] = function ($event) {
+          return $options.ChangeRadioValue('flatPoints');
+        })
+      }, null, 8
+      /* PROPS */
+      , _hoisted_90), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.point_type]]), _hoisted_91])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [_hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control",
+        maxlength: "3",
+        "onUpdate:modelValue": _cache[33] || (_cache[33] = function ($event) {
+          return $data.dataEdit.point_distance = $event;
+        }),
+        placeholder: "How Many Points Set after 1 KiloMeter?",
+        onKeypress: _cache[34] || (_cache[34] = function ($event) {
+          return $options.isNumber($event);
+        })
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.point_distance]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control",
+        maxlength: "5",
+        "onUpdate:modelValue": _cache[35] || (_cache[35] = function ($event) {
+          return $data.dataEdit.point_flat = $event;
+        }),
+        placeholder: "How many Points Set of Amount?",
+        onKeypress: _cache[36] || (_cache[36] = function ($event) {
+          return $options.isNumber($event);
+        })
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.point_flat]])])])])])];
     }),
     _: 1
     /* STABLE */
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
-    deleteForm: $data.deleteFormID,
-    confirmationMessage: "Are You Sure You want To Delete This Surcharge ???"
-  }, null, 8
-  /* PROPS */
-  , ["deleteForm"])])]);
+  , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit MOdel End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            <Delete :deleteForm=\"deleteFormID\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            />")])]);
 }
 
 /***/ }),
@@ -79517,7 +79729,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c] {\r\n    width: 90px !important;\r\n    display: inline-block;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.dataTables_length select[data-v-91dbd61c] {\n    width: 90px !important;\n    display: inline-block;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

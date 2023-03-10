@@ -74,5 +74,7 @@ require_once('web/accounts.php');
 require_once('web/profile/profile.php');
 // Expenses Routes
 require_once('web/expenses.php');
+// Loyalty Card Routes
+require_once('web/card/loyaltyCard.php');
 
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');
