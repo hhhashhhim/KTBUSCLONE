@@ -92,7 +92,7 @@
                                                                 class="far fa-edit"></i>
                                                             </button>
 
-                                                            <button title="Delete Schedule"
+                                                            <button style="display:none;" title="Delete Schedule"
                                                                     v-if="checkForSubmenuButtons('delete-schedule')"
                                                                     class="btn btn-danger btn-sm"><i
                                                                 class="far fa-trash-alt"></i>

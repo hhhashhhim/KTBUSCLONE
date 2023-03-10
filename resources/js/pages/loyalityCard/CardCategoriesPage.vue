@@ -76,7 +76,7 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button v-if="checkForSubmenuButtons('delete-surcharge')"
+                                                            <button style="display:none;" v-if="checkForSubmenuButtons('delete-surcharge')"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

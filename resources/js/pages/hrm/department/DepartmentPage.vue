@@ -69,7 +69,7 @@
                                                                     title="Edit Department">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Department"                                                                    class="btn btn-danger">
+                                                            <button style="display:none;" title="Delete Department"                                                                    class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
 <!--                                                            :data-target="'#' + deleteFormID"-->

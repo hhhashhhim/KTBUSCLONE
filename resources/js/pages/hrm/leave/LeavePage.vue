@@ -104,7 +104,7 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Leave"
+                                                            <button style="display:none;" title="Delete Leave"
                                                                     class="btn btn-danger text-light">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

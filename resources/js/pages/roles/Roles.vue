@@ -43,7 +43,7 @@
                                                                     title="Edit Role">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <a v-if="checkForSubmenuButtons('delete-role')" title="Delete Role"  class="btn btn-danger text-light">
+                                                            <a style="display:none;" v-if="checkForSubmenuButtons('delete-role')" title="Delete Role"  class="btn btn-danger text-light">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </a>
 <!--                                                            href="#delete-modal" data-toggle="modal"-->

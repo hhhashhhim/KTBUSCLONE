@@ -67,7 +67,7 @@
                                                                     class="btn btn-primary mx-1" title="Edit Part">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button v-if="checkForSubmenuButtons('delete-part')"
+                                                            <button style="display:none;" v-if="checkForSubmenuButtons('delete-part')"
                                                                     class="btn btn-danger mx-1" title="Delete Part">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

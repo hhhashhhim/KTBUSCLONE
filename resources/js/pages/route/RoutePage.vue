@@ -75,7 +75,7 @@
                                                                     @click="edit(route)"
                                                             ><i class="far fa-edit"></i>
                                                             </button>
-                                                            <button title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
+                                                            <button style="display:none;" title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>

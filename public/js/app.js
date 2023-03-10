@@ -53674,6 +53674,9 @@ var _hoisted_32 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_33 = [_hoisted_32];
 var _hoisted_34 = {
   key: 2,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger"
 };
 
@@ -54927,6 +54930,9 @@ var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_31 = [_hoisted_30];
 var _hoisted_32 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger"
 };
 
@@ -55466,6 +55472,9 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_24 = [_hoisted_23];
 var _hoisted_25 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   title: "Delete City",
   "class": "text-light btn btn-danger"
 };
@@ -56676,6 +56685,9 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_35 = [_hoisted_34];
 var _hoisted_36 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger text-light"
 };
 
@@ -57299,6 +57311,9 @@ var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_20 = [_hoisted_19];
 
 var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  style: {
+    "display": "none"
+  },
   title: "Delete Category",
   "class": "text-light btn btn-danger"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -57783,6 +57798,9 @@ var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_31 = [_hoisted_30];
 var _hoisted_32 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   title: "Delete Fare Class",
   "class": "btn btn-danger"
 };
@@ -58642,6 +58660,9 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_24 = [_hoisted_23];
 
 var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  style: {
+    "display": "none"
+  },
   title: "Delete Department",
   "class": "btn btn-danger"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -59104,6 +59125,9 @@ var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_51 = [_hoisted_50];
 
 var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  style: {
+    "display": "none"
+  },
   title: "Delete Designation",
   "class": "btn btn-danger"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -59526,6 +59550,9 @@ var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_30 = [_hoisted_29];
 
 var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  style: {
+    "display": "none"
+  },
   title: "Delete Employee",
   "class": "btn btn-danger"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -61198,6 +61225,9 @@ var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_56 = [_hoisted_55];
 
 var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  style: {
+    "display": "none"
+  },
   title: "Delete Leave",
   "class": "btn btn-danger text-light"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -61665,6 +61695,9 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_35 = [_hoisted_34];
 var _hoisted_36 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger"
 };
 
@@ -62902,6 +62935,9 @@ var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_28 = [_hoisted_27];
 var _hoisted_29 = {
   key: 2,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger",
   title: "Delete Link Part"
 };
@@ -63521,6 +63557,9 @@ var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_28 = [_hoisted_27];
 var _hoisted_29 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger mx-1",
   title: "Delete Part"
 };
@@ -66977,6 +67016,9 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_24 = [_hoisted_23];
 var _hoisted_25 = {
   key: 2,
+  style: {
+    "display": "none"
+  },
   title: "Delete Role",
   "class": "btn btn-danger text-light"
 };
@@ -67291,6 +67333,9 @@ var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_30 = [_hoisted_29];
 var _hoisted_31 = {
   key: 2,
+  style: {
+    "display": "none"
+  },
   title: "Delete Route",
   "class": "btn btn-danger"
 };
@@ -68718,6 +68763,9 @@ var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_35 = [_hoisted_34];
 var _hoisted_36 = {
   key: 2,
+  style: {
+    "display": "none"
+  },
   title: "Delete Schedule",
   "class": "btn btn-danger btn-sm"
 };
@@ -70293,6 +70341,9 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_35 = [_hoisted_34];
 var _hoisted_36 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   "class": "btn btn-danger"
 };
 
@@ -71441,6 +71492,9 @@ var _hoisted_135 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 var _hoisted_136 = [_hoisted_135];
 var _hoisted_137 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   title: "Delete Terminal",
   "class": "btn btn-danger mx-2"
 };
@@ -72808,6 +72862,9 @@ var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_30 = [_hoisted_29];
 var _hoisted_31 = {
   key: 1,
+  style: {
+    "display": "none"
+  },
   title: "Delete User",
   "class": "btn btn-danger text-light"
 };
