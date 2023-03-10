@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCardCategoriesTable extends Migration
+class CreateCardAssignsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,13 @@ class CreateCardCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('card_categories', function (Blueprint $table) {
+        Schema::create('card_assigns', function (Blueprint $table) {
             $table->id();
+            $table->string('cnic')->nullable();
+            $table->string('phone')->nullable();
             $table->string('name')->nullable();
-            $table->string('discount_type')->comment("1/flat,2/percentage")->nullable();
-            $table->decimal('flat_discount',12,2)->comment("per point")->nullable();
-            $table->decimal('percentage_discount',12,2)->comment("per point")->nullable();
-            $table->string('point_type')->comment("1/on amount,2/on distance")->nullable();
-            $table->decimal('point_flat',12,2)->comment("rupee for 1 point")->nullable();
-            $table->decimal('point_distance',12,2)->comment("km for 1 point")->nullable();
+            $table->integer('card_category_id')->nullable();
+            $table->integer('customer_id')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();
@@ -38,6 +36,6 @@ class CreateCardCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('card_categories');
+        Schema::dropIfExists('card_assigns');
     }
 }

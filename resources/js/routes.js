@@ -41,7 +41,8 @@ import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue"
 import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
 import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
-import loyalityCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
+import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
+import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 
 
 const url = '/kt/'
@@ -260,9 +261,14 @@ const routes = [
         name:"accounts-categories"
     },
     {
-        path: url + "loyality/card/categories",
-        component : loyalityCardPage,
-        name:"loyality-card-categories"
+        path: url + "loyalty/card/categories",
+        component : loyaltyCardPage,
+        name:"loyalty-card-categories"
+    },
+    {
+        path: url + "loyalty/card/assign",
+        component : loyaltyCardAssignPage,
+        name:"loyalty-card-assign"
     },
 ]
 const router = createRouter({

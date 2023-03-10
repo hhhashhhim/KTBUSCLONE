@@ -523,20 +523,43 @@ export default {
                                 {name: "edit-close-booking", allow: true},
                             ]
                         },
-                        {name: "all", allow: true},
-                        {name: "loyaltyCard", allow: true,
-                            buttons:[
+                        {name: "all", allow: true}
+                    ],
+                },
+                //Loyalty Card Panel
+                {
+                    name: "loyaltyCard",
+                    allow: true,
+                    childs: [
+                        {
+                            name: "loyaltyCardCategory",
+                            allow: true,
+                            buttons: [
                                 {
                                     name: "add-card-category",
-                                    allow: true
+                                    allow: true,
                                 },
                                 {
                                     name: "edit-card-category",
-                                    allow: true
+                                    allow: true,
+                                }
+                            ]
+                        },
+                        {
+                            name: "loyaltyCardAssign",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-assign-card",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-assign-card",
+                                    allow: true,
                                 }
                             ]
                         }
-                    ],
+                    ]
                 },
 
                 // Expenses Panel

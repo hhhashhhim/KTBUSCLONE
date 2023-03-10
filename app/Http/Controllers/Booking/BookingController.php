@@ -12,6 +12,7 @@ use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
 use App\Models\City;
+use App\Models\LoyaltyCard\CardAssign;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
@@ -382,6 +383,13 @@ class BookingController extends Controller
         }
     }
 
+    public function getPoints(Request $request)
+    {
+        if ($request->status == 'addFormCNIC' && $request['cnicNumber']) {
+             return CardAssign::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+        }
+    }
+
     public function getTerminals()
     {
         return [
@@ -429,10 +437,12 @@ class BookingController extends Controller
             ];
         }
     }
+
     public function getFareClass()
     {
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
+
     public function dropCheck(Request $request)
     {
         $uniqueDate = ScheduleDetail::where([
@@ -1012,8 +1022,8 @@ class BookingController extends Controller
 //     DB::transaction(function() use ($request){
 //      //your query
 //      });
-// } 
+// }
 // catch (\Exception $e){
-//     return 'Opps! Some thing went wrong';  
+//     return 'Opps! Some thing went wrong';
 //     // return "error------->".$e->getMessage();
 // }

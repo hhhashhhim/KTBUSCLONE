@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Card;
 
 use App\Http\Controllers\Controller;
-use App\Models\LoyalityCard\CardCategory;
+use App\Models\LoyaltyCard\CardCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;

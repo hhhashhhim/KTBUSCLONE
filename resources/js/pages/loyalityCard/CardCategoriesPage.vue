@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
-                            <h4>Loyality Card Categories</h4>
+                            <h4>Loyalty Card Categories</h4>
                             <div class="card-header-action">
                                 <a v-if="checkForSubmenuButtons('add-card-category')"
                                     href="#"
@@ -311,7 +311,7 @@ import {mapGetters} from "vuex";
 import showRouteDetails from "../route/popup/showRouteDetail";
 
 export default {
-    name: "SurchargePage",
+    name: "loyaltyCardPage",
     components: {
         Add,
         Edit,

@@ -75,10 +75,9 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
-                                                    <label>CNIC <span class="text-danger"
-                                                                      v-if="this.addForm.type != 'advance booking'">*</span></label>
+                                                    <label>CNIC <span class="text-danger"   v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                     <vue-mask
-                                                        v-on:blur="getCustomer('addFormCNIC')"
+                                                        v-on:blur="getCustomer('addFormCNIC'), getPoints('addFormCNIC')"
                                                         class="form-control"
                                                         v-model="addForm.customerCNIC"
                                                         mask="00000-0000000-0"
@@ -86,6 +85,7 @@
                                                         :options="options"
                                                     >
                                                     </vue-mask>
+                                                    <label v-if="this.haveLabel">{{ this.label }}</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -1141,6 +1141,8 @@ export default {
             labelDrop: '',
             hideDivButtonsDrop: true,
             ticketsIds: "",
+            label: "",
+            haveLabel: false,
             ticketsId: "",
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
@@ -1574,7 +1576,19 @@ export default {
         phoneFormat: function (string) {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
-
+        async getPoints(value) {
+            const resCnicPoints = await this.callApi("post", "booking/getPoints", {
+                cnicNumber: this.addForm.customerCNIC,
+                status: value,
+            });
+            if(resCnicPoints.data != ""){
+                this.label = "This Customer Have a loyalty Card";
+                this.haveLabel = true;
+            }else{
+                this.label = "";
+                this.haveLabel = false;
+            }
+        },
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {

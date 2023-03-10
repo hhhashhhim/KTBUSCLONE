@@ -190,6 +190,27 @@
                         </li>
                     </ul>
                 </li>
+                <!-- loyalityCard Panel -->
+                <li class="dropdown" v-if="checkPermission('loyaltyCard')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Loyalty Card
+                        </span>
+                    </a>
+                    <!--                    Permission just about terminals-->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown" v-if="checkForSubmenu('loyaltyCardCategory')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'loyalty-card-categories' }">
+                                <i class="fas fa-bookmark"></i> Card Category
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('loyaltyCardAssign')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'loyalty-card-assign' }">
+                                <i class="fas fa-bookmark"></i> Assign Card
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
                 <!-- Expenses panel -->
                 <li class="dropdown" v-if="checkPermission('expenses')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
