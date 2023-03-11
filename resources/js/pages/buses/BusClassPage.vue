@@ -1027,19 +1027,33 @@ export default {
         ,
 
         async addBusClass() {
-            console.log(this.data.seatMap);
+            // console.log(this.data.seatMap);
             this.validationErrors = [];
 
             // validation for assign all class
             let b = 0;
+            let c = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
+                    if(seat[i].reserved == true)
+                    {
+                        c = 1;
+                    }
                     if ((seat[i].class == undefined || seat[i].class == "0" || seat[i].class == 0) && seat[i].reserved == true) {
                         b = 1;
                     }
                 }
             });
-
+            // console.log(this.data);
+            
+            if (c == 0) {
+                return swal({
+                    title: "Required !",
+                    text: "Please Select Seats",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
             if (b == 1) {
                 return swal({
                     title: "Required !",
@@ -1048,7 +1062,7 @@ export default {
                     timer: 2000,
                 });
             }
-
+            
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
                 return swal({

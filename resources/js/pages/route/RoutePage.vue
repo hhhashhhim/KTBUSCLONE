@@ -346,6 +346,12 @@ export default {
             const res = await this.callApi("post", "routes/store", data);
             if (res.status === 200) {
                 this.loading = false;
+                swal({
+                    title: "Success",
+                    text: "Route Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
                 $('#route_table').DataTable().destroy();
                 this.routeStartName = "";
                 this.routeEndName = "";
@@ -353,12 +359,6 @@ export default {
                 this.addCities = 0;
                 this.cities = 0;
                 this.routeDetails = [];
-                swal({
-                    title: "Success",
-                    text: "Route Created Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
                 await this.fetchCities();
             } else {
                 this.loading = false;

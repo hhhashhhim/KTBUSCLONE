@@ -241,7 +241,7 @@
                                 class="btn btn-success step1 float-right"
                                 @click=" validateStep('step1');"
                             >
-                                Next<i class="fas fa-arrow-right pr-1"></i>
+                                <span class="mr-2">Next</span><i class="fas fa-arrow-right pr-1"></i>
                             </button>
                         </div>
                     </div>
@@ -343,7 +343,7 @@
                                 class="btn btn-success step2 float-right"
                                 @click=" validateStep('step2');"
                             >
-                                Next<i class="fas fa-arrow-right mr-1"></i>
+                                <span class="mr-2">Next</span><i class="fas fa-arrow-right pr-1"></i>
                             </button>
                         </div>
                     </div>
@@ -401,7 +401,7 @@
                             <button
                                 class="btn btn-success step2 float-right"
                                 @click=" validateStep('step3'); getEntireForm(); ">
-                                Next<i class="fas fa-arrow-right mr-1 border-dark"></i>
+                                <span class="mr-2">Next</span><i class="fas fa-arrow-right pr-1"></i>
                             </button>
                         </div>
                     </div>
@@ -591,7 +591,7 @@
                 <!--                            <button-->
                 <!--                                class="btn btn-success step1 float-right"-->
                 <!--                                @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">-->
-                <!--                                Next<i class="fas fa-arrow-right pr-1"></i>-->
+                <!--                                <span class="mr-2">Next</span><i class="fas fa-arrow-right pr-1"></i>-->
                 <!--                            </button>-->
                 <!--                        </div>-->
                 <!--                    </div>-->
