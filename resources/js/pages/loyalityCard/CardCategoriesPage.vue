@@ -106,12 +106,15 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-12">
                         <label for="CardName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="CardName"/>
                     </div>
+                </div>
+                <h5>Define per point discount</h5>
+                <div class="row">
                     <!--                    Discount-->
-                    <div class="form-group col-md-3 mt-4 pt-2">
+                    <div class="form-group col-md-4 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
                                    checked="" value="percentage" v-model="percentageRadio"
@@ -124,9 +127,10 @@
                             <label class="custom-control-label" for="flat">Flat Amount</label>
                         </div>
                     </div>
+                
 
 
-                    <div class="form-group col-md-5" v-if="showDivPercentage">
+                    <div class="form-group col-md-8" v-if="showDivPercentage">
                         <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="DiscountPercentage"
@@ -137,53 +141,50 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-5" v-if="showDivFlat">
+                    <div class="form-group col-md-8" v-if="showDivFlat">
                         <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span>
                             <span
                                 class="text-muted">max: 10K</span> </label>
                         <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat"
                                placeholder="Enter Flat Amount Applied Per Point"
                                @keypress="isNumber($event)">
-                    </div>
-
-                    <div class="col-md-12">
-                        <h5>Addition of Points Via Type</h5>
+                    </div>    
+                </div>
                         <!--points-->
-                        <div class="row">
-                            <div class="form-group col-md-3 mt-4 pt-2">
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="distancePoints" name="percentageAmountPoints"
-                                           class="custom-control-input"
-                                           checked="" value="distancePoints" v-model="pointsRadio"
-                                           @click="ChangeRadioValue('distancePoints')">
-                                    <label class="custom-control-label" for="distancePoints">Distance</label>
-                                </div>
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" id="flatPoints" name="flatAmountPoints"
-                                           class="custom-control-input"
-                                           value="flatPoints"
-                                           v-model="pointsRadio" @click="ChangeRadioValue('flatPoints')">
-                                    <label class="custom-control-label" for="flatPoints">Flat</label>
-                                </div>
-                            </div>
-                            <div class="form-group col-md-9" v-if="showDivDistancePoints">
-                                <label for="SurchargePercentage">Distance <span
-                                    class="text-danger ml-1">*</span></label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" maxlength="3" v-model="DistancePoints"
-                                           placeholder="How Many Points Set after 1 KiloMeter?"
-                                           @keypress="isNumber($event)">
-                                </div>
-                            </div>
-                            <div class="form-group col-md-9" v-if="showDivFlatPoints">
-                                <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>
-                                    <span
-                                        class="text-muted">max: 10K</span> </label>
-                                <input type="text" class="form-control" maxlength="5" v-model="FlatPoints"
-                                       placeholder="How many Points Set of Amount?"
-                                       @keypress="isNumber($event)">
-                            </div>
+                <h5>Define value to add one point</h5>
+                <div class="row">
+                    <div class="form-group col-md-4 mt-4 pt-2">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="distancePoints" name="percentageAmountPoints"
+                                    class="custom-control-input"
+                                    checked="" value="distancePoints" v-model="pointsRadio"
+                                    @click="ChangeRadioValue('distancePoints')">
+                            <label class="custom-control-label" for="distancePoints">Distance</label>
                         </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="flatPoints" name="flatAmountPoints"
+                                    class="custom-control-input"
+                                    value="flatPoints"
+                                    v-model="pointsRadio" @click="ChangeRadioValue('flatPoints')">
+                            <label class="custom-control-label" for="flatPoints">Flat Amount</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-8" v-if="showDivDistancePoints">
+                        <label for="SurchargePercentage">Distance <span
+                            class="text-danger ml-1">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" maxlength="3" v-model="DistancePoints"
+                                    placeholder="Enter km after that distance will increase 1 point"
+                                    @keypress="isNumber($event)">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-8" v-if="showDivFlatPoints">
+                        <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>
+                            <span
+                                class="text-muted">max: 10K</span> </label>
+                        <input type="text" class="form-control" maxlength="5" v-model="FlatPoints"
+                                placeholder="Enter amount after that amount will increase 1 point"
+                                @keypress="isNumber($event)">
                     </div>
                 </div>
                 <template v-slot:button>
