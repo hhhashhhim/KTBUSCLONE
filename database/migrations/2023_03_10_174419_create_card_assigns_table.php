@@ -20,6 +20,8 @@ class CreateCardAssignsTable extends Migration
             $table->string('name')->nullable();
             $table->integer('card_category_id')->nullable();
             $table->integer('customer_id')->nullable();
+            $table->integer('starting_points')->nullable();
+            $table->date('expiry_date')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->integer('updated_by')->nullable();

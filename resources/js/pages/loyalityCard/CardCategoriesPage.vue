@@ -117,7 +117,7 @@
                     <div class="form-group col-md-4 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" id="percentage" name="percentageAmount" class="custom-control-input"
-                                   checked="" value="percentage" v-model="percentageRadio"
+                                   value="percentage" v-model="percentageRadio"
                                    @click="ChangeRadioValue('percentage')">
                             <label class="custom-control-label" for="percentage">Percentage</label>
                         </div>
@@ -127,7 +127,7 @@
                             <label class="custom-control-label" for="flat">Flat Amount</label>
                         </div>
                     </div>
-                
+
 
 
                     <div class="form-group col-md-8" v-if="showDivPercentage">
@@ -148,7 +148,7 @@
                         <input type="text" class="form-control" maxlength="5" v-model="DiscountFlat"
                                placeholder="Enter Flat Amount Applied Per Point"
                                @keypress="isNumber($event)">
-                    </div>    
+                    </div>
                 </div>
                         <!--points-->
                 <h5>Define value to add one point</h5>

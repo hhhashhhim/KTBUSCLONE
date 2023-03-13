@@ -13,6 +13,7 @@ use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
 use App\Models\City;
 use App\Models\LoyaltyCard\CardAssign;
+use App\Models\LoyaltyCard\CardCategory;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
@@ -386,8 +387,22 @@ class BookingController extends Controller
     public function getPoints(Request $request)
     {
         if ($request->status == 'addFormCNIC' && $request['cnicNumber']) {
-             return CardAssign::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+            return CardAssign::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
         }
+    }
+
+    public function usagePoints(Request $request)
+    {
+        $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->select('card_category_id', 'starting_points')->first();
+        $data = CardCategory::find($category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
+        if ($data->discount_type == 'percentage') {
+            return $data->percentage_discount * $category->starting_points . ' % ';
+        }
+        if ($data->discount_type == 'flat') {
+            return $data->flat_discount * $category->starting_points;
+        }
+//        dd($request->all(), $category_id, $data->discount_type);
+
     }
 
     public function getTerminals()

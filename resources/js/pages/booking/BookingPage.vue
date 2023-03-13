@@ -75,7 +75,8 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
-                                                    <label>CNIC <span class="text-danger"   v-if="this.addForm.type != 'advance booking'">*</span></label>
+                                                    <label>CNIC <span class="text-danger"
+                                                                      v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                     <vue-mask
                                                         v-on:blur="getCustomer('addFormCNIC'), getPoints('addFormCNIC')"
                                                         class="form-control"
@@ -85,7 +86,7 @@
                                                         :options="options"
                                                     >
                                                     </vue-mask>
-                                                    <label v-if="this.haveLabel">{{ this.label }}</label>
+
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -97,6 +98,23 @@
                                                         id="fullName"
                                                         v-model="addForm.customerName"
                                                     />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" v-if="this.haveLabel">
+                                            <div class="col-md-6">
+                                                <label class="py-2 text-danger" v-if="this.haveLabel">{{
+                                                        this.label
+                                                    }}</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                           id="pointsCheckBox"
+                                                           @click="usePoints($event)" :value="this.pointsCardId"
+                                                           name="pointsUsage">
+                                                    <label class="custom-control-label"
+                                                           for="pointsCheckBox">Points Usage</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -1143,6 +1161,7 @@ export default {
             ticketsIds: "",
             label: "",
             haveLabel: false,
+            pointsCardId: "",
             ticketsId: "",
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
@@ -1581,14 +1600,33 @@ export default {
                 cnicNumber: this.addForm.customerCNIC,
                 status: value,
             });
-            if(resCnicPoints.data != ""){
-                this.label = "This Customer Have a loyalty Card";
+            if (resCnicPoints.data != "") {
+                this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                this.pointsCardId = resCnicPoints.data.id;
                 this.haveLabel = true;
-            }else{
+            } else {
                 this.label = "";
+                this.pointsCardId = "";
                 this.haveLabel = false;
             }
         },
+
+        async usePoints(e) {
+            if (e.target.checked) {
+                console.log(this.pointsCardId)
+                const resUsagePoints = await this.callApi("post", "booking/usagePoints", {
+                    id: this.pointsCardId,
+                    points: this.pointsCardId,
+                });
+                console.log(resUsagePoints.data);
+                //     this.points  = 0;
+            } else {
+                // this.addForm.gender = 1;
+                console.log(e);
+            }
+        },
+
+
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {

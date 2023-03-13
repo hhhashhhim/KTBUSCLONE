@@ -13,7 +13,11 @@ class CardAssignController extends Controller
 {
     public function index()
     {
-        return CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
+        $allRecords = CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
+        foreach ($allRecords as $single) {
+            $single->expiry_date = date('d/m/Y', strtotime($single->expiry_date));
+        }
+        return $allRecords;
     }
 
     public function cardCategories()
@@ -23,23 +27,27 @@ class CardAssignController extends Controller
 
     public function store(Request $request)
     {
+//       dd($request->all());
         $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
         if (!$customer) {
-            $customer = Customer::create([
-                'company_id' => Auth::user()->company_id,
-                'added_by' => Auth::user()->id,
-                'name' => $request->customerName,
-                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
-                'contact' => plainContactAndCnic($request->contact),
-            ]);
+            return response()->json(["errors" => ["Error" => ["To Assign The Loyalty Card, Customer Already Added To your Record "]]], 403);
+//            $customer = Customer::create([
+//                'company_id' => Auth::user()->company_id,
+//                'added_by' => Auth::user()->id,
+//                'name' => $request->customerName,
+//                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+//                'contact' => plainContactAndCnic($request->contact),
+//            ]);
         }
         return CardAssign::create([
-            'cnic' => plainContactAndCnic($request->customerCNIC),
-            'phone' => plainContactAndCnic($request->contact),
-            'name' => $request->customerName,
+            'cnic' => plainContactAndCnic($request->customerCNIC) ?? plainContactAndCnic($customer->cnic),
+            'phone' => plainContactAndCnic($request->contact) ?? plainContactAndCnic($customer->contact),
+            'name' => $request->customerName ?? $customer->name,
             'card_category_id' => $request->cardCategory,
             'customer_id' => $customer->id,
             'company_id' => Auth::user()->company_id,
+            'expiry_date' => $request->expiryDate,
+            'starting_points' => $request->startingPoints,
             'added_by' => Auth::user()->id,
         ]);
     }

@@ -46,7 +46,7 @@
                                             <div class="table-responsive">
                                                 <table class="table table-striped table-hover"
                                                        style="overflow-x: auto; white-space: nowrap;"
-                                                       id="cardAssign_table"
+                                                       id="cardAssignTable"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -55,6 +55,8 @@
                                                         <th>Customer Name</th>
                                                         <th>Customer Phone</th>
                                                         <th>Card Category Name</th>
+                                                        <th>Card Starting Points </th>
+                                                        <th>Card Expiry Date</th>
                                                         <th>Added By</th>
                                                         <!--                                                        <th v-if="checkForSubmenuButtons('edit-card-category')">Action-->
                                                         <!--                                                        </th>-->
@@ -65,9 +67,11 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ card.cnic }}</td>
                                                         <td>{{ card.name }}</td>
-                                                        <td>{{ card.phone}}</td>
-                                                        <td>{{ card.card_category.name}}</td>
-                                                        <td>{{ card.added_by.name}}</td>
+                                                        <td>{{ card.phone }}</td>
+                                                        <td>{{ card.card_category.name }}</td>
+                                                        <td>{{ card.starting_points }}</td>
+                                                        <td>{{ card.expiry_date }}</td>
+                                                        <td>{{ card.added_by.name }}</td>
                                                         <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')"-->
                                                         <!--                                                        <td v-if="checkForSubmenuButtons('edit-card-category')">-->
                                                         <!--                                                            <button v-if="checkForSubmenuButtons('edit-card-category')"-->
@@ -132,7 +136,7 @@
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-4">
                         <label for="CardName">Card Category<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="addForm.cardCategory">
                             <option value="0" selected disabled>Select Any Category</option>
@@ -140,6 +144,15 @@
                                 {{ single.name }}
                             </option>
                         </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="startPoint">Card Starting Points</label>
+                        <input type="text" id="startPoint" class="form-control" @keypress="isNumber($event)"
+                               v-model="addForm.startingPoints">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="expiryDate">Expiry Date <span class="text-danger ml-2">*</span></label>
+                        <input type="date" class="form-control" id="expiryDate" v-model="addForm.expiryDate">
                     </div>
                 </div>
                 <template v-slot:button>
@@ -295,6 +308,7 @@ export default {
             dataEdit: {},
             addForm: {
                 cardCategory: '0',
+                startingPoints: "0",
             },
         };
     },
@@ -312,7 +326,15 @@ export default {
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
-
+        isNumber: function (evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                evt.preventDefault();
+            } else {
+                return true;
+            }
+        },
         numberRange: function (evt) {
             const val = parseInt(evt.target.value + evt.key);
             if (!isNaN(val) && val > 100) {
@@ -343,7 +365,7 @@ export default {
 
 
             setTimeout(() => {
-                $("#cardAssign_table").DataTable();
+                $("#cardAssignTable").DataTable();
             }, 300);
         },
         clearForm: function () {
@@ -351,6 +373,8 @@ export default {
             this.addForm.contact = "";
             this.addForm.customerName = "";
             this.addForm.customerCNIC = "";
+            this.addForm.startingPoints = "0";
+            this.addForm.expiryDate = "";
         },
         isAlphabet: function (evet) {
             if (!/[a-zA-Z\s]/.test(event.key)) {
@@ -421,6 +445,14 @@ export default {
                     timer: 2000
                 });
             }
+            if (this.addForm.expiryDate == "" || typeof  this.addForm.expiryDate == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "PLease Add Expiry Date",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.loading = true;
             const resCardAssign = await this.callApi("post", "loyaltyCardAssign/store", this.addForm);
             if (resCardAssign.status == 201) {
@@ -430,7 +462,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                $("#cardAssign_table").DataTable().destroy();
+                $("#cardAssignTable").DataTable().destroy();
                 this.loading = false;
                 this.fetchCardCategories();
             } else {
@@ -486,7 +518,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                $("#cardAssign_table").DataTable().destroy();
+                $("#cardAssignTable").DataTable().destroy();
                 this.loading = false;
                 await this.fetchCardCategories();
             } else {
@@ -514,7 +546,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.cardsAssign.splice(obj.index, 1)
-                $("#cardAssign_table").DataTable().destroy();
+                $("#cardAssignTable").DataTable().destroy();
                 this.fetchCardCategories();
             }
         }
