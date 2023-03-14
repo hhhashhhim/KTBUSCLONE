@@ -107,7 +107,7 @@
                                                         this.label
                                                     }}</label>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-6" v-if="this.hideCheckBox">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" class="custom-control-input"
                                                            id="pointsCheckBox"
@@ -116,6 +116,7 @@
                                                     <label class="custom-control-label"
                                                            for="pointsCheckBox">Points Usage</label>
                                                 </div>
+                                                <label class="text-danger">{{ this.pointsUsage }}</label>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -1161,8 +1162,11 @@ export default {
             ticketsIds: "",
             label: "",
             haveLabel: false,
+            hideCheckBox: false,
             pointsCardId: "",
             ticketsId: "",
+            pointsUsage: "",
+            checkedUsagePoints: false,
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -1600,29 +1604,36 @@ export default {
                 cnicNumber: this.addForm.customerCNIC,
                 status: value,
             });
-            if (resCnicPoints.data != "") {
+            if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
                 this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
+
                 this.pointsCardId = resCnicPoints.data.id;
                 this.haveLabel = true;
             } else {
                 this.label = "";
                 this.pointsCardId = "";
+                this.hideCheckBox = false;
                 this.haveLabel = false;
             }
         },
 
         async usePoints(e) {
             if (e.target.checked) {
-                console.log(this.pointsCardId)
                 const resUsagePoints = await this.callApi("post", "booking/usagePoints", {
                     id: this.pointsCardId,
                     points: this.pointsCardId,
                 });
-                console.log(resUsagePoints.data);
-                //     this.points  = 0;
+                if (resUsagePoints.status == 200) {
+                    this.pointsUsage = "You Have " + resUsagePoints.data + " Discount";
+                    this.checkedUsagePoints = true;
+                } else {
+                    this.pointsUsage = "";
+                    this.checkedUsagePoints = false;
+                }
             } else {
-                // this.addForm.gender = 1;
-                console.log(e);
+                this.pointsUsage = "";
+                this.checkedUsagePoints = false;
             }
         },
 
@@ -2120,8 +2131,10 @@ export default {
                     timer: 2000
                 });
             }
-            const res = await this.callApi("post", "booking/store", this.addForm);
-            if (res.status == 200) {
+            this.addForm.pointsCardId = this.pointsCardId;
+            this.addForm.usagePoints = this.checkedUsagePoints;
+            const resTicket = await this.callApi("post", "booking/store", this.addForm);
+            if (resTicket.status == 200) {
                 iziToast.success({
                     title: 'Success!',
                     message: 'Booking Created Successfully',
@@ -2139,20 +2152,20 @@ export default {
                     customerCNIC: "",
                     selectedSeats: '',
                 };
-                this.ticketsIds = res.data.ids;
-                this.addForm.date = res.data.ticket[0].date;
-                this.addForm.terminalId = res.data.authTerminalId;
+                this.ticketsIds = resTicket.data.ids;
+                this.addForm.date = resTicket.data.ticket[0].date;
+                this.addForm.terminalId = resTicket.data.authTerminalId;
                 this.addForm.gender = 1;
                 this.addForm.type = 'booked';
-                this.addForm.schedule = res.data.ticket[0].schedule_id;
-                this.addForm.destinationCity = parseInt(res.data.ticket[0].destination_city_id);
-                this.addForm.departureCity = parseInt(res.data.ticket[0].departure_city_id);
+                this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
+                this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
+                this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
                 this.fetchScheduleData();
                 this.resetingArrays();
                 $("#booking_table").DataTable().destroy();
                 setTimeout(() => {
-                    if (res.data.ticket[0].type == "booked") {
+                    if (resTicket.data.ticket[0].type == "booked") {
                         this.$refs.refTicket.submit();
                     }
                 }, 700);
@@ -2163,11 +2176,11 @@ export default {
                 }, 300);
 
             } else {
-                if (res.status == 422) {
+                if (resTicket.status == 422) {
                     let errorContent = "";
                     let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resTicket.data.errors) {
+                        resTicket.data.errors[key].forEach((element) => {
                             errorContent += (
                                 (++count) + " - " +
                                 element +

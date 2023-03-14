@@ -315,7 +315,7 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchAssignedCard();
+        this.fetchAssignedCard();
         this.permissions = this.$store.state.permissions;
     },
     methods: {
@@ -362,7 +362,6 @@ export default {
             } else {
                 console.log(res);
             }
-
 
             setTimeout(() => {
                 $("#cardAssignTable").DataTable();
@@ -464,12 +463,12 @@ export default {
                 });
                 $("#cardAssignTable").DataTable().destroy();
                 this.loading = false;
-                this.fetchCardCategories();
+                this.fetchAssignedCard();
             } else {
-                if (res.status === 422) {
+                if (resCardAssign.status === 422) {
                     this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resCardAssign.data.errors) {
+                        resCardAssign.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }

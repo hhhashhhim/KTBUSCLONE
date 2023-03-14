@@ -69,13 +69,9 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        //            dd($request->all());
         if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
-        //        try {
-        //            DB::beginTransaction();
-
         // this is for get actual schedule date
         $detail = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
@@ -88,10 +84,25 @@ class BookingController extends Controller
         if (isset($request->flag) && $request->flag == 1) {
             $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
         } else {
+
             if (count($request->selectedSeats) == 0) {
                 return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
             }
-            //            dd($oldBooking, $request->all());
+            if ($request->usagePoints == true) {
+//                  Get Customer's Loyalty Card
+                $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
+                $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
+                $finalAmountDiscount = 0;
+                if ($card->discount_type == 'percentage') {
+                    $amountInPercent = (int)$card->percentage_discount * $cardAssign->starting_points;
+                    $finalAmountDiscount = (int)(($amountInPercent * $request->totalFare) / 100);
+                }
+                if ($card->discount_type == 'flat') {
+                    $amountInFlat = (int)$card->flat_discount * $cardAssign->starting_points;
+                    $finalAmountDiscount = (int)($amountInFlat - $request->totalFare);
+                }
+            }
+            dd($amountInPercent , $request->totalFare, $amountInPercent,$card->percentage_discount,  $cardAssign->starting_points);
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -152,8 +163,9 @@ class BookingController extends Controller
                     'remarks' => $request->remarks,
                     'gender' => $request->gender,
                     'type' => $request->type,
+                    'discount_type' => $request->usagePoints ? 'card' : null,
                     'added_by' => Auth::user()->id,
-                    'discount' => $request->discount ?? 0,
+                    'discount' => $request->discount ? $request->discount : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
                 ]);
                 if ($isPartial == 1) {
                     TicketIsPartial::create([
@@ -198,11 +210,6 @@ class BookingController extends Controller
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
             'authTerminalId' => Auth::user()->terminal_id,
         ];
-        //        } catch (\Exception $e) {
-        //            DB::rollBack();
-        //            return response()->json(["errors" => ["Error" => ["OOPS!! Something Went Wrong Please Try Again"]]], 422);
-        ////            return response()->json(["errors" => ["Error" => [$e->getMessage()]]], 422);
-        //        }
     }
 
     public function singleReschedule(Request $request)
@@ -394,15 +401,13 @@ class BookingController extends Controller
     public function usagePoints(Request $request)
     {
         $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->select('card_category_id', 'starting_points')->first();
-        $data = CardCategory::find($category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
+        $data = CardCategory::where('id',$category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
         if ($data->discount_type == 'percentage') {
-            return $data->percentage_discount * $category->starting_points . ' % ';
+            return $data->percentage_discount * $category->starting_points . ' %';
         }
         if ($data->discount_type == 'flat') {
             return $data->flat_discount * $category->starting_points;
         }
-//        dd($request->all(), $category_id, $data->discount_type);
-
     }
 
     public function getTerminals()
