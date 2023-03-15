@@ -110,6 +110,21 @@ class BookingController extends Controller
                     ]);
                 }
             }
+// loyalty card point addition
+            $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+            if ($checkCard) {
+                if ($checkCard->cardCategory->point_type == "flatPoints") {
+                    $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
+                } else {
+                    $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                    if ($distance) {
+                        $addPoint = $distance / $checkCard->cardCategory->point_distance;
+                    }else{
+                        return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
+                    }
+                }
+                $checkCard->increment("starting_points", $addPoint);
+            }
 
 
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
@@ -213,17 +228,6 @@ class BookingController extends Controller
                 }
                 $allTicket[] = $ticket->id;
             }
-        }
-        // loyalty card point addition
-        $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-        if ($checkCard) {
-            if ($checkCard->cardCategory->point_type == "flatPoints") {
-                $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
-            } else {
-                $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                $addPoint = $distance / $checkCard->cardCategory->point_distance;
-            }
-            $checkCard->increment("starting_points", $addPoint);
         }
 
 
