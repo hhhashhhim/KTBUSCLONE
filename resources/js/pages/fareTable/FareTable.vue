@@ -69,7 +69,9 @@
                                                     </tr>
                                                     <tr v-else>
                                                         <th></th>
-                                                        <th v-for="(city,i) in cities" :key="i"> {{ city.name }}</th>
+                                                        <th class="text-capitalize" v-for="(city,i) in cities" :key="i">
+                                                            {{ city.name }}
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -77,7 +79,10 @@
                                                         <template
                                                             v-for="(destinationCity,j) in departureCity.destinationCities"
                                                             :key="j">
-                                                            <th v-if="j==0"> {{ cities[i].name }}</th>
+                                                            <th class="text-capitalize" v-if="j==0"> {{
+                                                                    cities[i].name
+                                                                }}
+                                                            </th>
                                                             <td :class="destinationCity.id==departureCity.id?'bg-danger':'modal-cell'">
                                                                 <a
                                                                     href="#" :data-target="'#'+formID"
@@ -131,7 +136,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="distance_in_km">Distance In KM</label>
+                        <label for="distance_in_km">Distance In KM <span class="text-danger ml-1">*</span></label>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" @keypress="isNumber($event)" maxlength="4"
                                    v-model="data.distance_in_km">
@@ -237,20 +242,30 @@ export default {
         },
         async add() {
             this.validationErrors = [];
-            if (this.data.fare == '' || typeof this.data.fare == 'undefined')
+            if (this.data.fare == '' || typeof this.data.fare == 'undefined') {
                 return swal({
                     title: "Required!",
                     text: "Fare is Required!",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined')
+            }
+            if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined') {
                 return swal({
                     title: "Required!",
                     text: "Travel Time is Required!",
                     icon: "error",
                     timer: 2000
                 });
+            }
+            if (this.data.distance_in_km == '' || this.data.distance_in_km == null || typeof this.data.distance_in_km == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "Distance Field is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.loading = true;
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status == 200) {

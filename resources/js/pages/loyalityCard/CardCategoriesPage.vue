@@ -72,7 +72,6 @@
                                                         <td>{{ card.point_distance }}</td>
                                                         <td>{{ card.point_flat }}</td>
                                                         <td>{{ card.added_by.name }}</td>
-                                                        <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')"-->
                                                         <td v-if="checkForSubmenuButtons('edit-card-category')">
                                                             <button v-if="checkForSubmenuButtons('edit-card-category')" :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(card)"

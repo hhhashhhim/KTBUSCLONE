@@ -7,12 +7,11 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Assign Loyalty Card</h4>
                             <div class="card-header-action">
-                                <!--                                v-if="checkForSubmenuButtons('add-card-category')"-->
-                                <a
-                                    href="#"
-                                    data-toggle="modal"
-                                    :data-target="'#' + formID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-assign-card')"
+                                   href="#"
+                                   data-toggle="modal"
+                                   :data-target="'#' + formID"
+                                   class="btn btn-primary" @click="clearForm()"
                                 >
                                     Assign Card
                                 </a>
@@ -58,7 +57,7 @@
                                                         <th>Card Starting Points</th>
                                                         <th>Card Expiry Date</th>
                                                         <th>Added By</th>
-                                                        <th>Action
+                                                        <th v-if="checkForSubmenuButtons('edit-assign-card')">Action
                                                         </th>
                                                     </tr>
                                                     </thead>
@@ -72,13 +71,11 @@
                                                         <td>{{ card.starting_points }}</td>
                                                         <td>{{ card.expiry_date }}</td>
                                                         <td class="text-capitalize">{{ card.added_by.name }}</td>
-                                                        <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') ||-->
-                                                        <!--                                                        checkForSubmenuButtons('delete-surcharge')"-->
-                                                        <td>
-                                                            <button
-                                                                :data-target="'#' + editFormID" data-toggle="modal"
-                                                                @click="edit(card)"
-                                                                class="btn btn-primary mx-1">
+                                                        <td v-if="checkForSubmenuButtons('edit-assign-card')">
+                                                            <button v-if="checkForSubmenuButtons('edit-assign-card')"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(card)"
+                                                                    class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
                                                             <!--                                                            <button-->
@@ -193,11 +190,11 @@
                     <div class="form-group col-md-4">
                         <label for="CardName">Phone<span class="text-danger ml-1">*</span></label>
                         <vue-mask readonly
-                            class="form-control"
-                            v-model="dataEdit.phone"
-                            mask="0000-0000000"
-                            :raw="false"
-                            :options="optionsPhone"
+                                  class="form-control"
+                                  v-model="dataEdit.phone"
+                                  mask="0000-0000000"
+                                  :raw="false"
+                                  :options="optionsPhone"
                         >
                         </vue-mask>
                     </div>

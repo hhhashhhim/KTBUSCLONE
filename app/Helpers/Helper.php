@@ -157,10 +157,12 @@ if (!function_exists('updateFare')) {
         FareTable::where('from_city_id', $request->from)->where('to_city_id', $request->to)
             ->where('company_id', $company_id)->update([
             'time_difference' => $request->time_difference,
+            'distance_in_km' => $request->distance_in_km,
         ]);
         FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)
         ->where('company_id', $company_id)->update([
             'time_difference' => $request->time_difference,
+            'distance_in_km' => $request->distance_in_km,
         ]);
     }
 }

@@ -62,6 +62,7 @@
         .clear-both {
             clear: both;
         }
+
         hr {
             border: 2px dashed black;
         }
@@ -71,8 +72,8 @@
             window.print();
         });
 
-        setTimeout(function(){
-            window.close() ;
+        setTimeout(function () {
+            window.close();
         }, 1000); //Time before execution
     </script>
     <title>Print Ticket</title>
@@ -82,12 +83,14 @@
 <div style="page-break-before:always">&nbsp;</div>
 <div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
-        <div class="companyAddress"><span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
-            <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
-            <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span></div>
+    <div class="companyAddress">
+        <span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
+        <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
+        <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span>
         </div>
+    </div>
     @if($data['duplicate'] == 1)
-    <div style="text-align: center; border:2px dashed black;"><h3>Duplicate Ticket</h3></div>
+        <div style="text-align: center; border:2px dashed black;"><h3>Duplicate Ticket</h3></div>
     @endif
     <div class="custinfo" id="custinfo">
         <hr/>
@@ -136,6 +139,14 @@
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Fare :</p>
                 <p class="float-right">{{ $data['tickets'][$key]['seat_fare'] }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Discount :</p>
+                <p class="float-right">{{ $data['tickets'][$key]['discount'] ?? 0 }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="font-weight-bold float-left">Total Fare :</p>
+                <p class="float-right">{{( $data['tickets'][$key]['seat_fare']) - ( $data['tickets'][$key]['discount'] ?? 0) }}</p>
             </div>
         </div>
         <br>

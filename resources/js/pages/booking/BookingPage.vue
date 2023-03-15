@@ -1611,6 +1611,11 @@ export default {
                 this.pointsCardId = resCnicPoints.data.id;
                 this.haveLabel = true;
             }
+            if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
+                this.label = "";
+                this.hideCheckBox =  false;
+                this.haveLabel = false;
+            }
             if (resCnicPoints.status == 201) {
                 this.label = resCnicPoints.data.expiredData;
                 this.hideCheckBox = false;
