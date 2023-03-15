@@ -55,11 +55,11 @@
                                                         <th>Customer Name</th>
                                                         <th>Customer Phone</th>
                                                         <th>Card Category Name</th>
-                                                        <th>Card Starting Points </th>
+                                                        <th>Card Starting Points</th>
                                                         <th>Card Expiry Date</th>
                                                         <th>Added By</th>
-                                                        <!--                                                        <th v-if="checkForSubmenuButtons('edit-card-category')">Action-->
-                                                        <!--                                                        </th>-->
+                                                        <th>Action
+                                                        </th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -71,20 +71,21 @@
                                                         <td>{{ card.card_category.name }}</td>
                                                         <td>{{ card.starting_points }}</td>
                                                         <td>{{ card.expiry_date }}</td>
-                                                        <td>{{ card.added_by.name }}</td>
-                                                        <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') || checkForSubmenuButtons('delete-surcharge')"-->
-                                                        <!--                                                        <td v-if="checkForSubmenuButtons('edit-card-category')">-->
-                                                        <!--                                                            <button v-if="checkForSubmenuButtons('edit-card-category')"-->
-                                                        <!--                                                                    :data-target="'#' + editFormID" data-toggle="modal"-->
-                                                        <!--                                                                    @click="edit(card)"-->
-                                                        <!--                                                                    class="btn btn-primary mx-1">-->
-                                                        <!--                                                                <i class="far fa-edit"></i>-->
-                                                        <!--                                                            </button>-->
-                                                        <!--                                                            &lt;!&ndash;                                                            <button&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                                                class="btn btn-danger d-none">&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                                                <i class="far fa-trash-alt"></i>&ndash;&gt;-->
-                                                        <!--                                                            &lt;!&ndash;                                                            </button>&ndash;&gt;-->
-                                                        <!--                                                        </td>-->
+                                                        <td class="text-capitalize">{{ card.added_by.name }}</td>
+                                                        <!--                                                        v-if="checkForSubmenuButtons('edit-surcharge') ||-->
+                                                        <!--                                                        checkForSubmenuButtons('delete-surcharge')"-->
+                                                        <td>
+                                                            <button
+                                                                :data-target="'#' + editFormID" data-toggle="modal"
+                                                                @click="edit(card)"
+                                                                class="btn btn-primary mx-1">
+                                                                <i class="far fa-edit"></i>
+                                                            </button>
+                                                            <!--                                                            <button-->
+                                                            <!--                                                                class="btn btn-danger d-none">-->
+                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                                            </button>-->
+                                                        </td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -165,104 +166,66 @@
 
             <!-- Add Modal End -->
             <!--            Edit Model-->
-            <!--            <Edit-->
-            <!--                heading="Edit Card Category"-->
-            <!--                :errors="this.validationErrors"-->
-            <!--                :success="success"-->
-            <!--                :editForm="editFormID"-->
-            <!--            >-->
-            <!--                <div class="row">-->
-            <!--                    <div class="form-group col-md-4">-->
-            <!--                        <label for="CardName">Name <span class="text-danger ml-1">*</span></label>-->
-            <!--                        <input type="text" class="form-control" v-model="dataEdit.name"/>-->
-            <!--                    </div>-->
-            <!--                    &lt;!&ndash;                    Discount&ndash;&gt;-->
-            <!--                    <div class="form-group col-md-3 mt-4 pt-2">-->
-            <!--                        <div class="custom-control custom-radio custom-control-inline">-->
-            <!--                            <input type="radio" id="Editpercentage" name="percentageAmount" class="custom-control-input"-->
-            <!--                                   :checked="dataEdit.discount_type == 'percentage'" value="percentage"-->
-            <!--                                   v-model="dataEdit.discount_type"-->
-            <!--                                   @click="ChangeRadioValue('Editpercentage')">-->
-            <!--                            <label class="custom-control-label" for="Editpercentage">Percentage</label>-->
-            <!--                        </div>-->
-            <!--                        <div class="custom-control custom-radio custom-control-inline">-->
-            <!--                            <input type="radio" id="Editflat" name="flatAmount" class="custom-control-input"-->
-            <!--                                   value="flat" :checked="dataEdit.discount_type == 'flat'"-->
-            <!--                                   v-model="dataEdit.discount_type" @click="ChangeRadioValue('Editflat')">-->
-            <!--                            <label class="custom-control-label" for="Editflat">Flat Amount</label>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </div>-->
-            <!--                <div class="row">-->
-            <!--                    <div class="form-group col-md-6">-->
-            <!--                        <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>-->
-            <!--                        <div class="input-group">-->
-            <!--                            <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage_discount"-->
-            <!--                                   placeholder="Enter Percentage Applied Per Point"-->
-            <!--                                   @keypress="isNumber($event); numberRange($event)">-->
-            <!--                            <div class="input-group-append">-->
-            <!--                                <span class="input-group-text">%</span>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                    <div class="form-group col-md-6">-->
-            <!--                        <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span>-->
-            <!--                            <span-->
-            <!--                                class="text-muted">max: 10K</span> </label>-->
-            <!--                        <input type="text" class="form-control" maxlength="5" v-model="dataEdit.flat_discount"-->
-            <!--                               placeholder="Enter Flat Amount Applied Per Point"-->
-            <!--                               @keypress="isNumber($event)">-->
-            <!--                    </div>-->
-
-            <!--                    <div class="col-md-12">-->
-            <!--                        <h5>Addition of Points Via Type</h5>-->
-            <!--                        &lt;!&ndash;points&ndash;&gt;-->
-            <!--                        <div class="row">-->
-            <!--                            <div class="form-group col-md-4 mt-4 pt-2">-->
-            <!--                                <div class="custom-control custom-radio custom-control-inline">-->
-            <!--                                    <input type="radio" id="EditdistancePoints" name="percentageAmountPoints"-->
-            <!--                                           class="custom-control-input"-->
-            <!--                                           :checked="dataEdit.point_type == 'distancePoints'" value="distancePoints"-->
-            <!--                                           v-model="dataEdit.point_type"-->
-            <!--                                           @click="ChangeRadioValue('distancePoints')">-->
-            <!--                                    <label class="custom-control-label" for="EditdistancePoints">Distance</label>-->
-            <!--                                </div>-->
-            <!--                                <div class="custom-control custom-radio custom-control-inline">-->
-            <!--                                    <input type="radio" id="EditflatPoints" name="flatAmountPoints"-->
-            <!--                                           class="custom-control-input"-->
-            <!--                                           value="flatPoints"-->
-            <!--                                           :checked="dataEdit.point_type == 'flatPoints'"-->
-            <!--                                           v-model="dataEdit.point_type" @click="ChangeRadioValue('flatPoints')">-->
-            <!--                                    <label class="custom-control-label" for="EditflatPoints">Flat</label>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                            <div class="form-group col-md-4">-->
-            <!--                                <label for="SurchargePercentage">Distance <span-->
-            <!--                                    class="text-danger ml-1">*</span></label>-->
-            <!--                                <div class="input-group">-->
-            <!--                                    <input type="text" class="form-control" maxlength="3"-->
-            <!--                                           v-model="dataEdit.point_distance"-->
-            <!--                                           placeholder="How Many Points Set after 1 KiloMeter?"-->
-            <!--                                           @keypress="isNumber($event)">-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                            <div class="form-group col-md-4">-->
-            <!--                                <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>-->
-            <!--                                    <span-->
-            <!--                                        class="text-muted">max: 10K</span> </label>-->
-            <!--                                <input type="text" class="form-control" maxlength="5" v-model="dataEdit.point_flat"-->
-            <!--                                       placeholder="How many Points Set of Amount?"-->
-            <!--                                       @keypress="isNumber($event)">-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </div>-->
-            <!--                <template v-slot:button>-->
-            <!--                    <button type="button" class="btn btn-primary" @click="updateCard()"-->
-            <!--                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Card Category' }}-->
-            <!--                    </button>-->
-            <!--                </template>-->
-            <!--            </Edit>-->
+            <Edit
+                heading="Edit Card Category"
+                :errors="this.validationErrors"
+                :success="success"
+                :editForm="editFormID"
+            >
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="CardName">CNIC<span class="text-danger ml-1">*</span></label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.cnic"
+                            mask="00000-0000000-0"
+                            :raw="false"
+                            readonly=""
+                            :options="options"
+                        >
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="CardName">Customer Name<span class="text-danger ml-1">*</span></label>
+                        <input readonly type="text" class="form-control" v-model="dataEdit.name"
+                               @keypress="isAlphabet($event)"/>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="CardName">Phone<span class="text-danger ml-1">*</span></label>
+                        <vue-mask readonly
+                            class="form-control"
+                            v-model="dataEdit.phone"
+                            mask="0000-0000000"
+                            :raw="false"
+                            :options="optionsPhone"
+                        >
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="CardName">Card Category<span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="dataEdit.card_category_id">
+                            <option value="0" disabled>Select Any Category</option>
+                            <option v-for="(single, i) in categories" :key="i" :value="single.id">
+                                {{ single.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="startPoint">Card Starting Points</label>
+                        <input type="text" id="startPoint" class="form-control" @keypress="isNumber($event)"
+                               v-model="dataEdit.starting_points">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="expiryDate">Expiry Date <span class="text-danger ml-2">*</span></label>
+                        <input type="date" class="form-control" id="expiryDate" v-model="dataEdit.expiry_date">
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateCard()"
+                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Loylty Card' }}
+                    </button>
+                </template>
+            </Edit>
             <!--            Edit MOdel End-->
             <!--            <Delete :deleteForm="deleteFormID"-->
             <!--                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'-->
@@ -444,7 +407,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.addForm.expiryDate == "" || typeof  this.addForm.expiryDate == 'undefined') {
+            if (this.addForm.expiryDate == "" || typeof this.addForm.expiryDate == 'undefined') {
                 return swal({
                     title: "Required!",
                     text: "PLease Add Expiry Date",
@@ -465,12 +428,25 @@ export default {
                 this.loading = false;
                 this.fetchAssignedCard();
             } else {
-                if (resCardAssign.status === 422) {
+                if (resCardAssign.status == 422) {
                     this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resCardAssign.data.errors) {
                         resCardAssign.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
                 }
             }
@@ -478,55 +454,79 @@ export default {
 
         async updateCard() {
             this.validationErrors = [];
-            // if (this.dataEdit.name === ""|| typeof this.dataEdit.name == 'undefined')
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Name Field is Required ",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            //
-            // if (this.dataEdit.discount_type == "percentage" || this.dataEdit.percentageRadio == 'percentage') {
-            //     if (this.dataEdit.percentage == "" || this.dataEdit.percentage == null || typeof this.dataEdit.percentage == "undefined") {
-            //         return swal({
-            //             title: "Required!",
-            //             text: "Percentage Field is Required",
-            //             icon: "error",
-            //             timer: 2000
-            //         });
-            //     }
-            // }
-            // if (this.dataEdit.discount_type == 'flat' || this.dataEdit.percentageRadio == "flat") {
-            //     if (this.dataEdit.flat == "" || this.dataEdit.flat == null || typeof this.dataEdit.flat == "undefined") {
-            //         return swal({
-            //             title: "Required!",
-            //             text: "Flat Amount Field is Required",
-            //             icon: "error",
-            //             timer: 2000
-            //         });
-            //     }
-            // }
-
+            if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == "undefined") {
+                return swal({
+                    title: "Required!",
+                    text: "Cnic Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.name == "" || typeof this.dataEdit.name == "undefined") {
+                return swal({
+                    title: "Required!",
+                    text: "Name Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.phone == "" || typeof this.dataEdit.phone == "undefined") {
+                return swal({
+                    title: "Required!",
+                    text: "Contact Number Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.card_category_id == "0") {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Any Card Category",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.dataEdit.expiry_date == "" || typeof this.dataEdit.expiry_date == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "PLease Add Expiry Date",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
 
             this.loading = true;
-            const res = await this.callApi("post", 'loyaltyCardAssign/update', this.dataEdit);
-            if (res.status === 200) {
+            const resUpdateCard = await this.callApi("post", 'loyaltyCardAssign/update', this.dataEdit);
+            if (resUpdateCard.status === 200) {
                 swal({
                     title: "Success",
-                    text: "Card Category Updated Successfully",
+                    text: "Loyalty Card Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
                 $("#cardAssignTable").DataTable().destroy();
                 this.loading = false;
-                await this.fetchCardCategories();
+                this.fetchAssignedCard();
             } else {
-                if (res.status == 422) {
+                if (resUpdateCard.status == 422) {
                     this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resUpdateCard.data.errors) {
+                        resUpdateCard.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
 
                 }
