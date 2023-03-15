@@ -1604,15 +1604,20 @@ export default {
                 cnicNumber: this.addForm.customerCNIC,
                 status: value,
             });
+
             if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
                 this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
                 this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
-
                 this.pointsCardId = resCnicPoints.data.id;
                 this.haveLabel = true;
-            } else {
+            }
+            if (resCnicPoints.status == 201) {
+                this.label = resCnicPoints.data.expiredData;
+                this.hideCheckBox = false;
+                this.haveLabel = true;
+            }
+            if (resCnicPoints.status == 404) {
                 this.label = "";
-                this.pointsCardId = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
             }
@@ -1641,6 +1646,8 @@ export default {
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
+                    this.addForm.contact = "";
+                    this.addForm.customerName = "";
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         cnicNumber: this.addForm.customerCNIC,
                         status: flag,
@@ -1654,6 +1661,8 @@ export default {
             }
             if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
+                    this.addForm.customerName = "";
+                    this.addForm.customerCNIC = "";
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         phoneNumber: this.addForm.contact,
                         status: flag,
@@ -2152,6 +2161,9 @@ export default {
                     customerCNIC: "",
                     selectedSeats: '',
                 };
+                this.label = "";
+                this.hideCheckBox = false;
+                this.haveLabel = false;
                 this.ticketsIds = resTicket.data.ids;
                 this.addForm.date = resTicket.data.ticket[0].date;
                 this.addForm.terminalId = resTicket.data.authTerminalId;

@@ -8,16 +8,13 @@ use App\Models\LoyaltyCard\CardAssign;
 use App\Models\LoyaltyCard\CardCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CardAssignController extends Controller
 {
     public function index()
     {
-        $allRecords = CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
-        foreach ($allRecords as $single) {
-            $single->expiry_date = date('d/m/Y', strtotime($single->expiry_date));
-        }
-        return $allRecords;
+        return CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function cardCategories()
@@ -27,45 +24,36 @@ class CardAssignController extends Controller
 
     public function store(Request $request)
     {
-//       dd($request->all());
-        $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
-        if (!$customer) {
-            return response()->json(["errors" => ["Error" => ["To Assign The Loyalty Card, Customer Already Added To your Record "]]], 403);
-//            $customer = Customer::create([
-//                'company_id' => Auth::user()->company_id,
-//                'added_by' => Auth::user()->id,
-//                'name' => $request->customerName,
-//                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
-//                'contact' => plainContactAndCnic($request->contact),
-//            ]);
+        $data = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->first();
+        if (!$data) {
+            $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+            if (!$customer) {
+                return response()->json(["errors" => ["Error" => ["To Assign The Loyalty Card, Customer Already Added To your Record "]]], 403);
+            }
+            return CardAssign::create([
+                'cnic' => plainContactAndCnic($request->customerCNIC) ?? plainContactAndCnic($customer->cnic),
+                'phone' => plainContactAndCnic($request->contact) ?? plainContactAndCnic($customer->contact),
+                'name' => $request->customerName ?? $customer->name,
+                'card_category_id' => $request->cardCategory,
+                'customer_id' => $customer->id,
+                'company_id' => Auth::user()->company_id,
+                'expiry_date' => $request->expiryDate,
+                'starting_points' => $request->startingPoints,
+                'added_by' => Auth::user()->id,
+            ]);
+        } else {
+            return response()->json(["errors" => ["Error" => ["Loyalty Card Already Against Given CNIC Number "]]], 422);
         }
-        return CardAssign::create([
-            'cnic' => plainContactAndCnic($request->customerCNIC) ?? plainContactAndCnic($customer->cnic),
-            'phone' => plainContactAndCnic($request->contact) ?? plainContactAndCnic($customer->contact),
-            'name' => $request->customerName ?? $customer->name,
-            'card_category_id' => $request->cardCategory,
-            'customer_id' => $customer->id,
-            'company_id' => Auth::user()->company_id,
-            'expiry_date' => $request->expiryDate,
-            'starting_points' => $request->startingPoints,
-            'added_by' => Auth::user()->id,
-        ]);
     }
 
     public function update(Request $request)
     {
-        dd($request->all());
-
-//        return CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->update([
-//            'name' => $request->name,
-//            'discount_type' => $request->discount_type,
-//            'flat_discount' => $request->flat_discount ?? 0,
-//            'percentage_discount' => $request->percentage_discount ?? 0,
-//            'point_type' => $request->point_type,
-//            'point_flat' => $request->point_flat ?? 0,
-//            'point_distance' => $request->point_distance ?? 0,
-//            'updated_by' => Auth::user()->id,
-//        ]);
+        return CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->update([
+            'card_category_id' => $request->card_category_id,
+            'expiry_date' => $request->expiry_date,
+            'starting_points' => $request->starting_points,
+            'updated_by' => Auth::user()->id,
+        ]);
     }
 
     public function getCnic(Request $request)

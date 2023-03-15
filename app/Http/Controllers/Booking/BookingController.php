@@ -31,6 +31,7 @@ use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -95,14 +96,13 @@ class BookingController extends Controller
                 $finalAmountDiscount = 0;
                 if ($card->discount_type == 'percentage') {
                     $amountInPercent = (int)$card->percentage_discount * $cardAssign->starting_points;
-                    $finalAmountDiscount = (int)(($amountInPercent * $request->totalFare) / 100);
+                    $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
                 }
                 if ($card->discount_type == 'flat') {
                     $amountInFlat = (int)$card->flat_discount * $cardAssign->starting_points;
-                    $finalAmountDiscount = (int)($amountInFlat - $request->totalFare);
+                    $finalAmountDiscount = (int)($request->totalFare - $amountInFlat);
                 }
             }
-            dd($amountInPercent , $request->totalFare, $amountInPercent,$card->percentage_discount,  $cardAssign->starting_points);
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $departure_city_id = $schedule->route->fares->first()->departure_city_id;
             $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -394,14 +394,22 @@ class BookingController extends Controller
     public function getPoints(Request $request)
     {
         if ($request->status == 'addFormCNIC' && $request['cnicNumber']) {
-            return CardAssign::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+            $cardAssign = CardAssign::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+            if (!is_null($cardAssign)) {
+                if ($cardAssign->expiry_date >= date('Y-m-d')) {
+                    return $cardAssign;
+                } else {
+                    return response()->json(["expiredData" => "Loyalty Card is Expired Please Renew It"], 201);
+                }
+                return response()->json(["not_found" => "This Customer Dont have loyalty card"], 404);
+            }
         }
     }
 
     public function usagePoints(Request $request)
     {
-        $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->select('card_category_id', 'starting_points')->first();
-        $data = CardCategory::where('id',$category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
+        $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->whereDate('expiry_date', '<=', date('Y-m-d'))->select('card_category_id', 'starting_points')->first();
+        $data = CardCategory::where('id', $category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
         if ($data->discount_type == 'percentage') {
             return $data->percentage_discount * $category->starting_points . ' %';
         }
