@@ -408,10 +408,10 @@ class BookingController extends Controller
 
     public function usagePoints(Request $request)
     {
-        $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->whereDate('expiry_date', '<=', date('Y-m-d'))->select('card_category_id', 'starting_points')->first();
+        $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->select('card_category_id', 'starting_points')->first();
         $data = CardCategory::where('id', $category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
         if ($data->discount_type == 'percentage') {
-            return $data->percentage_discount * $category->starting_points . ' %';
+            return ($data->percentage_discount * $category->starting_points) >= 100 ? 100 . ' %' : $data->percentage_discount * $category->starting_points . ' %';
         }
         if ($data->discount_type == 'flat') {
             return $data->flat_discount * $category->starting_points;
@@ -436,7 +436,6 @@ class BookingController extends Controller
 
     public function advanceData(Request $request)
     {
-        //        dd($request->all());
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
@@ -867,7 +866,6 @@ class BookingController extends Controller
 
     public function busInvoice(Request $request)
     {
-        // dd($request->all());
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -940,12 +938,10 @@ class BookingController extends Controller
             $item->acutal_time = $item->date . " " . $item->scheduleDetail->departure_time; //if ticket booked from another terminal
 
             $ticketTerminal = Terminal::find($item->terminal_id);
-            // dd($ticketTerminal);
             if ($ticketTerminal->city_id == $item->departure_city_id) {
                 if ($checkTerminal->count() > 0) {
                     //              if ticket terminal id at last of sequence it mean no need to calculation
                     if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-                        //                    dd($checkTerminal);
                         foreach ($checkTerminal as $key => $single) {
                             if ($item->terminal_id == $single->terminal_id) {
                                 break;
