@@ -205,6 +205,21 @@ class BookingController extends Controller
                 $allTicket[] = $ticket->id;
             }
         }
+        // loyalty card point addition
+        $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+        if($checkCard)
+        {
+            if($checkCard->cardCategory->point_type == "flatPoints")
+            {
+                $addPoint = $request->totalAmount/$checkCard->cardCategory->point_flat;
+            }
+            else
+            {
+                $distance = FareTable::where(['from_city_id' => $request->departureCity,'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                $addPoint = $distance/$checkCard->cardCategory->point_distance;
+            }
+            $checkCard->increment("starting_points",$addPoint);
+        }
         return [
             'ids' => implode('-', $allTicket),
             'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
