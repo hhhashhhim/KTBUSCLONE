@@ -45,8 +45,8 @@ import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 
 
-// const url = '/kt/'
-const url = '/'
+//const url = '/kt/'
+ const url = '/'
 
 
 const routes = [
