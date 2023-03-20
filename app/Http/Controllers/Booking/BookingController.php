@@ -70,6 +70,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+//        dd($request->all());
         if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
         }
@@ -850,7 +851,6 @@ class BookingController extends Controller
 
     public function terminalInvoice(Request $request)
     {
-
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -866,13 +866,13 @@ class BookingController extends Controller
 
         $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
-            'terminal_id' => Auth::user()->terminal_id,
+            'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id ,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->get();
 
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
-        $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id, "route_id" => $routeId])->first();
+        $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id, "route_id" => $routeId])->first();
 
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];

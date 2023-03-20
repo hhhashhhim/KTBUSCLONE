@@ -15,6 +15,7 @@ class CreateCardAssignsTable extends Migration
     {
         Schema::create('card_assigns', function (Blueprint $table) {
             $table->id();
+            $table->string('rfId')->nullable();
             $table->string('cnic')->nullable();
             $table->string('phone')->nullable();
             $table->string('name')->nullable();

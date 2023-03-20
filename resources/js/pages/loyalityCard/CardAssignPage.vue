@@ -50,6 +50,7 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Sr No.</th>
+                                                        <th>RF ID No.</th>
                                                         <th>Customer Cnic</th>
                                                         <th>Customer Name</th>
                                                         <th>Customer Phone</th>
@@ -64,6 +65,7 @@
                                                     <tbody>
                                                     <tr v-for="(card, i) in cardsAssign" :key="i">
                                                         <td>{{ i + 1 }}</td>
+                                                        <td>{{ card.rf_id }}</td>
                                                         <td>{{ card.cnic }}</td>
                                                         <td>{{ card.name }}</td>
                                                         <td>{{ card.phone }}</td>
@@ -105,7 +107,12 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
+                        <label for="CardName">RF-ID<span class="text-danger ml-1">*</span></label>
+                        <input type="text" class="form-control" v-model="addForm.rfId"
+                               @keypress="isNumber($event)"/>
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="CardName">CNIC<span class="text-danger ml-1">*</span></label>
                         <vue-mask
                             v-on:blur="getCustomer('addFormCNIC')"
@@ -117,12 +124,13 @@
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+
+                    <div class="form-group col-md-3">
                         <label for="CardName">Customer Name<span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="addForm.customerName"
                                @keypress="isAlphabet($event)"/>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="CardName">Phone<span class="text-danger ml-1">*</span></label>
                         <vue-mask
                             v-on:blur="getCustomer('addFormContact')"
@@ -150,7 +158,7 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="expiryDate">Expiry Date <span class="text-danger ml-2">*</span></label>
-                        <input type="date" class="form-control" id="expiryDate" v-model="addForm.expiryDate">
+                        <input type="date" class="form-control" id="expiryDate" v-model="addForm.expiryDate" :min="minDateFilter()">
                     </div>
                 </div>
                 <template v-slot:button>
@@ -170,24 +178,29 @@
                 :editForm="editFormID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
+                        <label for="CardName">RF-ID<span class="text-danger ml-1">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.rf_id" readonly
+                               @keypress="isNumber($event)"/>
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="CardName">CNIC<span class="text-danger ml-1">*</span></label>
                         <vue-mask
                             class="form-control"
                             v-model="dataEdit.cnic"
                             mask="00000-0000000-0"
                             :raw="false"
-                            readonly=""
+                            readonly
                             :options="options"
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="CardName">Customer Name<span class="text-danger ml-1">*</span></label>
                         <input readonly type="text" class="form-control" v-model="dataEdit.name"
                                @keypress="isAlphabet($event)"/>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="CardName">Phone<span class="text-danger ml-1">*</span></label>
                         <vue-mask readonly
                                   class="form-control"
@@ -214,12 +227,12 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="expiryDate">Expiry Date <span class="text-danger ml-2">*</span></label>
-                        <input type="date" class="form-control" id="expiryDate" v-model="dataEdit.expiry_date">
+                        <input type="date" class="form-control" id="expiryDate" v-model="dataEdit.expiry_date" :min="minDateFilter()">
                     </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateCard()"
-                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Loylty Card' }}
+                            :disabled="loading"> {{ loading ? 'Loading...' : 'Update Loyalty Card' }}
                     </button>
                 </template>
             </Edit>
@@ -369,9 +382,27 @@ export default {
                 }
             }
         },
-
+        minDateFilter: function () {
+            const dtToday = new Date();
+            let month = dtToday.getMonth() + 1;
+            let day = dtToday.getDate();
+            const year = dtToday.getFullYear();
+            if (month < 10)
+                month = '0' + month.toString();
+            if (day < 10)
+                day = '0' + day.toString();
+            return year + '-' + month + '-' + day;
+        },
         async storeAssignCardDetails() {
             this.validationErrors = [];
+            if (this.addForm.rfId == "" || typeof this.addForm.rfId == "undefined") {
+                return swal({
+                    title: "Required!",
+                    text: "RF ID Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if (this.addForm.customerCNIC == "" || typeof this.addForm.customerCNIC == "undefined") {
                 return swal({
                     title: "Required!",
@@ -451,6 +482,14 @@ export default {
 
         async updateCard() {
             this.validationErrors = [];
+            if (this.dataEdit.rf_id == "" || typeof this.dataEdit.rf_id == "undefined") {
+                return swal({
+                    title: "Required!",
+                    text: "RF ID Field is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if (this.dataEdit.cnic == "" || typeof this.dataEdit.cnic == "undefined") {
                 return swal({
                     title: "Required!",
