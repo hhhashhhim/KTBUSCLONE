@@ -122,7 +122,7 @@
                                         <div class="row" v-if="this.pointsUsage">
                                             <div class="col-md-12">
                                                 <div class="form-group mb-0">
-                                                    <label for="points_use">Points Use</label>
+                                                    <label for="points_use">How Many Points you want to utilize</label>
                                                     <input
                                                         type="text"
                                                         class="form-control"
@@ -1180,6 +1180,7 @@ export default {
             hideCheckBox: false,
             pointsCardId: "",
             ticketsId: "",
+            pointsValidation: "",
             pointsUsage: "",
             checkedUsagePoints: false,
             addForm: {
@@ -1622,22 +1623,26 @@ export default {
 
             if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
                 this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                this.pointsValidation =  resCnicPoints.data.starting_points;
                 this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
                 this.pointsCardId = resCnicPoints.data.id;
                 this.haveLabel = true;
             }
             if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
                 this.label = "";
+                this.pointsValidation = "";
                 this.hideCheckBox =  false;
                 this.haveLabel = false;
             }
             if (resCnicPoints.status == 201) {
                 this.label = resCnicPoints.data.expiredData;
+                this.pointsValidation = "";
                 this.hideCheckBox = false;
                 this.haveLabel = true;
             }
             if (resCnicPoints.status == 404) {
                 this.label = "";
+                this.pointsValidation = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
             }
@@ -1650,7 +1655,7 @@ export default {
                     points: this.pointsCardId,
                 });
                 if (resUsagePoints.status == 200) {
-                    this.pointsUsage = "You Have " + resUsagePoints.data + " Discount";
+                    this.pointsUsage = "You Have " + resUsagePoints.data;
                     this.checkedUsagePoints = true;
                 } else {
                     this.pointsUsage = "";
@@ -2157,6 +2162,14 @@ export default {
                 return swal({
                     title: "required!",
                     text: "Please Select At Least One Seat",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if(this.addForm.pointsUseInput > this.pointsValidation){
+                return swal({
+                    title: "OOPS!",
+                    text: "Enter Numbers of points must be less then the points Card have",
                     icon: "error",
                     timer: 2000
                 });

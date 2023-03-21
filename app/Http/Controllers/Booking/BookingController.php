@@ -96,18 +96,18 @@ class BookingController extends Controller
                 $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
                 $finalAmountDiscount = 0;
                 if ($card->discount_type == 'percentage') {
-                    $amountInPercent = (int)$card->percentage_discount * $cardAssign->starting_points;
+                    $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
                     $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
-                    $pointsDeductPercentage = (($cardAssign->starting_points * $amountInPercent) / 100);
+//                    $pointsDeductPercentage = (($request->pointsUseInput * $amountInPercent) / 100);
                     $cardAssign->update([
-                        'starting_points' => $cardAssign->starting_points - $pointsDeductPercentage,
+                        'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
                     ]);
                 }
                 if ($card->discount_type == 'flat') {
-                    $amountInFlat = (int)$card->flat_discount * $cardAssign->starting_points;
+                    $amountInFlat = (int)$card->flat_discount * $request->pointsUseInput;
                     $finalAmountDiscount = (int)($request->totalFare - $amountInFlat);
                     $cardAssign->update([
-                        'starting_points' => $cardAssign->starting_points - $finalAmountDiscount,
+                        'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
                     ]);
                 }
             }
@@ -438,10 +438,10 @@ class BookingController extends Controller
         $category = CardAssign::where(['company_id' => Auth::user()->company_id, 'id' => $request->id])->select('card_category_id', 'starting_points')->first();
         $data = CardCategory::where('id', $category->card_category_id)->first(['discount_type', 'flat_discount', 'percentage_discount', 'point_type', 'point_flat', 'point_distance']);
         if ($data->discount_type == 'percentage') {
-            return ($data->percentage_discount * $category->starting_points) >= 100 ? 100 . ' %' : $data->percentage_discount * $category->starting_points . ' %';
+            return ($data->percentage_discount * $category->starting_points) >= 100 ? 100 . '% Discount' : $data->percentage_discount * $category->starting_points . '% Discount';
         }
         if ($data->discount_type == 'flat') {
-            return $data->flat_discount * $category->starting_points;
+            return $data->flat_discount * $category->starting_points . ' Discount In Flat Amount';
         }
     }
 

@@ -27339,6 +27339,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       hideCheckBox: false,
       pointsCardId: "",
       ticketsId: "",
+      pointsValidation: "",
       pointsUsage: "",
       checkedUsagePoints: false,
       addForm: {
@@ -28069,6 +28070,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
                   _this12.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                  _this12.pointsValidation = resCnicPoints.data.starting_points;
                   _this12.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
                   _this12.pointsCardId = resCnicPoints.data.id;
                   _this12.haveLabel = true;
@@ -28076,18 +28078,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
                   _this12.label = "";
+                  _this12.pointsValidation = "";
                   _this12.hideCheckBox = false;
                   _this12.haveLabel = false;
                 }
 
                 if (resCnicPoints.status == 201) {
                   _this12.label = resCnicPoints.data.expiredData;
+                  _this12.pointsValidation = "";
                   _this12.hideCheckBox = false;
                   _this12.haveLabel = true;
                 }
 
                 if (resCnicPoints.status == 404) {
                   _this12.label = "";
+                  _this12.pointsValidation = "";
                   _this12.hideCheckBox = false;
                   _this12.haveLabel = false;
                 }
@@ -28124,7 +28129,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resUsagePoints = _context13.sent;
 
                 if (resUsagePoints.status == 200) {
-                  _this13.pointsUsage = "You Have " + resUsagePoints.data + " Discount";
+                  _this13.pointsUsage = "You Have " + resUsagePoints.data;
                   _this13.checkedUsagePoints = true;
                 } else {
                   _this13.pointsUsage = "";
@@ -28885,12 +28890,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 16:
+                if (!(_this20.addForm.pointsUseInput > _this20.pointsValidation)) {
+                  _context20.next = 18;
+                  break;
+                }
+
+                return _context20.abrupt("return", swal({
+                  title: "OOPS!",
+                  text: "Enter Numbers of points must be less then the points Card have",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 18:
                 _this20.addForm.pointsCardId = _this20.pointsCardId;
                 _this20.addForm.usagePoints = _this20.checkedUsagePoints;
-                _context20.next = 20;
+                _context20.next = 22;
                 return _this20.callApi("post", "booking/store", _this20.addForm);
 
-              case 20:
+              case 22:
                 resTicket = _context20.sent;
 
                 if (resTicket.status == 200) {
@@ -28958,7 +28976,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 24:
               case "end":
                 return _context20.stop();
             }
@@ -51085,7 +51103,7 @@ var _hoisted_50 = {
 var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "points_use"
-  }, "Points Use", -1
+  }, "How Many Points you want to utilize", -1
   /* HOISTED */
   );
 });
