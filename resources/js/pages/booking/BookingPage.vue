@@ -119,6 +119,20 @@
                                                 <label class="text-danger">{{ this.pointsUsage }}</label>
                                             </div>
                                         </div>
+                                        <div class="row" v-if="this.pointsUsage">
+                                            <div class="col-md-12">
+                                                <div class="form-group mb-0">
+                                                    <label for="points_use">Points Use</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="points_use"
+                                                        placeholder="Leave Input Blank means Zero Points Usage"
+                                                        v-model="addForm.pointsUseInput"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
@@ -1004,6 +1018,7 @@
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+            <input type="hidden" name="terminal_id" :value="this.addForm.terminalId">
         </form>
         <!--Print Bus Invoice -->
         <form :action="$store.state.app_url + 'print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
@@ -1639,6 +1654,7 @@ export default {
                     this.checkedUsagePoints = true;
                 } else {
                     this.pointsUsage = "";
+                    this.addForm.pointsUseInput = "";
                     this.checkedUsagePoints = false;
                 }
             } else {
@@ -2760,6 +2776,14 @@ export default {
                 return swal({
                     title: "Required!",
                     text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.terminalId == 0 && this.$store.state.user.terminal_id == null) {
+                return swal({
+                    title: "Required!",
+                    text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
                     icon: "error",
                     timer: 2000
                 });
