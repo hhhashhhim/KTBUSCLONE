@@ -52,13 +52,14 @@
                                                         </td>
                                                         <td v-if="!editAble">
                                                             <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                                            <button class="btn btn-outline-danger" @click="removeRow($event,index)" v-if="index != 0">Remove</button>
+                                                            <button class="btn btn-outline-danger" @click="removeRow($event,index)" v-if="loop != 1">Remove</button>
                                                         </td>
                                                         <td v-else></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
                                                 <div class="d-flex justify-content-end">
+                                                    <input type="text" class="mr-4" disabled @keyup="saveRow($event,'fourth',index)" :value="totalAmount"/>
                                                     <button type="button" class="btn btn-outline-success mr-4" @click="add" :disabled="loading" v-if="!editAble">{{loading ? 'Loading...' : 'Save' }}
                                                     </button>
                                                     <button type="button" class="btn btn-outline-secondary mr-4" @click="editAble=false" :disabled="loading" v-else>Edit
@@ -141,6 +142,7 @@ export default {
             formID:'expense_form',
             editFormID:'edit_expense_form',
             // deleteFormID:'delete_city_form',
+            totalAmount: 0,
             postData : {
                 ticket_merge_id: "",
                 category: [],
@@ -164,6 +166,8 @@ export default {
         setTimeout(function(){
             $("#expense_table").DataTable();
         }, 300);
+        // total amount sum only for show
+        this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
     },
     methods:{
         clearForm : function(){
@@ -217,6 +221,9 @@ export default {
             {
                 this.postData.invoice[index] = event.target.value;
             }
+
+            // total amount sum only for show
+            this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
         },
         addRow() {
             this.loop++;
@@ -227,6 +234,9 @@ export default {
             this.postData.amount.splice(index, 1);
             this.postData.invoice.splice(index, 1);
             this.loop--;
+
+            // total amount sum only for show
+            this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
         },
         async add() {
 
