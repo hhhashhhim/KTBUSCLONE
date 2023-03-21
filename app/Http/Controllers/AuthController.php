@@ -10,6 +10,7 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
+//        return view('reports.dailySaleReport');
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

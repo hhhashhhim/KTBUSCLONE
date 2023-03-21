@@ -58445,7 +58445,7 @@ var _hoisted_5 = {
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\r\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\r\n                                    Add New Category\r\n                                </a>\r\n                            </div> ")], -1
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\n                                    Add New Category\n                                </a>\n                            </div> ")], -1
 /* HOISTED */
 );
 
@@ -58480,7 +58480,7 @@ var _hoisted_15 = ["onChange", "value", "disabled"];
 var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   selected: ""
-}, "Select Category ", -1
+}, "Select Category", -1
 /* HOISTED */
 );
 
@@ -58496,11 +58496,42 @@ var _hoisted_23 = {
   key: 1
 };
 var _hoisted_24 = {
+  "class": "mt-1"
+};
+
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_27 = {
+  "class": "form-group"
+};
+
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "totalNums"
+}, "Total Amount", -1
+/* HOISTED */
+);
+
+var _hoisted_29 = ["value"];
+
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_32 = {
   "class": "d-flex justify-content-end"
 };
-var _hoisted_25 = ["value"];
-var _hoisted_26 = ["disabled"];
-var _hoisted_27 = ["disabled"];
+var _hoisted_33 = ["disabled"];
+var _hoisted_34 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (i, index) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
@@ -58559,20 +58590,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: _cache[0] || (_cache[0] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
-    }, "Add"), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    }, "Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-outline-danger",
       onClick: function onClick($event) {
         return $options.removeRow($event, index);
       }
-    }, "Remove", 8
+    }, " Remove ", 8
     /* PROPS */
     , _hoisted_22)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_23))]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_24, [_hoisted_25, _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "totalNums",
     type: "text",
-    "class": "mr-4",
+    "class": "form-control mr-4",
     disabled: "",
     onKeyup: _cache[1] || (_cache[1] = function ($event) {
       return $options.saveRow($event, 'fourth', _ctx.index);
@@ -58580,7 +58612,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: $data.totalAmount
   }, null, 40
   /* PROPS, HYDRATE_EVENTS */
-  , _hoisted_25), !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  , _hoisted_29)])]), _hoisted_30, _hoisted_31])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [!$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "btn btn-outline-success mr-4",
@@ -58590,7 +58622,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: $data.loading
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save'), 9
   /* TEXT, PROPS */
-  , _hoisted_26)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  , _hoisted_33)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 1,
     type: "button",
     "class": "btn btn-outline-secondary mr-4",
@@ -58600,14 +58632,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: $data.loading
   }, "Edit ", 8
   /* PROPS */
-  , _hoisted_27)), !$data.editAble && $data.postData.category.length != 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  , _hoisted_34)), !$data.editAble && $data.postData.category.length != 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 2,
     type: "button",
     "class": "btn btn-outline-primary mr-4",
     onClick: _cache[4] || (_cache[4] = function ($event) {
       return $data.editAble = true;
     })
-  }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\r\n            heading=\"Add New Category\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :formID=\"formID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\r\n                </template>\r\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n            heading=\"Edit Category Name\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\r\n                </div>\r\n\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
+  }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\n            heading=\"Add New Category\"\n            :errors=\"this.validationErrors\"\n            :success=\"success\"\n            :formID=\"formID\"\n            >\n                <div class=\"form-group\">\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\n                </div>\n                <template v-slot:button>\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\n                </template>\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\n            heading=\"Edit Category Name\"\n            :errors=\"this.validationErrors\"\n            :success=\"success\"\n            :editForm=\"editFormID\"\n            >\n                <div class=\"form-group\">\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\n                </div>\n\n                <template v-slot:button>\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\n                </template>\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
 }
 
 /***/ }),
