@@ -18,5 +18,10 @@ class TicketMergeExpense extends Model
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
+    
+    public function expense_category()
+    {
+        return $this->hasOne(ExpenseCategory::class, 'id', 'expense_category_id');
+    }
 
 }
