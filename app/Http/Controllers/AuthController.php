@@ -27,10 +27,10 @@ class AuthController extends Controller
         $busId = TicketClosingMerge::where("id",$mergeId)->first()->bus_id;
         $singleData = (object)[];
         $singleData->bus_number = Bus::where(["company_id"=>Auth::user()->company_id,"id"=>$busId])->first()->bus_number;
-        
+
         // get route both side
-        $shedule_ids = TicketClosing::where(["company_id"=>Auth::user()->company_id,"ticket_merge_id"=>$mergeId])->pluck('schedule_id');
-        $schedule = Schedule::where(["company_id"=>Auth::user()->company_id])->whereIn("id",$shedule_ids)->with("route")->get();
+        $schedule_ids = TicketClosing::where(["company_id"=>Auth::user()->company_id,"ticket_merge_id"=>$mergeId])->pluck('schedule_id');
+        $schedule = Schedule::where(["company_id"=>Auth::user()->company_id])->whereIn("id",$schedule_ids)->with("route")->get();
         $singleData->city_one =  explode("-",$schedule[0]->route->name)[0];
         $singleData->city_two =  explode("-",$schedule[1]->route->name)[0];
         // return $data;
