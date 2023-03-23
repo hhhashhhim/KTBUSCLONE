@@ -34,11 +34,12 @@ class CityController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
             'name.required' => 'Name Field is Required!',
+            'name.alpha' => 'City Name must be in Alphabets',
             'name.unique' => 'City Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);
@@ -55,11 +56,12 @@ class CityController extends Controller
     public function update(Request $request)
     {
         $rules = [
-            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
         ];
 
         $customMessages = [
             'name.required' => 'Name Field is Required!',
+            'name.alpha' => 'City Name must be in Alphabets',
             'name.unique' => 'City Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);

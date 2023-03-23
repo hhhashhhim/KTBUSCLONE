@@ -418,6 +418,41 @@ export default {
                         }
                     ],
                 },
+                // Reports Panel
+                {
+                    name: "reports",
+                    allow: true,
+                    childs: [
+                        {
+                            name: "confirm-cancel",
+                            allow: true,
+                        },
+                        {
+                            name: "sales",
+                            allow: true,
+                        },
+                        {
+                            name: "close-trip",
+                            allow: true,
+                        },
+                        {
+                            name: "commission",
+                            allow: true,
+                        },
+                        {
+                            name: "complaints",
+                            allow: true,
+                        },
+                        {
+                            name: "over-issue",
+                            allow: true,
+                        },
+                        {
+                            name: "expenses",
+                            allow: true,
+                        },
+                    ],
+                },
                 // buses Panel
                 {
                     name: "buses",

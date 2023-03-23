@@ -63,50 +63,50 @@
                     </ul>
                 </li>
                 <!-- Reporting panel -->
-                <!-- <li class="dropdown" v-if="checkPermission('ticketing')">
+                <li class="dropdown" v-if="checkPermission('reports')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
                             Reports
                         </span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="dropdown">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('confirm-cancel')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fas fa-city"></i> Confirmed Canceled
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminal')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('sales')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fa fa-landmark"></i> Sales Report
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminal-time')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('close-trip')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('fare-class')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('commission')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fas fa-table"></i> Commission Reports
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('fare-table')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('complaints')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fas fa-table"></i> Complaints Reports
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('bus-class')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('over-issue')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fa fa-bus"></i> Over-Issue Reports
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('buses')">
-                            <router-link class="nav-link text-capitalize" >
+                        <li class="dropdown" v-if="checkForSubmenu('expenses')">
+                            <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fa fa-bus"></i> Expenses Report
                             </router-link>
                         </li>
                     </ul>
-                </li> -->
+                </li>
                 <!-- Buses panel -->
                 <li class="dropdown" v-if="checkPermission('buses')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>

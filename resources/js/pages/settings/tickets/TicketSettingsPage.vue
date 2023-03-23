@@ -118,9 +118,7 @@
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
                         <textarea id="refOfHiring" class="form-control" spellcheck="false"
-                            @keypress="countWords(this.addForm.termsCondition.length, 'terms', 140)" maxlength="140"
                             v-model="addForm.termsCondition"></textarea>
-                        <span class="text-danger">Length : {{ this.countWordsLength }}/140</span>
                     </div>
                 </div>
                 <template v-slot:button>
@@ -132,8 +130,7 @@
             <Edit heading="Edit Template" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
-                        <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company
-                                Admin)</span></label>
+                        <label for="terminals">Terminals <span class="text-danger">*</span></label>
                         <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
                             <option value="0" selected>Select Terminal</option>
                             <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.city.name
@@ -141,23 +138,19 @@
                             </option>
                         </select>
                     </div>
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <vue-mask id="uanNumber"-->
-                    <!--                                  class="form-control"-->
-                    <!--                                  v-model="dataEdit.uan"-->
-                    <!--                                  mask="00-000-000-000"-->
-                    <!--                                  :raw="false"-->
-                    <!--                                  :options="optionsUan"-->
-                    <!--                        >-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-6">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
                         </vue-mask>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" v-model="dataEdit.status">
+                            <option value="1">Active</option>
+                            <option value="0">In Active</option>
+                        </select>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
@@ -167,16 +160,10 @@
                     </div>
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
-                        <textarea id="refOfHiring" class="form-control" spellcheck="false" maxlength="140"
+                        <textarea id="refOfHiring" class="form-control" spellcheck="false"
                             v-model="dataEdit.terms_condition"></textarea>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="status">Status</label>
-                        <select class="form-control" id="status" v-model="dataEdit.status">
-                            <option value="1">Active</option>
-                            <option value="0">In Active</option>
-                        </select>
-                    </div>
+
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" @click="updateTemplate()" :disabled="loadingEdit">
@@ -252,21 +239,21 @@ export default {
         // phoneFormat: function (string) {
         //     return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         // },
-        countWords: function (count, flag, maxvalue) {
-            if (flag == 'terms' && maxvalue == 140) {
-                this.countWordsLength = count;
-            }
-            if (flag == 'address' && maxvalue == 45) {
-                this.countAddressLength = count;
-            }
-            // swal({
-            //     title: "OOPs !!!",
-            //     text: "Characters Must be less then or equal to Max Value",
-            //     icon: "error",
-            //     timer: 2000,
-            // });
-
-        },
+        // countWords: function (count, flag, maxvalue) {
+        //     if (flag == 'terms' && maxvalue == 140) {
+        //         this.countWordsLength = count;
+        //     }
+        //     if (flag == 'address' && maxvalue == 45) {
+        //         this.countAddressLength = count;
+        //     }
+        //     // swal({
+        //     //     title: "OOPs !!!",
+        //     //     text: "Characters Must be less then or equal to Max Value",
+        //     //     icon: "error",
+        //     //     timer: 2000,
+        //     // });
+        //
+        // },
         async fetchTemplates() {
             const resTicketTemplate = await this.callApi("post", 'settings/tickets');
             console.log(resTicketTemplate);

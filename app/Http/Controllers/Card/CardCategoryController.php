@@ -17,6 +17,17 @@ class CardCategoryController extends Controller
 
     public function store(Request $request)
     {
+        $rules = [
+            'name' => ['required', 'alpha', Rule::unique('card_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        ];
+
+        $customMessages = [
+            'name.required' => 'Name Field is Required!',
+            'name.alpha' => 'Name Must Be Alphabets',
+            'name.unique' => 'Name Must Be Unique',
+        ];
+        $this->validate($request, $rules, $customMessages);
+
         return CardCategory::create([
             'name' => $request->name,
             'discount_type' => $request->discountType,
