@@ -68,9 +68,9 @@
     <table style="border: none;">
         <tr>
             <th class="centerTH">Date</th>
-            <th class="fontWightTh">Date</th>
+            <th class="fontWightTh">{{now()->subDays(1)->format("d-M-Y")}}</th>
             <th class="centerTH">Bus NO</th>
-            <th class="fontWightTh">Bus NO</th>
+            <th class="fontWightTh">{{$singleData->bus_number}}</th>
         </tr>
     </table>
     <br>
@@ -79,7 +79,7 @@
         <div>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <th colspan="4">City 1</th>
+                    <th colspan="4">{{$singleData->city_one}}</th>
                 </tr>
                 <tr>
                     <th>Sr No</th>
@@ -87,106 +87,39 @@
                     <th>Passenger Count</th>
                     <th>Amount</th>
                 </tr>
+                @php
+                    $startTotalPass = 0;
+                    $startTotalAmount = 0;
+                @endphp
+                @foreach($data->schedule_start as $item)
                 <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
+                    <td>{{$loop->iteration}}</td>
+                    <td>{{$item[0]->terminal->name}}</td>
+                    <td>{{$item->count()}}</td>
+                    @php
+                        $startTotalPass += $item->count();
+                    @endphp
+                    <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                    @php
+                        $startTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                    @endphp
                 </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
+                @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 46%">Total</td>
-                    <td>Passenger Count Total</td>
-                    <td style="width: 17.5%">Total Amount</td>
+                    <td>{{$startTotalPass}}</td>
+                    <td style="width: 17.5%">{{$startTotalAmount}}</td>
                 </tr>
             </table>
-            <table border="2" style="text-align: center;">
-                <tr>
-                    <td style="width: 46%">City 2 Total</td>
-                    <td>City 2 Passenger Count Total</td>
-                    <td style="width: 17.5%">Total Amount</td>
-                </tr>
-            </table>
-            <table border="2" style="text-align: center;">
-                <tr>
-                    <td style="width: 46%">City 2 + city 1 Total</td>
-                    <td>City 2 + city 1 Passenger Count Total</td>
-                    <td style="width: 17.5%">City 1 + City 2Total Amount</td>
-                </tr>
-            </table>
-            <table border="2" style="text-align: center;">
-                <tr>
-                    <td style="width: 50%">Expenses</td>
-                    <td style="width: 50%">Expenses Total</td>
-                </tr>
-            </table>
-            <table border="2" style="text-align: center;">
-                <tr>
-                    <td style="width: 50%">Savings/Profit</td>
-                    <td style="width: 50%">(City 1 + City 2) - Expenses</td>
-                </tr>
-            </table>
+            
         </div>
         <!-- City 2 -->
         <div>
             <table border="2" style="text-align: center;border-left: none;border-right: none;">
                 <tr>
-                    <th colspan="4" style="border-left: none !important; border-right: none !important;">City 2</th>
+                    <th colspan="4" style="border-left: none !important; border-right: none !important;">{{$singleData->city_two}}</th>
                 </tr>
                 <tr >
                     <th style="border-left: none !important;">Sr No</th>
@@ -194,72 +127,30 @@
                     <th style="border:1px solid rgb(80, 79, 79) !important">Passenger Count</th>
                     <th style="border-right: none !important;">Amount</th>
                 </tr>
+                @php
+                    $returnTotalPass = 0;
+                    $returnTotalAmount = 0;
+                @endphp
+                @foreach($data->schedule_return as $item)
                 <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
+                    <td>{{$loop->iteration}}</td>
+                    <td>{{$item[0]->terminal->name}}</td>
+                    <td>{{$item->count()}}</td>
+                    @php
+                        $returnTotalPass += $item->count();
+                    @endphp
+                    <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                    @php
+                        $returnTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                    @endphp
                 </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Sr No</td>
-                    <td>Terminal Name</td>
-                    <td>Passenger Count</td>
-                    <td>Amount</td>
-                </tr>
+                @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 46%">Total</td>
-                    <td>Passenger Count Total</td>
-                    <td style="width: 17.5%">Total Amount</td>
+                    <td>{{$returnTotalPass}}</td>
+                    <td style="width: 17.5%">{{$returnTotalAmount}}</td>
                 </tr>
 
             </table>
@@ -274,52 +165,53 @@
                     <th>Expenses Details</th>
                     <th>Amount</th>
                 </tr>
+                @foreach($data->expense as $item)
                 <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
+                    <td>{{$item->expense_category->name}}</td>
+                    <td>{{$item->amount}}</td>
                 </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-                <tr>
-                    <td>Expenses Details</td>
-                    <td>Amount</td>
-                </tr>
-
+                @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 46%">Total</td>
-                    <td style="width: 17.5%">Total Amount</td>
+                    <td style="width: 17.5%">{{$data->expense->sum("amount")}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 46%">{{$singleData->city_one}}</td>
+                    <td>{{$startTotalPass}}</td>
+                    <td style="width: 17.5%">{{$startTotalAmount}}</td>
+                </tr>
+            </table>
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 46%">{{$singleData->city_two}}</td>
+                    <td>{{$returnTotalPass}}</td>
+                    <td style="width: 17.5%">{{$returnTotalAmount}}</td>
+                </tr>
+            </table>
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 46%">{{$singleData->city_one .'+'. $singleData->city_two}}</td>
+                    <td>{{$startTotalPass + $returnTotalPass}}</td>
+                    <td style="width: 17.5%">{{$startTotalAmount + $returnTotalAmount}}</td>
+                </tr>
+            </table>
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 50%">Expenses</td>
+                    <td style="width: 50%">{{$data->expense->sum('amount')}}</td>
+                </tr>
+            </table>
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 50%">Savings/Profit</td>
+                    <td style="width: 50%">{{$startTotalAmount + $returnTotalAmount - $data->expense->sum('amount')}}</td>
                 </tr>
             </table>
         </div>
