@@ -92,18 +92,18 @@
                     $startTotalAmount = 0;
                 @endphp
                 @foreach($data->schedule_start as $item)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$item[0]->terminal->name}}</td>
-                    <td>{{$item->count()}}</td>
-                    @php
-                        $startTotalPass += $item->count();
-                    @endphp
-                    <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
-                    @php
-                        $startTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
-                    @endphp
-                </tr>
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{$item[0]->terminal->name}}</td>
+                        <td>{{$item->count()}}</td>
+                        @php
+                            $startTotalPass += $item->count();
+                        @endphp
+                        <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                        @php
+                            $startTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                        @endphp
+                    </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
@@ -113,15 +113,16 @@
                     <td style="width: 17.5%">{{$startTotalAmount}}</td>
                 </tr>
             </table>
-            
+
         </div>
         <!-- City 2 -->
         <div>
             <table border="2" style="text-align: center;border-left: none;border-right: none;">
                 <tr>
-                    <th colspan="4" style="border-left: none !important; border-right: none !important;">{{$singleData->city_two}}</th>
+                    <th colspan="4"
+                        style="border-left: none !important; border-right: none !important;">{{$singleData->city_two}}</th>
                 </tr>
-                <tr >
+                <tr>
                     <th style="border-left: none !important;">Sr No</th>
                     <th style="border:1px solid rgb(80, 79, 79) !important">Terminal Name</th>
                     <th style="border:1px solid rgb(80, 79, 79) !important">Passenger Count</th>
@@ -132,18 +133,18 @@
                     $returnTotalAmount = 0;
                 @endphp
                 @foreach($data->schedule_return as $item)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$item[0]->terminal->name}}</td>
-                    <td>{{$item->count()}}</td>
-                    @php
-                        $returnTotalPass += $item->count();
-                    @endphp
-                    <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
-                    @php
-                        $returnTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
-                    @endphp
-                </tr>
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{$item[0]->terminal->name}}</td>
+                        <td>{{$item->count()}}</td>
+                        @php
+                            $returnTotalPass += $item->count();
+                        @endphp
+                        <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                        @php
+                            $returnTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                        @endphp
+                    </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
@@ -166,10 +167,10 @@
                     <th>Amount</th>
                 </tr>
                 @foreach($data->expense as $item)
-                <tr>
-                    <td>{{$item->expense_category->name}}</td>
-                    <td>{{$item->amount}}</td>
-                </tr>
+                    <tr>
+                        <td>{{$item->expense_category->name}}</td>
+                        <td>{{$item->amount}}</td>
+                    </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
@@ -216,5 +217,6 @@
             </table>
         </div>
     </div>
+</div>
 </body>
 </html>
