@@ -80,9 +80,10 @@
                                                         <td>
                                                             <div class="form-group">
                                                                 <label for="totalNums">Total Amount</label>
-                                                            <input id="totalNums" type="text" class="form-control mr-4" disabled
-                                                                   @keyup="saveRow($event,'fourth',index)"
-                                                                   :value="totalAmount"/>
+                                                                <input id="totalNums" type="text"
+                                                                       class="form-control mr-4" disabled
+                                                                       @keyup="saveRow($event,'fourth',index)"
+                                                                       :value="totalAmount"/>
                                                             </div>
                                                         </td>
                                                         <td></td>
@@ -113,6 +114,15 @@
                     </div>
                 </div>
             </div>
+
+            <!--Daily Summery Report Form-->
+            <form :action="$store.state.app_url + 'print/pdf/daily/summary/report'" method="POST"
+                  ref="refDailySummaryReport"
+                  target="_blank">
+                <input type="hidden" name="_token" v-bind:value="csrf">
+                <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
+            </form>
+
 
             <!-- Add Modal -->
             <!-- <Add
@@ -171,6 +181,7 @@ export default {
     },
     data() {
         return {
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             validationErrors: [],
             editAble: true,
             categories: [],
@@ -309,6 +320,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.$refs.refDailySummaryReport.submit();
                 await this.fetchData();
                 await this.existingExpenses();
                 this.loading = false;
