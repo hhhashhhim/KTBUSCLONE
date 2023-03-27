@@ -16,6 +16,8 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
+        
+        // Daily sale report start / dailySaleReport
 //        $mergeId = 39;
 //        $closings_ids = TicketClosing::where(["company_id"=>Auth::user()->company_id,"ticket_merge_id"=>$mergeId])->pluck('id');
 //        $data = (object)[];
@@ -38,6 +40,7 @@ class AuthController extends Controller
         //     "singleData" => $singleData,
         //     "data" => $data
         // ]);
+        // Daily sale report end
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }
