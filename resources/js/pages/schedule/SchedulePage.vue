@@ -1234,14 +1234,14 @@ export default {
                     });
                 }
 
-                if (this.data.addTerminalsOnClick.length > 0 && this.data.addTerminalsOnClick.length < 2) {
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select at Least 2 Terminals of Selected Route",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
+                // if (this.data.addTerminalsOnClick.length > 0) {
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select at Least 2 Terminals of Selected Route",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
 
                 if (this.data.busClass == 0)
                     return swal({
@@ -1250,14 +1250,7 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
-                // if (this.data.fareClass == 0)
-                //     return swal({
-                //         title: "Required!",
-                //         text: "Please Select Fare Class",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                if (this.data.route != 0 && this.data.busClass != 0 /*&& this.data.fareClass != 0*/) {
+                if (this.data.route != 0 && this.data.busClass != 0 ) {
                     this.activeSection = nextBtnValue;
                 }
             }

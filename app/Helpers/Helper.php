@@ -408,6 +408,14 @@ if (!function_exists('getMembers')) {
     }
 }
 
+//Get Buses
+if (!function_exists('getBusName')) {
+    function getBusName($id)
+    {
+        return \App\Models\Bus\Bus::where('id', $id)->first()->bus_number;
+    }
+}
+
 
 //Get route name
 if (!function_exists('routeName')) {
@@ -415,5 +423,13 @@ if (!function_exists('routeName')) {
     {
         $routeId = Schedule::where('id', $id)->first(['route_id'])->route_id;
         return Route::where('id', $routeId)->first(['id', 'name'])->name;
+    }
+}
+
+//Get online Terminals
+if (!function_exists('getTerminals')) {
+    function getTerminals()
+    {
+        return \App\Models\Terminal::where('is_online_terminal', 1)->where('company_id', Auth::user()->company_id)->get();
     }
 }

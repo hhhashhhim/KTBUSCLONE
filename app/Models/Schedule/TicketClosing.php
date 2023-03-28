@@ -11,6 +11,7 @@ use App\Models\FareClass;
 use App\Models\Route\Route;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +38,10 @@ class TicketClosing extends Model
     public function members()
     {
         return $this->hasMany( TicketClosingMember::class, 'ticket_closing_id', 'id' );
+    }
+    public function tickets()
+    {
+        return $this->hasMany( Ticket::class, 'ticket_closing_id', 'id' );
     }
 
 }

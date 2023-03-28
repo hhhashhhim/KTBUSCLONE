@@ -121,45 +121,6 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                    <!--                </div>-->
-                    <!--                <div class="row">-->
-                    <!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
-                    <!--                        <div class="form-check form-check-inline">-->
-                    <!--                            <input class="form-check-input" type="radio" id="positive_time" name="terminalTime"-->
-                    <!--                                   checked="" value="positiveTime" v-model="dataTime.time"-->
-                    <!--                                   @click="applyTimeMaks('positive')">-->
-                    <!--                            <label class="form-check-label" for="positive_time">-->
-                    <!--                                Positive-->
-                    <!--                            </label>-->
-                    <!--                        </div>-->
-                    <!--                        <div class="form-check form-check-inline">-->
-                    <!--                            <input class="form-check-input" type="radio" id="negative_time" name="terminalTime"-->
-                    <!--                                   value="negativeTime" v-model="dataTime.time" @click="applyTimeMaks('negative')">-->
-                    <!--                            <label class="form-check-label" for="negative_time">-->
-                    <!--                                Negative-->
-                    <!--                            </label>-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-5" v-if="showDivPositive">-->
-                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-                    <!--                        <vue-mask-->
-                    <!--                            class="form-control"-->
-                    <!--                            v-model="data.time_difference"-->
-                    <!--                            mask="00:00"-->
-                    <!--                            :raw="false"-->
-                    <!--                            :options="optionsPositive">-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-5" v-if="showDivNegative">-->
-                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-                    <!--                        <vue-mask-->
-                    <!--                            class="form-control"-->
-                    <!--                            v-model="data.time_difference"-->
-                    <!--                            mask="-00:00"-->
-                    <!--                            :raw="false"-->
-                    <!--                            :options="optionsNegative">-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
@@ -172,10 +133,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-9">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
                         <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="140"
                                   placeholder="Address Must be less then 140 characters or 21 words"></textarea>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label class="mt-4" for="is_online">Is Online Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
+                            <span>
+                                <input type="checkbox" id="is_online" class="colorinput-input" v-model="data.is_online"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
+                        </label>
                     </div>
                 </div>
                 <div class="row">
@@ -343,10 +313,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-9">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
                         <textarea class="form-control" spellcheck="false" v-model="dataEdit.address" maxlength="140"
                                   placeholder="Address Must be less then 140 characters or 21 words"></textarea>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label class="mt-4" for="is_online">Is Online Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
+                            <span>
+                                <input type="checkbox" id="is_online" class="colorinput-input" v-model="dataEdit.is_online_terminal"  v-bind:checked="dataEdit.is_online_terminal == 1"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
+                        </label>
                     </div>
                 </div>
                 <div class="row">
@@ -382,7 +361,7 @@
                         <label class="colorinput mx-3 mt-3">
                             <span>
                                 <input type="checkbox" class="colorinput-input" v-model="dataEdit.active_sms"
-                                       v-bind:checked="dataEdit.active_sms === 1"/>
+                                       v-bind:checked="dataEdit.active_sms == 1"/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>

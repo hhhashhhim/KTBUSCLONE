@@ -35,10 +35,14 @@ class ExpenseController extends Controller
         $request->validate([
             "ticket_merge_id" => 'required',
             "category" => 'required',
-            "description" => 'required',
+//            "description" => 'required',
             "amount" => 'required',
-            "invoice" => 'required',
-        ]);
+//            "invoice" => 'required',
+        ],[
+            "category.required" => "Category is  Required",
+            "amount.required" => "Expenses Amount  is Required",
+            ]
+        );
 
         TicketMergeExpense::where("ticket_merge_id", $request->ticket_merge_id)->delete();
         foreach ($request->category as $key => $value) {

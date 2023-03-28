@@ -56,325 +56,39 @@
             <th>M Tag</th>
             <th>Paid</th>
             <th>Non Paid</th>
-            <th>Jazz Cash</th>
-            <th>Do Safar</th>
-            <th>Online Web</th>
-            <th>Online Mobile</th>
-            <th>1 Link</th>
-            <th>SASTA Tcket</th>
-            <th>Book Me</th>
-            <th>Book Kro</th>
+            @foreach(getTerminals()  as $item)
+                <th>{{ $item->name }}</th>
+            @endforeach
+            {{--            <th>Jazz Cash</th>--}}
+            {{--            <th>Do Safar</th>--}}
+            {{--            <th>Online Web</th>--}}
+            {{--            <th>Online Mobile</th>--}}
+            {{--            <th>1 Link</th>--}}
+            {{--            <th>SASTA Tcket</th>--}}
+            {{--            <th>Book Me</th>--}}
+            {{--            <th>Book Kro</th>--}}
             <th>Net Cash</th>
         </tr>
         <!-- Raw Data -->
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
-        <tr>
-            <td>Sr NO</td>
-            <td>Bus NO</td>
-            <td>MOD</td>
-            <td>Income</td>
-            <td>Expenses</td>
-            <td>Profit</td>
-            <td>Commission</td>
-            <td>Hawa Jali</td>
-            <td>M Tag</td>
-            <td>Paid</td>
-            <td>Non Paid</td>
-            <td>Jazz Cash</td>
-            <td>Do Safar</td>
-            <td>Online Web</td>
-            <td>Online Mobile</td>
-            <td>1 Link</td>
-            <td>SASTA Tcket</td>
-            <td>Book Me</td>
-            <td>Book Kro</td>
-            <td>Net Cash</td>
-        </tr>
+        @foreach($data as $key => $single)
+            <tr>
+                <td>{{$key + 1}}</td>
+                <td>{{ getBusName($single->closing[0]->bus_id) }}</td>
+                <td>{{ $single->mod }}</td>
+                <td>{{$single->total_income}}</td>
+                <td>{{ $single->total_expenses }}</td>
+                <td>{{ $single-> total_income - $single->total_expenses}}</td>
+                <td>Commission</td>
+                <td>Hawa Jali</td>
+                <td>M Tag</td>
+                <td>Paid</td>
+                <td>Non Paid</td>
+                @foreach(getTerminals() as $singleTerminal)
+                    <td></td>
+                @endforeach
+                <td>Net Cash</td>
+            </tr>
+        @endforeach
         <!-- Total Row -->
         <tr>
             <th></th>
@@ -388,14 +102,9 @@
             <th>Total M Tag</th>
             <th>Total Paid</th>
             <th>Total Non Paid</th>
-            <th>Total Jazz Cash</th>
-            <th>Total Do Safar</th>
-            <th>Total Online Web</th>
-            <th>Total Online Mobile</th>
-            <th>Total 1 Link</th>
-            <th>Total SASTA Tcket</th>
-            <th>Total Book Me</th>
-            <th>Total Book Kro</th>
+            @foreach(getTerminals() as $singleTerminal)
+            <th> Total </th>
+            @endforeach
             <th>Total Net Cash</th>
         </tr>
     </table>
