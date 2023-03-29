@@ -28,7 +28,7 @@ class CardAssignController extends Controller
         if (!$data) {
             $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
             if (!$customer) {
-                return response()->json(["errors" => ["Error" => ["To Assign The Loyalty Card, Customer Already Added To your Record "]]], 403);
+                return response()->json(["errors" => ["Error" => ["To Assign The Loyalty Card, Customer Already Added To your Record "]]], 422);
             }
             return CardAssign::create([
                 'rf_id' =>$request->rfId,

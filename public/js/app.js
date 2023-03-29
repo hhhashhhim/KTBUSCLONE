@@ -38415,7 +38415,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 16:
                 resUpdateCard = _context5.sent;
 
-                if (resUpdateCard.status === 200) {
+                if (resUpdateCard.status == 200) {
                   swal({
                     title: "Success",
                     text: "Loyalty Card Updated Successfully",
@@ -38828,16 +38828,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this3.fetchCardCategories();
                 } else {
-                  if (res.status === 422) {
+                  if (resCard.status == 422) {
                     _this3.loading = false;
 
                     _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
+                      resCard.data.errors[key].forEach(function (element) {
                         _this3.errorsArray(element, key);
                       });
                     };
 
-                    for (key in res.data.errors) {
+                    for (key in resCard.data.errors) {
                       _loop(key);
                     }
                   }
@@ -38855,7 +38855,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res, _loop2, key;
+        var resUpdateCard, _loop2, key;
 
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
@@ -38895,9 +38895,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this4.callApi("post", 'loyaltyCard/update', _this4.dataEdit);
 
               case 4:
-                res = _context4.sent;
+                resUpdateCard = _context4.sent;
 
-                if (!(res.status === 200)) {
+                if (!(resUpdateCard.status === 200)) {
                   _context4.next = 13;
                   break;
                 }
@@ -38918,16 +38918,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 13:
-                if (res.status == 422) {
+                if (resUpdateCard.status == 422) {
                   _this4.loading = false;
 
                   _loop2 = function _loop2(key) {
-                    res.data.errors[key].forEach(function (element) {
+                    resUpdateCard.data.errors[key].forEach(function (element) {
                       _this4.errorsArray(element, key);
                     });
                   };
 
-                  for (key in res.data.errors) {
+                  for (key in resUpdateCard.data.errors) {
                     _loop2(key);
                   }
                 }

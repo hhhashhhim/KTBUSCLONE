@@ -533,10 +533,10 @@ export default {
                 this.loading = false;
                 this.fetchCardCategories();
             } else {
-                if (res.status === 422) {
+                if (resCard.status == 422) {
                     this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resCard.data.errors) {
+                        resCard.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }
@@ -577,8 +577,8 @@ export default {
 
 
             this.loading = true;
-            const res = await this.callApi("post", 'loyaltyCard/update', this.dataEdit);
-            if (res.status === 200) {
+            const resUpdateCard = await this.callApi("post", 'loyaltyCard/update', this.dataEdit);
+            if (resUpdateCard.status === 200) {
                 swal({
                     title: "Success",
                     text: "Card Category Updated Successfully",
@@ -589,10 +589,10 @@ export default {
                 this.loading = false;
                 await this.fetchCardCategories();
             } else {
-                if (res.status == 422) {
+                if (resUpdateCard.status == 422) {
                     this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
+                    for (const key in resUpdateCard.data.errors) {
+                        resUpdateCard.data.errors[key].forEach((element) => {
                             this.errorsArray(element, key);
                         });
                     }

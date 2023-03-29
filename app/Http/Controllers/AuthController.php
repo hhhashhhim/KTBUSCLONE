@@ -6,6 +6,7 @@ use App\Models\Expense\ExpenseCategory;
 use App\Models\Expense\TicketMergeExpense;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
+use App\Models\Terminal;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ class AuthController extends Controller
     {
 ////        main Data
 //        $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->get(['id', 'schedule_complete']);
+//        $terminals = Terminal::with('tickets')->where('is_online_terminal', 1)->get();
 //
 ////Map function for single iteration
 //        $closings->map(function ($closing) {
@@ -39,7 +41,7 @@ class AuthController extends Controller
 //            return $closing;
 //        });
 //
-////        return $closings;
+//        return $closings;
 //
 //
 //        return view('reports.dailySummeryReportEng', [

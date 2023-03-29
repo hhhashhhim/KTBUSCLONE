@@ -533,7 +533,7 @@ export default {
 
             this.loading = true;
             const resUpdateCard = await this.callApi("post", 'loyaltyCardAssign/update', this.dataEdit);
-            if (resUpdateCard.status === 200) {
+            if (resUpdateCard.status == 200) {
                 swal({
                     title: "Success",
                     text: "Loyalty Card Updated Successfully",

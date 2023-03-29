@@ -39,7 +39,7 @@
 <body>
 <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
     <div id="info">
-        <div class="companyName"><span>(City Name) Closing (Today Date)</span></div>
+        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>
     </div>
     <br>
 
