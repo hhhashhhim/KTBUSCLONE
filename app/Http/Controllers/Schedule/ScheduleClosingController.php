@@ -42,7 +42,7 @@ class ScheduleClosingController extends Controller
         ];
         return $data;
     }
-    
+
     public function merges()
     {
         $merges = TicketClosingMerge::
@@ -143,7 +143,8 @@ class ScheduleClosingController extends Controller
 
         Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
             "bus_id" => $request->bus,
-            "ticket_closing_id" => $closingRecord->id
+            "ticket_closing_id" => $closingRecord->id,
+            "ticket_merge_id" => $checkMergeRecord ? $checkMergeRecord->id : $newRecord->id,
         ]);
         return $closingRecord;
     }

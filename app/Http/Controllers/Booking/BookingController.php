@@ -185,6 +185,8 @@ class BookingController extends Controller
                     'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
                     'schedule_details_id' => $scheduleDetail->id,
                     'terminal_id' => $request->terminalId ?? Auth::user()->terminal_id,
+                    'terminal_name' => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->name,
+                    'online_terminal' => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->is_online_terminal,
                     'remarks' => $request->remarks,
                     'gender' => $request->gender,
                     'type' => $request->type,

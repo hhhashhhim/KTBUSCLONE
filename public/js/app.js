@@ -44359,16 +44359,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           text: "Please Select Route",
           icon: "error",
           timer: 2000
-        });
-
-        if (this.data.addTerminalsOnClick.length == 0) {
-          return swal({
-            title: "Required!",
-            text: "Please Select Terminals of Selected Route",
-            icon: "error",
-            timer: 2000
-          });
-        } // if (this.data.addTerminalsOnClick.length > 0) {
+        }); // if (this.data.addTerminalsOnClick.length == 0) {
+        //     return swal({
+        //         title: "Required!",
+        //         text: "Please Select Terminals of Selected Route",
+        //         icon: "error",
+        //         timer: 2000
+        //     });
+        // }
+        // if (this.data.addTerminalsOnClick.length > 0) {
         //     return swal({
         //         title: "Required!",
         //         text: "Please Select at Least 2 Terminals of Selected Route",
@@ -44376,7 +44375,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         //         timer: 2000
         //     });
         // }
-
 
         if (this.data.busClass == 0) return swal({
           title: "Required!",
@@ -76032,9 +76030,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
