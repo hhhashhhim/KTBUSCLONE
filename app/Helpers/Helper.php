@@ -156,14 +156,14 @@ if (!function_exists('updateFare')) {
         // this is for automatic store time diffrence against all fare classes
         FareTable::where('from_city_id', $request->from)->where('to_city_id', $request->to)
             ->where('company_id', $company_id)->update([
-            'time_difference' => $request->time_difference,
-            'distance_in_km' => $request->distance_in_km,
-        ]);
+                'time_difference' => $request->time_difference,
+                'distance_in_km' => $request->distance_in_km,
+            ]);
         FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)
-        ->where('company_id', $company_id)->update([
-            'time_difference' => $request->time_difference,
-            'distance_in_km' => $request->distance_in_km,
-        ]);
+            ->where('company_id', $company_id)->update([
+                'time_difference' => $request->time_difference,
+                'distance_in_km' => $request->distance_in_km,
+            ]);
     }
 }
 
@@ -193,17 +193,24 @@ if (!function_exists('updateFareTable')) {
     function updateFareTable($company_id)
     {
         $fareClasses = FareClass::where('company_id', $company_id)->get();
-        $cities = City::where('company_id', $company_id)->get();
+        // Loop through each fare class
         foreach ($fareClasses as $fareClass) {
+            // Get all cities for the company
+            $cities = City::where('company_id', $company_id)->get();
+            // Loop through each city as the first city
             foreach ($cities as $firstCity) {
+                // Loop through each city as the second city
                 foreach ($cities as $secondCity) {
+                    // Check if the first city and second city are different
                     if ($firstCity->id != $secondCity->id) {
+                        // Check if there is an existing fare for the fare class, first city, and second city
                         $oldFare = FareTable::where([
                             'company_id' => $company_id,
                             "fare_class" => $fareClass->id,
                             "from_city_id" => $firstCity->id,
                             "to_city_id" => $secondCity->id,
                         ])->first();
+                        // If there is no existing fare, create a new one with a fare of 0
                         if (!$oldFare) {
                             FareTable::create([
                                 "fare" => 0,
@@ -211,8 +218,30 @@ if (!function_exists('updateFareTable')) {
                                 "from_city_id" => $firstCity->id,
                                 "to_city_id" => $secondCity->id,
                                 "company_id" => $company_id,
+                                "time_difference" => $fareClass->time_difference,
+                                "distance_in_km" => $fareClass->distance_in_km,
                                 "added_by" => Auth::user()->id,
                             ]);
+                            // If the fare class is not the first fare class, update the new fare with the fare from the first fare class
+                            if ($fareClass->id != $fareClasses->first()->id) {
+                                $firstFare = FareTable::where([
+                                    'company_id' => $company_id,
+                                    "fare_class" => $fareClasses->first()->id,
+                                    "from_city_id" => $firstCity->id,
+                                    "to_city_id" => $secondCity->id,
+                                ])->first();
+                                if ($firstFare) {
+                                    $newFare = FareTable::where([
+                                        'company_id' => $company_id,
+                                        "fare_class" => $fareClass->id,
+                                        "from_city_id" => $firstCity->id,
+                                        "to_city_id" => $secondCity->id,
+                                    ])->first();
+                                    $newFare->time_difference = $firstFare->time_difference;
+                                    $newFare->distance_in_km = $firstFare->distance_in_km;
+                                    $newFare->save();
+                                }
+                            }
                         }
                     }
                 }

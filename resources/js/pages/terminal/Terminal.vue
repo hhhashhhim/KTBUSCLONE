@@ -562,7 +562,7 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchTerminals();
+         this.fetchTerminals();
         this.permissions = this.$store.state.permissions;
     },
     methods: {
@@ -714,7 +714,7 @@ export default {
                 });
                 this.loading = false;
                 $("#terminal_table").DataTable().destroy();
-                await this.fetchTerminals();
+                 this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
                 this.data.city_id = 0;
@@ -792,7 +792,7 @@ export default {
                 });
                 this.loading = false;
                 $("#terminal_table").DataTable().destroy();
-                await this.fetchTerminals();
+                 this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
                 }, 3000);

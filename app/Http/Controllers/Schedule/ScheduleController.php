@@ -27,7 +27,6 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
-
         // this for check time difference added or not against these cities
         $cityIds = array_column($request->cities, 'id');
         foreach ($cityIds as $first) {
@@ -276,14 +275,17 @@ class ScheduleController extends Controller
     {
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
+
     public function busClasses()
     {
         return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
+
     public function surchargeSelective()
     {
         return Surcharge::where('company_id', Auth::user()->company_id)->get();
     }
+
     public function discountSelective()
     {
         return Discount::where('company_id', Auth::user()->company_id)->get();

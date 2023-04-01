@@ -27208,6 +27208,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _popup_DetailsModal_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./popup/DetailsModal.vue */ "./resources/js/pages/booking/popup/DetailsModal.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -28381,6 +28383,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this16 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
+        var _this16$callApi;
+
         var resDropCheck;
         return _regeneratorRuntime().wrap(function _callee16$(_context16) {
           while (1) {
@@ -28389,12 +28393,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this16.labelDrop = '';
                 _this16.hideDivButtonsDrop = true;
                 _context16.next = 4;
-                return _this16.callApi("post", "booking/schedule/dropCheck", {
+                return _this16.callApi("post", "booking/schedule/dropCheck", (_this16$callApi = {
                   id: _this16.addForm.schedule,
                   date: _this16.addForm.date,
-                  departureCity: _this16.addForm.departureCity,
-                  destinationCity: _this16.addForm.destinationCity
-                });
+                  departureCity: _this16.addForm.departureCity
+                }, _defineProperty(_this16$callApi, "departureCity", _this16.addForm.departureCity), _defineProperty(_this16$callApi, "destinationCity", _this16.addForm.destinationCity), _this16$callApi));
 
               case 4:
                 resDropCheck = _context16.sent;
@@ -34246,14 +34249,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
-              return _this.fetchData();
+              _this.fetchData();
 
-            case 2:
-              _context.next = 4;
-              return _this.existingExpenses();
+              _this.existingExpenses();
 
-            case 4:
               setTimeout(function () {
                 $("#expense_table").DataTable();
               }, 300); // total amount sum only for show
@@ -34262,7 +34261,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return parseFloat(a) + parseFloat(b);
               }, 0);
 
-            case 6:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -34441,66 +34440,56 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 12:
                 res = _context4.sent;
 
-                if (!(res.status === 200)) {
-                  _context4.next = 30;
-                  break;
+                if (res.status === 200) {
+                  _this4.loading = false; // $('#expense').DataTable().destroy();
+
+                  _this4.postData.category = [];
+                  _this4.postData.description = [];
+                  _this4.postData.amount = [];
+                  _this4.postData.invoice = [];
+                  _this4.loop = 0;
+                  _this4.editAble = true;
+                  swal({
+                    title: "Success",
+                    text: "Expense Saved",
+                    icon: "success",
+                    timer: 2000
+                  });
+
+                  _this4.$refs.refDailySummaryReport.submit();
+
+                  _this4.fetchData();
+
+                  _this4.existingExpenses();
+
+                  _this4.loading = false;
+                } else {
+                  _this4.loading = false;
+
+                  if (res.status == 422) {
+                    (function () {
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
                 }
 
-                _this4.loading = false; // $('#expense').DataTable().destroy();
-
-                _this4.postData.category = [];
-                _this4.postData.description = [];
-                _this4.postData.amount = [];
-                _this4.postData.invoice = [];
-                _this4.loop = 0;
-                _this4.editAble = true;
-                swal({
-                  title: "Success",
-                  text: "Expense Saved",
-                  icon: "success",
-                  timer: 2000
-                });
-
-                _this4.$refs.refDailySummaryReport.submit();
-
-                _context4.next = 25;
-                return _this4.fetchData();
-
-              case 25:
-                _context4.next = 27;
-                return _this4.existingExpenses();
-
-              case 27:
-                _this4.loading = false;
-                _context4.next = 32;
-                break;
-
-              case 30:
-                _this4.loading = false;
-
-                if (res.status == 422) {
-                  (function () {
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in res.data.errors) {
-                      res.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 32:
+              case 14:
               case "end":
                 return _context4.stop();
             }
@@ -37504,14 +37493,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
-              return _this.fetchLeaves();
+              _this.fetchLeaves();
 
-            case 2:
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
 
-            case 4:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -38552,13 +38539,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
-              _context.next = 4;
-              return _this.fetchCardCategories();
 
-            case 4:
+              _this.fetchCardCategories();
+
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -38897,42 +38883,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 4:
                 resUpdateCard = _context4.sent;
 
-                if (!(resUpdateCard.status === 200)) {
-                  _context4.next = 13;
-                  break;
-                }
-
-                swal({
-                  title: "Success",
-                  text: "Card Category Updated Successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-                $("#cardCategory_table").DataTable().destroy();
-                _this4.loading = false;
-                _context4.next = 11;
-                return _this4.fetchCardCategories();
-
-              case 11:
-                _context4.next = 14;
-                break;
-
-              case 13:
-                if (resUpdateCard.status == 422) {
+                if (resUpdateCard.status === 200) {
+                  swal({
+                    title: "Success",
+                    text: "Card Category Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  $("#cardCategory_table").DataTable().destroy();
                   _this4.loading = false;
 
-                  _loop2 = function _loop2(key) {
-                    resUpdateCard.data.errors[key].forEach(function (element) {
-                      _this4.errorsArray(element, key);
-                    });
-                  };
+                  _this4.fetchCardCategories();
+                } else {
+                  if (resUpdateCard.status == 422) {
+                    _this4.loading = false;
 
-                  for (key in resUpdateCard.data.errors) {
-                    _loop2(key);
+                    _loop2 = function _loop2(key) {
+                      resUpdateCard.data.errors[key].forEach(function (element) {
+                        _this4.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in resUpdateCard.data.errors) {
+                      _loop2(key);
+                    }
                   }
                 }
 
-              case 14:
+              case 6:
               case "end":
                 return _context4.stop();
             }
@@ -43912,13 +43890,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
-              _context.next = 4;
-              return _this.fetchSchedule();
 
-            case 4:
+              _this.fetchSchedule();
+
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -43927,7 +43904,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    addDays: function addDays(sche) {
+    addDays: function addDays(schedule) {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -43935,7 +43912,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _this2.extendDate = sche;
+                _this2.extendDate = schedule;
 
               case 1:
               case "end":
@@ -43961,24 +43938,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 3:
                 resExtend = _context3.sent;
 
-                if (!(resExtend.status == 200)) {
-                  _context3.next = 9;
-                  break;
+                if (resExtend.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Schedule Extended successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  setTimeout(function () {
+                    _this3.loading = false;
+                  }, 500);
+
+                  _this3.fetchSchedule();
                 }
 
-                swal({
-                  title: "Success",
-                  text: "Schedule Extended successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-                setTimeout(function () {
-                  _this3.loading = false;
-                }, 500);
-                _context3.next = 9;
-                return _this3.fetchSchedule();
-
-              case 9:
+              case 5:
               case "end":
                 return _context3.stop();
             }
@@ -44490,54 +44464,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 17:
                 res = _context7.sent;
 
-                if (!(res.status == 201)) {
-                  _context7.next = 27;
-                  break;
+                if (res.status == 201) {
+                  swal({
+                    title: "Success",
+                    text: "Schedule Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+
+                  _this7.clearForm();
+
+                  $('#schedule_table').DataTable().destroy();
+                  _this7.loading = false;
+
+                  _this7.fetchSchedule();
+                } else {
+                  if (res.status == 422) {
+                    (function () {
+                      _this7.loading = false;
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
                 }
 
-                swal({
-                  title: "Success",
-                  text: "Schedule Created Successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-
-                _this7.clearForm();
-
-                $('#schedule_table').DataTable().destroy();
-                _this7.loading = false;
-                _context7.next = 25;
-                return _this7.fetchSchedule();
-
-              case 25:
-                _context7.next = 28;
-                break;
-
-              case 27:
-                if (res.status == 422) {
-                  (function () {
-                    _this7.loading = false;
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in res.data.errors) {
-                      res.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 28:
+              case 19:
               case "end":
                 return _context7.stop();
             }
@@ -44614,42 +44580,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 11:
                 resEdit = _context8.sent;
 
-                if (!(resEdit.status == 200)) {
-                  _context8.next = 20;
-                  break;
-                }
-
-                swal({
-                  title: "Success",
-                  text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
-                  icon: "success",
-                  timer: 4000
-                });
-                $("#schedule_table").DataTable().destroy();
-                _this8.loading = false;
-                _context8.next = 18;
-                return _this8.fetchSchedule();
-
-              case 18:
-                _context8.next = 21;
-                break;
-
-              case 20:
-                if (resEdit.status == 422) {
+                if (resEdit.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
+                    icon: "success",
+                    timer: 4000
+                  });
+                  $("#schedule_table").DataTable().destroy();
                   _this8.loading = false;
 
-                  _loop = function _loop(key) {
-                    res.data.errors.percentage.forEach(function (element) {
-                      _this8.errorsArray(element, key);
-                    });
-                  };
+                  _this8.fetchSchedule();
+                } else {
+                  if (resEdit.status == 422) {
+                    _this8.loading = false;
 
-                  for (key in res.data.errors) {
-                    _loop(key);
+                    _loop = function _loop(key) {
+                      res.data.errors.percentage.forEach(function (element) {
+                        _this8.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.data.errors) {
+                      _loop(key);
+                    }
                   }
                 }
 
-              case 21:
+              case 13:
               case "end":
                 return _context8.stop();
             }
@@ -45712,13 +45670,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               window.removeEventListener('keydown', _this.enter);
               window.removeEventListener('keydown', _this.altM);
-              _context.next = 4;
-              return _this.fetchTerminals();
 
-            case 4:
+              _this.fetchTerminals();
+
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -45942,54 +45899,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 12:
                 res = _context3.sent;
 
-                if (!(res.status == 200)) {
-                  _context3.next = 25;
-                  break;
-                }
-
-                swal({
-                  title: "Success",
-                  text: "Terminal Created Successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-                _this3.loading = false;
-                $("#terminal_table").DataTable().destroy();
-                _context3.next = 19;
-                return _this3.fetchTerminals();
-
-              case 19:
-                _this3.terminals = res.data;
-                _this3.data = {};
-                _this3.data.city_id = 0;
-                setTimeout(function () {
-                  _this3.success = "";
-                  $("#add-modal").modal("hide");
-                  empty(_this3.errorsArray);
-                }, 2000);
-                _context3.next = 27;
-                break;
-
-              case 25:
-                if (res.status === 422) {
+                if (res.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Terminal Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
                   _this3.loading = false;
+                  $("#terminal_table").DataTable().destroy();
 
-                  _loop = function _loop(key) {
-                    res.data.errors[key].forEach(function (element) {
-                      _this3.errorsArray(element, key);
-                    });
-                  };
+                  _this3.fetchTerminals();
 
-                  for (key in res.data.errors) {
-                    _loop(key);
+                  _this3.terminals = res.data;
+                  _this3.data = {};
+                  _this3.data.city_id = 0;
+                  setTimeout(function () {
+                    _this3.success = "";
+                    $("#add-modal").modal("hide");
+                    empty(_this3.errorsArray);
+                  }, 2000);
+                } else {
+                  if (res.status === 422) {
+                    _this3.loading = false;
+
+                    _loop = function _loop(key) {
+                      res.data.errors[key].forEach(function (element) {
+                        _this3.errorsArray(element, key);
+                      });
+                    };
+
+                    for (key in res.data.errors) {
+                      _loop(key);
+                    }
+                  }
+
+                  if (res.status === 423) {
+                    _this3.errorsArray(res.data.is_main, 'Main Terminal');
                   }
                 }
 
-                if (res.status === 423) {
-                  _this3.errorsArray(res.data.is_main, 'Main Terminal');
-                }
-
-              case 27:
+              case 14:
               case "end":
                 return _context3.stop();
             }
@@ -46116,28 +46066,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 12:
                 res = _context6.sent;
 
-                if (!(res.status === 201)) {
-                  _context6.next = 20;
-                  break;
+                if (res.status === 201) {
+                  swal({
+                    title: "Success",
+                    text: "Terminal Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this6.loading = false;
+                  $("#terminal_table").DataTable().destroy();
+
+                  _this6.fetchTerminals();
+
+                  setTimeout(function () {
+                    $("#edit-modal").modal("hide");
+                  }, 3000);
                 }
 
-                swal({
-                  title: "Success",
-                  text: "Terminal Updated Successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-                _this6.loading = false;
-                $("#terminal_table").DataTable().destroy();
-                _context6.next = 19;
-                return _this6.fetchTerminals();
-
-              case 19:
-                setTimeout(function () {
-                  $("#edit-modal").modal("hide");
-                }, 3000);
-
-              case 20:
                 if (res.status == 422) {
                   _this6.loading = false;
 
@@ -46156,7 +46101,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this6.errorsArray(res.data.is_main, 'Main Terminal');
                 }
 
-              case 22:
+              case 16:
               case "end":
                 return _context6.stop();
             }

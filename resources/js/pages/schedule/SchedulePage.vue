@@ -917,12 +917,12 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchSchedule();
+        this.fetchSchedule();
         this.permissions = this.$store.state.permissions;
     },
     methods: {
-        async addDays(sche) {
-            this.extendDate = sche;
+        async addDays(schedule) {
+            this.extendDate = schedule;
         },
         async extendedDate() {
             this.loading = true;
@@ -937,7 +937,7 @@ export default {
                 setTimeout(() => {
                     this.loading = false;
                 }, 500);
-                await this.fetchSchedule();
+                 this.fetchSchedule();
             }
         },
         async fetchSchedule() {
@@ -1317,7 +1317,7 @@ export default {
                 this.clearForm();
                 $('#schedule_table').DataTable().destroy();
                 this.loading = false;
-                await this.fetchSchedule();
+                this.fetchSchedule();
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -1387,7 +1387,7 @@ export default {
                 });
                 $("#schedule_table").DataTable().destroy();
                 this.loading = false;
-                await this.fetchSchedule();
+                 this.fetchSchedule();
             } else {
                 if (resEdit.status == 422) {
                     this.loading = false;

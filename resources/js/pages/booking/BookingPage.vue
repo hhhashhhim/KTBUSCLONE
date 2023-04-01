@@ -1839,6 +1839,7 @@ export default {
                 id: this.addForm.schedule,
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
+                departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
             if (resDropCheck.status == 200) {
