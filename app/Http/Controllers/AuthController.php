@@ -41,7 +41,7 @@ class AuthController extends Controller
 //            return $closing;
 //        });
 //
-//        return $closings;
+////        return $closings;
 //
 //
 //        return view('reports.dailySummeryReportEng', [

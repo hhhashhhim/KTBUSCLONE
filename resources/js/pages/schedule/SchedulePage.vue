@@ -1225,14 +1225,14 @@ export default {
                         timer: 2000
                     });
 
-                if (this.data.addTerminalsOnClick.length == 0) {
-                    return swal({
-                        title: "Required!",
-                        text: "Please Select Terminals of Selected Route",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
+                // if (this.data.addTerminalsOnClick.length == 0) {
+                //     return swal({
+                //         title: "Required!",
+                //         text: "Please Select Terminals of Selected Route",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
 
                 // if (this.data.addTerminalsOnClick.length > 0) {
                 //     return swal({
