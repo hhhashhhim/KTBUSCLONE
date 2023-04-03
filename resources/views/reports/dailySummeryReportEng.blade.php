@@ -39,7 +39,7 @@
 <body>
 <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
     <div id="info">
-        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>
+        {{--        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>--}}
     </div>
     <br>
 
@@ -71,22 +71,37 @@
         </tr>
         <!-- Raw Data -->
         @foreach($data as $key => $single)
+            @php
+                $singleRowNet = 0;
+            @endphp
             <tr>
                 <td>{{$key + 1}}</td>
                 <td>{{ getBusName($single->closing[0]->bus_id) }}</td>
                 <td>{{ $single->mod }}</td>
                 <td>{{$single->total_income}}</td>
                 <td>{{ $single->total_expenses }}</td>
-                <td>{{ $single-> total_income - $single->total_expenses}}</td>
+                <td>{{ $single->total_income - $single->total_expenses}}</td>
+                @php
+                    $singleRowNet += ($single->total_income - $single->total_expenses);
+                @endphp
                 <td>Commission</td>
                 <td>Hawa Jali</td>
                 <td>M Tag</td>
                 <td>Paid</td>
                 <td>Non Paid</td>
-                @foreach(getTerminals() as $singleTerminal)
-                    <td></td>
+                @foreach(getTerminals() as $key => $singleTerminal)
+                    @php
+                    $online_terminals_income = isset($online_terminals[$single->id][$singleTerminal->id]) ? $online_terminals[$single->id][$singleTerminal->id]->sum('seat_fare') - $online_terminals[$single->id][$singleTerminal->id]->sum('discount') : 0;
+                    @endphp
+                    <td>
+                        {{ $online_terminals_income }}
+                    </td>
+                    @php
+                        $singleRowNet -= $online_terminals_income;
+                    @endphp
+
                 @endforeach
-                <td>Net Cash</td>
+                <td>{{ $singleRowNet }}</td>
             </tr>
         @endforeach
         <!-- Total Row -->
@@ -103,7 +118,7 @@
             <th>Total Paid</th>
             <th>Total Non Paid</th>
             @foreach(getTerminals() as $singleTerminal)
-            <th> Total </th>
+                <th> Total</th>
             @endforeach
             <th>Total Net Cash</th>
         </tr>

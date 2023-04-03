@@ -10,6 +10,7 @@ use App\Models\FareTable;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Terminal;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -20,12 +21,12 @@ class AuthController extends Controller
     public function index(Request $request)
     {
 ////        main Data
-//        $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->get(['id', 'schedule_complete']);
-//        $terminals = Terminal::with('tickets')->where('is_online_terminal', 1)->get();
+//        $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->get(['id', 'schedule_complete']);
+//        $mergeIds = TicketClosingMerge::where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->pluck('id');
 //
+//        $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where('online_terminal', 1)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount'])->groupBy(['ticket_merge_id', 'terminal_id']);
 ////Map function for single iteration
 //        $closings->map(function ($closing) {
-////            dd($closing);
 ////            get data from single iteration with relation
 //            $closing->closing->map(function ($ticket) use ($closing) {
 //
@@ -35,20 +36,16 @@ class AuthController extends Controller
 //                    if (!is_null($elt->elt)) {
 //                        $ticket->elt_fare = $elt->elt->sum('elt_price');
 //                    }
-//
 //                });
-//                $closing->total_income = (int)$ticket->ticket_fare + $ticket->elt_fare;
+//                $closing->total_income = (int)$closing->closing->sum('ticket_fare') + (int)$closing->closing->sum('elt_fare');
 //            });
 //            $closing->total_expenses = (int)TicketMergeExpense::where('ticket_merge_id', $closing->id)->sum('amount');
 //            $closing->mod = ($closing->closing[0]->tickets->count() + $closing->closing[1]->tickets->count()) * 20;
 //            return $closing;
 //        });
-//
-////        return $closings;
-//
-//
 //        return view('reports.dailySummeryReportEng', [
 //            "data" => $closings,
+//            "online_terminals" => $onlineTerminalData,
 //        ]);
 
 
