@@ -515,7 +515,9 @@ class BookingController extends Controller
             'is_drop' => 1,
         ])->first();
 
-        return $found;
+        return [
+            "checkDrop"=>$found,
+        ];
     }
 
     public function selected(Request $request)

@@ -1842,7 +1842,7 @@ export default {
                 destinationCity: this.addForm.destinationCity,
             });
             if (resDropCheck.status == 200) {
-                if (resDropCheck.data) {
+                if (resDropCheck.data.checkDrop) {
                     this.labelDrop = 'This Schedule is Dropped';
                     this.hideDivButtonsDrop = false;
                 } else {

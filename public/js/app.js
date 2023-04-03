@@ -28400,7 +28400,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDropCheck = _context16.sent;
 
                 if (resDropCheck.status == 200) {
-                  if (resDropCheck.data) {
+                  if (resDropCheck.data.checkDrop) {
                     _this16.labelDrop = 'This Schedule is Dropped';
                     _this16.hideDivButtonsDrop = false;
                   } else {
