@@ -917,12 +917,12 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchSchedule();
+        this.fetchSchedule();
         this.permissions = this.$store.state.permissions;
     },
     methods: {
-        async addDays(sche) {
-            this.extendDate = sche;
+        async addDays(schedule) {
+            this.extendDate = schedule;
         },
         async extendedDate() {
             this.loading = true;
@@ -937,7 +937,7 @@ export default {
                 setTimeout(() => {
                     this.loading = false;
                 }, 500);
-                await this.fetchSchedule();
+                this.fetchSchedule();
             }
         },
         async fetchSchedule() {
@@ -966,15 +966,6 @@ export default {
             const resDiscount = await this.callApi("post", "schedule/discount/getSelective");
             this.discounts = resDiscount.data;
         },
-
-        // async fetchTerminals(event, index) {
-        //     const terminalRes = await this.callApi("post", "cities/terminals", {
-        //         id: value,
-        //     });
-        //     if (terminalRes.status == 200) {
-        //         this.terminals[index] = terminalRes.data;
-        //     }
-        // },
 
         async getEntireForm() {
             const resEntire = await this.callApi("post", "schedule/getEntire", this.data);
@@ -1250,7 +1241,7 @@ export default {
                         icon: "error",
                         timer: 2000
                     });
-                if (this.data.route != 0 && this.data.busClass != 0 ) {
+                if (this.data.route != 0 && this.data.busClass != 0) {
                     this.activeSection = nextBtnValue;
                 }
             }
@@ -1262,48 +1253,54 @@ export default {
 
         async addSchedule() {
             this.validationErrors = [];
-            if (this.data.name == "")
+            if (this.data.name == "") {
                 return swal({
                     title: "Required!",
                     text: "Via Field is Required ",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.StartDate == "")
+            }
+            if (this.data.StartDate == "") {
                 return swal({
                     title: "Required!",
                     text: "Start Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.EndDate == "")
+            }
+            if (this.data.EndDate == "") {
                 return swal({
                     title: "Required!",
                     text: "End Date is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.time == "")
+            }
+            if (this.data.time == "") {
                 return swal({
                     title: "Required!",
                     text: "Schedule Time is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.busClass == "")
+            }
+            if (this.data.busClass == "") {
                 return swal({
                     title: "Required!",
                     text: "Bus Class is Required",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.data.route == "")
+            }
+            if (this.data.route == "") {
                 return swal({
                     title: "Required!",
                     text: "Route is Required",
                     icon: "error",
                     timer: 2000
                 });
+            }
             this.data.cities = this.cities;
             this.loading = true;
             const res = await this.callApi("post", "schedule/store", this.data);
@@ -1317,7 +1314,7 @@ export default {
                 this.clearForm();
                 $('#schedule_table').DataTable().destroy();
                 this.loading = false;
-                await this.fetchSchedule();
+                this.fetchSchedule();
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -1387,7 +1384,7 @@ export default {
                 });
                 $("#schedule_table").DataTable().destroy();
                 this.loading = false;
-                await this.fetchSchedule();
+                this.fetchSchedule();
             } else {
                 if (resEdit.status == 422) {
                     this.loading = false;

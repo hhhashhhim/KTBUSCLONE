@@ -234,7 +234,7 @@ export default {
         };
     },
     async created() {
-        await this.fetchLeaves();
+         this.fetchLeaves();
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
     },

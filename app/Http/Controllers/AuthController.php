@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\Expense\ExpenseCategory;
 use App\Models\Expense\TicketMergeExpense;
+use App\Models\FareClass;
+use App\Models\FareTable;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Terminal;

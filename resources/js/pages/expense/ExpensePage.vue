@@ -208,8 +208,8 @@ export default {
         }
     },
     async created() {
-        await this.fetchData();
-        await this.existingExpenses();
+         this.fetchData();
+         this.existingExpenses();
         setTimeout(function () {
             $("#expense_table").DataTable();
         }, 300);
@@ -321,8 +321,8 @@ export default {
                     timer: 2000
                 });
                 this.$refs.refDailySummaryReport.submit();
-                await this.fetchData();
-                await this.existingExpenses();
+                 this.fetchData();
+                 this.existingExpenses();
                 this.loading = false;
             } else {
                 this.loading = false;

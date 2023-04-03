@@ -346,7 +346,7 @@ export default {
     async created() {
         window.removeEventListener('keydown', this.enter);
         window.removeEventListener('keydown', this.altM);
-        await this.fetchCardCategories();
+         this.fetchCardCategories();
         this.permissions = this.$store.state.permissions;
     },
     methods: {
@@ -587,7 +587,7 @@ export default {
                 });
                 $("#cardCategory_table").DataTable().destroy();
                 this.loading = false;
-                await this.fetchCardCategories();
+                 this.fetchCardCategories();
             } else {
                 if (resUpdateCard.status == 422) {
                     this.loading = false;
