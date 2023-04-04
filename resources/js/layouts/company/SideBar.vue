@@ -70,6 +70,11 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize"  :to="{ name: 'report-header'}">
+                                <i class="fas fa-city"></i> Report Headers
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('confirm-cancel')">
                             <router-link class="nav-link text-capitalize"  to="">
                                 <i class="fas fa-city"></i> Confirmed Canceled

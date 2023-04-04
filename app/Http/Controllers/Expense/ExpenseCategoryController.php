@@ -18,17 +18,6 @@ use Illuminate\Validation\Rule;
 
 class ExpenseCategoryController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
         return ExpenseCategory::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
@@ -38,7 +27,7 @@ class ExpenseCategoryController extends Controller
     {
         $rules = [
             'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at'),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-            
+
         ];
 
         $customMessages = [
@@ -46,7 +35,7 @@ class ExpenseCategoryController extends Controller
             'name.unique' => 'Category Name is Already Exist',
         ];
         $this->validate($request, $rules, $customMessages);
-        
+
         $category = ExpenseCategory::create([
             'name' => $request->name,
             'company_id' => Auth::user()->company_id,
@@ -68,7 +57,7 @@ class ExpenseCategoryController extends Controller
     {
         $rules = [
             'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->where("first_level_id",5)->where("second_level_id",18)->whereNull('deleted_at'),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-            
+
         ];
 
         $customMessages = [

@@ -79,5 +79,7 @@ require_once('web/expenses.php');
 require_once('web/card/loyaltyCard.php');
 // Loyalty Card Assign  Routes
 require_once('web/card/loyaltyCardAssign.php');
+// Reports Header Routes
+require_once('web/reports/reportsHeader.php');
 
 Route::get('/{any}', [AuthController::class, 'index'])->where('any', '.*');

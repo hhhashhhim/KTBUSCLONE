@@ -43,6 +43,7 @@ import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferenceP
 import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
+import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 
 
 const url = '/kt/'
@@ -269,6 +270,11 @@ const routes = [
         path: url + "loyalty/card/assign",
         component : loyaltyCardAssignPage,
         name:"loyalty-card-assign"
+    },
+    {
+        path: url + "reports/header",
+        component : ReportsHeadersPage,
+        name:"report-header"
     },
 ]
 const router = createRouter({
