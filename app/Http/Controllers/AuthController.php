@@ -20,16 +20,16 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
-////        main Data
+// //        main Data
 //        $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->get(['id', 'schedule_complete']);
 //        $mergeIds = TicketClosingMerge::where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->pluck('id');
-//
+
 //        $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where('online_terminal', 1)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount'])->groupBy(['ticket_merge_id', 'terminal_id']);
-////Map function for single iteration
+// //Map function for single iteration
 //        $closings->map(function ($closing) {
-////            get data from single iteration with relation
+// //            get data from single iteration with relation
 //            $closing->closing->map(function ($ticket) use ($closing) {
-//
+
 //                $ticket->ticket_fare = $ticket->tickets->sum("seat_fare") - $ticket->tickets->sum("discount");
 //                $ticket->elt_fare = 0;
 //                $ticket->tickets->map(function ($elt) use ($ticket) {

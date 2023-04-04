@@ -8,4 +8,6 @@ Route::group(['prefix' => 'reportsHeader', [CustomMiddleware::class]], function 
     Route::post('/', [ReportsHeaderController::class, 'index']);
     Route::post('/store', [ReportsHeaderController::class, 'store']);
     Route::post('/update', [ReportsHeaderController::class, 'update']);
+    Route::post('/link', [ReportsHeaderController::class, 'headerLink']);
+    Route::post('/link/get', [ReportsHeaderController::class, 'linkGet']);
 });

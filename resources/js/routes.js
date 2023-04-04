@@ -44,7 +44,7 @@ import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
-import HeaderLinkPage from "./pages/reportHeader/HeaderLinkPage.vue";
+import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 
 
 const url = '/kt/'

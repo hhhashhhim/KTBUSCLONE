@@ -32,7 +32,7 @@
                                                         <td>
                                                             {{saveRow(item.id,"first",index)}}
                                                             <select class="form-control rounded-0"
-                                                                :disabled="editAble" :value="postData.headers[index]">
+                                                                :disabled="editAble" :value="postData.headIds[index]">
                                                                 <option :value="item.id" :key="i"
                                                                     >
                                                                     {{ item.name }}
@@ -135,9 +135,9 @@ export default {
     },
     data() {
         return {
-            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             validationErrors: [],
-            editAble: false,
+            editAble: true,
             headers: [],
             loading: false,
             formID: 'expense_form',
@@ -146,7 +146,7 @@ export default {
             totalAmount: 0,
             postData: {
                 ticket_merge_id: "",
-                headers: [],
+                headIds: [],
                 values: [],
             },
             // dataEdit:{
@@ -160,10 +160,10 @@ export default {
         }
     },
     async created() {
-         this.fetchData();
-         this.existingExpenses();
+        this.postData.ticket_merge_id = this.$route.params.id;
+        this.fetchData();
         setTimeout(function () {
-            $("#expense_table").DataTable();
+            $("#header_table").DataTable();
         }, 300);
     },
     methods: {
@@ -171,35 +171,25 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", 'expenses/categories');
+            const res = await this.callApi("post", 'reportsHeader/link/get',{ticket_merge_id:this.postData.ticket_merge_id});
             if (res.status == 200) {
-                this.headers = res.data;
+                this.headers = res.data.headers;
+                
+                if(res.data.links != null)
+                {
+                    this.postData.values = [];
+                    for (var i = 0; i < res.data.links.length; i++) {
+                        this.postData.values.push(res.data.links[i].value);
+                    }
+                }
             }
 
             this.postData.ticket_merge_id = this.$route.params.id;
         },
-        async existingExpenses() {
-            // const res = await this.callApi("post", 'expenses', {ticket_merge_id: this.postData.ticket_merge_id});
-            // if (res.status == 200) {
-            //     const expenses = res.data;
-            //     if (expenses != "") {
-            //         this.loop = expenses.length;
-            //         for (var i = 0; i < expenses.length; i++) {
-            //             this.postData.category.push(expenses[i].expense_category_id);
-            //             this.postData.description.push(expenses[i].description);
-            //             this.postData.amount.push(expenses[i].amount);
-            //             this.postData.invoice.push(expenses[i].invoice);
-            //         }
-            //     } else {
-            //         this.loop = 1;
-            //         this.editAble = true;
-            //     }
-            // }
-        },
         saveRow(value, fieldName, index) {
             
             if (fieldName == "first") {
-                this.postData.headers[index] = value;
+                this.postData.headIds[index] = value;
             }
             if (fieldName == "second") {
                 this.postData.values[index] = parseFloat(value != "" ? value: 0);
@@ -212,25 +202,20 @@ export default {
 
 
             this.loading = true;
-            const res = await this.callApi("post", "expenses/store", this.postData);
+            const res = await this.callApi("post", "reportsHeader/link", this.postData);
             if (res.status === 200) {
                 this.loading = false;
                 // $('#expense').DataTable().destroy();
-                this.postData.category = [];
-                this.postData.description = [];
-                this.postData.amount = [];
-                this.postData.invoice = [];
-                this.loop = 0;
+                this.postData.headIds = [];
+                this.postData.values = [];
                 this.editAble = true;
                 swal({
                     title: "Success",
-                    text: "Expense Saved",
+                    text: "Header Saved",
                     icon: "success",
                     timer: 2000
                 });
-                this.$refs.refDailySummaryReport.submit();
                  this.fetchData();
-                 this.existingExpenses();
                 this.loading = false;
             } else {
                 this.loading = false;
@@ -264,7 +249,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.cities.splice(obj.index, 1)
-                $("#expense_table").DataTable().destroy();
+                $("#header_table").DataTable().destroy();
                 this.fetchData();
                 this.existingExpenses();
             }
