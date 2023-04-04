@@ -44,6 +44,7 @@ import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
+import HeaderLinkPage from "./pages/reportHeader/HeaderLinkPage.vue";
 
 
 const url = '/kt/'
@@ -240,6 +241,11 @@ const routes = [
         path: url + "expenses/:id",
         component : ExpensePage,
         name:"expense-page"
+    },
+    {
+        path: url + "report/header/link/:id",
+        component : HeaderLinkPage,
+        name:"header-link-page"
     },
     {
         path: url + "terminals/:id/commissions",

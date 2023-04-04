@@ -31,7 +31,6 @@
                                                         <th>Departure Date</th>
                                                         <th>Return Date</th>
                                                         <th>Return Schedule</th>
-                                                        ``
                                                         <th v-if="checkForSubmenuButtons('add-expense')">Expense</th>
                                                     </tr>
                                                     </thead>
@@ -58,6 +57,12 @@
                                                                          :to="{ name:'expense-page', params: { id:merge.id }}"
                                                                          title="Add Expense">
                                                                 <i class="fas fa-plus"></i>
+                                                            </router-link>
+                                                            <router-link v-if="checkForSubmenuButtons('add-expense')"
+                                                                         class="btn btn-success mx-2"
+                                                                         :to="{ name:'header-link-page', params: { id:merge.id }}"
+                                                                         title="header link">
+                                                                Link Headers
                                                             </router-link>
                                                         </td>
                                                     </tr>
