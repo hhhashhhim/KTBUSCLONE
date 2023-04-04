@@ -47,8 +47,8 @@ import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 import HeaderLinkPage from "./pages/reportHeader/HeaderLinkPage.vue";
 
 
-// const url = '/kt/'
- const url = '/'
+const url = '/kt/'
+ // const url = '/'
 
 
 const routes = [

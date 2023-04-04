@@ -49,6 +49,7 @@ class ReportsHeaderController extends Controller
         $expCtg = ReportsHeader::find($request->id);
         return $expCtg->update([
             'name' => $request->name,
+            'updated_by' => Auth::user()->id,
         ]);
     }
 
