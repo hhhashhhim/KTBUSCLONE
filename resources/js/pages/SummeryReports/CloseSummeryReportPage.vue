@@ -14,42 +14,69 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
+                                            <form :action="$store.state.app_url + 'reports/reportExport'"
+                                                  target="_blank"
+                                                  method="POST" ref="refDailySummeryReport">
+                                                <input type="hidden" name="_token" v-bind:value="csrf">
+                                                <input type="hidden" name="language" id="languageReport">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="busNo">Bus No</label>
+                                                            <select class="form-control" id="busNo" name="busNO">
+                                                                <option value="0" selected>Select Bus</option>
+                                                                <option
+                                                                    v-for="(bus, i) in buses"
+                                                                    :value="bus.id"
+                                                                    :key="i"
+                                                                >{{ bus.bus_number }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="scheduleRoute">Route</label>
+                                                            <select class="form-control" id="scheduleRoute"
+                                                                    name="schedule">
+                                                                <option value="0" selected>Select Schedule</option>
+                                                                <option class="text-uppercase"
+                                                                        v-for="(schedule, i) in schedules"
+                                                                        :value="schedule.id"
+                                                                        :key="i"
+                                                                >{{ schedule.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="fromDate">From Date</label>
+                                                            <input type="date" id="fromDate" class="form-control"
+                                                                   name="fromDate"
+                                                                   :max="maxDateFilterReport()">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label for="toDate">To Date <span
+                                                                class="text-danger ml-1">*</span></label>
+                                                            <input type="date" id="toDate" class="form-control"
+                                                                   name="toDate"
+                                                                   :max="maxDateFilterReport()">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
                                             <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="name">Bus No<span
-                                                            class="text-danger ml-1">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                               placeholder="Enter Header Name" v-model="data.name">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="name">Name <span
-                                                            class="text-danger ml-1">*</span></label>
-                                                        <input type="text" class="form-control"
-                                                               placeholder="Enter Header Name" v-model="data.name">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="name">Name <span
-                                                            class="text-danger ml-1">*</span></label>
-                                                        <input type="text" class="form-control"
-                                                               placeholder="Enter Header Name" v-model="data.name">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="name">Name <span
-                                                            class="text-danger ml-1">*</span></label>
-                                                        <input type="text" class="form-control"
-                                                               placeholder="Enter Header Name" v-model="data.name">
-                                                    </div>
-                                                </div>
                                                 <div class="card-footer">
-                                                    <button class="btn btn-primary">Report in English</button>
-                                                    <button class="btn btn-secondary">Report in Urdu</button>
+                                                    <button class="btn btn-primary mr-2"
+                                                            @click="getSummeryReport('english')">Export Report
+                                                    </button>
+                                                    <button class="btn btn-secondary mr-2"
+                                                            @click="getSummeryReport('urdu')">Export Report
+                                                        (Urdu)
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -72,145 +99,53 @@ import Edit from '../../components/Edit.vue';
 import {mapGetters} from 'vuex';
 
 export default {
-    name: "category",
+    name: "closeSummeryReport",
     components: {
         Add,
         Edit,
-        // Delete,
     },
     data() {
         return {
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             validationErrors: [],
             headers: [],
             loading: false,
             formID: 'reports_header',
             editFormID: 'edit_reports_header',
-            data: {
-                name: "",
-            },
-            dataEdit: {
-                id: "",
-                name: "",
-            },
+            schedules: [],
+            buses: [],
             success: false,
             errors: false,
         }
     },
     async created() {
-        this.fetchHeadersData();
+        this.fetchDailySummaryReport();
     },
     methods: {
-        clearForm: function () {
-            this.data = {};
-        },
-        async fetchHeadersData() {
-            const resHeaders = await this.callApi("post", 'reportsHeader');
-            if (resHeaders.status == 200) {
-                this.headers = resHeaders.data;
-            }
-            setTimeout(function () {
-                $("#report_header_table").DataTable();
-            }, 300);
-        },
-        async add() {
-            this.validationErrors = []
-            if (!this.data.name)
-                return swal({
-                    title: "Required",
-                    text: "Header Name is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            this.loading = true
-            const res = await this.callApi("post", 'reportsHeader/store', this.data);
-            if (res.status == 201) {
-                swal({
-                    title: "Success",
-                    text: "Header Created Successfully Named as  " + res.data.name,
-                    icon: "success",
-                    timer: 2000
-                });
-                $("#report_header_table").DataTable().destroy();
-                this.loading = false;
-                this.fetchHeadersData();
-                this.data.name = "";
-                setTimeout(function () {
-                    this.success = "";
-                    this.data = "";
-                }, 300)
-            } else {
-                if (res.status == 422) {
-                    this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
+        async fetchDailySummaryReport() {
+            const resGetSchedule = await this.callApi("post", 'reports/getSchedule');
+            const resGetBuses = await this.callApi("post", 'reports/getBuses');
+            if (resGetSchedule.status == 200 && resGetBuses.status == 200) {
+                this.schedules = resGetSchedule.data;
+                this.buses = resGetBuses.data;
             }
         },
-        edit(category) {
-            this.dataEdit = category;
+        maxDateFilterReport: function () {
+            const dtToday = new Date();
+            let month = dtToday.getMonth() + 1;
+            let day = dtToday.getDate();
+            const year = dtToday.getFullYear();
+            if (month < 10)
+                month = '0' + month.toString();
+            if (day < 10)
+                day = '0' + day.toString();
+            return year + '-' + month + '-' + day;
         },
-        async update() {
-            this.validationErrors = []
-            if (this.dataEdit.name == "")
-                return swal({
-                    title: "Required",
-                    text: "Header Name is required ",
-                    icon: "error",
-                    timer: 2000
-                });
-            this.loading = true;
-            const resEdit = await this.callApi("post", 'reportsHeader/update', this.dataEdit);
-            if (resEdit.status == 200) {
-                swal({
-                    title: "Success",
-                    text: "Header Name updated Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-                this.loading = false;
-                $("#report_header_table").DataTable().destroy();
-                this.fetchHeadersData();
-                setTimeout(() => {
-                    this.success = ""
-                    $('#edit-modal').modal('hide')
-                }, 3000);
-            } else {
-                if (resEdit.status == 422) {
-                    this.loading = false;
-                    for (const key in resEdit.data.errors) {
-                        resEdit.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
-                }
-                setTimeout(() => {
-                    this.loading = false
-                }, 3000);
-            }
-        },
-        // async deleteModal( city,i ){
-        //     const deletingObj = {
-        //         url:"cities/delete",
-        //         data:city,
-        //         index:i,
-        //     }
-        //     this.$store.commit("setDeleteObj",deletingObj);
-        // },
-    },
-    computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.cities.splice(obj.index, 1)
-                $("#report_header_table").DataTable().destroy();
-                this.fetchHeadersData();
-            }
+        async getSummeryReport(value) {
+            $("#languageReport").val(value);
+            this.$refs.refDailySummeryReport.submit();
+
         }
-    }
+    },
 }
 </script>
