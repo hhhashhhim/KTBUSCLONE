@@ -15,21 +15,41 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                                                        <input type="text" class="form-control" placeholder="Enter Header Name" v-model="data.name">
+                                                        <label for="name">Bus No<span
+                                                            class="text-danger ml-1">*</span></label>
+                                                            <input type="text" class="form-control"
+                                                               placeholder="Enter Header Name" v-model="data.name">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                                                        <input type="text" class="form-control" placeholder="Enter Header Name" v-model="data.name">
+                                                        <label for="name">Name <span
+                                                            class="text-danger ml-1">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                               placeholder="Enter Header Name" v-model="data.name">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <button class="btn btn-primary">Report In English</button>
-                                                    <button class="btn btn-secondary">Report In Urdu</button>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="name">Name <span
+                                                            class="text-danger ml-1">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                               placeholder="Enter Header Name" v-model="data.name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="name">Name <span
+                                                            class="text-danger ml-1">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                               placeholder="Enter Header Name" v-model="data.name">
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <button class="btn btn-primary">Report in English</button>
+                                                    <button class="btn btn-secondary">Report in Urdu</button>
                                                 </div>
                                             </div>
                                         </div>
