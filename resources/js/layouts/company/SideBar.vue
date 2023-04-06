@@ -86,7 +86,7 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('close-trip')">
-                            <router-link class="nav-link text-capitalize"  to="">
+                            <router-link class="nav-link text-capitalize"  :to="{ name : 'summery-report'}">
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>

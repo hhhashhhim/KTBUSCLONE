@@ -462,3 +462,11 @@ if (!function_exists('getTerminals')) {
         return \App\Models\Terminal::where('is_online_terminal', 1)->where('company_id', Auth::user()->company_id)->get();
     }
 }
+
+//Get Dynamic Headers
+if (!function_exists('getDynamicHeaders')) {
+    function getDynamicHeaders()
+    {
+        return \App\Models\ReportsHeader::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+    }
+}
