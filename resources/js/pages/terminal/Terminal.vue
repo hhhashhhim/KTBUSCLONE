@@ -71,16 +71,20 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="city_id">Terminal City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="data.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Terminal Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="data.name" placeholder="Enter Terminal Name">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="name">Terminal Name In Urdu<span class="text-danger ml-1">*</span></label>
+                        <input type="text" class="form-control" v-model="data.urdu_name" dir="rtl" placeholder="ٹرمینل نام">
                     </div>
                 </div>
                 <div class="row">
@@ -211,16 +215,20 @@
 
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="city_id">Terminal City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="dataEdit.city_id">
                             <option value="0">Select City</option>
                             <option v-for="(city,i) in cities" :key="i" :value="city.id"> {{ city.name }}</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Terminal Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="name">Terminal Name In Urdu <span class="text-danger ml-1">*</span></label>
+                        <input type="text" class="form-control" v-model="dataEdit.urdu_name" dir="rtl">
                     </div>
                 </div>
                 <div class="row">
@@ -537,6 +545,7 @@ export default {
             data: {
                 company_id: "",
                 name: "",
+                urdu_name: "",
                 available_seats: "",
                 contact: "",
                 address: "",
@@ -689,6 +698,13 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (!this.data.urdu_name)
+                return swal({
+                    title: "Required",
+                    text: "Terminal Urdu Name is required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (!this.data.contact)
                 return swal({
                     title: "Required",
@@ -764,6 +780,13 @@ export default {
                 return swal({
                     title: "Required",
                     text: "Terminal name is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEdit.urdu_name == "")
+                return swal({
+                    title: "Required",
+                    text: "Terminal urdu name is required",
                     icon: "error",
                     timer: 2000
                 });

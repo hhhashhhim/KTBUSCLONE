@@ -48,6 +48,7 @@ class TerminalController extends Controller
     {
         $rules = [
             'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+            'urdu_name' => ['required', Rule::unique('terminals', 'urdu_name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'city_id' => 'required',
             'contact' => 'required',
 //            'commission' => 'required',
@@ -76,6 +77,7 @@ class TerminalController extends Controller
 //        }
         Terminal::create([
             'name' => $request->name,
+            'urdu_name' => $request->urdu_name,
             'contact' => plainContactAndCnic($request->contact),
             'address' => $request->address ?? " ",
             'longitude' => $request->longitude,
@@ -108,6 +110,7 @@ class TerminalController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
+            'urdu_name' => 'required',
             'contact' => 'required',
         ]);
 //        if ($request->is_main) {
@@ -124,6 +127,7 @@ class TerminalController extends Controller
 //        }
         Terminal::find($request->id)->update([
             'name' => $request->name,
+            'urdu_name' => $request->urdu_name,
             'contact' => plainContactAndCnic($request->contact),
             'address' => $request->address,
             'longitude' => $request->longitude,
