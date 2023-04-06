@@ -39,7 +39,7 @@
 <body>
 <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
     <div id="info">
-        {{--        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>--}}
+        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>
     </div>
     <br>
 
@@ -51,76 +51,98 @@
             <th>Income</th>
             <th>Expenses</th>
             <th>Profit</th>
-            <th>Commission</th>
-            <th>Hawa Jali</th>
-            <th>M Tag</th>
-            <th>Paid</th>
-            <th>Non Paid</th>
+            @foreach(getDynamicHeaders() as $header)
+                <th>{{ $header->name }}</th>
+            @endforeach
             @foreach(getTerminals()  as $item)
                 <th>{{ $item->name }}</th>
             @endforeach
-            {{--            <th>Jazz Cash</th>--}}
-            {{--            <th>Do Safar</th>--}}
-            {{--            <th>Online Web</th>--}}
-            {{--            <th>Online Mobile</th>--}}
-            {{--            <th>1 Link</th>--}}
-            {{--            <th>SASTA Tcket</th>--}}
-            {{--            <th>Book Me</th>--}}
-            {{--            <th>Book Kro</th>--}}
             <th>Net Cash</th>
         </tr>
-        <!-- Raw Data -->
+        @php
+            $totalMOd = 0;
+            $totalIncome = 0;
+            $totalExpense = 0;
+            $totalProfit = 0;
+            $totalHeaders = [];
+            $totalTerminals = [];
+            $totalNetCash = 0;
+        @endphp
+            <!-- Raw Data -->
+        @foreach(getDynamicHeaders() as $singleHeader)
+            @php
+                array_push( $totalHeaders,0)
+            @endphp
+        @endforeach
+        @foreach(getTerminals() as $singleHeader)
+            @php
+                array_push( $totalTerminals ,0)
+            @endphp
+        @endforeach
         @foreach($data as $key => $single)
             @php
                 $singleRowNet = 0;
             @endphp
             <tr>
                 <td>{{$key + 1}}</td>
-                <td>{{ getBusName($single->closing[0]->bus_id) }}</td>
+                <td>{{ getBusName($single->closing[0]->bus_id)  }}</td>
+
                 <td>{{ $single->mod }}</td>
+                @php
+                    $totalMOd += $single->mod;
+                @endphp
                 <td>{{$single->total_income}}</td>
+                @php
+                    $totalIncome += $single->total_income;
+                @endphp
                 <td>{{ $single->total_expenses }}</td>
+                @php
+                    $totalExpense += $single->total_expenses;
+                @endphp
                 <td>{{ $single->total_income - $single->total_expenses}}</td>
                 @php
                     $singleRowNet += ($single->total_income - $single->total_expenses);
+                    $totalProfit += ($single->total_income - $single->total_expenses);
                 @endphp
-                <td>Commission</td>
-                <td>Hawa Jali</td>
-                <td>M Tag</td>
-                <td>Paid</td>
-                <td>Non Paid</td>
-                @foreach(getTerminals() as $key => $singleTerminal)
+                @foreach(getDynamicHeaders() as $keyHeader => $singleHeader)
+                    <td> {{ (int)$headers_link[$single->id][$singleHeader->id][0]->value}}</td>
                     @php
-                    $online_terminals_income = isset($online_terminals[$single->id][$singleTerminal->id]) ? $online_terminals[$single->id][$singleTerminal->id]->sum('seat_fare') - $online_terminals[$single->id][$singleTerminal->id]->sum('discount') : 0;
+                        $totalHeaders[$keyHeader] += (int)$headers_link[$single->id][$singleHeader->id][0]->value;
+                    @endphp
+                @endforeach
+                @foreach(getTerminals() as $keyTerminal => $singleTerminal)
+                    @php
+                        $online_terminals_income = isset($online_terminals[$single->id][$singleTerminal->id]) ? $online_terminals[$single->id][$singleTerminal->id]->sum('seat_fare') - $online_terminals[$single->id][$singleTerminal->id]->sum('discount') : 0;
                     @endphp
                     <td>
                         {{ $online_terminals_income }}
                     </td>
                     @php
                         $singleRowNet -= $online_terminals_income;
+                        $totalTerminals[$keyTerminal] += (int)$online_terminals_income;
                     @endphp
-
                 @endforeach
                 <td>{{ $singleRowNet }}</td>
             </tr>
+            @php
+                $totalNetCash += $singleRowNet;
+            @endphp
         @endforeach
         <!-- Total Row -->
         <tr>
             <th></th>
             <th></th>
-            <th>Total MOD</th>
-            <th>Total Income</th>
-            <th>Total Expenses</th>
-            <th>Total Profit</th>
-            <th>Total Commission</th>
-            <th>Total Hawa Jali</th>
-            <th>Total M Tag</th>
-            <th>Total Paid</th>
-            <th>Total Non Paid</th>
-            @foreach(getTerminals() as $singleTerminal)
-                <th> Total</th>
+            <th>{{ $totalMOd }}</th>
+            <th>{{ $totalIncome }}</th>
+            <th>{{ $totalExpense }}</th>
+            <th>{{ $totalProfit }}</th>
+            @foreach($totalHeaders as  $j)
+                <th>{{ $j  }}</th>
             @endforeach
-            <th>Total Net Cash</th>
+            @foreach($totalTerminals as $k)
+                <th> {{ $k }}</th>
+            @endforeach
+            <th> {{ $totalNetCash }}</th>
         </tr>
     </table>
 </div>
