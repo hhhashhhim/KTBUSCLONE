@@ -1,5 +1,5 @@
 import Profile from "./components/Profile.vue";
-import { createWebHistory,createRouter } from "vue-router";
+import {createWebHistory, createRouter} from "vue-router";
 
 import Users from "./pages/users/Users.vue";
 import Roles from "./pages/roles/Roles.vue";
@@ -48,250 +48,250 @@ import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
 
 
-const url = '/kt/'
- // const url = '/'
+// const url = '/kt/'
+const url = '/'
 
 
 const routes = [
     {
         path: url + "",
-        component : Users,
-        name:"home",
+        component: Users,
+        name: "home",
     },
     {
         path: url + "login",
-        component : Login,
-        name:"login",
+        component: Login,
+        name: "login",
     },
     {
         path: url + "users",
-        component : Users,
-        name:"users",
+        component: Users,
+        name: "users",
     },
     {
         path: url + "roles",
-        component : Roles,
-        name:"roles",
+        component: Roles,
+        name: "roles",
     },
     {
         path: url + "permissions/:id",
-        component :Permissions,
-        name:"role.permission"
+        component: Permissions,
+        name: "role.permission"
     },
     {
         path: url + "profiles",
-        component : Profile,
-        name:"profile"
+        component: Profile,
+        name: "profile"
     },
     {
         path: url + "companies",
-        component : Company,
-        name:"company"
+        component: Company,
+        name: "company"
     },
     {
         path: url + "terminals",
-        component : Terminal,
-        name:"terminal"
+        component: Terminal,
+        name: "terminal"
     },
     {
         path: url + "admin/dashboard",
-        component : Dashboard,
-        name:"admin-dashboard"
+        component: Dashboard,
+        name: "admin-dashboard"
     },
     {
         path: url + "fare-table",
-        component : FareTable,
-        name:"fare-table"
+        component: FareTable,
+        name: "fare-table"
     },
     {
         path: url + "fare-class",
-        component : FareClass,
-        name:"fare-class"
+        component: FareClass,
+        name: "fare-class"
     },
     {
         path: url + "routes",
-        component : RoutePage,
-        name:"routes-page"
+        component: RoutePage,
+        name: "routes-page"
     },
     {
         path: url + "discounts",
-        component : DiscountPage,
-        name:"discount-page"
+        component: DiscountPage,
+        name: "discount-page"
     },
     {
         path: url + "surcharge",
-        component : SurchargePage,
-        name:"surcharge-page"
+        component: SurchargePage,
+        name: "surcharge-page"
     },
     {
         path: url + "cities",
-        component : CitiesPage,
-        name:"cities-page"
+        component: CitiesPage,
+        name: "cities-page"
     },
     {
         path: url + "schedule",
-        component : SchedulePage,
-        name:"schedule-page"
+        component: SchedulePage,
+        name: "schedule-page"
     },
     {
         path: url + "buses",
-        component : BusesPage,
-        name:"buses-page"
+        component: BusesPage,
+        name: "buses-page"
     },
     {
         path: url + "bus-class",
-        component : BusClassPage,
-        name:"bus-class-page"
+        component: BusClassPage,
+        name: "bus-class-page"
     },
     {
         path: url + "bookings",
-        component : BookingPage,
-        name:"booking-page"
+        component: BookingPage,
+        name: "booking-page"
     },
     {
         path: url + "booking/schedule/closing",
-        component : ScheduleClosingPage,
-        name:"booking-schedule-closing"
+        component: ScheduleClosingPage,
+        name: "booking-schedule-closing"
     },
     {
         path: url + "booking/schedule/merges",
-        component : ScheduleMergePage,
-        name:"booking-schedule-merges"
+        component: ScheduleMergePage,
+        name: "booking-schedule-merges"
     },
     {
         path: url + "booking/all",
-        component : AllBookingPage,
-        name:"all-booking-page"
+        component: AllBookingPage,
+        name: "all-booking-page"
     },
     {
         path: url + "hrm/employees",
-        component : EmployeesPage,
-        name:"employees"
+        component: EmployeesPage,
+        name: "employees"
     },
     {
         path: url + "hrm/leaves",
-        component : LeavePage,
-        name:"leaves"
+        component: LeavePage,
+        name: "leaves"
     },
     {
         path: url + "hrm/departments",
-        component : DepartmentPage,
-        name:"departments"
+        component: DepartmentPage,
+        name: "departments"
     },
     {
         path: url + "hrm/designations",
-        component : DesignationPage,
-        name:"designations"
+        component: DesignationPage,
+        name: "designations"
     },
     {
         path: url + "fleet/maintenance/part",
-        component : MaintenancePartPage,
-        name:"maintenance-parts"
+        component: MaintenancePartPage,
+        name: "maintenance-parts"
     },
     {
         path: url + "fleet/maintenance/link",
-        component : MaintenanceLinkPage,
-        name:"maintenance-link"
+        component: MaintenanceLinkPage,
+        name: "maintenance-link"
     },
     {
         path: url + "fleet/maintenance/due",
-        component : MaintenanceDuePage,
-        name:"maintenance-due"
+        component: MaintenanceDuePage,
+        name: "maintenance-due"
     },
     {
         path: url + "fleet/maintenance/record",
-        component : MaintenanceRecordPage,
-        name:"maintenance-record"
+        component: MaintenanceRecordPage,
+        name: "maintenance-record"
     },
     {
         path: url + "refreshments/hotels",
-        component : HotelPage,
-        name:"hotels"
+        component: HotelPage,
+        name: "hotels"
     },
     {
         path: url + "refreshments/hotels/specific/foods",
-        component : FoodPage,
-        name:"foods"
+        component: FoodPage,
+        name: "foods"
     },
     {
         path: url + "refreshments/hotels/specific/foods/deals",
-        component : FoodDealPage,
-        name:"foodDeals"
+        component: FoodDealPage,
+        name: "foodDeals"
     },
     {
         path: url + "refreshments/hotels/food/order",
-        component : FoodOrderPage,
-        name:"foodOrder"
+        component: FoodOrderPage,
+        name: "foodOrder"
     },
     {
         path: url + "settings/tickets",
-        component : TicketSettingPage,
-        name:"ticketSettings"
+        component: TicketSettingPage,
+        name: "ticketSettings"
     },
     {
         path: url + "settings/profile",
-        component : ProfilePage,
-        name:"profileSettings"
+        component: ProfilePage,
+        name: "profileSettings"
     },
     {
         path: url + "expense/categories",
-        component : ExpenseCategoryPage,
-        name:"expense-category-page"
+        component: ExpenseCategoryPage,
+        name: "expense-category-page"
     },
     {
         path: url + "expenses/:id",
-        component : ExpensePage,
-        name:"expense-page"
+        component: ExpensePage,
+        name: "expense-page"
     },
     {
         path: url + "report/header/link/:id",
-        component : HeaderLinkPage,
-        name:"header-link-page"
+        component: HeaderLinkPage,
+        name: "header-link-page"
     },
     {
         path: url + "terminals/:id/commissions",
-        component : TerminalCommissionPage,
-        name:"terminal-commission"
+        component: TerminalCommissionPage,
+        name: "terminal-commission"
     },
     {
         path: url + "terminals/:id/discounts",
-        component : TerminalDiscountPage,
-        name:"terminal-discount"
+        component: TerminalDiscountPage,
+        name: "terminal-discount"
     },
     {
         path: url + "terminal/time/difference",
-        component : TerminalTimeDifferencePage,
-        name:"terminal-difference"
+        component: TerminalTimeDifferencePage,
+        name: "terminal-difference"
     },
     {
         path: url + "accounts/coa/categories",
-        component : AccountCategoryPage,
-        name:"accounts-categories"
+        component: AccountCategoryPage,
+        name: "accounts-categories"
     },
     {
         path: url + "loyalty/card/categories",
-        component : loyaltyCardPage,
-        name:"loyalty-card-categories"
+        component: loyaltyCardPage,
+        name: "loyalty-card-categories"
     },
     {
         path: url + "loyalty/card/assign",
-        component : loyaltyCardAssignPage,
-        name:"loyalty-card-assign"
+        component: loyaltyCardAssignPage,
+        name: "loyalty-card-assign"
     },
     {
         path: url + "reports/header",
-        component : ReportsHeadersPage,
-        name:"report-header"
+        component: ReportsHeadersPage,
+        name: "report-header"
     },
     {
         path: url + "reports/summary/close/trip",
-        component : CloseSummeryReportPage,
-        name:"summery-report"
+        component: CloseSummeryReportPage,
+        name: "summery-report"
     },
 ]
 const router = createRouter({
-    history:createWebHistory(),
-    mode:history,
+    history: createWebHistory(),
+    mode: history,
     routes,
 })
 
