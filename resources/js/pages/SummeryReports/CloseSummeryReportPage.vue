@@ -38,13 +38,13 @@
                                                         <div class="form-group">
                                                             <label for="scheduleRoute">Route</label>
                                                             <select class="form-control" id="scheduleRoute"
-                                                                    name="schedule">
-                                                                <option value="0" selected>Select Schedule</option>
+                                                                    name="route">
+                                                                <option value="0" selected>Select Route</option>
                                                                 <option class="text-uppercase"
-                                                                        v-for="(schedule, i) in schedules"
-                                                                        :value="schedule.id"
+                                                                        v-for="(route, i) in routes"
+                                                                        :value="route.id"
                                                                         :key="i"
-                                                                >{{ schedule.name }}
+                                                                >{{ route.name }}
                                                                 </option>
                                                             </select>
                                                         </div>
@@ -112,7 +112,7 @@ export default {
             loading: false,
             formID: 'reports_header',
             editFormID: 'edit_reports_header',
-            schedules: [],
+            routes: [],
             buses: [],
             success: false,
             errors: false,
@@ -123,10 +123,10 @@ export default {
     },
     methods: {
         async fetchDailySummaryReport() {
-            const resGetSchedule = await this.callApi("post", 'reports/getSchedule');
+            const resGetSchedule = await this.callApi("post", 'reports/getRoutes');
             const resGetBuses = await this.callApi("post", 'reports/getBuses');
             if (resGetSchedule.status == 200 && resGetBuses.status == 200) {
-                this.schedules = resGetSchedule.data;
+                this.routes = resGetSchedule.data;
                 this.buses = resGetBuses.data;
             }
         },

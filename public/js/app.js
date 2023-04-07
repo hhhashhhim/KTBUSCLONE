@@ -26977,7 +26977,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       formID: 'reports_header',
       editFormID: 'edit_reports_header',
-      schedules: [],
+      routes: [],
       buses: [],
       success: false,
       errors: false
@@ -27012,7 +27012,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'reports/getSchedule');
+                return _this2.callApi("post", 'reports/getRoutes');
 
               case 2:
                 resGetSchedule = _context2.sent;
@@ -27023,7 +27023,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resGetBuses = _context2.sent;
 
                 if (resGetSchedule.status == 200 && resGetBuses.status == 200) {
-                  _this2.schedules = resGetSchedule.data;
+                  _this2.routes = resGetSchedule.data;
                   _this2.buses = resGetBuses.data;
                 }
 
@@ -51172,13 +51172,13 @@ var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_25 = {
   "class": "form-control",
   id: "scheduleRoute",
-  name: "schedule"
+  name: "route"
 };
 
 var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "0",
   selected: ""
-}, "Select Schedule", -1
+}, "Select Route", -1
 /* HOISTED */
 );
 
@@ -51240,12 +51240,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_21);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_25, [_hoisted_26, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.schedules, function (schedule, i) {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_25, [_hoisted_26, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       "class": "text-uppercase",
-      value: schedule.id,
+      value: route.id,
       key: i
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.name), 9
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name), 9
     /* TEXT, PROPS */
     , _hoisted_27);
   }), 128
@@ -77324,9 +77324,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
