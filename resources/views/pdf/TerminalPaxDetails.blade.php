@@ -75,10 +75,15 @@
 <div id="info">
     <div class="companyName"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">   {{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</span></div>
-        <div style=" padding-bottom: 5px;"><span style="font-weight:600">{{ isset($format->terminal) ? $format->terminal->name : "Main Terminal"}}</span></div>
+        <div style=" padding-bottom: 5px;"><span
+                style="font-weight:600">   {{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</span>
+        </div>
+        <div style=" padding-bottom: 5px;"><span
+                style="font-weight:600">{{ isset($format->terminal) ? $format->terminal->name : "Main Terminal"}}</span>
+        </div>
         <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> 03-111-777-333 </span></div>
-        <div><span><b>Phone # : </b>{{ isset( $format->phone) ? formatContact($format->phone) : "0310-8886286" }}</span></div>
+        <div><span><b>Phone # : </b>{{ isset( $format->phone) ? formatContact($format->phone) : "0310-8886286" }}</span>
+        </div>
     </div>
 </div>
 <br>
@@ -159,26 +164,28 @@
         </tr>
 
     @endif
+</table>
+<table border="2" id="table2">
     <tr>
-        <th colspan="9"> Terminal Gross Sale</th>
-        <th>{{ $data['record']->sum('seat_fare') }}</th>
+        <th style="width: 75% !important;"> Terminal Gross Sale</th>
+        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') }}</th>
     </tr>
     <tr>
-        <th colspan="9"> Terminal Discount</th>
-        <th>{{ $terminalDiscount = $data['record']->sum('discount'); }}</th>
+        <th style="width: 75% !important;"> Terminal Discount</th>
+        <th style="width: 25% !important;">{{ $terminalDiscount = $data['record']->sum('discount'); }}</th>
     </tr>
     <tr>
-        <th colspan="9"> Elt Amount</th>
-        <th>{{ $data['totalElt'] }}</th>
+        <th style="width: 75% !important;"> Elt Amount</th>
+        <th style="width: 25% !important;">{{ $data['totalElt'] }}</th>
     </tr>
     <tr>
-        <th colspan="9"> Terminal Tickets Commission</th>
-        <th>
+        <th style="width: 75% !important;"> Terminal Tickets Commission</th>
+        <th style="width: 25% !important;">
             @if($data['commission'])
                 @if($data['commission']->flat_commission == 0)
-                {{ $ticketCommission = (($data['record']->sum('seat_fare') - $data['record']->sum('discount'))/100)*$data['commission']->percentage_commission }}
+                    {{ $ticketCommission = (($data['record']->sum('seat_fare') - $data['record']->sum('discount'))/100)*$data['commission']->percentage_commission }}
                 @else
-                {{ $ticketCommission = $data['record']->count() * $data['commission']->flat_commission }}
+                    {{ $ticketCommission = $data['record']->count() * $data['commission']->flat_commission }}
                 @endif
             @else
                 {{ $ticketCommission = 0; }}
@@ -186,26 +193,26 @@
         </th>
     </tr>
     <tr>
-        <th colspan="9"> Terminal Fixed Commission</th>
-        <th>
+        <th style="width: 75% !important;"> Terminal Fixed Commission</th>
+        <th style="width: 25% !important;">
             @if($data['commission'] && $data['record']->count() > 0)
-            {{ $fixCommission = $data['commission']->fix_commission }}
+                {{ $fixCommission = $data['commission']->fix_commission }}
             @else
-            {{ $fixCommission = 0 }}
+                {{ $fixCommission = 0 }}
             @endif
         </th>
     </tr>
     <tr>
-        <th colspan="9"> Terminal Ticket Refund</th>
-        <th>{{ $refund = 0 }}</th>
+        <th style="width: 75% !important;"> Terminal Ticket Refund</th>
+        <th style="width: 25% !important;">{{ $refund = 0 }}</th>
     </tr>
     <tr>
-        <th colspan="9"> Main Net Sale</th>
-        <th>{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
+        <th style="width: 75% !important;"> Main Net Sale</th>
+        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
     <tr>
-        <th colspan="9">Cash On Bus</th>
-        <th>{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
+        <th style="width: 75% !important;">Cash On Bus</th>
+        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
 </table>
 <br>
@@ -231,21 +238,21 @@
         @endif
 
         <th style="width: 25% !important;">Hostess Name</th>
-            @if(count($data['hostInfo']) > 0)
-                <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
+        @if(count($data['hostInfo']) > 0)
+            <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
 
-                    @foreach($data['hostInfo'] as $key => $value)
+                @foreach($data['hostInfo'] as $key => $value)
 
-                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                    @endforeach
+                @endforeach
 
-                </td>
-            @else
-                <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
-                    N/A
-                </td>
-            @endif
+            </td>
+        @else
+            <td class="fontWightTh" style="text-align: start; padding-left: 10px; width: 25% !important;">
+                N/A
+            </td>
+        @endif
     </tr>
 </table>
 <br>
@@ -259,11 +266,5 @@
     <p style="font-size: medium; font-weight: 600">Terminal Manager Signature <span style="font-weight: normal">..........................................</span>
     </p>
 </div>
-{{--<script type="text/javascript">--}}
-{{--    window.onload = function () {--}}
-{{--        window.print();--}}
-{{--    }--}}
-{{--</script>--}}
 </body>
-
 </html>

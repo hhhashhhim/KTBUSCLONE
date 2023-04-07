@@ -112,6 +112,8 @@ class BookingController extends Controller
                 }
             }
 // loyalty card point addition
+
+//            if (!is_null($request->customerCNIC)) {
             $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
             if ($checkCard) {
                 if ($checkCard->cardCategory->point_type == "flatPoints") {
@@ -120,12 +122,13 @@ class BookingController extends Controller
                     $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
                     if ($distance) {
                         $addPoint = $distance / $checkCard->cardCategory->point_distance;
-                    }else{
+                    } else {
                         return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
                     }
                 }
                 $checkCard->increment("starting_points", $addPoint);
             }
+//            }
 
 
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
@@ -516,7 +519,7 @@ class BookingController extends Controller
         ])->first();
 
         return [
-            "checkDrop"=>$found,
+            "checkDrop" => $found,
         ];
     }
 
@@ -870,7 +873,7 @@ class BookingController extends Controller
 
         $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
-            'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id ,
+            'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
         ])->get();

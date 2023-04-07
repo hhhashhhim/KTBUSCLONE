@@ -66,7 +66,7 @@ if (!function_exists('storeFare')) {
 if (!function_exists('plainContactAndCnic')) {
     function plainContactAndCnic(string $input_string)
     {
-        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $input_string)) {
+        if (preg_match('/[\'^£$%&*()}{@#~?><,|=_+¬-]/', $input_string)) {
             return str_replace('-', '', $input_string);
         }
         return $input_string;
