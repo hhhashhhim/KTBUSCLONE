@@ -48,8 +48,8 @@ import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
 
 
-const url = '/kt/'
-// const url = '/'
+// const url = '/kt/'
+const url = '/'
 
 
 const routes = [
