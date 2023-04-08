@@ -337,9 +337,9 @@
                                             <label for="seat_type">Seat Type</label>
                                             <select class="form-control" v-model="seatModify.type">
                                                 <option value="0" selected>Select Type</option>
-                                                <option value="reserved_for_female">
-                                                    Reserved for Female
-                                                </option>
+                                                <!--                                                <option value="reserved_for_female">-->
+                                                <!--                                                    Reserved for Female-->
+                                                <!--                                                </option>-->
                                                 <option value="not_for_sale">Not for Sale</option>
                                             </select>
                                         </div>
@@ -612,9 +612,9 @@
                                                 v-model="editSeatModify.type"
                                             >
                                                 <option value="0" selected>Select Type</option>
-                                                <option value="reserved_for_female">
-                                                    Reserved for Female
-                                                </option>
+                                                <!--                                                <option value="reserved_for_female">-->
+                                                <!--                                                    Reserved for Female-->
+                                                <!--                                                </option>-->
                                                 <option value="not_for_sale">Not for Sale</option>
                                             </select>
                                         </div>
@@ -638,7 +638,7 @@
             </div>
             <!--End Modal-->
 
-            <!--            Edit MOdel End-->
+            <!--            Edit Modal End-->
             <Delete
                 :deleteForm="deleteFormID"
                 confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
@@ -1035,8 +1035,7 @@ export default {
             let c = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
-                    if(seat[i].reserved == true)
-                    {
+                    if (seat[i].reserved == true) {
                         c = 1;
                     }
                     if ((seat[i].class == undefined || seat[i].class == "0" || seat[i].class == 0) && seat[i].reserved == true) {
@@ -1045,7 +1044,7 @@ export default {
                 }
             });
             // console.log(this.data);
-            
+
             if (c == 0) {
                 return swal({
                     title: "Required !",
@@ -1062,7 +1061,7 @@ export default {
                     timer: 2000,
                 });
             }
-            
+
             if (this.data.BusClassName === "")
                 // swal('Required', 'Bus Class Name is Required', 'error')
                 return swal({

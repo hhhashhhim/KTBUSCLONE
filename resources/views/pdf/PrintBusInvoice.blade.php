@@ -70,8 +70,8 @@
     <script src="{{ asset('/assets/js/jquery.min.js') }}"></script>
     <script type="text/javascript">
 
-         $(document).ready(function () {
-             window.print();
+        $(document).ready(function () {
+            window.print();
         });
     </script>
     <title>Print Bus Invoice</title>
@@ -126,55 +126,55 @@
         $totalAdjustCommission = 0;
     @endphp
     @foreach($mainData as $terminal)
-    @foreach($terminal as $destination)
-    <tr>
-        <td>SR #</td>
-        <td>{{ $destination[0] && $destination[0]->terminal ? $destination[0]->terminal->name : 'Terminal Not Alloted Yet' }}</td>
-        <td>{{ $destination->count() }}</td>
-        @php
-            $totalSeat += $destination->count()
-        @endphp
-        <td>{{ $destination[0]->destination_city->name }}</td>
-        <td>{{ $destination->pluck('seat_no')->implode(",") }}</td>
-        <td>{{ $destination->sum("seat_fare") }}</td>
-        @php
-            $totalSale += $destination->sum("seat_fare")
-        @endphp
-        <td>{{ $destination->sum("discount") }}</td>
-        @php
-            $totalDiscount += $destination->sum("discount")
-        @endphp
-        <td>
-            @if($destination[0]->commission)
-                @if($destination[0]->commission->flat_commission == 0)
-                {{ $commission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->percentage_commission }}
-                @else
-                {{ $commission = $destination->count() * $destination[0]->commission->flat_commission }}
-                @endif
-            @else
-                {{ $commission = 0; }}
-            @endif
-            @php
-                $totalCommission += $commission;
-            @endphp
-        </td>
-        <td>
-            @if($destination[0]->commission)
-                {{ $adjustCommission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->adjustment_commission }}
-            @else
-                {{ $adjustCommission = 0; }}
-            @endif
-            @php
-                $totalAdjustCommission += $adjustCommission;
-            @endphp
-        </td>
-        <td>{{ $destination->sum("elt_price") }}</td>
-        @php
-            $totalElt += $destination->sum("elt_price")
-        @endphp
-        <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount")) - $commission) - $totalAdjustCommission }}</td>
-    </tr>
-    @endforeach
+        @foreach($terminal as $destination)
+            <tr>
+                <td>SR #</td>
+                <td>{{ $destination[0] && $destination[0]->terminal ? $destination[0]->terminal->name : 'Terminal Not Alloted Yet' }}</td>
+                <td>{{ $destination->count() }}</td>
+                @php
+                    $totalSeat += $destination->count()
+                @endphp
+                <td>{{ $destination[0]->destination_city->name }}</td>
+                <td>{{ $destination->pluck('seat_no')->implode(",") }}</td>
+                <td>{{ $destination->sum("seat_fare") }}</td>
+                @php
+                    $totalSale += $destination->sum("seat_fare")
+                @endphp
+                <td>{{ $destination->sum("discount") }}</td>
+                @php
+                    $totalDiscount += $destination->sum("discount")
+                @endphp
+                <td>
+                    @if($destination[0]->commission)
+                        @if($destination[0]->commission->flat_commission == 0)
+                            {{ $commission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->percentage_commission }}
+                        @else
+                            {{ $commission = $destination->count() * $destination[0]->commission->flat_commission }}
+                        @endif
+                    @else
+                        {{ $commission = 0 }}
+                    @endif
+                    @php
+                        $totalCommission += $commission;
+                    @endphp
+                </td>
+                <td>
+                    @if($destination[0]->commission)
+                        {{ $adjustCommission = (($destination->sum("seat_fare") - $destination->sum("discount"))/100)*$destination[0]->commission->adjustment_commission }}
+                    @else
+                        {{ $adjustCommission = 0 }}
+                    @endif
+                    @php
+                        $totalAdjustCommission += $adjustCommission;
+                    @endphp
+                </td>
+                <td>{{ $destination->sum("elt_price") }}</td>
+                @php
+                    $totalElt += $destination->sum("elt_price")
+                @endphp
+                <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount")) - $commission) - $totalAdjustCommission }}</td>
+            </tr>
+        @endforeach
     @endforeach
     <tr>
         <th colspan="2">Total</th>
@@ -188,13 +188,13 @@
         <th>{{ ((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalAdjustCommission }}</th>
     </tr>
     @foreach($mainData as $terminal)
-    <tr>
-        <th colspan="8">{{ $terminal->first()[0]->terminal->name }} Fix Commission</th>
-        <td colspan="3">{{ $fixCommission = $terminal->first()[0]->commission ? intVal($terminal->first()[0]->commission->fix_commission) : 0 }}</td>
-    </tr>
-    @php
-        $totalFixCommission += $fixCommission;
-    @endphp
+        <tr>
+            <th colspan="8">{{ $terminal->first()[0]->terminal->name }} Fix Commission</th>
+            <td colspan="3">{{ $fixCommission = $terminal->first()[0]->commission ? intVal($terminal->first()[0]->commission->fix_commission) : 0 }}</td>
+        </tr>
+        @php
+            $totalFixCommission += $fixCommission;
+        @endphp
     @endforeach
     <tr>
         <th colspan="8">Gross Sale</th>
@@ -209,28 +209,28 @@
     <span style="font-weight: 900;font-size:12pt;">Drivers Name:</span>
     <span style="font-size: 12pt; padding-left: 10px;">
     @if($infoData->bus_data)
-        @foreach($infoData->bus_data->members as $data)
-            @if($data->type == 1)
-                {{ $data->driver_name->name . " (". $data->driver_name->contact .") |" }}
-            @endif
-        @endforeach
-    @else
-        Bus Not Alloted Yet
-    @endif
+            @foreach($infoData->bus_data->members as $data)
+                @if($data->type == 1)
+                    {{ $data->driver_name->name . " (". $data->driver_name->contact .") |" }}
+                @endif
+            @endforeach
+        @else
+            Bus Not Alloted Yet
+        @endif
     </span>
 </div>
 <div style="padding-bottom: 8px;">
     <span style="font-weight: 900;font-size:12pt;">Hosts Name:</span>
     <span style="font-size: 12pt; padding-left: 10px;">
     @if($infoData->bus_data)
-        @foreach($infoData->bus_data->members as $data)
-            @if($data->type == 2)
-                {{ $data->host_name->name . " (". $data->host_name->contact .") |" }}
-            @endif
-        @endforeach
-    @else
-        Bus Not Alloted Yet
-    @endif
+            @foreach($infoData->bus_data->members as $data)
+                @if($data->type == 2)
+                    {{ $data->host_name->name . " (". $data->host_name->contact .") |" }}
+                @endif
+            @endforeach
+        @else
+            Bus Not Alloted Yet
+        @endif
     </span>
 </div>
 <script type="text/javascript">

@@ -429,6 +429,21 @@
                                                          :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
                                                     <span class="text-wrap">{{ seatClass.name }}</span>
                                                 </div>
+                                                <div class="my-1 border-top w-100" v-if="showBookingDiv">
+                                                    <br>
+                                                    <span>Booked: <span class="text-dark"
+                                                                        style="font-weight: 700 !important">{{
+                                                            this.totalSeatsBooked
+                                                        }}</span> </span><br>
+                                                    <span>Issued: <span class="text-dark"
+                                                                        style="font-weight: 700 !important">{{
+                                                            this.totalSeatsIssued
+                                                        }}</span></span><br>
+                                                    <span>Available: <span class="text-dark"
+                                                                           style="font-weight: 700 !important">{{
+                                                            this.totalSeatsAvailable
+                                                        }}</span></span>
+                                                </div>
                                                 <br>
                                             </div>
                                         </div>
@@ -1158,6 +1173,10 @@ export default {
             specificCities: [],
             reSpecificCities: [],
             previousSumFare: 0,
+            totalSeats: 0,
+            totalSeatsAvailable: 0,
+            totalSeatsIssued: 0,
+            totalSeatsBooked: 0,
             selectedSeatDataBackEnd: [],
             mainAllRescheduleData: [],
             filterDate: new Date().toISOString().substr(0, 10),
@@ -1616,35 +1635,37 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
         async getPoints(value) {
-            const resCnicPoints = await this.callApi("post", "booking/getPoints", {
-                cnicNumber: this.addForm.customerCNIC,
-                status: value,
-            });
+            if (this.addForm.customerCNIC) {
+                const resCnicPoints = await this.callApi("post", "booking/getPoints", {
+                    cnicNumber: this.addForm.customerCNIC,
+                    status: value,
+                });
 
-            if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
-                this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
-                this.pointsValidation =  resCnicPoints.data.starting_points;
-                this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
-                this.pointsCardId = resCnicPoints.data.id;
-                this.haveLabel = true;
-            }
-            if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
-                this.label = "";
-                this.pointsValidation = "";
-                this.hideCheckBox =  false;
-                this.haveLabel = false;
-            }
-            if (resCnicPoints.status == 201) {
-                this.label = resCnicPoints.data.expiredData;
-                this.pointsValidation = "";
-                this.hideCheckBox = false;
-                this.haveLabel = true;
-            }
-            if (resCnicPoints.status == 404) {
-                this.label = "";
-                this.pointsValidation = "";
-                this.hideCheckBox = false;
-                this.haveLabel = false;
+                if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
+                    this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                    this.pointsValidation = resCnicPoints.data.starting_points;
+                    this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
+                    this.pointsCardId = resCnicPoints.data.id;
+                    this.haveLabel = true;
+                }
+                if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
+                    this.label = "";
+                    this.pointsValidation = "";
+                    this.hideCheckBox = false;
+                    this.haveLabel = false;
+                }
+                if (resCnicPoints.status == 201) {
+                    this.label = resCnicPoints.data.expiredData;
+                    this.pointsValidation = "";
+                    this.hideCheckBox = false;
+                    this.haveLabel = true;
+                }
+                if (resCnicPoints.status == 404) {
+                    this.label = "";
+                    this.pointsValidation = "";
+                    this.hideCheckBox = false;
+                    this.haveLabel = false;
+                }
             }
         },
 
@@ -1735,12 +1756,6 @@ export default {
         async fetchScheduleData() {
             this.resetingArrays();
             this.schedule = [];
-            // this.addForm.customerName = '';
-            // this.addForm.customerCNIC = '';
-            // this.addForm.contact = '';
-            // this.addForm.remarks = '';
-            // this.addForm.type = 'booked';
-            // this.addForm.gender = 1;
             this.addForm.totalFare = 0;
             this.addForm.totalAmount = 0;
             this.addForm.discount = '';
@@ -1754,10 +1769,29 @@ export default {
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                 });
+                // console.log(resSelected.data);
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
                     this.schedule = resSelected.data;
+                    this.totalSeats = 0;
+                    this.totalSeatsBooked = 0;
+                    this.totalSeatsIssued = 0;
+                    this.totalSeatsAvailable = 0;
+                    for (let i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
+                        for (let j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
+                            if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo")) {
+                                this.totalSeats++;
+                            }
+                            if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {
+                                this.totalSeatsBooked++;
+                            }
+                            if (resSelected.data.bus_class.seat_map[i][j].type == 'advance booking') {
+                                this.totalSeatsIssued++;
+                            }
+                        }
+                    }
+                    this.totalSeatsAvailable = this.totalSeats - (this.totalSeatsBooked + this.totalSeatsIssued);
                 }
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
@@ -2167,7 +2201,7 @@ export default {
                     timer: 2000
                 });
             }
-            if(this.addForm.pointsUseInput > this.pointsValidation){
+            if (this.addForm.pointsUseInput > this.pointsValidation) {
                 return swal({
                     title: "OOPS!",
                     text: "Enter Numbers of points must be less then the points Card have",
