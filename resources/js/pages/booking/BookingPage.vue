@@ -2215,8 +2215,7 @@ export default {
                     gender: "1",
                     customerCNIC: "",
                 };
-                this.fetchScheduleData();
-                this.resetArrays();
+
                 this.label = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
@@ -2229,7 +2228,8 @@ export default {
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
-
+                this.fetchScheduleData();
+                this.resetArrays();
                 setTimeout(() => {
                     if (resTicket.data.ticket[0].type == "booked") {
                         this.$refs.refTicket.submit();
