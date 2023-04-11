@@ -125,10 +125,10 @@
         $totalFixCommission = 0;
         $totalAdjustCommission = 0;
     @endphp
-    @foreach($mainData as $terminal)
+    @foreach($mainData as $key => $terminal)
         @foreach($terminal as $destination)
             <tr>
-                <td>SR #</td>
+                <td>{{ $key }}</td>
                 <td>{{ $destination[0] && $destination[0]->terminal ? $destination[0]->terminal->name : 'Terminal Not Alloted Yet' }}</td>
                 <td>{{ $destination->count() }}</td>
                 @php

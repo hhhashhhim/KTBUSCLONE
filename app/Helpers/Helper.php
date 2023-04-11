@@ -29,7 +29,7 @@ if (!function_exists('storeFare')) {
             'company_id' => $company_id,
             'time_difference' => $request->time_difference,
             'distance_in_km' => $request->distance_in_km,
-            'added_by' => auth()->user()->id,
+            'added_by' => Auth::user()->id,
         ]);
         /*Creating Route Fares those fare added after creating the route of one side*/
         $routeFares1Side = RouteFare::where('departure_city_id', $request->from_city_id)
@@ -48,7 +48,7 @@ if (!function_exists('storeFare')) {
             'company_id' => $company_id,
             'time_difference' => $request->time_difference,
             'distance_in_km' => $request->distance_in_km,
-            'added_by' => auth()->user()->id,
+            'added_by' => Auth::user()->id,
         ]);
 
         $routeFares2Side = RouteFare::where('departure_city_id', $fare2Side->from_city_id)
@@ -140,7 +140,7 @@ if (!function_exists('updateFare')) {
             'company_id' => $company_id,
             'time_difference' => $request->time_difference,
             'distance_in_km' => $request->distance_in_km,
-            'added_by' => auth()->user()->id,
+            'updated_by' => Auth::user()->id,
         ]);
         FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where('fare_class',
             $request->fare_class)->update([
@@ -151,7 +151,7 @@ if (!function_exists('updateFare')) {
             'company_id' => $company_id,
             'time_difference' => $request->time_difference,
             'distance_in_km' => $request->distance_in_km,
-            'added_by' => auth()->user()->id,
+            'updated_by' => Auth::user()->id,
         ]);
         // this is for automatic store time diffrence against all fare classes
         FareTable::where('from_city_id', $request->from)->where('to_city_id', $request->to)
@@ -393,7 +393,8 @@ if (!function_exists('printEltTicket')) {
 if (!function_exists('codeImage')) {
     function codeImage($code)
     {
-        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$code&size=350x350");
+        $codeEncode = urlencode($code);
+        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$codeEncode&size=350x350");
         $id = explode("| ", $code)[10];
         $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
         $path = public_path() . '/Customers/Qrs/';

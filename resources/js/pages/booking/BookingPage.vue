@@ -273,48 +273,46 @@
                                             </div>
                                         </div>
                                         <div v-if="hideDivButtonsDrop" class="my-2">
-                                            <div class="row">
-                                                <div class="form-group mt-2 mb-2"
-                                                >
-                                                    <a v-if="checkForSubmenuButtons('assign-bus')" href="#"
-                                                       :data-target="'#' + formID" data-toggle="modal"
-                                                       class="btn btn-primary" @click="closingData()">
-                                                        Assign Bus
-                                                    </a>
-                                                    <button v-if="checkForSubmenuButtons('terminal-invoice')"
-                                                            class="btn btn-info mx-1" @click="getTerminalInvoice()">
-                                                        Terminal Invoice
-                                                    </button>
-                                                    <button v-if="checkForSubmenuButtons('bus-invoice')"
-                                                            class="btn btn-warning mx-1" @click="getBusInvoice()">
-                                                        Bus Invoice
-                                                    </button>
-                                                    <button v-if="checkForSubmenuButtons('pax-list')"
-                                                            class="btn btn-danger mx-1" @click="getCustomerList()">
-                                                        Pax List
-                                                    </button>
-                                                    <button class="btn btn-success mx-1"
-                                                            v-on:click="add()"
-                                                            v-on:keyup.enter="add()">
-                                                        {{
-                                                            this.addForm.type == 'advance booking' ? 'Reserved Seat' :
-                                                                'Generate Ticket'
-                                                        }}
-                                                    </button>
-                                                </div>
+                                            <div class="form-group text-center mt-2 mb-2"
+                                            >
+                                                <a v-if="checkForSubmenuButtons('assign-bus')" href="#"
+                                                   :data-target="'#' + formID" data-toggle="modal"
+                                                   class="btn btn-primary btn-sm" @click="closingData()">
+                                                    Assign Bus
+                                                </a>
+                                                <button v-if="checkForSubmenuButtons('terminal-invoice')"
+                                                        class="btn btn-info ml-1 btn-sm" @click="getTerminalInvoice()">
+                                                    Terminal Invoice
+                                                </button>
+                                                <button v-if="checkForSubmenuButtons('bus-invoice')"
+                                                        class="btn btn-warning ml-1 btn-sm" @click="getBusInvoice()">
+                                                    Bus Invoice
+                                                </button>
+                                                <button v-if="checkForSubmenuButtons('pax-list')"
+                                                        class="btn btn-danger ml-1 btn-sm" @click="getCustomerList()">
+                                                    Pax List
+                                                </button>
+                                                <button class="btn btn-success ml-1 btn-sm"
+                                                        v-on:click="add()"
+                                                        v-on:keyup.enter="add()">
+                                                    {{
+                                                        this.addForm.type == 'advance booking' ? 'Reserved Seat' :
+                                                            'Generate Ticket'
+                                                    }}
+                                                </button>
                                             </div>
                                             <div class="text-center mb-2">
                                                 <button v-if="checkForSubmenuButtons('seat-details')"
-                                                        class="btn btn-outline-secondary text-dark mr-2"
+                                                        class="btn btn-outline-secondary btn-sm text-dark mr-2"
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
                                                 <button v-if="checkForSubmenuButtons('drop-schedule')"
-                                                        class="btn btn-secondary text-dark mr-2"
+                                                        class="btn btn-secondary btn-sm text-dark mr-2"
                                                         @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
                                                 </button>
-                                                <button class="btn btn-secondary text-dark"
+                                                <button class="btn btn-secondary btn-sm text-dark"
                                                         @click="fetchScheduleData()" :disabled="getSchedule">
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
@@ -1398,19 +1396,10 @@ export default {
 
         async getFilterRecord() {
             this.allBookings = [];
-            const table = $("#booking_table").DataTable();
-            table.destroy()
             const resDateFilter = await this.callApi("post", "booking", {date: this.filterDate});
             if (resDateFilter.status == 200) {
                 if (resDateFilter.data.length != 0) {
                     this.allBookings = resDateFilter.data;
-                    setTimeout(() => {
-                        $("#booking_table").DataTable();
-                    }, 300);
-                } else {
-                    setTimeout(() => {
-                        $("#booking_table").DataTable();
-                    }, 300);
                 }
             }
         },
@@ -1568,9 +1557,6 @@ export default {
                 this.cities = resCity.data;
                 this.terminals = resTerminals.data.terminals;
                 this.addForm.terminalId = resTerminals.data.authTerminalId;
-                setTimeout(() => {
-                    $("#booking_table").DataTable();
-                }, 300);
             } else {
                 console.log(res);
             }
@@ -1754,7 +1740,7 @@ export default {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
         async fetchScheduleData() {
-            this.resetingArrays();
+            this.resetArrays();
             this.schedule = [];
             this.addForm.totalFare = 0;
             this.addForm.totalAmount = 0;
@@ -1990,7 +1976,7 @@ export default {
                 this.addForm.selectedSeatsClass = this.selectedSeatsClass;
             } else {
                 this.fetchScheduleData();
-                this.resetingArrays();
+                this.resetArrays();
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2030,7 +2016,7 @@ export default {
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
             } else {
                 this.fetchScheduleData();
-                this.resetingArrays();
+                this.resetArrays();
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2228,8 +2214,9 @@ export default {
                     remarks: '',
                     gender: "1",
                     customerCNIC: "",
-                    selectedSeats: '',
                 };
+                this.fetchScheduleData();
+                this.resetArrays();
                 this.label = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
@@ -2242,19 +2229,12 @@ export default {
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
-                this.fetchScheduleData();
-                this.resetingArrays();
-                $("#booking_table").DataTable().destroy();
+
                 setTimeout(() => {
                     if (resTicket.data.ticket[0].type == "booked") {
                         this.$refs.refTicket.submit();
                     }
                 }, 700);
-
-                setTimeout(() => {
-                    $("#booking_table").DataTable();
-
-                }, 300);
 
             } else {
                 if (resTicket.status == 422) {
@@ -2281,9 +2261,11 @@ export default {
         }
         ,
 
-        async resetingArrays() {
+        async resetArrays() {
             this.selectedSeats = [];
             this.schedule = [];
+            this.selectedSeatsFare = []
+            this.selectedSeatsClass = []
             this.selectedBookedSeats = [];
             this.selectedOverIssueSeats = [];
             this.selectedBookedOverIssueSeats = [];
@@ -2293,16 +2275,6 @@ export default {
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
             this.bookedOverIssueSeats = [];
-            // let resBooking = await this.callApi("post", "booking");
-            // if (resBooking.status == 200) {
-            //     this.allBookings = resBooking.data
-            //     $("#booking_table").DataTable().destroy();
-            //     setTimeout(() => {
-            //         $("#booking_table").DataTable();
-            //     }, 300);
-            // } else {
-            //     console.log(res);
-            // }
         },
 
         async details(date, schedule_id) {
@@ -2353,7 +2325,7 @@ export default {
                 });
                 this.fetchScheduleData();
                 this.fetchReScheduleData();
-                this.resetingArrays();
+                this.resetArrays();
             }
         },
 
@@ -2401,7 +2373,7 @@ export default {
                 });
                 this.fetchScheduleData();
                 this.fetchReSpecificSchedules();
-                this.resetingArrays();
+                this.resetArrays();
             }
 
             if (resOverIssue.status == 422 && resOverIssue.data.message) {

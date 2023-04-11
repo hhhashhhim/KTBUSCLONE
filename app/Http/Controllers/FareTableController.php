@@ -12,17 +12,6 @@ use App\Jobs\UpdateSchedulesTime;
 
 class FareTableController extends Controller
 {
-
-//    public $company_id;
-
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->r = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -34,7 +23,7 @@ class FareTableController extends Controller
         if ($request->created == 1) {
             updateFare($request, $company_id);
         } else {
-           storeFare($request, $company_id);
+            storeFare($request, $company_id);
         }
         return $this->getFarePrices($request->fare_class);
 
@@ -47,7 +36,8 @@ class FareTableController extends Controller
 
     public function getFarePrices($fare_class)
     {
-        $cities = City::with(['city_to' => function ($q) { $q->orderBy('name')->where('cities.company_id', Auth::user()->company_id);
+        $cities = City::with(['city_to' => function ($q) {
+            $q->orderBy('name')->where('cities.company_id', Auth::user()->company_id);
         }])
             ->where('cities.company_id', Auth::user()->company_id)
             ->orderBy('name')->get();
@@ -102,9 +92,10 @@ class FareTableController extends Controller
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
+
     public function updateScheduleTimesProgress()
     {
-        return DB::table("jobs")->where("queue","UpdateSchedulesTime")->latest()->first();
+        return DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
     }
 
 }

@@ -137,6 +137,8 @@ class BookingController extends Controller
             if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                 $isPartial = 1;
             }
+        dd($request->all(), $request->departureCity, $request->destinationCity, $isPartial);
+
             if ($request->customerCNIC && $request->type == 'booked') {
                 $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
             } else {
@@ -432,8 +434,8 @@ class BookingController extends Controller
                 } else {
                     return response()->json(["expiredData" => "Loyalty Card is Expired Please Renew It"], 201);
                 }
-                return response()->json(["not_found" => "This Customer Dont have loyalty card"], 404);
             }
+            return response()->json(["not_found" => "This Customer Dont have loyalty card"], 404);
         }
     }
 
@@ -950,7 +952,9 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-        // return $mainData;
+        return $mainData;
+//         return $infoData;
+
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
     }
 
