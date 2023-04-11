@@ -84,6 +84,7 @@
                 $singleRowNet = 0;
             @endphp
             <tr>
+                
                 <td>{{$key + 1}}</td>
                 <td>{{ getBusName($single->closing[0]->bus_id)  }}</td>
 
@@ -105,10 +106,17 @@
                     $totalProfit += ($single->total_income - $single->total_expenses);
                 @endphp
                 @foreach(getDynamicHeaders() as $keyHeader => $singleHeader)
-                    <td> {{ (int)$headers_link[$single->id][$singleHeader->id][0]->value}}</td>
-                    @php
-                        $totalHeaders[$keyHeader] += (int)$headers_link[$single->id][$singleHeader->id][0]->value;
-                    @endphp
+                    @if(isset($headers_link[$single->id]))
+                        <td> {{ (int)$headers_link[$single->id][$singleHeader->id][0]->value}}</td>
+                        @php
+                            $totalHeaders[$keyHeader] += (int)$headers_link[$single->id][$singleHeader->id][0]->value;
+                        @endphp
+                    @else
+                        <td> 0 </td>
+                        @php
+                            $totalHeaders[$keyHeader] += 0;
+                        @endphp
+                    @endif
                 @endforeach
                 @foreach(getTerminals() as $keyTerminal => $singleTerminal)
                     @php

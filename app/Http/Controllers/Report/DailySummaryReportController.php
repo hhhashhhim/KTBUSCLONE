@@ -80,6 +80,7 @@ class DailySummaryReportController extends Controller
                 $closing->mod = ($closing->closing[0]->tickets->count() + $closing->closing[1]->tickets->count()) * 20;
                 return $closing;
             });
+            
             return view('reports.dailySummeryReportEng', [
                 "data" => $closings,
                 "online_terminals" => $onlineTerminalData,
@@ -87,8 +88,37 @@ class DailySummaryReportController extends Controller
             ]);
         }
          //        main Data
-        $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->get(['id', 'schedule_complete']);
-        $mergeIds = TicketClosingMerge::where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->pluck('id');
+        $closings = TicketClosingMerge::
+        with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')
+        ->where('schedule_complete', 1)
+        ->where('company_id', Auth::user()->company_id)
+        ->where(function ($q) use ($request) {
+            if ($request->route != 0) {
+                $schedules = Schedule::where('route_id', $request->route)->where('company_id', Auth::user()->company_id)->pluck('id');
+                $closing_ids = TicketClosing::whereIn('schedule_id', $schedules)->where('schedule_return', 1)->where('company_id', Auth::user()->company_id)->pluck('ticket_merge_id');
+                $q->whereIn('id', $closing_ids);
+            }
+            if ($request->busNO != 0) {
+                $q->where('bus_id', $request->busNO);
+            }
+            if ($request->fromDate != null) {
+                $q->where('schedule_departure_date', '>=', $request->fromDate);
+            }
+            if ($request->toDate != null) {
+                $q->where('schedule_departure_date', '<=', $request->toDate);
+            }
+        })
+        ->get(['id', 'schedule_complete']);
+
+        $mergeIds = TicketClosingMerge::where('schedule_complete', 1)
+        ->where(function ($p) use ($request) {
+            if ($request->fromDate != null) {
+                $p->where('schedule_departure_date', '>=', $request->fromDate);
+            }
+            if ($request->toDate != null) {
+                $p->where('schedule_departure_date', '<=', $request->toDate);
+            }
+        })->pluck('id');
         $headerLink = ReportHeaderLink::where('company_id', Auth::user()->company_id)->whereIn('ticket_merge_id', $mergeIds)->get(['id', 'header_id', 'ticket_merge_id', 'value'])->groupBy(['ticket_merge_id', 'header_id']);
         $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where('online_terminal', 1)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount'])->groupBy(['ticket_merge_id', 'terminal_id']);
         //Map function for single iteration
