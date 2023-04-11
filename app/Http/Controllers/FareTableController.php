@@ -94,8 +94,16 @@ class FareTableController extends Controller
     }
 
     public function updateScheduleTimesProgress()
-    {
-        return DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
+    {  
+        $data = DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
+        if($data)
+        {
+            return $data;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
 }
