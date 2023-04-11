@@ -80,6 +80,7 @@ class DailySummaryReportController extends Controller
                 $closing->mod = ($closing->closing[0]->tickets->count() + $closing->closing[1]->tickets->count()) * 20;
                 return $closing;
             });
+            
             return view('reports.dailySummeryReportEng', [
                 "data" => $closings,
                 "online_terminals" => $onlineTerminalData,

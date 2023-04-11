@@ -74,7 +74,6 @@ class AuthController extends Controller
         //        "headers_link" => $headerLink,
         //    ]);
 
-
         if (!Auth::check() && $request->path() != "login") {
             return redirect('/login');
         }

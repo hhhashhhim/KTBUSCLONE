@@ -81,10 +81,12 @@
                     $totalMOd += $single->mod;
                 @endphp
                 <td>{{$single->total_income}}</td>
+
                 @php
                     $totalIncome += $single->total_income;
                 @endphp
                 <td>{{ $single->total_expenses }}</td>
+                
                 @php
                     $totalExpense += $single->total_expenses;
                 @endphp
