@@ -49,8 +49,8 @@ import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPag
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 
 
-const url = '/kt/'
-// const url = '/'
+// const url = '/kt/'
+const url = '/'
 
 
 const routes = [
