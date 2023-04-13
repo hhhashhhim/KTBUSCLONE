@@ -137,8 +137,6 @@ class BookingController extends Controller
             if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                 $isPartial = 1;
             }
-            
-
             if ($request->customerCNIC && $request->type == 'booked') {
                 $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
             } else {
@@ -952,8 +950,6 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-//         return $infoData;
-
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
     }
 
