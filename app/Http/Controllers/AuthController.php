@@ -15,6 +15,12 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
+//        $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name','schedule:id,name,time')->where('company_id', Auth::user()->company_id)->where('type', 'booked')->get();
+//        $tickets->map(function ($single){
+//           $single->schedule_date_time =  date('Y-m-d H:i:s',strtotime($single->schedule_date.' '.$single->schedule->time));
+//        });
+//        return $tickets->groupBy(['schedule_date_time','added_by']);
+
         // //        main Data
         // $closings = TicketClosingMerge::with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount', 'closing.tickets.elt:id,elt_price,ticket_id')->where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->get(['id', 'schedule_complete']);
         // $mergeIds = TicketClosingMerge::where('schedule_complete', 1)->where('schedule_departure_date', '>', '2023-04-02')->pluck('id');

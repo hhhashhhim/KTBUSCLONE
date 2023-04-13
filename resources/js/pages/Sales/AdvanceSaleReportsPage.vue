@@ -39,24 +39,26 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label for="fromDate">From Date</label>
-                                                    <input id="fromDate" type="date" class="form-control"
-                                                           v-model="filterSales.fromDate" @change="salesFilter()">
+                                                    <label for="routeFilter">Routes</label>
+                                                    <select id="routeFilter" class="form-control"
+                                                            v-model="filterSales.route"
+                                                            @change="salesFilter()">
+                                                        <option value="0">Select Route</option>
+                                                        <option v-for="(route, i) in routes" :key="i"
+                                                                :value="route.id">
+                                                            {{ route.name }}
+                                                        </option>
+                                                    </select>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label for="fromTime">From Time</label>
-                                                    <input id="fromTime" type="time" class="form-control"
-                                                           v-model="filterSales.fromTime" @change="salesFilter()">
+                                                <div class="col-md-3">
+                                                    <label for="fromDate">From Date Time</label>
+                                                    <input id="fromDate" type="datetime-local" class="form-control"
+                                                           v-model="filterSales.fromDateTime" @change="salesFilter()">
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label for="toDate">To Date</label>
-                                                    <input id="toDate" type="date" class="form-control"
-                                                           v-model="filterSales.toDate" @change="salesFilter()">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="toTime">To Time</label>
-                                                    <input id="toTime" type="time" class="form-control"
-                                                           v-model="filterSales.toTime" @change="salesFilter()">
+                                                <div class="col-md-3">
+                                                    <label for="toDate">To Date Time</label>
+                                                    <input id="toDate" type="datetime-local" class="form-control"
+                                                           v-model="filterSales.toDateTime" @change="salesFilter()">
                                                 </div>
                                             </div>
                                             <div class="row mt-2">
@@ -69,20 +71,20 @@
                                                                 <th>Bus No</th>
                                                                 <th>No of Seat</th>
                                                                 <th>Terminal Name</th>
-                                                                <th>User Nam</th>
+                                                                <th>User Name</th>
                                                                 <th>Sale Amount</th>
                                                                 <th>ELT Amount</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
                                                             <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
+                                                                <td>{{ data.schedule_date}}</td>
+                                                                <td>{{ data.bus_class.name}}</td>
+                                                                <td>weew</td>
+                                                                <td>{{ data.terminal.name}}</td>
+                                                                <td>{{ data.added_by.name}}</td>
+                                                                <td>wdew</td>
+                                                                <td>wedewd</td>
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="2"></td>
@@ -166,11 +168,15 @@
                                                                 <td style="width: 25% !important;">0</td>
                                                             </tr>
                                                             <tr>
-                                                                <th style="width: 75% !important;">TOTAL CANCELATION CHARGES</th>
+                                                                <th style="width: 75% !important;">TOTAL CANCELATION
+                                                                    CHARGES
+                                                                </th>
                                                                 <td style="width: 25% !important;">0</td>
                                                             </tr>
                                                             <tr>
-                                                                <th style="width: 75% !important;">TOTAL CASH ON COUNTER</th>
+                                                                <th style="width: 75% !important;">TOTAL CASH ON
+                                                                    COUNTER
+                                                                </th>
                                                                 <td style="width: 25% !important;">0</td>
                                                             </tr>
                                                             </tbody>
@@ -202,10 +208,9 @@ export default {
             filterSales: {
                 terminal: 0,
                 user: 0,
-                fromDate: '',
-                fromTime: '',
-                toDate: '',
-                toTime: '',
+                route: 0,
+                fromDateTime: '',
+                toDateTime: '',
             },
         }
     },
@@ -216,15 +221,19 @@ export default {
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
-            if (resTerminals.status == 200 && resUserNames.status == 200) {
+            const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
+            if (resTerminals.status == 200 && resUserNames.status == 200 && resRoutes.status == 200) {
                 this.terminals = resTerminals.data;
                 this.users = resUserNames.data;
+                this.routes = resRoutes.data;
             }
 
         },
         async salesFilter() {
             const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
-            console.log(resFetchData);
+            if (resFetchData.status == 200) {
+                this.filters.record = resFetchData.data.record;
+            }
 
         },
     },
