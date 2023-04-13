@@ -46,10 +46,11 @@ import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
+import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 
 
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 
 const routes = [
@@ -287,6 +288,11 @@ const routes = [
         path: url + "reports/summary/close/trip",
         component: CloseSummeryReportPage,
         name: "summery-report"
+    },
+    {
+        path: url + "reports/advance/sale",
+        component: AdvanceSaleReportsPage,
+        name: "advance-sale-report"
     },
 ]
 const router = createRouter({

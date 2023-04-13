@@ -81,8 +81,8 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('sales')">
-                            <router-link class="nav-link text-capitalize"  to="">
-                                <i class="fa fa-landmark"></i> Sales Report
+                            <router-link class="nav-link text-capitalize"  :to="{ name: 'advance-sale-report' }">
+                                <i class="fa fa-landmark"></i> Advance Sales Report
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('close-trip')">

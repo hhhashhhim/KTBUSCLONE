@@ -1,5 +1,4 @@
 <template>
-
     <div>
         <div class="main-wrapper main-wrapper-1" v-if="$store.state.user">
             <div class="navbar-bg"></div>
