@@ -102,9 +102,9 @@
                                                                     class="btn btn-danger">
                                                                 <i class="far fa-trash-alt"></i>
                                                             </button>
-<!--                                                            :data-target="'#' + deleteFormID"-->
-<!--                                                            data-toggle="modal"-->
-<!--                                                            @click="deleteModal(employee,i)"-->
+                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
+                                                            <!--                                                            data-toggle="modal"-->
+                                                            <!--                                                            @click="deleteModal(employee,i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -834,10 +834,10 @@ export default {
                 });
                 this.loadingDepart = false;
                 this.departmentName == '';
-                if (this.departments.indexOf(resDepartmentStore.data) === -1) {
+                if (this.departments.indexOf(resDepartmentStore.data) == -1) {
                     this.departments.push(resDepartmentStore.data);
                 }
-                if (this.editDepartments.indexOf(resDepartmentStore.data) === -1) {
+                if (this.editDepartments.indexOf(resDepartmentStore.data) == -1) {
                     this.editDepartments.push(resDepartmentStore.data);
                 }
             }
@@ -890,10 +890,10 @@ export default {
                     timer: 2000
                 });
                 this.loadingDesignation = false;
-                if (this.designations.indexOf(resDesignationStore.data) === -1) {
+                if (this.designations.indexOf(resDesignationStore.data) == -1) {
                     this.designations.push(resDesignationStore.data);
                 }
-                if (this.editDesignations.indexOf(resDesignationStore.data) === -1) {
+                if (this.editDesignations.indexOf(resDesignationStore.data) == -1) {
                     this.editDesignations.push(resDesignationStore.data);
                 }
             } else {
@@ -1354,7 +1354,7 @@ export default {
                 this.loading = false;
                 await this.fetchEmployees();
             } else {
-                if (resEmployeeUpdate.status === 422) {
+                if (resEmployeeUpdate.status == 422) {
                     $("#" + formID).scrollTop(0, 0);
                     this.loading = false;
                     let errorContent = "";

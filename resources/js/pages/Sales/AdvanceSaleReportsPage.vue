@@ -64,7 +64,8 @@
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-striped table-hover">
+                                                        <table class="table table-striped table-hover text-center"
+                                                               id="saleReportTable">
                                                             <thead>
                                                             <tr>
                                                                 <th>Date</th>
@@ -76,21 +77,24 @@
                                                                 <th>ELT Amount</th>
                                                             </tr>
                                                             </thead>
+
                                                             <tbody>
-                                                            <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ data.schedule_date}}</td>
-                                                                <td>{{ data.bus_class.name}}</td>
-                                                                <td>weew</td>
-                                                                <td>{{ data.terminal.name}}</td>
-                                                                <td>{{ data.added_by.name}}</td>
-                                                                <td>wdew</td>
-                                                                <td>wedewd</td>
-                                                            </tr>
+                                                            <template v-for="(data,i) in filters.record" :key="i">
+                                                                <tr v-for="(single,j) in data" :key="j">
+                                                                    <td>{{ i }}</td>
+                                                                    <td>{{ single[0].bus_class.name }}</td>
+                                                                    <td>{{ single.length }}</td>
+                                                                    <td>{{ single[0].terminal.name }}</td>
+                                                                    <td>{{ single[0].added_by.name }}</td>
+                                                                    <td>{{ sumSeatFare(single) }}</td>
+                                                                    <td>{{ sumEltFare(single) }}</td>
+                                                                </tr>
+                                                            </template>
                                                             <tr>
                                                                 <td colspan="2"></td>
                                                                 <td>Total Seats</td>
                                                                 <td colspan="2"></td>
-                                                                <td>Total Sale AMount</td>
+                                                                <td>215</td>
                                                                 <td>ELT PRICE</td>
                                                             </tr>
                                                             </tbody>
@@ -236,7 +240,24 @@ export default {
             }
 
         },
+        sumSeatFare: function (arr) {
+            return arr.reduce((sum, single) => {
+                sum += single.seat_fare - single.discount;
+                return sum;
+            }, 0);
+        },
+        sumEltFare: function (arr) {
+            return arr.reduce((sum, single) => {
+                if (single.ticket_elt != null) {
+                    return sum += single.ticket_elt.elt_price;
+                } else {
+                    return sum += 0;
+                }
+            }, 0);
+        },
+
     },
+
 }
 </script>
 <style scoped>
