@@ -83526,7 +83526,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-56dc4dd1], th[data-v-56dc4dd1], td[data-v-56dc4dd1] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-56dc4dd1], th[data-v-56dc4dd1], td[data-v-56dc4dd1] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -114501,7 +114501,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AdvanceSaleReportsPage_vue_vue_type_template_id_56dc4dd1_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AdvanceSaleReportsPage.vue?vue&type=template&id=56dc4dd1&scoped=true */ "./resources/js/pages/Sales/AdvanceSaleReportsPage.vue?vue&type=template&id=56dc4dd1&scoped=true");
 /* harmony import */ var _AdvanceSaleReportsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AdvanceSaleReportsPage.vue?vue&type=script&lang=js */ "./resources/js/pages/Sales/AdvanceSaleReportsPage.vue?vue&type=script&lang=js");
 /* harmony import */ var _AdvanceSaleReportsPage_vue_vue_type_style_index_0_id_56dc4dd1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AdvanceSaleReportsPage.vue?vue&type=style&index=0&id=56dc4dd1&scoped=true&lang=css */ "./resources/js/pages/Sales/AdvanceSaleReportsPage.vue?vue&type=style&index=0&id=56dc4dd1&scoped=true&lang=css");
-/* harmony import */ var E_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var C_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
@@ -114509,7 +114509,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 
 
-const __exports__ = /*#__PURE__*/(0,E_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_AdvanceSaleReportsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_AdvanceSaleReportsPage_vue_vue_type_template_id_56dc4dd1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-56dc4dd1"],['__file',"resources/js/pages/Sales/AdvanceSaleReportsPage.vue"]])
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_kt_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_AdvanceSaleReportsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_AdvanceSaleReportsPage_vue_vue_type_template_id_56dc4dd1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-56dc4dd1"],['__file',"resources/js/pages/Sales/AdvanceSaleReportsPage.vue"]])
 /* hot reload */
 if (false) {}
 
