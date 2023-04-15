@@ -25,6 +25,7 @@
                                 class="close"
                                 data-dismiss="modal"
                                 aria-label="Close"
+                                 @click="close()"
                             >
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -40,6 +41,7 @@
                                     class="close"
                                     data-dismiss="alert"
                                     aria-label="Close"
+                                     @click="close()"
                                 >
                                     <span aria-hidden="true">&times;</span>
                                     <span class="sr-only">Close</span>
@@ -77,6 +79,7 @@
                         type="button"
                         class="btn btn-secondary btn-block"
                         data-dismiss="modal"
+                         @click="close()"
                     >
                         Close
                     </button>
@@ -100,6 +103,9 @@ export default {
         };
     },
     methods: {
+        close(){
+            $(`#${this.deleteForm}`).click();
+        },
         async deleteData() {
             const res = await this.callApi(
                 "post",

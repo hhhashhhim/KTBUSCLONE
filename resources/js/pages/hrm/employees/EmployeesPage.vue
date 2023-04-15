@@ -317,7 +317,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Department</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeDep()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -334,7 +334,7 @@
                                     :disabled="loadingDepart">
                                 {{ loadingDepart ? 'Loading...' : ' Add Department' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDep()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -347,7 +347,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Designation</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"  @click="closeDes()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -364,7 +364,7 @@
                                     :disabled="loadingDesignation">
                                 {{ loadingDesignation ? 'Loading...' : ' Add Designation' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDes()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -677,6 +677,12 @@ export default {
     },
 
     methods: {
+        closeDep(){
+            $("#addDepartmentModal").click();
+        },
+        closeDes(){
+            $("#addDesignationModal").click();
+        },
         accountCreate: function (e) {
             if (e.target.checked) {
                 this.addForm.createAccount = 1;

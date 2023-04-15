@@ -6,7 +6,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><span v-html="heading"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close()">
                                 <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -27,7 +27,7 @@
                 
                 <div class="modal-footer bg-whitesmoke br">
                     <slot name="button"></slot>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="close()">Close</button>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@ export default {
     },
     methods:{
         close(){
-            $(`#${this.formID}`).modal("hide")
+            $(`#${this.formID}`).click();
         }
     },
     watch:{

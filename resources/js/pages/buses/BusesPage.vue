@@ -107,7 +107,7 @@
                                 class="close"
                                 data-dismiss="modal"
                                 aria-label="Close"
-                                @click="close"
+                                @click="closeModal()"
                             >
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -204,7 +204,7 @@
                                 <button type="button" class="btn btn-primary" @click="addBuses" :disabled="loading">
                                     {{ loading ? 'Loading...' : 'Add Bus' }}
                                 </button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                             </div>
                         </div>
                     </div>
@@ -358,6 +358,9 @@ export default {
     },
 
     methods: {
+        closeModal(){
+            $(".modal").click();
+        },
         clearForm: function () {
             this.data = {};
             this.data.fare_class = 0;
