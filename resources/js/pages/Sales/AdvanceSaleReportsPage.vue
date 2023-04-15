@@ -94,7 +94,7 @@
                                                                 <td colspan="2"></td>
                                                                 <td>Total Seats</td>
                                                                 <td colspan="2"></td>
-                                                                <td>215</td>
+                                                                <td>{{total}}</td>
                                                                 <td>ELT PRICE</td>
                                                             </tr>
                                                             </tbody>
@@ -216,6 +216,8 @@ export default {
                 fromDateTime: '',
                 toDateTime: '',
             },
+            test: [],
+            total: 0,
         }
     },
     async created() {
@@ -243,6 +245,7 @@ export default {
         sumSeatFare: function (arr) {
             return arr.reduce((sum, single) => {
                 sum += single.seat_fare - single.discount;
+                this.test.push(single.seat_fare - single.discount);
                 return sum;
             }, 0);
         },
@@ -257,6 +260,19 @@ export default {
         },
 
     },
+    watch: 
+    {
+        test() {
+            console.log(this.test);
+        this.total = this.test.reduce((sum,total) =>{
+            console.log("a"+sum);
+            sum += sum;
+            console.log("b"+sum);
+            return sum;
+        },0)
+        console.log(this.test);
+    }
+    }
 
 }
 </script>

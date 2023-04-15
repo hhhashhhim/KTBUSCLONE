@@ -392,94 +392,94 @@
             </Edit>
 
             <!--View Details Model-->
-            <transition duration="1000" mode="out-in" enter-active-class="loader" leave-active-class="loader">
-                <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
-                     aria-hidden="true">
-                    <div class="modal-dialog modal-xl modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Terminal Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                        @click="close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body m-1 p-1">
-                                <div class="card-body my-0 py-0">
-                                    <!-- Table -->
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <table class="table table-striped table-hover" id="show_terminal">
-                                                <thead>
-                                                <tr>
-                                                    <th>Sr No.</th>
-                                                    <th>Terminal Name</th>
-                                                    <th>Address</th>
-                                                    <th>Contact Number</th>
-                                                    <th>Added By</th>
-                                                    <th v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
-                                                        Action
-                                                    </th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr v-for="(single, i) in terminalsDetails" :key="i">
-                                                    <td>{{ i + 1 }}</td>
-                                                    <td v-if="single.name">{{ single.name }}</td>
-                                                    <td v-else>N/A</td>
-                                                    <td v-if="single.address">{{ single.address }}</td>
-                                                    <td v-else>N/A</td>
-                                                    <td v-if="single.contact"> {{ phoneFormat(single.contact) }}</td>
-                                                    <td v-else>N/A</td>
-                                                    <td v-if="single.added_by">{{ single.added_by.name }}</td>
-                                                    <td v-else>N/A</td>
-                                                    <td style="width:200px;"
-                                                        v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
-                                                        <button title="Edit Terminal"
-                                                                :data-target="'#' + editFormID"
-                                                                data-toggle="modal"
-                                                                @click="editTerminal(single)"
-                                                                class="btn btn-warning mx-2"
-                                                                v-if="checkForSubmenuButtons('edit-terminal')"
-                                                        >
-                                                            <i class="far fa-edit"></i>
-                                                        </button>
-                                                        <button style="display:none;" title="Delete Terminal"
+           
+            <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
+                    aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Terminal Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                    @click="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body m-1 p-1">
+                            <div class="card-body my-0 py-0">
+                                <!-- Table -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <table class="table table-striped table-hover" id="show_terminal">
+                                            <thead>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Terminal Name</th>
+                                                <th>Address</th>
+                                                <th>Contact Number</th>
+                                                <th>Added By</th>
+                                                <th v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                    Action
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="(single, i) in terminalsDetails" :key="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td v-if="single.name">{{ single.name }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.address">{{ single.address }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.contact"> {{ phoneFormat(single.contact) }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.added_by">{{ single.added_by.name }}</td>
+                                                <td v-else>N/A</td>
+                                                <td style="width:200px;"
+                                                    v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                    <button title="Edit Terminal"
+                                                            :data-target="'#' + editFormID"
+                                                            data-toggle="modal"
+                                                            @click="editTerminal(single)"
+                                                            class="btn btn-warning mx-2"
+                                                            v-if="checkForSubmenuButtons('edit-terminal')"
+                                                    >
+                                                        <i class="far fa-edit"></i>
+                                                    </button>
+                                                    <button style="display:none;" title="Delete Terminal"
 
-                                                                class="btn btn-danger mx-2"
-                                                                v-if="checkForSubmenuButtons('delete-terminal')"
-                                                        >
-                                                            <i class="far fa-trash-alt"></i>
-                                                        </button>
-                                                        <!--                                                        :data-target="'#' + editFormID"-->
-                                                        <!--                                                        data-toggle="modal"-->
-                                                        <!--                                                        @click="editTerminal(single)"-->
-                                                        <router-link class="btn btn-success mx-2" title="Commission"
-                                                                     v-if="checkForSubmenuButtons('commission')"
-                                                                     :to="{ name:'terminal-commission', params: { id:single.id }}">
-                                                            <i class="fas fa-percent"></i>
-                                                        </router-link>
-                                                        <router-link class="btn btn-primary mx-2" title="Discount"
-                                                                     v-if="checkForSubmenuButtons('discount')"
-                                                                     :to="{ name:'terminal-discount', params: { id:single.id }}">
-                                                            <i class="fas fa-tag"></i>
-                                                        </router-link>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                            class="btn btn-danger mx-2"
+                                                            v-if="checkForSubmenuButtons('delete-terminal')"
+                                                    >
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </button>
+                                                    <!--                                                        :data-target="'#' + editFormID"-->
+                                                    <!--                                                        data-toggle="modal"-->
+                                                    <!--                                                        @click="editTerminal(single)"-->
+                                                    <router-link class="btn btn-success mx-2" title="Commission"
+                                                                    v-if="checkForSubmenuButtons('commission')"
+                                                                    :to="{ name:'terminal-commission', params: { id:single.id }}">
+                                                        <i class="fas fa-percent"></i>
+                                                    </router-link>
+                                                    <router-link class="btn btn-primary mx-2" title="Discount"
+                                                                    v-if="checkForSubmenuButtons('discount')"
+                                                                    :to="{ name:'terminal-discount', params: { id:single.id }}">
+                                                        <i class="fas fa-tag"></i>
+                                                    </router-link>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <!-- END TABLE -->
                                 </div>
+                                <!-- END TABLE -->
                             </div>
-                            <div class="modal-footer bg-whitesmoke br">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                         </div>
                     </div>
                 </div>
-            </transition>
+            </div>
+            
             <!-- Delete Modal -->
             <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???'/>
         </div>
@@ -575,6 +575,9 @@ export default {
         this.permissions = this.$store.state.permissions;
     },
     methods: {
+        closeModal(){
+            $("#detail-modal").click();
+        },
         datatableReset: function () {
             setTimeout(() => {
                 $("#show_terminal").DataTable();

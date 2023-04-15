@@ -264,7 +264,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addSeatNumberLabel">Add Seat Number</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeSeat()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -279,7 +279,7 @@
                                     @click="assignSeatNumber(setSeatNumber.rowId, setSeatNumber.colId)">Assign Seat
                                 Number
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeSeat()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -305,6 +305,7 @@
                                         class="close"
                                         data-dismiss="modal"
                                         aria-label="Close"
+                                         @click="closeDetail()"
                                     >
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -381,6 +382,7 @@
                                 class="close"
                                 data-dismiss="modal"
                                 aria-label="Close"
+                                 @click="closeFare()"
                             >
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -414,6 +416,7 @@
                                 type="button"
                                 class="btn btn-secondary"
                                 data-dismiss="modal"
+                                 @click="closeFare()"
                             >
                                 Close
                             </button>
@@ -583,6 +586,7 @@
                                         class="close"
                                         data-dismiss="modal"
                                         aria-label="Close"
+                                         @click="closeEditSeat()"
                                     >
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -717,6 +721,18 @@ export default {
         this.permissions = this.$store.state.permissions;
     },
     methods: {
+        closeSeat(){
+            $("#addSeatNumber").click();
+        },
+        closeDetail(){
+            $("#setSeatClass").click();
+        },
+        closeFare(){
+            $("#addFareClass").click();
+        },
+        closeEditSeat(){
+            $("#setEditSeatClass").click();
+        },
         resetAttributes: function () {
             let b = 0;
             this.data.seatMap.map((seat) => {

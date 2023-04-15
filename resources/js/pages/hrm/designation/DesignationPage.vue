@@ -142,7 +142,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Designation Details</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -190,7 +190,7 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -291,7 +291,9 @@ export default {
         window.removeEventListener('keydown', this.altM);
     },
     methods: {
-
+        closeModal(){
+            $("#detail-modal").click();
+        },
         async fetchDesignations() {
             const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
             if (resAllTerminals.status == 200) {

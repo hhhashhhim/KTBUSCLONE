@@ -24,6 +24,7 @@
                 class="close"
                 data-dismiss="modal"
                 aria-label="Close"
+                 @click="close()"
               >
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -39,6 +40,7 @@
                   class="close"
                   data-dismiss="alert"
                   aria-label="Close"
+                   @click="close()"
                 >
                   <span aria-hidden="true">&times;</span>
                   <span class="sr-only">Close</span>
@@ -55,6 +57,7 @@
                   class="close"
                   data-dismiss="alert"
                   aria-label="Close"
+                  @click="close()"
                 >
                   <span aria-hidden="true">&times;</span>
                   <span class="sr-only">Close</span>
@@ -98,6 +101,9 @@ export default {
     }
   },
   methods:{
+    close(){
+            $(`#${this.formID}`).click();
+        },
     async checkPassword(){
       
       if (this.password == "")

@@ -248,7 +248,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Update Terminal </h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -274,7 +274,7 @@
                                     :disabled="loadingTerminal">
                                 {{ loadingTerminal ? 'Loading...' : 'Update Terminal' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                         </div>
                     </div>
                 </div>
@@ -466,6 +466,9 @@ export default {
         this.permissions = this.$store.state.permissions;
     },
     methods: {
+        closeModal(){
+            $(".modal").click();
+        },
         phoneFormat: function (string) {
             return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
         },

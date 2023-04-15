@@ -460,7 +460,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addELTModelLabel">ADD ELT</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeElt()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -507,7 +507,7 @@
                                 @click="addEltToTicket(eltData)" :disabled="this.EltButton">
                             {{ this.EltButton ? 'Loading...' : 'Add ELT' }}
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeElt()">Close</button>
                     </div>
                 </div>
             </div>
@@ -520,7 +520,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Over-Issued Seats</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeOverissue()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -537,7 +537,7 @@
                                 @click="addOverIssueTicket(overIssueData)">
                             Over-Issue Ticket
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeOverissue()">Close</button>
                     </div>
                 </div>
             </div>
@@ -550,7 +550,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="reschedule_modalLabel">Reschedule Seats</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeReschedule()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -705,7 +705,7 @@
                         <button class="btn btn-primary" @click="rescheduleSeats()" :disabled="loadingRescheduleButton">
                             {{ loadingRescheduleButton ? 'Loading....' : 'Reschedule Seats' }}
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeReschedule()">Close</button>
                     </div>
                 </div>
             </div>
@@ -717,7 +717,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="dropScheduleLabel">Drop Schedule</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -734,7 +734,7 @@
                                 @click="dropScheduleData()" :disabled="dropScheduleButton">
                             Drop Schedule
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                     </div>
                 </div>
             </div>
@@ -745,7 +745,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="cancelModelLabel">Cancel Ticket</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeCancel()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -774,7 +774,7 @@
                                 @click="cancelBooking(cancelData)">
                             Cancel Ticket
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeCancel()">Close</button>
                     </div>
                 </div>
             </div>
@@ -787,7 +787,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="seatAllDetailsModalLabel">Seat Details</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -1251,6 +1251,23 @@ export default {
     },
 
     methods: {
+        // modal close
+        closeModal(){
+            $(".modal").modal('hide');
+        },
+        closeElt(){
+            $("#addELTModel").modal('hide');
+        },
+        closeReschedule(){
+            $("#reschedule_modal").modal('hide');
+        },
+        closeOverissue(){
+            $("#overIssue_model").modal('hide');
+        },
+        closeCancel(){
+            $("#cancelModel").modal('hide');
+        },
+        // end
         openAdvanceModel() {
             this.closeAdvanceCashModel = true;
         },
