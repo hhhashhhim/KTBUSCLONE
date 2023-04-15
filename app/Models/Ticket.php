@@ -49,6 +49,11 @@ class Ticket extends Model
         return $this->hasOne(FareClass::class, 'id', 'bus_class_id');
     }
 
+    public function busClass()
+    {
+        return $this->hasOne(BusClass::class, 'id', 'bus_class_id');
+    }
+
     public function customer()
     {
         return $this->hasOne(Customer::class, 'id', 'customer_id');
@@ -78,17 +83,17 @@ class Ticket extends Model
     {
         return $this->hasOne(TicketELT::class, 'ticket_id', 'id');
     }
-    
+
     public function commission()
     {
         return $this->hasOne(TerminalCommission::class,"terminal_id","terminal_id");
     }
-    
+
     public function bus()
     {
         return $this->hasOne(Bus::class,"id","bus_id");
     }
-    
+
     public function cancel()
     {
         return $this->hasOne(BookingCancel::class, 'ticket_id', 'id');

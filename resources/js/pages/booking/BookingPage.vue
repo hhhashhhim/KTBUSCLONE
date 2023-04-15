@@ -399,13 +399,13 @@
                                                             class="circles icons-legend mr-1 border shadow">
                                                             <i class="fas fa-check"></i>
                                                         </div>
-                                                        <span class="text-wrap mrn">Booked</span>
+                                                        <span class="text-wrap mrn">Advance Issued</span>
                                                     </div>
                                                     <div class="my-2">
                                                         <div
                                                             class="fas fa-check-double circles icons-legend shadow mr-1 border"
                                                         ></div>
-                                                        <span class="text-wrap mrn">Issued</span>
+                                                        <span class="text-wrap mrn">Confirmed Booked</span>
                                                     </div>
                                                     <div class="my-2">
                                                         <div
