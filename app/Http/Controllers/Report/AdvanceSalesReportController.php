@@ -30,7 +30,6 @@ class AdvanceSalesReportController extends Controller
 
     public function filterData(Request $request)
     {
-//        dd($request->all());
         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')

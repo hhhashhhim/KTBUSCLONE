@@ -94,7 +94,7 @@ class Ticket extends Model
         return $this->hasOne(Bus::class,"id","bus_id");
     }
 
-    public function cancel()
+    public function cancel_ticket()
     {
         return $this->hasOne(BookingCancel::class, 'ticket_id', 'id');
     }

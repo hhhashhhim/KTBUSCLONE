@@ -47,6 +47,7 @@ import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
+import ConfirmCancelationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 
 
 const url = '/kt/'
@@ -293,6 +294,11 @@ const routes = [
         path: url + "reports/advance/sale",
         component: AdvanceSaleReportsPage,
         name: "advance-sale-report"
+    },
+    {
+        path: url + "reports/confirm/cancel",
+        component: ConfirmCancelationPage,
+        name: "confirm-cancel-report"
     },
 ]
 const router = createRouter({
