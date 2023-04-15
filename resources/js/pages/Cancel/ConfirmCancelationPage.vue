@@ -36,11 +36,11 @@
                                                     <input id="toDate" type="date" class="form-control"
                                                            v-model="filterCancel.toDate" @change="CancelFilter()">
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <button class="btn btn-info mt-4 py-2" disabled @click="getPdfPrint()">Print
-                                                        Report
-                                                    </button>
-                                                </div>
+<!--                                                <div class="col-md-2">-->
+<!--                                                    <button class="btn btn-info mt-4 py-2" disabled @click="getPdfPrint()">Print-->
+<!--                                                        Report-->
+<!--                                                    </button>-->
+<!--                                                </div>-->
                                                 <!--Print Confirmation Cancel report-->
                                                 <form
                                                     :action="$store.state.app_url + 'print/pdf/confirm/cancellation/report'"
