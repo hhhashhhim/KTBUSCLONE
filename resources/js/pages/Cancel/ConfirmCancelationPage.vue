@@ -36,12 +36,12 @@
                                                     <input id="toDate" type="date" class="form-control"
                                                            v-model="filterCancel.toDate" @change="CancelFilter()">
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <button class="btn btn-primary mt-4 py-2" disabled
-                                                            @click="getPdfPrint()">Print
-                                                        Report
-                                                    </button>
-                                                </div>
+<!--                                                <div class="col-md-2">-->
+<!--                                                    <button class="btn btn-primary mt-4 py-2" disabled-->
+<!--                                                            @click="getPdfPrint()">Print-->
+<!--                                                        Report-->
+<!--                                                    </button>-->
+<!--                                                </div>-->
                                                 <!--Print Confirmation Cancel report-->
                                                 <form
                                                     :action="$store.state.app_url + 'print/pdf/confirm/cancellation/report'"
@@ -59,7 +59,7 @@
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-striped table-hover text-center">
+                                                        <table class="table table-striped text-center">
                                                             <thead>
                                                             <tr>
                                                                 <th>Bus Time</th>
@@ -78,7 +78,8 @@
                                                             </thead>
 
                                                             <tbody>
-                                                            <tr v-for="(filter,i) in filters" :key="i">
+                                                            <tr v-for="(filter,i) in filters" :key="i"
+                                                                :class="filter.badge">
                                                                 <td>{{ filter.bus_time }}</td>
                                                                 <td>{{ filter.terminal_name }}</td>
                                                                 <td>{{ filter.cancel_by }}</td>
@@ -162,5 +163,21 @@ export default {
 table, th, td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
+}
+
+.red {
+    background-color: #ff0000;
+}
+
+.yellow {
+    background-color: #FFFF00;
+}
+
+.white {
+    background-color: #FFFFFF;
+}
+
+.green {
+    background-color: #008000;
 }
 </style>

@@ -478,22 +478,17 @@ if (!function_exists('getRowBadgeColor')) {
     {
         $secDepart = strtotime($departureTime);
         $secCancellation = strtotime($cancellationTime);
-        $time_diff = $departureTime - $cancellationTime;
-        $time_diff_hours = round($time_diff / 3600);
+        $threeHoursBefore = $secDepart - 10800;
+        $oneHoursBefore = $threeHoursBefore - 3600;
         if ($secCancellation > $secDepart) {
             return "red";
         }
-        if ($time_diff_hours > 3) {
+        if ($threeHoursBefore > $secCancellation) {
             return "yellow";
         }
-        if (dsd) {
-            return "yellow";
+        if ($oneHoursBefore > $secCancellation) {
+            return "green";
         }
         return "white";
-
-//       after departure time label red
-//        just 4 hours before the departure time label yellow
-//        just before that 4 hours departure time label green
-//        all before then shows in label white
     }
 }
