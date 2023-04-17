@@ -31,7 +31,7 @@ class ConfirmCancellationReportController extends Controller
             $q->cancel_reason = $q->cancel_ticket->reason;
             $q->cancel_by = User::find($q->cancel_ticket->added_by)->name;
             $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_time = date('Y-m-d', strtotime($q->cancel_ticket->time)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
+            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->passenger_name = Customer::find($q->customer_id)->name;
             $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
             $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
@@ -39,13 +39,14 @@ class ConfirmCancellationReportController extends Controller
             $final = $percentageValue / 100;
             $q->amount_refund = (int)$q->seat_fare - $final;
             $q->cancelation_charges = $final;
+            $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)), $q->cancel_ticket->time);
             unset($q->cancel_ticket, $q->schedule);
         });
         return
             $tickets->when($request->fromDate, function ($query) use ($request) {
-                return $query->where('cancel_date', '>=', $request->fromDate);
+                return $query->where('bus_time', '>=', $request->fromDate);
             })->when($request->toDate, function ($query) use ($request) {
-                return $query->where('cancel_date', '<=', $request->toDate);
+                return $query->where('bus_time', '<=', $request->toDate);
             });
     }
 
@@ -62,7 +63,7 @@ class ConfirmCancellationReportController extends Controller
             $q->cancel_reason = $q->cancel_ticket->reason;
             $q->cancel_by = User::find($q->cancel_ticket->added_by)->name;
             $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_time = date('Y-m-d', strtotime($q->cancel_ticket->time)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
+            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->passenger_name = Customer::find($q->customer_id)->name;
             $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
             $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
@@ -73,10 +74,10 @@ class ConfirmCancellationReportController extends Controller
             unset($q->cancel_ticket, $q->schedule);
         });
         $tickets->when($request->fromDate, function ($query) use ($request) {
-            return $query->where('cancel_date', '>=', $request->fromDate);
+            return $query->where('bus_time', '>=', $request->fromDate);
         })->when($request->toDate, function ($query) use ($request) {
-            return $query->where('cancel_date', '<=', $request->toDate);
+            return $query->where('bus_time', '<=', $request->toDate);
         });
-        return view('reports.confirmCancleReport', ['tickets'=> $tickets]);
+        return view('reports.confirmCancelReport', ['tickets' => $tickets]);
     }
 }

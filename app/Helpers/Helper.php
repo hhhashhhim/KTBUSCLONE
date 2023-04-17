@@ -471,3 +471,29 @@ if (!function_exists('getDynamicHeaders')) {
         return \App\Models\ReportsHeader::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
     }
 }
+
+//Get getRowBadgeColor
+if (!function_exists('getRowBadgeColor')) {
+    function getRowBadgeColor($departureTime, $cancellationTime)
+    {
+        $secDepart = strtotime($departureTime);
+        $secCancellation = strtotime($cancellationTime);
+        $time_diff = $departureTime - $cancellationTime;
+        $time_diff_hours = round($time_diff / 3600);
+        if ($secCancellation > $secDepart) {
+            return "red";
+        }
+        if ($time_diff_hours > 3) {
+            return "yellow";
+        }
+        if (dsd) {
+            return "yellow";
+        }
+        return "white";
+
+//       after departure time label red
+//        just 4 hours before the departure time label yellow
+//        just before that 4 hours departure time label green
+//        all before then shows in label white
+    }
+}

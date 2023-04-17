@@ -17,18 +17,24 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
-//        $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)->where('type', 'canceled')->withTrashed()->get();
-//        $tickets->map(function ($q) {
-//            $q->cancel_percentage = $q->cancel_ticket->percentage;
-//            $q->cancel_reason = $q->cancel_ticket->reason;
-//            $q->cancel_by = User::find($q->cancel_ticket->added_by)->name;
-//            $q->cancel_date = $q->cancel_ticket->time;
-//            $q->bus_time = date('Y-m-d',strtotime($q->cancel_ticket->time)).' '. date('H:i:s', strtotime($q->schedule->time));
-//            $q->passenger_name = Customer::find($q->customer_id)->name;
-//            $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
-//            unset($q->cancel_ticket, $q->schedule);
-//        });
-//        return $tickets;
+        $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)->where('type', 'canceled')->withTrashed()->get();
+        $tickets->map(function ($q) {
+            $q->cancel_percentage = $q->cancel_ticket->percentage;
+            $q->cancel_reason = $q->cancel_ticket->reason;
+            $q->cancel_by = User::find($q->cancel_ticket->added_by)->name;
+            $q->cancel_date = $q->cancel_ticket->time;
+            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
+            $q->passenger_name = Customer::find($q->customer_id)->name;
+            $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
+            $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+            $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+            $final = $percentageValue / 100;
+            $q->amount_refund = (int)$q->seat_fare - $final;
+            $q->cancelation_charges = $final;
+            $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)), $q->cancel_ticket->time);
+            unset($q->cancel_ticket, $q->schedule);
+        });
+        return $tickets;
 
 
         if (!Auth::check() && $request->path() != "login") {
