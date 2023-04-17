@@ -86,15 +86,15 @@
                                                                     <td>{{ single.length }}</td>
                                                                     <td>{{ single[0].terminal.name }}</td>
                                                                     <td>{{ single[0].added_by.name }}</td>
-                                                                    <td>{{ sumSeatFare(single) }}</td>
-                                                                    <td>{{ sumEltFare(single) }}</td>
+                                                                    <td>a</td>
+                                                                    <td>b</td>
                                                                 </tr>
                                                             </template>
                                                             <tr>
                                                                 <td colspan="2"></td>
                                                                 <td>Total Seats</td>
                                                                 <td colspan="2"></td>
-                                                                <td>{{total}}</td>
+                                                                <td>abc</td>
                                                                 <td>ELT PRICE</td>
                                                             </tr>
                                                             </tbody>
@@ -216,8 +216,6 @@ export default {
                 fromDateTime: '',
                 toDateTime: '',
             },
-            test: [],
-            total: 0,
         }
     },
     async created() {
@@ -242,37 +240,8 @@ export default {
             }
 
         },
-        sumSeatFare: function (arr) {
-            return arr.reduce((sum, single) => {
-                sum += single.seat_fare - single.discount;
-                this.test.push(single.seat_fare - single.discount);
-                return sum;
-            }, 0);
-        },
-        sumEltFare: function (arr) {
-            return arr.reduce((sum, single) => {
-                if (single.ticket_elt != null) {
-                    return sum += single.ticket_elt.elt_price;
-                } else {
-                    return sum += 0;
-                }
-            }, 0);
-        },
 
     },
-    watch: 
-    {
-        test() {
-            console.log(this.test);
-        this.total = this.test.reduce((sum,total) =>{
-            console.log("a"+sum);
-            sum += sum;
-            console.log("b"+sum);
-            return sum;
-        },0)
-        console.log(this.test);
-    }
-    }
 
 }
 </script>
