@@ -17,58 +17,100 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
-//         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
-//             ->where('company_id', Auth::user()->company_id)
-//             ->where('type', 'booked')
-//             ->where('terminal_id', 10)
-//             ->when($request->terminal, function ($query) use ($request) {
-//                 return $query->where('terminal_id', $request->terminal);
-//             })
-//             ->when($request->user, function ($query) use ($request) {
-//                 return $query->where('added_by', $request->user);
-//             })
-//             ->when($request->route, function ($query) use ($request) {
-//                 $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-//                 return $query->whereIn('schedule_id', $scheduleIds);
-//             })->get();
-//
-//         $tickets->transform(function ($single) {
-//             $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule->time));
-//             return $single;
-//         });
-//
-//         $tickets = $tickets->when($request->fromDateTime, function ($query) use ($request) {
-//             return $query->where('schedule_date_time', '>=', $request->fromDateTime);
-//         })
-//             ->when($request->toDateTime, function ($query) use ($request) {
-//                 return $query->where('schedule_date_time', '<=', $request->toDateTime);
-//             })
-//             ->groupBy(['schedule_date_time', 'added_by']);
-//
-//         $sortData = [];
-//         // $tickets->map(function($outer) use ($sortData){
-//             // $outer->map(function($inner) use ($sortData){
-//                 // $single = [];
-//                 // $single['a'] = 'helo';
-//                 // array_push($sortData, 'abc');
-//
-//             // });
-//         // });
-//         foreach($tickets as $outer)
-//         {
-//             foreach($outer as $inner)
-//             {
-//                 dd($inner);
-//                 $single = [];
-//                 $single['bus_class'] = $inner[0]->busClass->name;
-//                 $single['seats'] = $inner->count();
-//                 $single['terminal'] = $inner[0]->terminal->name;
-//                 $single['user'] = $inner[0]->addedBy->name;
-//                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-//                 array_push($sortData, $single);
-//             }
-//         }
-//         return $sortData;
+        // $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
+        //     ->where('company_id', Auth::user()->company_id)
+        //     ->where('type', 'booked')
+        //     ->where('terminal_id', 10)
+        //     ->when($request->terminal, function ($query) use ($request) {
+        //         return $query->where('terminal_id', $request->terminal);
+        //     })
+        //     ->when($request->user, function ($query) use ($request) {
+        //         return $query->where('added_by', $request->user);
+        //     })
+        //     ->when($request->route, function ($query) use ($request) {
+        //         $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
+        //         return $query->whereIn('schedule_id', $scheduleIds);
+        //     })->get();
+
+        // $tickets->transform(function ($single) {
+        //     $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule->time));
+        //     return $single;
+        // });    
+        // $tickets = $tickets->when($request->fromDateTime, function ($query) use ($request) {
+        //     return $query->where('schedule_date_time', '>=', $request->fromDateTime);
+        // })
+        //     ->when($request->toDateTime, function ($query) use ($request) {
+        //         return $query->where('schedule_date_time', '<=', $request->toDateTime);
+        //     })
+
+        //     ->groupBy(['schedule_date_time', 'added_by']);
+
+
+        
+        // $sortData = [];
+        // foreach($tickets as $outer)
+        // {
+        //     foreach($outer as $inner)
+        //     {
+        //         $single = [];
+        //         $single['bus_class'] = $inner[0]->busClass->name;
+        //         $single['seats'] = $inner->count();
+        //         $single['terminal'] = $inner[0]->terminal->name;
+        //         $single['user'] = $inner[0]->addedBy->name;
+        //         $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+        //         $eltSum = 0;
+        //         foreach($inner as $tkt)
+        //         {
+        //             if($tkt->ticketElt)
+        //             {
+        //                 $eltSum += $tkt->ticketElt->elt_price;
+        //             }
+        //             else
+        //             {
+        //                 $eltSum += 0;        
+        //             }
+                    
+        //         }
+        //         $single['elt'] = $eltSum;
+        //         array_push($sortData, $single);
+        //     }
+        // }
+        // // refund Data QUeries;
+
+        // $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
+        //     ->where('type', 'canceled')->withTrashed()
+        //     ->when($request->terminal, function ($query) use ($request) {
+        //         return $query->where('terminal_id', $request->terminal);
+        //     })
+        //     ->when($request->user, function ($query) use ($request) {
+        //         return $query->where('added_by', $request->user);
+        //     })
+        //     ->when($request->route, function ($query) use ($request) {
+        //         $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
+        //         return $query->whereIn('schedule_id', $scheduleIds);
+        //     })->get();        
+        // $refundTickets->map(function ($q) {
+        //     $q->cancel_percentage = $q->cancel_ticket->percentage;
+        //     $q->cancel_reason = $q->cancel_ticket->reason;
+        //     $q->cancel_by = User::find($q->cancel_ticket->added_by)->name;
+        //     $q->cancel_date = $q->cancel_ticket->time;
+        //     $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
+        //     $q->passenger_name = Customer::find($q->customer_id)->name;
+        //     $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
+        //     $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+        //     $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+        //     $final = $percentageValue / 100;
+        //     $q->amount_refund = (int)$q->seat_fare - $final;
+        //     $q->cancelation_charges = $final;
+        //     $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)), $q->cancel_ticket->time);
+        //     unset($q->cancel_ticket, $q->schedule);
+        // });
+        // return $refundTickets->when($request->fromDate, function ($query) use ($request) {
+        //         return $query->where('bus_time', '>=', $request->fromDate);
+        //     })->when($request->toDate, function ($query) use ($request) {
+        //         return $query->where('bus_time', '<=', $request->toDate);
+        //     });
+        // return $sortData;
 
 
         if (!Auth::check() && $request->path() != "login") {

@@ -79,23 +79,21 @@
                                                             </thead>
 
                                                             <tbody>
-                                                            <template v-for="(data,i) in filters.record" :key="i">
-                                                                <tr v-for="(single,j) in data" :key="j">
+                                                                <tr v-for="(data,i) in filters.record" :key="i">
                                                                     <td>{{ i }}</td>
-                                                                    <td>{{ single[0].bus_class.name }}</td>
-                                                                    <td>{{ single.length }}</td>
-                                                                    <td>{{ single[0].terminal.name }}</td>
-                                                                    <td>{{ single[0].added_by.name }}</td>
-                                                                    <td>a</td>
-                                                                    <td>b</td>
+                                                                    <td>{{ data.bus_class }}</td>
+                                                                    <td>{{ data.seats }}</td>
+                                                                    <td>{{ data.terminal }}</td>
+                                                                    <td>{{ data.user }}</td>
+                                                                    <td>{{ data.sales }}</td>
+                                                                    <td>{{ data.elt }}</td>
                                                                 </tr>
-                                                            </template>
                                                             <tr>
                                                                 <td colspan="2"></td>
                                                                 <td>Total Seats</td>
                                                                 <td colspan="2"></td>
-                                                                <td>abc</td>
-                                                                <td>ELT PRICE</td>
+                                                                <td>{{ totalSeatFare() }}</td>
+                                                                <td>{{ totalEltFare() }}</td>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -240,6 +238,22 @@ export default {
             }
 
         },
+        totalSeatFare: function (){
+            if(this.filters.record)
+            {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum += single.sales;
+                },0)
+            }
+        },
+        totalEltFare: function (){
+            if(this.filters.record)
+            {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum += single.elt;
+                },0)
+            }
+        }
 
     },
 

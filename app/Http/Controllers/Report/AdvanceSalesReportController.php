@@ -56,8 +56,40 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('schedule_date_time', '<=', $request->toDateTime);
             })
             ->groupBy(['schedule_date_time', 'added_by']);
+
+        // return $tickets;
+        $sortData = [];
+        foreach($tickets as $outer)
+        {
+            foreach($outer as $inner)
+            {
+                $single = [];
+                $single['bus_class'] = $inner[0]->busClass->name;
+                $single['seats'] = $inner->count();
+                $single['terminal'] = $inner[0]->terminal->name;
+                $single['user'] = $inner[0]->addedBy->name;
+                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                $eltSum = 0;
+                foreach($inner as $tkt)
+                {
+                    if($tkt->ticketElt)
+                    {
+                        $eltSum += $tkt->ticketElt->elt_price;
+                    }
+                    else
+                    {
+                        $eltSum += 0;        
+                    }
+                    
+                }
+                $single['elt'] = $eltSum;
+                array_push($sortData, $single);
+            }
+        }
+
         return [
-            'record' => $tickets,
+            'record' => $sortData,
+            'refund' => $sortData,
         ];
 
     }
