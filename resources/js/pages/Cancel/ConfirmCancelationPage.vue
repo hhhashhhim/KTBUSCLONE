@@ -36,12 +36,12 @@
                                                     <input id="toDate" type="date" class="form-control"
                                                            v-model="filterCancel.toDate" @change="CancelFilter()">
                                                 </div>
-<!--                                                <div class="col-md-2">-->
-<!--                                                    <button class="btn btn-primary mt-4 py-2" disabled-->
-<!--                                                            @click="getPdfPrint()">Print-->
-<!--                                                        Report-->
-<!--                                                    </button>-->
-<!--                                                </div>-->
+                                                <div class="col-md-2">
+                                                    <button class="btn btn-primary mt-4 py-2"
+                                                            @click="getPdfPrint()">Print
+                                                        Report
+                                                    </button>
+                                                </div>
                                                 <!--Print Confirmation Cancel report-->
                                                 <form
                                                     :action="$store.state.app_url + 'print/pdf/confirm/cancellation/report'"
@@ -59,7 +59,7 @@
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-striped text-center">
+                                                        <table class="table text-center">
                                                             <thead>
                                                             <tr>
                                                                 <th>Bus Time</th>
@@ -139,6 +139,7 @@ export default {
         },
         async CancelFilter() {
             const resFetchData = await this.callApi("post", 'confirm/cancellation/fetchFilterData', this.filterCancel);
+            console.log(resFetchData);
             if (resFetchData.status == 200) {
                 this.filters = resFetchData.data;
             }
@@ -148,7 +149,7 @@ export default {
             if (this.filterCancel.terminal == 0 && this.filterCancel.fromDate == '' && this.filterCancel.toDate == '') {
                 return swal({
                     title: "Required!",
-                    text: "Atleast One Field is Required",
+                    text: "At Least One Field is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -166,11 +167,11 @@ table, th, td {
 }
 
 .red {
-    background-color: #ff0000;
+    background-color: #ec3030;
 }
 
 .yellow {
-    background-color: #FFFF00;
+    background-color: #bdbd02;
 }
 
 .white {
@@ -178,6 +179,6 @@ table, th, td {
 }
 
 .green {
-    background-color: #008000;
+    background-color: #03b203;
 }
 </style>

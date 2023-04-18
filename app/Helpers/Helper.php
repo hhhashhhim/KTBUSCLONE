@@ -476,13 +476,17 @@ if (!function_exists('getDynamicHeaders')) {
 if (!function_exists('getRowBadgeColor')) {
     function getRowBadgeColor($departureTime, $cancellationTime)
     {
+//        dd($cancellationTime, $departureTime);
         $secDepart = strtotime($departureTime);
         $secCancellation = strtotime($cancellationTime);
         $threeHoursBefore = $secDepart - 10800;
         $oneHoursBefore = $threeHoursBefore - 3600;
+
+//        dd($secCancellation > $secDepart);
         if ($secCancellation > $secDepart) {
             return "red";
         }
+
         if ($secCancellation > $threeHoursBefore) {
             return "yellow";
         }

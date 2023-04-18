@@ -134,7 +134,6 @@ export default {
     components: {
         Add,
         vueMask,
-
     },
     data() {
         return {
@@ -164,15 +163,19 @@ export default {
         };
     },
     methods: {
+        close() {
+            $(`#${this.formID}`).click();
+        },
         async add() {
             this.validationErrors = [];
-            if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined')
+            if (this.data.time_difference == '' || typeof this.data.time_difference == 'undefined') {
                 return swal({
                     title: "Required!",
                     text: "Time Difference is Required!",
                     icon: "error",
                     timer: 2000
                 });
+            }
             this.loading = true;
             const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
             if (resTimeDiff.status == 200) {
@@ -184,7 +187,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-
+                this.close();
             }
             if (resTimeDiff.status == 422) {
                 this.loading = false;
@@ -229,7 +232,7 @@ export default {
                 city: this.data.city,
                 to: to.id,
             });
-            if (resGetTerminal.status == 200 && resGetTerminal.data.length != 0) {
+            if (resGetTerminal.status == 200) {
                 this.data = resGetTerminal.data;
                 this.data.city = resGetTerminal.data.city_id;
                 this.data.created = 1;

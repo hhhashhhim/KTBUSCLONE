@@ -79,21 +79,21 @@
                                                             </thead>
 
                                                             <tbody>
-                                                                <tr v-for="(data,i) in filters.record" :key="i">
-                                                                    <td>{{ i }}</td>
-                                                                    <td>{{ data.bus_class }}</td>
-                                                                    <td>{{ data.seats }}</td>
-                                                                    <td>{{ data.terminal }}</td>
-                                                                    <td>{{ data.user }}</td>
-                                                                    <td>{{ data.sales }}</td>
-                                                                    <td>{{ data.elt }}</td>
-                                                                </tr>
+                                                            <tr v-for="(data,i) in filters.record" :key="i">
+                                                                <td>{{ i }}</td>
+                                                                <td>{{ data.bus_class }}</td>
+                                                                <td>{{ data.seats }}</td>
+                                                                <td>{{ data.terminal }}</td>
+                                                                <td>{{ data.user }}</td>
+                                                                <td>{{ data.sales }}</td>
+                                                                <td>{{ data.elt }}</td>
+                                                            </tr>
                                                             <tr>
-                                                                <td colspan="2"></td>
-                                                                <td>Total Seats</td>
-                                                                <td colspan="2"></td>
-                                                                <td>{{ totalSeatFare() }}</td>
-                                                                <td>{{ totalEltFare() }}</td>
+                                                                <th colspan="2"></th>
+                                                                <th>{{ totalSeats() ?? 0 }}</th>
+                                                                <th colspan="2"></th>
+                                                                <th>{{ totalSeatFare() ?? 0 }}</th>
+                                                                <th>{{ totalEltFare() ?? 0 }}</th>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -123,23 +123,23 @@
                                                             </thead>
                                                             <tbody>
                                                             <tr v-for="(dataRefund,i) in filters.refund" :key="i">
-                                                                <td>SR NO</td>
-                                                                <td>TICKET ID</td>
-                                                                <td>TERMINAL</td>
-                                                                <td>BUS NO</td>
-                                                                <td>SEAT NO</td>
-                                                                <td>REFUND AMOUNT</td>
-                                                                <td>CANCELATION CHARGES</td>
-                                                                <td>BUS TIMING</td>
-                                                                <td>REFUND BY</td>
-                                                                <td>CANCELATION DATE</td>
+                                                                <td>{{ i + 1 }}</td>
+                                                                <td>{{ dataRefund.id }}</td>
+                                                                <td>{{ dataRefund.terminal_name }}</td>
+                                                                <td>{{ dataRefund.bus_NO }}</td>
+                                                                <td>{{ dataRefund.seat_no }}</td>
+                                                                <td>{{ dataRefund.amount_refund }}</td>
+                                                                <td>{{ dataRefund.cancelation_charges }}</td>
+                                                                <td>{{ dataRefund.bus_time }}</td>
+                                                                <td>{{ dataRefund.refund_by }}</td>
+                                                                <td>{{ dataRefund.cancel_date }}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td colspan="4"></td>
-                                                                <td>No of seats</td>
-                                                                <td>Refund Total</td>
-                                                                <td>Total CANCELATION CHARGES</td>
-                                                                <td colspan="3"></td>
+                                                                <th colspan="4"></th>
+                                                                <th>{{ refundTotalSeats() ?? 0 }}</th>
+                                                                <th>{{ refundTotal() ?? 0 }}</th>
+                                                                <th>{{ refundTotalCharges()  ?? 0}}</th>
+                                                                <th colspan="3"></th>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -153,34 +153,34 @@
                                                         <table class="table table-striped table-hover"
                                                                style="  border: 3px solid #b9b9b9">
                                                             <tbody>
-                                                            <tr>
-                                                                <th style="width: 75% !important;">CASH ON BANK</th>
-                                                                <td style="width: 25% !important;">0</td>
-                                                            </tr>
+<!--                                                            <tr>-->
+<!--                                                                <th style="width: 75% !important;">CASH ON BANK</th>-->
+<!--                                                                <td style="width: 25% !important;">0</td>-->
+<!--                                                            </tr>-->
                                                             <tr>
                                                                 <th style="width: 75% !important;">CASH ON COUNTER</th>
-                                                                <td style="width: 25% !important;">0</td>
+                                                                <td style="width: 25% !important;">{{ totalSeatFare() ?? 0 }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th style="width: 75% !important;">TOTAL ELT</th>
-                                                                <td style="width: 25% !important;">0</td>
+                                                                <td style="width: 25% !important;">{{ totalEltFare() ?? 0 }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th style="width: 75% !important;">TOTAL REFUND</th>
-                                                                <td style="width: 25% !important;">0</td>
+                                                                <td style="width: 25% !important;">{{ refundTotal() ?? 0 }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th style="width: 75% !important;">TOTAL CANCELATION
                                                                     CHARGES
                                                                 </th>
-                                                                <td style="width: 25% !important;">0</td>
+                                                                <td style="width: 25% !important;">{{ refundTotalCharges() ?? 0}}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <th style="width: 75% !important;">TOTAL CASH ON
-                                                                    COUNTER
-                                                                </th>
-                                                                <td style="width: 25% !important;">0</td>
-                                                            </tr>
+<!--                                                            <tr>-->
+<!--                                                                <th style="width: 75% !important;">TOTAL CASH ON-->
+<!--                                                                    COUNTER-->
+<!--                                                                </th>-->
+<!--                                                                <td style="width: 25% !important;">{{ totalSeatFare() }}</td>-->
+<!--                                                            </tr>-->
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -235,23 +235,50 @@ export default {
             const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
                 this.filters.record = resFetchData.data.record;
+                this.filters.refund = resFetchData.data.refund;
             }
 
         },
-        totalSeatFare: function (){
-            if(this.filters.record)
-            {
+        // sales Table
+        totalSeats: function () {
+            if (this.filters.record) {
                 return this.filters.record.reduce((sum, single) => {
-                    return sum += single.sales;
-                },0)
+                    return sum += single.seats;
+                }, 0)
             }
         },
-        totalEltFare: function (){
-            if(this.filters.record)
-            {
+        totalSeatFare: function () {
+            if (this.filters.record) {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum += single.sales;
+                }, 0)
+            }
+        },
+        totalEltFare: function () {
+            if (this.filters.record) {
                 return this.filters.record.reduce((sum, single) => {
                     return sum += single.elt;
-                },0)
+                }, 0)
+            }
+        },
+        // refund Table
+        refundTotalCharges: function () {
+            if (this.filters.refund) {
+                return this.filters.refund.reduce((sum, single) => {
+                    return sum += single.cancelation_charges;
+                }, 0)
+            }
+        },
+        refundTotal: function () {
+            if (this.filters.refund) {
+                return this.filters.refund.reduce((sum, single) => {
+                    return sum += single.amount_refund;
+                }, 0)
+            }
+        },
+        refundTotalSeats: function () {
+            if (this.filters.refund) {
+                return this.filters.refund.length;
             }
         }
 

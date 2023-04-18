@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bus\BusClass;
 use App\Models\Route\Route;
 use App\Models\Schedule\Schedule;
 use App\Models\Terminal;
@@ -78,18 +79,52 @@ class AdvanceSalesReportController extends Controller
                     }
                     else
                     {
-                        $eltSum += 0;        
+                        $eltSum += 0;
                     }
-                    
+
                 }
                 $single['elt'] = $eltSum;
                 array_push($sortData, $single);
             }
         }
 
+//        Refund Data Detils
+
+        $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
+            ->where('type', 'canceled')->withTrashed()
+            ->when($request->terminal, function ($query) use ($request) {
+                return $query->where('terminal_id', $request->terminal);
+            })
+            ->when($request->user, function ($query) use ($request) {
+                return $query->where('added_by', $request->user);
+            })
+            ->when($request->route, function ($query) use ($request) {
+                $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
+                return $query->whereIn('schedule_id', $scheduleIds);
+            })
+            ->get();
+        $refundTickets->map(function ($q) {
+            $q->cancel_percentage = $q->cancel_ticket->percentage;
+            $q->refund_by = User::find($q->cancel_ticket->added_by)->name;
+            $q->cancel_date = $q->cancel_ticket->time;
+            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
+            $q->bus_NO = BusClass::find($q->bus_class_id)->name;
+            $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+            $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+            $final = $percentageValue / 100;
+            $q->amount_refund = (int)$q->seat_fare - $final;
+            $q->cancelation_charges = $final;
+            unset($q->cancel_ticket, $q->schedule);
+        });
+        $$refundTickets = $refundTickets->when($request->fromDate, function ($query) use ($request) {
+            return $query->where('bus_time', '>=', $request->fromDateTime);
+        })->when($request->toDate, function ($query) use ($request) {
+            return $query->where('bus_time', '<=', $request->toDateTime);
+        });
+
         return [
             'record' => $sortData,
-            'refund' => $sortData,
+            'refund' => $refundTickets,
         ];
 
     }

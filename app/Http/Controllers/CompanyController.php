@@ -28,6 +28,7 @@ class CompanyController extends Controller
 
         $company = Company::create([
             'name' => $request->name,
+            'user_name' => $request->userName,
             'contact' => plainContactAndCnic($request->contact),
             'location' => $request->location,
             'modules' => $request->modules,
@@ -79,6 +80,7 @@ class CompanyController extends Controller
         ]);
         Company::find($request->id)->update([
             'name' => $request->name,
+            'user_name' => $request->user_name,
             'contact' => plainContactAndCnic($request->contact),
             'location' => $request->location,
             'modules' => $request->modules,

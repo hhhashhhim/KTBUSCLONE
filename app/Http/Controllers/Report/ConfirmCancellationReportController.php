@@ -19,10 +19,9 @@ class ConfirmCancellationReportController extends Controller
 
     public function filterData(Request $request)
     {
-
         $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')->withTrashed()
-            ->when($request->terminal, function ($query) use ($request) {
+            ->when($request->terminal != 0, function ($query) use ($request) {
                 return $query->where('terminal_id', $request->terminal);
             })
             ->get();
@@ -43,14 +42,15 @@ class ConfirmCancellationReportController extends Controller
             unset($q->cancel_ticket, $q->schedule);
         });
         return
-            $tickets->when($request->fromDate, function ($query) use ($request) {
+            $tickets->when($request->fromDate != '', function ($query) use ($request) {
                 return $query->where('bus_time', '>=', $request->fromDate);
-            })->when($request->toDate, function ($query) use ($request) {
+            })->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('bus_time', '<=', $request->toDate);
             });
     }
 
-    public function getPrintPdf(Request $request)
+    public
+    function getPrintPdf(Request $request)
     {
         $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')->withTrashed()
