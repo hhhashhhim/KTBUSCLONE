@@ -483,10 +483,10 @@ if (!function_exists('getRowBadgeColor')) {
         if ($secCancellation > $secDepart) {
             return "red";
         }
-        if ($threeHoursBefore > $secCancellation) {
+        if ($secCancellation > $threeHoursBefore) {
             return "yellow";
         }
-        if ($oneHoursBefore > $secCancellation) {
+        if ($secCancellation > $oneHoursBefore) {
             return "green";
         }
         return "white";
