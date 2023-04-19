@@ -113,7 +113,7 @@ class AuthController extends Controller
         // return $sortData;
 
 
-        if (!Auth::check() && $request->path() != "login") {
+        if (!Auth::check() && $renquest->path() != "login") {
             return redirect('/login');
         }
         if (Auth::check() && $request->path() == "login") {
