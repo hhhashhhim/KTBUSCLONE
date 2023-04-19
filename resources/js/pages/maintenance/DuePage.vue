@@ -347,6 +347,7 @@ export default {
 
             const res = await this.callApi("post", "fleet/maintenance/due/add", formData , config);
             if (res.status === 201) {
+                $(".modal").click();
                 this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 this.postData.fleetId = "";
@@ -405,6 +406,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "fleet/meter/reading/update", this.readingData);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 this.readingData.fleetId = "";

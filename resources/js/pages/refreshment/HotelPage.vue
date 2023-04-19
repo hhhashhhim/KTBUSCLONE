@@ -315,6 +315,7 @@ export default {
 
             const res = await this.callApi("post", "refreshments/hotels/store", formData, config);
             if (res.status == 201) {
+                $(".modal").click();
                 this.loading = false
                 $("#hotel_table").DataTable().destroy();
                 this.success = "Hotel Created Successfully";
@@ -399,6 +400,7 @@ export default {
 
             const res = await this.callApi("post", "refreshments/hotels/update", formData, config);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false
                 $("#hotel_table").DataTable().destroy();
                 this.success = "Hotel Updated Successfully";

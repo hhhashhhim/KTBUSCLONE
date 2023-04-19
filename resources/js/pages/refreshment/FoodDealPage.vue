@@ -376,6 +376,7 @@ export default {
 
             const res = await this.callApi("post", "refreshments/hotels/specific/foods/deals/store", this.postData);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false
                 $("#deal_table").DataTable().destroy();
                 this.success = "Deal Added Successfully";
@@ -459,6 +460,7 @@ export default {
 
             const res = await this.callApi("post", "refreshments/hotels/specific/foods/deals/update", this.editData);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false
                 $("#deal_table").DataTable().destroy();
                 this.success = "Deal Updated Successfully";

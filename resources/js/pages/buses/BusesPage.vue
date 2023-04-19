@@ -416,6 +416,7 @@ export default {
             this.loadig = true;
             const res = await this.callApi("post", "buses/store", this.data);
             if (res.status === 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Bus Created Successfully",
@@ -458,6 +459,7 @@ export default {
 
             const res = await this.callApi("post", "buses/update", this.dataEdit);
             if (res.status === 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Bus Record updated Successfully",

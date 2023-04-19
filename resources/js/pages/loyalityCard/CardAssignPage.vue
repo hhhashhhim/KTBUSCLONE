@@ -324,6 +324,7 @@ export default {
         async fetchAssignedCard() {
             const resCategories = await this.callApi("post", 'loyaltyCardAssign/categories');
             if (resCategories.status == 200) {
+                $(".modal").click();
                 this.categories = resCategories.data
             } else {
                 console.log(resCategories);
@@ -446,6 +447,7 @@ export default {
             this.loading = true;
             const resCardAssign = await this.callApi("post", "loyaltyCardAssign/store", this.addForm);
             if (resCardAssign.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Card Assigned To Customer Successfully",
@@ -534,6 +536,7 @@ export default {
             this.loading = true;
             const resUpdateCard = await this.callApi("post", 'loyaltyCardAssign/update', this.dataEdit);
             if (resUpdateCard.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Loyalty Card Updated Successfully",

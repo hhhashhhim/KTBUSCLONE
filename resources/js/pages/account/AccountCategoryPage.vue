@@ -299,6 +299,7 @@ export default {
 
             const resCategory = await this.callApi("post", "accounts/coa/category/store", this.addForm);
             if (resCategory.status == 201) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",

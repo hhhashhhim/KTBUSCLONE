@@ -179,6 +179,7 @@ export default {
             this.loading = true;
             const resTimeDiff = await this.callApi("post", "terminal_time/store", this.data);
             if (resTimeDiff.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 this.fetchRecord();
                 swal({

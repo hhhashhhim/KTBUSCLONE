@@ -832,6 +832,7 @@ export default {
                 name: this.departmentName
             });
             if (resDepartmentStore.status == 201) {
+                this.closeDep();
                 swal({
                     title: "Success",
                     text: "Department Name Added Successfully!",
@@ -887,6 +888,7 @@ export default {
                 name: this.designationName
             });
             if (resDesignationStore.status == 201) {
+                this.closeDes();
                 this.designations = '';
                 this.editDesignations = '';
                 swal({
@@ -1167,6 +1169,7 @@ export default {
             this.loading = true;
             const resEmployeeAdd = await this.callApi("post", "hrm/employee/store", formData, config);
             if (resEmployeeAdd.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Employee record Successfully Created!",
@@ -1350,6 +1353,7 @@ export default {
 
             const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', formData, config);
             if (resEmployeeUpdate.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success!",
                     text: "Employee Record Updated Successfully",

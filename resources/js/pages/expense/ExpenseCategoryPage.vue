@@ -170,6 +170,7 @@ export default {
             this.loading = true
             const res = await this.callApi("post", 'expenses/categories/store', this.data);
             if (res.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Category Created Succesfuly Named as  " + res.data.name,
@@ -210,6 +211,7 @@ export default {
             this.loading = true;
             const resEdit = await this.callApi("post", 'expenses/categories/update', this.dataEdit);
             if (resEdit.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Category updated Successfully",

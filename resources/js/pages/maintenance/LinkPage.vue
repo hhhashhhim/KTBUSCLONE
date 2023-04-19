@@ -376,6 +376,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "fleet/part/link", data);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 this.fleetId = "";
@@ -456,6 +457,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "fleet/part/link/update", data);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 this.edit.fleetId = "";

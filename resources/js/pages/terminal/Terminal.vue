@@ -725,6 +725,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "terminals/store", this.data);
             if (res.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Terminal Created Successfully",
@@ -810,6 +811,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "terminals/update", this.dataEdit);
             if (res.status === 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Terminal Updated Successfully",

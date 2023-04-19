@@ -27613,10 +27613,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resCategory = _context4.sent;
 
                 if (!(resCategory.status == 201)) {
-                  _context4.next = 19;
+                  _context4.next = 20;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 swal({
                   title: "Success",
@@ -27628,14 +27629,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.clearForm();
 
                 $("#category_table").DataTable().destroy();
-                _context4.next = 17;
+                _context4.next = 18;
                 return _this4.fetchCategories();
 
-              case 17:
-                _context4.next = 20;
+              case 18:
+                _context4.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (resCategory.status == 422) {
                   (function () {
                     _this4.loading = false;
@@ -27659,7 +27660,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context4.stop();
             }
@@ -32015,9 +32016,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resSaveFareClass = _context3.sent;
 
                 if (!(resSaveFareClass.status == 201)) {
-                  _context3.next = 12;
+                  _context3.next = 13;
                   break;
                 }
+
+                _this3.closeFare();
 
                 swal({
                   title: "Success",
@@ -32026,16 +32029,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 _this3.loading = false;
-                _context3.next = 9;
+                _context3.next = 10;
                 return _this3.fetchBussClasses();
 
-              case 9:
+              case 10:
                 return _context3.abrupt("return", _context3.sent);
 
-              case 12:
+              case 13:
                 console.log(resSaveFareClass);
 
-              case 13:
+              case 14:
               case "end":
                 return _context3.stop();
             }
@@ -32058,6 +32061,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           delete _this4.data.seatMap[row][col].selected;
         });
         this.selectedSeats = [];
+        this.closeDetail();
         return swal({
           title: "Success",
           text: "Seats Modified Successfully !!!!",
@@ -32095,6 +32099,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       this.uniqueSeatNumber.push(this.setSeatNumber.addSeatNO);
       this.data.seatMap[rowId][colId].seatNo = this.setSeatNumber.addSeatNO;
+      this.closeSeat();
       swal({
         title: "Success",
         text: "Successfully Added Seat Number",
@@ -32154,6 +32159,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           "class": this.editSeatModify["class"],
           type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type
         };
+        this.closeEditSeat();
         swal({
           title: "Success!",
           text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
@@ -32360,10 +32366,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status == 201)) {
-                  _context4.next = 29;
+                  _context4.next = 30;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Bus Class Added Successfully",
@@ -32372,19 +32379,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#bus_class_table").DataTable().destroy();
                 _this5.loading = false;
-                _context4.next = 24;
+                _context4.next = 25;
                 return _this5.fetchBussClasses();
 
-              case 24:
+              case 25:
                 _this5.data = {
                   busClassColor: "#000000"
                 };
                 _this5.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 30;
+                _context4.next = 31;
                 break;
 
-              case 29:
+              case 30:
                 if (res.status == 422) {
                   _this5.loading = false;
 
@@ -32399,7 +32406,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 30:
+              case 31:
               case "end":
                 return _context4.stop();
             }
@@ -32476,10 +32483,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 21;
+                  _context5.next = 22;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Bus Class Updated Successfully",
@@ -32488,14 +32496,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#bus_class_table").DataTable().destroy();
                 _this6.loading = false;
-                _context5.next = 19;
+                _context5.next = 20;
                 return _this6.fetchBussClasses();
 
-              case 19:
-                _context5.next = 22;
+              case 20:
+                _context5.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (res.status == 422) {
                   _this6.loading = false;
 
@@ -32510,7 +32518,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context5.stop();
             }
@@ -32851,10 +32859,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status === 201)) {
-                  _context3.next = 21;
+                  _context3.next = 22;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Bus Created Successfully",
@@ -32866,18 +32875,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.scrollTo(0, 0);
                 _this3.data = {};
                 _this3.data.fare_class = 0;
-                _context3.next = 18;
+                _context3.next = 19;
                 return _this3.fetchBuses();
 
-              case 18:
+              case 19:
                 setTimeout(function () {
                   // window.location.reload();
                   _this3.isShowDiv = false;
                 }, 2000);
-                _context3.next = 22;
+                _context3.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -32892,7 +32901,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context3.stop();
             }
@@ -32935,10 +32944,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 15;
+                  _context4.next = 16;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Bus Record updated Successfully",
@@ -32947,14 +32957,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $('#buses_table').DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 13;
+                _context4.next = 14;
                 return _this4.fetchBuses();
 
-              case 13:
-                _context4.next = 16;
+              case 14:
+                _context4.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -32969,7 +32979,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context4.stop();
             }
@@ -33185,10 +33195,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 17;
+                  _context3.next = 18;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "City Created Succesfuly Named as  " + res.data.name,
@@ -33197,19 +33208,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#city_table").DataTable().destroy();
                 _this3.loading = false;
-                _context3.next = 13;
+                _context3.next = 14;
                 return _this3.fetchCities();
 
-              case 13:
+              case 14:
                 _this3.data.name = "";
                 setTimeout(function () {
                   this.success = "";
                   this.data = "";
                 }, 300);
-                _context3.next = 18;
+                _context3.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -33224,7 +33235,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context3.stop();
             }
@@ -33268,10 +33279,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 16;
+                  _context4.next = 17;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "City updated Successfully",
@@ -33280,18 +33292,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 _this4.loading = false;
                 $("#city_table").DataTable().destroy();
-                _context4.next = 13;
+                _context4.next = 14;
                 return _this4.fetchCities();
 
-              case 13:
+              case 14:
                 setTimeout(function () {
                   _this4.success = "";
                   $('#edit-modal').modal('hide');
                 }, 3000);
-                _context4.next = 18;
+                _context4.next = 19;
                 break;
 
-              case 16:
+              case 17:
                 if (resEdit.status == 422) {
                   _this4.loading = false;
 
@@ -33310,7 +33322,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.loading = false;
                 }, 3000);
 
-              case 18:
+              case 19:
               case "end":
                 return _context4.stop();
             }
@@ -34681,10 +34693,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 30;
+                  _context3.next = 31;
                   break;
                 }
 
+                $(".modal").click();
                 _this3.loading = false;
                 swal({
                   title: "Success",
@@ -34700,15 +34713,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.showDiscountDivPercentage = true;
                 _this3.showDiscountDivFlat = false;
                 $('#discount_table').DataTable().destroy();
-                _context3.next = 27;
+                _context3.next = 28;
                 return _this3.fetchDiscount();
 
-              case 27:
+              case 28:
                 window.scrollTo(0, 0);
-                _context3.next = 31;
+                _context3.next = 32;
                 break;
 
-              case 30:
+              case 31:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -34723,7 +34736,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 31:
+              case 32:
               case "end":
                 return _context3.stop();
             }
@@ -34800,10 +34813,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 21;
+                  _context4.next = 22;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 swal({
                   title: "Success!",
@@ -34812,14 +34826,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $('#discount_table').DataTable().destroy();
-                _context4.next = 19;
+                _context4.next = 20;
                 return _this4.fetchDiscount();
 
-              case 19:
-                _context4.next = 23;
+              case 20:
+                _context4.next = 24;
                 break;
 
-              case 21:
+              case 22:
                 if (res.status === 422) {
                   _this4.loading = false;
 
@@ -34837,7 +34851,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 23:
+              case 24:
               case "end":
                 return _context4.stop();
             }
@@ -35034,10 +35048,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 17;
+                  _context3.next = 18;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Category Created Succesfuly Named as  " + res.data.name,
@@ -35046,19 +35061,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#category_table").DataTable().destroy();
                 _this3.loading = false;
-                _context3.next = 13;
+                _context3.next = 14;
                 return _this3.fetchData();
 
-              case 13:
+              case 14:
                 _this3.data.name = "";
                 setTimeout(function () {
                   this.success = "";
                   this.data = "";
                 }, 300);
-                _context3.next = 18;
+                _context3.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -35073,7 +35088,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context3.stop();
             }
@@ -35117,10 +35132,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context4.sent;
 
                 if (!(resEdit.status == 200)) {
-                  _context4.next = 16;
+                  _context4.next = 17;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Category updated Successfully",
@@ -35129,18 +35145,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 _this4.loading = false;
                 $("#category_table").DataTable().destroy();
-                _context4.next = 13;
+                _context4.next = 14;
                 return _this4.fetchData();
 
-              case 13:
+              case 14:
                 setTimeout(function () {
                   _this4.success = "";
                   $('#edit-modal').modal('hide');
                 }, 3000);
-                _context4.next = 18;
+                _context4.next = 19;
                 break;
 
-              case 16:
+              case 17:
                 if (resEdit.status == 422) {
                   _this4.loading = false;
 
@@ -35159,7 +35175,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this4.loading = false;
                 }, 3000);
 
-              case 18:
+              case 19:
               case "end":
                 return _context4.stop();
             }
@@ -35718,10 +35734,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 19;
+                  _context3.next = 20;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success!",
                   text: "Fare Class Added Successfully",
@@ -35735,15 +35752,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   FareClassName: "",
                   FareClassColor: "#000000"
                 };
-                _context3.next = 16;
+                _context3.next = 17;
                 return _this3.fetchFareClasses();
 
-              case 16:
+              case 17:
                 window.scrollTo(0, 0);
-                _context3.next = 20;
+                _context3.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -35758,7 +35775,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -35812,10 +35829,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status == 200)) {
-                  _context4.next = 17;
+                  _context4.next = 18;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success!",
                   text: "Fare Class Updated Successfully",
@@ -35824,14 +35842,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#fare_class_table").DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 15;
+                _context4.next = 16;
                 return _this4.fetchFareClasses();
 
-              case 15:
-                _context4.next = 18;
+              case 16:
+                _context4.next = 19;
                 break;
 
-              case 17:
+              case 18:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -35846,7 +35864,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context4.stop();
             }
@@ -36057,6 +36075,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (res.status == 200) {
+                  $(".modal").click();
                   _this2.loading = false;
                   swal({
                     title: "Success",
@@ -36498,10 +36517,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDepartAdd = _context3.sent;
 
                 if (!(resDepartAdd.status == 201)) {
-                  _context3.next = 18;
+                  _context3.next = 19;
                   break;
                 }
 
+                $(".modal").click();
                 _this3.loading = false;
                 swal({
                   title: "Success",
@@ -36513,14 +36533,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.clearForm();
 
                 $("#department_table").DataTable().destroy();
-                _context3.next = 16;
+                _context3.next = 17;
                 return _this3.fetchDepartments();
 
-              case 16:
-                _context3.next = 19;
+              case 17:
+                _context3.next = 20;
                 break;
 
-              case 18:
+              case 19:
                 if (resDepartAdd.status == 422) {
                   (function () {
                     _this3.loading = false;
@@ -36544,7 +36564,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 19:
+              case 20:
               case "end":
                 return _context3.stop();
             }
@@ -36597,6 +36617,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDepartmentEdit = _context4.sent;
 
                 if (resDepartmentEdit.status == 200) {
+                  $(".modal").click();
                   _this4.loading = false;
                   swal({
                     title: "Success!",
@@ -37033,10 +37054,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDesignationAdd = _context6.sent;
 
                 if (!(resDesignationAdd.status == 201)) {
-                  _context6.next = 21;
+                  _context6.next = 22;
                   break;
                 }
 
+                $(".modal").click();
                 _this6.loading = false;
                 swal({
                   title: "Success",
@@ -37049,14 +37071,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 $("#designation_table").DataTable().destroy();
                 $("#show_designation").DataTable().destroy();
-                _context6.next = 19;
+                _context6.next = 20;
                 return _this6.fetchDesignations();
 
-              case 19:
-                _context6.next = 22;
+              case 20:
+                _context6.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (resDesignationAdd.status == 422) {
                   (function () {
                     _this6.loading = false;
@@ -37080,7 +37102,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context6.stop();
             }
@@ -37133,10 +37155,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDepartmentEdit = _context7.sent;
 
                 if (!(resDepartmentEdit.status == 200)) {
-                  _context7.next = 18;
+                  _context7.next = 19;
                   break;
                 }
 
+                $(".modal").click();
                 _this7.loading = false;
                 swal({
                   title: "Success!",
@@ -37146,14 +37169,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#designation_table").DataTable().destroy();
                 $("#show_designation").DataTable().destroy();
-                _context7.next = 16;
+                _context7.next = 17;
                 return _this7.fetchDesignations();
 
-              case 16:
-                _context7.next = 19;
+              case 17:
+                _context7.next = 20;
                 break;
 
-              case 18:
+              case 19:
                 if (resDepartmentEdit.status == 422) {
                   (function () {
                     _this7.loading = false;
@@ -37177,7 +37200,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 19:
+              case 20:
               case "end":
                 return _context7.stop();
             }
@@ -37629,6 +37652,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDepartmentStore = _context5.sent;
 
                 if (resDepartmentStore.status == 201) {
+                  _this5.closeDep();
+
                   swal({
                     title: "Success",
                     text: "Department Name Added Successfully!",
@@ -37721,6 +37746,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resDesignationStore = _context6.sent;
 
                 if (resDesignationStore.status == 201) {
+                  _this6.closeDes();
+
                   _this6.designations = '';
                   _this6.editDesignations = '';
                   swal({
@@ -38065,10 +38092,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEmployeeAdd = _context8.sent;
 
                 if (!(resEmployeeAdd.status == 201)) {
-                  _context8.next = 61;
+                  _context8.next = 62;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Employee record Successfully Created!",
@@ -38077,17 +38105,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#employee_table").DataTable().destroy();
                 _this8.loading = false;
-                _context8.next = 57;
+                _context8.next = 58;
                 return _this8.fetchEmployees();
 
-              case 57:
+              case 58:
                 _this8.clearForm();
 
                 window.scrollTo(0, 0);
-                _context8.next = 62;
+                _context8.next = 63;
                 break;
 
-              case 61:
+              case 62:
                 if (resEmployeeAdd.status == 422) {
                   (function () {
                     _this8.loading = false;
@@ -38111,7 +38139,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 62:
+              case 63:
               case "end":
                 return _context8.stop();
             }
@@ -38295,10 +38323,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEmployeeUpdate = _context9.sent;
 
                 if (!(resEmployeeUpdate.status == 200)) {
-                  _context9.next = 59;
+                  _context9.next = 60;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success!",
                   text: "Employee Record Updated Successfully",
@@ -38307,14 +38336,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#employee_table").DataTable().destroy();
                 _this9.loading = false;
-                _context9.next = 57;
+                _context9.next = 58;
                 return _this9.fetchEmployees();
 
-              case 57:
-                _context9.next = 61;
+              case 58:
+                _context9.next = 62;
                 break;
 
-              case 59:
+              case 60:
                 if (resEmployeeUpdate.status == 422) {
                   (function () {
                     $("#" + formID).scrollTop(0, 0);
@@ -38342,7 +38371,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {// window.location.reload();
                 }, 2000);
 
-              case 61:
+              case 62:
               case "end":
                 return _context9.stop();
             }
@@ -38744,10 +38773,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(resLeaveAdd);
 
                 if (!(resLeaveAdd.status == 201)) {
-                  _context4.next = 21;
+                  _context4.next = 22;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 swal({
                   title: "Success",
@@ -38756,16 +38786,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#leave_table").DataTable().destroy();
-                _context4.next = 18;
+                _context4.next = 19;
                 return _this4.fetchLeaves();
 
-              case 18:
+              case 19:
                 _this4.clearForm();
 
-                _context4.next = 22;
+                _context4.next = 23;
                 break;
 
-              case 21:
+              case 22:
                 if (resLeaveAdd.status == 422) {
                   _this4.loading = false;
 
@@ -38780,7 +38810,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 22:
+              case 23:
               case "end":
                 return _context4.stop();
             }
@@ -38848,10 +38878,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(resLeaveUpdate);
 
                 if (!(resLeaveUpdate.status == 200)) {
-                  _context5.next = 20;
+                  _context5.next = 21;
                   break;
                 }
 
+                $(".modal").click();
                 _this5.loading = false;
                 swal({
                   title: "Success!",
@@ -38860,14 +38891,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#leave_table").DataTable().destroy();
-                _context5.next = 18;
+                _context5.next = 19;
                 return _this5.fetchLeaves();
 
-              case 18:
-                _context5.next = 21;
+              case 19:
+                _context5.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (resLeaveUpdate.status == 422) {
                   $("#" + formID).scrollTop(0, 0);
                   _this5.loading = false;
@@ -38883,7 +38914,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context5.stop();
             }
@@ -39072,6 +39103,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resCategories = _context2.sent;
 
                 if (resCategories.status == 200) {
+                  $(".modal").click();
                   _this2.categories = resCategories.data;
                 } else {
                   console.log(resCategories);
@@ -39288,6 +39320,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resCardAssign = _context4.sent;
 
                 if (resCardAssign.status == 201) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Card Assigned To Customer Successfully",
@@ -39425,6 +39458,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resUpdateCard = _context5.sent;
 
                 if (resUpdateCard.status == 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Loyalty Card Updated Successfully",
@@ -39819,6 +39853,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resCard = _context3.sent;
 
                 if (resCard.status == 201) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Card Category Created Successfully",
@@ -39906,6 +39941,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resUpdateCard = _context4.sent;
 
                 if (resUpdateCard.status === 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Card Category Updated Successfully",
@@ -40198,10 +40234,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 201)) {
-                  _context4.next = 33;
+                  _context4.next = 34;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 _this4.postData.fleetId = "";
@@ -40218,15 +40255,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 30;
+                _context4.next = 31;
                 return _this4.fetchData();
 
-              case 30:
+              case 31:
                 _this4.loading = false;
-                _context4.next = 35;
+                _context4.next = 36;
                 break;
 
-              case 33:
+              case 34:
                 _this4.loading = false;
 
                 if (res.status == 422) {
@@ -40251,7 +40288,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 35:
+              case 36:
               case "end":
                 return _context4.stop();
             }
@@ -40289,10 +40326,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (!(res.status === 200)) {
-                  _context5.next = 17;
+                  _context5.next = 18;
                   break;
                 }
 
+                $(".modal").click();
                 _this5.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 _this5.readingData.fleetId = "";
@@ -40303,15 +40341,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context5.next = 14;
+                _context5.next = 15;
                 return _this5.fetchData();
 
-              case 14:
+              case 15:
                 _this5.loading = false;
-                _context5.next = 19;
+                _context5.next = 20;
                 break;
 
-              case 17:
+              case 18:
                 _this5.loading = false;
 
                 if (res.status == 422) {
@@ -40336,7 +40374,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 19:
+              case 20:
               case "end":
                 return _context5.stop();
             }
@@ -40531,10 +40569,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (!(res.status === 200)) {
-                  _context.next = 30;
+                  _context.next = 31;
                   break;
                 }
 
+                $(".modal").click();
                 _this.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 _this.fleetId = "";
@@ -40552,15 +40591,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setInterval(function () {
                   _this.loop = 1;
                 }, 2000);
-                _context.next = 27;
+                _context.next = 28;
                 return _this.fetchData();
 
-              case 27:
+              case 28:
                 _this.loading = false;
-                _context.next = 32;
+                _context.next = 33;
                 break;
 
-              case 30:
+              case 31:
                 _this.loading = false;
 
                 if (res.status == 422) {
@@ -40585,7 +40624,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 32:
+              case 33:
               case "end":
                 return _context.stop();
             }
@@ -40657,10 +40696,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context2.sent;
 
                 if (!(res.status === 200)) {
-                  _context2.next = 29;
+                  _context2.next = 30;
                   break;
                 }
 
+                $(".modal").click();
                 _this2.loading = false;
                 $('#maintenance_table').DataTable().destroy();
                 _this2.edit.fleetId = "";
@@ -40675,15 +40715,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context2.next = 26;
+                _context2.next = 27;
                 return _this2.fetchData();
 
-              case 26:
+              case 27:
                 _this2.loading = false;
-                _context2.next = 31;
+                _context2.next = 32;
                 break;
 
-              case 29:
+              case 30:
                 _this2.loading = false;
 
                 if (res.status == 422) {
@@ -40708,7 +40748,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 31:
+              case 32:
               case "end":
                 return _context2.stop();
             }
@@ -41013,10 +41053,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resPartAdd = _context3.sent;
 
                 if (!(resPartAdd.status == 201)) {
-                  _context3.next = 16;
+                  _context3.next = 17;
                   break;
                 }
 
+                $(".modal").click();
                 _this3.loading = false;
                 swal({
                   title: "Success",
@@ -41028,14 +41069,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.clearForm();
 
                 $("#part_table").DataTable().destroy();
-                _context3.next = 14;
+                _context3.next = 15;
                 return _this3.fetchParts();
 
-              case 14:
-                _context3.next = 17;
+              case 15:
+                _context3.next = 18;
                 break;
 
-              case 16:
+              case 17:
                 if (resPartAdd.status == 422) {
                   _this3.loading = false;
 
@@ -41050,7 +41091,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 17:
+              case 18:
               case "end":
                 return _context3.stop();
             }
@@ -41091,10 +41132,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resPartEdit = _context4.sent;
 
                 if (!(resPartEdit.status == 200)) {
-                  _context4.next = 15;
+                  _context4.next = 16;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 swal({
                   title: "Success!",
@@ -41103,14 +41145,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#part_table").DataTable().destroy();
-                _context4.next = 13;
+                _context4.next = 14;
                 return _this4.fetchParts();
 
-              case 13:
-                _context4.next = 16;
+              case 14:
+                _context4.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 if (resPartEdit.status == 422) {
                   _this4.loading = false;
 
@@ -41125,7 +41167,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 16:
+              case 17:
               case "end":
                 return _context4.stop();
             }
@@ -41688,10 +41730,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 29;
+                  _context5.next = 30;
                   break;
                 }
 
+                $(".modal").click();
                 _this5.loading = false;
                 $("#deal_table").DataTable().destroy();
                 _this5.success = "Deal Added Successfully";
@@ -41701,20 +41744,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.postData.foods = [];
                 _this5.postData.qtys = [];
                 _this5.loop = 0;
-                _context5.next = 25;
+                _context5.next = 26;
                 return _this5.fetchData();
 
-              case 25:
+              case 26:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this5.success = "";
                   $("#add-modal").modal("hide");
                   _this5.loop = 1;
                 }, 2000);
-                _context5.next = 30;
+                _context5.next = 31;
                 break;
 
-              case 29:
+              case 30:
                 if (res.status == 422) {
                   _this5.loading = false;
 
@@ -41729,7 +41772,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 30:
+              case 31:
               case "end":
                 return _context5.stop();
             }
@@ -41843,10 +41886,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context7.sent;
 
                 if (!(res.status == 200)) {
-                  _context7.next = 31;
+                  _context7.next = 32;
                   break;
                 }
 
+                $(".modal").click();
                 _this7.loading = false;
                 $("#deal_table").DataTable().destroy();
                 _this7.success = "Deal Updated Successfully";
@@ -41858,19 +41902,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this7.editData.foods = [];
                 _this7.editData.qtys = [];
                 _this7.editLoop = 0;
-                _context7.next = 27;
+                _context7.next = 28;
                 return _this7.fetchData();
 
-              case 27:
+              case 28:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this7.success = "";
                   $("#add-modal").modal("hide");
                 }, 2000);
-                _context7.next = 32;
+                _context7.next = 33;
                 break;
 
-              case 31:
+              case 32:
                 if (res.status == 422) {
                   _this7.loading = false;
 
@@ -41885,7 +41929,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 32:
+              case 33:
               case "end":
                 return _context7.stop();
             }
@@ -42136,10 +42180,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status == 201)) {
-                  _context4.next = 20;
+                  _context4.next = 21;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 $("#food_table").DataTable().destroy();
                 _this4.success = "Food Added Successfully";
@@ -42147,19 +42192,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.postData.price = "";
                 _this4.postData.unit = "";
                 _this4.postData.description = "";
-                _context4.next = 16;
+                _context4.next = 17;
                 return _this4.fetchData();
 
-              case 16:
+              case 17:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this4.success = "";
                   $("#add-modal").modal("hide");
                 }, 2000);
-                _context4.next = 21;
+                _context4.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -42174,7 +42219,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context4.stop();
             }
@@ -42245,10 +42290,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (!(res.status == 200)) {
-                  _context6.next = 20;
+                  _context6.next = 21;
                   break;
                 }
 
+                $(".modal").click();
                 _this6.loading = false;
                 $("#food_table").DataTable().destroy();
                 _this6.success = "Food Updated Successfully";
@@ -42256,19 +42302,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this6.postData.price = "";
                 _this6.postData.unit = "";
                 _this6.postData.description = "";
-                _context6.next = 16;
+                _context6.next = 17;
                 return _this6.fetchData();
 
-              case 16:
+              case 17:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this6.success = "";
                   $("#add-modal").modal("hide");
                 }, 2000);
-                _context6.next = 21;
+                _context6.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status == 422) {
                   _this6.loading = false;
 
@@ -42283,7 +42329,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context6.stop();
             }
@@ -42504,10 +42550,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status == 201)) {
-                  _context4.next = 37;
+                  _context4.next = 38;
                   break;
                 }
 
+                $(".modal").click();
                 _this3.loading = false;
                 $("#hotel_table").DataTable().destroy();
                 _this3.success = "Hotel Created Successfully";
@@ -42521,19 +42568,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.postData.commission = "";
                 _this3.postData.location = "";
                 $("#imageField").val('');
-                _context4.next = 33;
+                _context4.next = 34;
                 return _this3.fetchData();
 
-              case 33:
+              case 34:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this3.success = "";
                   $("#add-modal").modal("hide");
                 }, 2000);
-                _context4.next = 38;
+                _context4.next = 39;
                 break;
 
-              case 37:
+              case 38:
                 if (res.status == 422) {
                   _this3.loading = false;
 
@@ -42548,7 +42595,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 38:
+              case 39:
               case "end":
                 return _context4.stop();
             }
@@ -42640,10 +42687,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (!(res.status == 200)) {
-                  _context6.next = 41;
+                  _context6.next = 42;
                   break;
                 }
 
+                $(".modal").click();
                 _this5.loading = false;
                 $("#hotel_table").DataTable().destroy();
                 _this5.success = "Hotel Updated Successfully";
@@ -42659,19 +42707,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.editData.commission = "";
                 _this5.editData.location = "";
                 $("#editImageField").val('');
-                _context6.next = 37;
+                _context6.next = 38;
                 return _this5.fetchData();
 
-              case 37:
+              case 38:
                 window.scrollTo(0, 0);
                 setTimeout(function () {
                   _this5.success = "";
                   $("#add-modal").modal("hide");
                 }, 2000);
-                _context6.next = 42;
+                _context6.next = 43;
                 break;
 
-              case 41:
+              case 42:
                 if (res.status == 422) {
                   _this5.loading = false;
 
@@ -42686,7 +42734,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 42:
+              case 43:
               case "end":
                 return _context6.stop();
             }
@@ -43002,10 +43050,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 27;
+                  _context4.next = 28;
                   break;
                 }
 
+                $(".modal").click();
                 _this4.loading = false;
                 $('#order_table').DataTable().destroy();
                 _this4.postData.item = [];
@@ -43021,15 +43070,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 setTimeout(function () {
                   _this4.loop = 1;
                 }, 2000);
-                _context4.next = 24;
+                _context4.next = 25;
                 return _this4.fetchData();
 
-              case 24:
+              case 25:
                 _this4.loading = false;
-                _context4.next = 29;
+                _context4.next = 30;
                 break;
 
-              case 27:
+              case 28:
                 _this4.loading = false;
 
                 if (res.status == 422) {
@@ -43054,7 +43103,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 29:
+              case 30:
               case "end":
                 return _context4.stop();
             }
@@ -43518,10 +43567,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 200)) {
-                  _context3.next = 19;
+                  _context3.next = 20;
                   break;
                 }
 
+                $(".modal").click();
                 _this3.loading = false;
                 swal({
                   title: "Success!!",
@@ -43533,20 +43583,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.roles.unshift(res.data);
 
                 _this3.data.name = _this3.data.company_id = "";
-                _context3.next = 15;
+                _context3.next = 16;
                 return _this3.fetchRoles();
 
-              case 15:
+              case 16:
                 setTimeout(function () {
                   _this3.success = "";
                 }, 3000);
                 setTimeout(function () {
                   $("#role_table").DataTable();
                 }, 300);
-                _context3.next = 20;
+                _context3.next = 21;
                 break;
 
-              case 19:
+              case 20:
                 if (res.status == 422) {
                   (function () {
                     _this3.loading = false;
@@ -43567,7 +43617,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context3.stop();
             }
@@ -43620,6 +43670,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _res = _context4.sent;
 
                 if (_res.status == 200) {
+                  $(".modal").click();
                   _this4.roles = _res.data;
                 }
 
@@ -43853,10 +43904,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (!(res.status === 200)) {
-                  _context.next = 23;
+                  _context.next = 24;
                   break;
                 }
 
+                $(".modal").click();
                 _this.loading = false;
                 swal({
                   title: "Success",
@@ -43871,14 +43923,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this.addCities = 0;
                 _this.cities = 0;
                 _this.routeDetails = [];
-                _context.next = 21;
+                _context.next = 22;
                 return _this.fetchCities();
 
-              case 21:
-                _context.next = 25;
+              case 22:
+                _context.next = 26;
                 break;
 
-              case 23:
+              case 24:
                 _this.loading = false;
 
                 if (res.status == 422) {
@@ -43903,7 +43955,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 25:
+              case 26:
               case "end":
                 return _context.stop();
             }
@@ -43954,10 +44006,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context2.sent;
 
                 if (!(res.status == 200)) {
-                  _context2.next = 16;
+                  _context2.next = 17;
                   break;
                 }
 
+                $(".modal").click();
                 _this2.editLoading = false;
                 $('#route_table').DataTable().destroy();
                 swal({
@@ -43966,14 +44019,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context2.next = 14;
+                _context2.next = 15;
                 return _this2.fetchCities();
 
-              case 14:
-                _context2.next = 18;
+              case 15:
+                _context2.next = 19;
                 break;
 
-              case 16:
+              case 17:
                 _this2.editLoading = false;
 
                 if (res.status == 422) {
@@ -43998,7 +44051,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 18:
+              case 19:
               case "end":
                 return _context2.stop();
             }
@@ -44468,6 +44521,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context5.sent;
 
                 if (res.status == 201) {
+                  $(".modal").click();
                   _this5.loading = false;
                   swal({
                     title: "Success",
@@ -44615,6 +44669,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (res.status === 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Schedule Closing Updated Successfully",
@@ -44967,6 +45022,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resExtend = _context3.sent;
 
                 if (resExtend.status == 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Schedule Extended successfully",
@@ -45485,6 +45541,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context7.sent;
 
                 if (res.status == 201) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Schedule Created Successfully",
@@ -45601,6 +45658,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEdit = _context8.sent;
 
                 if (resEdit.status == 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
@@ -46375,10 +46433,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (!(res.status == 201)) {
-                  _context3.next = 28;
+                  _context3.next = 29;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Surcharge Created Successfully",
@@ -46394,14 +46453,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this3.isActive = 1;
                 $("#surcharge_table").DataTable().destroy();
                 _this3.loading = false;
-                _context3.next = 26;
+                _context3.next = 27;
                 return _this3.fetchSurcharges();
 
-              case 26:
-                _context3.next = 29;
+              case 27:
+                _context3.next = 30;
                 break;
 
-              case 28:
+              case 29:
                 if (res.status === 422) {
                   _this3.loading = false;
 
@@ -46416,7 +46475,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 29:
+              case 30:
               case "end":
                 return _context3.stop();
             }
@@ -46486,10 +46545,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context4.sent;
 
                 if (!(res.status === 200)) {
-                  _context4.next = 20;
+                  _context4.next = 21;
                   break;
                 }
 
+                $(".modal").click();
                 swal({
                   title: "Success",
                   text: "Surcharge Updated Successfully",
@@ -46498,14 +46558,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#surcharge_table").DataTable().destroy();
                 _this4.loading = false;
-                _context4.next = 18;
+                _context4.next = 19;
                 return _this4.fetchSurcharges();
 
-              case 18:
-                _context4.next = 21;
+              case 19:
+                _context4.next = 22;
                 break;
 
-              case 20:
+              case 21:
                 if (res.status == 422) {
                   _this4.loading = false;
 
@@ -46520,7 +46580,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 21:
+              case 22:
               case "end":
                 return _context4.stop();
             }
@@ -46937,6 +46997,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context3.sent;
 
                 if (res.status == 200) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Terminal Created Successfully",
@@ -47117,6 +47178,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context6.sent;
 
                 if (res.status === 201) {
+                  $(".modal").click();
                   swal({
                     title: "Success",
                     text: "Terminal Updated Successfully",
@@ -47976,6 +48038,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resTimeDiff = _context.sent;
 
                 if (resTimeDiff.status == 200) {
+                  $(".modal").click();
                   _this.loading = false;
 
                   _this.fetchRecord();
@@ -74146,7 +74209,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_127, [_hoisted_128, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_this.dataPreview.surcharge != null ? _this.dataPreview.surcharge.type == "percentage" ? _this.dataPreview.surcharge.percentage != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.percentage + "%" : "N/A" : _this.dataPreview.surcharge.flat != null ? _this.dataPreview.surcharge.name + "-" + _this.dataPreview.surcharge.flat : "N/A" : "N/A"), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <table class=\"table text-dark\" id=\"tableSchedulePreview\">\n                            <tbody>\n                            <tr>\n                                <th colspan=\"2\" class=\"mr-3\">Name</th>\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.Name ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th class=\"mr-3\">Start Date</th>\n                                <td>{{ this.dataPreview.start_date ?? \"N/A\" }}</td>\n                                <th class=\"mr-3 border-left\">End Date</th>\n                                <td>{{ this.dataPreview.end_date ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th>Time</th>\n                                <td> {{ this.dataPreview.time ?? \"N/A\" }}</td>\n                                <th class=\"mr-3 border-left\">Selected Bus Class</th>\n                                <td>{{ this.dataPreview.busClass ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th colspan=\"2\" class=\"mr-3\">Route</th>\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.route ?? \"N/A\" }}</td>\n                            </tr>\n                            <tr>\n                                <th class=\"mr-3\">Discount</th>\n                                <td> {{\n                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == \"percentage\" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.percentage + \"%\" : \"N/A\") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.flat : \"N/A\")) : \"N/A\"\n                                    }}\n                                </td>\n                                <th class=\"mr-3 border-left\">Surcharge</th>\n                                <td> {{\n                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == \"percentage\" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.percentage + \"%\" : \"N/A\") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.flat : \"N/A\")) : \"N/A\"\n                                    }}\n                                </td>\n                            </tr>\n                            </tbody>\n                        </table> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <table class=\"table text-dark\" id=\"tableSchedulePreview\">\r\n                            <tbody>\r\n                            <tr>\r\n                                <th colspan=\"2\" class=\"mr-3\">Name</th>\r\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.Name ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th class=\"mr-3\">Start Date</th>\r\n                                <td>{{ this.dataPreview.start_date ?? \"N/A\" }}</td>\r\n                                <th class=\"mr-3 border-left\">End Date</th>\r\n                                <td>{{ this.dataPreview.end_date ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th>Time</th>\r\n                                <td> {{ this.dataPreview.time ?? \"N/A\" }}</td>\r\n                                <th class=\"mr-3 border-left\">Selected Bus Class</th>\r\n                                <td>{{ this.dataPreview.busClass ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th colspan=\"2\" class=\"mr-3\">Route</th>\r\n                                <td colspan=\"2\" class=\"border-left\">{{ this.dataPreview.route ?? \"N/A\" }}</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <th class=\"mr-3\">Discount</th>\r\n                                <td> {{\r\n                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == \"percentage\" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.percentage + \"%\" : \"N/A\") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + \"-\" + this.dataPreview.discount.flat : \"N/A\")) : \"N/A\"\r\n                                    }}\r\n                                </td>\r\n                                <th class=\"mr-3 border-left\">Surcharge</th>\r\n                                <td> {{\r\n                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == \"percentage\" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.percentage + \"%\" : \"N/A\") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + \"-\" + this.dataPreview.surcharge.flat : \"N/A\")) : \"N/A\"\r\n                                    }}\r\n                                </td>\r\n                            </tr>\r\n                            </tbody>\r\n                        </table> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "btn btn-info back2 float-left",
         onClick: _cache[18] || (_cache[18] = function ($event) {
           return $options.previousSection('step2');
@@ -84396,7 +84459,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-16c99290], table *[data-v-16c99290] {\n    font-size: 10px;\n}\n.modal-cell[data-v-16c99290] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-16c99290] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n\n/*.modal-cell:hover .modal-btn {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}*/\n.header-select[data-v-16c99290] {\n    width: 35%;\n}\n.fade-enter-active[data-v-16c99290],\n.fade-leave-active[data-v-16c99290] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-16c99290], .fade-leave-to[data-v-16c99290] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-16c99290], table *[data-v-16c99290] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-16c99290] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-16c99290] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\r\n\r\n/*.modal-cell:hover .modal-btn {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\r\n}*/\n.header-select[data-v-16c99290] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-16c99290],\r\n.fade-leave-active[data-v-16c99290] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-16c99290], .fade-leave-to[data-v-16c99290] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -84420,7 +84483,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-69405f27],\ntable *[data-v-69405f27] {\n    font-size: 10px;\n}\n.modal-cell[data-v-69405f27] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-69405f27] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-69405f27] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-69405f27] {\n    width: 35%;\n}\n.fade-enter-active[data-v-69405f27],\n.fade-leave-active[data-v-69405f27] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-69405f27], .fade-leave-to[data-v-69405f27] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-69405f27], tr[data-v-69405f27], th[data-v-69405f27], td[data-v-69405f27], option[data-v-69405f27], select[data-v-69405f27], label[data-v-69405f27], button[data-v-69405f27], a[data-v-69405f27], div[data-v-69405f27], p[data-v-69405f27] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-69405f27] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-69405f27],\r\ntable *[data-v-69405f27] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-69405f27] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-69405f27] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-69405f27] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-69405f27] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-69405f27],\r\n.fade-leave-active[data-v-69405f27] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-69405f27], .fade-leave-to[data-v-69405f27] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-69405f27], tr[data-v-69405f27], th[data-v-69405f27], td[data-v-69405f27], option[data-v-69405f27], select[data-v-69405f27], label[data-v-69405f27], button[data-v-69405f27], a[data-v-69405f27], div[data-v-69405f27], p[data-v-69405f27] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-69405f27] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -84444,7 +84507,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-edcef258],\ntable *[data-v-edcef258] {\n    font-size: 10px;\n}\n.modal-cell[data-v-edcef258] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-edcef258] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-edcef258] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-edcef258] {\n    width: 35%;\n}\n.fade-enter-active[data-v-edcef258],\n.fade-leave-active[data-v-edcef258] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-edcef258], .fade-leave-to[data-v-edcef258] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-edcef258], tr[data-v-edcef258], th[data-v-edcef258], td[data-v-edcef258], option[data-v-edcef258], select[data-v-edcef258], label[data-v-edcef258], button[data-v-edcef258], a[data-v-edcef258], div[data-v-edcef258], p[data-v-edcef258] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-edcef258] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-edcef258],\r\ntable *[data-v-edcef258] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-edcef258] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-edcef258] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-edcef258] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-edcef258] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-edcef258],\r\n.fade-leave-active[data-v-edcef258] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-edcef258], .fade-leave-to[data-v-edcef258] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-edcef258], tr[data-v-edcef258], th[data-v-edcef258], td[data-v-edcef258], option[data-v-edcef258], select[data-v-edcef258], label[data-v-edcef258], button[data-v-edcef258], a[data-v-edcef258], div[data-v-edcef258], p[data-v-edcef258] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-edcef258] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -84684,7 +84747,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-0cb820ef], table *[data-v-0cb820ef] {\n    font-size: 10px;\n}\n.modal-cell[data-v-0cb820ef] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-0cb820ef] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.header-select[data-v-0cb820ef] {\n    width: 35%;\n}\n.fade-enter-active[data-v-0cb820ef],\n.fade-leave-active[data-v-0cb820ef] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-0cb820ef], .fade-leave-to[data-v-0cb820ef] {\n    opacity: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-0cb820ef], table *[data-v-0cb820ef] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-0cb820ef] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-0cb820ef] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.header-select[data-v-0cb820ef] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-0cb820ef],\r\n.fade-leave-active[data-v-0cb820ef] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-0cb820ef], .fade-leave-to[data-v-0cb820ef] {\r\n    opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

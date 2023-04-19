@@ -409,6 +409,7 @@ export default {
 
             const res = await this.callApi("post", "discount/store", data);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -472,6 +473,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", 'discount/update', this.dataEdit);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success!",

@@ -162,6 +162,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", 'role/store', this.data);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success!!",
@@ -209,6 +210,7 @@ export default {
                 this.success = "Role Updated Successfully";
                 const res = await this.callApi("post", 'role', {name: this.data.name});
                 if (res.status == 200) {
+                    $(".modal").click();
                     this.roles = res.data
                 }
                 this.dataEdit.name = this.dataEdit.company_id = "";
