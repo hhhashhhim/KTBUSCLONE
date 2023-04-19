@@ -517,6 +517,7 @@ export default {
 
             const resCard = await this.callApi("post", "loyaltyCard/store", data);
             if (resCard.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Card Category Created Successfully",
@@ -579,6 +580,7 @@ export default {
             this.loading = true;
             const resUpdateCard = await this.callApi("post", 'loyaltyCard/update', this.dataEdit);
             if (resUpdateCard.status === 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Card Category Updated Successfully",

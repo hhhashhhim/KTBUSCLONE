@@ -406,6 +406,7 @@ export default {
 
             const res = await this.callApi("post", "surcharge/store", data);
             if (res.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Surcharge Created Successfully",
@@ -469,6 +470,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", 'surcharge/update', this.dataEdit);
             if (res.status === 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Surcharge Updated Successfully",

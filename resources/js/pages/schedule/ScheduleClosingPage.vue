@@ -432,6 +432,7 @@ export default {
             this.loadig = true;
             const res = await this.callApi("post", "booking/close/schedule/closing/store", this.addData);
             if (res.status == 201) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -527,6 +528,7 @@ export default {
 
             const res = await this.callApi("post", "booking/close/schedule/closing/update", this.editData);
             if (res.status === 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Schedule Closing Updated Successfully",

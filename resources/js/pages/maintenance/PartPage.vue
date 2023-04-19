@@ -199,6 +199,7 @@ export default {
             this.loading = true;
             const resPartAdd = await this.callApi("post", "fleet/maintenance/part/store", this.addForm);
             if (resPartAdd.status == 201) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -233,6 +234,7 @@ export default {
             this.loading = true;
             const resPartEdit = await this.callApi("post", 'fleet/maintenance/part/update', this.dataEdit);
             if (resPartEdit.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success!",

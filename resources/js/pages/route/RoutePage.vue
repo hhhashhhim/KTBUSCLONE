@@ -348,6 +348,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "routes/store", data);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -410,6 +411,7 @@ export default {
             this.editLoading = true;
             const res = await this.callApi("post", "routes/update", this.dataEdit);
             if (res.status == 200) {
+                $(".modal").click();
                 this.editLoading = false;
                 $('#route_table').DataTable().destroy();
                 swal({

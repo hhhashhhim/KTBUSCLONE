@@ -269,6 +269,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "fare-table/store", this.data);
             if (res.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",

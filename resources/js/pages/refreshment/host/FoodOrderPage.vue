@@ -472,6 +472,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "refreshments/hotels/orders/book", this.postData);
             if (res.status === 200) {
+                $(".modal").click();
                 this.loading = false;
                 $('#order_table').DataTable().destroy();
                 this.postData.item = [];

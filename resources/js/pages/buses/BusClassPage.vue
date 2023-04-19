@@ -809,6 +809,7 @@ export default {
             this.loading = true;
             const resSaveFareClass = await this.callApi("post", "bus_classes/storeFareClass", this.addData);
             if (resSaveFareClass.status == 201) {
+                this.closeFare();
                 swal({
                     title: "Success",
                     text: "Fare Class Added Successfully",
@@ -834,6 +835,7 @@ export default {
 
                 })
                 this.selectedSeats = [];
+                this.closeDetail();
                 return swal({
                     title: "Success",
                     text: "Seats Modified Successfully !!!!",
@@ -874,6 +876,7 @@ export default {
 
             this.uniqueSeatNumber.push(this.setSeatNumber.addSeatNO);
             this.data.seatMap[rowId][colId].seatNo = this.setSeatNumber.addSeatNO;
+            this.closeSeat()
             swal({
                 title: "Success",
                 text: "Successfully Added Seat Number",
@@ -932,6 +935,7 @@ export default {
                     class: this.editSeatModify.class,
                     type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type,
                 };
+                this.closeEditSeat()
                 swal({
                     title: "Success!",
                     text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
@@ -1103,6 +1107,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "bus_classes/store", this.data);
             if (res.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Bus Class Added Successfully",
@@ -1168,6 +1173,7 @@ export default {
                 this.dataEdit
             );
             if (res.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Bus Class Updated Successfully",

@@ -183,6 +183,7 @@ export default {
             this.loading = true
             const res = await this.callApi("post", 'cities/store', this.data);
             if (res.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "City Created Succesfuly Named as  " + res.data.name,
@@ -223,6 +224,7 @@ export default {
             this.loading = true;
             const resEdit = await this.callApi("post", 'cities/update', this.dataEdit);
             if (resEdit.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "City updated Successfully",

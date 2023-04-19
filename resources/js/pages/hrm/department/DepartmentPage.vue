@@ -246,6 +246,7 @@ export default {
             this.loading = true;
             const resDepartAdd = await this.callApi("post", "hrm/department/store", this.addForm);
             if (resDepartAdd.status == 201) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -300,6 +301,7 @@ export default {
             this.loading = true;
             const resDepartmentEdit = await this.callApi("post", 'hrm/department/update', this.dataEdit);
             if (resDepartmentEdit.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success!",

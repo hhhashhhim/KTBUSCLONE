@@ -304,6 +304,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "fare-class/store", this.data);
             if (res.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success!",
                     text: "Fare Class Added Successfully",
@@ -354,6 +355,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", 'fare-class/update', this.dataEdit);
             if (res.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success!",
                     text: "Fare Class Updated Successfully",

@@ -363,6 +363,7 @@ export default {
             const resLeaveAdd = await this.callApi("post", "hrm/leave/store", this.addForm);
             console.log(resLeaveAdd)
             if (resLeaveAdd.status == 201) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success",
@@ -413,6 +414,7 @@ export default {
             const resLeaveUpdate = await this.callApi("post", 'hrm/leave/update', this.dataEdit);
             console.log(resLeaveUpdate);
             if (resLeaveUpdate.status == 200) {
+                $(".modal").click();
                 this.loading = false;
                 swal({
                     title: "Success!",

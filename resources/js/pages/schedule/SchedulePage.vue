@@ -928,6 +928,7 @@ export default {
             this.loading = true;
             const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
             if (resExtend.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Schedule Extended successfully",
@@ -1305,6 +1306,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "schedule/store", this.data);
             if (res.status == 201) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Schedule Created Successfully",
@@ -1376,6 +1378,7 @@ export default {
                 this.dataEdit
             );
             if (resEdit.status == 200) {
+                $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
