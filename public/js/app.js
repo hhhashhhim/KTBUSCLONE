@@ -29269,7 +29269,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   for (i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
                     for (j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
-                      if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo")) {
+                      if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
                         _this15.totalSeats++;
                       }
 
@@ -78577,9 +78577,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
