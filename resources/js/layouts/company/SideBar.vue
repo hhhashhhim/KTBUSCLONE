@@ -90,26 +90,26 @@
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('commission')">
-                            <router-link class="nav-link text-capitalize" to="">
-                                <i class="fas fa-table"></i> Commission Reports
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('complaints')">
-                            <router-link class="nav-link text-capitalize" to="">
-                                <i class="fas fa-table"></i> Complaints Reports
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('over-issue')">
-                            <router-link class="nav-link text-capitalize" to="">
-                                <i class="fa fa-bus"></i> Over-Issue Reports
-                            </router-link>
-                        </li>
-                        <li class="dropdown" v-if="checkForSubmenu('expenses')">
-                            <router-link class="nav-link text-capitalize" to="">
-                                <i class="fa fa-bus"></i> Expenses Report
-                            </router-link>
-                        </li>
+<!--                        <li class="dropdown" v-if="checkForSubmenu('commission')">-->
+<!--                            <router-link class="nav-link text-capitalize" to="">-->
+<!--                                <i class="fas fa-table"></i> Commission Reports-->
+<!--                            </router-link>-->
+<!--                        </li>-->
+<!--                        <li class="dropdown" v-if="checkForSubmenu('complaints')">-->
+<!--                            <router-link class="nav-link text-capitalize" to="">-->
+<!--                                <i class="fas fa-table"></i> Complaints Reports-->
+<!--                            </router-link>-->
+<!--                        </li>-->
+<!--                        <li class="dropdown" v-if="checkForSubmenu('over-issue')">-->
+<!--                            <router-link class="nav-link text-capitalize" to="">-->
+<!--                                <i class="fa fa-bus"></i> Over-Issue Reports-->
+<!--                            </router-link>-->
+<!--                        </li>-->
+<!--                        <li class="dropdown" v-if="checkForSubmenu('expenses')">-->
+<!--                            <router-link class="nav-link text-capitalize" to="">-->
+<!--                                <i class="fa fa-bus"></i> Expenses Report-->
+<!--                            </router-link>-->
+<!--                        </li>-->
                     </ul>
                 </li>
                 <!-- Buses panel -->

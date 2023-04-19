@@ -65,7 +65,11 @@ class TerminalTimeDifferenceController extends Controller
 
     public function check(Request $request)
     {
-        return TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city, 'terminal_from_id' => $request->from, 'terminal_to_id' => $request->to])->first();
+        $data = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city, 'terminal_from_id' => $request->from, 'terminal_to_id' => $request->to])->first();
+        if ($data) {
+            return $data;
+        }
+        return response()->json([], 204);
     }
 
     public function getTerminals(Request $request)

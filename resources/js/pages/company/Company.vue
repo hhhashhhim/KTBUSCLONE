@@ -59,9 +59,9 @@
                                                                         class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
-                                                                <button class="btn btn-danger text-light mx-1">
-                                                                    <i class="far fa-trash-alt"></i>
-                                                                </button>
+                                                                <!--                                                                <button class="btn btn-danger text-light mx-1">-->
+                                                                <!--                                                                    <i class="far fa-trash-alt"></i>-->
+                                                                <!--                                                                </button>-->
                                                             </td>
                                                         </tr>
                                                         </tbody>
@@ -216,7 +216,7 @@
                         <div class="form-group col-md-4">
                             <label for="userName">User Name</label>
                             <input type="text" class="form-control" placeholder="Enter User Name" id="userName"
-                                   v-model="dataEdit.name"/>
+                                   v-model="dataEdit.user_name"/>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="email">Email</label>
@@ -841,6 +841,12 @@ export default {
         $("input[type='search']").attr("autocomplete", "off");
     },
     methods: {
+        close() {
+            $(`#${this.formID}`).click();
+        },
+        editClose(){
+            $(`#${this.editForm}`).click();
+        },
         async fetchCompany() {
             this.data.modules = this.dataEdit.modules = this.defaultModules;
             const companyRes = await this.callApi("post", "company");
@@ -908,7 +914,8 @@ export default {
             if (res.status == 201) {
                 this.loading = false
                 $("#company_table").DataTable().destroy();
-                // this.success = "Company Created Successfully";
+                this.close();
+
                 swal({
                     title: "Success",
                     text: "Company Created Successfully",
@@ -944,7 +951,6 @@ export default {
         async edit(id, i) {
             const res = await this.callApi("post", "company/get", {id});
             let company;
-
             if (res.status == 200) {
                 company = res.data;
             } else {
@@ -999,9 +1005,10 @@ export default {
             if (res.status == 200) {
                 this.loading = false;
                 $("#company_table").DataTable().destroy();
+                this.editClose();
                 swal({
                     title: "Success",
-                    text: "Company Updated Succesfully",
+                    text: "Company Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
