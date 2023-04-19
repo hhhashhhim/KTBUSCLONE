@@ -1797,7 +1797,7 @@ export default {
                     this.totalSeatsAvailable = 0;
                     for (let i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
                         for (let j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
-                            if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale" ) {
+                            if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
                                 this.totalSeats++;
                             }
                             if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {

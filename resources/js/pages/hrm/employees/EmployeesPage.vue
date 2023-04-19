@@ -130,7 +130,8 @@
                 <div class="m-3 row">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="createAccount"
-                               @click="accountCreate($event)" value="0" name="createAccount">
+                               @click="accountCreate($event)" value="0" name="createAccount"
+                               :checked="addForm.createAccount == 1">
                         <label class="custom-control-label" for="createAccount">Want to Create An Account For
                             Employee</label>
                     </div>
@@ -198,21 +199,6 @@
                         <label for="hiringDate">Hiring Date</label>
                         <input type="date" id="hiringDate" class="form-control" v-model="addForm.HiringDate">
                     </div>
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="jobDesp">Job Description</label>-->
-                    <!--                        <input type="text" id="jobDesp" class="form-control" v-model="addForm.jobDescription">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="emergencyContact">Emergency Contact #</label>-->
-                    <!--                        <vue-mask id="emergencyContact"-->
-                    <!--                                  class="form-control"-->
-                    <!--                                  v-model="addForm.EmergencyContact"-->
-                    <!--                                  mask="0000-0000000"-->
-                    <!--                                  :raw="false"-->
-                    <!--                                  :options="optionsContact"-->
-                    <!--                        >-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-12">
                         <label for="address">Address</label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
@@ -317,7 +303,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Department</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeDep()">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                    @click="closeDep()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -334,7 +321,9 @@
                                     :disabled="loadingDepart">
                                 {{ loadingDepart ? 'Loading...' : ' Add Department' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDep()">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDep()">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -347,7 +336,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Designation</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"  @click="closeDes()">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                    @click="closeDes()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -364,7 +354,9 @@
                                     :disabled="loadingDesignation">
                                 {{ loadingDesignation ? 'Loading...' : ' Add Designation' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDes()">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDes()">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -677,10 +669,10 @@ export default {
     },
 
     methods: {
-        closeDep(){
+        closeDep() {
             $("#addDepartmentModal").click();
         },
-        closeDes(){
+        closeDes() {
             $("#addDesignationModal").click();
         },
         accountCreate: function (e) {
@@ -978,14 +970,33 @@ export default {
 
         clearForm: function () {
             this.loading = false;
+            this.addForm.createAccount = 0;
+            this.createDiv = false;
             this.addForm = {
                 paidLeaves: '0',
-                EmployeeDepartment: 0,
-                EmployeeDesignation: 0,
-                EmployeeTerminal: 0,
-                EmployeeType: "",
                 RadioSalaryTypeAdd: 'cash',
-            };
+                profile: null,
+                attachments: null,
+                email: '',
+                password: '',
+                EmployeeName: '',
+                EmployeeFatherName: '',
+                EmployeeCNIC: '',
+                EmployeeContact: '',
+                EmployeeAddress: '',
+                RefHiring: '',
+                HiringDate: '',
+                EmployeeDob: '',
+                EmployeeSalary: '',
+                workingDays: '',
+                bloodGroup: '',
+                EmergencyContact: '',
+                jobDescription: '',
+                EmployeeDepartment: 0,
+                EmployeeType: "",
+                EmployeeTerminal: 0,
+                EmployeeDesignation: 0,
+            }
             this.designations = '';
             this.nameProfile = '';
             this.urlProfile = '';
