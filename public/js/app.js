@@ -30811,6 +30811,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       this.$refs.refBusInvoice.submit();
     }
+  },
+  computed: {
+    disabledOptions: function disabledOptions() {
+      var now = new Date();
+      return this.allSchedules.filter(function (option) {
+        return new Date(option.departure_date + ' ' + option.departure_time) < now;
+      });
+    },
+    disabledOptionsReschedule: function disabledOptionsReschedule() {
+      var now = new Date();
+      return this.allReSchedules.filter(function (option) {
+        return new Date(option.departure_date + ' ' + option.departure_time) < now;
+      });
+    }
   }
 });
 
@@ -53645,7 +53659,7 @@ var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_31 = ["value"];
+var _hoisted_31 = ["value", "disabled"];
 
 var _hoisted_32 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -54393,7 +54407,7 @@ var _hoisted_190 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_191 = ["value"];
+var _hoisted_191 = ["disabled", "value"];
 var _hoisted_192 = {
   "class": "col-md-3"
 };
@@ -55273,6 +55287,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [_hoisted_30, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allSchedules, function (schedule, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: schedule.schedule_id,
+      disabled: $options.disabledOptions.includes(schedule),
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scheduleDropdown(schedule)), 9
     /* TEXT, PROPS */
@@ -55735,6 +55750,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_190, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allReSchedules, function (schedule, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      disabled: $options.disabledOptionsReschedule.includes(schedule),
       value: schedule.schedule_id,
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scheduleDropdown(schedule)), 9
@@ -78696,9 +78712,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

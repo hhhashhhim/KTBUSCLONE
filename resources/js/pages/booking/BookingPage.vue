@@ -63,7 +63,9 @@
                                                                 v-model="addForm.schedule">
                                                             <option value="0">Select Departure Time</option>
                                                             <option v-for="(schedule, i) in allSchedules"
-                                                                    :value="schedule.schedule_id" :key="i">
+                                                                    :value="schedule.schedule_id"
+                                                                    :disabled="disabledOptions.includes(schedule)"
+                                                                    :key="i">
                                                                 {{ scheduleDropdown(schedule) }}
                                                             </option>
                                                         </select>
@@ -603,6 +605,7 @@
                                         v-model="rescheduleData.rescheduleSchedule">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
+                                            :disabled="disabledOptionsReschedule.includes(schedule)"
                                             :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
                                     </option>
                                 </select>
@@ -2887,8 +2890,19 @@ export default {
         ,
     }
     ,
+    computed: {
+        disabledOptions() {
+            const now = new Date();
+            return this.allSchedules.filter(option => new Date(option.departure_date + ' ' + option.departure_time) < now);
+        },
+        disabledOptionsReschedule() {
+            const now = new Date();
+            return this.allReSchedules.filter(option => new Date(option.departure_date + ' ' + option.departure_time) < now);
+        },
+    },
 }
 ;
+
 </script>
 
 <style scoped>
