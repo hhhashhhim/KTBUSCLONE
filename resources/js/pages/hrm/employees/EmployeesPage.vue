@@ -137,13 +137,27 @@
                     </div>
                 </div>
                 <div v-if="createDiv" class="row mt-3">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="email">Email <span class="text-danger ml-1">*</span></label>
                         <input type="email" id="email" class="form-control" v-model="addForm.email"/>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="password">Password <span class="text-danger ml-1">*</span></label>
                         <input type="password" id="password" class="form-control" v-model="addForm.password"/>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="role">Role<span class="text-danger ml-1">*</span></label>
+                        <select
+                            type="text"
+                            class="form-control"
+                            id=""
+                            v-model="addForm.role"
+                        >
+                            <option value="">Select Role</option>
+                            <option v-for="(role, i) in roles" :value="role.id" :key="i">
+                                {{ role.name }}
+                            </option>
+                        </select>
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -586,6 +600,7 @@ export default {
                 email: null,
                 createAccount: 0,
                 password: null,
+                role: null,
                 EmployeeName: null,
                 EmployeeFatherName: null,
                 EmployeeCNIC: null,
@@ -634,6 +649,7 @@ export default {
             },
             departmentName: '',
             designationName: '',
+            roles: [],
             employees: [],
             terminals: [],
             departments: [],
@@ -938,6 +954,12 @@ export default {
             } else {
                 console.log(resFetchDepartment);
             }
+            const roleRes = await this.callApi("post", "role");
+            if (roleRes.status == 200) {
+                this.roles = roleRes.data;
+            } else {
+                console.log(roleRes)
+            }
 
             setTimeout(function () {
                 $("#employee_table").DataTable();
@@ -979,6 +1001,7 @@ export default {
                 attachments: null,
                 email: '',
                 password: '',
+                role: '',
                 EmployeeName: '',
                 EmployeeFatherName: '',
                 EmployeeCNIC: '',
@@ -1157,6 +1180,7 @@ export default {
 
             formData.append('email', this.addForm.email);
             formData.append('password', this.addForm.password);
+            formData.append('role', this.addForm.role);
             formData.append('EmployeeName', this.addForm.EmployeeName);
             formData.append('EmployeeFatherName', this.addForm.EmployeeFatherName);
             formData.append('EmployeeCNIC', this.addForm.EmployeeCNIC);
@@ -1230,13 +1254,13 @@ export default {
                 formData.append('attachment', this.attachmentsEdit ?? '');
             }
             this.validationErrors = [];
-            if (!this.editEmp.email)
-                return swal({
-                    title: "Required!",
-                    text: "Email Field is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.editEmp.email)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Email Field is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (!this.editEmp.EmployeeName)
                 return swal({
                     title: "Required!",
@@ -1279,13 +1303,13 @@ export default {
             //         icon: "error",
             //         timer: 2000
             //     });
-            if (!this.editEmp.EmployeeAddress)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Address is Required",
-                    icon: "error",
-                    timer: 2000
-                });
+            // if (!this.editEmp.EmployeeAddress)
+            //     return swal({
+            //         title: "Required!",
+            //         text: "Employee's Address is Required",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
             if (this.editEmp.EmployeeDepartment == "0")
                 return swal({
                     title: "Required!",
@@ -1417,7 +1441,7 @@ export default {
             this.editEmp.id = employ.id;
             this.editEmp.paidLeaves = employ.paid_leaves;
             this.editEmp.RadioSalaryTypeAdd = employ.salary_type;
-            this.editEmp.email = employ.user.email;
+            // this.editEmp.email = employ.user.email;
             this.editEmp.EmployeeName = employ.name;
             this.editEmp.EmployeeFatherName = employ.f_name;
             this.editEmp.EmployeeCNIC = employ.cnic;
