@@ -18,13 +18,23 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
+//        dd($request->path());
+//        if (!Auth::check() && $request->path() != "login") {
+//            return redirect('/login');
+//        }
+//        if (Auth::check() && $request->path() == "login") {
+//            return redirect('/');
+//        }
+//        return view('admin.index');
         if (!Auth::check() && $request->path() != "login") {
-            return redirect('/login');
+            return redirect()->to('/');
         }
+
         if (Auth::check() && $request->path() == "login") {
-            return redirect('/');
+            return redirect()->to('/login');
         }
         return view('admin.index');
+
     }
 
 
@@ -40,7 +50,7 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect("/");
+        return redirect("/login");
     }
 
     public function login(Request $request)
