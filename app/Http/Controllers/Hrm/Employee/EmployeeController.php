@@ -69,7 +69,7 @@ class EmployeeController extends Controller
                 "password" => Hash::make($request->password),
                 "terminal_id" => $request->EmployeeTerminal,
                 "contact" => plainContactAndCnic($request->EmployeeContact),
-                "role_id" => 0,
+                "role_id" => $request->role??0,
                 'company_id' => Auth::user()->company_id,
             ]);
             UserPassword::create([
@@ -143,7 +143,7 @@ class EmployeeController extends Controller
 
         $user = User::where("id", $request->userId)->update([
             "name" => $request->EmployeeName,
-            "email" => $request->email,
+            // "email" => $request->email,
             "contact" => plainContactAndCnic($request->EmployeeContact),
             "terminal_id" => $request->EmployeeTerminal,
             "role_id" => 0,

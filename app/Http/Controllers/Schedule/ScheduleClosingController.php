@@ -88,6 +88,20 @@ class ScheduleClosingController extends Controller
         if (count($bookingAvailable) == 0) {
             return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
         }
+        // if already assign
+        $checkAssign = TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            "bus_id" => $request->bus,
+            'schedule_id' => $request->schedule,
+            'schedule_date' => $depTime->schedule_date,
+        ])
+        ->first();
+
+        if ($checkAssign) {
+            return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
+        }
+
+        
         $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])->latest("id")->first();
         if ($checkMergeRecord) {
             TicketClosingMerge::where("id", $checkMergeRecord->id)->update([

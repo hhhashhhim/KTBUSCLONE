@@ -65,7 +65,7 @@
                                                     <tbody>
                                                     <tr v-for="(card, i) in cardsAssign" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ card.rf_id }}</td>
+                                                        <td>{{ card.rfId }}</td>
                                                         <td>{{ card.cnic }}</td>
                                                         <td>{{ card.name }}</td>
                                                         <td>{{ card.phone }}</td>
@@ -180,7 +180,7 @@
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label for="CardName">RF-ID<span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="dataEdit.rf_id" readonly
+                        <input type="text" class="form-control" v-model="dataEdit.rfId" readonly
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-3">
@@ -484,7 +484,7 @@ export default {
 
         async updateCard() {
             this.validationErrors = [];
-            if (this.dataEdit.rf_id == "" || typeof this.dataEdit.rf_id == "undefined") {
+            if (this.dataEdit.rfId == "" || typeof this.dataEdit.rfId == "undefined") {
                 return swal({
                     title: "Required!",
                     text: "RF ID Field is Required",
