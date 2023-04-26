@@ -18,23 +18,13 @@ class AuthController extends Controller
 {
     public function index(Request $request)
     {
-//        dd($request->path());
-//        if (!Auth::check() && $request->path() != "login") {
-//            return redirect('/login');
-//        }
-//        if (Auth::check() && $request->path() == "login") {
-//            return redirect('/');
-//        }
-//        return view('admin.index');
         if (!Auth::check() && $request->path() != "login") {
-            return redirect()->to('/');
+            return redirect('/login');
         }
-
         if (Auth::check() && $request->path() == "login") {
-            return redirect()->to('/login');
+            return redirect('/');
         }
         return view('admin.index');
-
     }
 
 
