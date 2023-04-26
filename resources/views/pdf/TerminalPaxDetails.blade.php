@@ -172,7 +172,7 @@
     </tr>
     <tr>
         <th style="width: 75% !important;"> Terminal Discount</th>
-        <th style="width: 25% !important;">{{ $terminalDiscount = $data['record']->sum('discount'); }}</th>
+        <th style="width: 25% !important;">{{ $terminalDiscount = $data['record']->sum('discount') }}</th>
     </tr>
     <tr>
         <th style="width: 75% !important;"> Elt Amount</th>
@@ -188,7 +188,7 @@
                     {{ $ticketCommission = $data['record']->count() * $data['commission']->flat_commission }}
                 @endif
             @else
-                {{ $ticketCommission = 0; }}
+                {{ $ticketCommission = 0 }}
             @endif
         </th>
     </tr>
