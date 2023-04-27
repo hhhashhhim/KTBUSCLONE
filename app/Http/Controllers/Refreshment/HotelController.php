@@ -39,6 +39,7 @@ class HotelController extends Controller
             // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
             "hotelName" => 'required|unique:hotels,name,Null,id,company_id,'.Auth::user()->company_id,
             "email" => 'required|email|unique:users',
+            "role" => 'required',
             "password" => 'required',
             "contact" => 'required',
             "commission" => 'required',
@@ -50,7 +51,7 @@ class HotelController extends Controller
             "email" => $request->email,
             "password" => Hash::make($request->password),
             "contact" => plainContactAndCnic($request->contact),
-            "role_id" => 0,
+            "role_id" => $request->role??0,
             'company_id' => Auth::user()->company_id,
         ]);
 

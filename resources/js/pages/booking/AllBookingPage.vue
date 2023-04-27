@@ -227,43 +227,28 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        setTimeout(() => {
-            $("#filterTable").DataTable();
-        }, 300);
+        // setTimeout(() => {
+        //     $("#filterTable").DataTable();
+        // }, 300);
     },
     methods: {
         async fetchRoutes() {
             const resRoute = await this.callApi("post", "allBooking/routes");
             if (resRoute.status == 200) {
-                ("#filterTable").DataTable().destroy();
                 this.routes = resRoute.data;
-                setTimeout(() => {
-                    $("#filterTable").DataTable();
-                }, 300);
-
-
             }
         },
         async fetchTerminals() {
             const resTerminal = await this.callApi("post", "allBooking/terminals");
             if (resTerminal.status == 200) {
-                ("#filterTable").DataTable().destroy();
                 this.terminals = resTerminal.data;
-                setTimeout(() => {
-                    $("#filterTable").DataTable();
-                }, 300);
 
             }
         },
         async fetchBus() {
             const resBuses = await this.callApi("post", "allBooking/buses");
             if (resBuses.status == 200) {
-                ("#filterTable").DataTable().destroy();
                 this.buses = resBuses.data;
-                setTimeout(() => {
-                    $("#filterTable").DataTable();
-                }, 300);
-
             }
 
         },
@@ -271,12 +256,7 @@ export default {
         async filterFunction() {
             const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
             if (resFilter.status == 200) {
-                ("#filterTable").DataTable().destroy();
                 this.allRecords = resFilter.data;
-                setTimeout(() => {
-                    $("#filterTable").DataTable();
-                }, 300);
-
             }
         },
     },
@@ -287,7 +267,6 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.discounts.splice(obj.index, 1)
-                $('#discount_table').DataTable().destroy();
             }
         }
     }

@@ -97,15 +97,29 @@
                             <input type="text" class="form-control" placeholder="Enter Name" id="userName"
                                 v-model="postData.name" />
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label for="email">Email <span class="text-danger ml-1">*</span></label>
                             <input type="email" class="form-control" placeholder="Enter Email" id="email"
                                 v-model="postData.email" />
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label for="password">Password <span class="text-danger ml-1">*</span></label>
                             <input type="password" class="form-control" placeholder="Enter Password" id="password"
                                 v-model="postData.password" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="role">Role<span class="text-danger ml-1">*</span></label>
+                            <select
+                                type="text"
+                                class="form-control"
+                                id=""
+                                v-model="postData.role"
+                            >
+                                <option value="">Select Role</option>
+                                <option v-for="(role, i) in roles" :value="role.id" :key="i">
+                                    {{ role.name }}
+                                </option>
+                            </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
@@ -233,9 +247,11 @@ export default {
             editFormID: 'edit_company_form',
             loading: false,
             hotels: [],
+            roles: [],
             postData: {
                 hotelName: "",
                 name: "",
+                role: "",
                 email: "",
                 password: "",
                 contact: "",
@@ -275,6 +291,12 @@ export default {
                     $("#hotel_table").DataTable();
                 }, 300);
             }
+            const roleRes = await this.callApi("post", "role");
+            if (roleRes.status == 200) {
+                this.roles = roleRes.data;
+            } else {
+                console.log(roleRes)
+            }
         },
         async hotelId(hotelId) {
             localStorage.setItem('hotel-id', hotelId);
@@ -285,7 +307,7 @@ export default {
         async add() {
 
             // validation for empty data
-            if (!this.postData.hotelName || !this.postData.name || !this.postData.email || !this.postData.password ||
+            if (!this.postData.hotelName || !this.postData.role || !this.postData.name || !this.postData.email || !this.postData.password ||
                 !this.postData.contact || !this.postData.commission || !this.postData.location) {
                 return swal({
                     title: "Error",
@@ -305,6 +327,7 @@ export default {
             formData.append('hotelName', this.postData.hotelName);
             formData.append('name', this.postData.name);
             formData.append('email', this.postData.email);
+            formData.append('role', this.postData.role);
             formData.append('password', this.postData.password);
             formData.append('contact', this.postData.contact);
             formData.append('logo', this.postData.logo);
@@ -317,9 +340,14 @@ export default {
             if (res.status == 201) {
                 $(".modal").click();
                 this.loading = false
+                swal({
+                    title: "Success",
+                    text: "Created Succesfuly",
+                    icon: "success",
+                    timer: 2000
+                });
                 $("#hotel_table").DataTable().destroy();
-                this.success = "Hotel Created Successfully";
-
+        
                 this.postData.hotelName = "";
                 this.postData.name = "";
                 this.postData.email = "";
