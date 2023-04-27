@@ -208,6 +208,7 @@ export default {
         }
     },
     async created() {
+        this.postData.ticket_merge_id = this.$route.params.id;
          this.fetchData();
          this.existingExpenses();
         setTimeout(function () {
@@ -225,8 +226,6 @@ export default {
             if (res.status == 200) {
                 this.categories = res.data;
             }
-
-            this.postData.ticket_merge_id = this.$route.params.id;
         },
         async existingExpenses() {
             const res = await this.callApi("post", 'expenses', {ticket_merge_id: this.postData.ticket_merge_id});

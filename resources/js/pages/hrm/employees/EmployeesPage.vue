@@ -600,7 +600,7 @@ export default {
                 email: null,
                 createAccount: 0,
                 password: null,
-                role: null,
+                role: "",
                 EmployeeName: null,
                 EmployeeFatherName: null,
                 EmployeeCNIC: null,

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AllBookingController extends Controller
 {
-
     public function routes()
     {
         return Route::where('company_id', Auth::user()->company_id)->get();
@@ -68,6 +67,6 @@ class AllBookingController extends Controller
             $data->where("type", $request->statusFilter)->withTrashed();
         }
 
-        return $data->with("schedule:id,route_id", "schedule.route:id,name", "bus:id,bus_number", "terminal:id,name", "addedBy:id,name", "scheduleDetail:id,departure_time", "cancel:id,ticket_id,added_by,created_at", "cancel.addedBy:id,name")->select("tickets.*", "customers.name", "customers.cnic", "customers.contact")->get();
+        return $data->with("schedule:id,route_id", "schedule.route:id,name", "bus:id,bus_number", "terminal:id,name", "addedBy:id,name", "scheduleDetail:id,departure_time", "cancel_ticket:id,ticket_id,added_by,created_at", "cancel_ticket.addedBy:id,name")->select("tickets.*", "customers.name", "customers.cnic", "customers.contact")->get();
     }
 }

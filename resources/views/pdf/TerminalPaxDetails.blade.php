@@ -208,11 +208,11 @@
     </tr>
     <tr>
         <th style="width: 75% !important;"> Main Net Sale</th>
-        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
+        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount + $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
     <tr>
         <th style="width: 75% !important;">Cash On Bus</th>
-        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount - $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
+        <th style="width: 25% !important;">{{ $data['record']->sum('seat_fare') - $terminalDiscount + $data['totalElt'] - $ticketCommission - $fixCommission - $refund }}</th>
     </tr>
 </table>
 <br>
