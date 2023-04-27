@@ -1774,6 +1774,14 @@ export default {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
         async fetchScheduleData() {
+            if (this.addForm.terminalId == 0 && this.$store.state.user.terminal_id == null) {
+                return swal({
+                    title: "Required!",
+                    text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.resetArrays();
             this.schedule = [];
             this.addForm.totalFare = 0;
@@ -1789,7 +1797,13 @@ export default {
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                 });
-                // console.log(resSelected.data);
+                const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
+                    terminal_id: this.$store.state.user.terminal_id ?? this.addForm.terminalId,
+                });
+                console.log(terminalSeats.data);
+                if (terminalSeats.status == 200) {
+                    this.allowedSeats = terminalSeats.data;
+                }
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;

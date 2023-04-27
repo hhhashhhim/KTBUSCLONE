@@ -522,6 +522,28 @@ class BookingController extends Controller
         ];
     }
 
+    public function terminalSeats(Request $request)
+    {
+        $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
+        if (!is_null($seats)) {
+            if (strpos($seats, '-') !== false) {
+                $rangeSeats = explode("|", str_replace(',', '|', $seats));
+                $output = [];
+                foreach ($rangeSeats as $range) {
+                    $parts = explode("-", $range);
+                    $start = intval($parts[0]);
+                    $end = intval($parts[1]);
+                    for ($i = $start; $i <= $end; $i++) {
+                        $output[] = str_pad($i, 2, "0", STR_PAD_LEFT);
+                    }
+                }
+                return $output;
+            }
+            return explode(",", $seats);
+        }
+        return response()->json([], 204);
+    }
+
     public function selected(Request $request)
     {
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
@@ -626,20 +648,6 @@ class BookingController extends Controller
                         }
                     }
                 }
-                //                if ($result !== false && $leavingIn30Min) {
-                //                    $seatMap[$i][$j]['over_issue'] = true;
-                //                    $seatMap[$i][$j]['departure_city'] = $tickets[$result]['departure_city']->id;
-                //                    $seatMap[$i][$j]['destination_city'] = $tickets[$result]['destination_city']->id;
-                //                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
-                //                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
-                //                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
-                //                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-                //                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
-                //                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
-                //                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
-                //                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
-                //                }
-                //                 print_r($column);
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
@@ -784,8 +792,6 @@ class BookingController extends Controller
         if (is_null(Auth::user()->terminal_id)) {
             return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
         }
-        //        try {
-        //            DB::beginTransaction();
         $ticket = Ticket::where([
             'company_id' => Auth::user()->company_id,
             'date' => $request->date,
@@ -821,12 +827,6 @@ class BookingController extends Controller
             ]);
         }
         return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
-
-        //            printEltTicket($elt->id, Auth::user()->company_id);
-        //        } catch (\Exception $e) {
-        //            DB::rollBack();
-        //            return response()->json(["errors" => ["Booking Error" => [$e->getMessage()]]], 422);
-        //        }
     }
 
     public

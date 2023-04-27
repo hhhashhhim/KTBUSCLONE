@@ -29227,11 +29227,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this15 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
-        var resSelected, i, j;
+        var _this15$$store$state$, resSelected, terminalSeats, i, j;
+
         return _regeneratorRuntime().wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
+                if (!(_this15.addForm.terminalId == 0 && _this15.$store.state.user.terminal_id == null)) {
+                  _context15.next = 2;
+                  break;
+                }
+
+                return _context15.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
                 _this15.resetArrays();
 
                 _this15.schedule = [];
@@ -29243,11 +29257,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this15.showBookingDiv = false;
 
                 if (!(_this15.addForm.schedule != 0 && _this15.addForm.date && _this15.addForm.departureCity != 0 && _this15.addForm.destinationCity != 0)) {
-                  _context15.next = 15;
+                  _context15.next = 22;
                   break;
                 }
 
-                _context15.next = 11;
+                _context15.next = 13;
                 return _this15.callApi("post", "booking/schedule/selected", {
                   id: _this15.addForm.schedule,
                   date: _this15.addForm.date,
@@ -29255,10 +29269,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this15.addForm.destinationCity
                 });
 
-              case 11:
+              case 13:
                 resSelected = _context15.sent;
+                _context15.next = 16;
+                return _this15.callApi("post", "booking/terminal/seats", {
+                  terminal_id: (_this15$$store$state$ = _this15.$store.state.user.terminal_id) !== null && _this15$$store$state$ !== void 0 ? _this15$$store$state$ : _this15.addForm.terminalId
+                });
 
-                // console.log(resSelected.data);
+              case 16:
+                terminalSeats = _context15.sent;
+                console.log(terminalSeats.data);
+
+                if (terminalSeats.status == 200) {
+                  _this15.allowedSeats = terminalSeats.data;
+                }
+
                 if (resSelected.status == 200) {
                   _this15.loading = false;
                   _this15.showBookingDiv = true;
@@ -29313,7 +29338,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 15:
+              case 22:
               case "end":
                 return _context15.stop();
             }
@@ -78712,9 +78737,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

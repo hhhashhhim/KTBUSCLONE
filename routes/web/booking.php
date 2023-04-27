@@ -30,6 +30,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/fare_class', [BookingController::class, 'getFareClass']);
     Route::post('/schedule/selected', [BookingController::class, 'selected']);
     Route::post('/schedule/dropCheck', [BookingController::class, 'dropCheck']);
+    Route::post('/terminal/seats', [BookingController::class, 'terminalSeats']);
 
     // Schedule Closing
     Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {
