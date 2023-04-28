@@ -167,6 +167,7 @@
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
+                                                            @change="fetchScheduleData()"
                                                             v-model="addForm.terminalId">
                                                         <option value="0">Select Terminal</option>
                                                         <option
@@ -331,7 +332,7 @@
                                              v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div v-if="col.reserved">
-                                                    <div v-if="allowedSeats.includes(parseInt(col.seatNo))"
+                                                    <div v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
                                                          class="image-span d-block text-center text-white shadow"
                                                          @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col) "
                                                          :class="getClasses(col)"
@@ -1279,7 +1280,7 @@ export default {
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
             window.addEventListener('keydown', this.altM);
-        }else{
+        } else {
             window.removeEventListener('keydown', this.enterKey);
             window.removeEventListener('keydown', this.altM);
         }
@@ -1818,9 +1819,11 @@ export default {
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id ?? this.addForm.terminalId,
                 });
-                console.log(terminalSeats.data);
                 if (terminalSeats.status == 200) {
                     this.allowedSeats = terminalSeats.data;
+                }
+                if (terminalSeats.status == 204) {
+                    this.allowedSeats = 0;
                 }
                 if (resSelected.status == 200) {
                     this.loading = false
