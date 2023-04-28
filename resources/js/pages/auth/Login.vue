@@ -135,7 +135,6 @@ export default {
                 this.data.email = this.data.password = "";
                 window.location = "admin/dashboard"
                 this.success = "";
-
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {

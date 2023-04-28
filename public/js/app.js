@@ -79197,10 +79197,6 @@ var routes = [{
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
   name: "home"
 }, {
-  path: url + "login",
-  component: _pages_auth_Login_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-  name: "login"
-}, {
   path: url + "users",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
   name: "users"
