@@ -95,8 +95,8 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="name">Select Bus <span class="text-danger">*</span></label>
-                        <select class="form-control rounded-0" v-model="busId" @change="getSchedule(busId)">
-                            <option value="" selected>Select Bus</option>
+                        <select class="form-control rounded-0" v-model="busId" @change="getSchedule(busId)" disabled>
+                            <option value="" selected>Not Assigned</option>
                             <option v-for="(bus, i) in buses" :value="bus.id" :key="i">
                                 {{ bus.bus_number }}
                             </option>
@@ -370,6 +370,7 @@ export default {
         clearForm: function () {
           this.data = {};
           this.reverseRoute = 1;
+          this.getSchedule(this.busId);
         },
         saveRow(event,fieldName,index) {
             // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
@@ -415,7 +416,7 @@ export default {
                 id: id
             });
             if (schedule.status === 200 && schedule.data) {
-                this.schedule = schedule.data.schedule_date + " " + schedule.data.schedule_time;
+                this.schedule = schedule.data.schedule_date ? schedule.data.schedule_date + " " + schedule.data.schedule_time : 'Not Assigned';
                 this.postData.ticketClosingId = schedule.data.id;
             }
         },
@@ -626,6 +627,7 @@ export default {
                 this.mainData = fleetRes.data.mainData;
                 this.buses = fleetRes.data.busDrop;
                 this.hotels = fleetRes.data.hotelDrop;
+                this.busId = fleetRes.data.hostData ? fleetRes.data.hostData.bus_id : '';
             }
 
             setTimeout(() => {

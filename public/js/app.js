@@ -42483,8 +42483,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 4:
               _this.permissions = _this.$store.state.permissions;
+              setTimeout(function () {
+                $("#hotel_table").DataTable();
+              }, 500);
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -42510,9 +42513,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (hotelRes.status == 200) {
                   _this2.hotels = hotelRes.data;
-                  setTimeout(function () {
-                    $("#hotel_table").DataTable();
-                  }, 300);
                 }
 
                 _context2.next = 6;
@@ -42923,6 +42923,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearForm: function clearForm() {
       this.data = {};
       this.reverseRoute = 1;
+      this.getSchedule(this.busId);
     },
     saveRow: function saveRow(event, fieldName, index) {
       // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
@@ -42977,7 +42978,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 schedule = _context.sent;
 
                 if (schedule.status === 200 && schedule.data) {
-                  _this.schedule = schedule.data.schedule_date + " " + schedule.data.schedule_time;
+                  _this.schedule = schedule.data.schedule_date ? schedule.data.schedule_date + " " + schedule.data.schedule_time : 'Not Assigned';
                   _this.postData.ticketClosingId = schedule.data.id;
                 }
 
@@ -43286,6 +43287,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this5.mainData = fleetRes.data.mainData;
                   _this5.buses = fleetRes.data.busDrop;
                   _this5.hotels = fleetRes.data.hotelDrop;
+                  _this5.busId = fleetRes.data.hostData ? fleetRes.data.hostData.bus_id : '';
                 }
 
                 setTimeout(function () {
@@ -70201,7 +70203,7 @@ var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_24 = {
   key: 0,
-  width: "225px !important"
+  width: "230px !important"
 };
 var _hoisted_25 = ["href"];
 var _hoisted_26 = ["src"];
@@ -71003,7 +71005,7 @@ var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: ""
-  }, "Select Bus", -1
+  }, "Not Assigned", -1
   /* HOISTED */
   );
 });
@@ -71257,7 +71259,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         onChange: _cache[2] || (_cache[2] = function ($event) {
           return $options.getSchedule($data.busId);
-        })
+        }),
+        disabled: ""
       }, [_hoisted_33, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: bus.id,
@@ -78780,9 +78783,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
