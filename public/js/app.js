@@ -29284,8 +29284,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this15 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
-        var _this15$$store$state$, resSelected, terminalSeats, i, j;
-
+        var resSelected, terminalSeats, i, j;
         return _regeneratorRuntime().wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
@@ -29330,7 +29329,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resSelected = _context15.sent;
                 _context15.next = 16;
                 return _this15.callApi("post", "booking/terminal/seats", {
-                  terminal_id: (_this15$$store$state$ = _this15.$store.state.user.terminal_id) !== null && _this15$$store$state$ !== void 0 ? _this15$$store$state$ : _this15.addForm.terminalId
+                  terminal_id: _this15.$store.state.user.terminal_id
                 });
 
               case 16:
@@ -30895,6 +30894,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       this.$refs.refBusInvoice.submit();
+    }
+  },
+  watch: {
+    'addForm.terminalId': function addFormTerminalId(newVal) {
+      this.$store.state.user.terminal_id = newVal;
     }
   },
   computed: {
@@ -79185,10 +79189,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; //
-// const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
