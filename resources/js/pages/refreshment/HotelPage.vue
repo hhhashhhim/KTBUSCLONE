@@ -31,8 +31,8 @@
                                                                 <th>Commission (%)</th>
                                                                 <th>Location</th>
                                                                 <th>Logo</th>
-                                                                <th v-if="checkForSubmenuButtons('edit-hotel') || checkForSubmenuButtons('food') || checkForSubmenuButtons('deal')"
-                                                                    width="225px !important">Action</th>
+                                                                <th  v-if="checkForSubmenuButtons('edit-hotel') || checkForSubmenuButtons('food') || checkForSubmenuButtons('deal')"
+                                                                    width="230px !important">Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -288,6 +288,9 @@ export default {
 
         await this.fetchData();
         this.permissions = this.$store.state.permissions;
+        setTimeout(() => {
+            $("#hotel_table").DataTable();
+        }, 500);
     },
 
     methods: {
@@ -295,9 +298,6 @@ export default {
             const hotelRes = await this.callApi("post", "refreshments/hotels");
             if (hotelRes.status == 200) {
                 this.hotels = hotelRes.data;
-                setTimeout(() => {
-                    $("#hotel_table").DataTable();
-                }, 300);
             }
             const roleRes = await this.callApi("post", "role");
             if (roleRes.status == 200) {

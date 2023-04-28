@@ -46,25 +46,25 @@ class FoodOrderController extends Controller
             where(["user_id"=>Auth::user()->id,"type"=>2,'company_id'=>Auth::user()->company_id])
             ->latest()->first()->ticket_closing_id??null;
         
-            $foodOrders = HotelFoodOrder::
-            where(['ticket_closing_id'=>$TicketClosingId,'company_id'=>Auth::user()->company_id])
-            ->get();
-            
+        $foodOrders = HotelFoodOrder::
+        where(['ticket_closing_id'=>$TicketClosingId,'company_id'=>Auth::user()->company_id])
+        ->get();
 
-            $foodOrders = $foodOrders->map(function($q){
-                if( $q->item_type == 1){
-                    $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
-                }
-                if( $q->item_type == 2){
-                    $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
-                }
-                return $q;
-            })->groupBy("seat_no");
+        $foodOrders = $foodOrders->map(function($q){
+            if( $q->item_type == 1){
+                $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
+            }
+            if( $q->item_type == 2){
+                $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
+            }
+            return $q;
+        })->groupBy("seat_no");
 
-            $data = [
+        $data = [
             "mainData" => $foodOrders,
             "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
             "hotelDrop" => Hotel::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
+            "hostData" => TicketClosing::find($TicketClosingId),
         ];
         return $data;
     }
