@@ -277,11 +277,19 @@ export default {
         };
     },
     async created() {
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
+
         await this.fetchData();
         this.permissions = this.$store.state.permissions;
     },
+
     methods: {
         async fetchData() {
             const hotelRes = await this.callApi("post", "refreshments/hotels");
@@ -347,7 +355,7 @@ export default {
                     timer: 2000
                 });
                 $("#hotel_table").DataTable().destroy();
-        
+
                 this.postData.hotelName = "";
                 this.postData.name = "";
                 this.postData.email = "";

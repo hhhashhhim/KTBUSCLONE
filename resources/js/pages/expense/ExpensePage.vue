@@ -208,6 +208,14 @@ export default {
         }
     },
     async created() {
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
         this.postData.ticket_merge_id = this.$route.params.id;
          this.fetchData();
          this.existingExpenses();
@@ -217,6 +225,7 @@ export default {
         // total amount sum only for show
         this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
     },
+
     methods: {
         clearForm: function () {
             this.data = {};

@@ -165,11 +165,19 @@ export default {
         };
     },
     async created() {
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
         await this.fetchParts();
         this.permissions = this.$store.state.permissions;
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+
     },
+
     methods: {
 
         async fetchParts() {

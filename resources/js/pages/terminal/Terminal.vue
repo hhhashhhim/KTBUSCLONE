@@ -392,7 +392,7 @@
             </Edit>
 
             <!--View Details Model-->
-           
+
             <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
                     aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -479,7 +479,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Delete Modal -->
             <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???'/>
         </div>
@@ -569,11 +569,19 @@ export default {
     },
 
     async created() {
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
+
          this.fetchTerminals();
         this.permissions = this.$store.state.permissions;
     },
+
     methods: {
         closeModal(){
             $("#detail-modal").click();

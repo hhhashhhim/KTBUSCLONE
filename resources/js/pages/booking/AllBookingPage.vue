@@ -222,15 +222,20 @@ export default {
         };
     },
     async created() {
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        // setTimeout(() => {
-        //     $("#filterTable").DataTable();
-        // }, 300);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
     },
+
     methods: {
         async fetchRoutes() {
             const resRoute = await this.callApi("post", "allBooking/routes");
