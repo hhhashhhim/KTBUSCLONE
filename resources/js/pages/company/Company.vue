@@ -776,6 +776,18 @@ export default {
                                 {
                                     name: "add-order",
                                     allow: true,
+                                },
+                                {
+                                    name: "received-order",
+                                    "allow": true
+                                },
+                                {
+                                    name: "ready-order",
+                                    allow: true
+                                },
+                                {
+                                    name: "delivered-order",
+                                    allow: true,
                                 }
                             ]
                         }

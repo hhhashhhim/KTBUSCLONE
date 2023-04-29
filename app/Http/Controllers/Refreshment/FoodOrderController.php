@@ -42,23 +42,49 @@ class FoodOrderController extends Controller
     
     public function orderFoodIndex(Request $request)
     {
-        $TicketClosingId = TicketClosingMember::
-            where(["user_id"=>Auth::user()->id,"type"=>2,'company_id'=>Auth::user()->company_id])
-            ->latest()->first()->ticket_closing_id??null;
-        
-        $foodOrders = HotelFoodOrder::
-        where(['ticket_closing_id'=>$TicketClosingId,'company_id'=>Auth::user()->company_id])
-        ->get();
+        $checkHotelLogin = Hotel::where("user_id",Auth::user()->id)->where("company_id",Auth::user()->company_id)->first();
+        if($checkHotelLogin)
+        {
+            // for hotel
+            $TicketClosingId = [];
+            $foodOrders = HotelFoodOrder::
+            where(['hotel_id'=>$checkHotelLogin->id,'company_id'=>Auth::user()->company_id])
+            ->where("created_at",'>',now()->subDays(1))
+            ->with("hotel:id,name","bus:id,bus_number")
+            ->get();
 
-        $foodOrders = $foodOrders->map(function($q){
-            if( $q->item_type == 1){
-                $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
-            }
-            if( $q->item_type == 2){
-                $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
-            }
-            return $q;
-        })->groupBy("seat_no");
+            $foodOrders = $foodOrders->map(function($q){
+                if( $q->item_type == 1){
+                    $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
+                }
+                if( $q->item_type == 2){
+                    $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
+                }
+                return $q;
+            })->groupBy("seat_no");
+        }
+        else
+        {
+            // for host
+            $TicketClosingId = TicketClosingMember::
+                where(["user_id"=>Auth::user()->id,"type"=>2,'company_id'=>Auth::user()->company_id])
+                ->latest()->first()->ticket_closing_id??null;
+            
+            $foodOrders = HotelFoodOrder::
+            where(['ticket_closing_id'=>$TicketClosingId,'company_id'=>Auth::user()->company_id])
+            ->with("hotel:id,name","bus:id,bus_number")
+            ->get();
+
+            $foodOrders = $foodOrders->map(function($q){
+                if( $q->item_type == 1){
+                    $q->food_record = HotelFood::where("id",$q->item_id)->first(['id','name','unit']);
+                }
+                if( $q->item_type == 2){
+                    $q->food_record = HotelFoodDeal::where("id",$q->item_id)->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")->first(['id','name']);
+                }
+                return $q;
+            })->groupBy("seat_no");
+        }
 
         $data = [
             "mainData" => $foodOrders,
@@ -137,7 +163,26 @@ class FoodOrderController extends Controller
 
     }
 
-
+    public function orderReceive(Request $request)
+    {
+        HotelFoodOrder::where("id",$request->id)->update([
+            "status" => "received"
+        ]);
+    }
+    
+    public function orderReady(Request $request)
+    {
+        HotelFoodOrder::where("id",$request->id)->update([
+            "status" => "ready"
+        ]);
+    
+    }
+    public function orderDelivered(Request $request)
+    {
+        HotelFoodOrder::where("id",$request->id)->update([
+            "status" => "delivered"
+        ]);
+    }
 
 
 }

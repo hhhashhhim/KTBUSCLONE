@@ -42,6 +42,9 @@ Route::group(['prefix' => 'refreshments', 'middleware', [CustomMiddleware::class
             // Route::post('/', [FoodDealController::class, 'index']);
             Route::post('/food', [FoodOrderController::class, 'orderFoodIndex']);
             Route::post('/book', [FoodOrderController::class, 'orderBook']);
+            Route::post('/received', [FoodOrderController::class, 'orderReceive']);
+            Route::post('/ready', [FoodOrderController::class, 'orderReady']);
+            Route::post('/delivered', [FoodOrderController::class, 'orderDelivered']);
         });
 
     });

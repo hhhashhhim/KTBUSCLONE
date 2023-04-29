@@ -25,5 +25,13 @@ class HotelFoodOrder extends Model
     {
         return $this->hasOne( HotelFoodDeal::class, 'id', 'item_id');
     }
+    public function hotel()
+    {
+        return $this->hasOne( Hotel::class, 'id', 'hotel_id');
+    }
+    public function bus()
+    {
+        return $this->hasOne( Bus::class, 'id', 'bus_id');
+    }
 
 }

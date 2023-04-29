@@ -29,7 +29,15 @@ class HotelController extends Controller
 
     public function index()
     {
-        return Hotel::with("user")->where("company_id",Auth::user()->company_id)->get();
+        $checkHotelLogin = Hotel::where("user_id",Auth::user()->id)->where("company_id",Auth::user()->company_id)->first();
+        if($checkHotelLogin)
+        {
+            return Hotel::with("user")->where("company_id",Auth::user()->company_id)->where("user_id",Auth::user()->id)->get();
+        }
+        else
+        {
+            return Hotel::with("user")->where("company_id",Auth::user()->company_id)->get();
+        }
     }
 
     public function store(Request $request)

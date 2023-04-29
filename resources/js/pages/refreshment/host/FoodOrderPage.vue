@@ -8,6 +8,7 @@
                             <h4>Food Order Page</h4>
                             <div class="card-header-action">
                                 <a
+                                    v-if="checkForSubmenuButtons('add-order')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -37,8 +38,10 @@
                                                         <th>Quantity</th>
                                                         <th>Amount</th>
                                                         <th>Seat No</th>
+                                                        <th>Hotel</th>
+                                                        <th>Bus No</th>
                                                         <th>Status</th>
-<!--                                                        <th>Action</th>-->
+                                                       <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -59,6 +62,8 @@
 
                                                             <td>{{ order.amount }}</td>
                                                             <td>{{ order.seat_no }}</td>
+                                                            <td>{{ order.hotel.name }}</td>
+                                                            <td>{{ order.bus.bus_number }}</td>
 
                                                             <td>
                                                                 <span v-if="order.status=='pending'" class="badge badge-warning">{{ order.status }}</span>
@@ -67,9 +72,29 @@
                                                                 <span v-else-if="order.status=='delivered'" class="badge badge-info">{{ order.status }}</span>
 <!--                                                            <td>N/A</td>-->
                                                             </td>
+                                                            <td>
+                                                                <button
+                                                                    v-if="order.status!='received' && checkForSubmenuButtons('received-order')"
+                                                                    @click="received(order.id)" class="btn btn-success mx-1 btn-sm"
+                                                                    title="received Order">
+                                                                    Received
+                                                                </button>
+                                                                <button
+                                                                    v-if="order.status!='ready' && checkForSubmenuButtons('ready-order')"
+                                                                    @click="ready(order.id)" class="btn btn-danger mx-1 btn-sm"
+                                                                    title="ready Order">
+                                                                    Ready
+                                                                </button>
+                                                                <button
+                                                                    v-if="order.status!='delivered' && checkForSubmenuButtons('delivered-order')"
+                                                                    @click="delivered(order.id)" class="btn btn-info mx-1 btn-sm"
+                                                                    title="delivered Order">
+                                                                    Delivered
+                                                                </button>
+                                                            </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="border-bottom border-success" colspan="5" style="height:0 !important; "></td>
+                                                            <td class="border-bottom border-success" colspan="8" style="height:0 !important; "></td>
                                                         </tr>
                                                     </template>
                                                     </tbody>
@@ -323,6 +348,7 @@ export default {
         return {
             loading : false,
             validationErrors: [],
+            permissions: [],
             mainData: [],
             buses: [],
             busId: "",
@@ -365,6 +391,7 @@ export default {
     },
     created() {
         this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         clearForm: function () {
@@ -418,6 +445,51 @@ export default {
             if (schedule.status === 200 && schedule.data) {
                 this.schedule = schedule.data.schedule_date ? schedule.data.schedule_date + " " + schedule.data.schedule_time : 'Not Assigned';
                 this.postData.ticketClosingId = schedule.data.id;
+            }
+        },
+        async received(id) {
+
+            const received = await this.callApi("post", "refreshments/hotels/orders/received", {
+                id: id
+            });
+            if (received.status === 200 && received.data) {
+               this.fetchData();
+                swal({
+                    title: "Success",
+                    text: "Order Received",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+        },
+        async ready(id) {
+
+            const ready = await this.callApi("post", "refreshments/hotels/orders/ready", {
+                id: id
+            });
+            if (ready.status === 200 && ready.data) {
+               this.fetchData();
+                swal({
+                    title: "Success",
+                    text: "Order Ready",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+        },
+        async delivered(id) {
+
+            const delivered = await this.callApi("post", "refreshments/hotels/orders/delivered", {
+                id: id
+            });
+            if (delivered.status === 200 && delivered.data) {
+               this.fetchData();
+                swal({
+                    title: "Success",
+                    text: "Order Delivered",
+                    icon: "success",
+                    timer: 2000
+                });
             }
         },
         async getFoods(id) {
