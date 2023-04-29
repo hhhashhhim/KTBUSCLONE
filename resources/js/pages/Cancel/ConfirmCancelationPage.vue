@@ -128,7 +128,16 @@ export default {
     },
     async created() {
         this.fetchFilters();
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
     },
+
     methods: {
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'confirm/cancellation/getTerminals');

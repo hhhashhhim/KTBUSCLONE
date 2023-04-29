@@ -205,8 +205,14 @@ export default {
     },
     async created() {
         this.fetchData();
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
     },
     data() {
         return {
@@ -233,6 +239,7 @@ export default {
             getSchedule: false,
         };
     },
+
     methods: {
         scheduleDropdown: function (schedule) {
             return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;

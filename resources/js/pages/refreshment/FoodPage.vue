@@ -234,12 +234,20 @@ export default {
         };
     },
     async created() {
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
+
         await this.setData();
         await this.fetchData();
         this.permissions = this.$store.state.permissions;
     },
+
     methods: {
         async fetchData() {
             const data = {

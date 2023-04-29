@@ -50,9 +50,9 @@ import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 import ConfirmCancelationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 
 
-const url = '/kt/'
+// const url = '/kt/'
 
-// const url = '/'
+const url = '/'
 
 
 const routes = [
@@ -60,11 +60,6 @@ const routes = [
         path: url + "",
         component: Users,
         name: "home",
-    },
-    {
-        path: url + "login",
-        component: Login,
-        name: "login",
     },
     {
         path: url + "users",

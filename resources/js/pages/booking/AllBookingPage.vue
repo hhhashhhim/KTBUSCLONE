@@ -101,8 +101,8 @@
                                                             <option value="booked">Booked</option>
                                                             <option value="advance booking">Advance Booked</option>
                                                             <option value="canceled">Cancelled</option>
-                                                            <option value="reschedule">Reschedule Ticket</option>
-                                                            <option value="over-issue">Over Issue Ticket</option>
+<!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
+<!--                                                            <option value="over-issue">Over Issue Ticket</option>-->
                                                         </select>
                                                     </div>
                                                 </div>
@@ -148,17 +148,12 @@
                                                             <td>{{ record.name }}</td>
                                                             <td>{{ record.cnic }}</td>
                                                             <td>{{ record.contact }}</td>
-                                                            <td>{{
-                                                                    parseFloat(record.seat_fare) -
-                                                                    parseFloat(record.discount ?? 0)
-                                                                }}
+                                                            <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount ?? 0) }}
                                                             </td>
                                                             <td>{{ record.created_at }}</td>
-                                                            <td>{{
-                                                                    record.cancel ? record.cancel.added_by.name : 'N/A'
-                                                                }}
+                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by.name : 'N/A' }}
                                                             </td>
-                                                            <td>{{ record.cancel ? record.cancel.created_at : 'N/A' }}
+                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.created_at : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>
@@ -222,15 +217,21 @@ export default {
         };
     },
     async created() {
-        window.removeEventListener('keydown', this.enter);
-        window.removeEventListener('keydown', this.altM);
+
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        // setTimeout(() => {
-        //     $("#filterTable").DataTable();
-        // }, 300);
+        this.filterForm.dateFilter = new Date().toISOString().substr(0, 10);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
     },
+
     methods: {
         async fetchRoutes() {
             const resRoute = await this.callApi("post", "allBooking/routes");

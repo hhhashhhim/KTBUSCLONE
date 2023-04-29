@@ -534,12 +534,17 @@ class BookingController extends Controller
                     $start = intval($parts[0]);
                     $end = intval($parts[1]);
                     for ($i = $start; $i <= $end; $i++) {
-                        $output[] = str_pad($i, 2, "0", STR_PAD_LEFT);
+                        $output[] = (int)str_pad($i, 2, "0", STR_PAD_LEFT);
                     }
                 }
-                return $output;
+                return array_unique($output);
             }
-            return explode(",", $seats);
+            $arrays = explode(",", $seats);
+            $seats = [];
+            foreach ($arrays as $item) {
+                $seats[] = (int)$item;
+            }
+            return $seats;
         }
         return response()->json([], 204);
     }
@@ -928,7 +933,7 @@ class BookingController extends Controller
             'id' => Auth::user()->terminal_id,
         ])->first()->name : "Not Assigned Terminal";
 
-        $mainData = Ticket::where([
+        $mainData = Ticket::withTrashed()->where([
             'tickets.company_id' => Auth::user()->company_id,
             'tickets.schedule_id' => $request->schedule_id,
             'tickets.schedule_date' => $uniqueDate,

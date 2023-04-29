@@ -160,12 +160,21 @@ export default {
         }
     },
     async created() {
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
         this.postData.ticket_merge_id = this.$route.params.id;
         this.fetchData();
         setTimeout(function () {
             $("#header_table").DataTable();
         }, 300);
     },
+
     methods: {
         clearForm: function () {
             this.data = {};
@@ -174,7 +183,7 @@ export default {
             const res = await this.callApi("post", 'reportsHeader/link/get',{ticket_merge_id:this.postData.ticket_merge_id});
             if (res.status == 200) {
                 this.headers = res.data.headers;
-                
+
                 if(res.data.links != null)
                 {
                     this.postData.values = [];
@@ -187,7 +196,7 @@ export default {
             this.postData.ticket_merge_id = this.$route.params.id;
         },
         saveRow(value, fieldName, index) {
-            
+
             if (fieldName == "first") {
                 this.postData.headIds[index] = value;
             }

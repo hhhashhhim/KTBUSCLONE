@@ -167,6 +167,7 @@
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
+                                                            @change="fetchScheduleData()"
                                                             v-model="addForm.terminalId">
                                                         <option value="0">Select Terminal</option>
                                                         <option
@@ -330,30 +331,44 @@
                                              class="d-flex justify-content-center seat-img p-0 m-0"
                                              v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
-                                                <div
-                                                    v-if="col.reserved"
-                                                    class="image-span d-block text-center text-white shadow"
-                                                    @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col) "
-                                                    :class="getClasses(col)"
-                                                    :title="getTitle(col)"
-                                                    :style="getStyle(col)"
-                                                >
-                                                    <small>{{ col.seatNo }}</small>
-                                                    <br/>
-                                                    <small v-if="col.type && col.type == 'booked'">
-                                                        <i class="type-icons fas fa-check-double"></i>
-                                                    </small>
-                                                    <small v-if="col.type && col.type == 'advance booking'">
-                                                        <i class="type-icons fas fa-check">
-                                                        </i>
-                                                    </small>
-                                                    <small v-if="col.type && col.type == 'over-issue'">
-                                                        <i class="type-icons far fa-hand-paper text-light">
-                                                        </i>
-                                                    </small>
-                                                    <small v-if="col.type && col.type == 'not_for_sale'">
-                                                        <i class="fas fa-minus-circle text-light"></i>
-                                                    </small>
+                                                <div v-if="col.reserved">
+                                                    <div
+                                                        v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
+                                                        class="image-span d-block text-center text-white shadow"
+                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col) "
+                                                        :class="getClasses(col)"
+                                                        :title="getTitle(col)"
+                                                        :style="getStyle(col)"
+                                                    >
+                                                        <small>{{ col.seatNo }}</small>
+                                                        <br/>
+                                                        <small v-if="col.type && col.type == 'booked'">
+                                                            <i class="type-icons fas fa-check-double"></i>
+                                                        </small>
+                                                        <small v-if="col.type && col.type == 'advance booking'">
+                                                            <i class="type-icons fas fa-check">
+                                                            </i>
+                                                        </small>
+                                                        <small v-if="col.type && col.type == 'over-issue'">
+                                                            <i class="type-icons far fa-hand-paper text-light">
+                                                            </i>
+                                                        </small>
+                                                        <small v-if="col.type && col.type == 'not_for_sale'">
+                                                            <i class="fas fa-minus-circle text-light"></i>
+                                                        </small>
+                                                    </div>
+                                                    <div v-else
+                                                         class="image-span d-block text-center text-white shadow"
+                                                         :class="getClasses(col)"
+                                                         :title="getTitle(col)"
+                                                         style="pointer-events: none !important; background-color: #444444 !important;"
+                                                    >
+                                                        <small>{{ col.seatNo }}</small>
+                                                        <br/>
+                                                        <small>
+                                                            <i class="type-icons fa fa-times text-danger"></i>
+                                                        </small>
+                                                    </div>
                                                 </div>
                                                 <span v-else></span>
                                             </div>
@@ -1186,6 +1201,7 @@ export default {
             bookingDetails: [],
             allSeatClasses: [],
             specificCities: [],
+            allowedSeats: [],
             reSpecificCities: [],
             previousSumFare: 0,
             totalSeats: 0,
@@ -1261,9 +1277,13 @@ export default {
         this.fetchAllSchedules();
         this.showBookingDiv = false;
         this.permissions = this.$store.state.permissions;
-        if (window.location.pathname.split("/").pop() == "bookings") {
-            window.addEventListener('keydown', this.enter);
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
             window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
         }
     },
 
@@ -1325,7 +1345,7 @@ export default {
             }
         },
 
-        enter: function (e) {
+        enterKey: function (e) {
             if (e.key == "Enter") {
                 if (!this.hideDivButtonsDrop) {
                     return swal({
@@ -1798,11 +1818,13 @@ export default {
                     destinationCity: this.addForm.destinationCity,
                 });
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
-                    terminal_id: this.$store.state.user.terminal_id ?? this.addForm.terminalId,
+                    terminal_id: this.$store.state.user.terminal_id,
                 });
-                console.log(terminalSeats.data);
                 if (terminalSeats.status == 200) {
                     this.allowedSeats = terminalSeats.data;
+                }
+                if (terminalSeats.status == 204) {
+                    this.allowedSeats = 0;
                 }
                 if (resSelected.status == 200) {
                     this.loading = false
@@ -2900,10 +2922,15 @@ export default {
                 });
             }
             this.$refs.refBusInvoice.submit();
+        },
+    },
+
+    watch: {
+        'addForm.terminalId': function (newVal) {
+            this.$store.state.user.terminal_id = newVal;
         }
-        ,
-    }
-    ,
+    },
+
     computed: {
         disabledOptions() {
             const now = new Date();

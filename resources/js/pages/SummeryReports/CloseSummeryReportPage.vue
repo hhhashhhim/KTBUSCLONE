@@ -120,7 +120,16 @@ export default {
     },
     async created() {
         this.fetchDailySummaryReport();
+        const currentRouteName = this.$route.name;
+        if (currentRouteName == 'booking-page') {
+            window.addEventListener('keydown', this.enterKey);
+            window.addEventListener('keydown', this.altM);
+        } else {
+            window.removeEventListener('keydown', this.enterKey);
+            window.removeEventListener('keydown', this.altM);
+        }
     },
+
     methods: {
         async fetchDailySummaryReport() {
             const resGetSchedule = await this.callApi("post", 'reports/getRoutes');

@@ -174,9 +174,13 @@ export default {
     BasicPopup,
   },
   async created() {
-      window.removeEventListener('keydown', this.enter);
-      window.removeEventListener('keydown', this.altM);
-
+      // window.removeEventListener('keydown', this.enterKey);
+      // window.removeEventListener('keydown', this.altM);
+      const currentRouteName = this.$route.name;
+      if (currentRouteName !== 'booking-page') {
+          window.removeEventListener('keydown', this.enterKey);
+          window.removeEventListener('keydown', this.altM);
+      }
   },
   data() {
     return {
@@ -202,6 +206,7 @@ export default {
       getSchedule: false,
     };
   },
+
   methods: {
     tConvert: function (time) {
       time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];

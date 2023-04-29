@@ -83,8 +83,13 @@ export default {
     };
   },
   async created() {
-      window.removeEventListener('keydown', this.enter);
-      window.removeEventListener('keydown', this.altM);
+      const currentRouteName = this.$route.name;
+      if (currentRouteName !== 'booking-page') {
+          window.removeEventListener('keydown', this.enterKey);
+          window.removeEventListener('keydown', this.altM);
+      }
+      // window.removeEventListener('keydown', this.enterKey);
+      // window.removeEventListener('keydown', this.altM);
     let role_id = this.$route.params.id;
     const res = await this.callApi("post", "role/get", { id: role_id });
     if (res.status == 200) {
@@ -97,6 +102,7 @@ export default {
       console.log(res);
     }
   },
+
   methods: {
     async save() {
       const res = await this.callApi("post", "role/update",{
