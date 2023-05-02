@@ -279,7 +279,6 @@
                                             <div class="form-group text-center mt-2 mb-2"
                                             >
                                                 <a v-if="checkForSubmenuButtons('assign-bus')" href="#"
-                                                   :data-target="'#' + formID" data-toggle="modal"
                                                    class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
                                                 </a>
@@ -1485,25 +1484,61 @@ export default {
         },
 
         async closingData() {
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Destination City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.date == "" || typeof this.addForm.date == 'undefined') {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Date First ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure Time First ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
             const resData = await this.callApi("post", "booking/getClosingData", {
                 scheduleId: this.addForm.schedule,
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });
-            this.buses = resData.data.buses;
-            this.drivers = resData.data.drivers;
-            this.hosts = resData.data.hosts;
-            this.dataForClose.date = resData.data.infoData.schedule_date;
-            this.dataForClose.schedule_detail = resData.data.infoData.schedule;
-            this.dataForClose.schedule = resData.data.infoData.schedule_id;
-            this.dataForClose.route_name = resData.data.infoData.route_name;
-            this.dataForClose.bus = resData.data.infoData.bus;
-            this.dataForClose.drivers = resData.data.infoData.drivers;
-            this.dataForClose.hosts = resData.data.infoData.hosts;
-            this.dataForClose.description = resData.data.infoData.description;
-            this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
+            if (resData.status == 200) {
+                this.buses = resData.data.buses;
+                this.drivers = resData.data.drivers;
+                this.hosts = resData.data.hosts;
+                this.dataForClose.date = resData.data.infoData.schedule_date;
+                this.dataForClose.schedule_detail = resData.data.infoData.schedule;
+                this.dataForClose.schedule = resData.data.infoData.schedule_id;
+                this.dataForClose.route_name = resData.data.infoData.route_name;
+                this.dataForClose.bus = resData.data.infoData.bus;
+                this.dataForClose.drivers = resData.data.infoData.drivers;
+                this.dataForClose.hosts = resData.data.infoData.hosts;
+                this.dataForClose.description = resData.data.infoData.description;
+                this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
 
+                $(`#${this.formID}`).modal('show');
+                ;
+            }
         },
 
         async closeSchedule() {
@@ -2804,7 +2839,7 @@ export default {
         ,
 
         // Get Passengers list
-        getCustomerList: function () {
+        async getCustomerList() {
             if (this.addForm.departureCity == 0) {
                 return swal({
                     title: "Required!",
@@ -2837,11 +2872,27 @@ export default {
                     timer: 2000
                 });
             }
-            this.$refs.refPassengerList.submit();
+            // check Buss Assigned or not
+            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            if (resCheckedBus.status == 200) {
+                this.$refs.refPassengerList.submit();
+            } else if (resCheckedBus.status == 204) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Assign Bus First!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
         }
         ,
         // Get Terminal Invoice
-        getTerminalInvoice: function () {
+        async getTerminalInvoice() {
 
             if (this.addForm.departureCity == 0) {
                 return swal({
@@ -2883,11 +2934,27 @@ export default {
                     timer: 2000
                 });
             }
-            this.$refs.refTerminalInvoice.submit();
+            // check Buss Assigned or not
+            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            if (resCheckedBus.status == 200) {
+                this.$refs.refTerminalInvoice.submit();
+            } else if (resCheckedBus.status == 204) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Assign Bus First!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
         }
         ,
         // Get Bus Invoice
-        getBusInvoice: function () {
+        async getBusInvoice() {
 
             if (this.addForm.departureCity == 0) {
                 return swal({
@@ -2921,7 +2988,24 @@ export default {
                     timer: 2000
                 });
             }
-            this.$refs.refBusInvoice.submit();
+            // check Buss Assigned or not
+            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            if (resCheckedBus.status == 200) {
+                this.$refs.refBusInvoice.submit();
+            } else if (resCheckedBus.status == 204) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Assign Bus First!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
         },
     },
 

@@ -47,12 +47,12 @@ import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
-import ConfirmCancelationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
+import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 
 
-// const url = '/kt/'
-
-const url = '/'
+const url = '/kt/'
+//
+// const url = '/'
 
 
 const routes = [
@@ -293,7 +293,7 @@ const routes = [
     },
     {
         path: url + "reports/confirm/cancel",
-        component: ConfirmCancelationPage,
+        component: ConfirmCancellationPage,
         name: "confirm-cancel-report"
     },
 ]

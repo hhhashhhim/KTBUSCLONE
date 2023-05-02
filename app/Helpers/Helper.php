@@ -182,7 +182,9 @@ if (!function_exists('updateAdvancedSeat')) {
         }
         $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
         $updateId->update([
-            'cnic' => plainContactAndCnic($request->customerCNIC),
+            'name' => $request->customerName,
+            'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+            'contact' => plainContactAndCnic($request->contact),
         ]);
         return $request->alreadyBookedId[0];
     }
@@ -476,13 +478,11 @@ if (!function_exists('getDynamicHeaders')) {
 if (!function_exists('getRowBadgeColor')) {
     function getRowBadgeColor($departureTime, $cancellationTime)
     {
-//        dd($cancellationTime, $departureTime);
         $secDepart = strtotime($departureTime);
         $secCancellation = strtotime($cancellationTime);
         $threeHoursBefore = $secDepart - 10800;
         $oneHoursBefore = $threeHoursBefore - 3600;
 
-//        dd($secCancellation > $secDepart);
         if ($secCancellation > $secDepart) {
             return "red";
         }
