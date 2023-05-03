@@ -538,16 +538,8 @@ class BookingController extends Controller
             "departure_date" => $request->date,
             "company_id" => Auth::user()->company_id
         ])->first();
-        $checkBusAssing = Ticket::where(["schedule_date"=>$departureTime->schedule_date,"schedule_id"=>$departureTime->schedule_id])->where("bus_id",'!=',null)->first();
-        // $assignedBus = TicketClosing::where([
-        //     "schedule_id" => $request->scheduleId,
-        //     "schedule_date" => $request->date,
-        //     "schedule_time" => $departureTime->departure_time,
-        //     "schedule_start" => $request->departureCity,
-        //     "schedule_end" => $request->destinationCity,
-        //     'company_id' => Auth::user()->company_id,
-        // ])->get();
-        if ($checkBusAssing) {
+        $checkBusAssigning = Ticket::where(["schedule_date" => $departureTime->schedule_date, "schedule_id" => $departureTime->schedule_id])->where("bus_id", '!=', null)->first();
+        if ($checkBusAssigning) {
             return response()->json([], 200);
         } else {
             return response()->json([], 204);
@@ -813,7 +805,7 @@ class BookingController extends Controller
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
 
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->orderBy('id')->where("user_id",'!=',0)->get(["user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         $data = [
             "buses" => $buses,
