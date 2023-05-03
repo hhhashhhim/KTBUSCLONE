@@ -187,7 +187,10 @@ class ScheduleController extends Controller
             $data[] = $routeFare->destination_city_id;
         }
         $data = collect($data)->unique();
-        return City::with('terminal')->whereIn('id', $data)->get();
+        return City::with(['terminal'=>function($q){
+            $q->where("is_online_terminal",null);
+            return $q->orWhere("is_online_terminal",0);
+        }])->whereIn('id', $data)->get();
     }
 
     public function getRouteFareClass(Request $request)
