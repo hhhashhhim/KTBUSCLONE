@@ -289,7 +289,7 @@
                         class="row d-flex justify-content-center"
                         v-if="stepTwoAddSchedule"
                     >
-                        <div class="col-md-12 class form-group mx-2">
+                        <div class="col-md-9 class form-group">
                             <div class="table-responsive">
                                 <table
                                     class="table table-striped table-hover"
@@ -327,6 +327,13 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                        <div class="col-md-3 class form-group px-0">
+                            <span class="text-dark h5 pb-5"
+                                  v-if="terminalNames.length !== 0 && this.data.route !== 0"> Selected Terminal Sequence</span>
+                            <ul>
+                                <li v-for="name in terminalNames">{{ name }}</li>
+                            </ul>
                         </div>
                     </div>
                     <div class="row">
@@ -877,6 +884,7 @@ export default {
             editTerminals: [],
             groupByCategory: [],
             allTerminalsIds: [],
+            terminalNames: [],
             editRoutes: [],
             success: false,
             error: false,
@@ -987,7 +995,6 @@ export default {
 
         tConvert: function (time) {
             time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
-
             if (time.length > 1) {
                 time = time.slice(1);
                 time[5] = +time[0] < 12 ? ' AM' : ' PM';
@@ -1028,23 +1035,13 @@ export default {
                         allow: true,
                     });
                 }
-                this.groupByCategory = this.data.addTerminalsOnClick.reduce((group, product) => {
-                    const {city_id} = product;
-                    group[city_id] = group[city_id] ?? [];
-                    group[city_id].push(product);
-                    return group;
-                }, {});
-                Object.entries(this.groupByCategory[cityId]).forEach(function (item) {
-                    this.allTerminalsIds.push(item.terminal_id);
-                });
-                console.log(typeof this.groupByCategory[cityId])
             } else {
-                const index = this.data.addTerminalsOnClick.indexOf(value);
-                this.data.addTerminalsOnClick.splice(index, 1);
-                const abc = this.groupByCategory[cityId];
-                const index1 = abc.findIndex(x => x.terminal_id == value);
-                this.groupByCategory[cityId].splice(index1, 1);
+                const removeIndex = this.data.addTerminalsOnClick.findIndex(t => t.terminal_id == parseInt(value));
+                if (removeIndex !== -1) {
+                    this.data.addTerminalsOnClick.splice(removeIndex, 1);
+                }
             }
+            console.log(this.data.addTerminalsOnClick);
         },
 
         editTerminal(event, id) {
@@ -1075,6 +1072,7 @@ export default {
             if (name == "route") {
                 if (evt.target.value == "0") {
                     this.stepTwoAddSchedule = false;
+                    this.terminalNames = [];
                 } else {
                     this.stepTwoAddSchedule = true;
                     const resRoute = await this.callApi("post", "schedule/getCity", {
@@ -1101,6 +1099,7 @@ export default {
             this.data = {
                 addTerminalsOnClick: [],
             };
+            this.terminalNames = [];
             this.data.route = 0;
             this.data.busClass = 0;
             this.data.discount = 0;
@@ -1410,9 +1409,6 @@ export default {
 
         async edit(schedule) {
             this.dataEdit.schedules = schedule;
-            // const resEditSchedule = await this.callApi("post", "schedule/edit", schedule_id);
-            // this.dataEdit.compare_array = resEditSchedule.data.compare_array;
-            // this.dataEdit.cities = resEditSchedule.data.cities;
         },
 
         async genericData() {
@@ -1443,6 +1439,17 @@ export default {
                 this.fetchSchedule();
             }
         },
+        'data.addTerminalsOnClick': {
+            handler() {
+                this.terminalNames = this.data.addTerminalsOnClick.map(item => {
+                    const terminalObject = this.cities.find(terminal => {
+                        return terminal.terminal.some(t => t.id == item.terminal_id);
+                    });
+                    return terminalObject ? terminalObject.terminal.find(t => t.id == item.terminal_id).name : '';
+                });
+            },
+            deep: true
+        }
     },
 };
 </script>

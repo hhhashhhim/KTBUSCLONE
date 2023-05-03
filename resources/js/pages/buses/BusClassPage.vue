@@ -13,7 +13,6 @@
                                    :data-target="'#' + formID"
                                    class="btn btn-primary"
                                    @click="clearForm()"
-
                                 >
                                     Add Bus Class
                                 </a>
@@ -220,8 +219,8 @@
                                         this.data.seatMap[rowIndex][colIndex].seatNo ?? 'N/A'
                                     }}</small>
                                 <img
-                                    :data-toggle="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? 'modal' : ''"
-                                    :data-target="(this.data.seatMap[rowIndex][colIndex].reserved && !this.data.seatMap[rowIndex][colIndex].seatNo) ? '#addSeatNumber' : ''"
+                                    :data-toggle="(this.data.seatMap[rowIndex][colIndex].reserved) ? 'modal' : ''"
+                                    :data-target="(this.data.seatMap[rowIndex][colIndex].reserved) ? '#addSeatNumber' : ''"
                                     v-if="col.reserved"
                                     class="position-relative"
                                     :class="col.selected ? 'selected' : ''"

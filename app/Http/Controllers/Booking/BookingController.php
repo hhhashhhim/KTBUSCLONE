@@ -138,13 +138,19 @@ class BookingController extends Controller
                 $isPartial = 1;
             }
             if ($request->customerCNIC && $request->type == 'booked') {
-                $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+                $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->where('company_id', Auth::user()->company_id)->first();
+            } else if ($request->type == 'advance booking') {
+                $customer = Customer::where('contact', plainContactAndCnic($request->contact))->where('company_id', Auth::user()->company_id)->first();
             } else {
                 $customer = false;
             }
-
             // Fare Fetching About the Schedule
-            if (!$customer) {
+            if ($customer) {
+                $customer->name = $request->customerName;
+                $customer->cnic = is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC);
+                $customer->contact = plainContactAndCnic($request->contact);
+                $customer->save();
+            } else {
                 $customer = Customer::create([
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
@@ -153,6 +159,7 @@ class BookingController extends Controller
                     'contact' => plainContactAndCnic($request->contact),
                 ]);
             }
+
             // Getting Already Booked Tickets
             if ($request->date == date('Y-m-d')) {
                 $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
@@ -520,6 +527,30 @@ class BookingController extends Controller
         return [
             "checkDrop" => $found,
         ];
+    }
+
+
+    public function checkAssignedBus(Request $request)
+    {
+        $departureTime = ScheduleDetail::where(["schedule_id" => $request->scheduleId,
+            "departure_id" => $request->departureCity,
+            "destination_id" => $request->destinationCity,
+            "departure_date" => $request->date,
+            "company_id" => Auth::user()->company_id
+        ])->first();
+        $assignedBus = TicketClosing::where([
+            "schedule_id" => $request->scheduleId,
+            "schedule_date" => $request->date,
+            "schedule_time" => $departureTime->departure_time,
+            "schedule_start" => $request->departureCity,
+            "schedule_end" => $request->destinationCity,
+            'company_id' => Auth::user()->company_id,
+        ])->get();
+        if ($assignedBus->count() > 0) {
+            return response()->json([], 200);
+        } else {
+            return response()->json([], 204);
+        }
     }
 
     public function terminalSeats(Request $request)

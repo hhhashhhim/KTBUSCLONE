@@ -73,7 +73,7 @@
                                                     <button class="btn btn-primary mr-2"
                                                             @click="getSummeryReport('english')">Export Report
                                                     </button>
-                                                    <button class="btn btn-secondary mr-2"
+                                                    <button class="btn btn-outline-danger mr-2"
                                                             @click="getSummeryReport('urdu')">Export Report
                                                         (Urdu)
                                                     </button>

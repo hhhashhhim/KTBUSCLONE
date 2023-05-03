@@ -22,7 +22,7 @@
                                                             <th>Fix Commission</th>
                                                             <th>Flat Commission</th>
                                                             <th>Percentage Commission</th>
-                                                            <th>Adjustment Commission</th>
+                                                            <th>KT Commission</th>
                                                             <th style="width:200px">Action</th>
                                                         </tr>
                                                     </thead>
