@@ -45948,59 +45948,64 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context6.prev = _context6.next) {
               case 0:
                 if (!(name == "route")) {
-                  _context6.next = 11;
+                  _context6.next = 16;
                   break;
                 }
 
                 if (!(evt.target.value == "0")) {
-                  _context6.next = 6;
+                  _context6.next = 8;
                   break;
                 }
 
                 _this6.stepTwoAddSchedule = false;
                 _this6.terminalNames = [];
-                _context6.next = 11;
+                _this6.data.addTerminalsOnClick = [];
+                $("#routeTerminalName input:checkbox:checked").prop('checked', false);
+                _context6.next = 16;
                 break;
 
-              case 6:
+              case 8:
                 _this6.stepTwoAddSchedule = true;
-                _context6.next = 9;
+                _this6.terminalNames = [];
+                _this6.data.addTerminalsOnClick = [];
+                $("#routeTerminalName input:checkbox:checked").prop('checked', false);
+                _context6.next = 14;
                 return _this6.callApi("post", "schedule/getCity", {
                   id: _this6.data.route
                 });
 
-              case 9:
+              case 14:
                 resRoute = _context6.sent;
                 _this6.cities = resRoute.data;
 
-              case 11:
+              case 16:
                 if (!(name == "routeEdit")) {
-                  _context6.next = 22;
+                  _context6.next = 27;
                   break;
                 }
 
                 if (!(evt.target.value == "0")) {
-                  _context6.next = 16;
+                  _context6.next = 21;
                   break;
                 }
 
                 _this6.stepTwoAddSchedule = false;
-                _context6.next = 22;
+                _context6.next = 27;
                 break;
 
-              case 16:
+              case 21:
                 _this6.stepTwoAddSchedule = true;
-                _context6.next = 19;
+                _context6.next = 24;
                 return _this6.callApi("post", "schedule/getCity", {
                   id: _this6.dataEdit.route_id
                 });
 
-              case 19:
+              case 24:
                 resRouteEdit = _context6.sent;
                 _this6.cities = resRouteEdit.dataEdit;
                 _this6.terminals = resRouteEdit.dataEdit;
 
-              case 22:
+              case 27:
               case "end":
                 return _context6.stop();
             }
@@ -79611,10 +79616,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt/'
-//
 
-var url = '/';
+var url = '/kt/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

@@ -1073,8 +1073,13 @@ export default {
                 if (evt.target.value == "0") {
                     this.stepTwoAddSchedule = false;
                     this.terminalNames = [];
+                    this.data.addTerminalsOnClick = [];
+                    $("#routeTerminalName input:checkbox:checked").prop('checked', false);
                 } else {
                     this.stepTwoAddSchedule = true;
+                    this.terminalNames = [];
+                    this.data.addTerminalsOnClick = [];
+                    $("#routeTerminalName input:checkbox:checked").prop('checked', false);
                     const resRoute = await this.callApi("post", "schedule/getCity", {
                         id: this.data.route,
                     });
