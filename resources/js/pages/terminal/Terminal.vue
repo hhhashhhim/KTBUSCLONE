@@ -84,22 +84,32 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="name">Terminal Name In Urdu<span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="data.urdu_name" dir="rtl" placeholder="ٹرمینل نام">
+                        <input type="text" class="form-control" v-model="data.urdu_name" dir="rtl"
+                               placeholder="ٹرمینل نام">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4 mt-4 pt-3">
+                    <div class="form-group  mt-4 pt-3"
+                         :class=" !this.showDivComma && !this.showDivDash  ? 'col-md-6' : 'col-md-5' ">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="all" name="valueType"
+                                   checked="" value="all" v-model="data.seatNumberType"
+                                   @click="applyMask('all')">
+                            <label class="form-check-label" for="all">
+                                All
+                            </label>
+                        </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="comma_separated" name="valueType"
-                                   checked="" value="comma" v-model="dataCheck.seatNumberType"
-                                   @click="applyMaks('comma')">
+                                   value="comma" v-model="data.seatNumberType"
+                                   @click="applyMask('comma')">
                             <label class="form-check-label" for="comma_separated">
                                 Comma Separated
                             </label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="seat_range_dash" name="valueType"
-                                   value="dash" v-model="dataCheck.seatNumberType" @click="applyMaks('dash')">
+                                   value="dash" v-model="data.seatNumberType" @click="applyMask('dash')">
                             <label class="form-check-label" for="seat_range_dash">
                                 Seat Range
                             </label>
@@ -125,7 +135,8 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group"
+                         :class=" !this.showDivComma && !this.showDivDash  ? 'col-md-6' : 'col-md-3' ">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
                             class="form-control"
@@ -146,7 +157,8 @@
                         <label class="mt-4" for="is_online">Is Online Terminal</label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" id="is_online" class="colorinput-input" v-model="data.is_online"/>
+                                <input type="checkbox" id="is_online" class="colorinput-input"
+                                       v-model="data.is_online"/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
@@ -189,15 +201,6 @@
                             </span>
                         </label>
                     </div>
-                    <!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
-                    <!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
-                    <!--                        <label class="colorinput mx-3 mt-3">-->
-                    <!--                            <span>-->
-                    <!--                                <input type="checkbox" class="colorinput-input" v-model="data.is_main"/>-->
-                    <!--                                <span class="colorinput-color bg-primary"></span>-->
-                    <!--                            </span>-->
-                    <!--                        </label>-->
-                    <!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
@@ -232,24 +235,37 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4 mt-4 pt-3">
+                    <div class="form-group mt-4 pt-3"
+                         :class="dataEdit.allowed_type == 'all' ?  'col-md-6' : 'col-md-5'">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="editAll" name="editValueType"
+                                   value="all"
+                                   v-model="dataEdit.allowed_type"
+                                   v-bind:checked="dataEdit.allowed_type == 'all'"
+                                   @click="this.dataEdit.available_seats = ''">
+                            <label class="form-check-label" for="editAll">
+                                All
+                            </label>
+                        </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="editComma_separated" name="editValueType"
-                                   checked="" value="comma" v-model="dataEditCheck.seatNumberType"
-                                   @click="editApplyMaks('comma')">
+                                   value="comma" v-model="dataEdit.allowed_type"
+                                   v-bind:checked="dataEdit.allowed_type == 'comma'"
+                                   @click="this.dataEdit.available_seats = ''">
                             <label class="form-check-label" for="editComma_separated">
                                 Comma Separated
                             </label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="editSeat_range_dash" name="editValueType"
-                                   value="dash" v-model="dataEditCheck.seatNumberType" @click="editApplyMaks('dash')">
+                                   value="dash" v-model="dataEdit.allowed_type"
+                                   v-bind:checked="dataEdit.allowed_type == 'dash'" @click="this.dataEdit.available_seats = ''">
                             <label class="form-check-label" for="editSeat_range_dash">
                                 Seat Range
                             </label>
                         </div>
                     </div>
-                    <div class="form-group col-md-4" v-if="showEditDivComma">
+                    <div class="form-group col-md-4" v-if="dataEdit.allowed_type == 'comma'">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -259,7 +275,7 @@
                             :options="optionComma">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4" v-if="showEditDivDash">
+                    <div class="form-group col-md-4" v-if="dataEdit.allowed_type == 'dash'">
                         <label for="available_seats">Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -269,47 +285,7 @@
                             :options="optionDash">
                         </vue-mask>
                     </div>
-                    <!--                </div>-->
-                    <!--                <div class="row">-->
-                    <!--                    <div class="form-group col-md-3 mt-4 pt-3">-->
-                    <!--                        <div class="form-check form-check-inline">-->
-                    <!--                            <input class="form-check-input" type="radio" id="positive_edit_time" name="editTerminalTime"-->
-                    <!--                                   checked="" value="positiveTimeEdit" v-model="dataEditTime.time"-->
-                    <!--                                   @click="editApplyMaks('positive')">-->
-                    <!--                            <label class="form-check-label" for="positive_edit_time">-->
-                    <!--                                Positive-->
-                    <!--                            </label>-->
-                    <!--                        </div>-->
-                    <!--                        <div class="form-check form-check-inline">-->
-                    <!--                            <input class="form-check-input" type="radio" id="negative_edit_time" name="editTerminalTime"-->
-                    <!--                                   value="negativeTimeEdit" v-model="dataEditTime.time"-->
-                    <!--                                   @click="editApplyMaks('negative')">-->
-                    <!--                            <label class="form-check-label" for="negative_edit_time">-->
-                    <!--                                Negative-->
-                    <!--                            </label>-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-5" v-if="showEditDivPositive">-->
-                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-                    <!--                        <vue-mask-->
-                    <!--                            class="form-control"-->
-                    <!--                            v-model="dataEdit.time_difference"-->
-                    <!--                            mask="00:00"-->
-                    <!--                            :raw="false"-->
-                    <!--                            :options="optionsPositive">-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-5" v-if="showEditDivNegative">-->
-                    <!--                        <label for="time_difference">Time Difference ( eg HH:MM )</label>-->
-                    <!--                        <vue-mask-->
-                    <!--                            class="form-control"-->
-                    <!--                            v-model="dataEdit.time_difference"-->
-                    <!--                            mask="-00:00"-->
-                    <!--                            :raw="false"-->
-                    <!--                            :options="optionsNegative">-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
-                    <div class="form-group col-md-4">
+                    <div class="form-group" :class="dataEdit.allowed_type == 'all' ? 'col-md-6' : 'col-md-3'">
                         <label for="contact">Terminal Contact <span class="text-danger ml-1">*</span> </label>
                         <vue-mask
                             class="form-control"
@@ -330,7 +306,9 @@
                         <label class="mt-4" for="is_online">Is Online Terminal</label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
-                                <input type="checkbox" id="is_online" class="colorinput-input" v-model="dataEdit.is_online_terminal"  v-bind:checked="dataEdit.is_online_terminal == 1"/>
+                                <input type="checkbox" id="is_online" class="colorinput-input"
+                                       v-model="dataEdit.is_online_terminal"
+                                       v-bind:checked="dataEdit.is_online_terminal == 1"/>
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
@@ -374,15 +352,6 @@
                             </span>
                         </label>
                     </div>
-                    <!--                    <div class="form-group col-md-2 d-flex align-items-center">-->
-                    <!--                        <label class="mt-4" for="sms">Main Terminal</label>-->
-                    <!--                        <label class="colorinput mx-3 mt-3">-->
-                    <!--                            <span>-->
-                    <!--                                <input type="checkbox" class="colorinput-input" @change="checkBoxEdit($event)" v-bind:checked="dataEdit.is_main == 1"/>-->
-                    <!--                                <span class="colorinput-color bg-primary"></span>-->
-                    <!--                            </span>-->
-                    <!--                        </label>-->
-                    <!--                    </div>-->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
@@ -394,7 +363,7 @@
             <!--View Details Model-->
 
             <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel"
-                    aria-hidden="true">
+                 aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -455,13 +424,13 @@
                                                     <!--                                                        data-toggle="modal"-->
                                                     <!--                                                        @click="editTerminal(single)"-->
                                                     <router-link class="btn btn-success mx-2" title="Commission"
-                                                                    v-if="checkForSubmenuButtons('commission')"
-                                                                    :to="{ name:'terminal-commission', params: { id:single.id }}">
+                                                                 v-if="checkForSubmenuButtons('commission')"
+                                                                 :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                         <i class="fas fa-percent"></i>
                                                     </router-link>
                                                     <router-link class="btn btn-primary mx-2" title="Discount"
-                                                                    v-if="checkForSubmenuButtons('discount')"
-                                                                    :to="{ name:'terminal-discount', params: { id:single.id }}">
+                                                                 v-if="checkForSubmenuButtons('discount')"
+                                                                 :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                         <i class="fas fa-tag"></i>
                                                     </router-link>
                                                 </td>
@@ -474,7 +443,9 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -538,8 +509,6 @@ export default {
             deleteFormID: "delete_terminal_form",
             cities: [],
             permissions: [],
-            dataEditCheck: {},
-            dataCheck: {},
             dataTime: {},
             dataEditTime: {},
             data: {
@@ -562,6 +531,7 @@ export default {
                 commission: "",
                 flatCommission: "",
                 percentageCommission: "",
+                seatNumberType: "all",
             },
             dataEdit: {},
             success: false,
@@ -578,12 +548,12 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
-         this.fetchTerminals();
+        this.fetchTerminals();
         this.permissions = this.$store.state.permissions;
     },
 
     methods: {
-        closeModal(){
+        closeModal() {
             $("#detail-modal").click();
         },
         datatableReset: function () {
@@ -597,11 +567,13 @@ export default {
             } else {
                 this.dataEdit.is_main = 0;
             }
-
-            console.log(this.dataEdit.is_main);
         },
-        applyMaks: function (value) {
-            console.log(value, typeof value);
+        applyMask: function (value) {
+            this.data.available_seats = "";
+            if (value == 'all') {
+                this.showDivComma = false;
+                this.showDivDash = false;
+            }
             if (value == 'comma') {
                 this.showDivComma = true;
                 this.showDivDash = false;
@@ -610,48 +582,8 @@ export default {
                 this.showDivComma = false;
                 this.showDivDash = true;
             }
+        },
 
-            if (value == 'positive') {
-                this.showDivPositive = true;
-                this.showDivNegative = false;
-            }
-            if (value == 'negative') {
-                this.showDivPositive = false;
-                this.showDivNegative = true;
-            }
-        },
-        applyTimeMaks: function (value) {
-            console.log(value, typeof value);
-            if (value == 'positive') {
-                this.showDivPositive = true;
-                this.showDivNegative = false;
-            }
-            if (value == 'negative') {
-                this.showDivPositive = false;
-                this.showDivNegative = true;
-                if (this.dataTime.time == "negativeTime") {
-                    this.data.time_difference == "";
-                }
-            }
-        },
-        editApplyMaks: function (value) {
-            if (value == 'comma') {
-                this.showEditDivComma = true;
-                this.showEditDivDash = false;
-            }
-            if (value == 'dash') {
-                this.showEditDivComma = false;
-                this.showEditDivDash = true;
-            }
-            if (value == 'positive') {
-                this.showEditDivPositive = true;
-                this.showEditDivNegative = false;
-            }
-            if (value == 'negative') {
-                this.showEditDivPositive = false;
-                this.showEditDivNegative = true;
-            }
-        },
         clearForm: function () {
             this.data = {};
             this.data.city_id = 0;
@@ -659,8 +591,9 @@ export default {
             this.data.flatCommission = "";
             this.data.percentageCommission = "";
             this.dataTime.time = "positiveTime";
-            this.dataCheck.seatNumberType = "comma";
-            this.showDivComma = true;
+            this.data.seatNumberType = "all";
+            this.showDivComma = false;
+            this.showDivDash = false;
             this.showDivPositive = true;
         },
         async fetchTerminals() {
@@ -742,7 +675,7 @@ export default {
                 });
                 this.loading = false;
                 $("#terminal_table").DataTable().destroy();
-                 this.fetchTerminals();
+                this.fetchTerminals();
                 this.terminals = res.data
                 this.data = {};
                 this.data.city_id = 0;
@@ -767,6 +700,7 @@ export default {
             }
         },
         async editTerminal(single) {
+            console.log(single);
             this.dataEdit = single;
         },
         async terminalDetail(id) {
@@ -828,7 +762,7 @@ export default {
                 });
                 this.loading = false;
                 $("#terminal_table").DataTable().destroy();
-                 this.fetchTerminals();
+                this.fetchTerminals();
                 setTimeout(() => {
                     $("#edit-modal").modal("hide");
                 }, 3000);

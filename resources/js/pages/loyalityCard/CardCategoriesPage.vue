@@ -55,7 +55,7 @@
                                                         <th>Percentage Discount</th>
                                                         <th>Flat Discount</th>
                                                         <th>Points Type</th>
-                                                        <th>Points per Discount</th>
+                                                        <th>Points after KM's</th>
                                                         <th>Points In Flat</th>
                                                         <th>Added By</th>
                                                         <th v-if="checkForSubmenuButtons('edit-card-category')">Action</th>

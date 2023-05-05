@@ -320,6 +320,10 @@
                         "allow": true
                     },
                     {
+                        "name": "discount-field",
+                        "allow": true
+                    },
+                    {
                         "name": "bus-invoice",
                         "allow": true
                     },

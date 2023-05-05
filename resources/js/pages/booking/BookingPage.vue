@@ -64,10 +64,11 @@
                                                             <option value="0">Select Departure Time</option>
                                                             <option v-for="(schedule, i) in allSchedules"
                                                                     :value="schedule.schedule_id"
-                                                                    :disabled="disabledOptions.includes(schedule)"
+
                                                                     :key="i">
                                                                 {{ scheduleDropdown(schedule) }}
                                                             </option>
+                                                            <!--                                                            :disabled="disabledOptions.includes(schedule)"-->
                                                         </select>
                                                     </div>
                                                 </div>
@@ -257,7 +258,7 @@
                                                     <input
                                                         type="text" @keypress="isNumber($event)"
                                                         @keyup="calculateTotal()"
-                                                        readonly
+                                                        :readonly="!checkForSubmenuButtons('discount-field')"
                                                         class="form-control"
                                                         id="fareDiscount"
                                                         v-model="addForm.discount"
@@ -456,7 +457,16 @@
                                                     <span>Available: <span class="text-dark"
                                                                            style="font-weight: 700 !important">{{
                                                             this.totalSeatsAvailable
-                                                        }}</span></span>
+                                                        }}</span></span><br>
+                                                    <span>ELT:
+                                                        <button title="View ELT Details"
+                                                                data-target="#elt_detail_modal"
+                                                                data-toggle="modal"
+                                                                :disabled=" eltDetailsModel.length == 0 "
+                                                                class="btn-primary btn btn-sm">{{
+                                                                this.eltDetailsModel.length
+                                                            }}</button>
+                                                        </span><br>
                                                 </div>
                                                 <br>
                                             </div>
@@ -469,6 +479,58 @@
                 </div>
             </div>
         </div>
+
+        <!--        ELT Deatils MOdel-->
+        <div class="modal fade" id="elt_detail_modal" tabindex="-1" aria-labelledby="eltDetailModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">ELT Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closeEltDetail()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body m-1 p-1">
+                        <div class="card-body my-0 py-0">
+                            <!-- Table -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Sr No.</th>
+                                            <th>Customer Name</th>
+                                            <th>Seat No</th>
+                                            <th>ELT Weight</th>
+                                            <th>ELT Price</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="(single, i) in eltDetailsModel" :key="i">
+                                            <td>{{ i + 1 }}</td>
+                                            <td>{{ single.customer.name }}</td>
+                                            <td>{{ single.seat_no }}</td>
+                                            <td>{{ single.elt_weight }}</td>
+                                            <td>{{ single.elt_price }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- END TABLE -->
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeEltDetail()">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!--Add ELT -->
         <div class="modal fade" id="addELTModel" tabindex="0" aria-labelledby="addELTModelLabel" aria-hidden="true">
@@ -619,10 +681,11 @@
                                         v-model="rescheduleData.rescheduleSchedule">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
-                                            :disabled="disabledOptionsReschedule.includes(schedule)"
+
                                             :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
                                     </option>
                                 </select>
+                                <!--                                :disabled="disabledOptionsReschedule.includes(schedule)"-->
                             </div>
                             <div class="col-md-3">
                                 <label for="rescheduleReason" class="mb-0">Reason</label>
@@ -1137,6 +1200,7 @@ export default {
             detailsFormId: "details-modal",
             customers: [],
             sameDataMain: [],
+            eltDetailsModel: [],
             cancelData: {
                 percentage: 'first',
             },
@@ -1290,6 +1354,9 @@ export default {
         // modal close
         closeModal() {
             $(".modal").modal('hide');
+        },
+        closeEltDetail() {
+            $("#elt_detail_modal").click();
         },
         closeElt() {
             $("#addELTModel").modal('hide');
@@ -1855,12 +1922,26 @@ export default {
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
                 });
+                const responseEltDetails = await this.callApi("post", "booking/booked/seats/elt/detail", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                });
+
+                if (responseEltDetails.status == 200) {
+                    this.eltDetailsModel = responseEltDetails.data
+                } else if (responseEltDetails.status == 204) {
+                    this.eltDetailsModel = [];
+                }
+
+
                 if (terminalSeats.status == 200) {
                     this.allowedSeats = terminalSeats.data;
-                }
-                if (terminalSeats.status == 204) {
+                } else if (terminalSeats.status == 204) {
                     this.allowedSeats = 0;
                 }
+
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
@@ -2201,8 +2282,7 @@ export default {
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
-        }
-        ,
+        },
 
         getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
@@ -2215,7 +2295,7 @@ export default {
         ,
 
         getTitle: function (col) {
-            if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue') {
+            if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         }
@@ -2324,6 +2404,7 @@ export default {
                 this.label = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
+                this.pointsUsage = false;
                 this.ticketsIds = resTicket.data.ids;
                 this.addForm.date = resTicket.data.ticket[0].date;
                 this.addForm.terminalId = resTicket.data.authTerminalId;
@@ -2564,6 +2645,7 @@ export default {
             if (resOverIssue.status == 201) {
                 this.EltButton = false;
                 this.eltIds = resOverIssue.data.id
+                this.fetchScheduleData();
                 setTimeout(() => {
                     this.$refs.refElt.submit();
                 }, 700);

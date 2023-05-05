@@ -49,7 +49,9 @@ import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPag
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 
+
 // const url = '/kt/'
+//
 const url = '/'
 
 

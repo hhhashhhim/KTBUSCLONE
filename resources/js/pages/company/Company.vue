@@ -536,6 +536,7 @@ export default {
                                 {name: "assign-bus", allow: true},
                                 {name: "terminal-invoice", allow: true},
                                 {name: "terminal-id", allow: true},
+                                {name: "discount-field", allow: true},
                                 {name: "bus-invoice", allow: true},
                                 {name: "pax-list", allow: true},
                                 {name: "seat-details", allow: true},
@@ -864,7 +865,7 @@ export default {
         close() {
             $(`#${this.formID}`).click();
         },
-        editClose(){
+        editClose() {
             $(`#${this.editForm}`).click();
         },
         async fetchCompany() {

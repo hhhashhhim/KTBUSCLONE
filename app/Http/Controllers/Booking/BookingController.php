@@ -97,7 +97,6 @@ class BookingController extends Controller
                 if ($card->discount_type == 'percentage') {
                     $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
                     $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
-//                    $pointsDeductPercentage = (($request->pointsUseInput * $amountInPercent) / 100);
                     $cardAssign->update([
                         'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
                     ]);
@@ -110,6 +109,7 @@ class BookingController extends Controller
                     ]);
                 }
             }
+
 // loyalty card point addition
 
             if (!is_null($request->customerCNIC) && $request->usagePoints == true) {
@@ -202,6 +202,7 @@ class BookingController extends Controller
                     'discount_type' => $request->usagePoints ? 'card' : null,
                     'added_by' => Auth::user()->id,
                     'discount' => $request->discount ? $request->discount : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
+                    'points_usage' => $request->pointsUseInput / count($request->selectedSeats),
                 ]);
                 if ($isPartial == 1) {
                     TicketIsPartial::create([
@@ -546,6 +547,23 @@ class BookingController extends Controller
         }
     }
 
+    public function fetchELTDetails(Request $request)
+    {
+        $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
+            ->where("destination_id", $request->destinationCity)
+            ->where('schedule_id', $request->id)
+            ->where('departure_date', $request->date)
+            ->where('company_id', Auth::user()->company_id)
+            ->first();
+        $tickets = Ticket::where("schedule_date", $uniqueDate->schedule_date)->where("schedule_id", $uniqueDate->schedule_id)->pluck("id");
+        $eltTickets = TicketELT::with('customer:id,name')->whereIn("ticket_id", $tickets)->get();
+        if ($eltTickets) {
+            return $eltTickets;
+        } else {
+            return response()->json([], 204);
+        }
+    }
+
     public function terminalSeats(Request $request)
     {
         $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
@@ -871,6 +889,34 @@ class BookingController extends Controller
             'seat_no' => $request->seat_no,
 
         ])->first();
+        $ticketPoints = Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'date' => $request->date,
+            'schedule_id' => $request->schedule_id,
+            'customer_id' => $request->customer_id,
+            'departure_city_id' => $request->departure_id,
+            'destination_city_id' => $request->destination_id,
+        ])->withTrashed()->get();
+
+        //Deduct points reverse in case of cancellation
+        $customer = Customer::where('id', $ticket->customer_id)->first();
+        $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+        if ($checkCard) {
+            if ($checkCard->cardCategory->point_type == "flatPoints") {
+                $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
+            } else {
+                $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                $subPoint = $distance / $checkCard->cardCategory->point_distance;
+            }
+            $checkCard->decrement("starting_points", $subPoint / $ticketPoints->count());
+
+            $checkCard->increment("starting_points", $ticket->points_usage);
+        }
+
+        $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
+        if ($delElt) {
+            $delElt->delete();
+        }
         $ticket->update([
             'type' => 'canceled',
         ]);
