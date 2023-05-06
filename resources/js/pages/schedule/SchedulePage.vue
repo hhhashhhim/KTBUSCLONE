@@ -706,43 +706,43 @@
                 <!--                    class="section3"-->
                 <!--                    :class="editActiveSection != 'step2' ? 'd-none' : ''"-->
                 <!--                >-->
-                <!--                    <div class="row">-->
-                <!--                        <div class="col-md-6 class form-group">-->
-                <!--                            <label for="surcharge">Surcharge</label>-->
-                <!--                            <select-->
-                <!--                                class="form-control"-->
-                <!--                                id="surcharge"-->
-                <!--                                v-model="dataEdit.schedules.surcharge_id"-->
-                <!--                            >-->
-                <!--                                <option value="0" selected>Select Surcharge</option>-->
-                <!--                                <option-->
-                <!--                                    v-for="(surcharge, i) in editSurcharges"-->
-                <!--                                    :value="surcharge.id"-->
-                <!--                                    :key="i"-->
-                <!--                                > {{ surcharge.name }} - -->
-                <!--                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}-->
-                <!--                                </option>-->
-                <!--                            </select>-->
-                <!--                        </div>-->
-                <!--                        <div class="col-md-6 class form-group">-->
-                <!--                            <label for="discount">Discount</label>-->
-                <!--                            <select-->
-                <!--                                class="form-control"-->
-                <!--                                id="discount"-->
-                <!--                                v-model="dataEdit.schedules.discount_id"-->
-                <!--                            >-->
-                <!--                                <option value="0" selected>Select Discount</option>-->
-                <!--                                <option-->
-                <!--                                    v-for="(discount, i) in editDiscounts"-->
-                <!--                                    :value="discount.id"-->
-                <!--                                    :key="i"-->
-                <!--                                >-->
-                <!--                                    {{ discount.name }} - -->
-                <!--                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}-->
-                <!--                                </option>-->
-                <!--                            </select>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
+                                    <div class="row">
+                                        <div class="col-md-6 class form-group">
+                                            <label for="surcharge">Surcharge</label>
+                                            <select
+                                                class="form-control"
+                                                id="surcharge"
+                                                v-model="dataEdit.schedules.surcharge_id"
+                                            >
+                                                <option value="0" >-----None------</option>
+                                                <option
+                                                    v-for="(surcharge, i) in editSurcharges"
+                                                    :value="surcharge.id"
+                                                    :key="i"
+                                                > {{ surcharge.name }} -
+                                                    {{ surcharge.percentage != null ? surcharge.percentage + '%' : surcharge.flat }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 class form-group">
+                                            <label for="discount">Discount</label>
+                                            <select
+                                                class="form-control"
+                                                id="discount"
+                                                v-model="dataEdit.schedules.discount_id"
+                                            >
+                                                <option value="0">------None-----</option>
+                                                <option
+                                                    v-for="(discount, i) in editDiscounts"
+                                                    :value="discount.id"
+                                                    :key="i"
+                                                >
+                                                    {{ discount.name }} -
+                                                    {{ discount.percentage != null ? discount.percentage + '%' : discount.flat }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
                 <!--                    <div class="row">-->
                 <!--                        <div class="col-md-6">-->
                 <!--                            <button-->

@@ -72,7 +72,8 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <a style="display:none;" v-if="checkForSubmenuButtons('delete-user')"
+                                                            <a style="display:none;"
+                                                               v-if="checkForSubmenuButtons('delete-user')"
                                                                title="Delete User"
                                                                class="btn btn-danger text-light"
                                                             >
@@ -248,7 +249,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Update Terminal </h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                    @click="closeModal()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -274,7 +276,9 @@
                                     :disabled="loadingTerminal">
                                 {{ loadingTerminal ? 'Loading...' : 'Update Terminal' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -380,6 +384,18 @@
                             </option>
                         </select>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="role">Allowed Seats Check</label>
+                        <select
+                            type="text"
+                            class="form-control"
+                            id="role"
+                            v-model="dataEdit.check_allowed_seats"
+                        >
+                            <option value="0">Not Checked</option>
+                            <option value="1">Checked</option>
+                        </select>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button
@@ -388,7 +404,7 @@
                         @click="update()"
                         :disabled="this.loadingUpdate"
                     >
-                        Update User
+                        {{ this.loadingUpdate ? "Loading..." : "Update User" }}
                     </button>
                 </template>
             </Edit>
@@ -474,7 +490,7 @@ export default {
     },
 
     methods: {
-        closeModal(){
+        closeModal() {
             $(".modal").click();
         },
         phoneFormat: function (string) {

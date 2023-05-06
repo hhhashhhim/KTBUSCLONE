@@ -12,11 +12,13 @@ use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
 use App\Models\City;
+use App\Models\Discount\Discount;
 use App\Models\LoyaltyCard\CardAssign;
 use App\Models\LoyaltyCard\CardCategory;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
+use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalCommission;
 use App\Models\Customer;
@@ -567,7 +569,7 @@ class BookingController extends Controller
     public function terminalSeats(Request $request)
     {
         $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
-        if (!is_null($seats)) {
+        if (!is_null($seats) &&  Auth::user()->check_allowed_seats == 1) {
             if (strpos($seats, '-') !== false) {
                 $rangeSeats = explode("|", str_replace(',', '|', $seats));
                 $output = [];
@@ -611,10 +613,11 @@ class BookingController extends Controller
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
-            ->select('id', 'route_id', 'bus_class_id', 'time')
+            ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
-
+        $scheduleDiscount = Discount::where('id', $schedule->discount_id)->where('is_active', 1)->first();
+        $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)
             ->get()->unique('fare_class');
@@ -638,6 +641,24 @@ class BookingController extends Controller
                 if ($column['reserved']) {
                     $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                     $seatMap[$i][$j]['fare'] = (int)$data->fare;
+                    if ($scheduleDiscount) {
+                        if ($scheduleDiscount->type == "percentage") {
+                            $number = $scheduleDiscount->percentage / 100;
+                            $percentage = (int)$data->fare * $number;
+                            $seatMap[$i][$j]['fare'] = round((int)$data->fare - $percentage);
+                        } else {
+                            $seatMap[$i][$j]['fare'] = (int)$data->fare - (int)$scheduleDiscount->flat;
+                        }
+                    }
+                    if ($scheduleSurcharge) {
+                        if ($scheduleSurcharge->type == "percentage") {
+                            $number = $scheduleSurcharge->percentage / 100;
+                            $percentage = (int)$data->fare * $number;
+                            $seatMap[$i][$j]['fare'] = round((int)$data->fare + $percentage);
+                        } else {
+                            $seatMap[$i][$j]['fare'] = (int)$data->fare + $scheduleSurcharge->flat;
+                        }
+                    }
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
                 if ($result !== false) {   /*&& $leavingIn30Min != true*/
@@ -707,7 +728,26 @@ class BookingController extends Controller
                         ], 422);
                     }
                     if ($class) {
-                        $seatMap[$i][$j]['fare'] = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                        $fare = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                        $seatMap[$i][$j]['fare'] = $fare;
+                        if ($scheduleDiscount) {
+                            if ($scheduleDiscount->type == "percentage") {
+                                $number = $scheduleDiscount->percentage / 100;
+                                $percentage = $fare * $number;
+                                $seatMap[$i][$j]['fare'] = round($fare - $percentage);
+                            } else {
+                                $seatMap[$i][$j]['fare'] = $fare - (int)$scheduleDiscount->flat;
+                            }
+                        }
+                        if ($scheduleSurcharge) {
+                            if ($scheduleSurcharge->type == "percentage") {
+                                $number = $scheduleSurcharge->percentage / 100;
+                                $percentage = $fare * $number;
+                                $seatMap[$i][$j]['fare'] = round($fare + $percentage);
+                            } else {
+                                $seatMap[$i][$j]['fare'] = $fare + $scheduleSurcharge->flat;
+                            }
+                        }
                     }
                 }
             }
@@ -1143,6 +1183,16 @@ class BookingController extends Controller
         $remainData = ['passengerCount' => $countPassenger, 'actualDepart' => $actualDeparture, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'scheduleName' => $scheduleName, 'busNo' => $busNo];
         return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup, 'remain' => $remainData]);
     }
+
+    public function fetchScheduleSurchargeDiscount(Request $request)
+    {
+        return Schedule::with(['surcharge' => function ($q) {
+            $q->where('is_active', 1);
+        }])->with(['discount' => function ($q) {
+            $q->where('is_active', 1);
+        }])->where(['id' => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first(['id', 'discount_id', 'surcharge_id']);
+    }
+
 }
 
 

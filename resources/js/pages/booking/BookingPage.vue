@@ -467,6 +467,14 @@
                                                                 this.eltDetailsModel.length
                                                             }}</button>
                                                         </span><br>
+                                                    <span>Discount: <span class="text-dark"
+                                                                          style="font-weight: 700 !important">{{
+                                                            this.appliedDiscount
+                                                        }}</span></span><br>
+                                                    <span>Surcharge: <span class="text-dark"
+                                                                           style="font-weight: 700 !important">{{
+                                                            this.appliedSurcharge
+                                                        }}</span></span>
                                                 </div>
                                                 <br>
                                             </div>
@@ -1293,6 +1301,8 @@ export default {
             hideCheckBox: false,
             pointsCardId: "",
             ticketsId: "",
+            appliedSurcharge: "",
+            appliedDiscount: "",
             pointsValidation: "",
             pointsUsage: "",
             checkedUsagePoints: false,
@@ -1922,6 +1932,9 @@ export default {
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
                 });
+                const resFetchDiscountSurcharge = await this.callApi("post", "booking/discount/surcharge/fetch", {
+                    schedule_id: this.addForm.schedule,
+                });
                 const responseEltDetails = await this.callApi("post", "booking/booked/seats/elt/detail", {
                     id: this.addForm.schedule,
                     date: this.addForm.date,
@@ -1934,7 +1947,11 @@ export default {
                 } else if (responseEltDetails.status == 204) {
                     this.eltDetailsModel = [];
                 }
-
+                // Fetch Discount and Surcharge  against schedule
+                if (resFetchDiscountSurcharge.status == 200) {
+                    this.appliedDiscount = resFetchDiscountSurcharge.data.discount ? (resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat) : 'N/A';
+                    this.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? (resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat) : 'N/A';
+                }
 
                 if (terminalSeats.status == 200) {
                     this.allowedSeats = terminalSeats.data;

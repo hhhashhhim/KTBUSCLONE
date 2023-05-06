@@ -162,6 +162,8 @@ class ScheduleController extends Controller
             'start_date' => $req['start_date'],
             'end_date' => $req['end_date'],
             'time' => $req['time'],
+            'surcharge_id' => $req['surcharge_id'],
+            'discount_id' => $req['discount_id'],
             'updated_by' => Auth::user()->id,
         ]);
     }
@@ -187,9 +189,9 @@ class ScheduleController extends Controller
             $data[] = $routeFare->destination_city_id;
         }
         $data = collect($data)->unique();
-        return City::with(['terminal'=>function($q){
-            $q->where("is_online_terminal",null);
-            return $q->orWhere("is_online_terminal",0);
+        return City::with(['terminal' => function ($q) {
+            $q->where("is_online_terminal", null);
+            return $q->orWhere("is_online_terminal", 0);
         }])->whereIn('id', $data)->get();
     }
 
@@ -285,11 +287,11 @@ class ScheduleController extends Controller
 
     public function surchargeSelective()
     {
-        return Surcharge::where('company_id', Auth::user()->company_id)->get();
+        return Surcharge::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
     }
 
     public function discountSelective()
     {
-        return Discount::where('company_id', Auth::user()->company_id)->get();
+        return Discount::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
     }
 }

@@ -73,6 +73,7 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
+
         $this->validate($request, [
             'name' => 'required',
             'email' => 'bail|required|email|unique:users,email,' . $request->id,
@@ -88,6 +89,7 @@ class UserController extends Controller
             'terminal_id' => $request->terminal_id,
             'destination_city_ids' => json_encode($request->destination_city_ids),
             'departure_city_ids' => json_encode($request->departure_city_ids),
+            'check_allowed_seats' => $request->check_allowed_seats,
             'company_id' => Auth::user()->company_id,
         ]);
         if ($request->password != "") {
