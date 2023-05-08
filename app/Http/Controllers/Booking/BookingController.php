@@ -569,7 +569,7 @@ class BookingController extends Controller
     public function terminalSeats(Request $request)
     {
         $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
-        if (!is_null($seats) &&  Auth::user()->check_allowed_seats == 1) {
+        if (!is_null($seats) && Auth::user()->check_allowed_seats == 1) {
             if (strpos($seats, '-') !== false) {
                 $rangeSeats = explode("|", str_replace(',', '|', $seats));
                 $output = [];
@@ -1005,9 +1005,22 @@ class BookingController extends Controller
         foreach ($passengerData as $passenger) {
             $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
         }
-        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission];
+
+        $refunds = Ticket::with('cancel_ticket:ticket_id,percentage')->where([
+            'company_id' => Auth::user()->company_id,
+            'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $uniqueDate,
+        ])->onlyTrashed()->get(['id', 'seat_fare', 'discount']);
+        $refundData = 0;
+        foreach ($refunds as $single) {
+            $percentageValue = ((int)$single->seat_fare - (int)$single->discount) * $single->cancel_ticket->percentage;
+            $final = $percentageValue / 100;
+            $refundData += $final;
+        }
+        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
-//            return  $passengerData;
+
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'format' => $format]);
     }
 

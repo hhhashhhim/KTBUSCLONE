@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\BusClass;
+use App\Models\CounterExpense;
 use App\Models\Route\Route;
 use App\Models\Schedule\Schedule;
 use App\Models\Terminal;
@@ -60,10 +61,8 @@ class AdvanceSalesReportController extends Controller
 
         // return $tickets;
         $sortData = [];
-        foreach($tickets as $outer)
-        {
-            foreach($outer as $inner)
-            {
+        foreach ($tickets as $outer) {
+            foreach ($outer as $inner) {
                 $single = [];
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
@@ -71,14 +70,10 @@ class AdvanceSalesReportController extends Controller
                 $single['user'] = $inner[0]->addedBy->name;
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                 $eltSum = 0;
-                foreach($inner as $tkt)
-                {
-                    if($tkt->ticketElt)
-                    {
+                foreach ($inner as $tkt) {
+                    if ($tkt->ticketElt) {
                         $eltSum += $tkt->ticketElt->elt_price;
-                    }
-                    else
-                    {
+                    } else {
                         $eltSum += 0;
                     }
 
@@ -112,19 +107,38 @@ class AdvanceSalesReportController extends Controller
             $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
             $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
             $final = $percentageValue / 100;
-            $q->amount_refund = (int)$q->seat_fare - $final;
-            $q->cancelation_charges = $final;
+            $q->amount_refund = round((int)$q->seat_fare - $final);
+            $q->cancelation_charges = round($final);
             unset($q->cancel_ticket, $q->schedule);
         });
-        $$refundTickets = $refundTickets->when($request->fromDate, function ($query) use ($request) {
+        $refundTickets = $refundTickets->when($request->fromDateTime, function ($query) use ($request) {
             return $query->where('bus_time', '>=', $request->fromDateTime);
-        })->when($request->toDate, function ($query) use ($request) {
+        })->when($request->toDateTime, function ($query) use ($request) {
             return $query->where('bus_time', '<=', $request->toDateTime);
         });
+        // Counter expenses data
+        if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
+            $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
+                ->when($request->terminal, function ($query) use ($request) {
+                    return $query->where('terminal_id', $request->terminal);
+                })
+                ->when($request->user, function ($query) use ($request) {
+                    return $query->where('added_by', $request->user);
+                })
+                ->when($request->fromDateTime, function ($query) use ($request) {
+                    return $query->where('time', '>=', $request->fromDateTime);
+                })
+                ->when($request->toDateTime, function ($query) use ($request) {
+                    return $query->where('time', '<=', $request->toDateTime);
+                })
+                ->get();
+        }
+
 
         return [
             'record' => $sortData,
             'refund' => $refundTickets,
+            'counterExpenses' => $counterexpenses ?? [],
         ];
 
     }
