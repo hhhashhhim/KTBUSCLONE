@@ -1,19 +1,25 @@
-/node_modules
-/vendor
-/storage
-/.laravel.log
-/.env
-/.env.backup
-/.env.*.php
-/.env.php
-/.env-production
-/.env.dusk.local
-/.phpunit.result.cache
-docker-compose.override.yml
-Homestead.json
-Homestead.yaml
+# Ignore vendor folder
+/vendor/
+
+# Ignore node_modules folder
+/node_modules/
+
+# Ignore compiled assets
+/public/js/
+/public/css/
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore the Laravel Mix config file
+webpack.mix.js
+
+# Ignore the NPM debug log file
 npm-debug.log
-yarn-error.log
+
+# Ignore the PHPUnit code coverage folder
+/coverage/
+#code editor olders
 /.idea
 /.vscode
-/resources/js/routes.js

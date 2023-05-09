@@ -84,7 +84,7 @@
 <div id="info">
     <div class="companyname"><span>Kainat Travels</span></div>
     <div class="companyAddress">
-        <span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
+        <span>{{ isset($data['format']->address) ? $data['format']->address : auth()->user()->terminal->address}}</span>
         <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
         <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span>
         </div>

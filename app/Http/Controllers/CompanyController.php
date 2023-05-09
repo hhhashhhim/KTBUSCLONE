@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CompanyController extends Controller
 {
@@ -19,10 +20,10 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required | unique:companies',
+            'name' => ['required', Rule::unique('companies', 'name')],
             'contact' => 'required',
             'userName' => 'required',
-            'email' => 'required | unique:users',
+            'email' => ['required|email', Rule::unique('users', 'email')],
             'password' => 'required',
         ]);
 
@@ -60,13 +61,10 @@ class CompanyController extends Controller
 
     public function logoUpload(Request $request)
     {
-        if($request->logo)
-        {
+        if ($request->logo) {
             $name = $this->image($request->logo);
             return response(['name' => $name], 200);
-        }
-        else
-        {
+        } else {
             return;
         }
 
@@ -77,6 +75,7 @@ class CompanyController extends Controller
         $request->validate([
             'name' => 'required',
             'contact' => 'required',
+            'email' => 'required|email',
         ]);
         Company::find($request->id)->update([
             'name' => $request->name,
@@ -86,8 +85,7 @@ class CompanyController extends Controller
             'modules' => $request->modules,
             'added_by' => auth()->user()->id,
         ]);
-        if($request->logo)
-        {
+        if ($request->logo) {
             Company::find($request->id)->update([
                 'logo' => $request->logo,
             ]);
@@ -97,8 +95,7 @@ class CompanyController extends Controller
             'contact' => plainContactAndCnic($request->contact),
             'email' => $request->email,
         ]);
-        if($request->password)
-        {
+        if ($request->password) {
             User::where('company_id', $request->id)->first()->update([
                 'password' => Hash::make($request->password),
             ]);
@@ -135,7 +132,7 @@ class CompanyController extends Controller
         $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)
             . "_" . time() . '.' . $image->extension();
         $image->move(public_path('uploads/company/logo/'), $imageName);
-            return $imageName;
+        return $imageName;
     }
 
 }

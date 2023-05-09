@@ -388,7 +388,7 @@
                 ]
             },
             {
-                "name": "all",
+                "name": "all-booking",
                 "allow": true
             },
             {

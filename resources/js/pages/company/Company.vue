@@ -109,7 +109,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="email">Email <span class="text-danger ml-1">*</span></label>
-                            <input type="text" class="form-control" placeholder="Enter Email" id="email"
+                            <input type="email" class="form-control" placeholder="email@address.com" id="email"
                                    v-model="data.email" autocomplete="off"/>
                         </div>
                         <div class="form-group col-md-4">
@@ -220,7 +220,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="email">Email</label>
-                            <input type="text" class="form-control" placeholder="Enter Email" id="email"
+                            <input type="email" class="form-control" placeholder="email@address.com" id="email"
                                    v-model="dataEdit.email"/>
                         </div>
                         <div class="form-group col-md-4">
@@ -559,7 +559,7 @@ export default {
                                 {name: "edit-close-booking", allow: true},
                             ]
                         },
-                        {name: "all", allow: true},
+                        {name: "all-booking", allow: true},
                         {
                             name: "counter-expenses",
                             allow: true,
