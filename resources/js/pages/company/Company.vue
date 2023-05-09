@@ -559,7 +559,15 @@ export default {
                                 {name: "edit-close-booking", allow: true},
                             ]
                         },
-                        {name: "all", allow: true}
+                        {name: "all", allow: true},
+                        {
+                            name: "counter-expenses",
+                            allow: true,
+                            buttons: [
+                                {name: "add-counter-expenses", allow: true},
+                                {name: "edit-counter-expenses", allow: true},
+                            ]
+                        },
                     ],
                 },
                 //Loyalty Card Panel

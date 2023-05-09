@@ -8,8 +8,7 @@
                             <h4>Counter Expenses</h4>
                             <div class="card-header-action">
                                 <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
-                                   class="btn btn-primary">
-                                    <!--                                    v-if="checkForSubmenuButtons('add-counter-expenses')"-->
+                                   class="btn btn-primary" v-if="checkForSubmenuButtons('add-counter-expenses')">
                                     Add Counter Expenses
                                 </a>
                             </div>
@@ -19,7 +18,6 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
-
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table table-striped table-hover"
@@ -29,7 +27,7 @@
                                                         <th>Sr No.</th>
                                                         <th>Amount</th>
                                                         <th>Narration</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-counter-expenses')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -37,8 +35,8 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ single.amount }}</td>
                                                         <td>{{ single.narration }}</td>
-                                                        <td>
-                                                            <button
+                                                        <td v-if="checkForSubmenuButtons('edit-counter-expenses')">
+                                                            <button v-if="checkForSubmenuButtons('edit-counter-expenses')"
                                                                 title="Edit Expenses" :data-target="'#' + editFormID"
                                                                 data-toggle="modal" @click="edit(single)"
                                                                 class=" text-light btn btn-primary mx-1">
