@@ -11,21 +11,6 @@ use Illuminate\Validation\Rule;
 
 class CityController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware(function ($request, $next) {
-    //         $urlName =  request()->segment(count(request()->segments()));
-    //         foreach (Auth::user()->role->permissions as $key => $single) {
-    //             foreach ($single['childs'] as $index => $item) {
-    //                 if ($item['name']  == $urlName && !$item['allow']) {
-    //                     return response()->json(['error' => 'Not authorized.'], 403);
-    //                 } else {
-    //                     return $next($request);
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
     public function index()
     {
         return City::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();

@@ -1,10 +1,16 @@
 <?php
 
 use App\Http\Controllers\Booking\BookingController;
+use App\Http\Controllers\Booking\CounterExpensesController;
 use App\Http\Controllers\Schedule\ScheduleClosingController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::group(['prefix' => 'counter/expenses', [CustomMiddleware::class]], function () {
+    Route::post('/', [CounterExpensesController::class, 'index']);
+    Route::post('/store', [CounterExpensesController::class, 'store']);
+    Route::post('/update', [CounterExpensesController::class, 'update']);
+});
 Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/cities', [BookingController::class, 'cities']);

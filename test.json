@@ -390,7 +390,78 @@
             {
                 "name": "all",
                 "allow": true
+            },
+            {
+                "name": "all",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "assign-bus",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-id",
+                        "allow": true
+                    },
+                    {
+                        "name": "discount-field",
+                        "allow": true
+                    },
+                    {
+                        "name": "bus-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "pax-list",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details",
+                        "allow": true
+                    },
+                    {
+                        "name": "drop-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details-shortcut",
+                        "allow": true
+                    },
+                    {
+                        "name": "advance-booking",
+                        "allow": true
+                    },
+                    {
+                        "name": "duplicate-ticket",
+                        "allow": true
+                    },
+                    {
+                        "name": "resend-sms",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-elt",
+                        "allow": true
+                    },
+                    {
+                        "name": "reschedule-seats",
+                        "allow": true
+                    },
+                    {
+                        "name": "overissue-seat",
+                        "allow": true
+                    },
+                    {
+                        "name": "cancel-ticket",
+                        "allow": true
+                    }
+                ]
             }
+
         ]
     },
     {

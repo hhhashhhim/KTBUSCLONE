@@ -138,13 +138,50 @@
                                                                 <th colspan="4"></th>
                                                                 <th>{{ refundTotalSeats() ?? 0 }}</th>
                                                                 <th>{{ refundTotal() ?? 0 }}</th>
-                                                                <th>{{ refundTotalCharges()  ?? 0}}</th>
+                                                                <th>{{ refundTotalCharges() ?? 0 }}</th>
                                                                 <th colspan="3"></th>
                                                             </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
+
+                                                <!--                                                Refund -->
+                                                <div class="col-md-12 text-center">
+                                                    <div class="my-1">
+                                                        <h3 class="text-mute">Counter Expenses</h3>
+                                                    </div>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped table-hover"
+                                                               style="  border: 3px solid #b9b9b9">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>Sr No.</th>
+                                                                <th>Terminal Name</th>
+                                                                <th>Amount</th>
+                                                                <th>Narration</th>
+                                                                <th> Added By</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <tr v-for="(single,i) in filters.counterExpenses" :key="i">
+                                                                <td>{{ i + 1 }}</td>
+                                                                <td>{{ single.terminal.name }}</td>
+                                                                <td>{{ single.amount }}</td>
+                                                                <td>{{ single.narration }}</td>
+                                                                <td>{{ single.added_by.name }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th colspan="2"></th>
+                                                                <th>{{ totalCounterAmount() ?? 0 }}</th>
+                                                                <th colspan="2"></th>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+
                                                 <div class="col-md-12 text-center">
                                                     <div class="my-1">
                                                         <h3 class="text-mute">Cash Details</h3>
@@ -153,34 +190,38 @@
                                                         <table class="table table-striped table-hover"
                                                                style="  border: 3px solid #b9b9b9">
                                                             <tbody>
-<!--                                                            <tr>-->
-<!--                                                                <th style="width: 75% !important;">CASH ON BANK</th>-->
-<!--                                                                <td style="width: 25% !important;">0</td>-->
-<!--                                                            </tr>-->
                                                             <tr>
                                                                 <th style="width: 75% !important;">CASH ON COUNTER</th>
-                                                                <td style="width: 25% !important;">{{ totalSeatFare() ?? 0 }}</td>
+                                                                <td style="width: 25% !important;">
+                                                                    {{ totalSeatFare() ?? 0 }}
+                                                                </td>
                                                             </tr>
                                                             <tr>
                                                                 <th style="width: 75% !important;">TOTAL ELT</th>
-                                                                <td style="width: 25% !important;">{{ totalEltFare() ?? 0 }}</td>
+                                                                <td style="width: 25% !important;">
+                                                                    {{ totalEltFare() ?? 0 }}
+                                                                </td>
                                                             </tr>
                                                             <tr>
                                                                 <th style="width: 75% !important;">TOTAL REFUND</th>
-                                                                <td style="width: 25% !important;">{{ refundTotal() ?? 0 }}</td>
+                                                                <td style="width: 25% !important;">{{
+                                                                        refundTotal() ?? 0
+                                                                    }}
+                                                                </td>
                                                             </tr>
                                                             <tr>
-                                                                <th style="width: 75% !important;">TOTAL CANCELATION
+                                                                <th style="width: 75% !important;">TOTAL CANCELLATION
                                                                     CHARGES
                                                                 </th>
-                                                                <td style="width: 25% !important;">{{ refundTotalCharges() ?? 0}}</td>
+                                                                <td style="width: 25% !important;">
+                                                                    {{ refundTotalCharges() ?? 0 }}
+                                                                </td>
                                                             </tr>
-<!--                                                            <tr>-->
-<!--                                                                <th style="width: 75% !important;">TOTAL CASH ON-->
-<!--                                                                    COUNTER-->
-<!--                                                                </th>-->
-<!--                                                                <td style="width: 25% !important;">{{ totalSeatFare() }}</td>-->
-<!--                                                            </tr>-->
+                                                            <tr>
+                                                                <th style="width: 75% !important;">Total Counter Expenses
+                                                                </th>
+                                                                <td style="width: 25% !important;">{{ totalCounterAmount() ?? 0 }}                                                                </td>
+                                                            </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -245,6 +286,7 @@ export default {
             if (resFetchData.status == 200) {
                 this.filters.record = resFetchData.data.record;
                 this.filters.refund = resFetchData.data.refund;
+                this.filters.counterExpenses = resFetchData.data.counterExpenses;
             }
 
         },
@@ -278,6 +320,14 @@ export default {
                 }, 0)
             }
         },
+        // Counter amount
+        totalCounterAmount: function () {
+            if (this.filters.counterExpenses) {
+                return this.filters.counterExpenses.reduce((sum, single) => {
+                    return sum += single.amount;
+                }, 0)
+            }
+        },
         refundTotal: function () {
             if (this.filters.refund) {
                 return this.filters.refund.reduce((sum, single) => {
@@ -285,11 +335,11 @@ export default {
                 }, 0)
             }
         },
-        refundTotalSeats: function () {
-            if (this.filters.refund) {
-                return this.filters.refund.length;
+            refundTotalSeats: function () {
+                if (this.filters.refund) {
+                    return this.filters.refund.length;
+                }
             }
-        }
 
     },
 

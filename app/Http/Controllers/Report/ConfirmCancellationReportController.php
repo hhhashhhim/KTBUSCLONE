@@ -37,7 +37,7 @@ class ConfirmCancellationReportController extends Controller
             $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
             $final = $percentageValue / 100;
             $q->amount_refund = (int)$q->seat_fare - $final;
-            $q->cancelation_charges = $final;
+            $q->cancelation_charges = round($final);
             $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)), $q->cancel_ticket->time);
             unset($q->cancel_ticket, $q->schedule);
         });
