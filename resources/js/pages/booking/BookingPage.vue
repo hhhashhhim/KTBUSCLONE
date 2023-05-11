@@ -719,31 +719,45 @@
                                 <div class="d-flex justify-content-center seat-img p-0 m-0"
                                      v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
                                     <div v-for="(col, colIndex) in record" :key="colIndex">
-                                        <div
-                                            v-if="col.reserved"
-                                            class="image-span d-block text-center text-white shadow"
-                                            @click="reScheduleSelectSeat(rowIndex, colIndex, col)"
-                                            :class="getClassesReschedule(col)"
-                                            :title="getTitle(col)"
-                                            :style="{border:'2px solid ' + col.color + ' !important',}"
-                                        >
-                                            <small>{{ col.seatNo }} </small>
-                                            <br/>
-                                            <small v-if="col.type && col.type == 'booked'">
-                                                <i class="type-icons fas fa-check-double">
-                                                </i>
-                                            </small>
-                                            <small v-if="col.type && col.type == 'advance booking'">
-                                                <i class="type-icons fas fa-check">
-                                                </i>
-                                            </small>
-                                            <small v-if="col.type && col.type == 'over-issue'">
-                                                <i class="type-icons far fa-hand-paper text-light">
-                                                </i>
-                                            </small>
-                                            <small v-if="col.type && col.type == 'not_for_sale'">
-                                                <i class="fas fa-minus-circle text-light"></i>
-                                            </small>
+                                        <div v-if="col.reserved">
+                                            <div
+                                                v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
+                                                class="image-span d-block text-center text-white shadow"
+                                                @click="reScheduleSelectSeat(rowIndex, colIndex, col)"
+                                                :class="getClassesReschedule(col)"
+                                                :title="getTitle(col)"
+                                                :style="{border:'2px solid ' + col.color + ' !important',}"
+                                            >
+                                                <small>{{ col.seatNo }} </small>
+                                                <br/>
+                                                <small v-if="col.type && col.type == 'booked'">
+                                                    <i class="type-icons fas fa-check-double">
+                                                    </i>
+                                                </small>
+                                                <small v-if="col.type && col.type == 'advance booking'">
+                                                    <i class="type-icons fas fa-check">
+                                                    </i>
+                                                </small>
+                                                <small v-if="col.type && col.type == 'over-issue'">
+                                                    <i class="type-icons far fa-hand-paper text-light">
+                                                    </i>
+                                                </small>
+                                                <small v-if="col.type && col.type == 'not_for_sale'">
+                                                    <i class="fas fa-minus-circle text-light"></i>
+                                                </small>
+                                            </div>
+                                            <div v-else
+                                                 class="image-span d-block text-center text-white shadow"
+                                                 :class="getClasses(col)"
+                                                 :title="getTitle(col)"
+                                                 style="pointer-events: none !important; background-color: #444444 !important;"
+                                            >
+                                                <small>{{ col.seatNo }}</small>
+                                                <br/>
+                                                <small>
+                                                    <i class="type-icons fa fa-times text-danger"></i>
+                                                </small>
+                                            </div>
                                         </div>
                                         <span v-else></span>
                                     </div>
@@ -2304,19 +2318,17 @@ export default {
         getClassesReschedule: function (col) {
             let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
             let selected = col.alreadyBooked ? "selected" : "";
-            let partial = col.partial ? "partial" : "";
+            let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
             return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
-        }
-        ,
+        },
 
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
-        }
-        ,
+        },
 
         getStyle: function (col) {
             let disabledSeat = col.type == 'not_for_sale' ? 'pointer-events: none;' : '';

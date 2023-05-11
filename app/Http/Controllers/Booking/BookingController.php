@@ -342,6 +342,18 @@ class BookingController extends Controller
                 'added_by' => Auth::user()->id,
             ]);
             $old_ticket = Ticket::where('id', $ticket['id'])->first();
+            $eltTicket = TicketELT::where(['company_id' => Auth::user()->company_id, 'ticket_id' => $ticket['id']])->first();
+            if($eltTicket) {
+                $eltTicket->ticket_id = $newTicket->id;
+                $eltTicket->customer_id = $newTicket->customer_id;
+                $eltTicket->departure_city = $newTicket->departure_city_id;
+                $eltTicket->destination_city = $newTicket->destination_city_id;
+                $eltTicket->seat_no = $newTicket->seat_no;
+                $eltTicket->schedule_id = $newTicket->schedule_id;
+                $eltTicket->seat_fare = $newTicket->seat_fare;
+                $eltTicket->date = $newTicket->date;
+                $eltTicket->save();
+            }
             $old_ticket->update([
                 'type' => 'reschedule'
             ]);
@@ -1014,13 +1026,12 @@ class BookingController extends Controller
         ])->onlyTrashed()->get(['id', 'seat_fare', 'discount']);
         $refundData = 0;
         foreach ($refunds as $single) {
-            $percentageValue = ((int)$single->seat_fare - (int)$single->discount) * $single->cancel_ticket->percentage;
+            $percentageValue = ((int)$single->seat_fare - (int)$single->discount) * (is_null($single->cancel_ticket) ? 0 : $single->cancel_ticket->percentage);
             $final = $percentageValue / 100;
             $refundData += $final;
         }
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
-
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'format' => $format]);
     }
 
@@ -1060,7 +1071,7 @@ class BookingController extends Controller
             'tickets.company_id' => Auth::user()->company_id,
             'tickets.schedule_id' => $request->schedule_id,
             'tickets.schedule_date' => $uniqueDate,
-        ])
+        ])->where('type', '!=', 'reschedule')
             ->with("terminal:id,name", "destination_city:id,name")
             ->with(["commission" => function ($q) use ($route) {
                 return $q->where("route_id", $route->id);
