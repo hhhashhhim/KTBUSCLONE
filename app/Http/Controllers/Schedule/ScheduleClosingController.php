@@ -101,7 +101,7 @@ class ScheduleClosingController extends Controller
             return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
         }
 
-        
+
         $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])->latest("id")->first();
         if ($checkMergeRecord) {
             TicketClosingMerge::where("id", $checkMergeRecord->id)->update([
@@ -134,6 +134,7 @@ class ScheduleClosingController extends Controller
 
         // for driver
         foreach ($request->drivers as $value) {
+
             TicketClosingMember::create([
                 "user_id" => $value,
                 "type" => 1,

@@ -79,8 +79,8 @@
             window.print();
         });
 
-        setTimeout(function(){
-            window.close() ;
+        // setTimeout(function () {
+        //     window.close();
         // }, 1000); //Time before execution
     </script>
     <title> Print Passenger List </title>
@@ -90,7 +90,7 @@
     <div class="companyName"><span>Kainat Travels</span></div>
     <br>
     <div class="companyAddress">
-        <div><span><b>{{ isset($format->address) ? $format->address : "Main Pirwadhi Mor Peshawar Road Rawalpindi" }}</b></span></div>
+        <div><span><b>{{ isset($format->address) ? $format->address : auth()->user()->terminal->address }}</b></span></div>
     </div>
     <br>
     <div class="companyAddress">
@@ -98,7 +98,6 @@
     </div>
 </div>
 <br>
-{{--{{ dd($remain) }}--}}
 <table border="2" id="table1">
     <tr>
         <th class="centerTH">Schedule:</th>
@@ -110,37 +109,37 @@
     </tr>
     <tr>
         <th colspan="1" class="centerTH">Driver Info</th>
-            @if(count($remain['driverInfo']) > 0)
-                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+        @if(count($remain['driverInfo']) > 0)
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                    @foreach($remain['driverInfo'] as $key => $value)
+                @foreach($remain['driverInfo'] as $key => $value)
 
-                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                    @endforeach
+                @endforeach
 
-                </th>
-            @else
-                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
-                    N/A
-                </th>
-            @endif
+            </th>
+        @else
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                N/A
+            </th>
+        @endif
         <th colspan="1" class="centerTH">Host Info</th>
-            @if(count($remain['hostInfo']) > 0)
-                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+        @if(count($remain['hostInfo']) > 0)
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
 
-                    @foreach($remain['hostInfo'] as $key => $value)
+                @foreach($remain['hostInfo'] as $key => $value)
 
-                        <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
+                    <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                    @endforeach
+                @endforeach
 
-                </th>
-            @else
-                <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
-                    N/A
-                </th>
-            @endif
+            </th>
+        @else
+            <th colspan="2" class="fontWightTh" style="text-align: start; padding-left: 10px">
+                N/A
+            </th>
+        @endif
     </tr>
 </table>
 {{--Table for passenger list--}}
