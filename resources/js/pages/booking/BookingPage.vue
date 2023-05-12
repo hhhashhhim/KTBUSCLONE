@@ -119,7 +119,7 @@
                                                     <label class="custom-control-label"
                                                            for="pointsCheckBox">Points Usage</label>
                                                 </div>
-                                                <label class="text-danger">{{ this.pointsUsage }}</label>
+                                                <label class="text-danger">{{ this.pointsUsage ? this.pointsUsage : '' }}</label>
                                             </div>
                                         </div>
                                         <div class="row" v-if="this.pointsUsage">
@@ -1342,7 +1342,10 @@ export default {
                 description: '',
             },
             rescheduleData: {
-                schedule: 0,
+                rescheduleSchedule: 0,
+                rescheduleDate: '',
+                rescheduleDestinationCity: 0,
+                dataDepartureCity: 0,
             },
 
             addFormOverIssue: {
@@ -1713,10 +1716,10 @@ export default {
 
         async getReDestinationCity() {
             this.reSpecificCities = [];
-            if (this.rescheduleData.dataDepartureCity == '0') {
+            if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.rescheduleData.dataDepartureCity});
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: parseInt(this.rescheduleData.dataDepartureCity)});
                 if (resReDepartureCity.length == 0) {
                     this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
@@ -1778,7 +1781,7 @@ export default {
             this.rescheduleData.rescheduleSchedule = 0;
             this.seatMapReschedule = false;
             const data = {
-                departure_city_id: this.rescheduleData.dataDepartureCity,
+                departure_city_id: parseInt(this.rescheduleData.dataDepartureCity),
                 destination_city_id: this.rescheduleData.rescheduleDestinationCity,
                 date: this.rescheduleData.rescheduleDate,
             }
@@ -2109,7 +2112,7 @@ export default {
             const res = await this.callApi("post", "booking/schedule/selected", {
                 id: this.rescheduleData.rescheduleSchedule,
                 date: this.rescheduleData.rescheduleDate,
-                departureCity: this.rescheduleData.dataDepartureCity,
+                departureCity: parseInt(this.rescheduleData.dataDepartureCity),
                 destinationCity: this.rescheduleData.rescheduleDestinationCity,
             });
             if (res.status == 200) {
@@ -2733,7 +2736,7 @@ export default {
                     dataCustomer: singleSeat[1][0].customer_id,
                     dataSchedule: singleSeat[1][0].schedule_id,
                     dataSeat_no: singleSeat[1][0].seat_no,
-                    dataDepartureCity: singleSeat[1][0].departure_city_id,
+                    dataDepartureCity: parseInt(singleSeat[1][0].departure_city_id),
                     dataAll: singleSeat[1][0],
                 }
                 arraySingleRescheduleData[i] = singlePostData;
@@ -2743,11 +2746,11 @@ export default {
                 arraySingleRescheduleData['oldSeats'] = oldSeats;
             });
             this.mainAllRescheduleData = arraySingleRescheduleData;
-            this.rescheduleData.dataDepartureCity = this.mainAllRescheduleData[0].dataDepartureCity;
+            this.rescheduleData.dataDepartureCity = parseInt(this.mainAllRescheduleData[0].dataDepartureCity);
             this.rescheduleData.rescheduleDate = this.mainAllRescheduleData[0].rescheduleDate;
             this.rescheduleData.rescheduleSchedule = 0;
 
-            if (this.rescheduleData.dataDepartureCity == '0') {
+            if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
                 const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.mainAllRescheduleData[0].dataDepartureCity});
@@ -2781,10 +2784,10 @@ export default {
             this.mainAllRescheduleData[0] = this.rescheduleData;
             this.mainAllRescheduleData.totalFare = this.rescheduleData.dataSeatFare;
             this.mainAllRescheduleData.oldSeats = this.rescheduleData.dataSeat_no;
-            if (this.rescheduleData.dataDepartureCity == '0') {
+            if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.rescheduleData.dataDepartureCity});
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: parseInt(this.rescheduleData.dataDepartureCity)});
                 if (resReDepartureCity.length == 0) {
                     this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
@@ -2845,7 +2848,7 @@ export default {
                 });
             }
 
-            if (this.rescheduleData.dataDepartureCity == 0) {
+            if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 return swal({
                     title: "Required!!",
                     text: "Please Select Departure City",
@@ -2887,7 +2890,7 @@ export default {
                 single.overIssueReschedule = this.overIssueScheduleCheckBox;
                 single.newDepartureTime = this.rescheduleData.rescheduleSchedule;
                 single.rescheduleDiscount = this.rescheduleDiscount;
-                single.dataDepartureCity = this.rescheduleData.dataDepartureCity;
+                single.dataDepartureCity = parseInt(this.rescheduleData.dataDepartureCity);
                 single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
             });
             this.loadingRescheduleButton = true;

@@ -28391,7 +28391,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         description: ''
       },
       rescheduleData: {
-        schedule: 0
+        rescheduleSchedule: 0,
+        rescheduleDate: '',
+        rescheduleDestinationCity: 0,
+        dataDepartureCity: 0
       },
       addFormOverIssue: {
         date: new Date().toISOString().substr(0, 10),
@@ -28969,7 +28972,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this8.reSpecificCities = [];
 
-                if (!(_this8.rescheduleData.dataDepartureCity == '0')) {
+                if (!(parseInt(_this8.rescheduleData.dataDepartureCity) == 0)) {
                   _context8.next = 5;
                   break;
                 }
@@ -28981,7 +28984,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 5:
                 _context8.next = 7;
                 return _this8.callApi("post", "booking/getDestination", {
-                  id: _this8.rescheduleData.dataDepartureCity
+                  id: parseInt(_this8.rescheduleData.dataDepartureCity)
                 });
 
               case 7:
@@ -29114,7 +29117,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this11.rescheduleData.rescheduleSchedule = 0;
                 _this11.seatMapReschedule = false;
                 data = {
-                  departure_city_id: _this11.rescheduleData.dataDepartureCity,
+                  departure_city_id: parseInt(_this11.rescheduleData.dataDepartureCity),
                   destination_city_id: _this11.rescheduleData.rescheduleDestinationCity,
                   date: _this11.rescheduleData.rescheduleDate
                 };
@@ -29620,7 +29623,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this17.callApi("post", "booking/schedule/selected", {
                   id: _this17.rescheduleData.rescheduleSchedule,
                   date: _this17.rescheduleData.rescheduleDate,
-                  departureCity: _this17.rescheduleData.dataDepartureCity,
+                  departureCity: parseInt(_this17.rescheduleData.dataDepartureCity),
                   destinationCity: _this17.rescheduleData.rescheduleDestinationCity
                 });
 
@@ -30530,7 +30533,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     dataCustomer: singleSeat[1][0].customer_id,
                     dataSchedule: singleSeat[1][0].schedule_id,
                     dataSeat_no: singleSeat[1][0].seat_no,
-                    dataDepartureCity: singleSeat[1][0].departure_city_id,
+                    dataDepartureCity: parseInt(singleSeat[1][0].departure_city_id),
                     dataAll: singleSeat[1][0]
                   };
                   arraySingleRescheduleData[i] = singlePostData;
@@ -30540,11 +30543,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   arraySingleRescheduleData['oldSeats'] = oldSeats;
                 });
                 _this26.mainAllRescheduleData = arraySingleRescheduleData;
-                _this26.rescheduleData.dataDepartureCity = _this26.mainAllRescheduleData[0].dataDepartureCity;
+                _this26.rescheduleData.dataDepartureCity = parseInt(_this26.mainAllRescheduleData[0].dataDepartureCity);
                 _this26.rescheduleData.rescheduleDate = _this26.mainAllRescheduleData[0].rescheduleDate;
                 _this26.rescheduleData.rescheduleSchedule = 0;
 
-                if (!(_this26.rescheduleData.dataDepartureCity == '0')) {
+                if (!(parseInt(_this26.rescheduleData.dataDepartureCity) == 0)) {
                   _context26.next = 14;
                   break;
                 }
@@ -30607,7 +30610,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this27.mainAllRescheduleData.totalFare = _this27.rescheduleData.dataSeatFare;
                 _this27.mainAllRescheduleData.oldSeats = _this27.rescheduleData.dataSeat_no;
 
-                if (!(_this27.rescheduleData.dataDepartureCity == '0')) {
+                if (!(parseInt(_this27.rescheduleData.dataDepartureCity) == 0)) {
                   _context27.next = 10;
                   break;
                 }
@@ -30619,7 +30622,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 10:
                 _context27.next = 12;
                 return _this27.callApi("post", "booking/getDestination", {
-                  id: _this27.rescheduleData.dataDepartureCity
+                  id: parseInt(_this27.rescheduleData.dataDepartureCity)
                 });
 
               case 12:
@@ -30728,7 +30731,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(_this29.rescheduleData.dataDepartureCity == 0)) {
+                if (!(parseInt(_this29.rescheduleData.dataDepartureCity) == 0)) {
                   _context29.next = 6;
                   break;
                 }
@@ -30790,7 +30793,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   single.overIssueReschedule = _this29.overIssueScheduleCheckBox;
                   single.newDepartureTime = _this29.rescheduleData.rescheduleSchedule;
                   single.rescheduleDiscount = _this29.rescheduleDiscount;
-                  single.dataDepartureCity = _this29.rescheduleData.dataDepartureCity;
+                  single.dataDepartureCity = parseInt(_this29.rescheduleData.dataDepartureCity);
                   single.dataDestination = _this29.rescheduleData.rescheduleDestinationCity;
                 });
 
@@ -56660,7 +56663,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     name: "pointsUsage"
   }, null, 8
   /* PROPS */
-  , _hoisted_45), _hoisted_46]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(this.pointsUsage), 1
+  , _hoisted_45), _hoisted_46]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(this.pointsUsage ? this.pointsUsage : ''), 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), this.pointsUsage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
@@ -80641,9 +80644,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

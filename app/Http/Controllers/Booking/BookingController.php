@@ -112,9 +112,9 @@ class BookingController extends Controller
                 }
             }
 
-// loyalty card point addition
+        // loyalty card point addition
 
-            if (!is_null($request->customerCNIC) && $request->usagePoints == true) {
+            if (!is_null($request->customerCNIC)) {
                 $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
                 if ($checkCard) {
                     if ($checkCard->cardCategory->point_type == "flatPoints") {
