@@ -83,7 +83,7 @@ class AdvanceSalesReportController extends Controller
             }
         }
 
-//        Refund Data Detils
+//        Refund Data Details
 
         $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')->withTrashed()
