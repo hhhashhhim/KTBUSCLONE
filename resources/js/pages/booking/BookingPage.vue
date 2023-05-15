@@ -1875,7 +1875,7 @@ export default {
                     }
                 }
             }
-            if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
+            if (flag == 'addFormContact' && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined') && (this.addForm.customerName == '' || typeof this.addForm.customerName === 'undefined')) {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
                     this.addForm.customerName = "";
                     this.addForm.customerCNIC = "";

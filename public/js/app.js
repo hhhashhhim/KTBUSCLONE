@@ -29294,7 +29294,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
               case 8:
-                if (!(flag == 'addFormContact' && _this14.addForm.customerCNIC == '' && _this14.addForm.customerName == '')) {
+                if (!(flag == 'addFormContact' && (_this14.addForm.customerCNIC == '' || typeof _this14.addForm.customerCNIC == 'undefined') && (_this14.addForm.customerName == '' || typeof _this14.addForm.customerName === 'undefined'))) {
                   _context14.next = 16;
                   break;
                 }
@@ -80644,9 +80644,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
