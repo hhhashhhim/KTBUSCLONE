@@ -50,8 +50,9 @@ import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 
-// const url = '/kt/'
 
+// const url = '/kt/'
+//
 const url = '/'
 
 const routes = [

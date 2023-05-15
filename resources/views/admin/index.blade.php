@@ -18,14 +18,16 @@
     <link rel='shortcut icon' type='image/x-icon' href='{{ asset('assets/img/fav-logo.png') }}'/>
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-timepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet"
+          href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
     <style>
-        html{
+        html {
             scroll-behavior: smooth !important;
         }
-        .select2-container{
-            width: 100%!important;
+
+        .select2-container {
+            width: 100% !important;
         }
     </style>
 </head>
@@ -34,11 +36,10 @@
 <div class="loader"></div>
 <div id="app">
     @if (Auth::check())
-
-        <main-app :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}" app_url="{{ config('app.url') }}">
+        <main-app :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}"
+                  app_url="{{ config('app.url') }}">
         </main-app>
     @else
-        {{-- <test-app :user="false" app_url="{{ config('app.url') }}"></test-app> --}}
         <main-app :user="false" app_url="{{ config('app.url') }}"></main-app>
     @endif
 </div>
