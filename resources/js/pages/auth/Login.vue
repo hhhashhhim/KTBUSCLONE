@@ -132,9 +132,9 @@ export default {
             const res = await this.callApi("post", "login", this.data);
             if (res.status == 200) {
                 this.success = "Logged In Successfully";
-                // this.data.email = this.data.password = "";
-                // window.location = "admin/dashboard"
-                // this.success = "";
+                this.data.email = this.data.password = "";
+                window.location = "admin/dashboard"
+                this.success = "";
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {
