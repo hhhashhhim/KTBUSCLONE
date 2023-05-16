@@ -27942,10 +27942,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context.sent;
 
                 if (res.status == 200) {
-                  _this.success = "Logged In Successfully";
-                  _this.data.email = _this.data.password = "";
-                  window.location = "admin/dashboard";
-                  _this.success = "";
+                  _this.success = "Logged In Successfully"; // this.data.email = this.data.password = "";
+                  // window.location = "admin/dashboard"
+                  // this.success = "";
                 } else {
                   if (res.status == 422) {
                     _loop = function _loop(key) {
