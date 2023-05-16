@@ -23,7 +23,7 @@ class CompanyController extends Controller
             'name' => ['required', Rule::unique('companies', 'name')],
             'contact' => 'required',
             'userName' => 'required',
-            'email' => ['required|email', Rule::unique('users', 'email')],
+            'email' => ['required', Rule::unique('users', 'email')],
             'password' => 'required',
         ]);
 

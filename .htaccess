@@ -1,5 +1,7 @@
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
+    Header Access-Control-Allow-Methods "PUT,POST,DELETE,GET,OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
 </IfModule>
 RewriteEngine On
 
