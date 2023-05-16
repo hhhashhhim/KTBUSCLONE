@@ -52,7 +52,6 @@ import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 
 
 // const url = '/kt/'
-//
 const url = '/'
 
 const routes = [

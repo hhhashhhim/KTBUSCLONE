@@ -27936,7 +27936,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 _context.next = 8;
-                return _this.callApi("post", "loginApi", _this.data);
+                return _this.callApi("post", "login", _this.data);
 
               case 8:
                 res = _context.sent;
@@ -80645,7 +80645,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
  // const url = '/kt/'
-//
 
 var url = '/';
 var routes = [{
