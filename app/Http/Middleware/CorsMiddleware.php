@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class cors
+class CorsMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,9 +16,10 @@ class cors
      */
     public function handle(Request $request, Closure $next)
     {
-//        return $next($request);
-        return $next($request)->header('Access-Control-Allow-Origin', "*");
-//            ->header('Access-Control-Allow-Methods',"PUT,POST,DELETE,GET,OPTIONS")
-//            ->header('Access-Control-Allow-Headers',"Accept,Authorization,Content-Type");
+        $response = $next($request);
+        $response->headers->set('Access-Control-Allow-Origin', 'https://www.techhord.com');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+        return $response;
     }
 }
