@@ -276,10 +276,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div v-if="hideDivButtonsDrop" class="my-2">
+                                        <div class="my-2">
                                             <div class="form-group text-center mt-2 mb-2"
                                             >
-                                                <a v-if="checkForSubmenuButtons('assign-bus')" href="#"
+                                                <a v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop" href="#"
                                                    class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
                                                 </a>
@@ -295,7 +295,7 @@
                                                         class="btn btn-danger ml-1 btn-sm" @click="getCustomerList()">
                                                     Pax List
                                                 </button>
-                                                <button class="btn btn-success ml-1 btn-sm"
+                                                <button v-if="hideDivButtonsDrop" class="btn btn-success ml-1 btn-sm"
                                                         v-on:click="add()"
                                                         v-on:keyup.enter="add()">
                                                     {{
@@ -310,7 +310,7 @@
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
-                                                <button v-if="checkForSubmenuButtons('drop-schedule')"
+                                                <button v-if="checkForSubmenuButtons('drop-schedule') && hideDivButtonsDrop"
                                                         class="btn btn-secondary btn-sm text-dark mr-2"
                                                         @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
@@ -320,9 +320,6 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
-                                        </div>
-                                        <div v-else class="text-center  my-2">
-                                            <span class="h2 font-weight-bold">{{ labelDrop }}</span>
                                         </div>
                                     </div>
                                     <!--                                        Seat Map-->
