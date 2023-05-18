@@ -27,7 +27,7 @@ class ScheduleClosingController extends Controller
     public function index()
     {
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->where("user_id",'!=',0)->get(["user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
         where('company_id', Auth::user()->company_id)
@@ -46,10 +46,10 @@ class ScheduleClosingController extends Controller
     public function merges()
     {
         $merges = TicketClosingMerge::
-        where(['company_id'=>Auth::user()->company_id,'schedule_complete'=>1])
-        ->with("bus:id,bus_number")
-        ->with("closing:id,ticket_merge_id,schedule_id","closing.schedule:id,name")
-        ->get();
+        where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
+            ->with("bus:id,bus_number")
+            ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
+            ->get();
         $data = [
             "merges" => $merges,
         ];
@@ -71,6 +71,11 @@ class ScheduleClosingController extends Controller
 
     public function store(Request $request)
     {
+//        dd($request->all());
+        // In Case of Already Exist
+        if ($request->alreadyAssigned == 1) {
+           updateCloseSchedule($request);
+        }
         // this is for get route id that will be followed by schedule
         $route = Schedule::find($request->schedule)->route_id;
         // this is for get schedule start city
@@ -84,6 +89,7 @@ class ScheduleClosingController extends Controller
             "departure_date" => $request->date,
             "company_id" => Auth::user()->company_id
         ])->first();
+
         $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
         if (count($bookingAvailable) == 0) {
             return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
@@ -95,12 +101,11 @@ class ScheduleClosingController extends Controller
             'schedule_id' => $request->schedule,
             'schedule_date' => $depTime->schedule_date,
         ])
-        ->first();
+            ->first();
 
         if ($checkAssign) {
             return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
         }
-
 
         $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])->latest("id")->first();
         if ($checkMergeRecord) {

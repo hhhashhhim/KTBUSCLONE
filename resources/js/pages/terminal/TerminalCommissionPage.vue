@@ -17,81 +17,84 @@
                                             <div class="table-responsive">
                                                 <table class="table table-striped">
                                                     <thead>
-                                                        <tr>
-                                                            <th style="width:200px">Route</th>
-                                                            <th>Fix Commission</th>
-                                                            <th>Flat Commission</th>
-                                                            <th>Percentage Commission</th>
-                                                            <th>KT Commission</th>
-                                                            <th style="width:200px">Action</th>
-                                                        </tr>
+                                                    <tr>
+                                                        <th style="width:200px">Route</th>
+                                                        <th>Fix Commission</th>
+                                                        <th>Flat Commission</th>
+                                                        <th>Percentage Commission</th>
+                                                        <th>KT Commission</th>
+                                                        <th style="width:200px">Action</th>
+                                                    </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="(i, index) in loop" :key="index">
-                                                            <td>
-                                                                <!-- {{ items[0] ? items[0].price : '' }} -->
-                                                                <select class="form-control rounded-0"
+                                                    <tr v-for="(i, index) in loop" :key="index">
+                                                        <td>
+                                                            <!-- {{ items[0] ? items[0].price : '' }} -->
+                                                            <select class="form-control rounded-0"
                                                                     @change="saveRow($event, 'first', index)"
                                                                     :value="postData.route[index]" :disabled="editAble">
-                                                                    <option value="" selected>Select Route </option>
-                                                                    <option v-for="(route, i) in routes"
+                                                                <option value="" selected>Select Route</option>
+                                                                <option v-for="(route, i) in routes"
                                                                         :value="route.id" :key="i">
-                                                                        {{ route.name }}
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control"
-                                                                    @keyup="saveRow($event, 'second', index)"
-                                                                    placeholder="Rs"
-                                                                    :value="postData.fixCommission[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control border-secondary"
-                                                                    @keyup="saveRow($event, 'third', index)"
-                                                                    placeholder="Rs"
-                                                                    :value="postData.flatCommission[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" min="0" class="form-control border-secondary"
-                                                                    @keyup="saveRow($event, 'fourth', index)"
-                                                                    placeholder="%"
-                                                                    :value="postData.percentCommission[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control"
-                                                                    @keyup="saveRow($event, 'fifth', index)"
-                                                                    placeholder="%"
-                                                                    :value="postData.adjustmentCommission[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td v-if="!editAble">
-                                                                <button class="btn btn-outline-primary mx-2"
-                                                                    @click="addRow">Add</button>
-                                                                <button class="btn btn-outline-danger"
+                                                                    {{ route.name }}
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control"
+                                                                   @keyup="saveRow($event, 'second', index)"
+                                                                   placeholder="Rs"
+                                                                   :value="postData.fixCommission[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control border-secondary"
+                                                                   @keyup="saveRow($event, 'third', index)"
+                                                                   placeholder="Rs"
+                                                                   :value="postData.flatCommission[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" min="0"
+                                                                   class="form-control border-secondary"
+                                                                   @keyup="saveRow($event, 'fourth', index)"
+                                                                   placeholder="%"
+                                                                   :value="postData.percentCommission[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control"
+                                                                   @keyup="saveRow($event, 'fifth', index)"
+                                                                   placeholder="%"
+                                                                   :value="postData.adjustmentCommission[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td v-if="!editAble">
+                                                            <button class="btn btn-outline-primary mx-2"
+                                                                    @click="addRow">Add
+                                                            </button>
+                                                            <button class="btn btn-outline-danger"
                                                                     @click="removeRow($event, index)"
-                                                                    v-if="loop != 1">Remove</button>
-                                                            </td>
-                                                            <td v-else></td>
-                                                        </tr>
+                                                                    v-if="loop != 1">Remove
+                                                            </button>
+                                                        </td>
+                                                        <td v-else></td>
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                                 <div class="d-flex justify-content-end">
                                                     <button type="button" class="btn btn-outline-success mr-4"
-                                                        @click="add" :disabled="loading" v-if="!editAble">{{
-                                                            loading?
-                                                                                                                'Loading...': 'Save'
+                                                            @click="add" :disabled="loading" v-if="!editAble">{{
+                                                            loading ?
+                                                                'Loading...' : 'Save'
                                                         }}
                                                     </button>
                                                     <button type="button" class="btn btn-outline-secondary mr-4"
-                                                        @click="editAble = false" :disabled="loading" v-else>Edit
+                                                            @click="editAble = false" :disabled="loading" v-else>Edit
                                                     </button>
                                                     <button type="button" class="btn btn-outline-primary mr-4"
-                                                        @click="editAble=true"
-                                                        v-if="!editAble && postData.route.length != 0">Cancel
+                                                            @click="editAble=true"
+                                                            v-if="!editAble && postData.route.length != 0">Cancel
                                                     </button>
                                                 </div>
                                             </div>
@@ -114,7 +117,7 @@
 // import Add from '../../components/Add.vue';
 // import Edit from '../../components/Edit.vue';
 // import Delete from '../../components/Delete.vue';
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 
 export default {
     name: "TerminalCommissionPage",
@@ -176,24 +179,20 @@ export default {
 
         },
         async existingCommissions() {
-            const res = await this.callApi("post",'terminals/commissions',{terminal_id : this.postData.terminal_id});
+            const res = await this.callApi("post", 'terminals/commissions', {terminal_id: this.postData.terminal_id});
             if (res.status == 200) {
                 const commissions = res.data.terminalCommission;
                 this.terminal = res.data.terminal;
-                if(commissions != "")
-                {
+                if (commissions != "") {
                     this.loop = commissions.length;
-                    for(var i = 0; i < commissions.length; i++)
-                    {
+                    for (var i = 0; i < commissions.length; i++) {
                         this.postData.route.push(commissions[i].route_id);
                         this.postData.fixCommission.push(commissions[i].fix_commission);
                         this.postData.flatCommission.push(commissions[i].flat_commission);
                         this.postData.percentCommission.push(commissions[i].percentage_commission);
                         this.postData.adjustmentCommission.push(commissions[i].adjustment_commission);
                     }
-                }
-                else
-                {
+                } else {
                     this.loop = 1;
                     this.editAble = false;
                 }
@@ -228,6 +227,9 @@ export default {
             this.postData.adjustmentCommission.splice(index, 1);
             this.loop--;
         },
+        closeTab() {
+            window.close();
+        },
         async add() {
 
             // validation for empty data
@@ -244,7 +246,7 @@ export default {
             // check if any index is empty or null in object
             for (var i = 0; i < this.postData.route.length; i++) {
                 if (!this.postData.route[i] || !this.postData.fixCommission[i] || !this.postData.flatCommission[i] ||
-                 !this.postData.percentCommission[i] || !this.postData.adjustmentCommission[i]) {
+                    !this.postData.percentCommission[i] || !this.postData.adjustmentCommission[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
@@ -267,7 +269,6 @@ export default {
             const res = await this.callApi("post", "terminals/commissions/store", this.postData);
             if (res.status === 200) {
                 this.loading = false;
-                // $('#expense').DataTable().destroy();
                 this.postData.route = [];
                 this.postData.fixCommission = [];
                 this.postData.flatCommission = [];
@@ -281,11 +282,11 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                await this.fetchData();
-                await this.existingCommissions();
+                 this.fetchData();
+                 this.existingCommissions();
                 this.loading = false;
-            }
-            else {
+                setTimeout(() => this.closeTab(), 1000);
+            } else {
                 this.loading = false;
                 if (res.status == 422) {
                     let errorContent = "";
@@ -309,10 +310,13 @@ export default {
                 }
             }
         },
-    },
+    }
+    ,
     computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
+        ...
+            mapGetters(['getDeletingObj'])
+    }
+    ,
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {

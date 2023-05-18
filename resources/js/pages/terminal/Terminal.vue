@@ -423,12 +423,12 @@
                                                     <!--                                                        :data-target="'#' + editFormID"-->
                                                     <!--                                                        data-toggle="modal"-->
                                                     <!--                                                        @click="editTerminal(single)"-->
-                                                    <router-link class="btn btn-success mx-2" title="Commission"
+                                                    <router-link  target="_blank" class="btn btn-success mx-2" title="Commission"
                                                                  v-if="checkForSubmenuButtons('commission')"
                                                                  :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                         <i class="fas fa-percent"></i>
                                                     </router-link>
-                                                    <router-link class="btn btn-primary mx-2" title="Discount"
+                                                    <router-link  target="_blank" class="btn btn-primary mx-2" title="Discount"
                                                                  v-if="checkForSubmenuButtons('discount')"
                                                                  :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                         <i class="fas fa-tag"></i>

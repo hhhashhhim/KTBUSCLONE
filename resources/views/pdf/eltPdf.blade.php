@@ -75,7 +75,6 @@
     </script>
     <title>Print ELT</title>
 </head>
-
 <body>
     <div id="info">
         <div class="companyname" style="margin-bottom: 15px;"><span>ELT RECIEPT</span></div>

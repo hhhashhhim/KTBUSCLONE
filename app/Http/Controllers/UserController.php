@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index(): array
     {
-        $users = User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->where('id', '!=', Auth::user()->id)->latest('id')->get();
+        $users = User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->latest('id')->get();
         foreach ($users as $user) {
             $user->name = ucfirst($user->name);
         }

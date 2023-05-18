@@ -82,9 +82,15 @@
                                                         <td>{{ employee.name }}</td>
                                                         <td>{{ phoneFormat(employee.contact) }}</td>
                                                         <td>{{ employee.company.name }}</td>
-                                                        <td>{{ employee.department.name }}</td>
-                                                        <td>{{ employee.designation.name }}</td>
-                                                        <td>{{ employee.hiring_date }}</td>
+                                                        <td>{{
+                                                                employee.department ? employee.department.name : 'N/A'
+                                                            }}
+                                                        </td>
+                                                        <td>{{
+                                                                employee.designation ? employee.department.name : 'N/A'
+                                                            }}
+                                                        </td>
+                                                        <td>{{ employee.hiring_date ?? 'N/A' }}</td>
                                                         <td>{{ cnicFormat(employee.cnic) }}</td>
                                                         <td>
                                                             <div :class="getStatusClass(employee.status)">
@@ -218,7 +224,7 @@
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="addForm.EmployeeAddress"></textarea>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.addForm.EmployeeType == '0'">
                         <label for="department">Terminal<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="addForm.EmployeeTerminal" @change="getDepartment()">
                             <option value="0" selected>Select Terminal</option>
@@ -230,7 +236,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.addForm.EmployeeType == '0'">
                         <label for="department">Department<span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDepartmentModal" @click="clearDepartmentForm()"> Add
@@ -243,7 +249,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.addForm.EmployeeType == '0'">
                         <label for="designation">Designation<span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
                              data-toggle="modal" data-target="#addDesignationModal" @click="clearDesignationForm()"> Add
@@ -277,17 +283,18 @@
                     <div class="form-group col-md-6">
                         <label for="attachments">Upload Attachments</label>
                         <div class="custom-file">
-                            <input type="file" @change="onFileChange($event, 'attachments')" accept=".pdf, .docx, .doc"
+                            <input type="file" @change="onFileChange($event, 'attachments')"
+                                   accept=".pdf, .docx, .doc, .png, .jpeg, .jpg"
                                    class="custom-file-input" id="attachments">
                             <label class="custom-file-label overflow-hidden"
                                    for="attachments">{{
-                                    attachments != '' ? attachments : 'Choose .pdf, .docx, .doc File'
+                                    attachments != '' ? attachments : 'Choose .pdf, .docx, .doc, .png, .jepg, .jpg File'
                                 }}</label>
                         </div>
 
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture <span class="text-danger mr-1">*</span></label>
+                        <label for="salary">Employee Picture</label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
                             <img v-if="urlProfile" class="img-responsive thumbnail rounded "
@@ -384,14 +391,6 @@
                 :editForm="editFormID"
             >
                 <div class="row mt-3">
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="email">Email <span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <input type="email" id="email" class="form-control" v-model="editEmp.email"/>-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="password">Password <small>(Empty field will save password same)</small></label>-->
-                    <!--                        <input type="password" id="password" class="form-control" v-model="editEmp.password"/>-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-4">
                         <label for="EmployeeName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" id="EmployeeName" class="form-control" v-model="editEmp.EmployeeName"/>
@@ -443,27 +442,12 @@
                         <label for="hiringDate">Hiring Date</label>
                         <input type="date" id="hiringDate" class="form-control" v-model="editEmp.HiringDate">
                     </div>
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="jobDesp">Job Description</label>-->
-                    <!--                        <input type="text" id="jobDesp" class="form-control" v-model="editEmp.jobDescription">-->
-                    <!--                    </div>-->
-                    <!--                    <div class="form-group col-md-6">-->
-                    <!--                        <label for="emergencyContact">Emergency Contact #</label>-->
-                    <!--                        <vue-mask id="emergencyContact"-->
-                    <!--                                  class="form-control"-->
-                    <!--                                  v-model="editEmp.EmergencyContact"-->
-                    <!--                                  mask="0000-0000000"-->
-                    <!--                                  :raw="false"-->
-                    <!--                                  :options="optionsContact"-->
-                    <!--                        >-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
                     <div class="form-group col-md-12">
                         <label for="address">Address</label>
                         <textarea type="text" class="form-control" id="address" cols="30" rows="10"
                                   v-model="editEmp.EmployeeAddress"></textarea>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.editEmp.EmployeeType == '0'">
                         <label for="department">Terminal<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editEmp.EmployeeTerminal" @change="getDepartment()">
                             <option value="0" selected>Select Terminal</option>
@@ -475,7 +459,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.editEmp.EmployeeType == '0'">
                         <label for="department">Department<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editEmp.EmployeeDepartment"
                                 @change="getEditDesignation()">
@@ -485,7 +469,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="this.editEmp.EmployeeType == '0'">
                         <label for="designation">Designation<span class="text-danger ml-1">*</span></label>
                         <select class="form-control" v-model="editEmp.EmployeeDesignation">
                             <option value="0" selected>Select Designation</option>
@@ -530,12 +514,12 @@
                                    class="custom-file-input" id="attachmentsEdit`">
                             <label class="custom-file-label overflow-hidden"
                                    for="attachmentsEdit">{{
-                                    attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc File'
+                                    attachmentsEdit != '' ? attachmentsEdit : 'Choose .pdf, .docx, .doc, .png, .jpg, .jepg File'
                                 }}</label>
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="salary">Employee Picture <span class="text-danger mr-1">*</span> <small>(Empty field
+                        <label for="salary">Employee Picture <small>(Empty field
                             will save picture same)</small></label>
                         <div class="border border-dark my-3"
                              style="height: 250px;  width: 250px; background-color: #d9d9d9">
@@ -1079,13 +1063,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.addForm.EmployeeFatherName)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Father Name Field is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
             if (this.addForm.EmployeeType == "")
                 return swal({
                     title: "Required!",
@@ -1107,83 +1084,41 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.addForm.EmployeeDob)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Date of Birth is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.addForm.HiringDate)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Hiring Date  is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.addForm.EmployeeAddress)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Address is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            if (this.addForm.EmployeeTerminal == "0")
+            if (!this.addForm.password && !this.addForm.email && this.addForm.EmployeeType == "2")
+                return swal({
+                    title: "Required!",
+                    text: "Employee's Type is Bus Host, Please Create Its Account For Refreshment Panel",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.addForm.EmployeeTerminal == "0" && this.addForm.EmployeeType == "0")
                 return swal({
                     title: "Required!",
                     text: "Please Select Employee's Terminal",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDepartment == "0")
+            if (this.addForm.EmployeeDepartment == "0" && this.addForm.EmployeeType == "0")
                 return swal({
                     title: "Required!",
                     text: "Please Select Employee's Department",
                     icon: "error",
                     timer: 2000
                 });
-            if (this.addForm.EmployeeDesignation == "0")
+            if (this.addForm.EmployeeDesignation == "0" && this.addForm.EmployeeType == "0")
                 return swal({
                     title: "Required!",
                     text: "Employee's Designation is Required",
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.addForm.workingDays)
+            // if (!this.addForm.profile)
             //     return swal({
             //         title: "Required!",
-            //         text: "Employee's Working Days is Required",
+            //         text: "Employee's Profile is Required",
             //         icon: "error",
             //         timer: 2000
             //     });
-            // if (!this.addForm.paidLeaves)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Paid Leaves is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.addForm.bloodGroup)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Paid Leaves is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.addForm.EmployeeSalary)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Salary is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            if (!this.addForm.profile)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Profile is Required",
-                    icon: "error",
-                    timer: 2000
-                });
 
 
             formData.append('email', this.addForm.email);
@@ -1262,13 +1197,6 @@ export default {
                 formData.append('attachment', this.attachmentsEdit ?? '');
             }
             this.validationErrors = [];
-            // if (!this.editEmp.email)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Email Field is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
             if (!this.editEmp.EmployeeName)
                 return swal({
                     title: "Required!",
@@ -1276,13 +1204,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.editEmp.EmployeeFatherName)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Father Name Field is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
+
             if (!this.editEmp.EmployeeCNIC)
                 return swal({
                     title: "Required!",
@@ -1304,62 +1226,30 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            // if (!this.editEmp.HiringDate)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Hiring Date  is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.editEmp.EmployeeAddress)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Address is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            if (this.editEmp.EmployeeDepartment == "0")
-                return swal({
-                    title: "Required!",
-                    text: "Please Select Employee's Department",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.editEmp.EmployeeDesignation)
-                return swal({
-                    title: "Required!",
-                    text: "Employee's Designation is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            // if (!this.editEmp.workingDays)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Working Days is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.editEmp.paidLeaves)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Paid Leaves is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.editEmp.bloodGroup)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Paid Leaves is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // if (!this.editEmp.EmployeeSalary)
-            //     return swal({
-            //         title: "Required!",
-            //         text: "Employee's Salary is Required",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
+            if (this.editEmp.EmployeeTerminal == '0' && this.editEmp.EmployeeType == '0')
+                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeTerminal == '0';
+            return swal({
+                title: "Required!",
+                text: "Employee's Terminal is Required",
+                icon: "error",
+                timer: 2000
+            });
+            if (this.editEmp.EmployeeDepartment == "0" && this.editEmp.EmployeeType == '0')
+                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeDepartment == '0';
+            return swal({
+                title: "Required!",
+                text: "Please Select Employee's Department",
+                icon: "error",
+                timer: 2000
+            });
+            if (this.editEmp.EmployeeDesignation == '0' && this.editEmp.EmployeeType == '0')
+                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeDesignation == '0';
+            return swal({
+                title: "Required!",
+                text: "Employee's Designation is Required",
+                icon: "error",
+                timer: 2000
+            });
             if (!this.editEmp.status)
                 return swal({
                     title: "Required!",

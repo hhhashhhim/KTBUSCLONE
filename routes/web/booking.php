@@ -40,6 +40,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/check/bus/assigned', [BookingController::class, 'checkAssignedBus']);
     Route::post('/booked/seats/elt/detail', [BookingController::class, 'fetchELTDetails']);
     Route::post('/discount/surcharge/fetch', [BookingController::class, 'fetchScheduleSurchargeDiscount']);
+    Route::post('/elt/fetch/old', [BookingController::class, 'getFetchOldELT']);
 
     // Schedule Closing
     Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {

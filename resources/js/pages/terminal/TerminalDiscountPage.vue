@@ -17,73 +17,75 @@
                                             <div class="table-responsive">
                                                 <table class="table table-striped">
                                                     <thead>
-                                                        <tr>
-                                                            <th style="width:200px">Route</th>
-                                                            <th>Discount</th>
-                                                            <th>Apply From</th>
-                                                            <th>Apply End</th>
-                                                            <th style="width:200px">Action</th>
-                                                        </tr>
+                                                    <tr>
+                                                        <th style="width:200px">Route</th>
+                                                        <th>Discount</th>
+                                                        <th>Apply From</th>
+                                                        <th>Apply End</th>
+                                                        <th style="width:200px">Action</th>
+                                                    </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="(i, index) in loop" :key="index">
-                                                            <td>
-                                                                <!-- {{ items[0] ? items[0].price : '' }} -->
-                                                                <select class="form-control rounded-0"
+                                                    <tr v-for="(i, index) in loop" :key="index">
+                                                        <td>
+                                                            <!-- {{ items[0] ? items[0].price : '' }} -->
+                                                            <select class="form-control rounded-0"
                                                                     @change="saveRow($event, 'first', index)"
                                                                     :value="postData.route[index]" :disabled="editAble">
-                                                                    <option value="" selected>Select Route </option>
-                                                                    <option v-for="(route, i) in routes"
+                                                                <option value="" selected>Select Route</option>
+                                                                <option v-for="(route, i) in routes"
                                                                         :value="route.id" :key="i">
-                                                                        {{ route.name }}
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" class="form-control"
-                                                                    @keyup="saveRow($event, 'second', index)"
-                                                                    placeholder="%"
-                                                                    :value="postData.discount[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td>
-                                                                <input type="date" class="form-control"
-                                                                    @change="saveRow($event, 'third', index)"
-                                                                    placeholder=""
-                                                                    :value="postData.startDate[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td>
-                                                                <input type="date" min="0" class="form-control"
-                                                                    @change="saveRow($event, 'fourth', index)"
-                                                                    placeholder="%"
-                                                                    :value="postData.endDate[index]"
-                                                                    :disabled="editAble" />
-                                                            </td>
-                                                            <td v-if="!editAble">
-                                                                <button class="btn btn-outline-primary mx-2"
-                                                                    @click="addRow">Add</button>
-                                                                <button class="btn btn-outline-danger"
+                                                                    {{ route.name }}
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control"
+                                                                   @keyup="saveRow($event, 'second', index)"
+                                                                   placeholder="%"
+                                                                   :value="postData.discount[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" class="form-control"
+                                                                   @change="saveRow($event, 'third', index)"
+                                                                   placeholder=""
+                                                                   :value="postData.startDate[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="date" min="0" class="form-control"
+                                                                   @change="saveRow($event, 'fourth', index)"
+                                                                   placeholder="%"
+                                                                   :value="postData.endDate[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td v-if="!editAble">
+                                                            <button class="btn btn-outline-primary mx-2"
+                                                                    @click="addRow">Add
+                                                            </button>
+                                                            <button class="btn btn-outline-danger"
                                                                     @click="removeRow($event, index)"
-                                                                    v-if="loop != 1">Remove</button>
-                                                            </td>
-                                                            <td v-else></td>
-                                                        </tr>
+                                                                    v-if="loop != 1">Remove
+                                                            </button>
+                                                        </td>
+                                                        <td v-else></td>
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                                 <div class="d-flex justify-content-end">
                                                     <button type="button" class="btn btn-outline-success mr-4"
-                                                        @click="add" :disabled="loading" v-if="!editAble">{{
-                                                            loading?
-                                                                                                                'Loading...': 'Save'
+                                                            @click="add" :disabled="loading" v-if="!editAble">{{
+                                                            loading ?
+                                                                'Loading...' : 'Save'
                                                         }}
                                                     </button>
                                                     <button type="button" class="btn btn-outline-secondary mr-4"
-                                                        @click="editAble = false" :disabled="loading" v-else>Edit
+                                                            @click="editAble = false" :disabled="loading" v-else>Edit
                                                     </button>
                                                     <button type="button" class="btn btn-outline-primary mr-4"
-                                                        @click="editAble=true"
-                                                        v-if="!editAble && postData.route.length != 0">Cancel
+                                                            @click="editAble=true"
+                                                            v-if="!editAble && postData.route.length != 0">Cancel
                                                     </button>
                                                 </div>
                                             </div>
@@ -106,7 +108,7 @@
 // import Add from '../../components/Add.vue';
 // import Edit from '../../components/Edit.vue';
 // import Delete from '../../components/Delete.vue';
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 
 export default {
     name: "TerminalDiscountPage",
@@ -168,23 +170,19 @@ export default {
 
         },
         async existingDiscounts() {
-            const res = await this.callApi("post",'terminals/discounts',{terminal_id : this.postData.terminal_id});
+            const res = await this.callApi("post", 'terminals/discounts', {terminal_id: this.postData.terminal_id});
             if (res.status == 200) {
                 const discounts = res.data.terminalDiscount;
                 this.terminal = res.data.terminal;
-                if(discounts != "")
-                {
+                if (discounts != "") {
                     this.loop = discounts.length;
-                    for(var i = 0; i < discounts.length; i++)
-                    {
+                    for (var i = 0; i < discounts.length; i++) {
                         this.postData.route.push(discounts[i].route_id);
                         this.postData.discount.push(discounts[i].discount);
                         this.postData.startDate.push(discounts[i].start_date);
                         this.postData.endDate.push(discounts[i].end_date);
                     }
-                }
-                else
-                {
+                } else {
                     this.loop = 1;
                     this.editAble = false;
                 }
@@ -220,6 +218,9 @@ export default {
 
             console.log(this.postData);
         },
+        closeTab() {
+            window.close();
+        },
         async add() {
 
             // validation for empty data
@@ -236,7 +237,7 @@ export default {
             // check if any index is empty or null in object
             for (var i = 0; i < this.postData.route.length; i++) {
                 if (!this.postData.route[i] || !this.postData.discount[i] || !this.postData.startDate[i] ||
-                 !this.postData.endDate[i]) {
+                    !this.postData.endDate[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
@@ -264,11 +265,11 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                await this.fetchData();
-                await this.existingDiscounts();
+                this.fetchData();
+                this.existingDiscounts();
                 this.loading = false;
-            }
-            else {
+                setTimeout(() => this.closeTab(), 1000);
+            } else {
                 this.loading = false;
                 if (res.status == 422) {
                     let errorContent = "";

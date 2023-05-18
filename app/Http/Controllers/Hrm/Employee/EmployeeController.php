@@ -32,34 +32,17 @@ class EmployeeController extends Controller
 
         $rules = [
             'EmployeeName' => 'required',
-//            'EmployeeFatherName' => 'required',
             'EmployeeContact' => ['required', Rule::unique('employees', 'contact')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeCNIC' => ['required', Rule::unique('employees', 'cnic')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
             'EmployeeDob' => 'required',
-//            'HiringDate' => 'required',
-//            'EmployeeAddress' => 'required',
-//            'workingDays' => 'required',
-//            'paidLeaves' => 'required',
-//            'bloodGroup' => 'required',
-//            'EmployeeSalary' => 'required',
-            'profile' => 'required',
         ];
-
         $customMessages = [
             'EmployeeName.required' => 'Employee Name is Required!',
-//            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
             'EmployeeContact.required' => 'Employee Contact Number is Required!',
             'EmployeeContact.unique' => 'Employee Contact Number Already Taken!',
             'EmployeeCNIC.required' => 'Employee CNIC Number  is Required!',
             'EmployeeCNIC.unique' => 'Every Employee Must Have Unique CNIC NUmber',
             'EmployeeDob.required' => 'Employee Date of Birth is Required!',
-//            'HiringDate.required' => 'Employee Hiring Date is Required!',
-//            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
-//            'workingDays.required' => 'Working Days is Required!',
-//            'paidLeaves.required' => 'Paid Leaves is Required!',
-//            'bloodGroup.required' => 'Blood Group is Required!',
-//            'EmployeeSalary.required' => 'Employee Salary is Required!',
-            'profile.required' => 'Employee Profile is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
         if ($request->createAccount == 1) {
@@ -69,7 +52,7 @@ class EmployeeController extends Controller
                 "password" => Hash::make($request->password),
                 "terminal_id" => $request->EmployeeTerminal,
                 "contact" => plainContactAndCnic($request->EmployeeContact),
-                "role_id" => $request->role??0,
+                "role_id" => $request->role ?? 0,
                 'company_id' => Auth::user()->company_id,
             ]);
             UserPassword::create([
@@ -110,51 +93,34 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
-//        dd($request->all());
         $rules = [
             'EmployeeName' => 'required',
-//            "email" => 'required|email|unique:users,email,' . $request->userId,
-//            'EmployeeFatherName' => 'required',
             'EmployeeContact' => 'required',
             'EmployeeCNIC' => 'required',
             'EmployeeDob' => 'required',
-//            'HiringDate' => 'required',
-//            'EmployeeAddress' => 'required',
-//            'workingDays' => 'required',
-//            'paidLeaves' => 'required',
-//            'bloodGroup' => 'required',
-//            'EmployeeSalary' => 'required',
         ];
 
         $customMessages = [
             'EmployeeName.required' => 'Employee Name is Required!',
-//            'EmployeeFatherName.required' => 'Employees Father Name is Required!',
             'EmployeeContact.required' => 'Employee Contact Number is Required!',
             'EmployeeCNIC.required' => 'Employee CNIC Number  is Required!',
             'EmployeeDob.required' => 'Employee Date of Birth is Required!',
-//            'HiringDate.required' => 'Employee Hiring Date is Required!',
-//            'EmployeeAddress.required' => 'Employee Mailing Address is Required!',
-//            'workingDays.required' => 'Working Days is Required!',
-//            'paidLeaves.required' => 'Paid Leaves is Required!',
-//            'bloodGroup.required' => 'Blood Group is Required!',
-//            'EmployeeSalary.required' => 'Employee Salary is Required!',
         ];
         $this->validate($request, $rules, $customMessages);
 
-        $user = User::where("id", $request->userId)->update([
+        User::where("id", $request->userId)->update([
             "name" => $request->EmployeeName,
-            // "email" => $request->email,
             "contact" => plainContactAndCnic($request->EmployeeContact),
             "terminal_id" => $request->EmployeeTerminal,
             "role_id" => 0,
         ]);
 
         if ($request->password) {
-            $user = User::where("id", $request->userId)->update([
+            User::where("id", $request->userId)->update([
                 "password" => Hash::make($request->password),
             ]);
 
-            UserPassword::where("user_id",$request->id)->update([
+            UserPassword::where("user_id", $request->id)->update([
                 'user_password' => $request->password,
             ]);
         }
@@ -180,13 +146,11 @@ class EmployeeController extends Controller
             'status' => $request->status,
             "terminal_id" => $request->EmployeeTerminal,
         ]);
-
         if ($request->profile) {
             Employee::where("user_id", $request->userId)->update([
                 'profile_Img' => $this->image($request->profile),
             ]);
         }
-
         if ($request->attachment) {
             Employee::where("user_id", $request->userId)->update([
                 'attachments' => $this->attachment($request->attachment),
@@ -197,34 +161,25 @@ class EmployeeController extends Controller
     public function delete(Request $request)
     {
         return Employee::find($request->id)->delete();
-
     }
 
     // Image Upload
     public function image($image)
     {
-
         $filenameWithExt = $image->getClientOriginalName();
-        //get just filename
         $filename = pathinfo($filenameWithExt);
-        //get just extension
         $extension = $image->extension();
         $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
-        //Move to folder
         $image->move(public_path('uploads/hrm/employee/profile/'), $nameToStore);
         return $nameToStore;
     }
 
     public function attachment($image)
     {
-
         $filenameWithExt = $image->getClientOriginalName();
-        //get just filename
         $filename = pathinfo($filenameWithExt);
-        //get just extension
         $extension = $image->extension();
         $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
-        //Move to folder
         $path = $image->move(public_path('uploads/hrm/employee/attachment/'), $nameToStore);
         return $nameToStore;
     }

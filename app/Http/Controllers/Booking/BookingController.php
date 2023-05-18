@@ -112,7 +112,7 @@ class BookingController extends Controller
                 }
             }
 
-        // loyalty card point addition
+            // loyalty card point addition
 
             if (!is_null($request->customerCNIC)) {
                 $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
@@ -343,7 +343,7 @@ class BookingController extends Controller
             ]);
             $old_ticket = Ticket::where('id', $ticket['id'])->first();
             $eltTicket = TicketELT::where(['company_id' => Auth::user()->company_id, 'ticket_id' => $ticket['id']])->first();
-            if($eltTicket) {
+            if ($eltTicket) {
                 $eltTicket->ticket_id = $newTicket->id;
                 $eltTicket->customer_id = $newTicket->customer_id;
                 $eltTicket->departure_city = $newTicket->departure_city_id;
@@ -866,6 +866,9 @@ class BookingController extends Controller
 
         $infoData = (object)[];
         $infoData->schedule = date("m/d/Y h:i A", strtotime("$schedule->schedule_date $schedule->departure_time")) . ' - ' . $schedule->schedule->name;
+        $infoData->ticket_closing_id = $checkAssign ? $checkAssign->id : '';
+        $infoData->merge_id = $checkAssign ? $checkAssign->ticket_merge_id : '';
+        $infoData->alreadyAssigned = $checkAssign ? 1 : 0;
         $infoData->schedule_date = $schedule->schedule_date;
         $infoData->schedule_id = $schedule->schedule_id;
         $infoData->route_name = $schedule->schedule->route->name;
@@ -873,7 +876,6 @@ class BookingController extends Controller
         $infoData->bus = $checkAssign ? $checkAssign->bus_id : '';
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
-
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
         $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
@@ -908,7 +910,7 @@ class BookingController extends Controller
             'date' => $request->date,
         ])->first();
 
-        if (!$old) {
+        if (!$old && $request->alreadyExist !== 0) {
             return TicketELT::create([
                 'company_id' => Auth::user()->company_id,
                 'ticket_id' => $ticket->id,
@@ -924,6 +926,14 @@ class BookingController extends Controller
                 'elt_description' => $request->eltDescription,
                 'added_by' => Auth::user()->id,
             ]);
+        } else {
+            $old->update([
+                'elt_price' => $request->totalPrice,
+                'elt_weight' => $request->eltWeight,
+                'elt_description' => $request->eltDescription,
+                'updated_by' => Auth::user()->company_id,
+            ]);
+            return $old;
         }
         return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
     }
@@ -1026,7 +1036,7 @@ class BookingController extends Controller
         ])->onlyTrashed()->get(['id', 'seat_fare', 'discount']);
         $refundData = 0;
         foreach ($refunds as $single) {
-            $percentageValue = ((int)$single->seat_fare - (int)$single->discount) * (is_null($single->cancel_ticket) ? 0 : $single->cancel_ticket->percentage);
+            $percentageValue = ((int)$single->seat_fare - ((int)$single->discount)) * (is_null($single->cancel_ticket) ? 0 : $single->cancel_ticket->percentage);
             $final = $percentageValue / 100;
             $refundData += $final;
         }
@@ -1215,6 +1225,26 @@ class BookingController extends Controller
         }])->with(['discount' => function ($q) {
             $q->where('is_active', 1);
         }])->where(['id' => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first(['id', 'discount_id', 'surcharge_id']);
+    }
+
+    public function getFetchOldELT(Request $request)
+    {
+        $foundELT = TicketELT::where([
+            'date' => $request->date,
+            'customer_id' => $request->customer_id,
+            'seat_no' => $request->seat_no,
+            'schedule_id' => $request->schedule_id,
+            'departure_city' => $request->departure_city_id,
+            'destination_city' => $request->destination_city_id,
+            'company_id' => Auth::user()->company_id,
+            'ticket_id' => $request->id,
+        ])->first();
+        $foundELT->alreadyExist = $foundELT ? 1 : 0;
+        if ($foundELT) {
+            return $foundELT;
+        } else {
+            return response()->json([], 204);
+        }
     }
 
 }

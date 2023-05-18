@@ -1229,7 +1229,7 @@ export default {
                 });
                 this.cloneDone = false;
                 $("#bus_class_table").DataTable().destroy();
-                await this.fetchBussClasses();
+                 this.fetchBussClasses();
                 this.data = {
                     busClassColor: "#000000",
                 };

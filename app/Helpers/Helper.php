@@ -9,7 +9,10 @@ use App\Models\Hrm\Employee\Employee;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMember;
+use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
@@ -500,5 +503,58 @@ if (!function_exists('getRowBadgeColor')) {
             return "green";
         }
         return "white";
+    }
+}
+
+//Update Closed Schedule Function
+if (!function_exists('updateCloseSchedule')) {
+    function updateCloseSchedule($request)
+    {
+        // this is for get route id that will be followed by schedule
+        $route = Schedule::find($request->schedule)->route_id;
+        // this is for get schedule start city
+        $departure = RouteFare::where("route_id", $route)->orderBy('id', 'ASC')->first();
+        // this is for get schedule end city
+        $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
+        // this is for get schedule departure time
+        $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
+            "departure_id" => $departure->departure_city_id,
+            "destination_id" => $departure->destination_city_id,
+            "departure_date" => $request->date,
+            "company_id" => Auth::user()->company_id
+        ])->first();
+        $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
+        if (count($bookingAvailable) == 0) {
+            return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
+        } else {
+            foreach ($bookingAvailable as $key => $single) {
+                $single->ticket_closing_id = null;
+                $single->bus_id = null;
+                $single->save();
+            }
+        }
+        $checkMergeRecord = TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "id" => $request->ticket_merge_id])->first();
+        if ($checkMergeRecord) {
+            TicketClosingMerge::where(["company_id" => Auth::user()->company_id, "id" => $request->ticket_merge_id])->update([
+                "schedule_return_date" => null,
+                "schedule_complete" => 0,
+            ]);
+        }
+        $closings = TicketClosing::where('id', $request->ticket_closing_id)->first();
+        $members = TicketClosingMember::where([
+            "ticket_closing_id" => $closings->id,
+            "bus_id" => $request->bus,
+            'company_id' => Auth::user()->company_id,
+            'added_by' => Auth::user()->id,
+        ])->get();
+        foreach ($members as $key => $singleMember) {
+            $singleMember->delete();
+        }
+        Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
+            "bus_id" => null,
+            "ticket_closing_id" => null,
+            "ticket_merge_id" => null,
+        ]);
+        $closings->delete();
     }
 }

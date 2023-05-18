@@ -119,7 +119,9 @@
                                                     <label class="custom-control-label"
                                                            for="pointsCheckBox">Points Usage</label>
                                                 </div>
-                                                <label class="text-danger">{{ this.pointsUsage ? this.pointsUsage : '' }}</label>
+                                                <label class="text-danger">{{
+                                                        this.pointsUsage ? this.pointsUsage : ''
+                                                    }}</label>
                                             </div>
                                         </div>
                                         <div class="row" v-if="this.pointsUsage">
@@ -256,7 +258,7 @@
                                                     <label>Discount <span
                                                         class="ml-2 text-muted"></span></label>
                                                     <input
-                                                        type="text" @keypress="isNumber($event)"
+                                                        type="text" @keypress="isNumberDiscount($event)"
                                                         @keyup="calculateTotal()"
                                                         :readonly="!checkForSubmenuButtons('discount-field')"
                                                         class="form-control"
@@ -279,7 +281,8 @@
                                         <div class="my-2">
                                             <div class="form-group text-center mt-2 mb-2"
                                             >
-                                                <a v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop" href="#"
+                                                <a v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop"
+                                                   href="#"
                                                    class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
                                                 </a>
@@ -310,9 +313,10 @@
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
-                                                <button v-if="checkForSubmenuButtons('drop-schedule') && hideDivButtonsDrop"
-                                                        class="btn btn-secondary btn-sm text-dark mr-2"
-                                                        @click="scheduleDrop()" :disabled="dropScheduleButton">
+                                                <button
+                                                    v-if="checkForSubmenuButtons('drop-schedule') && hideDivButtonsDrop"
+                                                    class="btn btn-secondary btn-sm text-dark mr-2"
+                                                    @click="scheduleDrop()" :disabled="dropScheduleButton">
                                                     Drop Schedule
                                                 </button>
                                                 <button class="btn btn-secondary btn-sm text-dark"
@@ -557,6 +561,7 @@
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Weight" @keypress="isNumber($event)"
                                         id="weight"
+                                        :disabled="editAbleELT"
                                         v-model="eltData.eltWeight"
                                     />
                                 </div>
@@ -569,6 +574,7 @@
                                         type="text"
                                         class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
                                         id="fullName"
+                                        :disabled="editAbleELT"
                                         v-model="eltData.eltPrice"
                                     />
                                 </div>
@@ -579,6 +585,7 @@
                                 <div class="form-group">
                                     <label for="description">Description</label>
                                     <textarea class="form-control" id="description" placeholder="Enter Elt Description"
+                                              :disabled="editAbleELT"
                                               v-model="eltData.dataDescription"
                                     ></textarea>
                                 </div>
@@ -587,8 +594,15 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
-                                @click="addEltToTicket(eltData)" :disabled="this.EltButton">
-                            {{ this.EltButton ? 'Loading...' : 'Add ELT' }}
+                                @click="addEltToTicket(eltData)" v-if="EltButton || !editAbleELT">
+                            {{ this.EltButton ? 'Loading...' : 'Add ELT Button' }}
+                        </button>
+                        <button type="button" class="btn btn-outline-info"
+                                @click="editAbleELT = false" v-if="editAbleELT">Edit
+                        </button>
+                        <button type="button" class="btn btn-outline-danger"
+                                @click="editAbleELT = true "
+                                v-if="!editAbleELT">Cancel
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeElt()">Close
                         </button>
@@ -795,7 +809,7 @@
                                         <label for="name">Discount </label>
                                         <input
                                             type="text"
-                                            @keypress="isNumber($event)"
+                                            @keypress="isNumberDiscount($event)"
                                             class="form-control"
                                             v-model="rescheduleDiscount"
                                         />
@@ -1032,7 +1046,7 @@
             <div class="row">
                 <div class=" form-group col-md-6">
                     <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control" v-model="dataForClose.bus" :disabled="checkCloseData">
+                    <select class="form-control" v-model="dataForClose.bus" :disabled="checkCloseData && editAble">
                         <option value="">Select Bus Class</option>
                         <option
                             v-for="(bus, i) in buses"
@@ -1076,7 +1090,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple
-                            :disabled="checkCloseData">
+                            :disabled="checkCloseData && editAble">
                         <option
                             v-for="(driver, i) in drivers"
                             :key="i"
@@ -1089,7 +1103,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple
-                            :disabled="checkCloseData">
+                            :disabled="checkCloseData && editAble">
                         <option
                             v-for="(host, i) in hosts"
                             :key="i"
@@ -1105,21 +1119,31 @@
                         class="form-control"
                         placeholder="Enter Description"
                         id="location"
-                        :disabled="checkCloseData"
+                        :disabled="checkCloseData && editAble"
                         v-model="dataForClose.description"
                         cols="30"
                         rows="10"
                     ></textarea>
                 </div>
             </div>
+            <!--            <div class="d-flex justify-content-end">-->
+            <!--                -->
+            <!--            </div>-->
             <template v-slot:button>
                 <button
                     type="button"
                     class="btn btn-primary"
-                    v-if="!checkCloseData"
+                    v-if="!checkCloseData || !editAble"
                     @click="closeSchedule" :disabled="loading"
                 >
                     {{ loading ? 'Loading...' : 'Close Booking' }}
+                </button>
+                <button type="button" class="btn btn-outline-info"
+                        @click="editAble = false" :disabled="loading" v-else>Edit
+                </button>
+                <button type="button" class="btn btn-outline-danger"
+                        @click="editAble=true"
+                        v-if="!editAble">Cancel
                 </button>
             </template>
         </Add>
@@ -1213,7 +1237,6 @@ export default {
             drivers: [],
             hosts: [],
             assignBus: 0,
-            getCustomermessage: '',
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
             detailsFormId: "details-modal",
@@ -1233,6 +1256,9 @@ export default {
                 drivers: [],
                 hosts: [],
                 description: '',
+                ticket_closing_id: '',
+                alreadyAssigned: '',
+                ticket_merge_id: '',
             },
             dropScheduleFormData: {
                 reason: '',
@@ -1268,6 +1294,8 @@ export default {
             reScheduleDest: '',
             reScheduleDate: '',
             loading: false,
+            editAble: true,
+            editAbleELT: true,
             getSchedule: false,
             showBookingDiv: false,
             showReBookingDiv: false,
@@ -1618,6 +1646,9 @@ export default {
                 this.drivers = resData.data.drivers;
                 this.hosts = resData.data.hosts;
                 this.dataForClose.date = resData.data.infoData.schedule_date;
+                this.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
+                this.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
+                this.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
                 this.dataForClose.schedule_detail = resData.data.infoData.schedule;
                 this.dataForClose.schedule = resData.data.infoData.schedule_id;
                 this.dataForClose.route_name = resData.data.infoData.route_name;
@@ -1626,7 +1657,6 @@ export default {
                 this.dataForClose.hosts = resData.data.infoData.hosts;
                 this.dataForClose.description = resData.data.infoData.description;
                 this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
-
                 $(`#${this.formID}`).modal('show');
                 ;
             }
@@ -1669,7 +1699,7 @@ export default {
                     icon: 'error',
                     timer: 2000
                 });
-            this.loadig = true;
+            this.loading = true;
             const res = await this.callApi("post", "booking/close/schedule/closing/store", this.dataForClose);
             if (res.status == 201) {
                 swal({
@@ -1679,6 +1709,7 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
+                this.editAble = true;
                 this.dataForClose.bus = "";
                 this.dataForClose.date = "";
                 this.dataForClose.schedule = "";
@@ -1686,6 +1717,7 @@ export default {
                 this.dataForClose.hosts = [];
                 this.dataForClose.description = "";
                 this.closingData();
+                setTimeout(() => this.closeModal(), 1500);
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -1899,7 +1931,7 @@ export default {
                     timer: 2000
                 });
             } else {
-                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? parseFloat(this.addForm.discount) : this.addForm.totalFare)
+                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? (this.addForm.discount) : this.addForm.totalFare)
             }
         },
 
@@ -1914,6 +1946,15 @@ export default {
                 evt.preventDefault();
             } else {
                 return true;
+            }
+        },
+        isNumberDiscount(event) {
+            const charCode = event.which ? event.which : event.keyCode;
+            if (
+                (charCode < 48 || charCode > 57) && // Not a digit
+                charCode !== 45 // Not a minus sign
+            ) {
+                event.preventDefault();
             }
         },
         changeToUpperCase: function (string) {
@@ -2625,7 +2666,7 @@ export default {
         ,
 
         //ELT MODEL DATA
-        passDataToEltModel: function (data) {
+        async passDataToEltModel(data) {
             this.eltData = {
                 dataDate: data.date,
                 dataCustomer: data.customer_id,
@@ -2635,9 +2676,22 @@ export default {
                 dataSeat_no: data.seat_no,
                 dataSeatFare: data.seat_fare,
             }
+            const resELT = await this.callApi("post", "booking/elt/fetch/old", data);
+            if (resELT.status == 200) {
+                this.editAbleELT = true;
+                this.eltData.eltWeight = resELT.data.elt_weight;
+                this.eltData.eltPrice = resELT.data.elt_price;
+                this.eltData.dataDescription = resELT.data.elt_description;
+                this.eltData.alreadyExist = resELT.data.alreadyExist;
+
+            } else if (resELT.status == 204) {
+                this.editAbleELT = false;
+                this.eltData.eltWeight = '';
+                this.eltData.eltPrice = '';
+                this.eltData.dataDescription = '';
+            }
             $("#addELTModel").modal('show');
-        }
-        ,
+        },
 
         async addEltToTicket(dataEnter) {
             if (dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined') {
@@ -2668,6 +2722,7 @@ export default {
                 totalPrice: dataEnter.eltPrice,
                 singleFare: dataEnter.dataSeatFare,
                 eltDescription: dataEnter.dataDescription,
+                alreadyExist: dataEnter.alreadyExist,
             }
             this.EltButton = true;
             const resOverIssue = await this.callApi("post", "booking/elt", data);
@@ -2684,8 +2739,23 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.closeModal();
             }
-            this.closeModal();
+            if (resOverIssue.status == 200) {
+                this.EltButton = false;
+                this.eltIds = resOverIssue.data.id
+                this.fetchScheduleData();
+                setTimeout(() => {
+                    this.$refs.refElt.submit();
+                }, 700);
+                swal({
+                    title: "Success",
+                    text: "ELT Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.closeModal();
+            }
             if (resOverIssue.status == 422 && resOverIssue.data.message) {
                 this.EltButton = false;
                 swal({
@@ -2694,10 +2764,12 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+                this.closeModal();
             }
 
             if (resOverIssue.status == 422) {
                 this.EltButton = false;
+                this.closeModal();
                 let errorContent = "";
                 let count = 0;
                 for (const key in resOverIssue.data.errors) {

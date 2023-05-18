@@ -16,8 +16,8 @@ class CorsMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if ( !str_contains(url(''), 'localhost')) {
+//        if ( !str_contains(url(''), 'localhost')) {
             return $next($request);
-        }
+//        }
     }
 }

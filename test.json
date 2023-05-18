@@ -46,7 +46,7 @@
                         "allow": true
                     },
                     {
-                        "name": "",
+                        "name": "discount",
                         "allow": true
                     }
                 ]
