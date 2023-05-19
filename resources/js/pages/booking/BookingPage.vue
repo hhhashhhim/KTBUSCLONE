@@ -1656,8 +1656,7 @@ export default {
                 this.dataForClose.hosts = resData.data.infoData.hosts;
                 this.dataForClose.description = resData.data.infoData.description;
                 this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
-                $(`#${this.formID}`).modal('show');
-                ;
+                $(`#${this.formAddID}`).modal('show');
             }
         },
 
@@ -1741,7 +1740,7 @@ export default {
                 }
             }
         },
-        
+
         async updateCloseSchedule() {
             this.validationErrors = [];
             if (!this.dataForClose.bus)
