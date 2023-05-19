@@ -71,11 +71,6 @@ class ScheduleClosingController extends Controller
 
     public function store(Request $request)
     {
-//        dd($request->all());
-        // In Case of Already Exist
-        if ($request->alreadyAssigned == 1) {
-           updateCloseSchedule($request);
-        }
         // this is for get route id that will be followed by schedule
         $route = Schedule::find($request->schedule)->route_id;
         // this is for get schedule start city
@@ -175,6 +170,16 @@ class ScheduleClosingController extends Controller
         where(["company_id" => Auth::user()->company_id, "id" => $request->mergeId])
             ->first();
 
+        // revert previous bus merge record
+        if ($prevMerge->schedule_complete == 1) {
+            TicketClosingMerge::where("id", $prevMerge->id)->update([
+                "schedule_return_date" => null,
+                "schedule_complete" => 0,
+            ]);
+        } else {
+            $prevMerge->delete();
+        }
+        
         $checkMergeRecord = TicketClosingMerge::
         where(["company_id" => Auth::user()->company_id, "bus_id" => $request->bus, "schedule_complete" => 0])
             ->latest("id")->first();
@@ -195,15 +200,6 @@ class ScheduleClosingController extends Controller
             ]);
         }
 
-        // revert previous bus merge record
-        if ($prevMerge->schedule_complete == 1) {
-            TicketClosingMerge::where("id", $prevMerge->id)->update([
-                "schedule_return_date" => null,
-                "schedule_complete" => 0,
-            ]);
-        } else {
-            $prevMerge->delete();
-        }
         // delete old members
         TicketClosingMember::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->delete();
 

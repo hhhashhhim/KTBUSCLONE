@@ -373,10 +373,35 @@ class BookingController extends Controller
         if (!$request->date) {
             return "Date is Required";
         }
+        
         $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
-        $allSchedules->map(function ($single) {
-            $single->departure_date = date("m/d/Y", strtotime($single->departure_date));
-            $single->departure_time = date("h:i A", strtotime($single->departure_time));
+        $allSchedules->map(function ($single) use ($request){
+        //     $sub = 0;
+        //     if(Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id)
+        //     {
+        //         $checkTerminal = ScheduleTerminalSequence::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->departure_city_id, 'schedule_id' => $single->schedule_id])->orderBy('id', 'DESC')->get();
+        //         if($checkTerminal->count() > 0)
+        //         {
+        //             if ($checkTerminal->first()->terminal_id != Auth::user()->terminal_id)
+        //             {
+        //                 foreach ($checkTerminal as $key => $terminalSequence) {
+        //                     if (Auth::user()->terminal_id == $terminalSequence->terminal_id) {
+        //                         break;
+        //                     } else {
+        //                         $terminalTime = TerminalTimeDifference::where(['company_id' =>  Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+        //                         if ($terminalTime) {
+        //                             $time = explode(":", $terminalTime->time_difference);
+        //                             $sub += ($time[0] * 60 * 60) + ($time[1] * 60);
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+            
+            $exactDate = date("Y-m-d h:i A",strtotime($single->departure_date.' '.$single->departure_time));
+            $single->departure_date = date("m/d/Y", strtotime($exactDate));
+            $single->departure_time = date("h:i A", strtotime($exactDate));
         });
         return $allSchedules;
     }
