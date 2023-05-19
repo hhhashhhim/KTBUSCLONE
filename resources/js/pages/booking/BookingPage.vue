@@ -1046,7 +1046,7 @@
             <div class="row">
                 <div class=" form-group col-md-6">
                     <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control" v-model="dataForClose.bus" :disabled="checkCloseData && editAble">
+                    <select class="form-control" v-model="dataForClose.bus">
                         <option value="">Select Bus Class</option>
                         <option
                             v-for="(bus, i) in buses"
@@ -1090,7 +1090,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple
-                            :disabled="checkCloseData && editAble">
+                            >
                         <option
                             v-for="(driver, i) in drivers"
                             :key="i"
@@ -1103,7 +1103,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple
-                            :disabled="checkCloseData && editAble">
+                            >
                         <option
                             v-for="(host, i) in hosts"
                             :key="i"
@@ -1119,7 +1119,6 @@
                         class="form-control"
                         placeholder="Enter Description"
                         id="location"
-                        :disabled="checkCloseData && editAble"
                         v-model="dataForClose.description"
                         cols="30"
                         rows="10"
@@ -1130,20 +1129,22 @@
             <!--                -->
             <!--            </div>-->
             <template v-slot:button>
+                    <!-- v-if="!checkCloseData || !editAble" -->
                 <button
+                    v-if="checkCloseData"
                     type="button"
                     class="btn btn-primary"
-                    v-if="!checkCloseData || !editAble"
+                    @click="updateCloseSchedule" :disabled="loading"
+                >
+                    {{ loading ? 'Loading...' : 'Update' }}
+                </button>
+                <button
+                    v-else
+                    type="button"
+                    class="btn btn-primary"
                     @click="closeSchedule" :disabled="loading"
                 >
                     {{ loading ? 'Loading...' : 'Close Booking' }}
-                </button>
-                <button type="button" class="btn btn-outline-info"
-                        @click="editAble = false" :disabled="loading" v-else>Edit
-                </button>
-                <button type="button" class="btn btn-outline-danger"
-                        @click="editAble=true"
-                        v-if="!editAble">Cancel
                 </button>
             </template>
         </Add>
@@ -1705,6 +1706,89 @@ export default {
                 swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                this.editAble = true;
+                this.dataForClose.bus = "";
+                this.dataForClose.date = "";
+                this.dataForClose.schedule = "";
+                this.dataForClose.drivers = [];
+                this.dataForClose.hosts = [];
+                this.dataForClose.description = "";
+                this.closingData();
+                setTimeout(() => this.closeModal(), 1500);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        
+        async updateCloseSchedule() {
+            this.validationErrors = [];
+            if (!this.dataForClose.bus)
+                return swal({
+                    title: "Required",
+                    text: "Bus is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (!this.dataForClose.date)
+                return swal({
+                    title: "Required",
+                    text: "Date is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (!this.dataForClose.schedule)
+                return swal({
+                    title: "Required",
+                    text: "Schedule is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.dataForClose.drivers.length == 0)
+                return swal({
+                    title: "Required",
+                    text: "Driver is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            if (this.dataForClose.hosts.length == 0)
+                return swal({
+                    title: "Required",
+                    text: "Host is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            this.loading = true;
+            this.dataForClose.mergeId = this.dataForClose.ticket_merge_id
+            this.dataForClose.closingId = this.dataForClose.ticket_closing_id
+             const res = await this.callApi("post", "booking/close/schedule/closing/update", this.dataForClose);
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
