@@ -549,6 +549,7 @@ export default {
                                 {name: "reschedule-seats", allow: true},
                                 {name: "overissue-seat", allow: true},
                                 {name: "cancel-ticket", allow: true},
+                                {name: "check-assigned-bus", allow: true},
                             ]
                         },
                         {
@@ -944,7 +945,6 @@ export default {
                 this.loading = false
                 $("#company_table").DataTable().destroy();
                 this.close();
-
                 swal({
                     title: "Success",
                     text: "Company Created Successfully",

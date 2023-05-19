@@ -306,7 +306,8 @@
             {
                 "name": "bookings",
                 "allow": true,
-                "buttons": [
+                "buttons":
+                [
                     {
                         "name": "assign-bus",
                         "allow": true
@@ -369,6 +370,10 @@
                     },
                     {
                         "name": "cancel-ticket",
+                        "allow": true
+                    },
+                    {
+                        "name": "check-assign-bus",
                         "allow": true
                     }
                 ]

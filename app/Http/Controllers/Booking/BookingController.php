@@ -203,7 +203,7 @@ class BookingController extends Controller
                     'type' => $request->type,
                     'discount_type' => $request->usagePoints ? 'card' : null,
                     'added_by' => Auth::user()->id,
-                    'discount' => $request->discount ? $request->discount : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
+                    'discount' => $request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
                     'points_usage' => $request->pointsUseInput / count($request->selectedSeats),
                 ]);
                 if ($isPartial == 1) {
@@ -1081,10 +1081,10 @@ class BookingController extends Controller
             'tickets.company_id' => Auth::user()->company_id,
             'tickets.schedule_id' => $request->schedule_id,
             'tickets.schedule_date' => $uniqueDate,
-        ])->where('type', '!=', 'reschedule')
+        ])->where('type', '!=', 'reschedule')->where('type', '!=', 'canceled')
             ->with("terminal:id,name", "destination_city:id,name")
             ->with(["commission" => function ($q) use ($route) {
-                return $q->where("route_id", $route->id);
+                return $q->where("route_id", $route->id)->where('fix_commission', '!=', 0.00);
             }])
             ->leftJoin("ticket_e_l_t_s", "ticket_e_l_t_s.ticket_id", "tickets.id") //this for if elt exist show else null
             ->select("tickets.*", "ticket_e_l_t_s.elt_price")

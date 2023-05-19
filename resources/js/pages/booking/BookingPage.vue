@@ -1041,7 +1041,7 @@
             heading="Close Schedule"
             :errors="this.validationErrors"
             :success="success"
-            :formID="formID"
+            :formID="formAddID"
         >
             <div class="row">
                 <div class=" form-group col-md-6">
@@ -1126,9 +1126,6 @@
                     ></textarea>
                 </div>
             </div>
-            <!--            <div class="d-flex justify-content-end">-->
-            <!--                -->
-            <!--            </div>-->
             <template v-slot:button>
                 <button
                     type="button"
@@ -1268,7 +1265,7 @@ export default {
                 schedule_id: '',
             },
             isActive: 1,
-            formID: "addBooking",
+            formAddID: "addBooking",
             deleteFormID: "delete_addBooking",
             validationErrors: [],
             success: false,
@@ -1635,6 +1632,7 @@ export default {
                     timer: 2000,
                 });
             }
+
             const resData = await this.callApi("post", "booking/getClosingData", {
                 scheduleId: this.addForm.schedule,
                 date: this.addForm.date,
@@ -2367,7 +2365,7 @@ export default {
 
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
-                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Seat Fare : " + col.fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
 
@@ -3055,28 +3053,31 @@ export default {
                     timer: 2000
                 });
             }
-            // check Buss Assigned or not
-            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
-                scheduleId: this.addForm.schedule,
-                date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
-                destinationCity: this.addForm.destinationCity,
-            });
-            if (resCheckedBus.status == 200) {
-                this.$refs.refPassengerList.submit();
-            } else if (resCheckedBus.status == 204) {
-                return swal({
-                    title: "OOPS!!",
-                    text: "Please Assign Bus First!",
-                    icon: "error",
-                    timer: 2000
+            if (this.checkForSubmenuButtons('check-assigned-bus')) {
+                // check Buss Assigned or not
+                const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                    scheduleId: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
                 });
+                if (resCheckedBus.status == 200) {
+                    this.$refs.refPassengerList.submit();
+                } else if (resCheckedBus.status == 204) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Assign Bus First!",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            } else {
+                this.$refs.refPassengerList.submit();
             }
         }
         ,
         // Get Terminal Invoice
         async getTerminalInvoice() {
-
             if (this.addForm.departureCity == 0) {
                 return swal({
                     title: "Required!",
@@ -3117,22 +3118,27 @@ export default {
                     timer: 2000
                 });
             }
-            // check Buss Assigned or not
-            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
-                scheduleId: this.addForm.schedule,
-                date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
-                destinationCity: this.addForm.destinationCity,
-            });
-            if (resCheckedBus.status == 200) {
-                this.$refs.refTerminalInvoice.submit();
-            } else if (resCheckedBus.status == 204) {
-                return swal({
-                    title: "OOPS!!",
-                    text: "Please Assign Bus First!",
-                    icon: "error",
-                    timer: 2000
+
+            if (this.checkForSubmenuButtons('check-assigned-bus')) {
+                // check Buss Assigned or not
+                const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                    scheduleId: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
                 });
+                if (resCheckedBus.status == 200) {
+                    this.$refs.refTerminalInvoice.submit();
+                } else if (resCheckedBus.status == 204) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Assign Bus First!",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            } else {
+                this.$refs.refTerminalInvoice.submit();
             }
         }
         ,
@@ -3171,22 +3177,26 @@ export default {
                     timer: 2000
                 });
             }
-            // check Buss Assigned or not
-            const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
-                scheduleId: this.addForm.schedule,
-                date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
-                destinationCity: this.addForm.destinationCity,
-            });
-            if (resCheckedBus.status == 200) {
-                this.$refs.refBusInvoice.submit();
-            } else if (resCheckedBus.status == 204) {
-                return swal({
-                    title: "OOPS!!",
-                    text: "Please Assign Bus First!",
-                    icon: "error",
-                    timer: 2000
+            if (this.checkForSubmenuButtons('check-assigned-bus')) {
+                // check Buss Assigned or not
+                const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+                    scheduleId: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
                 });
+                if (resCheckedBus.status == 200) {
+                    this.$refs.refBusInvoice.submit();
+                } else if (resCheckedBus.status == 204) {
+                    return swal({
+                        title: "OOPS!!",
+                        text: "Please Assign Bus First!",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            } else {
+                this.$refs.refBusInvoice.submit();
             }
 
         },

@@ -172,7 +172,7 @@
                 @php
                     $totalElt += $destination->sum("elt_price")
                 @endphp
-                <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - $destination->sum("discount")) - $commission) - $totalAdjustCommission }}</td>
+                <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - ($destination->sum("discount"))) - $commission) - $totalAdjustCommission }}</td>
             </tr>
         @endforeach
     @endforeach

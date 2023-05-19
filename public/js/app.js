@@ -28296,7 +28296,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         schedule_id: ''
       },
       isActive: 1,
-      formID: "addBooking",
+      formAddID: "addBooking",
       deleteFormID: "delete_addBooking",
       validationErrors: [],
       success: false,
@@ -29968,7 +29968,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     getTitle: function getTitle(col) {
       if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
-        return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+        return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Seat Fare : " + col.fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
       }
     },
     getStyle: function getStyle(col) {
@@ -31015,7 +31015,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                _context31.next = 10;
+                if (!_this32.checkForSubmenuButtons('check-assigned-bus')) {
+                  _context31.next = 20;
+                  break;
+                }
+
+                _context31.next = 11;
                 return _this32.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this32.addForm.schedule,
                   date: _this32.addForm.date,
@@ -31023,22 +31028,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this32.addForm.destinationCity
                 });
 
-              case 10:
+              case 11:
                 resCheckedBus = _context31.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context31.next = 15;
+                  _context31.next = 16;
                   break;
                 }
 
                 _this32.$refs.refPassengerList.submit();
 
-                _context31.next = 17;
+                _context31.next = 18;
                 break;
 
-              case 15:
+              case 16:
                 if (!(resCheckedBus.status == 204)) {
-                  _context31.next = 17;
+                  _context31.next = 18;
                   break;
                 }
 
@@ -31049,7 +31054,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 17:
+              case 18:
+                _context31.next = 21;
+                break;
+
+              case 20:
+                _this32.$refs.refPassengerList.submit();
+
+              case 21:
               case "end":
                 return _context31.stop();
             }
@@ -31132,7 +31144,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                _context32.next = 12;
+                if (!_this33.checkForSubmenuButtons('check-assigned-bus')) {
+                  _context32.next = 22;
+                  break;
+                }
+
+                _context32.next = 13;
                 return _this33.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this33.addForm.schedule,
                   date: _this33.addForm.date,
@@ -31140,22 +31157,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this33.addForm.destinationCity
                 });
 
-              case 12:
+              case 13:
                 resCheckedBus = _context32.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context32.next = 17;
+                  _context32.next = 18;
                   break;
                 }
 
                 _this33.$refs.refTerminalInvoice.submit();
 
-                _context32.next = 19;
+                _context32.next = 20;
                 break;
 
-              case 17:
+              case 18:
                 if (!(resCheckedBus.status == 204)) {
-                  _context32.next = 19;
+                  _context32.next = 20;
                   break;
                 }
 
@@ -31166,7 +31183,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 19:
+              case 20:
+                _context32.next = 23;
+                break;
+
+              case 22:
+                _this33.$refs.refTerminalInvoice.submit();
+
+              case 23:
               case "end":
                 return _context32.stop();
             }
@@ -31236,7 +31260,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                _context33.next = 10;
+                if (!_this34.checkForSubmenuButtons('check-assigned-bus')) {
+                  _context33.next = 20;
+                  break;
+                }
+
+                _context33.next = 11;
                 return _this34.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this34.addForm.schedule,
                   date: _this34.addForm.date,
@@ -31244,22 +31273,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this34.addForm.destinationCity
                 });
 
-              case 10:
+              case 11:
                 resCheckedBus = _context33.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context33.next = 15;
+                  _context33.next = 16;
                   break;
                 }
 
                 _this34.$refs.refBusInvoice.submit();
 
-                _context33.next = 17;
+                _context33.next = 18;
                 break;
 
-              case 15:
+              case 16:
                 if (!(resCheckedBus.status == 204)) {
-                  _context33.next = 17;
+                  _context33.next = 18;
                   break;
                 }
 
@@ -31270,7 +31299,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 17:
+              case 18:
+                _context33.next = 21;
+                break;
+
+              case 20:
+                _this34.$refs.refBusInvoice.submit();
+
+              case 21:
               case "end":
                 return _context33.stop();
             }
@@ -34233,6 +34269,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             allow: true
           }, {
             name: "cancel-ticket",
+            allow: true
+          }, {
+            name: "check-assigned-bus",
             allow: true
           }]
         }, {
@@ -57466,7 +57505,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     heading: "Close Schedule",
     errors: this.validationErrors,
     success: $data.success,
-    formID: $data.formID
+    formID: $data.formAddID
   }, {
     button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [!$data.checkCloseData || !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
