@@ -373,7 +373,7 @@ class BookingController extends Controller
         if (!$request->date) {
             return "Date is Required";
         }
-        
+
         $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
         $allSchedules->map(function ($single) use ($request){
         //     $sub = 0;
@@ -398,7 +398,7 @@ class BookingController extends Controller
         //             }
         //         }
         //     }
-            
+
             $exactDate = date("Y-m-d h:i A",strtotime($single->departure_date.' '.$single->departure_time));
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
@@ -1109,7 +1109,7 @@ class BookingController extends Controller
         ])->where('type', '!=', 'reschedule')->where('type', '!=', 'canceled')
             ->with("terminal:id,name", "destination_city:id,name")
             ->with(["commission" => function ($q) use ($route) {
-                return $q->where("route_id", $route->id)->where('fix_commission', '!=', 0.00);
+                return $q->where("route_id", $route->id);
             }])
             ->leftJoin("ticket_e_l_t_s", "ticket_e_l_t_s.ticket_id", "tickets.id") //this for if elt exist show else null
             ->select("tickets.*", "ticket_e_l_t_s.elt_price")
