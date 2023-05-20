@@ -31,7 +31,7 @@ class ScheduleClosingController extends Controller
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
         where('company_id', Auth::user()->company_id)
-            ->with("bus:id,bus_number", "schedule:id,name")
+            ->with("bus:id,bus_number", "schedule:id,name,route_id","schedule.route:id,name")
             ->get()
             ->groupBy('ticket_merge_id');
         $data = [

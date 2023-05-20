@@ -375,34 +375,35 @@ class BookingController extends Controller
         }
 
         $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
-        $allSchedules->map(function ($single) use ($request){
-        //     $sub = 0;
-        //     if(Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id)
-        //     {
-        //         $checkTerminal = ScheduleTerminalSequence::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->departure_city_id, 'schedule_id' => $single->schedule_id])->orderBy('id', 'DESC')->get();
-        //         if($checkTerminal->count() > 0)
-        //         {
-        //             if ($checkTerminal->first()->terminal_id != Auth::user()->terminal_id)
-        //             {
-        //                 foreach ($checkTerminal as $key => $terminalSequence) {
-        //                     if (Auth::user()->terminal_id == $terminalSequence->terminal_id) {
-        //                         break;
-        //                     } else {
-        //                         $terminalTime = TerminalTimeDifference::where(['company_id' =>  Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
-        //                         if ($terminalTime) {
-        //                             $time = explode(":", $terminalTime->time_difference);
-        //                             $sub += ($time[0] * 60 * 60) + ($time[1] * 60);
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
+        foreach($allSchedules as $single)
+        {
+            $sub = 0;
+            if(Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id)
+            {
+                $checkTerminal = ScheduleTerminalSequence::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->departure_city_id, 'schedule_id' => $single->schedule_id])->orderBy('id', 'DESC')->get();
+                if($checkTerminal->count() > 0)
+                {
+                    if(in_array(Auth::user()->terminal_id, $checkTerminal->pluck("terminal_id")->toArray()))
+                    {
+                        foreach ($checkTerminal as $key => $terminalSequence) {
+                            if (Auth::user()->terminal_id == $terminalSequence->terminal_id) {
+                                break;
+                            } else {
+                                $terminalTime = TerminalTimeDifference::where(['company_id' =>  Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+                                if ($terminalTime) {
+                                    $time = explode(":", $terminalTime->time_difference);
+                                    $sub += ($time[0] * 60 * 60) + ($time[1] * 60);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            $exactDate = date("Y-m-d h:i A",strtotime($single->departure_date.' '.$single->departure_time));
+            $exactDate = date("Y-m-d h:i A",strtotime($single->departure_date.' '.$single->departure_time) - $sub);
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
-        });
+        }
         return $allSchedules;
     }
 
@@ -1146,7 +1147,9 @@ class BookingController extends Controller
             if ($ticketTerminal->city_id == $item->departure_city_id) {
                 if ($checkTerminal->count() > 0) {
                     //              if ticket terminal id at last of sequence it mean no need to calculation
-                    if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
+                    // if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
+                    if(in_array($item->terminal_id, $checkTerminal->pluck("terminal_id")->toArray()))
+                    {
                         foreach ($checkTerminal as $key => $single) {
                             if ($item->terminal_id == $single->terminal_id) {
                                 break;

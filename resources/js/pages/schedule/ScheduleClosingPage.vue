@@ -30,6 +30,7 @@
                                                     <tr>
                                                         <th>Bus Number</th>
                                                         <th>Schedule</th>
+                                                        <th>Route Name</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
                                                         <th v-if="checkForSubmenuButtons('edit-close-booking')">Action
@@ -47,6 +48,10 @@
                                                             <td class="h5"
                                                                 :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule.name }}
+                                                            </td>
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                                {{ close.schedule.route.name }}
                                                             </td>
                                                             <td class="h5"
                                                                 :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
