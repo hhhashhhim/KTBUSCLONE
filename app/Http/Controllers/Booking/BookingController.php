@@ -66,7 +66,6 @@ class BookingController extends Controller
         } else {
             $ids = json_decode(Auth::user()->departure_city_ids);
         }
-
         return City::with('addedBy')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
     }
 

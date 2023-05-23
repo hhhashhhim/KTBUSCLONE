@@ -82,24 +82,4 @@ class ExpenseController extends Controller
              "data" => $data
          ]);
     }
-    // public function update(Request $request)
-    // {
-    //     $rules = [
-    //         'name' => ['required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-    //     ];
-
-    //     $customMessages = [
-    //         'name.required' => 'Name Field is Required!',
-    //         'name.unique' => 'Category Name is Already Exist',
-    //     ];
-    //     $this->validate($request, $rules, $customMessages);
-    //     return ExpenseCategory::find($request->id)->update([
-    //         'name' => $request->name,
-    //     ]);
-    // }
-
-    // public function delete(Request $request)
-    // {
-    //     return City::find($request->id)->delete();
-    // }
 }
