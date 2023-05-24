@@ -183,7 +183,7 @@
         <th style="width: 25% !important;">
             @if($data['commission'])
                 @if($data['commission']->flat_commission == 0)
-                    {{ $ticketCommission = (($data['record']->sum('seat_fare') - $data['record']->sum('discount'))/100)*$data['commission']->percentage_commission }}
+                    {{ $ticketCommission = (($data['record']->sum('seat_fare') - ($data['record']->sum('discount')))/100)*$data['commission']->percentage_commission }}
                 @else
                     {{ $ticketCommission = $data['record']->count() * $data['commission']->flat_commission }}
                 @endif
