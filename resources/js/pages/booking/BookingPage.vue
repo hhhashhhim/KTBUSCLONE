@@ -1133,7 +1133,7 @@
                     class="btn btn-primary"
                     @click="updateCloseSchedule" :disabled="loading"
                 >
-                    {{ loading ? 'Loading...' : 'Update' }}
+                    {{ loading ? 'Loading...' : 'Update Schedule' }}
                 </button>
                 <button
                     v-else
@@ -2064,6 +2064,7 @@ export default {
                     date: this.addForm.date,
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
+                    dropTerminal: this.addForm.terminalId,
                 });
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
@@ -2233,6 +2234,7 @@ export default {
                 date: this.rescheduleData.rescheduleDate,
                 departureCity: parseInt(this.rescheduleData.dataDepartureCity),
                 destinationCity: this.rescheduleData.rescheduleDestinationCity,
+                dropTerminal: this.addForm.terminalId,
             });
             if (res.status == 200) {
                 this.seatMapReschedule = true;

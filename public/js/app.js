@@ -26609,7 +26609,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       validationErrors: [],
       editAble: true,
       headers: [],
@@ -26756,6 +26755,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this3.fetchData();
 
                   _this3.loading = false;
+                  setTimeout(function () {
+                    window.close();
+                  }, 3000);
                 } else {
                   _this3.loading = false;
 
@@ -29553,7 +29555,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   id: _this16.addForm.schedule,
                   date: _this16.addForm.date,
                   departureCity: _this16.addForm.departureCity,
-                  destinationCity: _this16.addForm.destinationCity
+                  destinationCity: _this16.addForm.destinationCity,
+                  dropTerminal: _this16.addForm.terminalId
                 });
 
               case 13:
@@ -29780,7 +29783,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   id: _this18.rescheduleData.rescheduleSchedule,
                   date: _this18.rescheduleData.rescheduleDate,
                   departureCity: parseInt(_this18.rescheduleData.dataDepartureCity),
-                  destinationCity: _this18.rescheduleData.rescheduleDestinationCity
+                  destinationCity: _this18.rescheduleData.rescheduleDestinationCity,
+                  dropTerminal: _this18.addForm.terminalId
                 });
 
               case 14:
@@ -52768,7 +52772,7 @@ var _hoisted_5 = {
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Report Headers Link"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\r\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\r\n                                    Add New Category\r\n                                </a>\r\n                            </div> ")], -1
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Report Headers Link")], -1
 /* HOISTED */
 );
 
@@ -52883,7 +52887,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_23)], 8
   /* PROPS */
-  , _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\r\n            heading=\"Add New Category\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :formID=\"formID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\r\n                </template>\r\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n            heading=\"Edit Category Name\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\r\n                </div>\r\n\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
+  , _hoisted_21)])]);
 }
 
 /***/ }),
@@ -57646,7 +57650,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return $options.updateCloseSchedule && $options.updateCloseSchedule.apply($options, arguments);
         }),
         disabled: $data.loading
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update'), 9
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Schedule'), 9
       /* TEXT, PROPS */
       , _hoisted_385)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 1,
@@ -63074,7 +63078,7 @@ var _hoisted_5 = {
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"card-header-action\">\r\n                                <a href=\"#\" data-toggle=\"modal\" :data-target=\"'#'+formID\" @click=\"clearForm()\" class=\"btn btn-primary\">\r\n                                    Add New Category\r\n                                </a>\r\n                            </div> ")], -1
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Expenses")], -1
 /* HOISTED */
 );
 
@@ -63290,7 +63294,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_37)], 8
   /* PROPS */
-  , _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Add\r\n            heading=\"Add New Category\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :formID=\"formID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"data.name\">\r\n                </div>\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"add\">{{ loading ? 'Loading...': 'Add New Category' }}</button>\r\n                </template>\r\n            </Add> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Edit\r\n            heading=\"Edit Category Name\"\r\n            :errors=\"this.validationErrors\"\r\n            :success=\"success\"\r\n            :editForm=\"editFormID\"\r\n            >\r\n                <div class=\"form-group\">\r\n                    <label for=\"name\">Name <span class=\"text-danger ml-1\">*</span></label>\r\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Enter Category Name\" v-model=\"dataEdit.name\">\r\n                </div>\r\n\r\n                <template v-slot:button>\r\n                    <button type=\"button\" class=\"btn btn-primary\" :disabled=\"loading\" @click=\"update\">{{ loading ? 'Loading...': 'Update Category' }}</button>\r\n                </template>\r\n            </Edit> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <Delete :deleteForm=\"deleteFormID\" confirmationMessage=\"Are You Sure You want To Delete This City ???\" /> ")])]);
+  , _hoisted_35)])]);
 }
 
 /***/ }),
@@ -75266,6 +75270,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_24, [_ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
       key: 0,
+      target: "_blank",
       "class": "btn btn-success mx-2",
       to: {
         name: 'expense-page',
@@ -75285,6 +75290,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* PROPS, DYNAMIC_SLOTS */
     , ["to"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
       key: 1,
+      target: "_blank",
       "class": "btn btn-success mx-2",
       to: {
         name: 'header-link-page',

@@ -1,6 +1,5 @@
 import Profile from "./components/Profile.vue";
 import {createWebHistory, createRouter} from "vue-router";
-
 import Users from "./pages/users/Users.vue";
 import Roles from "./pages/roles/Roles.vue";
 import Company from "./pages/company/Company.vue";
@@ -51,7 +50,6 @@ import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 
 const url = '/kt/'
-
 // const url = '/'
 
 const routes = [
