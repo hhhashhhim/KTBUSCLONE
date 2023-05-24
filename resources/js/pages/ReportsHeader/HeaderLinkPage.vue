@@ -6,11 +6,6 @@
                     <div class="card card-primary ">
                         <div class="card-header">
                             <h4>Report Headers Link</h4>
-                            <!-- <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
-                                    Add New Category
-                                </a>
-                            </div> -->
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -30,20 +25,22 @@
                                                     <tbody>
                                                     <tr v-for="(item,index) in headers" :key="index">
                                                         <td>
-                                                            {{saveRow(item.id,"first",index)}}
+                                                            {{ saveRow(item.id, "first", index) }}
                                                             <select class="form-control rounded-0"
-                                                                :disabled="editAble" :value="postData.headIds[index]">
+                                                                    :disabled="editAble"
+                                                                    :value="postData.headIds[index]">
                                                                 <option :value="item.id" :key="i"
-                                                                    >
+                                                                >
                                                                     {{ item.name }}
                                                                 </option>
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            {{saveRow(postData.values[index]??0,"second",index)}}
+                                                            {{ saveRow(postData.values[index] ?? 0, "second", index) }}
                                                             <input type="number" min="0" class="form-control"
-                                                            :value="postData.values[index]"
-                                                                :disabled="editAble" @keyup="saveRow($event,'third',index)"/>
+                                                                   :value="postData.values[index]"
+                                                                   :disabled="editAble"
+                                                                   @keyup="saveRow($event,'third',index)"/>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -76,48 +73,8 @@
                 <input type="hidden" name="_token" v-bind:value="csrf">
                 <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
             </form>
-
-
-            <!-- Add Modal -->
-            <!-- <Add
-            heading="Add New Category"
-            :errors="this.validationErrors"
-            :success="success"
-            :formID="formID"
-            >
-                <div class="form-group">
-                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="data.name">
-                </div>
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="add">{{ loading ? 'Loading...': 'Add New Category' }}</button>
-                </template>
-            </Add> -->
-
-            <!-- Add Modal -->
-            <!-- <Edit
-            heading="Edit Category Name"
-            :errors="this.validationErrors"
-            :success="success"
-            :editForm="editFormID"
-            >
-                <div class="form-group">
-                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="dataEdit.name">
-                </div>
-
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="update">{{ loading ? 'Loading...': 'Update Category' }}</button>
-                </template>
-            </Edit> -->
-
-            <!-- Add Modal -->
-            <!-- <Delete :deleteForm="deleteFormID" confirmationMessage="Are You Sure You want To Delete This City ???" /> -->
-
         </div>
     </section>
-
-
 </template>
 
 <script>
@@ -135,7 +92,6 @@ export default {
     },
     data() {
         return {
-            // csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             validationErrors: [],
             editAble: true,
             headers: [],
@@ -180,12 +136,11 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", 'reportsHeader/link/get',{ticket_merge_id:this.postData.ticket_merge_id});
+            const res = await this.callApi("post", 'reportsHeader/link/get', {ticket_merge_id: this.postData.ticket_merge_id});
             if (res.status == 200) {
                 this.headers = res.data.headers;
 
-                if(res.data.links != null)
-                {
+                if (res.data.links != null) {
                     this.postData.values = [];
                     for (var i = 0; i < res.data.links.length; i++) {
                         this.postData.values.push(res.data.links[i].value);
@@ -201,15 +156,13 @@ export default {
                 this.postData.headIds[index] = value;
             }
             if (fieldName == "second") {
-                this.postData.values[index] = parseFloat(value != "" ? value: 0);
-                }
+                this.postData.values[index] = parseFloat(value != "" ? value : 0);
+            }
             if (fieldName == "third") {
-                this.postData.values[index] = parseFloat(event.target.value != "" ? value.target.value: 0);
+                this.postData.values[index] = parseFloat(event.target.value != "" ? value.target.value : 0);
             }
         },
         async add() {
-
-
             this.loading = true;
             const res = await this.callApi("post", "reportsHeader/link", this.postData);
             if (res.status === 200) {
@@ -224,8 +177,12 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
-                 this.fetchData();
+                this.fetchData();
                 this.loading = false;
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+
             } else {
                 this.loading = false;
                 if (res.status == 422) {

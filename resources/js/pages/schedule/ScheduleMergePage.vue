@@ -52,13 +52,14 @@
                                                             {{ merge.schedule_return_date }}
                                                         </td>
                                                         <td v-if="checkForSubmenuButtons('add-expense')">
-                                                            <router-link v-if="checkForSubmenuButtons('add-expense')"
+                                                            <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"
                                                                          class="btn btn-success mx-2"
                                                                          :to="{ name:'expense-page', params: { id:merge.id }}"
                                                                          title="Add Expense">
                                                                 <i class="fas fa-plus"></i>
                                                             </router-link>
-                                                            <router-link v-if="checkForSubmenuButtons('add-expense')"
+                                                            <router-link target="_blank"
+                                                                         v-if="checkForSubmenuButtons('add-expense')"
                                                                          class="btn btn-success mx-2"
                                                                          :to="{ name:'header-link-page', params: { id:merge.id }}"
                                                                          title="header link">

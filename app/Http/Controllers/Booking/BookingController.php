@@ -32,6 +32,7 @@ use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
+use App\Models\TerminalDiscount;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -366,8 +367,7 @@ class BookingController extends Controller
         return Ticket::find($request->id)->delete();
     }
 
-    public
-    function fetchSpecificSchedule(Request $request)
+    public function fetchSpecificSchedule(Request $request)
     {
         if (!$request->date) {
             return "Date is Required";
@@ -670,6 +670,10 @@ class BookingController extends Controller
                 ]
             ], 422);
         }
+//        //Apply terminal Commission
+//        $discountTerminal = TerminalDiscount::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> ($request->dropTerminal !== 0 && $request->dropTerminal == Auth::user()->terminal_id) ? Auth::user()->terminal_id : $request->dropTerminal])->first();
+//        dd($discountTerminal);
+
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;
         foreach ($seatMap as $i => $iValue) {

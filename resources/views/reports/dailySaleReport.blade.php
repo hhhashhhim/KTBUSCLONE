@@ -59,7 +59,7 @@
 </head>
 
 <body>
-<div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
+<div style="border: 2px solid black; padding: 15px 3px 5px 3px !important; width: 100% !important; height: auto !important; ">
     <div id="info">
         <div class="companyName"><span>Kainat Travels</span></div>
     </div>
@@ -69,8 +69,10 @@
         <tr>
             <th class="centerTH">Date</th>
             <th class="fontWightTh">{{now()->subDays(1)->format("d-M-Y")}}</th>
-            <th class="centerTH">Bus NO</th>
+            <th class="centerTH">Bus No</th>
             <th class="fontWightTh">{{$singleData->bus_number}}</th>
+            <th class="centerTH">Route</th>
+            <th class="fontWightTh">{{$singleData->city_one . ' - ' . $singleData->city_two}}</th>
         </tr>
     </table>
     <br>

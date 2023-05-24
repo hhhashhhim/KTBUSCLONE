@@ -6,11 +6,6 @@
                     <div class="card card-primary ">
                         <div class="card-header">
                             <h4>Expenses</h4>
-                            <!-- <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()" class="btn btn-primary">
-                                    Add New Category
-                                </a>
-                            </div> -->
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -122,48 +117,8 @@
                 <input type="hidden" name="_token" v-bind:value="csrf">
                 <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
             </form>
-
-
-            <!-- Add Modal -->
-            <!-- <Add
-            heading="Add New Category"
-            :errors="this.validationErrors"
-            :success="success"
-            :formID="formID"
-            >
-                <div class="form-group">
-                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="data.name">
-                </div>
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="add">{{ loading ? 'Loading...': 'Add New Category' }}</button>
-                </template>
-            </Add> -->
-
-            <!-- Add Modal -->
-            <!-- <Edit
-            heading="Edit Category Name"
-            :errors="this.validationErrors"
-            :success="success"
-            :editForm="editFormID"
-            >
-                <div class="form-group">
-                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="dataEdit.name">
-                </div>
-
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="update">{{ loading ? 'Loading...': 'Update Category' }}</button>
-                </template>
-            </Edit> -->
-
-            <!-- Add Modal -->
-            <!-- <Delete :deleteForm="deleteFormID" confirmationMessage="Are You Sure You want To Delete This City ???" /> -->
-
         </div>
     </section>
-
-
 </template>
 
 <script>
@@ -217,8 +172,8 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         this.postData.ticket_merge_id = this.$route.params.id;
-         this.fetchData();
-         this.existingExpenses();
+        this.fetchData();
+        this.existingExpenses();
         setTimeout(function () {
             $("#expense_table").DataTable();
         }, 300);
@@ -329,8 +284,8 @@ export default {
                     timer: 2000
                 });
                 this.$refs.refDailySummaryReport.submit();
-                 this.fetchData();
-                 this.existingExpenses();
+                this.fetchData();
+                this.existingExpenses();
                 this.loading = false;
             } else {
                 this.loading = false;
