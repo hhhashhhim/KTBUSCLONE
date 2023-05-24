@@ -670,8 +670,10 @@ class BookingController extends Controller
                 ]
             ], 422);
         }
-//        //Apply terminal Commission
-//        $discountTerminal = TerminalDiscount::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> ($request->dropTerminal !== 0 && $request->dropTerminal == Auth::user()->terminal_id) ? Auth::user()->terminal_id : $request->dropTerminal])->first();
+//        //Apply terminal discount
+        $terminalDiscount = TerminalDiscount::where(["terminal_id"=>$request->dropTerminal??0,"route_id"=>$schedule->route_id])->first();
+
+        //        $discountTerminal = TerminalDiscount::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> ($request->dropTerminal !== 0 && $request->dropTerminal == Auth::user()->terminal_id) ? Auth::user()->terminal_id : $request->dropTerminal])->first();
 //        dd($discountTerminal);
 
         // Looping Through the seat of the bus
@@ -690,6 +692,11 @@ class BookingController extends Controller
                         } else {
                             $seatMap[$i][$j]['fare'] = (int)$data->fare - (int)$scheduleDiscount->flat;
                         }
+                    }
+                    if($terminalDiscount)
+                    {
+                        $tdiscount = ((int)$data->fare/100) * (int)$terminalDiscount->discount;
+                        $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                     }
                     if ($scheduleSurcharge) {
                         if ($scheduleSurcharge->type == "percentage") {
@@ -779,6 +786,11 @@ class BookingController extends Controller
                             } else {
                                 $seatMap[$i][$j]['fare'] = $fare - (int)$scheduleDiscount->flat;
                             }
+                        }
+                        if($terminalDiscount)
+                        {
+                            $tdiscount = ((int)$fare/100) * (int)$terminalDiscount->discount;
+                            $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                         }
                         if ($scheduleSurcharge) {
                             if ($scheduleSurcharge->type == "percentage") {
@@ -1257,6 +1269,14 @@ class BookingController extends Controller
             $q->where('is_active', 1);
         }])->where(['id' => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first(['id', 'discount_id', 'surcharge_id']);
     }
+    
+    public function fetchTerminalDiscount(Request $request)
+    {
+        $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
+        return $terminalDiscount = TerminalDiscount::where(["terminal_id"=>$request->dropTerminal??0,"route_id"=>$schedule->route_id])->first();
+    }
+
+    
 
     public function getFetchOldELT(Request $request)
     {
