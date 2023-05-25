@@ -61,10 +61,17 @@ class ExpenseController extends Controller
 
     public function dailySummery(Request $request)
     {
-        $closings_ids = TicketClosing::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->pluck('id');
+        $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
         $data = (object)[];
-        $data->schedule_start = Ticket::where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closings_ids[0])->with('terminal:id,name')->get()->groupBy(['terminal_id']);
-        $data->schedule_return = Ticket::where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closings_ids[1])->with('terminal:id,name')->get()->groupBy(['terminal_id']);
+        
+        $data->schedule_start = Ticket::with("elt")->with(["commission"=>function($q) use ($closing_pair){
+            $q->where("route_id",$closing_pair[0]->schedule->route_id);
+        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
+
+        $data->schedule_return = Ticket::with("elt")->with(["commission"=>function($q) use ($closing_pair){
+            $q->where("route_id",$closing_pair[1]->schedule->route_id);
+        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
+
         $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->with("expense_category:id,name")->get();
 
         // get bus number
@@ -76,6 +83,7 @@ class ExpenseController extends Controller
         $schedule = Schedule::where(["company_id" => Auth::user()->company_id])->whereIn("id", $schedule_ids)->with("route")->get();
         $singleData->city_one = explode("-", $schedule[0]->route->name)[0];
         $singleData->city_two = explode("-", $schedule[1]->route->name ?? $schedule[0]->route->name)[0];
+
 
         return view('reports.dailySaleReport', [
             "singleData" => $singleData,

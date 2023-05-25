@@ -101,9 +101,41 @@
                         @php
                             $startTotalPass += $item->count();
                         @endphp
-                        <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                        <td>
+                            @if($item[0]->commission)
+                                @if($item[0]->commission->flat_commission == 0)
+                                    @php $startCommission = (($item->sum("seat_fare") - ($item->sum("discount")))/100)*$item[0]->commission->percentage_commission @endphp
+                                @else
+                                    @php $startCommission = $item->count() * $item[0]->commission->flat_commission @endphp
+                                @endif
+                                <!-- adjustment commission -->
+                                @php 
+                                    $startAdjustCommission = (($item->sum("seat_fare") - $item->sum("discount"))/100)*$item[0]->commission->adjustment_commission;
+                                    $startFixCommission = $item[0]->commission->fix_commission 
+                                @endphp
+                                <!-- fix commission -->
+                            @else
+                                <!-- adjustment commission -->
+                                @php 
+                                    $startCommission = 0 ;
+                                    $startAdjustCommission = 0;
+                                    $startFixCommission = 0;
+                                @endphp
+                            @endif
+
+                            <!-- for elt -->
+                            @php $startElt = 0 @endphp
+                            @foreach($item as $ticket)
+                                @if($ticket->elt)
+                                    @php $startElt += $ticket->elt->elt_price; @endphp
+                                @endif
+                            @endforeach
+                            
+                            {{($item->sum('seat_fare') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission }}
+                        
+                        </td>
                         @php
-                            $startTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                            $startTotalAmount += ($item->sum('seat_fare') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission;
                         @endphp
                     </tr>
                 @endforeach
@@ -142,9 +174,40 @@
                         @php
                             $returnTotalPass += $item->count();
                         @endphp
-                        <td>{{$item->sum('seat_fare') - $item->sum('discount')}}</td>
+                        <td>
+                            @if($item[0]->commission)
+                                @if($item[0]->commission->flat_commission == 0)
+                                    @php $returnCommission = (($item->sum("seat_fare") - ($item->sum("discount")))/100)*$item[0]->commission->percentage_commission @endphp
+                                @else
+                                    @php $returnCommission = $item->count() * $item[0]->commission->flat_commission @endphp
+                                @endif
+                                <!-- adjustment commission -->
+                                @php 
+                                    $returnAdjustCommission = (($item->sum("seat_fare") - $item->sum("discount"))/100)*$item[0]->commission->adjustment_commission;
+                                    $returnFixCommission = $item[0]->commission->fix_commission 
+                                @endphp
+                                <!-- fix commission -->
+                            @else
+                                <!-- adjustment commission -->
+                                @php 
+                                    $returnCommission = 0 ;
+                                    $returnAdjustCommission = 0;
+                                    $returnFixCommission = 0;
+                                @endphp
+                            @endif
+
+                            <!-- for elt -->
+                            @php $returnElt = 0 @endphp
+                            @foreach($item as $ticket)
+                                @if($ticket->elt)
+                                    @php $returnElt += $ticket->elt->elt_price; @endphp
+                                @endif
+                            @endforeach
+                            
+                            {{($item->sum('seat_fare') + $returnElt - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission }}
+                        </td>
                         @php
-                            $returnTotalAmount += $item->sum('seat_fare') - $item->sum('discount');
+                            $returnTotalAmount += ($item->sum('seat_fare') + $returnElt - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission ;
                         @endphp
                     </tr>
                 @endforeach
