@@ -34,6 +34,11 @@ class FareTableController extends Controller
         return $this->getFarePrices($request->fare_class);
     }
 
+    public function getUpdateCities()
+    {
+        return City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+    }
+
     public function getFarePrices($fare_class)
     {
         $cities = City::with(['city_to' => function ($q) {
@@ -76,6 +81,24 @@ class FareTableController extends Controller
         return response($checkFare, 200);
     }
 
+    public function fareUpdate(Request $request)
+    {
+
+        FareTable::where(['from_city_id' => $request->fromCity, 'to_city_id' => $request->toCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
+            'fare' => $request->updatedFare,
+            'updated_by' => Auth::user()->id,
+        ]);
+        if ($request->reverse == true) {
+            FareTable::where(['from_city_id' => $request->toCity, 'to_city_id' => $request->fromCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
+                'fare' => $request->updatedFare,
+                'updated_by' => Auth::user()->id,
+            ]);
+        }
+        return response()->json([
+            'message' => 'Updated Successfully',
+        ], 200);
+    }
+
     public function updateScheduleTimes(Request $request)
     {
         $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
@@ -94,14 +117,11 @@ class FareTableController extends Controller
     }
 
     public function updateScheduleTimesProgress()
-    {  
+    {
         $data = DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
-        if($data)
-        {
+        if ($data) {
             return $data;
-        }
-        else
-        {
+        } else {
             return 0;
         }
     }

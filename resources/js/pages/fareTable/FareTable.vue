@@ -29,12 +29,57 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between px-4 border" v-else>
-                            <p>After updating time differrence press button this will check and update your schedule.
+                            <p>After updating time difference press button this will check and update your schedule.
                                 This can take time.</p>
-                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes"
+                            <button class="btn btn-danger mt-4 ml-2 mb-1" type="button" @click="updateScheduleTimes()"
                                     :disabled="loadingTable">
                                 {{ loadingTable ? 'Loading...' : 'Update Schedule' }}
                             </button>
+                        </div>
+                        <div class="border">
+                            <div class="row d-flex justify-content-between mx-3 my-2">
+                                <div class="form-group col-md-3">
+                                    <label for="department">From City<span class="text-danger ml-1">*</span></label>
+                                    <select class="form-control" v-model="addForm.fromCity">
+                                        <option value="0">Select From City</option>
+                                        <option v-for="(city,i) in updateCities" :key="i" :value="city.id"> {{
+                                                city.name
+                                            }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="department">To City<span class="text-danger ml-1">*</span></label>
+                                    <select class="form-control" v-model="addForm.toCity">
+                                        <option value="0">Select To City</option>
+                                        <option v-for="(city,i) in updateCities" :key="i" :value="city.id"> {{
+                                                city.name
+                                            }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="EmployeeName">Updated Fare <span
+                                        class="text-danger ml-1">*</span></label>
+                                    <input type="text" id="EmployeeName" class="form-control"
+                                           @keypress="isNumber($event)" maxlength="5"
+                                           v-model="addForm.updatedFare"/>
+                                </div>
+                                <div class="form-group col-md-1">
+                                    <label for="reverseFare">Reverse Fare </label>
+                                    <label class="colorinput mx-3 mt-3">
+                                        <input type="checkbox" id="reverseFare" class="colorinput-input"
+                                               v-model="addForm.reverse"/>
+                                        <span class="colorinput-color bg-primary"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <button class="btn btn-success mt-4 ml-2 mb-1" type="button" @click="updateFare()"
+                                            :disabled="loadingFare">
+                                        {{ loadingFare ? 'Loading...' : 'Update Fare' }}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <transition name="fade">
@@ -198,6 +243,7 @@ export default {
             loading: false,
             showDivOrHide: false,
             loadingTable: false,
+            loadingFare: false,
             date: null,
             options: {
                 placeholder: 'HH:MM',
@@ -215,8 +261,15 @@ export default {
             data: {
                 fare_class: '0',
             },
+            addForm: {
+                fromCity: 0,
+                toCity: 0,
+                updatedFare: '',
+                reverse: true,
+            },
             dataEdit: {},
             from: {},
+            updateCities: [],
             to: {},
             success: false,
             error: false,
@@ -255,6 +308,15 @@ export default {
                     title: "Required!",
                     text: "Travel Time is Required!",
                     icon: "error",
+                    timer: 2000
+                });
+            }
+            const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+            if (!timeRegex.test(this.data.time_difference)) {
+                return swal({
+                    title: "Warning!",
+                    text: "Please enter a valid time in HH:MM format",
+                    icon: "warning",
                     timer: 2000
                 });
             }
@@ -305,10 +367,13 @@ export default {
 
         async getClasses() {
             const res = await this.callApi("post", 'fare-table/fare_class/get');
-            if (res.status == 200) {
-                this.fareClasses = res.data
+            const resUpdateCities = await this.callApi("post", 'fare-table/update/cities/get');
+            if (res.status == 200 && resUpdateCities.status == 200) {
+                this.fareClasses = res.data;
+                this.updateCities = resUpdateCities.data;
             } else {
                 console.log(res);
+                console.log(resUpdateCities);
             }
         },
 
@@ -322,6 +387,13 @@ export default {
             }
         },
 
+        CheckBox: function (e) {
+            if (e.target.checked) {
+                this.addForm.reverse = 1;
+            } else {
+                this.addForm.reverse = 0;
+            }
+        },
         async updateScheduleTimes() {
             this.loadingTable = true;
             const res = await this.callApi("post", 'fare-table/schedules/times/update');
@@ -338,6 +410,58 @@ export default {
                 }, 500);
             } else {
                 console.log(res);
+            }
+        },
+        async updateFare() {
+            if (this.addForm.fromCity == '0') {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select From City!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.toCity == '0') {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select To City!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.data.fare_class == '0') {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Fare Class",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.updatedFare == '' || typeof this.addForm.updatedFare == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "Updated Fare is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.loadingFare = true;
+            this.addForm.fareClass = this.data.fare_class;
+            const resUpdateFare = await this.callApi("post", 'fare-table/fare/update', this.addForm);
+            if (resUpdateFare.status == 200) {
+                this.loadingFare = false;
+                swal({
+                    title: "Success",
+                    text: "Fare Updated Successfully!",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchRecord();
+                this.addForm.fromCity = 0;
+                this.addForm.toCity = 0;
+                this.addForm.updatedFare = '';
+                this.addForm.reverse = true;
+
             }
         },
 

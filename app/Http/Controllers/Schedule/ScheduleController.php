@@ -136,22 +136,53 @@ class ScheduleController extends Controller
     public function editSchedule(Request $request)
     {
         $schedule = Schedule::find($request->id);
-        $dataArr = [];
-        if (!is_null($schedule->route_city_terminal)) {
-            foreach ($schedule->route_city_terminal as $key => $item) {
-                $dataArr['city'][$key] = $item['city_id'];
-                $dataArr['terminal'][$key] = $item['terminal_id'];
+        $routeFares = RouteFare::where('route_id', $schedule->route_id)->select('departure_city_id', 'destination_city_id')->get();
+        $data = [];
+        foreach ($routeFares as $i => $routeFare) {
+            if ($i == 0) {
+                $data[] = $routeFare->departure_city_id;
             }
-            $cities_id = array_unique($dataArr['city']);
-            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
-            return [
-                'cities' => $city,
-                'schedules' => $schedule,
-                'compare_array' => $schedule->route_city_terminal,
-            ];
-        } else {
-            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
+            $data[] = $routeFare->destination_city_id;
         }
+        $data = collect($data)->unique();
+        $compare = City::with(['terminal' => function ($q) {
+            $q->where("is_online_terminal", null);
+            return $q->orWhere("is_online_terminal", 0)->select('id','city_id', 'name');
+        }])->whereIn('id', $data)->get();
+        return [
+            'schedules' => $schedule,
+            'compare' => $compare,
+        ];
+//        dd($schedule);
+//        $dataArr = [];
+//        if (!is_null($schedule->route_city_terminal)) {
+//            foreach ($schedule->route_city_terminal as $key => $item) {
+//                $dataArr['city'][$key] = $item['city_id'];
+//                $dataArr['terminal'][$key] = $item['terminal_id'];
+//            }
+//            $cities_id = array_unique($dataArr['city']);
+//            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
+//            $routeFares = RouteFare::where('route_id', $request->id)->select('departure_city_id', 'destination_city_id')->get();
+//            $data = [];
+//            foreach ($routeFares as $i => $routeFare) {
+//                if ($i == 0) {
+//                    $data[] = $routeFare->departure_city_id;
+//                }
+//                $data[] = $routeFare->destination_city_id;
+//            }
+//            $data = collect($data)->unique();
+//            return City::with(['terminal' => function ($q) {
+//                $q->where("is_online_terminal", null);
+//                return $q->orWhere("is_online_terminal", 0);
+//            }])->whereIn('id', $data)->get();
+//            return [
+//                'cities' => $city,
+//                'schedules' => $schedule,
+//                'compare_array' => $schedule->route_city_terminal,
+//            ];
+//        } else {
+//            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
+//        }
     }
 
     public function updateSchedule(Request $request)

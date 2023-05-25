@@ -2097,12 +2097,12 @@ export default {
                     this.eltDetailsModel = [];
                 }
                 // Fetch Discount and Surcharge  against schedule
-                
+
                 if (resFetchDiscountSurcharge.status == 200) {
                     this.appliedDiscount = resFetchDiscountSurcharge.data.discount ? (resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat) : 'N/A';
                     this.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? (resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat) : 'N/A';
                 }
-                
+
                 if (restDiscount.status == 200) {
                     this.terminalDiscount = restDiscount.data.discount ? restDiscount.data.discount + '%' : 'N/A';
                 }
@@ -2215,7 +2215,6 @@ export default {
             const resDropCheck = await this.callApi("post", "booking/schedule/dropCheck", {
                 id: this.addForm.schedule,
                 date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
             });

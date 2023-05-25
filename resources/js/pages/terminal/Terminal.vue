@@ -259,7 +259,8 @@
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" id="editSeat_range_dash" name="editValueType"
                                    value="dash" v-model="dataEdit.allowed_type"
-                                   v-bind:checked="dataEdit.allowed_type == 'dash'" @click="this.dataEdit.available_seats = ''">
+                                   v-bind:checked="dataEdit.allowed_type == 'dash'"
+                                   @click="this.dataEdit.available_seats = ''">
                             <label class="form-check-label" for="editSeat_range_dash">
                                 Seat Range
                             </label>
@@ -420,15 +421,14 @@
                                                     >
                                                         <i class="far fa-trash-alt"></i>
                                                     </button>
-                                                    <!--                                                        :data-target="'#' + editFormID"-->
-                                                    <!--                                                        data-toggle="modal"-->
-                                                    <!--                                                        @click="editTerminal(single)"-->
-                                                    <router-link  target="_blank" class="btn btn-success mx-2" title="Commission"
+                                                    <router-link target="_blank" class="btn btn-success mx-2"
+                                                                 title="Commission"
                                                                  v-if="checkForSubmenuButtons('commission')"
                                                                  :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                         <i class="fas fa-percent"></i>
                                                     </router-link>
-                                                    <router-link  target="_blank" class="btn btn-primary mx-2" title="Discount"
+                                                    <router-link target="_blank" class="btn btn-primary mx-2"
+                                                                 title="Discount"
                                                                  v-if="checkForSubmenuButtons('discount')"
                                                                  :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                         <i class="fas fa-tag"></i>
