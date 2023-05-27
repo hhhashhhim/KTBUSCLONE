@@ -263,7 +263,7 @@
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 46%">{{$singleData->city_one .'+'. $singleData->city_two}}</td>
+                    <td style="width: 46%">Gross Total</td>
                     <td>{{$startTotalPass + $returnTotalPass}}</td>
                     <td style="width: 17.5%">{{$startTotalAmount + $returnTotalAmount}}</td>
                 </tr>
@@ -276,7 +276,7 @@
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 50%">Savings/Profit</td>
+                    <td style="width: 50%">Net Profit</td>
                     <td style="width: 50%">{{$startTotalAmount + $returnTotalAmount - $data->expense->sum('amount')}}</td>
                 </tr>
             </table>

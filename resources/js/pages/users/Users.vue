@@ -151,7 +151,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="departure">Departure City </label>
+                        <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="departure" multiple
                                 v-model="data.departure">
                             <option
@@ -163,7 +163,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="destinations">Destination City </label>
+                        <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="destinations" multiple
                                 v-model="data.destination">
                             <option
@@ -334,7 +334,7 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="departure">Departure City </label>
+                        <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="departure" multiple
                                 v-model="dataEdit.departure_city_ids">
                             <option
@@ -346,7 +346,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="destinations">Destination City </label>
+                        <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="destinations" multiple
                                 v-model="dataEdit.destination_city_ids">
                             <option
@@ -569,10 +569,31 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (this.data.contact == "" || typeof this.data.contact == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Contact is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.data.password == "" || typeof this.data.password == 'undefined')
                 return swal({
                     title: "Required!!",
                     text: "Password is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.data.departure == "" || typeof this.data.departure == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Departure City is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.data.destination == "" || typeof this.data.destination == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Destination City is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -744,6 +765,20 @@ export default {
                     timer: 2000
                 });
             }
+            if (this.dataEdit.departure_city_ids == "" || typeof this.dataEdit.departure_city_ids == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Departure City is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEdit.destination_city_ids == "" || typeof this.dataEdit.destination_city_ids == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Destination City is Required",
+                    icon: "error",
+                    timer: 2000
+                });
             if (this.dataEdit.terminal_id == "0") {
                 return swal({
                     title: "Required!!!",
