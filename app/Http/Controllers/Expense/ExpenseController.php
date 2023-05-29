@@ -45,16 +45,18 @@ class ExpenseController extends Controller
         );
 
         TicketMergeExpense::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+        $i = 0;
         foreach ($request->category as $key => $value) {
             TicketMergeExpense::create([
                 'ticket_merge_id' => $request->ticket_merge_id,
                 'expense_category_id' => $request->category[$key],
                 'description' => $request->description[$key],
                 'amount' => $request->amount[$key],
-                'invoice' => $request->invoice[$key],
+                'invoice' => "exp-".++$i.'-'.$request->ticket_merge_id,
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
+
         }
     }
 

@@ -56,7 +56,7 @@
                                                             <input type="text" class="form-control"
                                                                    @keyup="saveRow($event,'fourth',index)"
                                                                    :value="postData.invoice[index]"
-                                                                   :disabled="editAble"/>
+                                                                   disabled/>
                                                         </td>
                                                         <td v-if="!editAble">
                                                             <button class="btn btn-outline-primary mx-2"
@@ -244,7 +244,7 @@ export default {
 
             // validation for empty data
             if (!this.postData.ticket_merge_id || this.postData.category.length == 0 || this.postData.description.length == 0 ||
-                this.postData.amount.length == 0 || this.postData.invoice.length == 0) {
+                this.postData.amount.length == 0) {
                 return swal({
                     title: "Error",
                     text: "Please Fill All Field",
@@ -255,7 +255,7 @@ export default {
 
             // check if any index is empty or null in object
             for (var i = 0; i < this.postData.category.length; i++) {
-                if (!this.postData.category[i] || !this.postData.description[i] || !this.postData.amount[i] || !this.postData.invoice[i]) {
+                if (!this.postData.category[i] || !this.postData.description[i] || !this.postData.amount[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
