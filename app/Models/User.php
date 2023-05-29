@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\admin\Role;
+use App\Models\Hrm\Employee\Employee;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -65,9 +66,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(City::class, 'id', 'destination_city_id');
     }
-    
+
     public function userpass()
     {
         return $this->hasOne(UserPassword::class, 'user_id', 'id');
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'user_id', 'id');
     }
 }

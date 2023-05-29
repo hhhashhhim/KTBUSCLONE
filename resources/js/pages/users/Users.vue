@@ -57,7 +57,7 @@
                                                         <td>{{ user.name }}</td>
                                                         <td>{{ user.email }}</td>
                                                         <td>{{ phoneFormat(user.contact) }}</td>
-                                                        <td v-if="user.terminal_id != null">
+                                                        <td v-if="user.terminal_id !==  0 && user.terminal_id !== null">
                                                             {{ user.terminal.city.name }} - {{ user.terminal.name }}
                                                         </td>
                                                         <td v-else>N/A</td>

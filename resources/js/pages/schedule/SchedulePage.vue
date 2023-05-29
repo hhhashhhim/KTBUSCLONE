@@ -80,7 +80,7 @@
                                                         <td>
                                                             <button class="btn btn-info btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('extend-schedule')"
-                                                                    @click="addDays(schedule)"
+                                                                    @click="addDays(schedule), this.extendDate.extended_days == ''"
                                                                     data-target="#addDaysModal" data-toggle="modal"
                                                                     title="Extend Schedule Range"><i
                                                                 class="fas fa-plus"></i></button>
@@ -121,7 +121,7 @@
                     <div class="modal-content ">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addDaysModalLabel">Extend Schedule</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" @click="close()" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -129,7 +129,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>No. of Days (e.g: DD)</label>
+                                        <label>No. of Days (e.g: DD) <span class="text-danger mr-1">*</span></label>
                                         <vue-mask
                                             class="form-control"
                                             v-model="extendDate.extended_days"
@@ -145,7 +145,7 @@
                             <button type="button" class="btn btn-primary" @click="extendedDate()" :disabled="loading">
                                 {{ loading ? 'Loading... ' : 'Extend Schedule' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" @click="close()" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -467,42 +467,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- <table class="table text-dark" id="tableSchedulePreview">
-                            <tbody>
-                            <tr>
-                                <th colspan="2" class="mr-3">Name</th>
-                                <td colspan="2" class="border-left">{{ this.dataPreview.Name ?? "N/A" }}</td>
-                            </tr>
-                            <tr>
-                                <th class="mr-3">Start Date</th>
-                                <td>{{ this.dataPreview.start_date ?? "N/A" }}</td>
-                                <th class="mr-3 border-left">End Date</th>
-                                <td>{{ this.dataPreview.end_date ?? "N/A" }}</td>
-                            </tr>
-                            <tr>
-                                <th>Time</th>
-                                <td> {{ this.dataPreview.time ?? "N/A" }}</td>
-                                <th class="mr-3 border-left">Selected Bus Class</th>
-                                <td>{{ this.dataPreview.busClass ?? "N/A" }}</td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" class="mr-3">Route</th>
-                                <td colspan="2" class="border-left">{{ this.dataPreview.route ?? "N/A" }}</td>
-                            </tr>
-                            <tr>
-                                <th class="mr-3">Discount</th>
-                                <td> {{
-                                        this.dataPreview.discount != null ? (this.dataPreview.discount.type == "percentage" ? (this.dataPreview.discount.percentage != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.percentage + "%" : "N/A") : (this.dataPreview.discount.flat != null ? this.dataPreview.discount.name + "-" + this.dataPreview.discount.flat : "N/A")) : "N/A"
-                                    }}
-                                </td>
-                                <th class="mr-3 border-left">Surcharge</th>
-                                <td> {{
-                                        this.dataPreview.surcharge != null ? (this.dataPreview.surcharge.type == "percentage" ? (this.dataPreview.surcharge.percentage != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.percentage + "%" : "N/A") : (this.dataPreview.surcharge.flat != null ? this.dataPreview.surcharge.name + "-" + this.dataPreview.surcharge.flat : "N/A")) : "N/A"
-                                    }}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table> -->
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -568,80 +532,6 @@
                         />
                     </div>
                 </div>
-                <!--                    <div class="row">-->
-                <!--                        <div class="col-md-6"></div>-->
-                <!--                        <div class="col-md-6">-->
-                <!--                            <button-->
-                <!--                                class="btn btn-success step1 float-right"-->
-                <!--                                @click=" editNextSection('step1'); this.stepTwoAddSchedule = true; ">-->
-                <!--                                <span class="mr-2">Next</span><i class="fas fa-arrow-right pr-1"></i>-->
-                <!--                            </button>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </section>-->
-
-                <!--                <section class="section2" :class="editActiveSection != 'step1' ? 'd-none' : ''">-->
-                <!--                    <div class="row">-->
-                <!--                        <div class="col-md-8 class form-group">-->
-                <!--                            <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>-->
-                <!--                            <select disabled-->
-                <!--                                    class="form-control"-->
-                <!--                                    id="route" @change="getSelectiveData('routeEdit', $event)"-->
-                <!--                                    v-model="dataEdit.schedules.route_id"-->
-                <!--                            >-->
-                <!--                                <option value="0" selected>Select Route</option>-->
-                <!--                                <option-->
-                <!--                                    v-for="(route, i) in editRoutes"-->
-                <!--                                    :value="route.id"-->
-                <!--                                    :key="i"-->
-                <!--                                >-->
-                <!--                                    {{ route.name }}-->
-                <!--                                </option>-->
-                <!--                            </select>-->
-                <!--                        </div>-->
-                <!--                        <div class="col-md-4 class form-group">-->
-                <!--                            <label for="busClassEdit">Bus Class <span class="text-danger ml-1">*</span></label>-->
-                <!--                            <select-->
-                <!--                                class="form-control"-->
-                <!--                                id="busClassEdit"-->
-                <!--                                v-model="dataEdit.schedules.bus_class_id"-->
-                <!--                            >-->
-                <!--                                <option value="0" selected>Select Bus Class</option>-->
-                <!--                                <option-->
-                <!--                                    v-for="(type, i) in busClasses"-->
-                <!--                                    :value="type.id"-->
-                <!--                                    :key="i"-->
-                <!--                                >-->
-                <!--                                    {{ type.name }}-->
-                <!--                                </option>-->
-                <!--                            </select>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="row">-->
-                <!--                        <div class="col-md-6">-->
-                <!--                            <button-->
-                <!--                                class="btn btn-info back1 float-left"-->
-                <!--                                @click="editPreviousSection(0)"-->
-                <!--                            >-->
-                <!--                                <i class="fas fa-arrow-left mr-1"></i>Previous-->
-                <!--                            </button>-->
-                <!--                        </div>-->
-                <!--                        <div class="col-md-6">-->
-                <!--                            <button-->
-                <!--                                class="btn btn-success step2 float-right"-->
-                <!--                                @click="editNextSection('step2')"-->
-                <!--                            >-->
-                <!--                                Next<i class="fas fa-arrow-right mr-1"></i>-->
-                <!--                            </button>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </section>-->
-
-                <!--                <section-->
-                <!--                    class="section3"-->
-                <!--                    :class="editActiveSection != 'step2' ? 'd-none' : ''"-->
-                <!--                >-->
                 <div class="row">
                     <div class="col-md-6 class form-group">
                         <label for="surcharge">Surcharge</label>
@@ -716,11 +606,8 @@
                     </div>
                 </div>
 
-                <div
-                    class="row d-flex justify-content-center"
-                    v-if="stepTwoAddSchedule"
-                >
-                    <div class="col-md-12 class form-group mx-2">
+                <div class="row" v-if="this.showTableDiv">
+                    <div class="col-md-9 class form-group">
                         <div class="table-responsive">
                             <table
                                 class="table table-striped table-hover"
@@ -735,26 +622,36 @@
                                 </thead>
                                 <tbody>
                                 <tr v-for="(city, i) in dataEdit.cities" :key="i">
-                                    <td>{{ i + 1 }}</td>
-                                    <td>{{ city.name }}</td>
-                                    <td>
-                                        <span v-for="item in city.terminal" :key="item.id">
+                                    <template v-if="city.terminal.length >= 2">
+                                        <td>{{ i + 1 }}</td>
+                                        <td>{{ city.name }}</td>
+                                        <td><span v-for="item in city.terminal" :key="item.id">
                                         <label class="colorinput mx-3">
-                                        <span> <input type="checkbox" class="colorinput-input"
-                                                      @click="editTerminal($event, city.id)"
-                                                      v-bind:checked=" checkedSelectedTerminals(item.id) "
-                                                      id="terminal" :value="item.id"/>
-                                        <span class="colorinput-color bg-primary"></span>
+                                        <span>
+                                            <input type="checkbox" class="colorinput-input routeEditTerminals"
+                                                   @click="editTerminal($event, city.id)"
+                                                   v-bind:checked="this.dataEdit.schedules.terminalId.includes(item.id)"
+                                                   :value="item.id"/>
+                                        <span
+                                            class="colorinput-color bg-primary"></span>
                                         </span>
                                         </label>
                                         <label class="checkbox-inputs"
-                                               for="terminal">{{ item.name }}</label>\
+                                               for="terminal">{{ item.name }}</label>
                                         </span>
-                                    </td>
+                                        </td>
+                                    </template>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="col-md-3 class form-group px-0">
+                            <span class="text-dark h5 pb-5"
+                                  v-if="this.dataEdit.editSequence !== 0 "> Selected Terminal Sequence</span>
+                        <ul>
+                            <li v-for="name in dataEdit.editSequence">{{ name }}</li>
+                        </ul>
                     </div>
                 </div>
                 <template v-slot:button>
@@ -818,6 +715,7 @@ export default {
             classes: "",
             routeClasses: "",
             isShowEditDiv: false,
+            showTableDiv: true,
             stepTwoAddSchedule: false,
             buses: "",
             addTerminalId: "",
@@ -861,14 +759,26 @@ export default {
     },
 
     methods: {
+        close() {
+            $(".modal").click();
+        },
         async addDays(schedule) {
             this.extendDate = schedule;
         },
         async extendedDate() {
+            if (this.extendDate.extended_days == '' || typeof this.extendDate.extended_days == 'undefined') {
+                return swal({
+                    title: "Required!",
+                    text: "No of Days is Required!",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             this.loading = true;
             const resExtend = await this.callApi("post", "schedule/extend", this.extendDate);
             if (resExtend.status == 200) {
-                $(".modal").click();
+                this.extendDate = "";
+                this.close();
                 swal({
                     title: "Success",
                     text: "Schedule Extended successfully",
@@ -965,31 +875,25 @@ export default {
                     this.data.addTerminalsOnClick.splice(removeIndex, 1);
                 }
             }
-            console.log(this.data.addTerminalsOnClick);
         },
 
         editTerminal(event, id) {
+            const value = event.target.value
             if (event.target.checked) {
-                const value = event.target.value;
-                this.dataEdit.compare_array = this.dataEdit.compare_array.map((arr) => {
-                    if (arr.terminal_id == value) {
-                        return {...arr, allow: !arr.allow};
-                    }
-                    return arr;
-                });
-
-                this.dataEdit.updated_route_city_terminal = this.dataEdit.compare_array;
-            }
-        },
-
-        checkedSelectedTerminals(id) {
-            let status = "";
-            status = this.dataEdit.compare_array.filter((arr) => {
-                if (arr.terminal_id == id) {
-                    return arr;
+                const index = this.dataEdit.schedules.route_city_terminal.indexOf(value);
+                if (index == -1) {
+                    this.dataEdit.schedules.route_city_terminal.push({
+                        city_id: id,
+                        terminal_id: parseInt(value),
+                        allow: true,
+                    });
                 }
-            });
-            return status[0].allow;
+            } else {
+                const removeIndex = this.dataEdit.schedules.route_city_terminal.findIndex(t => t.terminal_id == parseInt(value));
+                if (removeIndex !== -1) {
+                    this.dataEdit.schedules.route_city_terminal.splice(removeIndex, 1);
+                }
+            }
         },
 
         async getSelectiveData(name, evt) {
@@ -1012,14 +916,23 @@ export default {
             }
             if (name == "routeEdit") {
                 if (evt.target.value == "0") {
-                    this.stepTwoAddSchedule = false;
+                    this.showTableDiv = false;
+                    this.dataEdit.cities = [];
+                    this.dataEdit.editSequence = [];
+                    this.dataEdit.schedules.route_city_terminal = [];
+                    this.dataEdit.schedules.terminalId = [];
+                    $(".routeEditTerminals input:checkbox:checked").prop('checked', false);
                 } else {
-                    this.stepTwoAddSchedule = true;
+                    this.showTableDiv = true;
                     const resRouteEdit = await this.callApi("post", "schedule/getCity", {
-                        id: this.dataEdit.route_id,
+                        id: this.dataEdit.schedules.route_id,
                     });
-                    this.cities = resRouteEdit.dataEdit;
-                    this.terminals = resRouteEdit.dataEdit;
+                    this.dataEdit.schedules.terminalId = [];
+                    this.dataEdit.schedules.route_city_terminal = [];
+                    this.dataEdit.editSequence = [];
+                    this.dataEdit.cities = resRouteEdit.data;
+                    $(".routeEditTerminals input:checkbox:checked").prop('checked', false);
+
                 }
             }
         },
@@ -1158,7 +1071,7 @@ export default {
             this.loading = true;
             const res = await this.callApi("post", "schedule/store", this.data);
             if (res.status == 201) {
-                $(".modal").click();
+                this.close();
                 swal({
                     title: "Success",
                     text: "Schedule Created Successfully",
@@ -1224,13 +1137,9 @@ export default {
                     timer: 2000
                 });
             this.loading = true;
-            const resEdit = await this.callApi(
-                "post",
-                "schedule/update",
-                this.dataEdit
-            );
+            const resEdit = await this.callApi("post", "schedule/update", this.dataEdit);
             if (resEdit.status == 200) {
-                $(".modal").click();
+                $(`#${this.editFormID}`).modal('hide');
                 swal({
                     title: "Success",
                     text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
@@ -1256,6 +1165,8 @@ export default {
             const resEditSchedule = await this.callApi("post", "schedule/edit", {id: schedule.id});
             if (resEditSchedule.status == 200) {
                 this.dataEdit.schedules = resEditSchedule.data.schedules;
+                this.dataEdit.editSequence = resEditSchedule.data.schedules.terminalName;
+                this.dataEdit.cities = resEditSchedule.data.compare;
             }
             $(`#${this.editFormID}`).modal('show');
         },
@@ -1276,22 +1187,23 @@ export default {
             this.$store.commit("setDeleteObj", deletingObj);
         },
     },
-    computed: {
-        ...mapGetters(["getDeletingObj"]),
-    },
-
     watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.discounts.splice(obj.index, 1);
-                $('#schedule_table').DataTable().destroy();
-                this.fetchSchedule();
-            }
-        },
         'data.addTerminalsOnClick': {
             handler() {
                 this.terminalNames = this.data.addTerminalsOnClick.map(item => {
                     const terminalObject = this.cities.find(terminal => {
+                        return terminal.terminal.some(t => t.id == item.terminal_id);
+                    });
+                    return terminalObject ? terminalObject.terminal.find(t => t.id == item.terminal_id).name : '';
+                });
+            },
+            deep: true
+        },
+
+        'dataEdit.schedules.route_city_terminal': {
+            handler() {
+                this.dataEdit.editSequence = this.dataEdit.schedules.route_city_terminal.map(item => {
+                    const terminalObject = this.dataEdit.cities.find(terminal => {
                         return terminal.terminal.some(t => t.id == item.terminal_id);
                     });
                     return terminalObject ? terminalObject.terminal.find(t => t.id == item.terminal_id).name : '';

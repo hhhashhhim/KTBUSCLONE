@@ -15,6 +15,7 @@ use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Surcharge\Surcharge;
+use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -108,7 +109,6 @@ class ScheduleController extends Controller
                     $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
                     $departureTime = date("Y-m-d H:i", $totalTime);
                     $lastDepId = $detail->departure_city_id;
-                    // this is single schedule end date to calculate schedule completion days
                 }
                 $scheduleEndDate = date("Y-m-d", $totalTime);
 
@@ -147,48 +147,27 @@ class ScheduleController extends Controller
         $data = collect($data)->unique();
         $compare = City::with(['terminal' => function ($q) {
             $q->where("is_online_terminal", null);
-            return $q->orWhere("is_online_terminal", 0)->select('id','city_id', 'name');
+            return $q->orWhere("is_online_terminal", 0)->select('id', 'city_id', 'name');
         }])->whereIn('id', $data)->get();
+        $terminalID = [];
+        foreach ($schedule->route_city_terminal as $key => $item) {
+            $terminalID[] = $item['terminal_id'];
+
+        }
+
+        $schedule['terminalId'] = $terminalID;
+        $schedule['terminalName'] = Terminal::whereIn('id', $terminalID)->pluck('name');
         return [
             'schedules' => $schedule,
             'compare' => $compare,
         ];
-//        dd($schedule);
-//        $dataArr = [];
-//        if (!is_null($schedule->route_city_terminal)) {
-//            foreach ($schedule->route_city_terminal as $key => $item) {
-//                $dataArr['city'][$key] = $item['city_id'];
-//                $dataArr['terminal'][$key] = $item['terminal_id'];
-//            }
-//            $cities_id = array_unique($dataArr['city']);
-//            $city = City::with('terminal')->whereIn('id', $cities_id)->where('company_id', Auth::user()->company_id)->get();
-//            $routeFares = RouteFare::where('route_id', $request->id)->select('departure_city_id', 'destination_city_id')->get();
-//            $data = [];
-//            foreach ($routeFares as $i => $routeFare) {
-//                if ($i == 0) {
-//                    $data[] = $routeFare->departure_city_id;
-//                }
-//                $data[] = $routeFare->destination_city_id;
-//            }
-//            $data = collect($data)->unique();
-//            return City::with(['terminal' => function ($q) {
-//                $q->where("is_online_terminal", null);
-//                return $q->orWhere("is_online_terminal", 0);
-//            }])->whereIn('id', $data)->get();
-//            return [
-//                'cities' => $city,
-//                'schedules' => $schedule,
-//                'compare_array' => $schedule->route_city_terminal,
-//            ];
-//        } else {
-//            return response()->json(['message' => 'Please Select Terminals while Adding Schedule'], 422);
-//        }
     }
 
     public function updateSchedule(Request $request)
     {
         $req = $request->schedules;
-        return Schedule::where('id', $req['id'])->update([
+//        dd($req);
+        $schedule = Schedule::where('id', $req['id'])->update([
             'name' => $req['name'],
             'start_date' => $req['start_date'],
             'end_date' => $req['end_date'],
@@ -196,7 +175,22 @@ class ScheduleController extends Controller
             'surcharge_id' => $req['surcharge_id'],
             'discount_id' => $req['discount_id'],
             'updated_by' => Auth::user()->id,
+            'route_id' => $req['route_id'],
+            'bus_class_id' => $req['bus_class_id'],
+            'route_city_terminal' => $req['route_city_terminal'] ?? [],
         ]);
+        ScheduleTerminalSequence::where('schedule_id', $req['id'])->delete();
+
+        foreach ($req['route_city_terminal'] as $key => $single) {
+            ScheduleTerminalSequence::create([
+                'schedule_id' => $req['id'],
+                'city_id' => $single['city_id'],
+                'terminal_id' => $single['terminal_id'],
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+        }
+        return $schedule;
     }
 
     public function deleteSchedule(Request $request)

@@ -99,15 +99,21 @@
                                                         </td>
                                                         <td>{{ employee.added_by.name }}</td>
                                                         <td>
+                                                            <button data-target="#addUser" data-toggle="modal"
+                                                                    v-if="employee.user_id == '0' || employee.user_id == null"
+                                                                    @click="this.userData.employee_id = employee.id"
+                                                                    class="btn btn-info mx-1" title="Add User Account">
+                                                                <i class="fa fa-user-plus"></i>
+                                                            </button>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editEmployee(employee)"
                                                                     class="btn btn-primary mx-1" title="Edit Employee">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button style="display:none;" title="Delete Employee"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
-                                                            </button>
+                                                            <!--                                                            <button style="display:none;" title="Delete Employee"-->
+                                                            <!--                                                                    class="btn btn-danger">-->
+                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
+                                                            <!--                                                            </button>-->
                                                             <!--                                                            :data-target="'#' + deleteFormID"-->
                                                             <!--                                                            data-toggle="modal"-->
                                                             <!--                                                            @click="deleteModal(employee,i)"-->
@@ -382,6 +388,115 @@
                     </div>
                 </div>
             </div>
+            <!--            Add User Account -->
+            <div class="modal fade" id="addUser" tabindex="-1" aria-labelledby="addUserLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add User Account</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                    @click="closeDes()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Name"
+                                        id="name"
+                                        autocomplete="off"
+                                        v-model="userData.name"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="email">Email <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Enter Email"
+                                        id="email"
+                                        autocomplete="off"
+                                        v-model="userData.email"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
+                                    <vue-mask id="phone"
+                                              class="form-control"
+                                              v-model="userData.contact"
+                                              mask="0000-0000000"
+                                              :raw="false"
+                                              :options="optionsContact"
+                                    >
+                                    </vue-mask>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="password">Password <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        placeholder="Enter Password"
+                                        id="password"
+                                        autocomplete="off"
+                                        v-model="userData.password"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="departure">Departure City </label>
+                                    <select class="form-control" id="departure" multiple
+                                            v-model="userData.departure">
+                                        <option
+                                            v-for="(singleDeparture, i) in departureCities"
+                                            :value="singleDeparture.id"
+                                            :key="i"
+                                        >{{ singleDeparture.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="destinations">Destination City </label>
+                                    <select class="form-control" id="destinations" multiple
+                                            v-model="userData.destination">
+                                        <option
+                                            v-for="(singleDestination, i) in destinationCities"
+                                            :value="singleDestination.id"
+                                            :key="i"
+                                        >{{ singleDestination.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
+                                    <select class="form-control" id="terminals"
+                                            v-model="userData.terminal_id">
+                                        <option value="0">Select Terminal</option>
+                                        <option
+                                            v-for="(terminal, i) in terminals"
+                                            :value="terminal.id"
+                                            :key="i"
+                                        >{{ terminal.name }} ({{ terminal.city.name }})
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" :disabled="this.loading"
+                                    @click="addUserAccount()">
+                                {{ this.loading ? 'Loading...' : 'Add User' }}
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDes()">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!--            End Add New Department-->
             <!--            Edit Model-->
             <Edit
@@ -603,6 +718,17 @@ export default {
                 EmployeeTerminal: 0,
                 EmployeeDesignation: 0,
             },
+            userData: {
+                name: "",
+                email: "",
+                contact: "",
+                password: "",
+                company_id: "",
+                terminal_id: 0,
+                employee_id: '',
+                destination: [],
+                departure: [],
+            },
             editEmp: {
                 userId: null,
                 paidLeaves: '0',
@@ -639,6 +765,8 @@ export default {
             departments: [],
             editDepartments: [],
             designations: [],
+            departureCities: [],
+            destinationCities: [],
             editDesignations: [],
             urlProfile: '',
             urlProfileEdit: '',
@@ -682,6 +810,82 @@ export default {
         },
         closeDes() {
             $("#addDesignationModal").click();
+        },
+        closeUser() {
+            $("#").click();
+        },
+        async addUserAccount() {
+            if (this.userData.name == "" || typeof this.userData.name == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.userData.email == "" || typeof this.userData.email == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Email is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.userData.password == "" || typeof this.userData.password == 'undefined')
+                return swal({
+                    title: "Required!!",
+                    text: "Password is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.userData.departure.length == 0)
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Departure City/Cities",
+                    icon: "error",
+                    timer: 2000
+                });
+                if (this.userData.destination.length == 0 )
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Destination City/Cities",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.userData.terminal_id == 0)
+                return swal({
+                    title: "Required!!",
+                    text: "Please Select Terminal",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loading = true;
+            const res = await this.callApi("post", "hrm/employee/user/store", this.userData);
+            if (res.status == 200) {
+                this.loading = false;
+                swal({
+                    title: "Success!!",
+                    text: "User Created Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchEmployees();
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += ((++count) + " - " + element + "\n");
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+                    }
+                }
+            }
         },
         accountCreate: function (e) {
             if (e.target.checked) {
@@ -927,10 +1131,17 @@ export default {
 
         async fetchEmployees() {
             const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
+            const resCities = await this.callApi("post", "hrm/employee/cities");
             if (resAllTerminals.status == 200) {
                 this.terminals = resAllTerminals.data
             } else {
                 console.log(resAllTerminals);
+            }
+            if (resCities.status == 200) {
+                this.destinationCities = resCities.data;
+                this.departureCities = resCities.data;
+            } else {
+                console.log(resCities);
             }
             const resEmployeeIndex = await this.callApi("post", 'hrm/employee');
             if (resEmployeeIndex.status == 200) {

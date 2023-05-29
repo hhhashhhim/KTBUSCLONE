@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Hrm\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\User;
 use App\Models\UserPassword;
@@ -18,6 +19,15 @@ class EmployeeController extends Controller
     {
         return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where('company_id', Auth::user()->company_id)->get();
 
+    }
+
+    public function getCities()
+    {
+        $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        foreach ($cities as $single) {
+            $single->name = ucfirst($single->name);
+        }
+        return $cities;
     }
 
     public function store(Request $request)
@@ -161,6 +171,24 @@ class EmployeeController extends Controller
     public function delete(Request $request)
     {
         return Employee::find($request->id)->delete();
+    }
+
+    public function userStore(Request $request)
+    {
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'contact' => formatContact($request->contact),
+            'password' => Hash::make($request->password),
+            'terminal_id' => $request->terminal_id,
+            'destination_city_ids' => json_encode($request->destination),
+            'departure_city_ids' => json_encode($request->departure),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return Employee::where('id', $request->employee_id)->update([
+            'user_id' => $user->id,
+        ]);
     }
 
     // Image Upload
