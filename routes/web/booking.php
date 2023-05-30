@@ -42,6 +42,8 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/discount/surcharge/fetch', [BookingController::class, 'fetchScheduleSurchargeDiscount']);
     Route::post('/schedule/terminal/discount/fetch', [BookingController::class, 'fetchTerminalDiscount']);
     Route::post('/elt/fetch/old', [BookingController::class, 'getFetchOldELT']);
+    Route::post('/fetch/over/issue/seat', [BookingController::class, 'fetchOverIssueSeat']);
+    Route::post('/revert/over/issue/seat', [BookingController::class, 'revertOverIssueSeat']);
 
     // Schedule Closing
     Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {

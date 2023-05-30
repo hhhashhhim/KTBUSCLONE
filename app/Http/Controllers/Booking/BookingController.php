@@ -374,21 +374,17 @@ class BookingController extends Controller
         }
 
         $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
-        foreach($allSchedules as $single)
-        {
+        foreach ($allSchedules as $single) {
             $sub = 0;
-            if(Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id)
-            {
+            if (Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id) {
                 $checkTerminal = ScheduleTerminalSequence::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->departure_city_id, 'schedule_id' => $single->schedule_id])->orderBy('id', 'DESC')->get();
-                if($checkTerminal->count() > 0)
-                {
-                    if(in_array(Auth::user()->terminal_id, $checkTerminal->pluck("terminal_id")->toArray()))
-                    {
+                if ($checkTerminal->count() > 0) {
+                    if (in_array(Auth::user()->terminal_id, $checkTerminal->pluck("terminal_id")->toArray())) {
                         foreach ($checkTerminal as $key => $terminalSequence) {
                             if (Auth::user()->terminal_id == $terminalSequence->terminal_id) {
                                 break;
                             } else {
-                                $terminalTime = TerminalTimeDifference::where(['company_id' =>  Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+                                $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
                                 if ($terminalTime) {
                                     $time = explode(":", $terminalTime->time_difference);
                                     $sub += ($time[0] * 60 * 60) + ($time[1] * 60);
@@ -399,7 +395,7 @@ class BookingController extends Controller
                 }
             }
 
-            $exactDate = date("Y-m-d h:i A",strtotime($single->departure_date.' '.$single->departure_time) - $sub);
+            $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) - $sub);
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
         }
@@ -433,8 +429,7 @@ class BookingController extends Controller
         ];
     }
 
-    public
-    function overIssueAddNew(Request $request)
+    public function overIssueAddNew(Request $request)
     {
         $ticket = Ticket::where([
             'company_id' => Auth::user()->company_id,
@@ -456,6 +451,7 @@ class BookingController extends Controller
             'reason' => $request->remarks,
             'added_by' => Auth::user()->id,
         ]);
+        $ticket->delete();
         return $ticket;
     }
 
@@ -671,7 +667,7 @@ class BookingController extends Controller
             ], 422);
         }
 //        //Apply terminal discount
-        $terminalDiscount = TerminalDiscount::where(["terminal_id"=>$request->dropTerminal??0,"route_id"=>$schedule->route_id])->first();
+        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->first();
 
         //        $discountTerminal = TerminalDiscount::where(['company_id'=> Auth::user()->company_id, 'terminal_id'=> ($request->dropTerminal !== 0 && $request->dropTerminal == Auth::user()->terminal_id) ? Auth::user()->terminal_id : $request->dropTerminal])->first();
 //        dd($discountTerminal);
@@ -693,9 +689,8 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['fare'] = (int)$data->fare - (int)$scheduleDiscount->flat;
                         }
                     }
-                    if($terminalDiscount)
-                    {
-                        $tdiscount = ((int)$data->fare/100) * (int)$terminalDiscount->discount;
+                    if ($terminalDiscount) {
+                        $tdiscount = ((int)$data->fare / 100) * (int)$terminalDiscount->discount;
                         $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                     }
                     if ($scheduleSurcharge) {
@@ -787,9 +782,8 @@ class BookingController extends Controller
                                 $seatMap[$i][$j]['fare'] = $fare - (int)$scheduleDiscount->flat;
                             }
                         }
-                        if($terminalDiscount)
-                        {
-                            $tdiscount = ((int)$fare/100) * (int)$terminalDiscount->discount;
+                        if ($terminalDiscount) {
+                            $tdiscount = ((int)$fare / 100) * (int)$terminalDiscount->discount;
                             $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                         }
                         if ($scheduleSurcharge) {
@@ -1163,8 +1157,7 @@ class BookingController extends Controller
                 if ($checkTerminal->count() > 0) {
                     //              if ticket terminal id at last of sequence it mean no need to calculation
                     // if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-                    if(in_array($item->terminal_id, $checkTerminal->pluck("terminal_id")->toArray()))
-                    {
+                    if (in_array($item->terminal_id, $checkTerminal->pluck("terminal_id")->toArray())) {
                         foreach ($checkTerminal as $key => $single) {
                             if ($item->terminal_id == $single->terminal_id) {
                                 break;
@@ -1269,14 +1262,47 @@ class BookingController extends Controller
             $q->where('is_active', 1);
         }])->where(['id' => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first(['id', 'discount_id', 'surcharge_id']);
     }
-    
+
     public function fetchTerminalDiscount(Request $request)
     {
         $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-        return $terminalDiscount = TerminalDiscount::where(["terminal_id"=>$request->dropTerminal??0,"route_id"=>$schedule->route_id])->first();
+        return $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->first();
     }
 
-    
+    public function fetchOverIssueSeat(Request $request)
+    {
+//        dd($request->all());
+        $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
+            ->where("destination_id", $request->destinationCity)
+            ->where('schedule_id', $request->id)
+            ->where('departure_date', $request->date)
+            ->where('company_id', Auth::user()->company_id)
+            ->first();
+        $tickets = Ticket::withTrashed()->with('overIssueSeats', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
+        foreach ($tickets as $key => $single) {
+            $single->bookingDate = date('d/m/Y H:i A', strtotime($single->created_at));
+            $single->OverIssueDate = date('d/m/Y H:i A', strtotime($single->overIssueSeats->time));
+        }
+        return $tickets;
+    }
+
+    public function revertOverIssueSeat(Request $request)
+    {
+        $ticket = Ticket::where([
+            'schedule_id' => $request->schedule_id,
+            'schedule_date' => $request->schedule_date,
+            'seat_no' => $request->seat_no,
+        ])->first();
+        if (!$ticket) {
+            Ticket::withTrashed()->where('id', $request->ticket_id)->update([
+                'type' => 'booked',
+                'deleted_at' => null,
+            ]);
+            return TicketsOverIssue::where('ticket_id', $request->ticket_id)->delete();
+        } else {
+            return response()->json(["errors" => ["Revert Error" => ["This seat has been booked by Someone Else! \n You can't Revert This Seat"]]], 422);
+        }
+    }
 
     public function getFetchOldELT(Request $request)
     {
