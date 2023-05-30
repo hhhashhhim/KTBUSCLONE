@@ -396,7 +396,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title">Add User Account</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                    @click="closeDes()">
+                                    @click="closeUser()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -490,7 +490,7 @@
                                     @click="addUserAccount()">
                                 {{ this.loading ? 'Loading...' : 'Add User' }}
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeDes()">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeUser()">
                                 Close
                             </button>
                         </div>
@@ -812,7 +812,7 @@ export default {
             $("#addDesignationModal").click();
         },
         closeUser() {
-            $("#").click();
+            $("#addUser").click();
         },
         async addUserAccount() {
             if (this.userData.name == "" || typeof this.userData.name == 'undefined')
@@ -867,6 +867,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.closeUser();
                 this.fetchEmployees();
             } else {
                 if (res.status == 422) {

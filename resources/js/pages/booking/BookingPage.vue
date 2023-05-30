@@ -468,12 +468,22 @@
                                                                 this.eltDetailsModel.length
                                                             }}</button>
                                                         </span><br>
+                                                    <span>OverIssue Seat:
+                                                        <button title="View Over Issue Seat  Details"
+                                                                data-target="#overIssue_detail_modal"
+                                                                data-toggle="modal"
+                                                                :disabled=" overIssueSeatsRevert.length == 0 "
+                                                                class="btn-primary btn btn-sm">{{
+                                                                this.overIssueSeatsRevert.length
+                                                            }}</button>
+                                                        </span>
+                                                    <br>
                                                     <span>T/Discount: <span class="text-dark"
-                                                                          style="font-weight: 700 !important">{{
+                                                                            style="font-weight: 700 !important">{{
                                                             this.terminalDiscount
                                                         }}</span></span><br>
                                                     <span>S/Discount: <span class="text-dark"
-                                                                          style="font-weight: 700 !important">{{
+                                                                            style="font-weight: 700 !important">{{
                                                             this.appliedDiscount
                                                         }}</span></span><br>
                                                     <span>Surcharge: <span class="text-dark"
@@ -537,6 +547,112 @@
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeEltDetail()">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--        OverIssue Detail Modal -->
+        <div class="modal fade" id="overIssue_detail_modal" tabindex="-1" aria-labelledby="overIssueDetailModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="overIssueDetailModalLabel">OverIssue Seat Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closeOverIssueDetail()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body m-1 p-1">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card" v-for="(singleSeat,  i) in overIssueSeatsRevert">
+                                        <div class="card-body p-3">
+                                            <div class="row ml-2 border-bottom">
+                                                <div class="col-md-4 d-flex justify-content-start">
+                                                    <h4 class="mb-0 font-weight-bold mr-3">Seat :</h4>
+                                                    <h4 class="mb-0 text-muted">{{ singleSeat.seat_no }}</h4>
+                                                </div>
+                                                <div class="col-md-4 d-flex justify-content-start">
+                                                    <h6 class="mb-0 font-weight-bold mr-3">OverIssue Time :</h6>
+                                                    <h6 class="mb-0  text-danger">{{ singleSeat.OverIssueDate }}</h6>
+                                                </div>
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
+                                                    <h4 class="mb-0 text-muted text-capitalize">{{
+                                                            singleSeat.type
+                                                        }}</h4>
+                                                </div>
+                                            </div>
+                                            <div class="row my-3 pl-3">
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Date :</p>
+                                                        <p class="mb-0">{{ singleSeat.date }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3"> Bus Class :</p>
+                                                        <p class="mb-0">{{ singleSeat.seat_class.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
+                                                        <p class="mb-0">{{ singleSeat.schedule.name }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Name : </p>
+                                                        <p class="mb-0">{{ singleSeat.customer.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Cnic :</p>
+                                                        <p class="mb-0">{{ cnicFormat(singleSeat.customer.cnic) }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
+                                                        <p class="mb-0">
+                                                            {{ phoneFormat(singleSeat.customer.contact) }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Booking Date & Time : </p>
+                                                        <p class="mb-0">{{ singleSeat.bookingDate }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3"> Departure City :</p>
+                                                        <p class="mb-0">{{ singleSeat.departure_city.name }}</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
+                                                        <p class="mb-0">{{ singleSeat.destination_city.name }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--Buttons-->
+                                            <div class="row mt-3">
+                                                <div class="col-md-12 text-right">
+                                                    <button @click="revertOverIssueFunction(singleSeat)"
+                                                            type="button" class="btn btn-info ml-2"
+                                                            :disabled="loadingRevertButton">{{
+                                                            loadingRevertButton ? 'Loading...' : 'Revert Over Issue'
+                                                        }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                @click="closeOverIssueDetail()">
                             Close
                         </button>
                     </div>
@@ -1094,7 +1210,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple
-                            >
+                    >
                         <option
                             v-for="(driver, i) in drivers"
                             :key="i"
@@ -1107,7 +1223,7 @@
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple
-                            >
+                    >
                         <option
                             v-for="(host, i) in hosts"
                             :key="i"
@@ -1130,7 +1246,7 @@
                 </div>
             </div>
             <template v-slot:button>
-                    <!-- v-if="!checkCloseData || !editAble" -->
+                <!-- v-if="!checkCloseData || !editAble" -->
                 <button
                     v-if="checkCloseData"
                     type="button"
@@ -1245,6 +1361,7 @@ export default {
             customers: [],
             sameDataMain: [],
             eltDetailsModel: [],
+            overIssueSeatsRevert: [],
             cancelData: {
                 percentage: 'first',
             },
@@ -1348,6 +1465,7 @@ export default {
             pointsValidation: "",
             pointsUsage: "",
             checkedUsagePoints: false,
+            loadingRevertButton: false,
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -1412,6 +1530,9 @@ export default {
         },
         closeEltDetail() {
             $("#elt_detail_modal").click();
+        },
+        closeOverIssueDetail() {
+            $("#overIssue_detail_modal").click();
         },
         closeElt() {
             $("#addELTModel").modal('hide');
@@ -1786,7 +1907,7 @@ export default {
             this.loading = true;
             this.dataForClose.mergeId = this.dataForClose.ticket_merge_id
             this.dataForClose.closingId = this.dataForClose.ticket_closing_id
-             const res = await this.callApi("post", "booking/close/schedule/closing/update", this.dataForClose);
+            const res = await this.callApi("post", "booking/close/schedule/closing/update", this.dataForClose);
             if (res.status == 200) {
                 swal({
                     title: "Success",
@@ -1953,6 +2074,47 @@ export default {
             }
         },
 
+        async revertOverIssueFunction(item) {
+            const resFinalRevert = await this.callApi("post", "booking/revert/over/issue/seat", {
+                ticket_id: item.id,
+                schedule_id: item.schedule_id,
+                schedule_date: item.schedule_date,
+                seat_no: item.seat_no,
+            });
+            this.loadingRevertButton = true;
+            if (resFinalRevert.status == 200) {
+                this.loadingRevertButton = false
+                swal({
+                    title: "Success!",
+                    text: "Seat Revert Successfully!",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+
+            } else if (resFinalRevert.status == 422) {
+                this.loadingRevertButton = false
+                let errorContent = "";
+                let count = 0;
+                for (const key in resFinalRevert.data.errors) {
+                    resFinalRevert.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
+                }
+            }
+        },
+
         async usePoints(e) {
             if (e.target.checked) {
                 const resUsagePoints = await this.callApi("post", "booking/usagePoints", {
@@ -2090,6 +2252,21 @@ export default {
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                 });
+
+                const resFetchOverIssueSeat = await this.callApi("post", "booking/fetch/over/issue/seat", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                });
+                if (resFetchOverIssueSeat.status == 200) {
+                    this.overIssueSeatsRevert = resFetchOverIssueSeat.data
+                    if (resFetchOverIssueSeat.data.length == 0) {
+                        this.closeOverIssueDetail();
+                    }
+                } else {
+                    console.log(resFetchOverIssueSeat);
+                }
 
                 if (responseEltDetails.status == 200) {
                     this.eltDetailsModel = responseEltDetails.data
@@ -2727,8 +2904,6 @@ export default {
                     timer: 2000
                 });
                 this.fetchScheduleData();
-                this.fetchReSpecificSchedules();
-                this.resetArrays();
                 this.closeModal();
             }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Booking\TicketELT;
+use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\BusClass;
 use App\Models\Bus\Bus;
 use App\Models\Booking\BookingCancel;
@@ -97,5 +98,10 @@ class Ticket extends Model
     public function cancel_ticket()
     {
         return $this->hasOne(BookingCancel::class, 'ticket_id', 'id');
+    }
+
+    public function overIssueSeats()
+    {
+        return $this->hasOne(TicketsOverIssue::class, 'ticket_id', 'id');
     }
 }
