@@ -34844,8 +34844,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var config, formData, logo, logoRes, res, _loop, key;
-
+        var config, formData, logo, logoRes, res;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -34979,17 +34978,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 2000);
                 } else {
                   if (res.status == 422) {
-                    _this3.loading = false;
+                    (function () {
+                      _this3.loading = false;
+                      var errorContent = "";
+                      var count = 0;
 
-                    _loop = function _loop(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this3.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + element + "\n";
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
                   }
                 }
 
@@ -35051,8 +35056,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var config, formData, logo, logoRes, res, _loop2, key;
-
+        var config, formData, logo, logoRes, res;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -35138,15 +35142,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 3000);
                 } else {
                   if (res.status == 422) {
-                    _loop2 = function _loop2(key) {
-                      res.data.errors[key].forEach(function (element) {
-                        _this5.errorsArray(element, key);
-                      });
-                    };
+                    (function () {
+                      _this5.loading = false;
+                      var errorContent = "";
+                      var count = 0;
 
-                    for (key in res.data.errors) {
-                      _loop2(key);
-                    }
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + element + "\n";
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
                   }
                 }
 

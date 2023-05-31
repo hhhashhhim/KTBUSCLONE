@@ -11,6 +11,8 @@ use App\Models\Route\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TerminalController extends Controller
 {
@@ -49,46 +51,54 @@ class TerminalController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-            'urdu_name' => ['required', Rule::unique('terminals', 'urdu_name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-            'city_id' => 'required',
-            'contact' => 'required',
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('terminals', 'name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'urdu_name' => ['required', Rule::unique('terminals', 'urdu_name')->where('city_id', $request->city_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'city_id' => 'required',
+                    'contact' => 'required',
+                ];
 
-        $customMessages = [
-            'name.required' => 'Name Field is Required!',
-            'name.unique' => 'Terminal Name already exist against This City',
-            'city_id.required' => 'Please Select Any City ',
-            'contact.required' => 'Please Enter your Phone Number',
-        ];
-        $this->validate($request, $rules, $customMessages);
+                $customMessages = [
+                    'name.required' => 'Name Field is Required!',
+                    'name.unique' => 'Terminal Name already exist against This City',
+                    'city_id.required' => 'Please Select Any City ',
+                    'contact.required' => 'Please Enter your Phone Number',
+                ];
+                $this->validate($request, $rules, $customMessages);
 
-        Terminal::create([
-            'name' => $request->name,
-            'urdu_name' => $request->urdu_name,
-            'contact' => plainContactAndCnic($request->contact),
-            'address' => $request->address ?? " ",
-            'longitude' => $request->longitude,
-            'latitude' => $request->latitude,
-            'time_difference' => $request->time_difference,
-            'available_seats' => $request->available_seats,
-            'advance_booking' => $request->advance_booking,
-            'active_sms' => $request->active_sms ? 1 : 0,
-            'city_id' => $request->city_id,
-            'online_terminal_name' => $request->online_terminal_name ?? " ",
-            'is_online_terminal' => isset($request->is_online) ? 1 : 0,
-            'status' => $request->active ? 1 : 0,
-            'is_main' => $request->is_main ? 1 : 0,
-            'allowed_type' => $request->seatNumberType,
-            'fixed_commission' => $request->commission ?? 0,
-            'ticket_flat_commission' => $request->flatCommission ?? 0,
-            'ticket_percentage_commission' => $request->percentageCommission ?? 0,
-            'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
-        ]);
+                Terminal::create([
+                    'name' => $request->name,
+                    'urdu_name' => $request->urdu_name,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'address' => $request->address ?? " ",
+                    'longitude' => $request->longitude,
+                    'latitude' => $request->latitude,
+                    'time_difference' => $request->time_difference,
+                    'available_seats' => $request->available_seats,
+                    'advance_booking' => $request->advance_booking,
+                    'active_sms' => $request->active_sms ? 1 : 0,
+                    'city_id' => $request->city_id,
+                    'online_terminal_name' => $request->online_terminal_name ?? " ",
+                    'is_online_terminal' => isset($request->is_online) ? 1 : 0,
+                    'status' => $request->active ? 1 : 0,
+                    'is_main' => $request->is_main ? 1 : 0,
+                    'allowed_type' => $request->seatNumberType,
+                    'fixed_commission' => $request->commission ?? 0,
+                    'ticket_flat_commission' => $request->flatCommission ?? 0,
+                    'ticket_percentage_commission' => $request->percentageCommission ?? 0,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
+                ]);
+                DB::commit();
+                return $this->index();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
-        return $this->index();
     }
 
     public function delete(Request $request)
@@ -98,35 +108,44 @@ class TerminalController extends Controller
 
     public function update(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'urdu_name' => 'required',
-            'contact' => 'required',
-        ]);
-        Terminal::find($request->id)->update([
-            'name' => $request->name,
-            'urdu_name' => $request->urdu_name,
-            'contact' => plainContactAndCnic($request->contact),
-            'address' => $request->address,
-            'longitude' => $request->longitude,
-            'latitude' => $request->latitude,
-            'time_difference' => $request->time_difference,
-            'advance_booking' => $request->advance_booking,
-            'available_seats' => $request->available_seats,
-            'city_id' => $request->city_id,
-            'online_terminal_name' => $request->online_terminal_name,
-            'is_online_terminal' => $request->is_online_terminal == true ? 1 : 0,
-            'is_main' => (int)$request->is_main,
-            'fixed_commission' => $request->fixed_commission ?? 0,
-            'ticket_flat_commission' => $request->ticket_flat_commission ?? 0,
-            'ticket_percentage_commission' => $request->ticket_percentage_commission ?? 0,
-            'allowed_type' => $request->allowed_type,
-            'active_sms' => $request->active_sms ? 1 : 0,
-            'status' => (int)$request->status,
-        ]);
-        return response()->json([
-            'message' => 'Updated Successfully',
-        ], 201);
+        try {
+                DB::beginTransaction();
+                $this->validate($request, [
+                    'name' => 'required',
+                    'urdu_name' => 'required',
+                    'contact' => 'required',
+                ]);
+                Terminal::find($request->id)->update([
+                    'name' => $request->name,
+                    'urdu_name' => $request->urdu_name,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'address' => $request->address,
+                    'longitude' => $request->longitude,
+                    'latitude' => $request->latitude,
+                    'time_difference' => $request->time_difference,
+                    'advance_booking' => $request->advance_booking,
+                    'available_seats' => $request->available_seats,
+                    'city_id' => $request->city_id,
+                    'online_terminal_name' => $request->online_terminal_name,
+                    'is_online_terminal' => $request->is_online_terminal == true ? 1 : 0,
+                    'is_main' => (int)$request->is_main,
+                    'fixed_commission' => $request->fixed_commission ?? 0,
+                    'ticket_flat_commission' => $request->ticket_flat_commission ?? 0,
+                    'ticket_percentage_commission' => $request->ticket_percentage_commission ?? 0,
+                    'allowed_type' => $request->allowed_type,
+                    'active_sms' => $request->active_sms ? 1 : 0,
+                    'status' => (int)$request->status,
+                ]);
+                DB::commit();
+
+                return response()->json([
+                    'message' => 'Updated Successfully',
+                ], 201);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function terminalCommissions(Request $request)
@@ -142,30 +161,38 @@ class TerminalController extends Controller
 
     public function commissionStore(Request $request)
     {
-        $request->validate([
-            "terminal_id" => 'required',
-            "route" => 'required',
-            "fixCommission" => 'required',
-            "flatCommission" => 'required',
-            "percentCommission" => 'required',
-            "adjustmentCommission" => 'required',
-        ]);
-        TerminalCommission::where("terminal_id", $request->terminal_id)->delete();
-        foreach ($request->route as $key => $value) {
-            $checkExist = TerminalCommission::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
-            if (!$checkExist) {
-                TerminalCommission::create([
-                    'terminal_id' => $request->terminal_id,
-                    'route_id' => $request->route[$key],
-                    'fix_commission' => $request->fixCommission[$key],
-                    'flat_commission' => $request->flatCommission[$key],
-                    'percentage_commission' => $request->percentCommission[$key],
-                    'adjustment_commission' => $request->adjustmentCommission[$key],
-                    'company_id' => Auth::user()->company_id,
-                    'added_by' => Auth::user()->id,
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "terminal_id" => 'required',
+                    "route" => 'required',
+                    "fixCommission" => 'required',
+                    "flatCommission" => 'required',
+                    "percentCommission" => 'required',
+                    "adjustmentCommission" => 'required',
                 ]);
+                TerminalCommission::where("terminal_id", $request->terminal_id)->delete();
+                foreach ($request->route as $key => $value) {
+                    $checkExist = TerminalCommission::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
+                    if (!$checkExist) {
+                        TerminalCommission::create([
+                            'terminal_id' => $request->terminal_id,
+                            'route_id' => $request->route[$key],
+                            'fix_commission' => $request->fixCommission[$key],
+                            'flat_commission' => $request->flatCommission[$key],
+                            'percentage_commission' => $request->percentCommission[$key],
+                            'adjustment_commission' => $request->adjustmentCommission[$key],
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-        }
     }
 
     public function terminalDiscounts(Request $request)
@@ -181,29 +208,37 @@ class TerminalController extends Controller
 
     public function discountStore(Request $request)
     {
-        $request->validate([
-            "terminal_id" => 'required',
-            "route" => 'required',
-            "discount" => 'required',
-            "startDate" => 'required',
-            "endDate" => 'required',
-        ]);
-
-        TerminalDiscount::where("terminal_id", $request->terminal_id)->delete();
-        foreach ($request->route as $key => $value) {
-            $checkExist = TerminalDiscount::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
-            if (!$checkExist) {
-                TerminalDiscount::create([
-                    'terminal_id' => $request->terminal_id,
-                    'route_id' => $request->route[$key],
-                    'discount' => $request->discount[$key],
-                    'start_date' => $request->startDate[$key],
-                    'end_date' => $request->endDate[$key],
-                    'company_id' => Auth::user()->company_id,
-                    'added_by' => Auth::user()->id,
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "terminal_id" => 'required',
+                    "route" => 'required',
+                    "discount" => 'required',
+                    "startDate" => 'required',
+                    "endDate" => 'required',
                 ]);
+
+                TerminalDiscount::where("terminal_id", $request->terminal_id)->delete();
+                foreach ($request->route as $key => $value) {
+                    $checkExist = TerminalDiscount::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
+                    if (!$checkExist) {
+                        TerminalDiscount::create([
+                            'terminal_id' => $request->terminal_id,
+                            'route_id' => $request->route[$key],
+                            'discount' => $request->discount[$key],
+                            'start_date' => $request->startDate[$key],
+                            'end_date' => $request->endDate[$key],
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-        }
     }
 
 }

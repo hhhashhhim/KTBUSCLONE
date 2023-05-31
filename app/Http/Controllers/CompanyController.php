@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CompanyController extends Controller
 {
@@ -19,42 +21,49 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => ['required', Rule::unique('companies', 'name')],
-            'contact' => 'required',
-            'userName' => 'required',
-            'email' => ['required', Rule::unique('users', 'email')],
-            'password' => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    'name' => ['required', Rule::unique('companies', 'name')],
+                    'contact' => 'required',
+                    'userName' => 'required',
+                    'email' => ['required', Rule::unique('users', 'email')],
+                    'password' => 'required',
+                ]);
 
-        $company = Company::create([
-            'name' => $request->name,
-            'user_name' => $request->userName,
-            'contact' => plainContactAndCnic($request->contact),
-            'location' => $request->location,
-            'modules' => $request->modules,
-            'logo' => $request->logo,
-            'added_by' => auth()->user()->id,
-        ]);
+                $company = Company::create([
+                    'name' => $request->name,
+                    'user_name' => $request->userName,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'location' => $request->location,
+                    'modules' => $request->modules,
+                    'logo' => $request->logo,
+                    'added_by' => auth()->user()->id,
+                ]);
 
-        $role = Role::create([
-            'name' => 'admin',
-            'company_id' => $company->id,
-            'permissions' => $request->modules,
-        ]);
+                $role = Role::create([
+                    'name' => 'admin',
+                    'company_id' => $company->id,
+                    'permissions' => $request->modules,
+                ]);
 
-        $user = User::create([
-            'name' => $request->userName,
-            'email' => $request->email,
-            'contact' => plainContactAndCnic($request->contact),
-            'password' => Hash::make($request->password),
-            'role_id' => $role->id,
-            'destination_city_ids' => "all",
-            'departure_city_ids' => "all",
-            'company_id' => $company->id,
-        ]);
-
-        return $company;
+                $user = User::create([
+                    'name' => $request->userName,
+                    'email' => $request->email,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'password' => Hash::make($request->password),
+                    'role_id' => $role->id,
+                    'destination_city_ids' => "all",
+                    'departure_city_ids' => "all",
+                    'company_id' => $company->id,
+                ]);
+                DB::commit();
+                return $company;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
@@ -72,40 +81,49 @@ class CompanyController extends Controller
 
     public function update(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'contact' => 'required',
-            'email' => 'required|email',
-        ]);
-        Company::find($request->id)->update([
-            'name' => $request->name,
-            'user_name' => $request->user_name,
-            'contact' => plainContactAndCnic($request->contact),
-            'location' => $request->location,
-            'modules' => $request->modules,
-            'added_by' => auth()->user()->id,
-        ]);
-        if ($request->logo) {
-            Company::find($request->id)->update([
-                'logo' => $request->logo,
-            ]);
-        }
-        User::where('company_id', $request->id)->first()->update([
-            'name' => $request->name,
-            'contact' => plainContactAndCnic($request->contact),
-            'email' => $request->email,
-        ]);
-        if ($request->password) {
-            User::where('company_id', $request->id)->first()->update([
-                'password' => Hash::make($request->password),
-            ]);
-        }
-        Role::where('company_id', $request->id)->where('name', 'admin')->update([
-            'permissions' => $request->modules,
-        ]);
-        return response()->json([
-            'message' => "Updated Successfully",
-        ], 200);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    'name' => 'required',
+                    'contact' => 'required',
+                    'email' => 'required|email',
+                ]);
+                Company::find($request->id)->update([
+                    'name' => $request->name,
+                    'user_name' => $request->user_name,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'location' => $request->location,
+                    'modules' => $request->modules,
+                    'added_by' => auth()->user()->id,
+                ]);
+                if ($request->logo) {
+                    Company::find($request->id)->update([
+                        'logo' => $request->logo,
+                    ]);
+                }
+                User::where('company_id', $request->id)->first()->update([
+                    'name' => $request->name,
+                    'contact' => plainContactAndCnic($request->contact),
+                    'email' => $request->email,
+                ]);
+                if ($request->password) {
+                    User::where('company_id', $request->id)->first()->update([
+                        'password' => Hash::make($request->password),
+                    ]);
+                }
+                Role::where('company_id', $request->id)->where('name', 'admin')->update([
+                    'permissions' => $request->modules,
+                ]);
+                DB::commit();
+                return response()->json([
+                    'message' => "Updated Successfully",
+                ], 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
