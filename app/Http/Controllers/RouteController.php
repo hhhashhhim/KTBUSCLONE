@@ -9,6 +9,8 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RouteController extends Controller
 {
@@ -30,78 +32,48 @@ class RouteController extends Controller
         return $subRoutes;
 
     }
-     public function store(Request $request)
-     {
-        $request->validate([
-            'routeStart' => 'required',
-            'routeEnd' => 'required',
-            'cities' => 'required',
-        ], [
-            'route.required' => 'Route Name is Required !!!!'
-        ]);
-        if (count($request->cities) < 2) {
-            return response()->json(["errors" => ["Cities Error" => ["Please Select At leat 2 Cities !!!"]]], 422);
-        }
-        foreach ($request['cities'] as $index => $city) {
-            $used_cities[] = $city;
-            foreach ($request['cities'] as $innerIndex => $innerCity) {
-                if (in_array($innerCity, $used_cities)) {
-                    continue;
-                } else {
-                    $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
-                    $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->count();
-
-                    if ($fareClasses == 0 || $fare->count() < $fareClasses) {
-                        return response()->json([
-                            "errors" => [
-                                "Fare Error" => ["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
-                            ]
-                        ], 422);
-                    }
-                }
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $request->validate([
+                'routeStart' => 'required',
+                'routeEnd' => 'required',
+                'cities' => 'required',
+            ], [
+                'route.required' => 'Route Name is Required !!!!'
+            ]);
+            if (count($request->cities) < 2) {
+                return response()->json(["errors" => ["Cities Error" => ["Please Select At leat 2 Cities !!!"]]], 422);
             }
-        }
-        $route = Route::create([
-            'name' => $request['routeStart'] . '-' . $request['routeEnd'],
-            'company_id' => Auth::user()->company_id,
-            'added_by' => auth()->user()->id
-        ]);
-        $used_cities = [];//key can't be same
-        foreach ($request['cities'] as $index => $city) {
-            $used_cities[] = $city;
-            foreach ($request['cities'] as $innerIndex => $innerCity) {
-                if (in_array($innerCity, $used_cities)) {
-                    continue;
-                } else {
-                    $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+            foreach ($request['cities'] as $index => $city) {
+                $used_cities[] = $city;
+                foreach ($request['cities'] as $innerIndex => $innerCity) {
+                    if (in_array($innerCity, $used_cities)) {
+                        continue;
+                    } else {
+                        $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+                        $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->count();
 
-                    if ($fare->count() > 0) {
-                        foreach ($fare as $detail) {
-                            RouteFare::create([
-                                'route_id' => $route->id,
-                                'fare_id' => $detail->id,
-                                'fare_class_id' => $detail->fare_class,
-                                'departure_city_id' => $used_cities[$index],
-                                'destination_city_id' => $innerCity,
-                                'company_id' => Auth::user()->company_id,
-                                'added_by' => auth()->user()->id
-                            ]);
+                        if ($fareClasses == 0 || $fare->count() < $fareClasses) {
+                            return response()->json([
+                                "errors" => [
+                                    "Fare Error" => ["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
+                                ]
+                            ], 422);
                         }
                     }
                 }
             }
-        }
-        if ($request['revereRoute'] == 1) {
-            // Reverse Route
             $route = Route::create([
-                'name' => $request['routeEnd'] . '-' . $request['routeStart'],
+                'name' => $request['routeStart'] . '-' . $request['routeEnd'],
                 'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
             ]);
             $used_cities = [];//key can't be same
-            foreach (array_reverse($request['cities']) as $index => $city) {
+            foreach ($request['cities'] as $index => $city) {
                 $used_cities[] = $city;
-                foreach (array_reverse($request['cities']) as $innerIndex => $innerCity) {
+                foreach ($request['cities'] as $innerIndex => $innerCity) {
                     if (in_array($innerCity, $used_cities)) {
                         continue;
                     } else {
@@ -123,23 +95,70 @@ class RouteController extends Controller
                     }
                 }
             }
+            if ($request['revereRoute'] == 1) {
+                // Reverse Route
+                $route = Route::create([
+                    'name' => $request['routeEnd'] . '-' . $request['routeStart'],
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => auth()->user()->id
+                ]);
+                $used_cities = [];//key can't be same
+                foreach (array_reverse($request['cities']) as $index => $city) {
+                    $used_cities[] = $city;
+                    foreach (array_reverse($request['cities']) as $innerIndex => $innerCity) {
+                        if (in_array($innerCity, $used_cities)) {
+                            continue;
+                        } else {
+                            $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+
+                            if ($fare->count() > 0) {
+                                foreach ($fare as $detail) {
+                                    RouteFare::create([
+                                        'route_id' => $route->id,
+                                        'fare_id' => $detail->id,
+                                        'fare_class_id' => $detail->fare_class,
+                                        'departure_city_id' => $used_cities[$index],
+                                        'destination_city_id' => $innerCity,
+                                        'company_id' => Auth::user()->company_id,
+                                        'added_by' => auth()->user()->id
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            DB::commit();
+            return ['message' => 'success'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
-        return ['message' => 'success'];
     }
 
     public function update(Request $request)
     {
-        $request->validate([
-            'routeStartName' => 'required',
-            'routeEndName' => 'required',
-        ]);
-        Route::where([
-            'company_id' => Auth::user()->company_id,
-            'id' => $request->id,
-        ])->update([
-            'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
-        ]);
-        return ['message' => 'success'];
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    'routeStartName' => 'required',
+                    'routeEndName' => 'required',
+                ]);
+                Route::where([
+                    'company_id' => Auth::user()->company_id,
+                    'id' => $request->id,
+                ])->update([
+                    'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
+                ]);
+                DB::commit();
+                return ['message' => 'success'];
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
     public function list()
     {

@@ -968,13 +968,26 @@ export default {
                 }, 2000);
             } else {
                 if (res.status == 422) {
-                    this.loading = false
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
+                this.loading = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in res.data.errors) {
+                    res.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
                 }
+            }
             }
         },
         async edit(id, i) {
@@ -1049,12 +1062,26 @@ export default {
                 }, 3000);
             } else {
                 if (res.status == 422) {
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
-                        });
-                    }
+                this.loading = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in res.data.errors) {
+                    res.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
                 }
+            }
             }
         },
         async deleteModal(company, i) {

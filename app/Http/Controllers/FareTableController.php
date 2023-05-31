@@ -9,23 +9,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdateSchedulesTime;
+use Illuminate\Support\Facades\Log;
 
 class FareTableController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate([
-            'fare' => 'required',
-            'fare_class' => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    'fare' => 'required',
+                    'fare_class' => 'required',
+                ]);
 
-        $company_id = auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id;
-        if ($request->created == 1) {
-            updateFare($request, $company_id);
-        } else {
-            storeFare($request, $company_id);
-        }
-        return $this->getFarePrices($request->fare_class);
+                $company_id = auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id;
+                if ($request->created == 1) {
+                    updateFare($request, $company_id);
+                } else {
+                    storeFare($request, $company_id);
+                }
+                DB::commit();
+                return $this->getFarePrices($request->fare_class);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
@@ -83,32 +93,48 @@ class FareTableController extends Controller
 
     public function fareUpdate(Request $request)
     {
+        try {
+                DB::beginTransaction();
+                FareTable::where(['from_city_id' => $request->fromCity, 'to_city_id' => $request->toCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
+                    'fare' => $request->updatedFare,
+                    'updated_by' => Auth::user()->id,
+                ]);
+                if ($request->reverse == true) {
+                    FareTable::where(['from_city_id' => $request->toCity, 'to_city_id' => $request->fromCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
+                        'fare' => $request->updatedFare,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
+                DB::commit();
+                return response()->json([
+                    'message' => 'Updated Successfully',
+                ], 200);
 
-        FareTable::where(['from_city_id' => $request->fromCity, 'to_city_id' => $request->toCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
-            'fare' => $request->updatedFare,
-            'updated_by' => Auth::user()->id,
-        ]);
-        if ($request->reverse == true) {
-            FareTable::where(['from_city_id' => $request->toCity, 'to_city_id' => $request->fromCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
-                'fare' => $request->updatedFare,
-                'updated_by' => Auth::user()->id,
-            ]);
-        }
-        return response()->json([
-            'message' => 'Updated Successfully',
-        ], 200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function updateScheduleTimes(Request $request)
     {
-        $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
-        $id = $this->dispatch($job);
-        // DB::table("jobs")->where("queue","default")->update([
-        //     "progress" => 3233
-        // ]);
+        try {
+                DB::beginTransaction();
+                $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
+                $id = $this->dispatch($job);
+                // DB::table("jobs")->where("queue","default")->update([
+                //     "progress" => 3233
+                // ]);
 
-        // return UpdateSchedulesTime::dispatch(Auth::user());
-        return $id;
+                // return UpdateSchedulesTime::dispatch(Auth::user());
+                DB::commit();
+                return $id;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function getDays($start, $end)

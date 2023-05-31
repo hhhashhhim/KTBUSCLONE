@@ -8,6 +8,8 @@ use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CityController extends Controller
 {
@@ -18,41 +20,57 @@ class CityController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'name.required' => 'Name Field is Required!',
-            'name.alpha' => 'City Name must be in Alphabets',
-            'name.unique' => 'City Name is Already Exist',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        $city = City::create([
-            'name' => $request->name,
-            'company_id' => Auth::user()->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
-        $this->cityCombinations($city);
-        updateFareTable(Auth::user()->company_id);
-        return City::with('addedBy')->find($city->id);
+                $customMessages = [
+                    'name.required' => 'Name Field is Required!',
+                    'name.alpha' => 'City Name must be in Alphabets',
+                    'name.unique' => 'City Name is Already Exist',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $city = City::create([
+                    'name' => $request->name,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+                $this->cityCombinations($city);
+                updateFareTable(Auth::user()->company_id);
+                DB::commit();
+                return City::with('addedBy')->find($city->id);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'name.required' => 'Name Field is Required!',
-            'name.alpha' => 'City Name must be in Alphabets',
-            'name.unique' => 'City Name is Already Exist',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return City::find($request->id)->update([
-            'name' => $request->name,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Name Field is Required!',
+                    'name.alpha' => 'City Name must be in Alphabets',
+                    'name.unique' => 'City Name is Already Exist',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                City::find($request->id)->update([
+                    'name' => $request->name,
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function delete(Request $request)
