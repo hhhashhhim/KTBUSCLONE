@@ -30399,7 +30399,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                           title: "Error",
                           text: errorContent,
                           icon: "error",
-                          timer: 2000
+                          timer: 5000
                         });
                       }
                     })();

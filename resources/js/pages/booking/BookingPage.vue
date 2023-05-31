@@ -2784,7 +2784,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 2000
+                            timer: 5000
                         });
 
                     }
