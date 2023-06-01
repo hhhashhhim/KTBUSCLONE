@@ -2859,6 +2859,27 @@ export default {
                 this.resetArrays();
                 this.closeModal();
             }
+            if (resCancelBooking.status == 422) {
+                this.dropScheduleButton = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resCancelBooking.data.errors) {
+                    resCancelBooking.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
+                }
+            }
         },
 
         //over issue model complete data

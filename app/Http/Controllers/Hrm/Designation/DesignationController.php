@@ -8,6 +8,8 @@ use App\Models\Hrm\Designation\Designation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DesignationController extends Controller
 {
@@ -34,40 +36,58 @@ class DesignationController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('terminal_id', $request->terminal)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department)->where('terminal_id', $request->terminal)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'name.required' => 'Designation Name is Required!',
-            'name.unique' => 'Designation Name Already Registered Against this Department/Terminal! Please Select other Terminal or Department',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Designation::create([
-            'terminal_id' => $request->terminal,
-            'department_id' => $request->department,
-            'name' => $request->name,
-            'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Designation Name is Required!',
+                    'name.unique' => 'Designation Name Already Registered Against this Department/Terminal! Please Select other Terminal or Department',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $designation =  Designation::create([
+                    'terminal_id' => $request->terminal,
+                    'department_id' => $request->department,
+                    'name' => $request->name,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                DB::commit();
+                return $designation;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Designation Name Already Registered Against this Department/Company !',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Designation::where('id', $request->id)->update([
-            'department_id' => $request->department_id,
-            'name' => $request->name,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Department Name is Required!',
+                    'name.unique' => 'Designation Name Already Registered Against this Department/Company !',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $designation =  Designation::where('id', $request->id)->update([
+                    'department_id' => $request->department_id,
+                    'name' => $request->name,
+                ]);
+                DB::commit();
+                return $designation;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function delete(Request $request)

@@ -30531,7 +30531,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this25.closeModal();
                 }
 
-              case 5:
+                if (resCancelBooking.status == 422) {
+                  (function () {
+                    _this25.dropScheduleButton = false;
+                    var errorContent = "";
+                    var count = 0;
+
+                    for (var key in resCancelBooking.data.errors) {
+                      resCancelBooking.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + element + "\n";
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
+                }
+
+              case 6:
               case "end":
                 return _context25.stop();
             }
@@ -33195,8 +33215,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var seatNo, res, _loop2, key;
-
+        var seatNo, res;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -33282,17 +33301,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 22:
                 if (res.status == 422) {
-                  _this6.loading = false;
+                  (function () {
+                    _this6.dropScheduleButton = false;
+                    var errorContent = "";
+                    var count = 0;
 
-                  _loop2 = function _loop2(key) {
-                    res.data.errors.percentage.forEach(function (element) {
-                      _this6.errorsArray(element, key);
-                    });
-                  };
-
-                  for (key in res.data.errors) {
-                    _loop2(key);
-                  }
+                    for (var key in res.data.errors) {
+                      res.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + element + "\n";
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
                 }
 
               case 23:
@@ -36977,8 +37002,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res, _loop2, key;
-
+        var res;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -37041,17 +37065,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 18:
                 if (res.status == 422) {
-                  _this4.loading = false;
+                  (function () {
+                    _this4.cloneDone = false;
+                    var errorContent = "";
+                    var count = 0;
 
-                  _loop2 = function _loop2(key) {
-                    res.data.errors.percentage.forEach(function (element) {
-                      _this4.errorsArray(element, key);
-                    });
-                  };
-
-                  for (key in res.data.errors) {
-                    _loop2(key);
-                  }
+                    for (var key in res.data.errors) {
+                      res.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
                 }
 
               case 19:
@@ -40324,8 +40357,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var resLeaveUpdate, _loop3, key;
-
+        var resLeaveUpdate;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -40402,18 +40434,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 21:
                 if (resLeaveUpdate.status == 422) {
-                  $("#" + formID).scrollTop(0, 0);
-                  _this5.loading = false;
+                  (function () {
+                    _this5.cloneDone = false;
+                    var errorContent = "";
+                    var count = 0;
 
-                  _loop3 = function _loop3(key) {
-                    resLeaveUpdate.data.errors[key].forEach(function (element) {
-                      _this5.errorsArray(element, key);
-                    });
-                  };
-
-                  for (key in resLeaveUpdate.data.errors) {
-                    _loop3(key);
-                  }
+                    for (var key in resLeaveUpdate.data.errors) {
+                      resLeaveUpdate.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
                 }
 
               case 22:
@@ -42122,6 +42162,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status == 422) {
                   (function () {
+                    _this.cloneDone = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -46777,7 +46818,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this3.fetchSchedule();
                 }
 
-              case 7:
+                if (resExtend.status == 422) {
+                  (function () {
+                    _this3.cloneDone = false;
+                    var errorContent = "";
+                    var count = 0;
+
+                    for (var key in resExtend.data.errors) {
+                      resExtend.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
+                }
+
+              case 8:
               case "end":
                 return _context3.stop();
             }
@@ -47256,8 +47320,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this8 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var resEdit, _loop, key;
-
+        var resEdit;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
@@ -47335,17 +47398,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this8.fetchSchedule();
                 } else {
                   if (resEdit.status == 422) {
-                    _this8.loading = false;
+                    (function () {
+                      _this8.cloneDone = false;
+                      var errorContent = "";
+                      var count = 0;
 
-                    _loop = function _loop(key) {
-                      res.data.errors.percentage.forEach(function (element) {
-                        _this8.errorsArray(element, key);
-                      });
-                    };
-
-                    for (key in res.data.errors) {
-                      _loop(key);
-                    }
+                      for (var key in resEdit.data.errors) {
+                        resEdit.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
                   }
                 }
 
@@ -82238,9 +82310,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 class FoodController extends Controller
 {
 
@@ -35,37 +37,55 @@ class FoodController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            "name" => 'required|unique:hotel_foods,name,Null,id,hotel_id,'.$request->hotelId,
-            "price" => 'required',
-            "unit" => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "name" => 'required|unique:hotel_foods,name,Null,id,hotel_id,'.$request->hotelId,
+                    "price" => 'required',
+                    "unit" => 'required',
+                ]);
 
-        return HotelFood::create([
-            "name" => $request->name,
-            "price" => $request->price,
-            "unit" => $request->unit,
-            "description" => $request->description,
-            "hotel_id" => $request->hotelId,
-            "company_id" => Auth::user()->company_id,
-            "added_by" => Auth::user()->id,
-        ]);
+                $hotelFood = HotelFood::create([
+                    "name" => $request->name,
+                    "price" => $request->price,
+                    "unit" => $request->unit,
+                    "description" => $request->description,
+                    "hotel_id" => $request->hotelId,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $hotelFood;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function update(Request $request)
     {
-        $request->validate([
-            "name" => 'required|unique:hotel_foods,name,'.$request->foodId.',id,hotel_id,'.$request->hotelId,
-            "price" => 'required',
-            "unit" => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "name" => 'required|unique:hotel_foods,name,'.$request->foodId.',id,hotel_id,'.$request->hotelId,
+                    "price" => 'required',
+                    "unit" => 'required',
+                ]);
 
-        return HotelFood::where("id",$request->foodId)->update([
-            "name" => $request->name,
-            "price" => $request->price,
-            "unit" => $request->unit,
-            "description" => $request->description,
-        ]);
+                $hotelFood = HotelFood::where("id",$request->foodId)->update([
+                    "name" => $request->name,
+                    "price" => $request->price,
+                    "unit" => $request->unit,
+                    "description" => $request->description,
+                ]);
+                DB::commit();
+                return $hotelFood;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
 

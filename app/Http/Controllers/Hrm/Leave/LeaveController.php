@@ -7,6 +7,8 @@ use App\Models\admin\Role;
 use App\Models\Hrm\Leave\Leave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LeaveController extends Controller
 {
@@ -34,53 +36,71 @@ class LeaveController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'from' => 'required',
-            'to' => 'required',
-            'reason' => 'required',
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'from' => 'required',
+                    'to' => 'required',
+                    'reason' => 'required',
+                ];
 
-        $customMessages = [
-            'from.required' => 'From/Start Date is Required!',
-            'to.required' => 'To / End Date is Required is Required!',
-            'reason.required' => 'Please Enter Leave Reason!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Leave::create([
-            'from' => $request->from,
-            'to' => $request->to,
-            'reason' => $request->reason,
-            'days' => $this->dateDifferenceInDays($request->from, $request->to),
-            'status' => 'P',
-            'applied_by' => Auth::user()->id,
-            'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $customMessages = [
+                    'from.required' => 'From/Start Date is Required!',
+                    'to.required' => 'To / End Date is Required is Required!',
+                    'reason.required' => 'Please Enter Leave Reason!',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $leave =  Leave::create([
+                    'from' => $request->from,
+                    'to' => $request->to,
+                    'reason' => $request->reason,
+                    'days' => $this->dateDifferenceInDays($request->from, $request->to),
+                    'status' => 'P',
+                    'applied_by' => Auth::user()->id,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                DB::commit();
+                return $leave;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'from' => 'required',
-            'to' => 'required',
-            'reason' => 'required',
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'from' => 'required',
+                    'to' => 'required',
+                    'reason' => 'required',
+                ];
 
-        $customMessages = [
-            'from.required' => 'From/Start Date is Required!',
-            'to.required' => 'To / End Date is Required is Required!',
-            'reason.required' => 'Please Enter Leave Reason!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Leave::where('id', $request->id)->update([
-            'from' => $request->from,
-            'to' => $request->to,
-            'reason' => $request->reason,
-            'days' => $this->dateDifferenceInDays($request->from, $request->to),
-            'status' => 'P',
-            'applied_by' => Auth::user()->id,
-        ]);
+                $customMessages = [
+                    'from.required' => 'From/Start Date is Required!',
+                    'to.required' => 'To / End Date is Required is Required!',
+                    'reason.required' => 'Please Enter Leave Reason!',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $leave =  Leave::where('id', $request->id)->update([
+                    'from' => $request->from,
+                    'to' => $request->to,
+                    'reason' => $request->reason,
+                    'days' => $this->dateDifferenceInDays($request->from, $request->to),
+                    'status' => 'P',
+                    'applied_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $leave;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
 
     }

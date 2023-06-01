@@ -434,12 +434,24 @@ export default {
                 await this.fetchLeaves();
             } else {
                 if (resLeaveUpdate.status == 422) {
-                    $("#" + formID).scrollTop(0, 0);
-                    this.loading = false;
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in resLeaveUpdate.data.errors) {
                         resLeaveUpdate.data.errors[key].forEach((element) => {
-                            this.errorsArray(element, key);
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
                 }
             }

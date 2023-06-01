@@ -400,6 +400,7 @@ export default {
             else {
                 this.loading = false;
                 if (res.status == 422) {
+                    this.cloneDone = false;
                     let errorContent = "";
                     let count = 0;
                     for (const key in res.data.errors) {

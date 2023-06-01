@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 class FoodOrderController extends Controller
 {
 
@@ -126,40 +128,48 @@ class FoodOrderController extends Controller
 
     public function orderBook(Request $request)
     {
-        $request->validate([
-            "ticketClosingId" => 'required',
-            "estimatedTime" => 'required',
-            "hotelId" => 'required',
-            "item" => 'required',
-            "quantity" => 'required',
-            "seat" => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "ticketClosingId" => 'required',
+                    "estimatedTime" => 'required',
+                    "hotelId" => 'required',
+                    "item" => 'required',
+                    "quantity" => 'required',
+                    "seat" => 'required',
+                ]);
 
-        $TicketClosing = TicketClosing::find($request->ticketClosingId);
+                $TicketClosing = TicketClosing::find($request->ticketClosingId);
 
-        foreach($request->item as $key=>$value)
-        {
-            $checkItem = explode("-",$request->item[$key]);
-            $food = $checkItem[1] == 1 ? HotelFood::find($checkItem[0]) : HotelFoodDeal::find($checkItem[0]);
+                foreach($request->item as $key=>$value)
+                {
+                    $checkItem = explode("-",$request->item[$key]);
+                    $food = $checkItem[1] == 1 ? HotelFood::find($checkItem[0]) : HotelFoodDeal::find($checkItem[0]);
 
-            HotelFoodOrder::create([
-                "hotel_id" => $request->hotelId,
-                "item_id" => $checkItem[0],
-                "item_type" => $checkItem[1],
-                "quantity" => $request->quantity[$key],
-                "price" => $food->price,
-                "amount" => ($food->price * $request->quantity[$key]),
-                "seat_no" => $request->seat[$key],
-                "estimated_time" => $request->estimatedTime,
-                "ticket_closing_id" => $TicketClosing->id,
-                "bus_id" => $TicketClosing->bus_id,
-                "schedule_id" => $TicketClosing->schedule_id,
-                "schedule_date" => $TicketClosing->schedule_date,
-                "status" => "pending",
-                "company_id" => Auth::user()->company_id,
-                "added_by" => Auth::user()->id,
-            ]);
-        }
+                    HotelFoodOrder::create([
+                        "hotel_id" => $request->hotelId,
+                        "item_id" => $checkItem[0],
+                        "item_type" => $checkItem[1],
+                        "quantity" => $request->quantity[$key],
+                        "price" => $food->price,
+                        "amount" => ($food->price * $request->quantity[$key]),
+                        "seat_no" => $request->seat[$key],
+                        "estimated_time" => $request->estimatedTime,
+                        "ticket_closing_id" => $TicketClosing->id,
+                        "bus_id" => $TicketClosing->bus_id,
+                        "schedule_id" => $TicketClosing->schedule_id,
+                        "schedule_date" => $TicketClosing->schedule_date,
+                        "status" => "pending",
+                        "company_id" => Auth::user()->company_id,
+                        "added_by" => Auth::user()->id,
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 

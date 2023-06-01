@@ -8,6 +8,8 @@ use App\Models\Maintenance\MaintenancePart;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FleetMaintenancePartController extends Controller
 {
@@ -29,40 +31,58 @@ class FleetMaintenancePartController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 
-        ];
+                ];
 
-        $customMessages = [
-            'name.required' => 'Part Name is Required!',
-            'name.unique' => 'Part Name Already Registred !',
-        ];
-        $this->validate($request, $rules, $customMessages);
+                $customMessages = [
+                    'name.required' => 'Part Name is Required!',
+                    'name.unique' => 'Part Name Already Registred !',
+                ];
+                $this->validate($request, $rules, $customMessages);
 
-        return MaintenancePart::create([
-            'name' => $request->name,
-            'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $part =  MaintenancePart::create([
+                    'name' => $request->name,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                DB::commit();
+                return $part;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 
-        ];
+                ];
 
-        $customMessages = [
-            'name.required' => 'Part Name is Required!',
-            'name.unique' => 'Part Name Already Registred !',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return MaintenancePart::where('id', $request->id)->update([
-            'name' => $request->name,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Part Name is Required!',
+                    'name.unique' => 'Part Name Already Registred !',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $part = MaintenancePart::where('id', $request->id)->update([
+                    'name' => $request->name,
+                ]);
+                DB::commit();
+                return $part;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
 
     }

@@ -375,12 +375,24 @@ export default {
 
             } else {
                 if (res.status == 422) {
-                    this.loading = false;
-
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
                     for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
                 }
             }

@@ -790,6 +790,27 @@ export default {
                 }, 500);
                 this.fetchSchedule();
             }
+            if (resExtend.status == 422) {
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resExtend.data.errors) {
+                        resExtend.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
         },
         async fetchSchedule() {
 
@@ -1151,11 +1172,24 @@ export default {
                 this.fetchSchedule();
             } else {
                 if (resEdit.status == 422) {
-                    this.loading = false;
-                    for (const key in res.data.errors) {
-                        res.data.errors.percentage.forEach((element) => {
-                            this.errorsArray(element, key);
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resEdit.data.errors) {
+                        resEdit.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
                         });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
                     }
                 }
             }

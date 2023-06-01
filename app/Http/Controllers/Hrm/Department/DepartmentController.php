@@ -8,6 +8,8 @@ use App\Models\Terminal;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DepartmentController extends Controller
 {
@@ -29,41 +31,58 @@ class DepartmentController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id,)->where('terminal_id', $request->terminal)->whereNull('deleted_at')],
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id,)->where('terminal_id', $request->terminal)->whereNull('deleted_at')],
 
-        ];
+                ];
 
-        $customMessages = [
-            'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Department Name Already Registered Against this Terminal!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Department::create([
-            'name' => $request->name,
-            'terminal_id' => $request->terminal,
-            'added_by' => Auth::user()->id,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Department Name is Required!',
+                    'name.unique' => 'Department Name Already Registered Against this Terminal!',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $department =  Department::create([
+                    'name' => $request->name,
+                    'terminal_id' => $request->terminal,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                DB::commit();
+                return $department;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
 
-        ];
+                ];
 
-        $customMessages = [
-            'name.required' => 'Department Name is Required!',
-            'name.unique' => 'Department Name Already Registered Against this Terminal !',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return Department::where('id', $request->id)->update([
-            'name' => $request->name,
-            'terminal_id' => $request->terminal_id,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Department Name is Required!',
+                    'name.unique' => 'Department Name Already Registered Against this Terminal !',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $department =  Department::where('id', $request->id)->update([
+                    'name' => $request->name,
+                    'terminal_id' => $request->terminal_id,
+                ]);
+                return $department;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
 
 
     }

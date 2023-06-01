@@ -8,6 +8,8 @@ use App\Models\ReportHeaderLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportsHeaderController extends Controller
 {
@@ -18,40 +20,58 @@ class ReportsHeaderController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
-            'name' => ['required' => Rule::unique('reports_headers', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required' => Rule::unique('reports_headers', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'name.required' => 'Name Field is Required!',
-            'name.unique' => 'Header is Already Exist',
-        ];
-        $this->validate($request, $rules, $customMessages);
+                $customMessages = [
+                    'name.required' => 'Name Field is Required!',
+                    'name.unique' => 'Header is Already Exist',
+                ];
+                $this->validate($request, $rules, $customMessages);
 
-        return ReportsHeader::create([
-            'name' => $request->name,
-            'company_id' => Auth::user()->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
+                $header =  ReportsHeader::create([
+                    'name' => $request->name,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $header;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function update(Request $request)
     {
-        $rules = [
-            'name' => ['required' => Rule::unique('reports_headers', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'name' => ['required' => Rule::unique('reports_headers', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
 
-        ];
+                ];
 
-        $customMessages = [
-            'name.required' => 'Name Field is Required!',
-            'name.unique' => 'Header is Already Exist',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        $expCtg = ReportsHeader::find($request->id);
-        return $expCtg->update([
-            'name' => $request->name,
-            'updated_by' => Auth::user()->id,
-        ]);
+                $customMessages = [
+                    'name.required' => 'Name Field is Required!',
+                    'name.unique' => 'Header is Already Exist',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $expCtg = ReportsHeader::find($request->id);
+                $data = $expCtg->update([
+                    'name' => $request->name,
+                    'updated_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $data;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function linkGet(Request $request)
@@ -77,15 +97,23 @@ class ReportsHeaderController extends Controller
 
     public function headerLink(Request $request)
     {
-        ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
-        foreach ($request->headIds as $key => $value) {
-            ReportHeaderLink::create([
-                'ticket_merge_id' => $request->ticket_merge_id,
-                'header_id' => $request->headIds[$key],
-                'value' => $request->values[$key],
-                'company_id' => Auth::user()->company_id,
-                'added_by' => Auth::user()->id,
-            ]);
-        }
+        try {
+                DB::beginTransaction();
+                ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+                foreach ($request->headIds as $key => $value) {
+                    ReportHeaderLink::create([
+                        'ticket_merge_id' => $request->ticket_merge_id,
+                        'header_id' => $request->headIds[$key],
+                        'value' => $request->values[$key],
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 }

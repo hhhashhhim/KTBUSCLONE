@@ -12,6 +12,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use Illuminate\Support\Facades\Log;
+
 class FleetMaintenanceController extends Controller
 {
 
@@ -50,68 +52,84 @@ class FleetMaintenanceController extends Controller
 
     public function fleetPartLink(Request $request)
     {
-        $rules = [
-            'fleetId' => 'required',
-            'currentReading' => 'required',
-            'fleetPart' => 'required',
-            'maintenanceAfter' => 'required',
-            'maintenanceAt' => 'required',
-        ];
-        $this->validate($request, $rules);
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'fleetId' => 'required',
+                    'currentReading' => 'required',
+                    'fleetPart' => 'required',
+                    'maintenanceAfter' => 'required',
+                    'maintenanceAt' => 'required',
+                ];
+                $this->validate($request, $rules);
 
-        Bus::where("id",$request->fleetId)->update([
-            "current_reading" => $request->currentReading
-        ]);
-
-        foreach($request->fleetPart as $key => $value)
-        {
-            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->fleetPart[$key],"company_id"=>Auth::user()->company_id])->first();
-            if(!$checkExist)
-            {
-                MaintenancePartLink::create([
-                    "bus_id" => $request->fleetId,
-                    "part_id" => $request->fleetPart[$key],
-                    "maintenance_after" => $request->maintenanceAfter[$key],
-                    "maintenance_at" => $request->maintenanceAt[$key],
-                    'added_by' => Auth::user()->id,
-                    'company_id' => Auth::user()->company_id,
+                Bus::where("id",$request->fleetId)->update([
+                    "current_reading" => $request->currentReading
                 ]);
+
+                foreach($request->fleetPart as $key => $value)
+                {
+                    $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->fleetPart[$key],"company_id"=>Auth::user()->company_id])->first();
+                    if(!$checkExist)
+                    {
+                        MaintenancePartLink::create([
+                            "bus_id" => $request->fleetId,
+                            "part_id" => $request->fleetPart[$key],
+                            "maintenance_after" => $request->maintenanceAfter[$key],
+                            "maintenance_at" => $request->maintenanceAt[$key],
+                            'added_by' => Auth::user()->id,
+                            'company_id' => Auth::user()->company_id,
+                        ]);
+                    }
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-        }
     }
 
     public function updateFleetPartLink(Request $request)
     {
-        $rules = [
-            'fleetId' => 'required',
-            'currentReading' => 'required',
-            'fleetPart' => 'required',
-            'maintenanceAfter' => 'required',
-            'maintenanceAt' => 'required',
-        ];
-        $this->validate($request, $rules);
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'fleetId' => 'required',
+                    'currentReading' => 'required',
+                    'fleetPart' => 'required',
+                    'maintenanceAfter' => 'required',
+                    'maintenanceAt' => 'required',
+                ];
+                $this->validate($request, $rules);
 
-        Bus::where("id",$request->fleetId)->update([
-            "current_reading" => $request->currentReading
-        ]);
-
-        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"company_id"=>Auth::user()->company_id])->delete();
-
-        foreach($request->fleetPart as $key => $value)
-        {
-            $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>Auth::user()->company_id])->first();
-            if(!$checkExist)
-            {
-                MaintenancePartLink::create([
-                    "bus_id" => $request->fleetId,
-                    "part_id" => $request->fleetPart[$key],
-                    "maintenance_after" => $request->maintenanceAfter[$key],
-                    "maintenance_at" => $request->maintenanceAt[$key],
-                    'added_by' => Auth::user()->id,
-                    'company_id' => Auth::user()->company_id,
+                Bus::where("id",$request->fleetId)->update([
+                    "current_reading" => $request->currentReading
                 ]);
+
+                MaintenancePartLink::where(["bus_id"=>$request->fleetId,"company_id"=>Auth::user()->company_id])->delete();
+
+                foreach($request->fleetPart as $key => $value)
+                {
+                    $checkExist = MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$value,"company_id"=>Auth::user()->company_id])->first();
+                    if(!$checkExist)
+                    {
+                        MaintenancePartLink::create([
+                            "bus_id" => $request->fleetId,
+                            "part_id" => $request->fleetPart[$key],
+                            "maintenance_after" => $request->maintenanceAfter[$key],
+                            "maintenance_at" => $request->maintenanceAt[$key],
+                            'added_by' => Auth::user()->id,
+                            'company_id' => Auth::user()->company_id,
+                        ]);
+                    }
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-        }
     }
 
 
@@ -137,60 +155,86 @@ class FleetMaintenanceController extends Controller
 
     public function dueMaintenanceAdd(Request $request)
     {
-        Bus::where("id",$request->fleetId)->update([
-            "current_reading" => $request->currentReading,
-            "reading_date" => date('Y-m-d'),
-        ]);
+        try {
+                DB::beginTransaction();
+                Bus::where("id",$request->fleetId)->update([
+                    "current_reading" => $request->currentReading,
+                    "reading_date" => date('Y-m-d'),
+                ]);
 
-        MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->partId])->update([
-            "maintenance_at" => $request->currentReading,
-            "maintenance_date" => date("Y-m-d")
-        ]);
+                MaintenancePartLink::where(["bus_id"=>$request->fleetId,"part_id"=>$request->partId])->update([
+                    "maintenance_at" => $request->currentReading,
+                    "maintenance_date" => date("Y-m-d")
+                ]);
 
-        return FleetMaintenance::create([
-            "bus_id" => $request->fleetId,
-            "part_id" => $request->partId,
-            "amount" => $request->amount,
-            "company_paid" => $request->companyPaid,
-            "evidence" => $this->image($request->evidence)??null,
-            "detail" => $request->detail,
-            "maintenance_type" => $request->maintenanceType,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $maintenance = FleetMaintenance::create([
+                    "bus_id" => $request->fleetId,
+                    "part_id" => $request->partId,
+                    "amount" => $request->amount,
+                    "company_paid" => $request->companyPaid,
+                    "evidence" => $this->image($request->evidence)??null,
+                    "detail" => $request->detail,
+                    "maintenance_type" => $request->maintenanceType,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                DB::commit();
+                return $maintenance;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function dueMaintenanceUpdate(Request $request)
     {
-        if($request->evidence)
-        {
-            FleetMaintenance::where("id",$request->maintenanceId)->update([
-                "evidence" => $this->image($request->evidence)??null,
-            ]);
-        }
+        try {
+                DB::beginTransaction();
+                if($request->evidence)
+                {
+                    FleetMaintenance::where("id",$request->maintenanceId)->update([
+                        "evidence" => $this->image($request->evidence)??null,
+                    ]);
+                }
 
-        return FleetMaintenance::where("id",$request->maintenanceId)->update([
-            "amount" => $request->amount,
-            "company_paid" => $request->companyPaid,
-            "detail" => $request->detail,
-        ]);
+                $maintenance = FleetMaintenance::where("id",$request->maintenanceId)->update([
+                    "amount" => $request->amount,
+                    "company_paid" => $request->companyPaid,
+                    "detail" => $request->detail,
+                ]);
+                DB::commit();
+                return $maintenance;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function updateMeterReading(Request $request)
     {
-        $fleet = Bus::find($request->fleetId);
+        try {
+                DB::beginTransaction();
+                $fleet = Bus::find($request->fleetId);
 
-        if($fleet->current_reading > $request->currentReading)
-        {
-            return response()->json([
-                "errors" => [
-                    "Reading Error" => ["New Reading should be greater than current reading"]
-                ]
-            ], 422);
-        }
-        Bus::where("id",$request->fleetId)->update([
-            "current_reading" => $request->currentReading,
-            "reading_date" => date("Y-m-d")
-        ]);
+                if($fleet->current_reading > $request->currentReading)
+                {
+                    return response()->json([
+                        "errors" => [
+                            "Reading Error" => ["New Reading should be greater than current reading"]
+                        ]
+                    ], 422);
+                }
+                Bus::where("id",$request->fleetId)->update([
+                    "current_reading" => $request->currentReading,
+                    "reading_date" => date("Y-m-d")
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function maintenanceRecord()

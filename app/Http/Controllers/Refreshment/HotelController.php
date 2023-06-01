@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Illuminate\Support\Facades\Log;
 class HotelController extends Controller
 {
 
@@ -42,81 +43,98 @@ class HotelController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            "name" => 'required',
-            // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
-            "hotelName" => 'required|unique:hotels,name,Null,id,company_id,'.Auth::user()->company_id,
-            "email" => 'required|email|unique:users',
-            "role" => 'required',
-            "password" => 'required',
-            "contact" => 'required',
-            "commission" => 'required',
-            "location" => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "name" => 'required',
+                    // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
+                    "hotelName" => 'required|unique:hotels,name,Null,id,company_id,'.Auth::user()->company_id,
+                    "email" => 'required|email|unique:users',
+                    "role" => 'required',
+                    "password" => 'required',
+                    "contact" => 'required',
+                    "commission" => 'required',
+                    "location" => 'required',
+                ]);
 
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => Hash::make($request->password),
-            "contact" => plainContactAndCnic($request->contact),
-            "role_id" => $request->role??0,
-            'company_id' => Auth::user()->company_id,
-        ]);
+                $user = User::create([
+                    "name" => $request->name,
+                    "email" => $request->email,
+                    "password" => Hash::make($request->password),
+                    "contact" => plainContactAndCnic($request->contact),
+                    "role_id" => $request->role??0,
+                    'company_id' => Auth::user()->company_id,
+                ]);
 
-        return Hotel::create([
-            "user_id" => $user->id,
-            "name" => $request->hotelName,
-            "contact" => plainContactAndCnic($request->contact),
-            "logo" => $request->logo ? $this->image($request->logo) : null,
-            "location" => $request->location,
-            "commission" => $request->commission,
-            "balance" => $request->balance??0,
-            "company_id" => Auth::user()->company_id,
-            "added_by" => Auth::user()->id,
-        ]);
+                $hotel = Hotel::create([
+                    "user_id" => $user->id,
+                    "name" => $request->hotelName,
+                    "contact" => plainContactAndCnic($request->contact),
+                    "logo" => $request->logo ? $this->image($request->logo) : null,
+                    "location" => $request->location,
+                    "commission" => $request->commission,
+                    "balance" => $request->balance??0,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $hotel;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function update(Request $request)
     {
-        $request->validate([
-            "name" => 'required',
-            // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
-            "hotelName" => 'required|unique:hotels,name,'.$request->hotelId.',id,company_id,'.Auth::user()->company_id,
-            "email" => 'required|email|unique:users,email,'.$request->userId,
-            "contact" => 'required',
-            "commission" => 'required',
-            "location" => 'required',
-        ]);
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "name" => 'required',
+                    // unique:table,column,except,idColumn,anotherColumn,anotherColumnValue
+                    "hotelName" => 'required|unique:hotels,name,'.$request->hotelId.',id,company_id,'.Auth::user()->company_id,
+                    "email" => 'required|email|unique:users,email,'.$request->userId,
+                    "contact" => 'required',
+                    "commission" => 'required',
+                    "location" => 'required',
+                ]);
 
-        User::where("id",$request->userId)->update([
-            "name" => $request->name,
-            "email" => $request->email,
-            "contact" => plainContactAndCnic($request->contact),
-        ]);
+                User::where("id",$request->userId)->update([
+                    "name" => $request->name,
+                    "email" => $request->email,
+                    "contact" => plainContactAndCnic($request->contact),
+                ]);
 
-        if($request->password)
-        {
-            User::where("id",$request->userId)->update([
-                "password" => Hash::make($request->password),
-            ]);
-        }
+                if($request->password)
+                {
+                    User::where("id",$request->userId)->update([
+                        "password" => Hash::make($request->password),
+                    ]);
+                }
 
-        Hotel::where("id",$request->hotelId)->update([
-            "name" => $request->hotelName,
-            "contact" => plainContactAndCnic($request->contact),
-            "location" => $request->location,
-            "commission" => $request->commission,
-            "balance" => $request->balance??0,
-            "company_id" => Auth::user()->company_id,
-            "added_by" => Auth::user()->id,
-        ]);
+                Hotel::where("id",$request->hotelId)->update([
+                    "name" => $request->hotelName,
+                    "contact" => plainContactAndCnic($request->contact),
+                    "location" => $request->location,
+                    "commission" => $request->commission,
+                    "balance" => $request->balance??0,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
 
-        if($request->logo)
-        {
-            Hotel::where("id",$request->hotelId)->update([
-                "logo" => $request->logo ? $this->image($request->logo) : null,
-            ]);
-        }
+                if($request->logo)
+                {
+                    Hotel::where("id",$request->hotelId)->update([
+                        "logo" => $request->logo ? $this->image($request->logo) : null,
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     // Image Upload

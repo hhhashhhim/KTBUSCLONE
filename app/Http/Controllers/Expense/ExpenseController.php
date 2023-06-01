@@ -11,6 +11,8 @@ use App\Models\Ticket;
 use App\Models\Expense\TicketMergeExpense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ExpenseController extends Controller
 {
@@ -32,32 +34,40 @@ class ExpenseController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            "ticket_merge_id" => 'required',
-            "category" => 'required',
-//            "description" => 'required',
-            "amount" => 'required',
-//            "invoice" => 'required',
-        ], [
-                "category.required" => "Category is  Required",
-                "amount.required" => "Expenses Amount  is Required",
-            ]
-        );
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "ticket_merge_id" => 'required',
+                    "category" => 'required',
+        //            "description" => 'required',
+                    "amount" => 'required',
+        //            "invoice" => 'required',
+                ], [
+                        "category.required" => "Category is  Required",
+                        "amount.required" => "Expenses Amount  is Required",
+                    ]
+                );
 
-        TicketMergeExpense::where("ticket_merge_id", $request->ticket_merge_id)->delete();
-        $i = 0;
-        foreach ($request->category as $key => $value) {
-            TicketMergeExpense::create([
-                'ticket_merge_id' => $request->ticket_merge_id,
-                'expense_category_id' => $request->category[$key],
-                'description' => $request->description[$key],
-                'amount' => $request->amount[$key],
-                'invoice' => "exp-".++$i.'-'.$request->ticket_merge_id,
-                'company_id' => Auth::user()->company_id,
-                'added_by' => Auth::user()->id,
-            ]);
+                TicketMergeExpense::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+                $i = 0;
+                foreach ($request->category as $key => $value) {
+                    TicketMergeExpense::create([
+                        'ticket_merge_id' => $request->ticket_merge_id,
+                        'expense_category_id' => $request->category[$key],
+                        'description' => $request->description[$key],
+                        'amount' => $request->amount[$key],
+                        'invoice' => "exp-".++$i.'-'.$request->ticket_merge_id,
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
 
-        }
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
 

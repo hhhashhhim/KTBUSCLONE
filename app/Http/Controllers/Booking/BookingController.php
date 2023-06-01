@@ -829,70 +829,80 @@ class BookingController extends Controller
 
     public function dropSchedule(Request $request)
     {
-        $uniqueDate = ScheduleDetail::where([
-            'company_id' => Auth::user()->company_id,
-            'schedule_id' => $request->schedule_id,
-            'departure_date' => $request->date,
-            'departure_id' => $request->departure_city_id,
-            'destination_id' => $request->destination_city_id,
-        ])->first()->schedule_date;
-
-        $tickets = Ticket::where([
-            'company_id' => Auth::user()->company_id,
-            'schedule_id' => $request->schedule_id,
-            'schedule_date' => $uniqueDate,
-        ])->first();
-        $old = DropSchedule::where([
-            'company_id' => Auth::user()->company_id,
-            'date' => $request->date,
-            'schedule_date' => $uniqueDate,
-            'schedule_id' => $request->schedule_id,
-        ])->first();
-
-        if (isset($tickets) && $tickets->ticket_closing_id != null) {
-            TicketClosingMember::where([
-                'company_id' => Auth::user()->company_id,
-                'ticket_closing_id' => $tickets->ticket_closing_id,
-            ])->delete();
-
-            $mergeId = TicketClosing::where([
-                'company_id' => Auth::user()->company_id,
-                'id' => $tickets->ticket_closing_id,
-            ])->first()->ticket_merge_id;
-
-            TicketClosing::where([
-                'company_id' => Auth::user()->company_id,
-                'id' => $tickets->ticket_closing_id,
-            ])->delete();
-
-
-            $mergeRecord = TicketClosingMerge::find($mergeId);
-            if ($mergeRecord->schedule_complete == 1) {
-                TicketClosingMerge::where([
+        try {
+                DB::beginTransaction();
+                $uniqueDate = ScheduleDetail::where([
                     'company_id' => Auth::user()->company_id,
-                    'id' => $mergeId,
-                ])->update([
-                    "schedule_complete" => 0,
-                    "schedule_return_date" => null,
-                ]);
-            } else {
-                $mergeRecord->delete();
+                    'schedule_id' => $request->schedule_id,
+                    'departure_date' => $request->date,
+                    'departure_id' => $request->departure_city_id,
+                    'destination_id' => $request->destination_city_id,
+                ])->first()->schedule_date;
+
+                $tickets = Ticket::where([
+                    'company_id' => Auth::user()->company_id,
+                    'schedule_id' => $request->schedule_id,
+                    'schedule_date' => $uniqueDate,
+                ])->first();
+                $old = DropSchedule::where([
+                    'company_id' => Auth::user()->company_id,
+                    'date' => $request->date,
+                    'schedule_date' => $uniqueDate,
+                    'schedule_id' => $request->schedule_id,
+                ])->first();
+
+                if (isset($tickets) && $tickets->ticket_closing_id != null) {
+                    TicketClosingMember::where([
+                        'company_id' => Auth::user()->company_id,
+                        'ticket_closing_id' => $tickets->ticket_closing_id,
+                    ])->delete();
+
+                    $mergeId = TicketClosing::where([
+                        'company_id' => Auth::user()->company_id,
+                        'id' => $tickets->ticket_closing_id,
+                    ])->first()->ticket_merge_id;
+
+                    TicketClosing::where([
+                        'company_id' => Auth::user()->company_id,
+                        'id' => $tickets->ticket_closing_id,
+                    ])->delete();
+
+
+                    $mergeRecord = TicketClosingMerge::find($mergeId);
+                    if ($mergeRecord->schedule_complete == 1) {
+                        TicketClosingMerge::where([
+                            'company_id' => Auth::user()->company_id,
+                            'id' => $mergeId,
+                        ])->update([
+                            "schedule_complete" => 0,
+                            "schedule_return_date" => null,
+                        ]);
+                    } else {
+                        $mergeRecord->delete();
+                    }
+                }
+                if (!$old) {
+                    DropSchedule::create([
+                        'company_id' => Auth::user()->company_id,
+                        'terminal_id' => Auth::user()->terminal_id,
+                        'date' => $request->date,
+                        'schedule_date' => $uniqueDate,
+                        'schedule_id' => $request->schedule_id,
+                        'added_by' => Auth::user()->id,
+                        'is_drop' => 1,
+                        'reason' => $request->reason,
+                    ]);
+                    DB::commit();
+                    return response()->json(['success' => 'Success'], 200);
+                }
+                DB::commit();
+                return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-        }
-        if (!$old) {
-            DropSchedule::create([
-                'company_id' => Auth::user()->company_id,
-                'terminal_id' => Auth::user()->terminal_id,
-                'date' => $request->date,
-                'schedule_date' => $uniqueDate,
-                'schedule_id' => $request->schedule_id,
-                'added_by' => Auth::user()->id,
-                'is_drop' => 1,
-                'reason' => $request->reason,
-            ]);
-            return response()->json(['success' => 'Success'], 200);
-        }
-        return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
     }
 
     public
@@ -950,106 +960,125 @@ class BookingController extends Controller
     public
     function bookingElt(Request $request)
     {
-        if (is_null(Auth::user()->terminal_id)) {
-            return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
-        }
-        $ticket = Ticket::where([
-            'company_id' => Auth::user()->company_id,
-            'date' => $request->date,
-            'schedule_id' => $request->schedule_id,
-            'customer_id' => $request->customer_id,
-            'departure_city_id' => $request->departure_id,
-            'destination_city_id' => $request->destination_id,
-            'seat_no' => $request->seat_no,
-        ])->first(['id']);
-        $old = TicketELT::where([
-            'company_id' => Auth::user()->company_id,
-            'ticket_id' => $ticket->id,
-            'customer_id' => $request->customer_id,
-            'schedule_id' => $request->schedule_id,
-            'date' => $request->date,
-        ])->first();
+        try {
+                DB::beginTransaction();
+                if (is_null(Auth::user()->terminal_id)) {
+                    return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+                }
+                $ticket = Ticket::where([
+                    'company_id' => Auth::user()->company_id,
+                    'date' => $request->date,
+                    'schedule_id' => $request->schedule_id,
+                    'customer_id' => $request->customer_id,
+                    'departure_city_id' => $request->departure_id,
+                    'destination_city_id' => $request->destination_id,
+                    'seat_no' => $request->seat_no,
+                ])->first(['id']);
+                $old = TicketELT::where([
+                    'company_id' => Auth::user()->company_id,
+                    'ticket_id' => $ticket->id,
+                    'customer_id' => $request->customer_id,
+                    'schedule_id' => $request->schedule_id,
+                    'date' => $request->date,
+                ])->first();
 
-        if (!$old && $request->alreadyExist !== 0) {
-            return TicketELT::create([
-                'company_id' => Auth::user()->company_id,
-                'ticket_id' => $ticket->id,
-                'customer_id' => $request->customer_id,
-                'departure_city' => $request->departure_id,
-                'destination_city' => $request->destination_id,
-                'schedule_id' => $request->schedule_id,
-                'seat_no' => $request->seat_no,
-                'date' => $request->date,
-                'elt_price' => $request->totalPrice,
-                'seat_fare' => $request->singleFare,
-                'elt_weight' => $request->eltWeight,
-                'elt_description' => $request->eltDescription,
-                'added_by' => Auth::user()->id,
-            ]);
-        } else {
-            $old->update([
-                'elt_price' => $request->totalPrice,
-                'elt_weight' => $request->eltWeight,
-                'elt_description' => $request->eltDescription,
-                'updated_by' => Auth::user()->company_id,
-            ]);
-            return $old;
-        }
-        return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
+                if (!$old && $request->alreadyExist !== 0) {
+                    $ticketElt = TicketELT::create([
+                        'company_id' => Auth::user()->company_id,
+                        'ticket_id' => $ticket->id,
+                        'customer_id' => $request->customer_id,
+                        'departure_city' => $request->departure_id,
+                        'destination_city' => $request->destination_id,
+                        'schedule_id' => $request->schedule_id,
+                        'seat_no' => $request->seat_no,
+                        'date' => $request->date,
+                        'elt_price' => $request->totalPrice,
+                        'seat_fare' => $request->singleFare,
+                        'elt_weight' => $request->eltWeight,
+                        'elt_description' => $request->eltDescription,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                    DB::commit();
+                    return $ticketElt;
+                } else {
+                    $old->update([
+                        'elt_price' => $request->totalPrice,
+                        'elt_weightd' => $request->eltWeight,
+                        'elt_description' => $request->eltDescription,
+                        'updated_by' => Auth::user()->company_id,
+                    ]);
+                    DB::commit();
+                    return $old;
+                }
+                // return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public
     function cancelingBooking(Request $request)
     {
-        $ticket = Ticket::where([
-            'company_id' => Auth::user()->company_id,
-            'date' => $request->date,
-            'schedule_id' => $request->schedule_id,
-            'customer_id' => $request->customer_id,
-            'departure_city_id' => $request->departure_id,
-            'destination_city_id' => $request->destination_id,
-            'seat_no' => $request->seat_no,
+        try {
+                DB::beginTransaction();
+                $ticket = Ticket::where([
+                    'company_id' => Auth::user()->company_id,
+                    'date' => $request->date,
+                    'schedule_id' => $request->schedule_id,
+                    'customer_id' => $request->customer_id,
+                    'departure_city_id' => $request->departure_id,
+                    'destination_city_id' => $request->destination_id,
+                    'seat_no' => $request->seat_no,
 
-        ])->first();
-        $ticketPoints = Ticket::where([
-            'company_id' => Auth::user()->company_id,
-            'date' => $request->date,
-            'schedule_id' => $request->schedule_id,
-            'customer_id' => $request->customer_id,
-            'departure_city_id' => $request->departure_id,
-            'destination_city_id' => $request->destination_id,
-        ])->withTrashed()->get();
+                ])->first();
+                $ticketPoints = Ticket::where([
+                    'company_id' => Auth::user()->company_id,
+                    'date' => $request->date,
+                    'schedule_id' => $request->schedule_id,
+                    'customer_id' => $request->customer_id,
+                    'departure_city_id' => $request->departure_id,
+                    'destination_city_id' => $request->destination_id,
+                ])->withTrashed()->get();
 
-        //Deduct points reverse in case of cancellation
-        $customer = Customer::where('id', $ticket->customer_id)->first();
-        $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-        if ($checkCard) {
-            if ($checkCard->cardCategory->point_type == "flatPoints") {
-                $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
-            } else {
-                $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                $subPoint = $distance / $checkCard->cardCategory->point_distance;
+                //Deduct points reverse in case of cancellation
+                $customer = Customer::where('id', $ticket->customer_id)->first();
+                $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+                if ($checkCard) {
+                    if ($checkCard->cardCategory->point_type == "flatPoints") {
+                        $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
+                    } else {
+                        $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                        $subPoint = $distance / $checkCard->cardCategory->point_distance;
+                    }
+                    $checkCard->decrement("starting_points", $subPoint / $ticketPoints->count());
+
+                    $checkCard->increment("starting_points", $ticket->points_usage);
+                }
+
+                $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
+                if ($delElt) {
+                    $delElt->delete();
+                }
+                $ticket->update([
+                    'type' => 'canceled',
+                ]);
+                BookingCancel::create([
+                    'company_id' => Auth::user()->company_id,
+                    'ticket_id' => $ticket->id,
+                    'percentage' => $request->percentage,
+                    'reason' => $request->remarks,
+                    'added_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $ticket->delete();
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-            $checkCard->decrement("starting_points", $subPoint / $ticketPoints->count());
-
-            $checkCard->increment("starting_points", $ticket->points_usage);
-        }
-
-        $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
-        if ($delElt) {
-            $delElt->delete();
-        }
-        $ticket->update([
-            'type' => 'canceled',
-        ]);
-        BookingCancel::create([
-            'company_id' => Auth::user()->company_id,
-            'ticket_id' => $ticket->id,
-            'percentage' => $request->percentage,
-            'reason' => $request->remarks,
-            'added_by' => Auth::user()->id,
-        ]);
-        return $ticket->delete();
     }
 
     public

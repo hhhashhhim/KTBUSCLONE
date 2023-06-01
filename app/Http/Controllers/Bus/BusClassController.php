@@ -8,6 +8,8 @@ use App\Models\FareClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BusClassController extends Controller
 {
@@ -29,43 +31,63 @@ class BusClassController extends Controller
 
     public function storeBusClass(Request $request)
     {
-        $rules = [
-            'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-//            'BusClassColor' => 'required',
-            'noOfRows' => 'required|integer',
-            'noOfCols' => 'required|integer',
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'BusClassName' => ['required', Rule::unique('bus_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+        //            'BusClassColor' => 'required',
+                    'noOfRows' => 'required|integer',
+                    'noOfCols' => 'required|integer',
+                ];
 
-        $customMessages = [
-            'BusClassName.required' => 'Bus Class Name is Required!',
-//            'BusClassColor.required' => 'Bus Class Color is Required!',
-            'name.unique' => 'Bus Class Name is already available!',
-            'noOfRows.required' => 'No of Rows of Bus  is Required!',
-            'noOfCols.required' => 'No of Cols of Bus  is Required!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return BusClass::create([
-            'name' => $request->BusClassName,
-            'color' => !$request->BusClassColor ? '#000000' : $request->BusClassColor,
-            'is_active' => !$request->isActive ? 1 : $request->isActive,
-            'seat_map' => $request->seatMap,
-            'no_of_rows' => $request->noOfRows,
-            'no_of_cols' => $request->noOfCols,
-            'company_id' => Auth::user()->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
+                $customMessages = [
+                    'BusClassName.required' => 'Bus Class Name is Required!',
+        //            'BusClassColor.required' => 'Bus Class Color is Required!',
+                    'name.unique' => 'Bus Class Name is already available!',
+                    'noOfRows.required' => 'No of Rows of Bus  is Required!',
+                    'noOfCols.required' => 'No of Cols of Bus  is Required!',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $busClass =  BusClass::create([
+                    'name' => $request->BusClassName,
+                    'color' => !$request->BusClassColor ? '#000000' : $request->BusClassColor,
+                    'is_active' => !$request->isActive ? 1 : $request->isActive,
+                    'seat_map' => $request->seatMap,
+                    'no_of_rows' => $request->noOfRows,
+                    'no_of_cols' => $request->noOfCols,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $busClass;
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function updateBusClass(Request $request)
     {
-        return BusClass::where('id', $request->id)->update([
-            'name' => $request->name,
-            'color' => $request->busClassColor,
-            'seat_map' => $request->seat_map,
-            'no_of_rows' => $request->no_of_rows,
-            'no_of_cols' => $request->no_of_cols,
-            'is_active' => $request->is_active,
-        ]);
+        try {
+                DB::beginTransaction();
+                $busClass = BusClass::where('id', $request->id)->update([
+                    'name' => $request->name,
+                    'color' => $request->busClassColor,
+                    'seat_map' => $request->seat_map,
+                    'no_of_rows' => $request->no_of_rows,
+                    'no_of_cols' => $request->no_of_cols,
+                    'is_active' => $request->is_active,
+                ]);
+                DB::commit();
+                return $busClass;
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function deleteBusClass(Request $request)
@@ -75,13 +97,21 @@ class BusClassController extends Controller
 
     public function duplicateBusClass(Request $request)
     {
-        $busClass = BusClass::where('company_id', Auth::user()->company_id)->where('id', $request->id)->first();
-        $busClass->name = $busClass->name .'-' .'Duplicate';
-        $busClass->time = now();
-        $new = $busClass->replicate();
-        $new->created_at  = now();
-        $new->save();
-        return $new;
+        try {
+                DB::beginTransaction();
+                $busClass = BusClass::where('company_id', Auth::user()->company_id)->where('id', $request->id)->first();
+                $busClass->name = $busClass->name .'-' .'Duplicate';
+                $busClass->time = now();
+                $new = $busClass->replicate();
+                $new->created_at  = now();
+                $new->save();
+                DB::commit();
+                return $new;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
     public function fareClasses(){
         return FareClass::with('addedBy')
@@ -90,20 +120,30 @@ class BusClassController extends Controller
     }
     public function saveFareClass(Request $request)
     {
-        $rules = [
-            'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-        ];
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'FareClassName' => ['required', Rule::unique('fare_classes', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                ];
 
-        $customMessages = [
-            'FareClassName.required' => 'Fare Class Name is Required!',
-            'FareClassName.unique' => 'This Fare Class Name is Already Exist!',
-        ];
-        $this->validate($request, $rules, $customMessages);
-        return FareClass::create([
-            'name' => $request->FareClassName,
-            'is_active' => 1,
-            'company_id' => Auth::user()->company_id,
-            'added_by' => Auth::user()->id,
-        ]);
+                $customMessages = [
+                    'FareClassName.required' => 'Fare Class Name is Required!',
+                    'FareClassName.unique' => 'This Fare Class Name is Already Exist!',
+                ];
+                $this->validate($request, $rules, $customMessages);
+                $fareClass =  FareClass::create([
+                    'name' => $request->FareClassName,
+                    'is_active' => 1,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+                DB::commit();
+                return $fareClass;
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 }
