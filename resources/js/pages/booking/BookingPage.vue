@@ -1209,7 +1209,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" v-model="dataForClose.drivers" multiple
+                    <select class="form-control rounded-0" id="assignDriver" v-model="dataForClose.drivers" multiple
                     >
                         <option
                             v-for="(driver, i) in drivers"
@@ -1222,7 +1222,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" v-model="dataForClose.hosts" multiple
+                    <select class="form-control rounded-0" id="assignHost" v-model="dataForClose.hosts" multiple
                     >
                         <option
                             v-for="(host, i) in hosts"
@@ -1522,7 +1522,43 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
     },
-
+    mounted() {
+        const self = this;
+        // assignDriver
+        const assignDriver = $('#assignDriver');
+        assignDriver.on('change', function() {
+            const selectedValues = $(this).val();
+            self.dataForClose.drivers = selectedValues;
+        });
+        // assignHost
+        const assignHost = $('#assignHost');
+        assignHost.on('change', function() {
+            const selectedValues = $(this).val();
+            self.dataForClose.hosts = selectedValues;
+        });
+        
+        
+        // departureCity
+        // const departureCity = $('#departureCity');
+        // departureCity.on('change', (e) => {
+        //     this.addForm.departureCity = e.target.value;
+        //     this.fetchSpecificSchedules();
+        //     this.getDestinationCity();
+        // });
+        // // destinationCity
+        // const destinationCity = $('#destinationCity');
+        // destinationCity.on('change', (e) => {
+        //     this.addForm.destinationCity = e.target.value;
+        //     this.fetchSpecificSchedules();
+        // });
+        // // scheduleName
+        // const scheduleName = $('#scheduleName');
+        // scheduleName.on('change', (e) => {
+        //     this.addForm.schedule = e.target.value;
+        //     this.fetchScheduleData();
+        //     this.busDropCheck();
+        // });
+    },
     methods: {
         // modal close
         closeModal() {
@@ -1783,6 +1819,10 @@ export default {
                 this.dataForClose.description = resData.data.infoData.description;
                 this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
                 $(`#${this.formAddID}`).modal('show');
+                setTimeout(() => {
+                    $("#assignDriver").select2();
+                    $("#assignHost").select2();
+                }, 200);
             }
         },
 

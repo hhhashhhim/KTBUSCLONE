@@ -38,6 +38,8 @@ class UserController extends Controller
         try {
                 DB::beginTransaction();
 
+                $departure = array_map('intval', $request->departure);
+                $destination = array_map('intval', $request->destination);
                 $this->validate($request, [
                     'name' => 'required',
                     'email' => 'bail|required|email|unique:users',
@@ -52,8 +54,8 @@ class UserController extends Controller
                     'password' => Hash::make($request->password),
                     'role_id' => $request->role,
                     'terminal_id' => $request->terminal_id,
-                    'destination_city_ids' => json_encode($request->destination),
-                    'departure_city_ids' => json_encode($request->departure),
+                    'destination_city_ids' => json_encode($destination),
+                    'departure_city_ids' => json_encode($departure),
                     'company_id' => Auth::user()->company_id,
                 ]);
 
@@ -87,10 +89,11 @@ class UserController extends Controller
         try {
                 DB::beginTransaction();
 
+                $departure = array_map('intval',$request->departure_city_ids);
+                $destination = array_map('intval', $request->destination_city_ids);
                 $this->validate($request, [
                     'name' => 'required',
                     'email' => 'bail|required|email|unique:users,email,' . $request->id,
-                    'password' => 'required',
                     'role_id' => 'required',
                     'contact' => 'required',
                 ]);
@@ -100,8 +103,8 @@ class UserController extends Controller
                     'contact' => !is_null($request->contact) ? formatContact($request->contact) : null,
                     'role_id' => $request->role_id,
                     'terminal_id' => $request->terminal_id,
-                    'destination_city_ids' => json_encode($request->destination_city_ids),
-                    'departure_city_ids' => json_encode($request->departure_city_ids),
+                    'destination_city_ids' => json_encode($destination),
+                    'departure_city_ids' => json_encode($departure),
                     'check_allowed_seats' => $request->check_allowed_seats,
                     'company_id' => Auth::user()->company_id,
                 ]);

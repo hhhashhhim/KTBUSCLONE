@@ -55,6 +55,15 @@ class ScheduleClosingController extends Controller
         ];
         return $data;
     }
+    
+    public function getMembers(Request $request)
+    {
+        $data = [
+            "drivers" => TicketClosingMember::where(['type' => 1, 'company_id' => Auth::user()->company_id,"ticket_closing_id" => $request->closingId])->pluck("user_id"),
+            "hosts" => TicketClosingMember::where(['type' => 2, 'company_id' => Auth::user()->company_id,"ticket_closing_id" => $request->closingId])->pluck("user_id"),
+        ];
+        return $data;
+    }
 
     public function fetchSchedule(Request $request)
     {

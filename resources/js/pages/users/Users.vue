@@ -335,7 +335,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" id="departure" multiple
+                        <select class="form-control" id="editDeparture" multiple
                                 v-model="dataEdit.departure_city_ids">
                             <option
                                 v-for="(singleDeparture, i) in departureCities"
@@ -347,7 +347,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" id="destinations" multiple
+                        <select class="form-control" id="editDestinations" multiple
                                 v-model="dataEdit.destination_city_ids">
                             <option
                                 v-for="(singleDestination, i) in destinationCities"
@@ -488,7 +488,38 @@ export default {
         await this.fetchUsers();
         this.permissions = this.$store.state.permissions;
     },
+    mounted() {
+        setTimeout(() => {
+            const departure = $('#departure');
+            const destinations = $('#destinations');
+            const editDeparture = $('#editDeparture');
+            const editDestinations = $('#editDestinations');
 
+            // Initialize Select2
+            departure.select2();
+            destinations.select2();
+
+            // Handle Select2 change event
+            const self = this;
+
+            departure.on('change', function() {
+                const selectedValues = $(this).val();
+                self.data.departure = selectedValues;
+            });
+            destinations.on('change', function() {
+                const selectedValues = $(this).val();
+                self.data.destination = selectedValues;
+            });
+            editDeparture.on('change', function() {
+                const selectedValues = $(this).val();
+                self.dataEdit.departure_city_ids = selectedValues;
+            });
+            editDestinations.on('change', function() {
+                const selectedValues = $(this).val();
+                self.dataEdit.destination_city_ids = selectedValues;
+            });
+        }, 1000);
+    },
     methods: {
         closeModal() {
             $(".modal").click();
@@ -735,6 +766,10 @@ export default {
             if (resEditUser.status == 200) {
                 this.dataEdit = resEditUser.data;
                 this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
+                setTimeout(() => {
+                    $("#editDeparture").select2();
+                    $("#editDestinations").select2();
+                }, 200);
             } else {
                 console.log(resEditUser);
             }

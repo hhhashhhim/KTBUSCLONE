@@ -53,6 +53,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'index']);
             Route::post('/store', [ScheduleClosingController::class, 'store']);
             Route::post('/update', [ScheduleClosingController::class, 'update']);
+            Route::post('/members', [ScheduleClosingController::class, 'getMembers']);
         });
 
         Route::group(['prefix' => '/merges', [CustomMiddleware::class]], function () {

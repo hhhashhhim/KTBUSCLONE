@@ -28448,6 +28448,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, _callee);
     }))();
   },
+  mounted: function mounted() {
+    var self = this; // assignDriver
+
+    var assignDriver = $('#assignDriver');
+    assignDriver.on('change', function () {
+      var selectedValues = $(this).val();
+      self.dataForClose.drivers = selectedValues;
+    }); // assignHost
+
+    var assignHost = $('#assignHost');
+    assignHost.on('change', function () {
+      var selectedValues = $(this).val();
+      self.dataForClose.hosts = selectedValues;
+    }); // departureCity
+    // const departureCity = $('#departureCity');
+    // departureCity.on('change', (e) => {
+    //     this.addForm.departureCity = e.target.value;
+    //     this.fetchSpecificSchedules();
+    //     this.getDestinationCity();
+    // });
+    // // destinationCity
+    // const destinationCity = $('#destinationCity');
+    // destinationCity.on('change', (e) => {
+    //     this.addForm.destinationCity = e.target.value;
+    //     this.fetchSpecificSchedules();
+    // });
+    // // scheduleName
+    // const scheduleName = $('#scheduleName');
+    // scheduleName.on('change', (e) => {
+    //     this.addForm.schedule = e.target.value;
+    //     this.fetchScheduleData();
+    //     this.busDropCheck();
+    // });
+  },
   methods: {
     // modal close
     closeModal: function closeModal() {
@@ -28834,6 +28868,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this6.dataForClose.description = resData.data.infoData.description;
                   _this6.checkCloseData = resData.data.infoData.bus == "" ? false : true;
                   $("#".concat(_this6.formAddID)).modal('show');
+                  setTimeout(function () {
+                    $("#assignDriver").select2();
+                    $("#assignHost").select2();
+                  }, 200);
                 }
 
               case 12:
@@ -46082,12 +46120,42 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, _callee);
     }))();
   },
+  mounted: function mounted() {
+    var _this2 = this;
+
+    setTimeout(function () {
+      var self = _this2;
+      var assignDriver = $('#assignDriver');
+      var assignHost = $('#assignHost');
+      var updateAssignDriver = $('#updateAssignDriver');
+      var updateAssignHost = $('#updateAssignHost'); // Initialize Select2
+
+      assignDriver.select2();
+      assignHost.select2();
+      assignDriver.on('change', function () {
+        var selectedValues = $(this).val();
+        self.addData.drivers = selectedValues;
+      });
+      assignHost.on('change', function () {
+        var selectedValues = $(this).val();
+        self.addData.hosts = selectedValues;
+      });
+      updateAssignDriver.on('change', function () {
+        var selectedValues = $(this).val();
+        self.editData.drivers = selectedValues;
+      });
+      updateAssignHost.on('change', function () {
+        var selectedValues = $(this).val();
+        self.editData.hosts = selectedValues;
+      });
+    }, 1000);
+  },
   methods: {
     clearForm: function clearForm() {
       this.data = {};
     },
     fetchData: function fetchData() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var res;
@@ -46096,16 +46164,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", "booking/close/schedule/closing");
+                return _this3.callApi("post", "booking/close/schedule/closing");
 
               case 2:
                 res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this2.closings = res.data.closings;
-                  _this2.buses = res.data.buses;
-                  _this2.hosts = res.data.hosts;
-                  _this2.drivers = res.data.drivers;
+                  _this3.closings = res.data.closings;
+                  _this3.buses = res.data.buses;
+                  _this3.hosts = res.data.hosts;
+                  _this3.drivers = res.data.drivers;
                 } else {
                   console.log(res);
                 }
@@ -46126,7 +46194,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getSchedule: function getSchedule() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var data, res;
@@ -46135,16 +46203,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 data = {
-                  date: _this3.addData.date
+                  date: _this4.addData.date
                 };
                 _context3.next = 3;
-                return _this3.callApi("post", "booking/close/schedule/fetch", data);
+                return _this4.callApi("post", "booking/close/schedule/fetch", data);
 
               case 3:
                 res = _context3.sent;
 
                 if (res.status == 200) {
-                  _this3.schedules = res.data;
+                  _this4.schedules = res.data;
                 } else {
                   console.log(res);
                 }
@@ -46158,7 +46226,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getScheduleForEdit: function getScheduleForEdit(date) {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var data, res;
@@ -46170,13 +46238,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   date: date
                 };
                 _context4.next = 3;
-                return _this4.callApi("post", "booking/close/schedule/fetch", data);
+                return _this5.callApi("post", "booking/close/schedule/fetch", data);
 
               case 3:
                 res = _context4.sent;
 
                 if (res.status == 200) {
-                  _this4.editSchedules = res.data;
+                  _this5.editSchedules = res.data;
                 } else {
                   console.log(res);
                 }
@@ -46189,23 +46257,54 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4);
       }))();
     },
-    closeSchedule: function closeSchedule() {
-      var _this5 = this;
+    getMembers: function getMembers(closingId) {
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var res;
+        var data, res;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this5.validationErrors = [];
+                data = {
+                  closingId: closingId
+                };
+                _context5.next = 3;
+                return _this6.callApi("post", "booking/close/schedule/closing/members", data);
 
-                if (_this5.addData.bus) {
-                  _context5.next = 3;
+              case 3:
+                res = _context5.sent;
+
+                if (res.status == 200) {
+                  _this6.editData.drivers = res.data.drivers;
+                  _this6.editData.hosts = res.data.hosts;
+                }
+
+              case 5:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }))();
+    },
+    closeSchedule: function closeSchedule() {
+      var _this7 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _this7.validationErrors = [];
+
+                if (_this7.addData.bus) {
+                  _context6.next = 3;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Bus is required",
                   icon: 'error',
@@ -46213,12 +46312,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (_this5.addData.date) {
-                  _context5.next = 5;
+                if (_this7.addData.date) {
+                  _context6.next = 5;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Date is required",
                   icon: 'error',
@@ -46226,12 +46325,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (_this5.addData.schedule) {
-                  _context5.next = 7;
+                if (_this7.addData.schedule) {
+                  _context6.next = 7;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Schedule is required",
                   icon: 'error',
@@ -46239,12 +46338,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this5.addData.drivers.length == 0)) {
-                  _context5.next = 9;
+                if (!(_this7.addData.drivers.length == 0)) {
+                  _context6.next = 9;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Driver is required",
                   icon: 'error',
@@ -46252,12 +46351,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this5.addData.hosts.length == 0)) {
-                  _context5.next = 11;
+                if (!(_this7.addData.hosts.length == 0)) {
+                  _context6.next = 11;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Host is required",
                   icon: 'error',
@@ -46265,16 +46364,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                _this5.loadig = true;
-                _context5.next = 14;
-                return _this5.callApi("post", "booking/close/schedule/closing/store", _this5.addData);
+                _this7.loadig = true;
+                _context6.next = 14;
+                return _this7.callApi("post", "booking/close/schedule/closing/store", _this7.addData);
 
               case 14:
-                res = _context5.sent;
+                res = _context6.sent;
 
                 if (res.status == 201) {
                   $(".modal").click();
-                  _this5.loading = false;
+                  _this7.loading = false;
                   swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
@@ -46282,18 +46381,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
                   $('#closing_table').DataTable().destroy();
-                  _this5.addData.bus = "";
-                  _this5.addData.date = "";
-                  _this5.addData.schedule = "";
-                  _this5.addData.drivers = [];
-                  _this5.addData.hosts = [];
-                  _this5.addData.description = ""; // this.fetchData();
+                  _this7.addData.bus = "";
+                  _this7.addData.date = "";
+                  _this7.addData.schedule = "";
+                  _this7.addData.drivers = [];
+                  _this7.addData.hosts = [];
+                  _this7.addData.description = ""; // this.fetchData();
 
-                  _this5.$router.go(0);
+                  _this7.$router.go(0);
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this5.loading = false;
+                      _this7.loading = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -46317,10 +46416,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     editSchedule: function editSchedule(schedule) {
@@ -46331,29 +46430,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.getScheduleForEdit(schedule.schedule_date);
       this.editData.schedule = schedule.schedule_id;
       this.editData.description = schedule.description;
+      this.getMembers(schedule.id);
+      setTimeout(function () {
+        $("#updateAssignDriver").select2();
+        $("#updateAssignHost").select2();
+      }, 1000);
     },
     // viewBus(view) {
     //     this.dataView = view;
     //     console.log(this.dataViews);
     // },
     updateSchedule: function updateSchedule() {
-      var _this6 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var res, _loop, key;
 
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this6.validationErrors = [];
+                _this8.validationErrors = [];
 
-                if (_this6.editData.bus) {
-                  _context6.next = 3;
+                if (_this8.editData.bus) {
+                  _context7.next = 3;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required",
                   text: "Bus is required",
                   icon: 'error',
@@ -46361,12 +46465,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (_this6.editData.date) {
-                  _context6.next = 5;
+                if (_this8.editData.date) {
+                  _context7.next = 5;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required",
                   text: "Date is required",
                   icon: 'error',
@@ -46374,12 +46478,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (_this6.editData.schedule) {
-                  _context6.next = 7;
+                if (_this8.editData.schedule) {
+                  _context7.next = 7;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required",
                   text: "Schedule is required",
                   icon: 'error',
@@ -46387,12 +46491,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this6.editData.drivers.length == 0)) {
-                  _context6.next = 9;
+                if (!(_this8.editData.drivers.length == 0)) {
+                  _context7.next = 9;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required",
                   text: "Driver is required",
                   icon: 'error',
@@ -46400,12 +46504,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this6.editData.hosts.length == 0)) {
-                  _context6.next = 11;
+                if (!(_this8.editData.hosts.length == 0)) {
+                  _context7.next = 11;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required",
                   text: "Host is required",
                   icon: 'error',
@@ -46413,12 +46517,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                _this6.loading = true;
-                _context6.next = 14;
-                return _this6.callApi("post", "booking/close/schedule/closing/update", _this6.editData);
+                _this8.loading = true;
+                _context7.next = 14;
+                return _this8.callApi("post", "booking/close/schedule/closing/update", _this8.editData);
 
               case 14:
-                res = _context6.sent;
+                res = _context7.sent;
 
                 if (res.status === 200) {
                   $(".modal").click();
@@ -46429,16 +46533,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
                   $('#closing_table').DataTable().destroy();
-                  _this6.loading = false; // this.fetchData();
+                  _this8.loading = false; // this.fetchData();
 
-                  _this6.$router.go(0);
+                  _this8.$router.go(0);
                 } else {
                   if (res.status == 422) {
-                    _this6.loading = false;
+                    _this8.loading = false;
 
                     _loop = function _loop(key) {
                       res.data.errors[key].forEach(function (element) {
-                        _this6.errorsArray(element, key);
+                        _this8.errorsArray(element, key);
                       });
                     };
 
@@ -46450,10 +46554,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 16:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     } // async deleteBus(busVal, i) {
     //     const deletingObj = {
@@ -50096,6 +50200,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, _callee);
     }))();
   },
+  mounted: function mounted() {
+    var _this2 = this;
+
+    setTimeout(function () {
+      var departure = $('#departure');
+      var destinations = $('#destinations');
+      var editDeparture = $('#editDeparture');
+      var editDestinations = $('#editDestinations'); // Initialize Select2
+
+      departure.select2();
+      destinations.select2(); // Handle Select2 change event
+
+      var self = _this2;
+      departure.on('change', function () {
+        var selectedValues = $(this).val();
+        self.data.departure = selectedValues;
+      });
+      destinations.on('change', function () {
+        var selectedValues = $(this).val();
+        self.data.destination = selectedValues;
+      });
+      editDeparture.on('change', function () {
+        var selectedValues = $(this).val();
+        self.dataEdit.departure_city_ids = selectedValues;
+      });
+      editDestinations.on('change', function () {
+        var selectedValues = $(this).val();
+        self.dataEdit.destination_city_ids = selectedValues;
+      });
+    }, 1000);
+  },
   methods: {
     closeModal: function closeModal() {
       $(".modal").click();
@@ -50110,7 +50245,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return this.authCheck == 0;
     },
     getAuthTerminal: function getAuthTerminal() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resDepart;
@@ -50119,13 +50254,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'terminals/all');
+                return _this3.callApi("post", 'terminals/all');
 
               case 2:
                 resDepart = _context2.sent;
 
                 if (resDepart.status == 200) {
-                  _this2.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
+                  _this3.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
                 } else {
                   console.log(resDepart);
                 }
@@ -50149,7 +50284,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.roleName = '';
     },
     fetchUsers: function fetchUsers() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var userRes, resCities, roleRes, resDepart;
@@ -50158,49 +50293,49 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this3.callApi("post", "user");
+                return _this4.callApi("post", "user");
 
               case 2:
                 userRes = _context3.sent;
                 _context3.next = 5;
-                return _this3.callApi("post", "user/cities");
+                return _this4.callApi("post", "user/cities");
 
               case 5:
                 resCities = _context3.sent;
 
                 if (userRes.status == 200 && resCities.status == 200) {
-                  _this3.users = userRes.data.users;
-                  _this3.authCheck = userRes.data.authCheck;
-                  _this3.destinationCities = resCities.data;
-                  _this3.departureCities = resCities.data;
+                  _this4.users = userRes.data.users;
+                  _this4.authCheck = userRes.data.authCheck;
+                  _this4.destinationCities = resCities.data;
+                  _this4.departureCities = resCities.data;
                 } else {
                   console.log(userRes);
                   console.log(resCities);
                 }
 
                 _context3.next = 9;
-                return _this3.callApi("post", "company/roles", {
-                  id: _this3.data.company_id
+                return _this4.callApi("post", "company/roles", {
+                  id: _this4.data.company_id
                 });
 
               case 9:
                 roleRes = _context3.sent;
 
                 if (roleRes.status == 200) {
-                  _this3.roles = roleRes.data;
+                  _this4.roles = roleRes.data;
                 } else {
                   console.log(roleRes);
                 }
 
                 _context3.next = 13;
-                return _this3.callApi("post", 'terminals/all');
+                return _this4.callApi("post", 'terminals/all');
 
               case 13:
                 resDepart = _context3.sent;
 
                 if (resDepart.status == 200) {
-                  _this3.terminals = resDepart.data.terminals;
-                  _this3.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
+                  _this4.terminals = resDepart.data.terminals;
+                  _this4.updateTerminal = resDepart.data.authTerminalId == null ? 0 : resDepart.data.authTerminalId;
                 } else {
                   console.log(resDepart);
                 }
@@ -50218,7 +50353,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     add: function add() {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var res;
@@ -50226,7 +50361,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(_this4.data.name == "" || typeof _this4.data.name == 'undefined')) {
+                if (!(_this5.data.name == "" || typeof _this5.data.name == 'undefined')) {
                   _context4.next = 2;
                   break;
                 }
@@ -50239,7 +50374,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this4.data.email == "" || typeof _this4.data.email == 'undefined')) {
+                if (!(_this5.data.email == "" || typeof _this5.data.email == 'undefined')) {
                   _context4.next = 4;
                   break;
                 }
@@ -50252,7 +50387,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(_this4.data.contact == "" || typeof _this4.data.contact == 'undefined')) {
+                if (!(_this5.data.contact == "" || typeof _this5.data.contact == 'undefined')) {
                   _context4.next = 6;
                   break;
                 }
@@ -50265,7 +50400,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this4.data.password == "" || typeof _this4.data.password == 'undefined')) {
+                if (!(_this5.data.password == "" || typeof _this5.data.password == 'undefined')) {
                   _context4.next = 8;
                   break;
                 }
@@ -50278,7 +50413,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this4.data.departure == "" || typeof _this4.data.departure == 'undefined')) {
+                if (!(_this5.data.departure == "" || typeof _this5.data.departure == 'undefined')) {
                   _context4.next = 10;
                   break;
                 }
@@ -50291,7 +50426,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(_this4.data.destination == "" || typeof _this4.data.destination == 'undefined')) {
+                if (!(_this5.data.destination == "" || typeof _this5.data.destination == 'undefined')) {
                   _context4.next = 12;
                   break;
                 }
@@ -50304,7 +50439,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(_this4.data.terminal_id == 0)) {
+                if (!(_this5.data.terminal_id == 0)) {
                   _context4.next = 14;
                   break;
                 }
@@ -50317,7 +50452,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 14:
-                if (!(_this4.data.role == 0)) {
+                if (!(_this5.data.role == 0)) {
                   _context4.next = 16;
                   break;
                 }
@@ -50330,9 +50465,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 16:
-                _this4.loading = true;
+                _this5.loading = true;
                 _context4.next = 19;
-                return _this4.callApi("post", "user/store", _this4.data);
+                return _this5.callApi("post", "user/store", _this5.data);
 
               case 19:
                 res = _context4.sent;
@@ -50342,7 +50477,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                _this4.loading = false;
+                _this5.loading = false;
                 swal({
                   title: "Success!!",
                   text: "User Created Successfully",
@@ -50351,7 +50486,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#users_table").DataTable().destroy();
                 _context4.next = 26;
-                return _this4.fetchUsers();
+                return _this5.fetchUsers();
 
               case 26:
                 setTimeout(function () {
@@ -50363,7 +50498,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 29:
                 if (res.status == 422) {
                   (function () {
-                    _this4.loading = false;
+                    _this5.loading = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -50390,7 +50525,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     updateTerminalUser: function updateTerminalUser() {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resTerminalUpdate;
@@ -50398,7 +50533,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(_this5.updateTerminal == 0)) {
+                if (!(_this6.updateTerminal == 0)) {
                   _context5.next = 2;
                   break;
                 }
@@ -50411,20 +50546,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this5.loadingTerminal = true;
+                _this6.loadingTerminal = true;
                 _context5.next = 5;
-                return _this5.callApi("post", "user/update/terminal", {
-                  terminal_id: _this5.updateTerminal
+                return _this6.callApi("post", "user/update/terminal", {
+                  terminal_id: _this6.updateTerminal
                 });
 
               case 5:
                 resTerminalUpdate = _context5.sent;
 
                 if (resTerminalUpdate.status == 200) {
-                  _this5.loadingTerminal = false;
-                  _this5.updateTerminal = resTerminalUpdate.data.terminal_id;
+                  _this6.loadingTerminal = false;
+                  _this6.updateTerminal = resTerminalUpdate.data.terminal_id;
 
-                  _this5.fetchUsers();
+                  _this6.fetchUsers();
 
                   $('#assignTerminalUser').modal('hide');
                   swal({
@@ -50437,7 +50572,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resTerminalUpdate.status == 422) {
                   (function () {
-                    _this5.loadingTerminal = false;
+                    _this6.loadingTerminal = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -50464,7 +50599,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     addNewRole: function addNewRole() {
-      var _this6 = this;
+      var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var resAddRole;
@@ -50472,7 +50607,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (!(_this6.roleName == '' || typeof _this6.roleName == 'undefined')) {
+                if (!(_this7.roleName == '' || typeof _this7.roleName == 'undefined')) {
                   _context6.next = 2;
                   break;
                 }
@@ -50485,21 +50620,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this6.loadingRole = true;
+                _this7.loadingRole = true;
                 _context6.next = 5;
-                return _this6.callApi("post", "role/store", {
-                  name: _this6.roleName
+                return _this7.callApi("post", "role/store", {
+                  name: _this7.roleName
                 });
 
               case 5:
                 resAddRole = _context6.sent;
 
                 if (resAddRole.status == 200) {
-                  _this6.loadingRole = false;
+                  _this7.loadingRole = false;
 
-                  _this6.roles.push(resAddRole.data);
+                  _this7.roles.push(resAddRole.data);
 
-                  _this6.roleName = '';
+                  _this7.roleName = '';
                   swal({
                     title: "Success!!",
                     text: "Role added Successfully ",
@@ -50510,7 +50645,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resAddRole.status == 422) {
                   (function () {
-                    _this6.loadingRole = false;
+                    _this7.loadingRole = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -50537,7 +50672,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     edit: function edit(user) {
-      var _this7 = this;
+      var _this8 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var resEditUser;
@@ -50546,7 +50681,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context7.prev = _context7.next) {
               case 0:
                 _context7.next = 2;
-                return _this7.callApi("post", "user/edit", {
+                return _this8.callApi("post", "user/edit", {
                   'id': user.id
                 });
 
@@ -50554,8 +50689,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resEditUser = _context7.sent;
 
                 if (resEditUser.status == 200) {
-                  _this7.dataEdit = resEditUser.data;
-                  _this7.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
+                  _this8.dataEdit = resEditUser.data;
+                  _this8.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
+                  setTimeout(function () {
+                    $("#editDeparture").select2();
+                    $("#editDestinations").select2();
+                  }, 200);
                 } else {
                   console.log(resEditUser);
                 }
@@ -50569,7 +50708,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     update: function update() {
-      var _this8 = this;
+      var _this9 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var resUpdateUser;
@@ -50577,7 +50716,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(_this8.dataEdit.name == "" || typeof _this8.dataEdit.name == 'undefined')) {
+                if (!(_this9.dataEdit.name == "" || typeof _this9.dataEdit.name == 'undefined')) {
                   _context8.next = 2;
                   break;
                 }
@@ -50590,7 +50729,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this8.dataEdit.email == "" || typeof _this8.dataEdit.email == 'undefined')) {
+                if (!(_this9.dataEdit.email == "" || typeof _this9.dataEdit.email == 'undefined')) {
                   _context8.next = 4;
                   break;
                 }
@@ -50603,7 +50742,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(_this8.dataEdit.contact == "" || typeof _this8.dataEdit.contact == 'undefined')) {
+                if (!(_this9.dataEdit.contact == "" || typeof _this9.dataEdit.contact == 'undefined')) {
                   _context8.next = 6;
                   break;
                 }
@@ -50616,7 +50755,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this8.dataEdit.departure_city_ids == "" || typeof _this8.dataEdit.departure_city_ids == 'undefined')) {
+                if (!(_this9.dataEdit.departure_city_ids == "" || typeof _this9.dataEdit.departure_city_ids == 'undefined')) {
                   _context8.next = 8;
                   break;
                 }
@@ -50629,7 +50768,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this8.dataEdit.destination_city_ids == "" || typeof _this8.dataEdit.destination_city_ids == 'undefined')) {
+                if (!(_this9.dataEdit.destination_city_ids == "" || typeof _this9.dataEdit.destination_city_ids == 'undefined')) {
                   _context8.next = 10;
                   break;
                 }
@@ -50642,7 +50781,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(_this8.dataEdit.terminal_id == "0")) {
+                if (!(_this9.dataEdit.terminal_id == "0")) {
                   _context8.next = 12;
                   break;
                 }
@@ -50655,7 +50794,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(_this8.dataEdit.role_id == "0")) {
+                if (!(_this9.dataEdit.role_id == "0")) {
                   _context8.next = 14;
                   break;
                 }
@@ -50668,9 +50807,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 14:
-                _this8.loadingUpdate = true;
+                _this9.loadingUpdate = true;
                 _context8.next = 17;
-                return _this8.callApi("post", "user/update", _this8.dataEdit);
+                return _this9.callApi("post", "user/update", _this9.dataEdit);
 
               case 17:
                 resUpdateUser = _context8.sent;
@@ -50680,7 +50819,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                _this8.loadingUpdate = false;
+                _this9.loadingUpdate = false;
                 swal({
                   title: "Successfull!!",
                   text: "User Updated Successfully",
@@ -50689,7 +50828,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#users_table").DataTable().destroy();
                 _context8.next = 24;
-                return _this8.fetchUsers();
+                return _this9.fetchUsers();
 
               case 24:
                 setTimeout(function () {
@@ -50699,8 +50838,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 25:
                 if (resUpdateUser.status == 422) {
                   (function () {
-                    _this8.loadingUpdate = false;
-                    _this8.error = resUpdateUser.data;
+                    _this9.loadingUpdate = false;
+                    _this9.error = resUpdateUser.data;
                     var errorContent = "";
                     var count = 0;
 
@@ -50727,7 +50866,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     deleteModal: function deleteModal(user, i) {
-      var _this9 = this;
+      var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var deletingObj;
@@ -50741,7 +50880,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this9.$store.commit("setDeleteObj", deletingObj);
+                _this10.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
               case "end":
@@ -58557,6 +58696,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.schedule_detail]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_439, [_hoisted_440, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "assignDriver",
         "onUpdate:modelValue": _cache[85] || (_cache[85] = function ($event) {
           return $data.dataForClose.drivers = $event;
         }),
@@ -58574,6 +58714,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_442, [_hoisted_443, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "assignHost",
         "onUpdate:modelValue": _cache[86] || (_cache[86] = function ($event) {
           return $data.dataForClose.hosts = $event;
         }),
@@ -76237,6 +76378,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "assignDriver",
         "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.addData.drivers = $event;
         }),
@@ -76254,6 +76396,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "assignHost",
         "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
           return $data.addData.hosts = $event;
         }),
@@ -76354,6 +76497,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.schedule]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "updateAssignDriver",
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.editData.drivers = $event;
         }),
@@ -76371,6 +76515,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editData.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
+        id: "updateAssignHost",
         "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
           return $data.editData.hosts = $event;
         }),
@@ -81946,7 +82091,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.password]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
-        id: "departure",
+        id: "editDeparture",
         multiple: "",
         "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
           return $data.dataEdit.departure_city_ids = $event;
@@ -81964,7 +82109,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.departure_city_ids]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
-        id: "destinations",
+        id: "editDestinations",
         multiple: "",
         "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
           return $data.dataEdit.destination_city_ids = $event;

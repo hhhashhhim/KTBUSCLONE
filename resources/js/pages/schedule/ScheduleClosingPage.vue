@@ -138,7 +138,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control rounded-0" v-model="addData.drivers" multiple>
+                        <select class="form-control rounded-0" id="assignDriver" v-model="addData.drivers" multiple>
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
@@ -150,7 +150,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control rounded-0" v-model="addData.hosts" multiple>
+                        <select class="form-control rounded-0" id="assignHost" v-model="addData.hosts" multiple>
                             <option
                                 v-for="(host, i) in hosts"
                                 :key="i"
@@ -240,7 +240,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control rounded-0" v-model="editData.drivers" multiple>
+                        <select class="form-control rounded-0" id="updateAssignDriver" v-model="editData.drivers" multiple>
                             <option
                                 v-for="(driver, i) in drivers"
                                 :key="i"
@@ -252,7 +252,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control rounded-0" v-model="editData.hosts" multiple>
+                        <select class="form-control rounded-0" id="updateAssignHost" v-model="editData.hosts" multiple>
                             <option
                                 v-for="(host, i) in hosts"
                                 :key="i"
@@ -357,7 +357,36 @@ export default {
         this.fetchData();
         this.permissions = this.$store.state.permissions;
     },
+    mounted() {
+        setTimeout(() => {
+            const self = this;
+            const assignDriver = $('#assignDriver');
+            const assignHost = $('#assignHost');
+            const updateAssignDriver = $('#updateAssignDriver');
+            const updateAssignHost = $('#updateAssignHost');
+            
+            // Initialize Select2
+            assignDriver.select2();
+            assignHost.select2();
 
+            assignDriver.on('change', function() {
+                const selectedValues = $(this).val();
+                self.addData.drivers = selectedValues;
+            });
+            assignHost.on('change', function() {
+                const selectedValues = $(this).val();
+                self.addData.hosts = selectedValues;
+            });
+            updateAssignDriver.on('change', function() {
+                const selectedValues = $(this).val();
+                self.editData.drivers = selectedValues;
+            });
+            updateAssignHost.on('change', function() {
+                const selectedValues = $(this).val();
+                self.editData.hosts = selectedValues;
+            });
+        }, 1000);
+    },
     methods: {
         clearForm: function () {
             this.data = {};
@@ -402,6 +431,17 @@ export default {
             } else {
                 console.log(res);
             }
+        },
+        async getMembers(closingId) {
+            const data = {
+                closingId: closingId
+            }
+            const res = await this.callApi("post", "booking/close/schedule/closing/members", data);
+
+            if (res.status == 200) {
+                this.editData.drivers = res.data.drivers;
+                this.editData.hosts = res.data.hosts;
+            } 
         },
 
         async closeSchedule() {
@@ -494,6 +534,12 @@ export default {
             this.getScheduleForEdit(schedule.schedule_date);
             this.editData.schedule = schedule.schedule_id;
             this.editData.description = schedule.description;
+            this.getMembers(schedule.id);
+            
+            setTimeout(() => {
+                $("#updateAssignDriver").select2();
+                $("#updateAssignHost").select2();
+            }, 1000);
         },
         // viewBus(view) {
         //     this.dataView = view;
