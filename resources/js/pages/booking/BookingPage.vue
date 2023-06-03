@@ -16,6 +16,7 @@
                                                             class="text-danger">*</span></label>
                                                         <select class="form-control" id="departureCity"
                                                                 @change="fetchSpecificSchedules(); getDestinationCity()"
+                                                                :disabled="depLoading"
                                                                 v-model="addForm.departureCity">
                                                             <option value="0" selected>Select Departure City</option>
                                                             <option v-for="(city, i) in cities"
@@ -33,6 +34,7 @@
                                                             City<span class="text-danger ml-1">*</span></label>
                                                         <select class="form-control" id="destinationCity"
                                                                 @change="fetchSpecificSchedules()"
+                                                                :disabled="desLoading"
                                                                 v-model="addForm.destinationCity">
                                                             <option value="0" selected>Select Destination City</option>
                                                             <option v-for="(city, i) in specificCities" :value="city.id"
@@ -1466,6 +1468,8 @@ export default {
             pointsUsage: "",
             checkedUsagePoints: false,
             loadingRevertButton: false,
+            depLoading: false,
+            desLoading: false,
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -1751,15 +1755,20 @@ export default {
         },
 
         async getDestinationCity() {
+            this.desLoading = true;
+            this.specificCities = [];
+            this.addForm.destinationCity = "0";
             if (this.addForm.departureCity == '0') {
                 this.addForm.destinationCity = 0;
             } else {
                 const resDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.addForm.departureCity});
                 if (resDepartureCity.length == 0) {
                     this.addForm.destinationCity = 0
+                    this.desLoading = false;
                 } else {
                     this.addForm.destinationCity = 0;
                     this.specificCities = resDepartureCity.data;
+                    this.desLoading = false;
                     $('#destinationCity').select2();
                 }
             }
@@ -2009,18 +2018,21 @@ export default {
         },
 
         async fetchAllSchedules() {
+            this.depLoading = true;
             const resBooking = await this.callApi("post", "booking");
-            const resClass = await this.callApi("post", "booking/fare_class")
-            const resCity = await this.callApi("post", "booking/cities")
-            const resTerminals = await this.callApi("post", "booking/terminals")
+            const resClass = await this.callApi("post", "booking/fare_class");
+            const resCity = await this.callApi("post", "booking/cities");
+            const resTerminals = await this.callApi("post", "booking/terminals");
             if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
                 this.allBookings = resBooking.data;
                 this.allSeatClasses = resClass.data;
                 this.cities = resCity.data;
                 this.terminals = resTerminals.data.terminals;
                 this.addForm.terminalId = resTerminals.data.authTerminalId;
+                this.depLoading = false;
                 $('#departureCity').select2();
             } else {
+                this.depLoading = false;
                 console.log(res);
             }
         },
