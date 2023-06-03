@@ -28449,6 +28449,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   mounted: function mounted() {
+    var _this2 = this;
+
     var self = this; // assignDriver
 
     var assignDriver = $('#assignDriver');
@@ -28461,26 +28463,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     assignHost.on('change', function () {
       var selectedValues = $(this).val();
       self.dataForClose.hosts = selectedValues;
-    }); // departureCity
-    // const departureCity = $('#departureCity');
-    // departureCity.on('change', (e) => {
-    //     this.addForm.departureCity = e.target.value;
-    //     this.fetchSpecificSchedules();
-    //     this.getDestinationCity();
-    // });
-    // // destinationCity
-    // const destinationCity = $('#destinationCity');
-    // destinationCity.on('change', (e) => {
-    //     this.addForm.destinationCity = e.target.value;
-    //     this.fetchSpecificSchedules();
-    // });
-    // // scheduleName
-    // const scheduleName = $('#scheduleName');
-    // scheduleName.on('change', (e) => {
-    //     this.addForm.schedule = e.target.value;
-    //     this.fetchScheduleData();
-    //     this.busDropCheck();
-    // });
+    });
+    setTimeout(function () {
+      // departureCity
+      var departureCity = $('#departureCity');
+      departureCity.on('change', function (e) {
+        _this2.addForm.departureCity = e.target.value;
+
+        _this2.fetchSpecificSchedules();
+
+        _this2.getDestinationCity();
+      }); // destinationCity
+
+      var destinationCity = $('#destinationCity');
+      destinationCity.on('change', function (e) {
+        _this2.addForm.destinationCity = e.target.value;
+
+        _this2.fetchSpecificSchedules();
+      }); // scheduleName
+
+      var scheduleName = $('#scheduleName');
+      scheduleName.on('change', function (e) {
+        _this2.addForm.schedule = e.target.value;
+
+        _this2.fetchScheduleData();
+
+        _this2.busDropCheck();
+      });
+    }, 500);
   },
   methods: {
     // modal close
@@ -28555,7 +28565,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     altM: function altM(e) {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
@@ -28563,8 +28573,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 if ((e.metaKey || e.altKey) && String.fromCharCode(e.which).toLowerCase() == 'm') {
-                  if (_this2.checkForSubmenuButtons('seat-details-shortcut')) {
-                    _this2.seatDetails();
+                  if (_this3.checkForSubmenuButtons('seat-details-shortcut')) {
+                    _this3.seatDetails();
                   } else {
                     swal({
                       title: "OOPS!!",
@@ -28584,7 +28594,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     seatDetails: function seatDetails() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var dataSeats, resSeatData;
@@ -28592,7 +28602,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!(_this3.addForm.departureCity == 0)) {
+                if (!(_this4.addForm.departureCity == 0)) {
                   _context3.next = 2;
                   break;
                 }
@@ -28605,7 +28615,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this3.addForm.destinationCity == 0)) {
+                if (!(_this4.addForm.destinationCity == 0)) {
                   _context3.next = 4;
                   break;
                 }
@@ -28618,7 +28628,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(_this3.addForm.schedule == 0)) {
+                if (!(_this4.addForm.schedule == 0)) {
                   _context3.next = 6;
                   break;
                 }
@@ -28631,27 +28641,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this3.selectedBookedSeats.length != 0 || _this3.selectedBookedOverIssueSeats.length != 0)) {
+                if (!(_this4.selectedBookedSeats.length != 0 || _this4.selectedBookedOverIssueSeats.length != 0)) {
                   _context3.next = 15;
                   break;
                 }
 
                 dataSeats = {
-                  seatNO: _this3.selectedBookedSeats.length != 0 && _this3.selectedBookedOverIssueSeats.length == 0 ? _this3.selectedBookedSeats : _this3.selectedBookedOverIssueSeats,
-                  scheduleId: _this3.addForm.schedule,
-                  date: _this3.addForm.date,
-                  departureCity: _this3.addForm.departureCity,
-                  destinationCity: _this3.addForm.destinationCity
+                  seatNO: _this4.selectedBookedSeats.length != 0 && _this4.selectedBookedOverIssueSeats.length == 0 ? _this4.selectedBookedSeats : _this4.selectedBookedOverIssueSeats,
+                  scheduleId: _this4.addForm.schedule,
+                  date: _this4.addForm.date,
+                  departureCity: _this4.addForm.departureCity,
+                  destinationCity: _this4.addForm.destinationCity
                 };
                 _context3.next = 10;
-                return _this3.callApi("post", "booking/advance", dataSeats);
+                return _this4.callApi("post", "booking/advance", dataSeats);
 
               case 10:
                 resSeatData = _context3.sent;
 
                 if (resSeatData.status == 200) {
-                  _this3.selectedSeatDataBackEnd = resSeatData.data.tickets;
-                  _this3.allRescheduleButton = resSeatData.data.showButton;
+                  _this4.selectedSeatDataBackEnd = resSeatData.data.tickets;
+                  _this4.allRescheduleButton = resSeatData.data.showButton;
                   $('#seatAllDetailsModal').modal('show');
                 }
 
@@ -28697,7 +28707,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
     },
     getFilterRecord: function getFilterRecord() {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resDateFilter;
@@ -28705,10 +28715,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _this4.allBookings = [];
+                _this5.allBookings = [];
                 _context4.next = 3;
-                return _this4.callApi("post", "booking", {
-                  date: _this4.filterDate
+                return _this5.callApi("post", "booking", {
+                  date: _this5.filterDate
                 });
 
               case 3:
@@ -28716,7 +28726,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resDateFilter.status == 200) {
                   if (resDateFilter.data.length != 0) {
-                    _this4.allBookings = resDateFilter.data;
+                    _this5.allBookings = resDateFilter.data;
                   }
                 }
 
@@ -28738,7 +28748,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return year + '-' + month + '-' + day;
     },
     getDestinationCity: function getDestinationCity() {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resDepartureCity;
@@ -28746,29 +28756,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(_this5.addForm.departureCity == '0')) {
+                if (!(_this6.addForm.departureCity == '0')) {
                   _context5.next = 4;
                   break;
                 }
 
-                _this5.addForm.destinationCity = 0;
+                _this6.addForm.destinationCity = 0;
                 _context5.next = 8;
                 break;
 
               case 4:
                 _context5.next = 6;
-                return _this5.callApi("post", "booking/getDestination", {
-                  id: _this5.addForm.departureCity
+                return _this6.callApi("post", "booking/getDestination", {
+                  id: _this6.addForm.departureCity
                 });
 
               case 6:
                 resDepartureCity = _context5.sent;
 
                 if (resDepartureCity.length == 0) {
-                  _this5.addForm.destinationCity = 0;
+                  _this6.addForm.destinationCity = 0;
                 } else {
-                  _this5.addForm.destinationCity = 0;
-                  _this5.specificCities = resDepartureCity.data;
+                  _this6.addForm.destinationCity = 0;
+                  _this6.specificCities = resDepartureCity.data;
+                  $('#destinationCity').select2();
                 }
 
               case 8:
@@ -28780,7 +28791,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     closingData: function closingData() {
-      var _this6 = this;
+      var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var resData;
@@ -28788,7 +28799,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (!(_this6.addForm.departureCity == 0)) {
+                if (!(_this7.addForm.departureCity == 0)) {
                   _context6.next = 2;
                   break;
                 }
@@ -28801,7 +28812,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this6.addForm.destinationCity == 0)) {
+                if (!(_this7.addForm.destinationCity == 0)) {
                   _context6.next = 4;
                   break;
                 }
@@ -28814,7 +28825,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (!(_this6.addForm.date == "" || typeof _this6.addForm.date == 'undefined')) {
+                if (!(_this7.addForm.date == "" || typeof _this7.addForm.date == 'undefined')) {
                   _context6.next = 6;
                   break;
                 }
@@ -28827,7 +28838,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this6.addForm.schedule == 0)) {
+                if (!(_this7.addForm.schedule == 0)) {
                   _context6.next = 8;
                   break;
                 }
@@ -28841,33 +28852,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 8:
                 _context6.next = 10;
-                return _this6.callApi("post", "booking/getClosingData", {
-                  scheduleId: _this6.addForm.schedule,
-                  date: _this6.addForm.date,
-                  departureCity: _this6.addForm.departureCity,
-                  destinationCity: _this6.addForm.destinationCity
+                return _this7.callApi("post", "booking/getClosingData", {
+                  scheduleId: _this7.addForm.schedule,
+                  date: _this7.addForm.date,
+                  departureCity: _this7.addForm.departureCity,
+                  destinationCity: _this7.addForm.destinationCity
                 });
 
               case 10:
                 resData = _context6.sent;
 
                 if (resData.status == 200) {
-                  _this6.buses = resData.data.buses;
-                  _this6.drivers = resData.data.drivers;
-                  _this6.hosts = resData.data.hosts;
-                  _this6.dataForClose.date = resData.data.infoData.schedule_date;
-                  _this6.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
-                  _this6.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
-                  _this6.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
-                  _this6.dataForClose.schedule_detail = resData.data.infoData.schedule;
-                  _this6.dataForClose.schedule = resData.data.infoData.schedule_id;
-                  _this6.dataForClose.route_name = resData.data.infoData.route_name;
-                  _this6.dataForClose.bus = resData.data.infoData.bus;
-                  _this6.dataForClose.drivers = resData.data.infoData.drivers;
-                  _this6.dataForClose.hosts = resData.data.infoData.hosts;
-                  _this6.dataForClose.description = resData.data.infoData.description;
-                  _this6.checkCloseData = resData.data.infoData.bus == "" ? false : true;
-                  $("#".concat(_this6.formAddID)).modal('show');
+                  _this7.buses = resData.data.buses;
+                  _this7.drivers = resData.data.drivers;
+                  _this7.hosts = resData.data.hosts;
+                  _this7.dataForClose.date = resData.data.infoData.schedule_date;
+                  _this7.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
+                  _this7.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
+                  _this7.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
+                  _this7.dataForClose.schedule_detail = resData.data.infoData.schedule;
+                  _this7.dataForClose.schedule = resData.data.infoData.schedule_id;
+                  _this7.dataForClose.route_name = resData.data.infoData.route_name;
+                  _this7.dataForClose.bus = resData.data.infoData.bus;
+                  _this7.dataForClose.drivers = resData.data.infoData.drivers;
+                  _this7.dataForClose.hosts = resData.data.infoData.hosts;
+                  _this7.dataForClose.description = resData.data.infoData.description;
+                  _this7.checkCloseData = resData.data.infoData.bus == "" ? false : true;
+                  $("#".concat(_this7.formAddID)).modal('show');
                   setTimeout(function () {
                     $("#assignDriver").select2();
                     $("#assignHost").select2();
@@ -28883,7 +28894,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     closeSchedule: function closeSchedule() {
-      var _this7 = this;
+      var _this8 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var res;
@@ -28891,9 +28902,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                _this7.validationErrors = [];
+                _this8.validationErrors = [];
 
-                if (_this7.dataForClose.bus) {
+                if (_this8.dataForClose.bus) {
                   _context7.next = 3;
                   break;
                 }
@@ -28906,7 +28917,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (_this7.dataForClose.date) {
+                if (_this8.dataForClose.date) {
                   _context7.next = 5;
                   break;
                 }
@@ -28919,7 +28930,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (_this7.dataForClose.schedule) {
+                if (_this8.dataForClose.schedule) {
                   _context7.next = 7;
                   break;
                 }
@@ -28932,7 +28943,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this7.dataForClose.drivers.length == 0)) {
+                if (!(_this8.dataForClose.drivers.length == 0)) {
                   _context7.next = 9;
                   break;
                 }
@@ -28945,7 +28956,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this7.dataForClose.hosts.length == 0)) {
+                if (!(_this8.dataForClose.hosts.length == 0)) {
                   _context7.next = 11;
                   break;
                 }
@@ -28958,9 +28969,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                _this7.loading = true;
+                _this8.loading = true;
                 _context7.next = 14;
-                return _this7.callApi("post", "booking/close/schedule/closing/store", _this7.dataForClose);
+                return _this8.callApi("post", "booking/close/schedule/closing/store", _this8.dataForClose);
 
               case 14:
                 res = _context7.sent;
@@ -28969,142 +28980,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   swal({
                     title: "Success",
                     text: "Schedule Closed Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this7.loading = false;
-                  _this7.editAble = true;
-                  _this7.dataForClose.bus = "";
-                  _this7.dataForClose.date = "";
-                  _this7.dataForClose.schedule = "";
-                  _this7.dataForClose.drivers = [];
-                  _this7.dataForClose.hosts = [];
-                  _this7.dataForClose.description = "";
-
-                  _this7.closingData();
-
-                  setTimeout(function () {
-                    return _this7.closeModal();
-                  }, 1500);
-                } else {
-                  if (res.status == 422) {
-                    (function () {
-                      _this7.loading = false;
-                      var errorContent = "";
-                      var count = 0;
-
-                      for (var key in res.data.errors) {
-                        res.data.errors[key].forEach(function (element) {
-                          errorContent += ++count + " - " + element + "\n";
-                        });
-                        swal({
-                          title: "Error",
-                          text: errorContent,
-                          icon: "error",
-                          timer: 2000
-                        });
-                      }
-                    })();
-                  }
-                }
-
-              case 16:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7);
-      }))();
-    },
-    updateCloseSchedule: function updateCloseSchedule() {
-      var _this8 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                _this8.validationErrors = [];
-
-                if (_this8.dataForClose.bus) {
-                  _context8.next = 3;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required",
-                  text: "Bus is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 3:
-                if (_this8.dataForClose.date) {
-                  _context8.next = 5;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required",
-                  text: "Date is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 5:
-                if (_this8.dataForClose.schedule) {
-                  _context8.next = 7;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required",
-                  text: "Schedule is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 7:
-                if (!(_this8.dataForClose.drivers.length == 0)) {
-                  _context8.next = 9;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required",
-                  text: "Driver is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 9:
-                if (!(_this8.dataForClose.hosts.length == 0)) {
-                  _context8.next = 11;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required",
-                  text: "Host is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 11:
-                _this8.loading = true;
-                _this8.dataForClose.mergeId = _this8.dataForClose.ticket_merge_id;
-                _this8.dataForClose.closingId = _this8.dataForClose.ticket_closing_id;
-                _context8.next = 16;
-                return _this8.callApi("post", "booking/close/schedule/closing/update", _this8.dataForClose);
-
-              case 16:
-                res = _context8.sent;
-
-                if (res.status == 200) {
-                  swal({
-                    title: "Success",
-                    text: "Updated Successfully",
                     icon: "success",
                     timer: 2000
                   });
@@ -29144,6 +29019,142 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
+              case 16:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7);
+      }))();
+    },
+    updateCloseSchedule: function updateCloseSchedule() {
+      var _this9 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                _this9.validationErrors = [];
+
+                if (_this9.dataForClose.bus) {
+                  _context8.next = 3;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required",
+                  text: "Bus is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 3:
+                if (_this9.dataForClose.date) {
+                  _context8.next = 5;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required",
+                  text: "Date is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 5:
+                if (_this9.dataForClose.schedule) {
+                  _context8.next = 7;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required",
+                  text: "Schedule is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this9.dataForClose.drivers.length == 0)) {
+                  _context8.next = 9;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required",
+                  text: "Driver is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!(_this9.dataForClose.hosts.length == 0)) {
+                  _context8.next = 11;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required",
+                  text: "Host is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 11:
+                _this9.loading = true;
+                _this9.dataForClose.mergeId = _this9.dataForClose.ticket_merge_id;
+                _this9.dataForClose.closingId = _this9.dataForClose.ticket_closing_id;
+                _context8.next = 16;
+                return _this9.callApi("post", "booking/close/schedule/closing/update", _this9.dataForClose);
+
+              case 16:
+                res = _context8.sent;
+
+                if (res.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this9.loading = false;
+                  _this9.editAble = true;
+                  _this9.dataForClose.bus = "";
+                  _this9.dataForClose.date = "";
+                  _this9.dataForClose.schedule = "";
+                  _this9.dataForClose.drivers = [];
+                  _this9.dataForClose.hosts = [];
+                  _this9.dataForClose.description = "";
+
+                  _this9.closingData();
+
+                  setTimeout(function () {
+                    return _this9.closeModal();
+                  }, 1500);
+                } else {
+                  if (res.status == 422) {
+                    (function () {
+                      _this9.loading = false;
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + element + "\n";
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
+                }
+
               case 18:
               case "end":
                 return _context8.stop();
@@ -29153,7 +29164,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getReDestinationCity: function getReDestinationCity() {
-      var _this9 = this;
+      var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var resReDepartureCity;
@@ -29161,31 +29172,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                _this9.reSpecificCities = [];
+                _this10.reSpecificCities = [];
 
-                if (!(parseInt(_this9.rescheduleData.dataDepartureCity) == 0)) {
+                if (!(parseInt(_this10.rescheduleData.dataDepartureCity) == 0)) {
                   _context9.next = 5;
                   break;
                 }
 
-                _this9.rescheduleData.rescheduleDestinationCity = 0;
+                _this10.rescheduleData.rescheduleDestinationCity = 0;
                 _context9.next = 9;
                 break;
 
               case 5:
                 _context9.next = 7;
-                return _this9.callApi("post", "booking/getDestination", {
-                  id: parseInt(_this9.rescheduleData.dataDepartureCity)
+                return _this10.callApi("post", "booking/getDestination", {
+                  id: parseInt(_this10.rescheduleData.dataDepartureCity)
                 });
 
               case 7:
                 resReDepartureCity = _context9.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this9.rescheduleData.rescheduleDestinationCity = 0;
+                  _this10.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this9.rescheduleData.rescheduleDestinationCity = 0;
-                  _this9.reSpecificCities = resReDepartureCity.data;
+                  _this10.rescheduleData.rescheduleDestinationCity = 0;
+                  _this10.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 9:
@@ -29197,7 +29208,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     fetchAllSchedules: function fetchAllSchedules() {
-      var _this10 = this;
+      var _this11 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         var resBooking, resClass, resCity, resTerminals;
@@ -29206,32 +29217,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context10.prev = _context10.next) {
               case 0:
                 _context10.next = 2;
-                return _this10.callApi("post", "booking");
+                return _this11.callApi("post", "booking");
 
               case 2:
                 resBooking = _context10.sent;
                 _context10.next = 5;
-                return _this10.callApi("post", "booking/fare_class");
+                return _this11.callApi("post", "booking/fare_class");
 
               case 5:
                 resClass = _context10.sent;
                 _context10.next = 8;
-                return _this10.callApi("post", "booking/cities");
+                return _this11.callApi("post", "booking/cities");
 
               case 8:
                 resCity = _context10.sent;
                 _context10.next = 11;
-                return _this10.callApi("post", "booking/terminals");
+                return _this11.callApi("post", "booking/terminals");
 
               case 11:
                 resTerminals = _context10.sent;
 
                 if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
-                  _this10.allBookings = resBooking.data;
-                  _this10.allSeatClasses = resClass.data;
-                  _this10.cities = resCity.data;
-                  _this10.terminals = resTerminals.data.terminals;
-                  _this10.addForm.terminalId = resTerminals.data.authTerminalId;
+                  _this11.allBookings = resBooking.data;
+                  _this11.allSeatClasses = resClass.data;
+                  _this11.cities = resCity.data;
+                  _this11.terminals = resTerminals.data.terminals;
+                  _this11.addForm.terminalId = resTerminals.data.authTerminalId;
+                  $('#departureCity').select2();
                 } else {
                   console.log(res);
                 }
@@ -29252,7 +29264,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     fetchSpecificSchedules: function fetchSpecificSchedules() {
-      var _this11 = this;
+      var _this12 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
         var data, resFetchSchedule;
@@ -29260,32 +29272,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                _this11.getSchedule = true;
-                _this11.showBookingDiv = false;
-                _this11.allSchedules = {};
-                _this11.addForm.schedule = 0;
+                _this12.getSchedule = true;
+                _this12.showBookingDiv = false;
+                _this12.allSchedules = {};
+                _this12.addForm.schedule = 0;
                 data = {
-                  departure_city_id: _this11.addForm.departureCity,
-                  destination_city_id: _this11.addForm.destinationCity,
-                  date: _this11.addForm.date
+                  departure_city_id: _this12.addForm.departureCity,
+                  destination_city_id: _this12.addForm.destinationCity,
+                  date: _this12.addForm.date
                 };
                 _context11.next = 7;
-                return _this11.callApi("post", "booking/fetchSchedule", data);
+                return _this12.callApi("post", "booking/fetchSchedule", data);
 
               case 7:
                 resFetchSchedule = _context11.sent;
 
                 if (resFetchSchedule.status == 200) {
                   if (resFetchSchedule.length != 0) {
-                    _this11.getSchedule = false;
-                    _this11.allSchedules = resFetchSchedule.data;
+                    _this12.getSchedule = false;
+                    _this12.allSchedules = resFetchSchedule.data;
+                    $('#scheduleName').select2();
                   } else {
-                    _this11.addForm.schedule = 0;
-                    _this11.showBookingDiv = false;
+                    _this12.addForm.schedule = 0;
+                    _this12.showBookingDiv = false;
                   }
                 }
 
-                _this11.fetchScheduleData();
+                _this12.fetchScheduleData();
 
               case 10:
               case "end":
@@ -29296,7 +29309,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     fetchReSpecificSchedules: function fetchReSpecificSchedules() {
-      var _this12 = this;
+      var _this13 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
         var data, resFetchSchedule;
@@ -29304,26 +29317,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                _this12.allReSchedules = {};
-                _this12.rescheduleData.rescheduleSchedule = 0;
-                _this12.seatMapReschedule = false;
+                _this13.allReSchedules = {};
+                _this13.rescheduleData.rescheduleSchedule = 0;
+                _this13.seatMapReschedule = false;
                 data = {
-                  departure_city_id: parseInt(_this12.rescheduleData.dataDepartureCity),
-                  destination_city_id: _this12.rescheduleData.rescheduleDestinationCity,
-                  date: _this12.rescheduleData.rescheduleDate
+                  departure_city_id: parseInt(_this13.rescheduleData.dataDepartureCity),
+                  destination_city_id: _this13.rescheduleData.rescheduleDestinationCity,
+                  date: _this13.rescheduleData.rescheduleDate
                 };
                 _context12.next = 6;
-                return _this12.callApi("post", "booking/fetchSchedule", data);
+                return _this13.callApi("post", "booking/fetchSchedule", data);
 
               case 6:
                 resFetchSchedule = _context12.sent;
 
                 if (resFetchSchedule.status == 200) {
                   if (resFetchSchedule.length != 0) {
-                    _this12.seatMapReschedule = false;
-                    _this12.allReSchedules = resFetchSchedule.data;
+                    _this13.seatMapReschedule = false;
+                    _this13.allReSchedules = resFetchSchedule.data;
                   } else {
-                    _this12.rescheduleData.rescheduleSchedule = 0;
+                    _this13.rescheduleData.rescheduleSchedule = 0;
                   }
                 }
 
@@ -29342,7 +29355,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.replace(/(\d{4})(\d{7})/, "$1-$2");
     },
     getPoints: function getPoints(value) {
-      var _this13 = this;
+      var _this14 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
         var resCnicPoints;
@@ -29350,14 +29363,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
-                if (!_this13.addForm.customerCNIC) {
+                if (!_this14.addForm.customerCNIC) {
                   _context13.next = 8;
                   break;
                 }
 
                 _context13.next = 3;
-                return _this13.callApi("post", "booking/getPoints", {
-                  cnicNumber: _this13.addForm.customerCNIC,
+                return _this14.callApi("post", "booking/getPoints", {
+                  cnicNumber: _this14.addForm.customerCNIC,
                   status: value
                 });
 
@@ -29365,32 +29378,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resCnicPoints = _context13.sent;
 
                 if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
-                  _this13.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
-                  _this13.pointsValidation = resCnicPoints.data.starting_points;
-                  _this13.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
-                  _this13.pointsCardId = resCnicPoints.data.id;
-                  _this13.haveLabel = true;
+                  _this14.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
+                  _this14.pointsValidation = resCnicPoints.data.starting_points;
+                  _this14.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
+                  _this14.pointsCardId = resCnicPoints.data.id;
+                  _this14.haveLabel = true;
                 }
 
                 if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
-                  _this13.label = "";
-                  _this13.pointsValidation = "";
-                  _this13.hideCheckBox = false;
-                  _this13.haveLabel = false;
+                  _this14.label = "";
+                  _this14.pointsValidation = "";
+                  _this14.hideCheckBox = false;
+                  _this14.haveLabel = false;
                 }
 
                 if (resCnicPoints.status == 201) {
-                  _this13.label = resCnicPoints.data.expiredData;
-                  _this13.pointsValidation = "";
-                  _this13.hideCheckBox = false;
-                  _this13.haveLabel = true;
+                  _this14.label = resCnicPoints.data.expiredData;
+                  _this14.pointsValidation = "";
+                  _this14.hideCheckBox = false;
+                  _this14.haveLabel = true;
                 }
 
                 if (resCnicPoints.status == 404) {
-                  _this13.label = "";
-                  _this13.pointsValidation = "";
-                  _this13.hideCheckBox = false;
-                  _this13.haveLabel = false;
+                  _this14.label = "";
+                  _this14.pointsValidation = "";
+                  _this14.hideCheckBox = false;
+                  _this14.haveLabel = false;
                 }
 
               case 8:
@@ -29402,7 +29415,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     revertOverIssueFunction: function revertOverIssueFunction(item) {
-      var _this14 = this;
+      var _this15 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
         var resFinalRevert;
@@ -29411,7 +29424,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context14.prev = _context14.next) {
               case 0:
                 _context14.next = 2;
-                return _this14.callApi("post", "booking/revert/over/issue/seat", {
+                return _this15.callApi("post", "booking/revert/over/issue/seat", {
                   ticket_id: item.id,
                   schedule_id: item.schedule_id,
                   schedule_date: item.schedule_date,
@@ -29420,10 +29433,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 resFinalRevert = _context14.sent;
-                _this14.loadingRevertButton = true;
+                _this15.loadingRevertButton = true;
 
                 if (resFinalRevert.status == 200) {
-                  _this14.loadingRevertButton = false;
+                  _this15.loadingRevertButton = false;
                   swal({
                     title: "Success!",
                     text: "Seat Revert Successfully!",
@@ -29431,10 +29444,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this14.fetchScheduleData();
+                  _this15.fetchScheduleData();
                 } else if (resFinalRevert.status == 422) {
                   (function () {
-                    _this14.loadingRevertButton = false;
+                    _this15.loadingRevertButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -29461,7 +29474,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     usePoints: function usePoints(e) {
-      var _this15 = this;
+      var _this16 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
         var resUsagePoints;
@@ -29475,29 +29488,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _context15.next = 3;
-                return _this15.callApi("post", "booking/usagePoints", {
-                  id: _this15.pointsCardId,
-                  points: _this15.pointsCardId
+                return _this16.callApi("post", "booking/usagePoints", {
+                  id: _this16.pointsCardId,
+                  points: _this16.pointsCardId
                 });
 
               case 3:
                 resUsagePoints = _context15.sent;
 
                 if (resUsagePoints.status == 200) {
-                  _this15.pointsUsage = "You Have " + resUsagePoints.data;
-                  _this15.checkedUsagePoints = true;
+                  _this16.pointsUsage = "You Have " + resUsagePoints.data;
+                  _this16.checkedUsagePoints = true;
                 } else {
-                  _this15.pointsUsage = "";
-                  _this15.addForm.pointsUseInput = "";
-                  _this15.checkedUsagePoints = false;
+                  _this16.pointsUsage = "";
+                  _this16.addForm.pointsUseInput = "";
+                  _this16.checkedUsagePoints = false;
                 }
 
                 _context15.next = 9;
                 break;
 
               case 7:
-                _this15.pointsUsage = "";
-                _this15.checkedUsagePoints = false;
+                _this16.pointsUsage = "";
+                _this16.checkedUsagePoints = false;
 
               case 9:
               case "end":
@@ -29508,7 +29521,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getCustomer: function getCustomer(flag) {
-      var _this16 = this;
+      var _this17 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
         var resCnic, _resCnic;
@@ -29522,52 +29535,52 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                if (!(_this16.addForm.customerCNIC != '' && _this16.addForm.customerCNIC != 'undefined')) {
+                if (!(_this17.addForm.customerCNIC != '' && _this17.addForm.customerCNIC != 'undefined')) {
                   _context16.next = 8;
                   break;
                 }
 
-                _this16.addForm.contact = "";
-                _this16.addForm.customerName = "";
+                _this17.addForm.contact = "";
+                _this17.addForm.customerName = "";
                 _context16.next = 6;
-                return _this16.callApi("post", "booking/getCNIC", {
-                  cnicNumber: _this16.addForm.customerCNIC,
+                return _this17.callApi("post", "booking/getCNIC", {
+                  cnicNumber: _this17.addForm.customerCNIC,
                   status: flag
                 });
 
               case 6:
                 resCnic = _context16.sent;
 
-                if ((_this16.addForm.contact == '' || typeof _this16.addForm.contact == 'undefined') && (_this16.addForm.customerName == '' || typeof _this16.addForm.customerName == 'undefined')) {
-                  _this16.addForm.contact = resCnic.data.contact;
-                  _this16.addForm.customerName = resCnic.data.name;
+                if ((_this17.addForm.contact == '' || typeof _this17.addForm.contact == 'undefined') && (_this17.addForm.customerName == '' || typeof _this17.addForm.customerName == 'undefined')) {
+                  _this17.addForm.contact = resCnic.data.contact;
+                  _this17.addForm.customerName = resCnic.data.name;
                 }
 
               case 8:
-                if (!(flag == 'addFormContact' && (_this16.addForm.customerCNIC == '' || typeof _this16.addForm.customerCNIC == 'undefined') && (_this16.addForm.customerName == '' || typeof _this16.addForm.customerName === 'undefined'))) {
+                if (!(flag == 'addFormContact' && (_this17.addForm.customerCNIC == '' || typeof _this17.addForm.customerCNIC == 'undefined') && (_this17.addForm.customerName == '' || typeof _this17.addForm.customerName === 'undefined'))) {
                   _context16.next = 16;
                   break;
                 }
 
-                if (!(_this16.addForm.contact != '' && _this16.addForm.contact != 'undefined')) {
+                if (!(_this17.addForm.contact != '' && _this17.addForm.contact != 'undefined')) {
                   _context16.next = 16;
                   break;
                 }
 
-                _this16.addForm.customerName = "";
-                _this16.addForm.customerCNIC = "";
+                _this17.addForm.customerName = "";
+                _this17.addForm.customerCNIC = "";
                 _context16.next = 14;
-                return _this16.callApi("post", "booking/getCNIC", {
-                  phoneNumber: _this16.addForm.contact,
+                return _this17.callApi("post", "booking/getCNIC", {
+                  phoneNumber: _this17.addForm.contact,
                   status: flag
                 });
 
               case 14:
                 _resCnic = _context16.sent;
 
-                if ((_this16.addForm.customerName == '' || typeof _this16.addForm.customerName == 'undefined') && (_this16.addForm.customerCNIC == '' || typeof _this16.addForm.customerCNIC == 'undefined')) {
-                  _this16.addForm.customerCNIC = _resCnic.data.cnic;
-                  _this16.addForm.customerName = _resCnic.data.name;
+                if ((_this17.addForm.customerName == '' || typeof _this17.addForm.customerName == 'undefined') && (_this17.addForm.customerCNIC == '' || typeof _this17.addForm.customerCNIC == 'undefined')) {
+                  _this17.addForm.customerCNIC = _resCnic.data.cnic;
+                  _this17.addForm.customerName = _resCnic.data.name;
                 }
 
               case 16:
@@ -29615,7 +29628,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     fetchScheduleData: function fetchScheduleData() {
-      var _this17 = this;
+      var _this18 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee17() {
         var resSelected, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat, i, j;
@@ -29623,7 +29636,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context17.prev = _context17.next) {
               case 0:
-                if (!(_this17.addForm.terminalId == 0 && _this17.$store.state.user.terminal_id == null)) {
+                if (!(_this18.addForm.terminalId == 0 && _this18.$store.state.user.terminal_id == null)) {
                   _context17.next = 2;
                   break;
                 }
@@ -29636,147 +29649,147 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this17.resetArrays();
+                _this18.resetArrays();
 
-                _this17.schedule = [];
-                _this17.addForm.totalFare = 0;
-                _this17.addForm.totalAmount = 0;
-                _this17.addForm.discount = '';
-                _this17.validationErrors = [];
-                _this17.loading = true;
-                _this17.showBookingDiv = false;
+                _this18.schedule = [];
+                _this18.addForm.totalFare = 0;
+                _this18.addForm.totalAmount = 0;
+                _this18.addForm.discount = '';
+                _this18.validationErrors = [];
+                _this18.loading = true;
+                _this18.showBookingDiv = false;
 
-                if (!(_this17.addForm.schedule != 0 && _this17.addForm.date && _this17.addForm.departureCity != 0 && _this17.addForm.destinationCity != 0)) {
+                if (!(_this18.addForm.schedule != 0 && _this18.addForm.date && _this18.addForm.departureCity != 0 && _this18.addForm.destinationCity != 0)) {
                   _context17.next = 37;
                   break;
                 }
 
                 _context17.next = 13;
-                return _this17.callApi("post", "booking/schedule/selected", {
-                  id: _this17.addForm.schedule,
-                  date: _this17.addForm.date,
-                  departureCity: _this17.addForm.departureCity,
-                  destinationCity: _this17.addForm.destinationCity,
-                  dropTerminal: _this17.addForm.terminalId
+                return _this18.callApi("post", "booking/schedule/selected", {
+                  id: _this18.addForm.schedule,
+                  date: _this18.addForm.date,
+                  departureCity: _this18.addForm.departureCity,
+                  destinationCity: _this18.addForm.destinationCity,
+                  dropTerminal: _this18.addForm.terminalId
                 });
 
               case 13:
                 resSelected = _context17.sent;
                 _context17.next = 16;
-                return _this17.callApi("post", "booking/terminal/seats", {
-                  terminal_id: _this17.$store.state.user.terminal_id
+                return _this18.callApi("post", "booking/terminal/seats", {
+                  terminal_id: _this18.$store.state.user.terminal_id
                 });
 
               case 16:
                 terminalSeats = _context17.sent;
                 _context17.next = 19;
-                return _this17.callApi("post", "booking/schedule/terminal/discount/fetch", {
-                  id: _this17.addForm.schedule,
-                  date: _this17.addForm.date,
-                  departureCity: _this17.addForm.departureCity,
-                  destinationCity: _this17.addForm.destinationCity,
-                  dropTerminal: _this17.addForm.terminalId
+                return _this18.callApi("post", "booking/schedule/terminal/discount/fetch", {
+                  id: _this18.addForm.schedule,
+                  date: _this18.addForm.date,
+                  departureCity: _this18.addForm.departureCity,
+                  destinationCity: _this18.addForm.destinationCity,
+                  dropTerminal: _this18.addForm.terminalId
                 });
 
               case 19:
                 restDiscount = _context17.sent;
                 _context17.next = 22;
-                return _this17.callApi("post", "booking/discount/surcharge/fetch", {
-                  schedule_id: _this17.addForm.schedule
+                return _this18.callApi("post", "booking/discount/surcharge/fetch", {
+                  schedule_id: _this18.addForm.schedule
                 });
 
               case 22:
                 resFetchDiscountSurcharge = _context17.sent;
                 _context17.next = 25;
-                return _this17.callApi("post", "booking/booked/seats/elt/detail", {
-                  id: _this17.addForm.schedule,
-                  date: _this17.addForm.date,
-                  departureCity: _this17.addForm.departureCity,
-                  destinationCity: _this17.addForm.destinationCity
+                return _this18.callApi("post", "booking/booked/seats/elt/detail", {
+                  id: _this18.addForm.schedule,
+                  date: _this18.addForm.date,
+                  departureCity: _this18.addForm.departureCity,
+                  destinationCity: _this18.addForm.destinationCity
                 });
 
               case 25:
                 responseEltDetails = _context17.sent;
                 _context17.next = 28;
-                return _this17.callApi("post", "booking/fetch/over/issue/seat", {
-                  id: _this17.addForm.schedule,
-                  date: _this17.addForm.date,
-                  departureCity: _this17.addForm.departureCity,
-                  destinationCity: _this17.addForm.destinationCity
+                return _this18.callApi("post", "booking/fetch/over/issue/seat", {
+                  id: _this18.addForm.schedule,
+                  date: _this18.addForm.date,
+                  departureCity: _this18.addForm.departureCity,
+                  destinationCity: _this18.addForm.destinationCity
                 });
 
               case 28:
                 resFetchOverIssueSeat = _context17.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
-                  _this17.overIssueSeatsRevert = resFetchOverIssueSeat.data;
+                  _this18.overIssueSeatsRevert = resFetchOverIssueSeat.data;
 
                   if (resFetchOverIssueSeat.data.length == 0) {
-                    _this17.closeOverIssueDetail();
+                    _this18.closeOverIssueDetail();
                   }
                 } else {
                   console.log(resFetchOverIssueSeat);
                 }
 
                 if (responseEltDetails.status == 200) {
-                  _this17.eltDetailsModel = responseEltDetails.data;
+                  _this18.eltDetailsModel = responseEltDetails.data;
                 } else if (responseEltDetails.status == 204) {
-                  _this17.eltDetailsModel = [];
+                  _this18.eltDetailsModel = [];
                 } // Fetch Discount and Surcharge  against schedule
 
 
                 if (resFetchDiscountSurcharge.status == 200) {
-                  _this17.appliedDiscount = resFetchDiscountSurcharge.data.discount ? resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat : 'N/A';
-                  _this17.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat : 'N/A';
+                  _this18.appliedDiscount = resFetchDiscountSurcharge.data.discount ? resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat : 'N/A';
+                  _this18.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat : 'N/A';
                 }
 
                 if (restDiscount.status == 200) {
-                  _this17.terminalDiscount = restDiscount.data.discount ? restDiscount.data.discount + '%' : 'N/A';
+                  _this18.terminalDiscount = restDiscount.data.discount ? restDiscount.data.discount + '%' : 'N/A';
                 }
 
                 if (terminalSeats.status == 200) {
-                  _this17.allowedSeats = terminalSeats.data;
+                  _this18.allowedSeats = terminalSeats.data;
                 } else if (terminalSeats.status == 204) {
-                  _this17.allowedSeats = 0;
+                  _this18.allowedSeats = 0;
                 }
 
                 if (resSelected.status == 200) {
-                  _this17.loading = false;
-                  _this17.showBookingDiv = true;
-                  _this17.schedule = resSelected.data;
-                  _this17.totalSeats = 0;
-                  _this17.totalSeatsBooked = 0;
-                  _this17.totalSeatsIssued = 0;
-                  _this17.totalSeatsAvailable = 0;
+                  _this18.loading = false;
+                  _this18.showBookingDiv = true;
+                  _this18.schedule = resSelected.data;
+                  _this18.totalSeats = 0;
+                  _this18.totalSeatsBooked = 0;
+                  _this18.totalSeatsIssued = 0;
+                  _this18.totalSeatsAvailable = 0;
 
                   for (i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
                     for (j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
                       if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
-                        _this17.totalSeats++;
+                        _this18.totalSeats++;
                       }
 
                       if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {
-                        _this17.totalSeatsBooked++;
+                        _this18.totalSeatsBooked++;
                       }
 
                       if (resSelected.data.bus_class.seat_map[i][j].type == 'advance booking') {
-                        _this17.totalSeatsIssued++;
+                        _this18.totalSeatsIssued++;
                       }
                     }
                   }
 
-                  _this17.totalSeatsAvailable = _this17.totalSeats - (_this17.totalSeatsBooked + _this17.totalSeatsIssued);
+                  _this18.totalSeatsAvailable = _this18.totalSeats - (_this18.totalSeatsBooked + _this18.totalSeatsIssued);
                 }
 
-                if (resSelected.status == 500 && _this17.addForm.schedule == 0) {
-                  _this17.loading = true;
-                  _this17.showBookingDiv = false;
+                if (resSelected.status == 500 && _this18.addForm.schedule == 0) {
+                  _this18.loading = true;
+                  _this18.showBookingDiv = false;
                 }
 
                 if (resSelected.status == 422) {
                   (function () {
-                    _this17.showBookingDiv = false;
-                    _this17.loading = false;
+                    _this18.showBookingDiv = false;
+                    _this18.loading = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -29849,7 +29862,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $('#dropSchedule').modal('show');
     },
     busDropCheck: function busDropCheck() {
-      var _this18 = this;
+      var _this19 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
         var resDropCheck;
@@ -29857,14 +29870,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context18.prev = _context18.next) {
               case 0:
-                _this18.labelDrop = '';
-                _this18.hideDivButtonsDrop = true;
+                _this19.labelDrop = '';
+                _this19.hideDivButtonsDrop = true;
                 _context18.next = 4;
-                return _this18.callApi("post", "booking/schedule/dropCheck", {
-                  id: _this18.addForm.schedule,
-                  date: _this18.addForm.date,
-                  departureCity: _this18.addForm.departureCity,
-                  destinationCity: _this18.addForm.destinationCity
+                return _this19.callApi("post", "booking/schedule/dropCheck", {
+                  id: _this19.addForm.schedule,
+                  date: _this19.addForm.date,
+                  departureCity: _this19.addForm.departureCity,
+                  destinationCity: _this19.addForm.destinationCity
                 });
 
               case 4:
@@ -29872,11 +29885,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resDropCheck.status == 200) {
                   if (resDropCheck.data.checkDrop) {
-                    _this18.labelDrop = 'This Schedule is Dropped';
-                    _this18.hideDivButtonsDrop = false;
+                    _this19.labelDrop = 'This Schedule is Dropped';
+                    _this19.hideDivButtonsDrop = false;
                   } else {
-                    _this18.hideDivButtonsDrop = true;
-                    _this18.labelDrop = '';
+                    _this19.hideDivButtonsDrop = true;
+                    _this19.labelDrop = '';
                   }
                 }
 
@@ -29889,7 +29902,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     fetchReScheduleData: function fetchReScheduleData() {
-      var _this19 = this;
+      var _this20 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
         var res;
@@ -29897,37 +29910,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context19.prev = _context19.next) {
               case 0:
-                _this19.reScheduleSeatMap = [];
-                _this19.reScheduleSchedule = '';
-                _this19.reScheduleDepart = '';
-                _this19.reScheduleDest = '';
-                _this19.reScheduleDate = '';
-                _this19.alreadyBookedSeatClassName = [];
-                _this19.alreadyBookedSeatClass = [];
-                _this19.alreadyBookedSeatFare = [];
-                _this19.totalAlreadyBookedSeatFare = 0;
-                _this19.alreadyBookedSeat = [];
-                _this19.seatMapReschedule = false;
+                _this20.reScheduleSeatMap = [];
+                _this20.reScheduleSchedule = '';
+                _this20.reScheduleDepart = '';
+                _this20.reScheduleDest = '';
+                _this20.reScheduleDate = '';
+                _this20.alreadyBookedSeatClassName = [];
+                _this20.alreadyBookedSeatClass = [];
+                _this20.alreadyBookedSeatFare = [];
+                _this20.totalAlreadyBookedSeatFare = 0;
+                _this20.alreadyBookedSeat = [];
+                _this20.seatMapReschedule = false;
 
-                if (_this19.rescheduleData.rescheduleSchedule == 0) {
-                  _this19.seatMapReschedule = false;
+                if (_this20.rescheduleData.rescheduleSchedule == 0) {
+                  _this20.seatMapReschedule = false;
                 }
 
                 _context19.next = 14;
-                return _this19.callApi("post", "booking/schedule/selected", {
-                  id: _this19.rescheduleData.rescheduleSchedule,
-                  date: _this19.rescheduleData.rescheduleDate,
-                  departureCity: parseInt(_this19.rescheduleData.dataDepartureCity),
-                  destinationCity: _this19.rescheduleData.rescheduleDestinationCity,
-                  dropTerminal: _this19.addForm.terminalId
+                return _this20.callApi("post", "booking/schedule/selected", {
+                  id: _this20.rescheduleData.rescheduleSchedule,
+                  date: _this20.rescheduleData.rescheduleDate,
+                  departureCity: parseInt(_this20.rescheduleData.dataDepartureCity),
+                  destinationCity: _this20.rescheduleData.rescheduleDestinationCity,
+                  dropTerminal: _this20.addForm.terminalId
                 });
 
               case 14:
                 res = _context19.sent;
 
                 if (res.status == 200) {
-                  _this19.seatMapReschedule = true;
-                  _this19.reScheduleSeatMap = res.data;
+                  _this20.seatMapReschedule = true;
+                  _this20.reScheduleSeatMap = res.data;
                 } else {
                   if (res.status == 422) {
                     (function () {
@@ -29958,7 +29971,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     selectSeat: function selectSeat(row, col, seatNo, fare, colClass) {
-      var _this20 = this;
+      var _this21 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee20() {
         var index, _index, _index2, _index3;
@@ -29967,9 +29980,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
-                _this20.validationErrors = [];
+                _this21.validationErrors = [];
 
-                if (!(_this20.addForm.oldBookings == 1 && !_this20.schedule.bus_class.seat_map[row][col].type)) {
+                if (!(_this21.addForm.oldBookings == 1 && !_this21.schedule.bus_class.seat_map[row][col].type)) {
                   _context20.next = 3;
                   break;
                 }
@@ -29982,80 +29995,80 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (!(_this20.schedule.bus_class.seat_map[row][col].type && _this20.selectedSeats.length == 0)) {
+                if (!(_this21.schedule.bus_class.seat_map[row][col].type && _this21.selectedSeats.length == 0)) {
                   _context20.next = 10;
                   break;
                 }
 
-                index = _this20.selectedBookedSeats.indexOf(seatNo);
+                index = _this21.selectedBookedSeats.indexOf(seatNo);
 
                 if (index != -1) {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this20.selectedBookedSeats.splice(index, 1);
+                  _this21.selectedBookedSeats.splice(index, 1);
 
-                  _this20.bookedSeats = _this20.bookedSeats.filter(function (seat) {
+                  _this21.bookedSeats = _this21.bookedSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
                     }
                   });
-                  _this20.addForm.totalFare -= parseFloat(_this20.schedule.bus_class.seat_map[row][col].fare);
+                  _this21.addForm.totalFare -= parseFloat(_this21.schedule.bus_class.seat_map[row][col].fare);
                 } else {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this20.selectedBookedSeats.push(seatNo);
+                  _this21.selectedBookedSeats.push(seatNo);
 
-                  _this20.bookedSeats.push(_this20.schedule.bus_class.seat_map[row][col]);
+                  _this21.bookedSeats.push(_this21.schedule.bus_class.seat_map[row][col]);
 
-                  _this20.addForm.totalFare += parseFloat(_this20.schedule.bus_class.seat_map[row][col].fare);
+                  _this21.addForm.totalFare += parseFloat(_this21.schedule.bus_class.seat_map[row][col].fare);
                 }
 
-                _this20.addForm.totalAmount = _this20.addForm.totalFare;
-                _this20.addForm.selectedBookedSeats = _this20.selectedBookedSeats;
+                _this21.addForm.totalAmount = _this21.addForm.totalFare;
+                _this21.addForm.selectedBookedSeats = _this21.selectedBookedSeats;
                 _context20.next = 22;
                 break;
 
               case 10:
-                if (!(!_this20.schedule.bus_class.seat_map[row][col].type && _this20.selectedBookedSeats.length == 0)) {
+                if (!(!_this21.schedule.bus_class.seat_map[row][col].type && _this21.selectedBookedSeats.length == 0)) {
                   _context20.next = 19;
                   break;
                 }
 
-                _index = _this20.selectedSeats.indexOf(seatNo);
+                _index = _this21.selectedSeats.indexOf(seatNo);
 
                 if (_index != -1) {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this20.selectedSeats.splice(_index, 1);
+                  _this21.selectedSeats.splice(_index, 1);
 
-                  _this20.selectedSeatsFare.splice(_index, 1);
+                  _this21.selectedSeatsFare.splice(_index, 1);
 
-                  _this20.selectedSeatsClass.splice(_index, 1);
+                  _this21.selectedSeatsClass.splice(_index, 1);
 
-                  _this20.addForm.totalFare -= _this20.schedule.bus_class.seat_map[row][col].fare;
+                  _this21.addForm.totalFare -= _this21.schedule.bus_class.seat_map[row][col].fare;
                 } else {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this20.selectedSeats.push(seatNo);
+                  _this21.selectedSeats.push(seatNo);
 
-                  _this20.selectedSeatsFare.push(fare);
+                  _this21.selectedSeatsFare.push(fare);
 
-                  _this20.selectedSeatsClass.push(colClass);
+                  _this21.selectedSeatsClass.push(colClass);
 
-                  _this20.addForm.totalFare += _this20.schedule.bus_class.seat_map[row][col].fare;
+                  _this21.addForm.totalFare += _this21.schedule.bus_class.seat_map[row][col].fare;
                 }
 
-                _this20.addForm.totalAmount = _this20.addForm.totalFare;
-                _this20.addForm.selectedSeats = _this20.selectedSeats;
-                _this20.addForm.selectedSeatsFare = _this20.selectedSeatsFare;
-                _this20.addForm.selectedSeatsClass = _this20.selectedSeatsClass;
+                _this21.addForm.totalAmount = _this21.addForm.totalFare;
+                _this21.addForm.selectedSeats = _this21.selectedSeats;
+                _this21.addForm.selectedSeatsFare = _this21.selectedSeatsFare;
+                _this21.addForm.selectedSeatsClass = _this21.selectedSeatsClass;
                 _context20.next = 22;
                 break;
 
               case 19:
-                _this20.fetchScheduleData();
+                _this21.fetchScheduleData();
 
-                _this20.resetArrays();
+                _this21.resetArrays();
 
                 return _context20.abrupt("return", swal({
                   title: "Oops",
@@ -30065,61 +30078,61 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 22:
-                if (!(_this20.schedule.bus_class.seat_map[row][col].over_issue && _this20.selectedOverIssueSeats.length == 0)) {
+                if (!(_this21.schedule.bus_class.seat_map[row][col].over_issue && _this21.selectedOverIssueSeats.length == 0)) {
                   _context20.next = 28;
                   break;
                 }
 
-                _index2 = _this20.selectedBookedOverIssueSeats.indexOf(seatNo);
+                _index2 = _this21.selectedBookedOverIssueSeats.indexOf(seatNo);
 
                 if (_index2 != -1) {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this20.selectedBookedOverIssueSeats.splice(_index2, 1);
+                  _this21.selectedBookedOverIssueSeats.splice(_index2, 1);
 
-                  _this20.bookedOverIssueSeats = _this20.bookedOverIssueSeats.filter(function (seat) {
+                  _this21.bookedOverIssueSeats = _this21.bookedOverIssueSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
                     }
                   });
                 } else {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this20.selectedBookedOverIssueSeats.push(seatNo);
+                  _this21.selectedBookedOverIssueSeats.push(seatNo);
 
-                  _this20.bookedOverIssueSeats.push(_this20.schedule.bus_class.seat_map[row][col]);
+                  _this21.bookedOverIssueSeats.push(_this21.schedule.bus_class.seat_map[row][col]);
                 }
 
-                _this20.addForm.selectedBookedOverIssueSeats = _this20.selectedBookedOverIssueSeats;
+                _this21.addForm.selectedBookedOverIssueSeats = _this21.selectedBookedOverIssueSeats;
                 _context20.next = 37;
                 break;
 
               case 28:
-                if (!(!_this20.schedule.bus_class.seat_map[row][col].over_issue && _this20.selectedBookedOverIssueSeats.length == 0)) {
+                if (!(!_this21.schedule.bus_class.seat_map[row][col].over_issue && _this21.selectedBookedOverIssueSeats.length == 0)) {
                   _context20.next = 34;
                   break;
                 }
 
-                _index3 = _this20.selectedOverIssueSeats.indexOf(seatNo);
+                _index3 = _this21.selectedOverIssueSeats.indexOf(seatNo);
 
                 if (_index3 != -1) {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this20.selectedOverIssueSeats.splice(_index3, 1);
+                  _this21.selectedOverIssueSeats.splice(_index3, 1);
                 } else {
-                  _this20.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this21.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this20.selectedOverIssueSeats.push(seatNo);
+                  _this21.selectedOverIssueSeats.push(seatNo);
                 }
 
-                _this20.addForm.selectedOverIssueSeats = _this20.selectedOverIssueSeats;
+                _this21.addForm.selectedOverIssueSeats = _this21.selectedOverIssueSeats;
                 _context20.next = 37;
                 break;
 
               case 34:
-                _this20.fetchScheduleData();
+                _this21.fetchScheduleData();
 
-                _this20.resetArrays();
+                _this21.resetArrays();
 
                 return _context20.abrupt("return", swal({
                   title: "Oops",
@@ -30138,7 +30151,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // update Form After  advanced Booked seat
     updateBookedSeat: function updateBookedSeat(data) {
-      var _this21 = this;
+      var _this22 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee21() {
         var index, _ref;
@@ -30147,32 +30160,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context21.prev = _context21.next) {
               case 0:
-                _this21.addForm.alreadyBookedId = [];
+                _this22.addForm.alreadyBookedId = [];
 
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
-                  index = _this21.advanceSeat.indexOf(data.seatNo);
+                  index = _this22.advanceSeat.indexOf(data.seatNo);
 
                   if (index != -1) {
-                    _this21.addForm.selectedSeats.splice(index, 1);
+                    _this22.addForm.selectedSeats.splice(index, 1);
 
-                    _this21.advanceSeat.splice(index, 1);
+                    _this22.advanceSeat.splice(index, 1);
 
-                    _this21.addForm.alreadyBookedId.splice(index, 1);
+                    _this22.addForm.alreadyBookedId.splice(index, 1);
 
-                    _this21.addForm.flag = 0;
+                    _this22.addForm.flag = 0;
                   } else {
-                    _this21.addForm.alreadyBookedId.push(data.id);
+                    _this22.addForm.alreadyBookedId.push(data.id);
 
-                    _this21.addForm.customerCNIC = (_ref = data.customer_cnic == 0) !== null && _ref !== void 0 ? _ref : '';
-                    _this21.addForm.customerName = data.customer_name;
-                    _this21.addForm.contact = data.customer_phone;
-                    _this21.addForm.remarks = data.remarks;
+                    _this22.addForm.customerCNIC = (_ref = data.customer_cnic == 0) !== null && _ref !== void 0 ? _ref : '';
+                    _this22.addForm.customerName = data.customer_name;
+                    _this22.addForm.contact = data.customer_phone;
+                    _this22.addForm.remarks = data.remarks;
 
-                    _this21.addForm.selectedSeats.push(data.seatNo);
+                    _this22.addForm.selectedSeats.push(data.seatNo);
 
-                    _this21.advanceSeat.push(data.seatNo);
+                    _this22.advanceSeat.push(data.seatNo);
 
-                    _this21.addForm.flag = 1;
+                    _this22.addForm.flag = 1;
                   }
                 }
 
@@ -30250,7 +30263,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
     },
     add: function add() {
-      var _this22 = this;
+      var _this23 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee22() {
         var resTicket;
@@ -30258,7 +30271,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context22.prev = _context22.next) {
               case 0:
-                if (!(_this22.addForm.departureCity == 0)) {
+                if (!(_this23.addForm.departureCity == 0)) {
                   _context22.next = 2;
                   break;
                 }
@@ -30271,7 +30284,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this22.addForm.destinationCity == 0)) {
+                if (!(_this23.addForm.destinationCity == 0)) {
                   _context22.next = 4;
                   break;
                 }
@@ -30284,7 +30297,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (_this22.addForm.date) {
+                if (_this23.addForm.date) {
                   _context22.next = 6;
                   break;
                 }
@@ -30297,7 +30310,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this22.addForm.schedule == 0)) {
+                if (!(_this23.addForm.schedule == 0)) {
                   _context22.next = 8;
                   break;
                 }
@@ -30310,7 +30323,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!((_this22.addForm.customerCNIC == '' || typeof _this22.addForm.customerCNIC == 'undefined') && _this22.addForm.type != 'advance booking')) {
+                if (!((_this23.addForm.customerCNIC == '' || typeof _this23.addForm.customerCNIC == 'undefined') && _this23.addForm.type != 'advance booking')) {
                   _context22.next = 10;
                   break;
                 }
@@ -30323,7 +30336,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(!_this22.addForm.customerName || typeof _this22.addForm.customerName == 'undefined')) {
+                if (!(!_this23.addForm.customerName || typeof _this23.addForm.customerName == 'undefined')) {
                   _context22.next = 12;
                   break;
                 }
@@ -30336,7 +30349,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(!_this22.addForm.contact || typeof _this22.addForm.contact == 'undefined')) {
+                if (!(!_this23.addForm.contact || typeof _this23.addForm.contact == 'undefined')) {
                   _context22.next = 14;
                   break;
                 }
@@ -30349,7 +30362,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 14:
-                if (!(_this22.selectedSeats.length == 0 && _this22.selectedBookedSeats.length == 0)) {
+                if (!(_this23.selectedSeats.length == 0 && _this23.selectedBookedSeats.length == 0)) {
                   _context22.next = 16;
                   break;
                 }
@@ -30362,7 +30375,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 16:
-                if (!(_this22.addForm.pointsUseInput > _this22.pointsValidation)) {
+                if (!(_this23.addForm.pointsUseInput > _this23.pointsValidation)) {
                   _context22.next = 18;
                   break;
                 }
@@ -30375,10 +30388,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 18:
-                _this22.addForm.pointsCardId = _this22.pointsCardId;
-                _this22.addForm.usagePoints = _this22.checkedUsagePoints;
+                _this23.addForm.pointsCardId = _this23.pointsCardId;
+                _this23.addForm.usagePoints = _this23.checkedUsagePoints;
                 _context22.next = 22;
-                return _this22.callApi("post", "booking/store", _this22.addForm);
+                return _this23.callApi("post", "booking/store", _this23.addForm);
 
               case 22:
                 resTicket = _context22.sent;
@@ -30390,7 +30403,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     position: 'topRight',
                     hideAfter: 1000
                   });
-                  _this22.addForm = {
+                  _this23.addForm = {
                     totalAmount: 0,
                     discount: '',
                     totalFare: 0,
@@ -30400,27 +30413,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     gender: "1",
                     customerCNIC: ""
                   };
-                  _this22.label = "";
-                  _this22.hideCheckBox = false;
-                  _this22.haveLabel = false;
-                  _this22.pointsUsage = false;
-                  _this22.ticketsIds = resTicket.data.ids;
-                  _this22.addForm.date = resTicket.data.ticket[0].date;
-                  _this22.addForm.terminalId = resTicket.data.authTerminalId;
-                  _this22.addForm.gender = 1;
-                  _this22.addForm.type = 'booked';
-                  _this22.addForm.schedule = resTicket.data.ticket[0].schedule_id;
-                  _this22.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
-                  _this22.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
-                  _this22.selectedSeats.length = 0;
+                  _this23.label = "";
+                  _this23.hideCheckBox = false;
+                  _this23.haveLabel = false;
+                  _this23.pointsUsage = false;
+                  _this23.ticketsIds = resTicket.data.ids;
+                  _this23.addForm.date = resTicket.data.ticket[0].date;
+                  _this23.addForm.terminalId = resTicket.data.authTerminalId;
+                  _this23.addForm.gender = 1;
+                  _this23.addForm.type = 'booked';
+                  _this23.addForm.schedule = resTicket.data.ticket[0].schedule_id;
+                  _this23.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
+                  _this23.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
+                  _this23.selectedSeats.length = 0;
 
-                  _this22.fetchScheduleData();
+                  _this23.fetchScheduleData();
 
-                  _this22.resetArrays();
+                  _this23.resetArrays();
 
                   setTimeout(function () {
                     if (resTicket.data.ticket[0].type == "booked") {
-                      _this22.$refs.refTicket.submit();
+                      _this23.$refs.refTicket.submit();
                     }
                   }, 700);
                 } else {
@@ -30453,26 +30466,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     resetArrays: function resetArrays() {
-      var _this23 = this;
+      var _this24 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                _this23.selectedSeats = [];
-                _this23.schedule = [];
-                _this23.selectedSeatsFare = [];
-                _this23.selectedSeatsClass = [];
-                _this23.selectedBookedSeats = [];
-                _this23.selectedOverIssueSeats = [];
-                _this23.selectedBookedOverIssueSeats = [];
-                _this23.addForm.selectedSeats = [];
-                _this23.addForm.selectedBookedSeats = [];
-                _this23.addForm.selectedOverIssueSeats = [];
-                _this23.addForm.selectedBookedOverIssueSeats = [];
-                _this23.bookedSeats = [];
-                _this23.bookedOverIssueSeats = [];
+                _this24.selectedSeats = [];
+                _this24.schedule = [];
+                _this24.selectedSeatsFare = [];
+                _this24.selectedSeatsClass = [];
+                _this24.selectedBookedSeats = [];
+                _this24.selectedOverIssueSeats = [];
+                _this24.selectedBookedOverIssueSeats = [];
+                _this24.addForm.selectedSeats = [];
+                _this24.addForm.selectedBookedSeats = [];
+                _this24.addForm.selectedOverIssueSeats = [];
+                _this24.addForm.selectedBookedOverIssueSeats = [];
+                _this24.bookedSeats = [];
+                _this24.bookedOverIssueSeats = [];
 
               case 13:
               case "end":
@@ -30483,7 +30496,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     details: function details(date, schedule_id) {
-      var _this24 = this;
+      var _this25 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
         var resBookingDetail;
@@ -30491,9 +30504,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context24.prev = _context24.next) {
               case 0:
-                $("#" + _this24.detailsFormId + " table").DataTable().destroy();
+                $("#" + _this25.detailsFormId + " table").DataTable().destroy();
                 _context24.next = 3;
-                return _this24.callApi("post", "booking/details", {
+                return _this25.callApi("post", "booking/details", {
                   date: date,
                   schedule_id: schedule_id
                 });
@@ -30502,9 +30515,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resBookingDetail = _context24.sent;
 
                 if (resBookingDetail.status === 200) {
-                  _this24.bookingDetails = resBookingDetail.data;
+                  _this25.bookingDetails = resBookingDetail.data;
                   setTimeout(function () {
-                    $("#" + _this24.detailsFormId + " table").DataTable();
+                    $("#" + _this25.detailsFormId + " table").DataTable();
                   }, 300);
                 } else {
                   console.log(resBookingDetail);
@@ -30530,7 +30543,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $("#cancelModel").modal('show');
     },
     cancelBooking: function cancelBooking(dataEnter) {
-      var _this25 = this;
+      var _this26 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee25() {
         var data, resCancelBooking;
@@ -30549,7 +30562,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   remarks: dataEnter.reason
                 };
                 _context25.next = 3;
-                return _this25.callApi("post", "booking/canceling", data);
+                return _this26.callApi("post", "booking/canceling", data);
 
               case 3:
                 resCancelBooking = _context25.sent;
@@ -30562,16 +30575,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this25.fetchScheduleData();
+                  _this26.fetchScheduleData();
 
-                  _this25.resetArrays();
+                  _this26.resetArrays();
 
-                  _this25.closeModal();
+                  _this26.closeModal();
                 }
 
                 if (resCancelBooking.status == 422) {
                   (function () {
-                    _this25.dropScheduleButton = false;
+                    _this26.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -30610,7 +30623,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $("#overIssue_model").modal('show');
     },
     addOverIssueTicket: function addOverIssueTicket(dataEnter) {
-      var _this26 = this;
+      var _this27 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee26() {
         var data, resOverIssue;
@@ -30642,7 +30655,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   remarks: dataEnter.reason
                 };
                 _context26.next = 5;
-                return _this26.callApi("post", "booking/overIssueAdd", data);
+                return _this27.callApi("post", "booking/overIssueAdd", data);
 
               case 5:
                 resOverIssue = _context26.sent;
@@ -30655,9 +30668,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this26.fetchScheduleData();
+                  _this27.fetchScheduleData();
 
-                  _this26.closeModal();
+                  _this27.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -30698,7 +30711,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     //ELT MODEL DATA
     passDataToEltModel: function passDataToEltModel(data) {
-      var _this27 = this;
+      var _this28 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee27() {
         var resELT;
@@ -30706,7 +30719,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context27.prev = _context27.next) {
               case 0:
-                _this27.eltData = {
+                _this28.eltData = {
                   dataDate: data.date,
                   dataCustomer: data.customer_id,
                   dataSchedule: data.schedule_id,
@@ -30716,22 +30729,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dataSeatFare: data.seat_fare
                 };
                 _context27.next = 3;
-                return _this27.callApi("post", "booking/elt/fetch/old", data);
+                return _this28.callApi("post", "booking/elt/fetch/old", data);
 
               case 3:
                 resELT = _context27.sent;
 
                 if (resELT.status == 200) {
-                  _this27.editAbleELT = true;
-                  _this27.eltData.eltWeight = resELT.data.elt_weight;
-                  _this27.eltData.eltPrice = resELT.data.elt_price;
-                  _this27.eltData.dataDescription = resELT.data.elt_description;
-                  _this27.eltData.alreadyExist = resELT.data.alreadyExist;
+                  _this28.editAbleELT = true;
+                  _this28.eltData.eltWeight = resELT.data.elt_weight;
+                  _this28.eltData.eltPrice = resELT.data.elt_price;
+                  _this28.eltData.dataDescription = resELT.data.elt_description;
+                  _this28.eltData.alreadyExist = resELT.data.alreadyExist;
                 } else if (resELT.status == 204) {
-                  _this27.editAbleELT = false;
-                  _this27.eltData.eltWeight = '';
-                  _this27.eltData.eltPrice = '';
-                  _this27.eltData.dataDescription = '';
+                  _this28.editAbleELT = false;
+                  _this28.eltData.eltWeight = '';
+                  _this28.eltData.eltPrice = '';
+                  _this28.eltData.dataDescription = '';
                 }
 
                 $("#addELTModel").modal('show');
@@ -30745,7 +30758,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     addEltToTicket: function addEltToTicket(dataEnter) {
-      var _this28 = this;
+      var _this29 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee28() {
         var data, resOverIssue;
@@ -30792,21 +30805,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   eltDescription: dataEnter.dataDescription,
                   alreadyExist: dataEnter.alreadyExist
                 };
-                _this28.EltButton = true;
+                _this29.EltButton = true;
                 _context28.next = 8;
-                return _this28.callApi("post", "booking/elt", data);
+                return _this29.callApi("post", "booking/elt", data);
 
               case 8:
                 resOverIssue = _context28.sent;
 
                 if (resOverIssue.status == 201) {
-                  _this28.EltButton = false;
-                  _this28.eltIds = resOverIssue.data.id;
+                  _this29.EltButton = false;
+                  _this29.eltIds = resOverIssue.data.id;
 
-                  _this28.fetchScheduleData();
+                  _this29.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this28.$refs.refElt.submit();
+                    _this29.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -30815,17 +30828,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this28.closeModal();
+                  _this29.closeModal();
                 }
 
                 if (resOverIssue.status == 200) {
-                  _this28.EltButton = false;
-                  _this28.eltIds = resOverIssue.data.id;
+                  _this29.EltButton = false;
+                  _this29.eltIds = resOverIssue.data.id;
 
-                  _this28.fetchScheduleData();
+                  _this29.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this28.$refs.refElt.submit();
+                    _this29.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -30834,11 +30847,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this28.closeModal();
+                  _this29.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
-                  _this28.EltButton = false;
+                  _this29.EltButton = false;
                   swal({
                     title: "Error",
                     text: resOverIssue.data.message,
@@ -30846,14 +30859,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this28.closeModal();
+                  _this29.closeModal();
                 }
 
                 if (resOverIssue.status == 422) {
                   (function () {
-                    _this28.EltButton = false;
+                    _this29.EltButton = false;
 
-                    _this28.closeModal();
+                    _this29.closeModal();
 
                     var errorContent = "";
                     var count = 0;
@@ -30881,7 +30894,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     allRescheduleData: function allRescheduleData() {
-      var _this29 = this;
+      var _this30 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee29() {
         var arraySingleRescheduleData, oldSeats, totalFare, resReDepartureCity;
@@ -30892,9 +30905,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 arraySingleRescheduleData = [];
                 oldSeats = [];
                 totalFare = 0;
-                _this29.reSpecificCities = [];
-                _this29.rescheduleData.rescheduleSchedule = [];
-                Object.entries(_this29.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
+                _this30.reSpecificCities = [];
+                _this30.rescheduleData.rescheduleSchedule = [];
+                Object.entries(_this30.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
                   var _singleSeat$1$0$disco;
 
                   var singlePostData = {};
@@ -30913,34 +30926,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   arraySingleRescheduleData['totalFare'] = totalFare;
                   arraySingleRescheduleData['oldSeats'] = oldSeats;
                 });
-                _this29.mainAllRescheduleData = arraySingleRescheduleData;
-                _this29.rescheduleData.dataDepartureCity = parseInt(_this29.mainAllRescheduleData[0].dataDepartureCity);
-                _this29.rescheduleData.rescheduleDate = _this29.mainAllRescheduleData[0].rescheduleDate;
-                _this29.rescheduleData.rescheduleSchedule = 0;
+                _this30.mainAllRescheduleData = arraySingleRescheduleData;
+                _this30.rescheduleData.dataDepartureCity = parseInt(_this30.mainAllRescheduleData[0].dataDepartureCity);
+                _this30.rescheduleData.rescheduleDate = _this30.mainAllRescheduleData[0].rescheduleDate;
+                _this30.rescheduleData.rescheduleSchedule = 0;
 
-                if (!(parseInt(_this29.rescheduleData.dataDepartureCity) == 0)) {
+                if (!(parseInt(_this30.rescheduleData.dataDepartureCity) == 0)) {
                   _context29.next = 14;
                   break;
                 }
 
-                _this29.rescheduleData.rescheduleDestinationCity = 0;
+                _this30.rescheduleData.rescheduleDestinationCity = 0;
                 _context29.next = 18;
                 break;
 
               case 14:
                 _context29.next = 16;
-                return _this29.callApi("post", "booking/getDestination", {
-                  id: _this29.mainAllRescheduleData[0].dataDepartureCity
+                return _this30.callApi("post", "booking/getDestination", {
+                  id: _this30.mainAllRescheduleData[0].dataDepartureCity
                 });
 
               case 16:
                 resReDepartureCity = _context29.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this29.rescheduleData.rescheduleDestinationCity = 0;
+                  _this30.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this29.rescheduleData.rescheduleDestinationCity = 0;
-                  _this29.reSpecificCities = resReDepartureCity.data;
+                  _this30.rescheduleData.rescheduleDestinationCity = 0;
+                  _this30.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 18:
@@ -30956,7 +30969,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // Reschedule model
     passDataToRescheduleModel: function passDataToRescheduleModel(data) {
-      var _this30 = this;
+      var _this31 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee30() {
         var resReDepartureCity;
@@ -30964,9 +30977,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context30.prev = _context30.next) {
               case 0:
-                _this30.mainAllRescheduleData = [];
-                _this30.reSpecificCities = [];
-                _this30.rescheduleData = {
+                _this31.mainAllRescheduleData = [];
+                _this31.reSpecificCities = [];
+                _this31.rescheduleData = {
                   rescheduleDate: data.date,
                   existingDate: data.date,
                   dataCustomer: data.customer_id,
@@ -30977,33 +30990,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dataSeatFare: data.seat_fare,
                   dataAll: data
                 };
-                _this30.mainAllRescheduleData[0] = _this30.rescheduleData;
-                _this30.mainAllRescheduleData.totalFare = _this30.rescheduleData.dataSeatFare;
-                _this30.mainAllRescheduleData.oldSeats = _this30.rescheduleData.dataSeat_no;
+                _this31.mainAllRescheduleData[0] = _this31.rescheduleData;
+                _this31.mainAllRescheduleData.totalFare = _this31.rescheduleData.dataSeatFare;
+                _this31.mainAllRescheduleData.oldSeats = _this31.rescheduleData.dataSeat_no;
 
-                if (!(parseInt(_this30.rescheduleData.dataDepartureCity) == 0)) {
+                if (!(parseInt(_this31.rescheduleData.dataDepartureCity) == 0)) {
                   _context30.next = 10;
                   break;
                 }
 
-                _this30.rescheduleData.rescheduleDestinationCity = 0;
+                _this31.rescheduleData.rescheduleDestinationCity = 0;
                 _context30.next = 14;
                 break;
 
               case 10:
                 _context30.next = 12;
-                return _this30.callApi("post", "booking/getDestination", {
-                  id: parseInt(_this30.rescheduleData.dataDepartureCity)
+                return _this31.callApi("post", "booking/getDestination", {
+                  id: parseInt(_this31.rescheduleData.dataDepartureCity)
                 });
 
               case 12:
                 resReDepartureCity = _context30.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this30.rescheduleData.rescheduleDestinationCity = 0;
+                  _this31.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this30.rescheduleData.rescheduleDestinationCity = 0;
-                  _this30.reSpecificCities = resReDepartureCity.data;
+                  _this31.rescheduleData.rescheduleDestinationCity = 0;
+                  _this31.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 14:
@@ -31018,7 +31031,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     dropScheduleData: function dropScheduleData() {
-      var _this31 = this;
+      var _this32 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee31() {
         var resDropSchedule;
@@ -31026,17 +31039,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context31.prev = _context31.next) {
               case 0:
-                _this31.dropScheduleButton = true;
+                _this32.dropScheduleButton = true;
                 _context31.next = 3;
-                return _this31.callApi("post", "booking/dropSchedule", _this31.dropScheduleFormData);
+                return _this32.callApi("post", "booking/dropSchedule", _this32.dropScheduleFormData);
 
               case 3:
                 resDropSchedule = _context31.sent;
 
                 if (resDropSchedule.status == 200) {
-                  _this31.dropScheduleButton = false;
+                  _this32.dropScheduleButton = false;
 
-                  _this31.busDropCheck();
+                  _this32.busDropCheck();
 
                   swal({
                     title: "Success",
@@ -31045,12 +31058,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this31.closeModal();
+                  _this32.closeModal();
                 }
 
                 if (resDropSchedule.status == 422) {
                   (function () {
-                    _this31.dropScheduleButton = false;
+                    _this32.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -31077,7 +31090,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     rescheduleSeats: function rescheduleSeats() {
-      var _this32 = this;
+      var _this33 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee32() {
         var resReschedule;
@@ -31085,24 +31098,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context32.prev = _context32.next) {
               case 0:
-                if (!(_this32.alreadyBookedSeat.length != _this32.mainAllRescheduleData.length)) {
+                if (!(_this33.alreadyBookedSeat.length != _this33.mainAllRescheduleData.length)) {
                   _context32.next = 4;
                   break;
                 }
 
-                _this32.alreadyBookedSeat = [];
+                _this33.alreadyBookedSeat = [];
 
-                _this32.fetchReScheduleData();
+                _this33.fetchReScheduleData();
 
                 return _context32.abrupt("return", swal({
                   title: "Oops",
-                  text: "Your Just Select " + _this32.mainAllRescheduleData.length + " for Reschedule",
+                  text: "Your Just Select " + _this33.mainAllRescheduleData.length + " for Reschedule",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 4:
-                if (!(parseInt(_this32.rescheduleData.dataDepartureCity) == 0)) {
+                if (!(parseInt(_this33.rescheduleData.dataDepartureCity) == 0)) {
                   _context32.next = 6;
                   break;
                 }
@@ -31115,7 +31128,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this32.rescheduleData.rescheduleDestinationCity == 0)) {
+                if (!(_this33.rescheduleData.rescheduleDestinationCity == 0)) {
                   _context32.next = 8;
                   break;
                 }
@@ -31128,7 +31141,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this32.rescheduleData.rescheduleDate == '' || typeof _this32.rescheduleData.rescheduleDate == 'undefined')) {
+                if (!(_this33.rescheduleData.rescheduleDate == '' || typeof _this33.rescheduleData.rescheduleDate == 'undefined')) {
                   _context32.next = 10;
                   break;
                 }
@@ -31141,7 +31154,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(_this32.rescheduleData.rescheduleSchedule == 0)) {
+                if (!(_this33.rescheduleData.rescheduleSchedule == 0)) {
                   _context32.next = 12;
                   break;
                 }
@@ -31154,31 +31167,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                _this32.mainAllRescheduleData.map(function (single, index) {
-                  single.selected_seatNo = _this32.alreadyBookedSeat[index];
-                  single.selected_seatClass = _this32.alreadyBookedSeatClass[index];
-                  single.selected_seatFare = _this32.alreadyBookedSeatFare[index];
-                  single.reason = _this32.rescheduleData.reason;
-                  single.rescheduleDate = _this32.rescheduleData.rescheduleDate;
-                  single.rescheduleType = _this32.rescheduleSeatType;
-                  single.overIssueReschedule = _this32.overIssueScheduleCheckBox;
-                  single.newDepartureTime = _this32.rescheduleData.rescheduleSchedule;
-                  single.rescheduleDiscount = _this32.rescheduleDiscount;
-                  single.dataDepartureCity = parseInt(_this32.rescheduleData.dataDepartureCity);
-                  single.dataDestination = _this32.rescheduleData.rescheduleDestinationCity;
+                _this33.mainAllRescheduleData.map(function (single, index) {
+                  single.selected_seatNo = _this33.alreadyBookedSeat[index];
+                  single.selected_seatClass = _this33.alreadyBookedSeatClass[index];
+                  single.selected_seatFare = _this33.alreadyBookedSeatFare[index];
+                  single.reason = _this33.rescheduleData.reason;
+                  single.rescheduleDate = _this33.rescheduleData.rescheduleDate;
+                  single.rescheduleType = _this33.rescheduleSeatType;
+                  single.overIssueReschedule = _this33.overIssueScheduleCheckBox;
+                  single.newDepartureTime = _this33.rescheduleData.rescheduleSchedule;
+                  single.rescheduleDiscount = _this33.rescheduleDiscount;
+                  single.dataDepartureCity = parseInt(_this33.rescheduleData.dataDepartureCity);
+                  single.dataDestination = _this33.rescheduleData.rescheduleDestinationCity;
                 });
 
-                _this32.loadingRescheduleButton = true;
+                _this33.loadingRescheduleButton = true;
                 _context32.next = 16;
-                return _this32.callApi("post", "booking/reschedule", {
-                  'data': _this32.mainAllRescheduleData
+                return _this33.callApi("post", "booking/reschedule", {
+                  'data': _this33.mainAllRescheduleData
                 });
 
               case 16:
                 resReschedule = _context32.sent;
 
                 if (resReschedule.status == 200) {
-                  _this32.loadingRescheduleButton = false;
+                  _this33.loadingRescheduleButton = false;
                   swal({
                     title: "Success",
                     text: "Seat Reschedule Successfully",
@@ -31186,15 +31199,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this32.fetchScheduleData();
+                  _this33.fetchScheduleData();
 
-                  _this32.fetchReScheduleData();
+                  _this33.fetchReScheduleData();
 
-                  _this32.closeModal();
+                  _this33.closeModal();
                 } else {
                   if (resReschedule.status == 422) {
                     (function () {
-                      _this32.loadingRescheduleButton = false;
+                      _this33.loadingRescheduleButton = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -31223,14 +31236,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // Duplicate Ticket
     duplicateTicket: function duplicateTicket(data) {
-      var _this33 = this;
+      var _this34 = this;
 
       this.ticketsId = data.id;
       setTimeout(function () {
         if (data.type == "booked") {
-          _this33.$refs.refDuplicateTicket.submit();
+          _this34.$refs.refDuplicateTicket.submit();
 
-          _this33.closeModal();
+          _this34.closeModal();
         } else {
           swal({
             title: "OOppss!!!",
@@ -31239,13 +31252,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             timer: 2000
           });
 
-          _this33.closeModal();
+          _this34.closeModal();
         }
       }, 700);
     },
     // Get Passengers list
     getCustomerList: function getCustomerList() {
-      var _this34 = this;
+      var _this35 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee33() {
         var resCheckedBus;
@@ -31253,7 +31266,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context33.prev = _context33.next) {
               case 0:
-                if (!(_this34.addForm.departureCity == 0)) {
+                if (!(_this35.addForm.departureCity == 0)) {
                   _context33.next = 2;
                   break;
                 }
@@ -31266,7 +31279,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this34.addForm.destinationCity == 0)) {
+                if (!(_this35.addForm.destinationCity == 0)) {
                   _context33.next = 4;
                   break;
                 }
@@ -31279,7 +31292,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (_this34.addForm.date) {
+                if (_this35.addForm.date) {
                   _context33.next = 6;
                   break;
                 }
@@ -31292,7 +31305,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this34.addForm.schedule == 0)) {
+                if (!(_this35.addForm.schedule == 0)) {
                   _context33.next = 8;
                   break;
                 }
@@ -31305,17 +31318,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!_this34.checkForSubmenuButtons('check-assigned-bus')) {
+                if (!_this35.checkForSubmenuButtons('check-assigned-bus')) {
                   _context33.next = 20;
                   break;
                 }
 
                 _context33.next = 11;
-                return _this34.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this34.addForm.schedule,
-                  date: _this34.addForm.date,
-                  departureCity: _this34.addForm.departureCity,
-                  destinationCity: _this34.addForm.destinationCity
+                return _this35.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this35.addForm.schedule,
+                  date: _this35.addForm.date,
+                  departureCity: _this35.addForm.departureCity,
+                  destinationCity: _this35.addForm.destinationCity
                 });
 
               case 11:
@@ -31326,7 +31339,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                _this34.$refs.refPassengerList.submit();
+                _this35.$refs.refPassengerList.submit();
 
                 _context33.next = 18;
                 break;
@@ -31349,7 +31362,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 20:
-                _this34.$refs.refPassengerList.submit();
+                _this35.$refs.refPassengerList.submit();
 
               case 21:
               case "end":
@@ -31361,7 +31374,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // Get Terminal Invoice
     getTerminalInvoice: function getTerminalInvoice() {
-      var _this35 = this;
+      var _this36 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee34() {
         var resCheckedBus;
@@ -31369,7 +31382,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context34.prev = _context34.next) {
               case 0:
-                if (!(_this35.addForm.departureCity == 0)) {
+                if (!(_this36.addForm.departureCity == 0)) {
                   _context34.next = 2;
                   break;
                 }
@@ -31382,7 +31395,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this35.addForm.destinationCity == 0)) {
+                if (!(_this36.addForm.destinationCity == 0)) {
                   _context34.next = 4;
                   break;
                 }
@@ -31395,7 +31408,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (_this35.addForm.date) {
+                if (_this36.addForm.date) {
                   _context34.next = 6;
                   break;
                 }
@@ -31408,7 +31421,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this35.addForm.schedule == 0)) {
+                if (!(_this36.addForm.schedule == 0)) {
                   _context34.next = 8;
                   break;
                 }
@@ -31421,7 +31434,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this35.addForm.terminalId == 0 && _this35.$store.state.user.terminal_id == null)) {
+                if (!(_this36.addForm.terminalId == 0 && _this36.$store.state.user.terminal_id == null)) {
                   _context34.next = 10;
                   break;
                 }
@@ -31434,17 +31447,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!_this35.checkForSubmenuButtons('check-assigned-bus')) {
+                if (!_this36.checkForSubmenuButtons('check-assigned-bus')) {
                   _context34.next = 22;
                   break;
                 }
 
                 _context34.next = 13;
-                return _this35.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this35.addForm.schedule,
-                  date: _this35.addForm.date,
-                  departureCity: _this35.addForm.departureCity,
-                  destinationCity: _this35.addForm.destinationCity
+                return _this36.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this36.addForm.schedule,
+                  date: _this36.addForm.date,
+                  departureCity: _this36.addForm.departureCity,
+                  destinationCity: _this36.addForm.destinationCity
                 });
 
               case 13:
@@ -31455,7 +31468,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                _this35.$refs.refTerminalInvoice.submit();
+                _this36.$refs.refTerminalInvoice.submit();
 
                 _context34.next = 20;
                 break;
@@ -31478,7 +31491,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 22:
-                _this35.$refs.refTerminalInvoice.submit();
+                _this36.$refs.refTerminalInvoice.submit();
 
               case 23:
               case "end":
@@ -31490,7 +31503,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // Get Bus Invoice
     getBusInvoice: function getBusInvoice() {
-      var _this36 = this;
+      var _this37 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee35() {
         var resCheckedBus;
@@ -31498,7 +31511,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context35.prev = _context35.next) {
               case 0:
-                if (!(_this36.addForm.departureCity == 0)) {
+                if (!(_this37.addForm.departureCity == 0)) {
                   _context35.next = 2;
                   break;
                 }
@@ -31511,7 +31524,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this36.addForm.destinationCity == 0)) {
+                if (!(_this37.addForm.destinationCity == 0)) {
                   _context35.next = 4;
                   break;
                 }
@@ -31524,7 +31537,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                if (_this36.addForm.date) {
+                if (_this37.addForm.date) {
                   _context35.next = 6;
                   break;
                 }
@@ -31537,7 +31550,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this36.addForm.schedule == 0)) {
+                if (!(_this37.addForm.schedule == 0)) {
                   _context35.next = 8;
                   break;
                 }
@@ -31550,17 +31563,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!_this36.checkForSubmenuButtons('check-assigned-bus')) {
+                if (!_this37.checkForSubmenuButtons('check-assigned-bus')) {
                   _context35.next = 20;
                   break;
                 }
 
                 _context35.next = 11;
-                return _this36.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this36.addForm.schedule,
-                  date: _this36.addForm.date,
-                  departureCity: _this36.addForm.departureCity,
-                  destinationCity: _this36.addForm.destinationCity
+                return _this37.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this37.addForm.schedule,
+                  date: _this37.addForm.date,
+                  departureCity: _this37.addForm.departureCity,
+                  destinationCity: _this37.addForm.destinationCity
                 });
 
               case 11:
@@ -31571,7 +31584,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   break;
                 }
 
-                _this36.$refs.refBusInvoice.submit();
+                _this37.$refs.refBusInvoice.submit();
 
                 _context35.next = 18;
                 break;
@@ -31594,7 +31607,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 20:
-                _this36.$refs.refBusInvoice.submit();
+                _this37.$refs.refBusInvoice.submit();
 
               case 21:
               case "end":

@@ -1537,27 +1537,29 @@ export default {
             self.dataForClose.hosts = selectedValues;
         });
         
-        
-        // departureCity
-        // const departureCity = $('#departureCity');
-        // departureCity.on('change', (e) => {
-        //     this.addForm.departureCity = e.target.value;
-        //     this.fetchSpecificSchedules();
-        //     this.getDestinationCity();
-        // });
-        // // destinationCity
-        // const destinationCity = $('#destinationCity');
-        // destinationCity.on('change', (e) => {
-        //     this.addForm.destinationCity = e.target.value;
-        //     this.fetchSpecificSchedules();
-        // });
-        // // scheduleName
-        // const scheduleName = $('#scheduleName');
-        // scheduleName.on('change', (e) => {
-        //     this.addForm.schedule = e.target.value;
-        //     this.fetchScheduleData();
-        //     this.busDropCheck();
-        // });
+        setTimeout(() => {
+            
+            // departureCity
+            const departureCity = $('#departureCity');
+            departureCity.on('change', (e) => {
+                this.addForm.departureCity = e.target.value;
+                this.fetchSpecificSchedules();
+                this.getDestinationCity();
+            });
+            // destinationCity
+            const destinationCity = $('#destinationCity');
+            destinationCity.on('change', (e) => {
+                this.addForm.destinationCity = e.target.value;
+                this.fetchSpecificSchedules();
+            });
+            // scheduleName
+            const scheduleName = $('#scheduleName');
+            scheduleName.on('change', (e) => {
+                this.addForm.schedule = e.target.value;
+                this.fetchScheduleData();
+                this.busDropCheck();
+            });
+        }, 500);
     },
     methods: {
         // modal close
@@ -1758,6 +1760,7 @@ export default {
                 } else {
                     this.addForm.destinationCity = 0;
                     this.specificCities = resDepartureCity.data;
+                    $('#destinationCity').select2();
                 }
             }
         },
@@ -2016,6 +2019,7 @@ export default {
                 this.cities = resCity.data;
                 this.terminals = resTerminals.data.terminals;
                 this.addForm.terminalId = resTerminals.data.authTerminalId;
+                $('#departureCity').select2();
             } else {
                 console.log(res);
             }
@@ -2044,6 +2048,7 @@ export default {
                 if (resFetchSchedule.length != 0) {
                     this.getSchedule = false;
                     this.allSchedules = resFetchSchedule.data;
+                    $('#scheduleName').select2();
                 } else {
                     this.addForm.schedule = 0;
                     this.showBookingDiv = false;
