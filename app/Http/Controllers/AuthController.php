@@ -36,6 +36,25 @@ class AuthController extends Controller
             ->where('read', true)
             ->first();
     }
+    
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            "currentPassword" => 'required',
+            "newPassword" => 'required',
+            "confirmPassword" => 'required|same:newPassword',
+        ]);
+
+        if(!Hash::check($request->currentPassword, Auth::user()->password))
+        {
+            return response()->json(["errors" => ["Error" => ['Current Password Not Matched']]], 422);
+        }
+
+        User::where("id",Auth::user()->id)->update([
+            "password" => Hash::make($request->newPassword)
+        ]);
+
+    }
 
     public function logout()
     {

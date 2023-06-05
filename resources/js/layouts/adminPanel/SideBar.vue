@@ -20,6 +20,12 @@
                         <i class="fa fa-building"></i> Company
                     </router-link>
                 </li>
+                <li class="dropdown toggled">
+                    <router-link class="nav-link text-capitalize" :to="{ name:'update-password' }"
+                                 :class="activeLink=='update-password'?'active':''" @click.native="activeLink('update-password')">
+                        <i class="fa fa-building"></i> Update Password
+                    </router-link>
+                </li>
             </ul>
         </aside>
     </div>

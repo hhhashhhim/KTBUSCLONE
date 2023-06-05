@@ -3,6 +3,7 @@ import {createWebHistory, createRouter} from "vue-router";
 import Users from "./pages/users/Users.vue";
 import Roles from "./pages/roles/Roles.vue";
 import Company from "./pages/company/Company.vue";
+import Updatepassword from "./pages/auth/UpdatePassword.vue";
 import Permissions from "./pages/roles/Permissions.vue";
 import Login from "./pages/auth/Login.vue";
 import Terminal from "./pages/terminal/Terminal.vue";
@@ -82,6 +83,11 @@ const routes = [
         path: url + "companies",
         component: Company,
         name: "company"
+    },
+    {
+        path: url + "update-password",
+        component: Updatepassword,
+        name: "update-password"
     },
     {
         path: url + "terminals",
