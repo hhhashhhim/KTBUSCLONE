@@ -9,20 +9,21 @@
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
                 <li class="dropdown">
+                <!-- :class="activeLink=='dashboard'?'active':''" @click.native="activeLink('dashboard')" -->
                     <router-link class="nav-link text-capitalize" :to="{ name:'admin-dashboard' }"
-                                 :class="activeLink=='dashboard'?'active':''" @click.native="activeLink('dashboard')">
+                                 >
                         <i class="fa fa-desktop"></i> Dashboard
                     </router-link>
                 </li>
                 <li class="dropdown toggled">
                     <router-link class="nav-link text-capitalize" :to="{ name:'company' }"
-                                 :class="activeLink=='company'?'active':''" @click.native="activeLink('company')">
+                                >
                         <i class="fa fa-building"></i> Company
                     </router-link>
                 </li>
                 <li class="dropdown toggled">
                     <router-link class="nav-link text-capitalize" :to="{ name:'update-password' }"
-                                 :class="activeLink=='update-password'?'active':''" @click.native="activeLink('update-password')">
+                                 >
                         <i class="fa fa-building"></i> Update Password
                     </router-link>
                 </li>
