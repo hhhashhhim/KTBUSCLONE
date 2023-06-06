@@ -33,11 +33,8 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
-
-
 </template>
 
 <script>
@@ -64,7 +61,6 @@ export default {
             this.data = {};
         },
         async add() {
-            console.log(this.data);
             this.validationErrors = []
             if (!this.data.currentPassword)
                 return swal({

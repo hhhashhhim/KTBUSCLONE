@@ -28034,11 +28034,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                console.log(_this.data);
                 _this.validationErrors = [];
 
                 if (_this.data.currentPassword) {
-                  _context.next = 4;
+                  _context.next = 3;
                   break;
                 }
 
@@ -28049,9 +28048,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 4:
+              case 3:
                 if (_this.data.newPassword) {
-                  _context.next = 6;
+                  _context.next = 5;
                   break;
                 }
 
@@ -28062,9 +28061,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 6:
+              case 5:
                 if (_this.data.confirmPassword) {
-                  _context.next = 8;
+                  _context.next = 7;
                   break;
                 }
 
@@ -28075,12 +28074,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 8:
+              case 7:
                 _this.loading = true;
-                _context.next = 11;
+                _context.next = 10;
                 return _this.callApi("post", 'password/update', _this.data);
 
-              case 11:
+              case 10:
                 res = _context.sent;
 
                 if (res.status == 200) {
@@ -28120,7 +28119,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 13:
+              case 12:
               case "end":
                 return _context.stop();
             }
