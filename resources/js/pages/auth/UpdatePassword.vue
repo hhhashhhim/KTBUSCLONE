@@ -11,17 +11,17 @@
                             <div class="row">
                                 <div class="form-group col-md-6">
                                     <label for="name">Current Password <span class="text-danger ml-1">*</span></label>
-                                    <input type="password" class="form-control" placeholder="Enter City Name" v-model="data.currentPassword">
+                                    <input type="password" class="form-control" placeholder="" v-model="data.currentPassword">
                                 </div>
                                 <div class="form-group col-md-6">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="name">New Password <span class="text-danger ml-1">*</span></label>
-                                    <input type="password" class="form-control" placeholder="Enter City Name" v-model="data.newPassword">
+                                    <input type="password" class="form-control" placeholder="" v-model="data.newPassword">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="name">Confirm Password <span class="text-danger ml-1">*</span></label>
-                                    <input type="password" class="form-control" placeholder="Enter City Name" v-model="data.confirmPassword">
+                                    <input type="password" class="form-control" placeholder="" v-model="data.confirmPassword">
                                 </div>
                                 <div class="col-md-6">
                                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
