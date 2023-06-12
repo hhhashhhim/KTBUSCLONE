@@ -380,7 +380,7 @@ class BookingController extends Controller
             return "Date is Required";
         }
 
-        $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date])->get();
+        $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])->get();
         foreach ($allSchedules as $single) {
             $sub = 0;
             if (Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id) {
