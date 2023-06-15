@@ -59,8 +59,7 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <div class="form-group">
-                                                            <label for="toDate">To Date <span
-                                                                class="text-danger ml-1">*</span></label>
+                                                            <label for="toDate">To Date</label>
                                                             <input type="date" id="toDate" class="form-control"
                                                                    name="toDate"
                                                                    :max="maxDateFilterReport()">

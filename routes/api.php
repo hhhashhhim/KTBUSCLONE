@@ -32,4 +32,6 @@ use Illuminate\Support\Facades\Route;
 //
 Route::group(['prefix'=>'booking','middleware',[CustomMiddleware::class]],function(){
    Route::post('/schedule/available',[BookingApiController::class,'availableSchedules']);
+   Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
+   Route::post('/new',[BookingApiController::class,'bookSeat']);
 });

@@ -737,7 +737,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name']??"N/A";
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
@@ -753,7 +753,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
                             $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
                             $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
-                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['addedBy']['name'];
+                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['addedBy']['name']??'N/A';
                             $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
                             $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
                             $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;

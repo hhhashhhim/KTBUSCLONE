@@ -54659,9 +54659,7 @@ var _hoisted_33 = {
 
 var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "toDate"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("To Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+}, "To Date", -1
 /* HOISTED */
 );
 
@@ -82791,9 +82789,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
