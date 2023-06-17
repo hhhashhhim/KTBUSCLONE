@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ValidationResource;
+use App\Http\Resources\ConflictResource;
 use App\Http\Resources\CreatedResource;
 use App\Models\Discount\Discount;
 use App\Models\Surcharge\Surcharge;
@@ -321,11 +322,27 @@ class BookingApiController extends Controller
                     ->where('company_id', $request->company_id)
                     ->first();
                 $existingTicket = Ticket::where(['company_id' => $request->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id']);
+                
                 $allTicket = [];
                 if (isset($request->flag) && $request->flag == 1) {
+                    // checking only reserved seats will go through this process
+                    $checkAlreadyBooked = Ticket::whereIn("id",$request->advance_booked_ids)->where(['company_id' => $request->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id,"type" => "advance booking"])->get();
+                    if($checkAlreadyBooked->count() != count($request->advance_booked_ids))
+                    {
+                        $error = ["Some of your seat combinations are not reserved for confirm booking"];
+                        return new ConflictResource($error);
+                    }
                     $allTicket[] = updateAdvancedSeat($request, $request->company_id);
                 } else {
-                    
+
+                    // checking booking available with these seat selection
+                    $checkAlreadyBooked = Ticket::whereIn("seat_no",$request->selected_seats)->where(['company_id' => $request->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
+                    if($checkAlreadyBooked->count() > 0)
+                    {
+                        $error = ["One seat of your combination already booked"];
+                        return new ConflictResource($error);
+                    }
+
                     $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $request->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                     $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                     $destination_city_id = $schedule->route->fares->last()->destination_city_id;
