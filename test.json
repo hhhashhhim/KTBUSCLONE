@@ -150,6 +150,10 @@
                 "allow": true
             },
             {
+                "name": "schedule-drop",
+                "allow": true
+            },
+            {
                 "name": "close-trip",
                 "allow": true
             },
@@ -308,6 +312,10 @@
                 "allow": true,
                 "buttons":
                 [
+                    {
+                        "name": "previous-date",
+                        "allow": true
+                    },
                     {
                         "name": "assign-bus",
                         "allow": true

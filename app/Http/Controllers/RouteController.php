@@ -67,6 +67,7 @@ class RouteController extends Controller
             }
             $route = Route::create([
                 'name' => $request['routeStart'] . '-' . $request['routeEnd'],
+                'via' => $request['routeVia'],
                 'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
             ]);
@@ -99,6 +100,7 @@ class RouteController extends Controller
                 // Reverse Route
                 $route = Route::create([
                     'name' => $request['routeEnd'] . '-' . $request['routeStart'],
+                    'via' => $request['routeVia'],
                     'company_id' => Auth::user()->company_id,
                     'added_by' => auth()->user()->id
                 ]);
@@ -150,6 +152,7 @@ class RouteController extends Controller
                     'id' => $request->id,
                 ])->update([
                     'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
+                    'via' => $request['routeVia'],
                 ]);
                 DB::commit();
                 return ['message' => 'success'];

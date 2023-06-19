@@ -50,7 +50,7 @@
                                                     <div class="form-group mb-0">
                                                         <label for="date" class="mb-0">Date <span
                                                             class="text-danger ml-1">*</span></label>
-                                                        <input type="date" :min="minDateFilter()" class="form-control"
+                                                        <input type="date" :min="checkForSubmenuButtons('previous-date') ? '' : minDateFilter()" class="form-control"
                                                                id="dynamicDate"
                                                                v-model="addForm.date"
                                                                @change="fetchSpecificSchedules()"/>

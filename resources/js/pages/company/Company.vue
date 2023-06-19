@@ -432,6 +432,10 @@ export default {
                             allow: true,
                         },
                         {
+                            name: "schedule-drop",
+                            allow: true,
+                        },
+                        {
                             name: "close-trip",
                             allow: true,
                         },
@@ -533,6 +537,7 @@ export default {
                             name: "bookings",
                             allow: true,
                             buttons: [
+                                {name: "previous-date", allow: true},
                                 {name: "assign-bus", allow: true},
                                 {name: "terminal-invoice", allow: true},
                                 {name: "terminal-id", allow: true},

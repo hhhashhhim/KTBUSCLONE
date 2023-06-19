@@ -54,6 +54,7 @@
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
+                                                        <th>Via</th>
                                                         <th>Added By</th>
                                                         <th v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">Action</th>
                                                     </tr>
@@ -62,6 +63,7 @@
                                                     <tr v-for="(route, i) in routes" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ route.name }}</td>
+                                                        <td>{{ route.via??'N/A' }}</td>
                                                         <td>{{ route.added_by.name }}</td>
                                                         <td v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">
                                                             <button title="Show Route Details" v-if="checkForSubmenuButtons('details-routes')"
@@ -105,14 +107,18 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeStartName"/>
                     </div>
 
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="name">Via</label>
+                        <input type="text" class="form-control" v-model="routeVia"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="col-md-6">
@@ -215,14 +221,19 @@
                 :editForm="editFormID"
             >
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeStartName"/>
                     </div>
 
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeEndName"/>
+                    </div>
+                    
+                    <div class="form-group col-md-4">
+                        <label for="name">Via</label>
+                        <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
                     </div>
                 </div>
 
@@ -277,6 +288,7 @@ export default {
             icon: ' <i class="fa fa-bus"></i> ',
             loop: 1,
             routeStartName: '',
+            routeVia: '',
             routeEndName: '',
             reverseRoute: 1,
             routeDetails: [],
@@ -318,6 +330,7 @@ export default {
                 id: route.id,
                 routeStartName: route.name.split('-')[0],
                 routeEndName: route.name.split('-')[1],
+                routeVia: route.via,
             }
         },
         async addRoute() {
@@ -341,6 +354,7 @@ export default {
             const data = {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
+                routeVia: this.routeVia,
                 cities: this.addCities,
                 revereRoute: this.reverseRoute,
                 terminals: this.addTerminalsOnClick
@@ -359,6 +373,7 @@ export default {
                 $('#route_table').DataTable().destroy();
                 this.routeStartName = "";
                 this.routeEndName = "";
+                this.routeVia = "";
                 this.loop = 1;
                 this.addCities = 0;
                 this.cities = 0;

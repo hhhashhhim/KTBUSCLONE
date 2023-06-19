@@ -261,7 +261,7 @@
                             >
                                 <option value="0" selected>Select Route</option>
                                 <option v-for="(route, i) in routes" :value="route.id" :key="i">
-                                    {{ route.name }}
+                                    {{ route.name }} {{route.via ? '(via  '+route.via+' )' : ''}}
                                 </option>
                             </select>
                         </div>
@@ -583,7 +583,7 @@
                                 :value="route.id"
                                 :key="i"
                             >
-                                {{ route.name }}
+                                {{ route.name }} {{route.via ? '(via  '+route.via+' )' : ''}}
                             </option>
                         </select>
                     </div>

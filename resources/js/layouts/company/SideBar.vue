@@ -85,6 +85,11 @@
                                 <i class="fa fa-landmark"></i> Advance Sales Report
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('schedule-drop')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'schedule-drop-report' }">
+                                <i class="fa fa-landmark"></i> Schedule Drop Report
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('close-trip')">
                             <router-link class="nav-link text-capitalize" :to="{ name : 'summery-report'}">
                                 <i class="fas fa-clock"></i> Closed Trip Report

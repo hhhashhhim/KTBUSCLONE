@@ -81,6 +81,8 @@ require_once('web/card/loyaltyCard.php');
 require_once('web/card/loyaltyCardAssign.php');
 // Reports Header Routes
 require_once('web/reports/reportsHeader.php');
+// Reports Schedule Drop
+require_once('web/reports/scheduleDropReport.php');
 // Reports Routes
 require_once('web/reports/reports.php');
 // Reports Advance sale Routes
