@@ -90,6 +90,12 @@
                                                                     class="btn btn-primary mr-1 btn-sm"><i
                                                                 class="far fa-edit"></i>
                                                             </button>
+                                                            <button class="btn btn-success btn-sm mr-1"
+                                                                    v-if="checkForSubmenuButtons('update-time')"
+                                                                    @click="editTime(schedule)"
+                                                                    data-target="#editTimeModal" data-toggle="modal"
+                                                                    title="Edit Time"><i
+                                                                class="fas fa-clock"></i></button>
 
                                                             <!--                                                            <button style="display:none;" title="Delete Schedule"-->
                                                             <!--                                                                    v-if="checkForSubmenuButtons('delete-schedule')"-->
@@ -144,6 +150,58 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-primary" @click="extendedDate()" :disabled="loading">
                                 {{ loading ? 'Loading... ' : 'Extend Schedule' }}
+                            </button>
+                            <button type="button" @click="close()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- edit time -->
+            <div class="modal fade" id="editTimeModal" tabindex="-1" aria-labelledby="addDaysModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content ">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addDaysModalLabel">Edit Time</h5>
+                            <button type="button" class="close" @click="close()" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12 class form-group">
+                                    <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="date"
+                                        id="start"
+                                        class="form-control"
+                                        v-model="dataEditTime.start_date"
+                                        
+                                    />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 class form-group">
+                                    <label for="end">End Date <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="date"
+                                        id="end"
+                                        class="form-control"
+                                        v-model="dataEditTime.end_date"
+                                        
+                                    />
+                                </div>
+                                <div class="col-md-12 class form-group">
+                                    <label for="time">Time<span class="text-danger ml-1">*</span></label>
+                                    <input type="number" id="time" class="form-control" v-model="dataEditTime.time"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" @click="updateScheduleTime()" :disabled="loading">
+                                {{ loading ? 'Loading... ' : 'Update Time' }}
                             </button>
                             <button type="button" @click="close()" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
@@ -504,7 +562,7 @@
                             v-model="dataEdit.schedules.name"
                         />
                     </div>
-                    <div class="col-md-6 class form-group">
+                    <!-- <div class="col-md-6 class form-group">
                         <label for="start">Start Date <span class="text-danger ml-1">*</span></label>
                         <input
                             type="date"
@@ -513,9 +571,9 @@
                             v-model="dataEdit.schedules.start_date"
                             disabled
                         />
-                    </div>
+                    </div> -->
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-6 class form-group">
                         <label for="end">End Date <span class="text-danger ml-1">*</span></label>
                         <input
@@ -531,7 +589,7 @@
                         <input type="time" id="time" class="form-control" v-model="dataEdit.schedules.time"
                         />
                     </div>
-                </div>
+                </div> -->
                 <div class="row">
                     <div class="col-md-6 class form-group">
                         <label for="surcharge">Surcharge</label>
@@ -570,7 +628,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-8 class form-group">
+                    <div class="col-md-6 class form-group">
                         <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
                         <select
                             class="form-control"
@@ -587,7 +645,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="col-md-4 class form-group">
+                    <div class="col-md-6 class form-group">
                         <label for="busClassEdit">Bus Class <span class="text-danger ml-1">*</span></label>
                         <select
                             class="form-control"
@@ -740,6 +798,12 @@ export default {
                 cities: [],
                 terminals: [],
                 compare_array: [],
+            },
+            dataEditTime: {
+                start_date: "",
+                end_date: "",
+                time: "",
+                schedule_id: "",
             },
             dataPreview: {},
         };
@@ -1194,6 +1258,66 @@ export default {
                 }
             }
         },
+        
+        async updateScheduleTime() {
+            if (this.dataEditTime.start_date == "" || typeof this.dataEditTime.start_date == "undefined")
+                return swal({
+                    title: "Required!",
+                    text: "Start Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEditTime.end_date == "" || typeof this.dataEditTime.end_date == "undefined")
+                return swal({
+                    title: "Required!",
+                    text: "End Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEditTime.time == "" || typeof this.dataEditTime.time == "undefined")
+                return swal({
+                    title: "Required!",
+                    text: "Schedule Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loading = true;
+            const resEdit = await this.callApi("post", "schedule/time/update", this.dataEditTime);
+            if (resEdit.status == 200) {
+                $(`#${this.editFormID}`).modal('hide');
+                swal({
+                    title: "Success",
+                    text: "Schedule Updated Successfully",
+                    icon: "success",
+                    timer: 4000
+                });
+                $("#schedule_table").DataTable().destroy();
+                this.loading = false;
+                this.fetchSchedule();
+            } else {
+                if (resEdit.status == 422) {
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in resEdit.data.errors) {
+                        resEdit.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
 
         async edit(schedule) {
             const resEditSchedule = await this.callApi("post", "schedule/edit", {id: schedule.id});
@@ -1203,6 +1327,10 @@ export default {
                 this.dataEdit.cities = resEditSchedule.data.compare;
             }
             $(`#${this.editFormID}`).modal('show');
+        },
+        
+        async editTime(schedule) {
+            this.dataEditTime.schedule_id = schedule.id
         },
 
         async genericData() {

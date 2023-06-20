@@ -9,6 +9,7 @@ Route::group(['prefix' => 'schedule', [CustomMiddleware::class]], function () {
     Route::post('/store', [ScheduleController::class, 'storeSchedule']);
     Route::post('/edit', [ScheduleController::class, 'editSchedule']);
     Route::post('/update', [ScheduleController::class, 'updateSchedule']);
+    Route::post('/time/update', [ScheduleController::class, 'updateScheduleTime']);
     Route::post('/delete', [ScheduleController::class, 'deleteSchedule']);
     Route::post('/getRoute', [ScheduleController::class, 'getRoutes']);
     Route::post('/getCity', [ScheduleController::class, 'getCity']);

@@ -79,6 +79,7 @@ class ScheduleController extends Controller
                     'end_date' => $request->EndDate,
                     'route_id' => $request->route,
                     'time' => $request->time,
+                    'updated_time' => $request->time,
                     'surcharge_id' => $request->surcharge,
                     'discount_id' => $request->discount,
                     'bus_class_id' => $request->busClass,
@@ -172,6 +173,40 @@ class ScheduleController extends Controller
         ];
     }
 
+    public function updateScheduleTime(Request $request)
+    {
+        try {
+                DB::beginTransaction();
+                $rules = [
+                    'start_date' => 'required',
+                    'end_date' => 'required',
+                    'time' => 'required',
+                ];
+
+                $customMessages = [
+                    'start_date.required' => 'Start Date is Required',
+                    'end_date.required' => 'End Date is Required',
+                    'time.required' => 'time is Required',
+                ];
+                $this->validate($request, $rules, $customMessages);
+
+                $detail = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])->whereBetween("schedule_date",[$request->start_date,$request->end_date])->get();
+                foreach($detail as $single)
+                {
+                    $updatedTime = date("Y-m-d H:i:s",strtotime(($single->departure_date.' '.$single->departure_time)) + ($request->time*60));
+                    $single->update([
+                        "departure_date" => date("Y-m-d",strtotime($updatedTime)),
+                        "departure_time" => date("H:i:s",strtotime($updatedTime)),
+                    ]);  
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
+        
+    }
     public function updateSchedule(Request $request)
     {
         try {
@@ -182,7 +217,6 @@ class ScheduleController extends Controller
                     'name' => $req['name'],
                     'start_date' => $req['start_date'],
                     'end_date' => $req['end_date'],
-                    'time' => $req['time'],
                     'surcharge_id' => $req['surcharge_id'],
                     'discount_id' => $req['discount_id'],
                     'updated_by' => Auth::user()->id,

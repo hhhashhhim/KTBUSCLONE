@@ -485,6 +485,7 @@ export default {
                             name: "schedules",
                             allow: true,
                             buttons: [
+                                {name: "update-time", allow: true},
                                 {name: "add-schedule", allow: true},
                                 {name: "edit-schedule", allow: true},
                                 {name: "extend-schedule", allow: true},

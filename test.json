@@ -224,6 +224,10 @@
                 "allow": true,
                 "buttons": [
                     {
+                        "name": "update-time",
+                        "allow": true
+                    },
+                    {
                         "name": "add-schedule",
                         "allow": true
                     },
