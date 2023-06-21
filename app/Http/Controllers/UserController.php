@@ -13,13 +13,33 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index(): array
+    public function index(Request $request)
     {
-        $users = User::with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->latest('id')->get();
+        
+        $users = User::
+            with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')
+            ->where(function($q) use ($request){
+                if($request->name)
+                {
+                    $q->where("name",'like','%'.$request->name.'%');
+                }
+                if($request->terminal)
+                {
+                    $q->where("terminal_id",$request->terminal);
+                }
+                if ($request->role) {
+                    $q->where("role_id",$request->role);
+                }
+            })
+            ->where('company_id', Auth::user()->company_id)
+            ->latest('id')
+            ->get();
+        
         foreach ($users as $user) {
             $user->name = ucfirst($user->name);
         }
-        return ['users' => $users,
+        return [
+            'users' => $users,
             'authCheck' => is_null(Auth::user()->terminal_id) ? 0 : Auth::user()->terminal_id
         ];
     }

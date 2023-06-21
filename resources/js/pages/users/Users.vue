@@ -25,6 +25,37 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="row px-2 mb-4">
+                                <div class="col-md-4">
+                                    <label for="fromDate">Name</label>
+                                    <input type="text" class="form-control" name="name"
+                                            v-model="filterData.name" @keyup="fetchUsers()" readonly onfocus="this.removeAttribute('readonly');" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="terminalFilter">Select Terminal</label>
+                                    <select id="terminalFilter" class="form-control"
+                                            v-model="filterData.terminal"
+                                            @change="fetchUsers()">
+                                        <option value="">Select Terminal</option>
+                                        <option v-for="(item, i) in terminals" :key="i"
+                                                :value="item.id">
+                                            {{ item.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="routeFilter">Select Role</label>
+                                    <select id="routeFilter" class="form-control"
+                                            v-model="filterData.role"
+                                            @change="fetchUsers()">
+                                        <option value="">Select Role</option>
+                                        <option v-for="(role, i) in roles" :key="i"
+                                                :value="role.id">
+                                            {{ role.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -449,6 +480,11 @@ export default {
             editFormID: 'edit_user_form',
             roleName: '',
             updateTerminal: 0,
+            filterData: {
+                name : "",
+                terminal : "",
+                role : "",
+            },
             data: {
                 name: "",
                 email: "",
@@ -555,7 +591,7 @@ export default {
         },
 
         async fetchUsers() {
-            const userRes = await this.callApi("post", "user");
+            const userRes = await this.callApi("post", "user",this.filterData);
             const resCities = await this.callApi("post", "user/cities");
             if (userRes.status == 200 && resCities.status == 200) {
                 this.users = userRes.data.users;
@@ -580,9 +616,9 @@ export default {
             } else {
                 console.log(resDepart);
             }
-            setTimeout(() => {
-                $("#users_table").DataTable();
-            }, 300);
+            // setTimeout(() => {
+            //     $("#users_table").DataTable();
+            // }, 300);
         },
 
         async add() {

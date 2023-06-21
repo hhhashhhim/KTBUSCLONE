@@ -67,7 +67,7 @@ class ExpenseCategoryController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->where("first_level_id",5)->where("second_level_id",18)->whereNull('deleted_at'),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->where("first_level_id",5)->where("second_level_id",18)->whereNull('deleted_at')->ignore($request->id),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
 
                 ];
 

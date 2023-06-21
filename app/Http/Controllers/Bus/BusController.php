@@ -75,7 +75,7 @@ class BusController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'bus_number' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'bus_number' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
                     'fare_class_id' => 'required|integer',
                 ];
 

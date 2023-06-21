@@ -69,7 +69,7 @@ class DesignationController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'name' => ['required', Rule::unique('designations', 'name')->where('department_id', $request->department_id)->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
                 ];
 
                 $customMessages = [

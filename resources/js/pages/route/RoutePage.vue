@@ -208,6 +208,7 @@
                             </table>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" @click="printPrice()">Print</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                         </div>
                     </div>
@@ -243,6 +244,14 @@
                     </button>
                 </template>
             </Edit>
+            
+            <!--Daily Summery Report Form-->
+            <form :action="$store.state.app_url + 'fare-table/fare/print'" method="POST"
+                  ref="farePrint"
+                  target="_blank">
+                <input type="hidden" name="_token" v-bind:value="csrf">
+                <input type="hidden" name="route_id" :value="this.route_id">
+            </form>
 
             <!-- Add Modal -->
             <Delete confirmationMessage='Are You Sure You want To Delete This "Route" ???'
@@ -266,6 +275,7 @@ export default {
     },
     data() {
         return {
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             loading: false,
             editLoading: false,
             cities: [],
@@ -279,6 +289,7 @@ export default {
             routes: [],
             formID: "route_form",
             editFormID: 'edit_route_form',
+            route_id: "",
             data: {},
             dataEdit: {},
             from: {},
@@ -511,6 +522,8 @@ export default {
         },
         async fetchRouteDetails(id) {
 
+            this.route_id = id ;
+
             const routeDetailRes = await this.callApi("post", "routes/details", {
                 id: id
             });
@@ -519,7 +532,10 @@ export default {
                 this.th = routeDetailRes.data.th;
             }
         },
-
+        printPrice()
+        {
+            this.$refs.farePrint.submit();
+        },
         deleteModal(terminal, i) {
             const deletingObj = {
                 url: "terminal/delete",

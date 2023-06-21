@@ -23,9 +23,29 @@ use Illuminate\Support\Facades\Log;
 
 class ScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Schedule::with('fare_class', 'route', 'bus_class', 'addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        $schedules = Schedule::
+            with('fare_class', 'route', 'bus_class', 'addedBy')
+            ->where(function($q) use ($request){
+                if($request->bus_class)
+                {
+                    $q->where("bus_class_id",$request->bus_class);
+                }
+                if($request->route)
+                {
+                    $q->where("route_id",$request->route);
+                }
+                if ($request->departure_date) {
+                    $q->whereDate("start_date", "<=", $request->departure_date)
+                      ->whereDate("end_date", ">=", $request->departure_date);
+                }
+            })
+            ->where('company_id', Auth::user()->company_id)
+            ->orderBy('id')
+            ->get();
+
+        return $schedules;
     }
 
     public function storeSchedule(Request $request)

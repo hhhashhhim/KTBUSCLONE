@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use Illuminate\Http\Request;
+use App\Models\Route\RouteFare;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdateSchedulesTime;
@@ -135,6 +136,27 @@ class FareTableController extends Controller
                 Log::error('Database transaction error: ' . $e->getMessage());
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
+    }
+
+    public function farePrint(Request $request)
+    {
+        $routeFareCities = RouteFare::where('route_id', $request->route_id)->where('company_id', Auth::user()->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
+        $data = [];
+        foreach ($routeFareCities as $cities) {
+            foreach ($cities as $city) {
+                $data[$city[0]->city_from->name][$city[0]->city_to->name]['departure_city'] = $city[0]->city_from->name;
+                $data[$city[0]->city_from->name][$city[0]->city_to->name]['destination_city'] = $city[0]->city_to->name;
+                foreach ($city as $fare) {
+                    $data[$city[0]->city_from->name][$city[0]->city_to->name][$fare->fare_details->class->name] = $fare->fare_details->class->name . '---';
+                    $data[$city[0]->city_from->name][$city[0]->city_to->name][$fare->fare_details->class->name . '_fare'] = $fare->fare_details->fare;
+                }
+            }
+        }
+        
+        return view('reports.farePrintReport', [
+            'data' => $data,
+            'th' => FareClass::where('company_id', Auth::user()->company_id)->orderBY('name', 'ASC')->get(),
+        ]);
     }
 
     public function getDays($start, $end)

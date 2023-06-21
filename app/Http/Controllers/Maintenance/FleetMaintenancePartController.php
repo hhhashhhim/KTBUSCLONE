@@ -64,7 +64,7 @@ class FleetMaintenancePartController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'name' => ['required', Rule::unique('fleet_maintenance_parts', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
 
                 ];
 

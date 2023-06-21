@@ -64,7 +64,7 @@ class DepartmentController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')],
+                    'name' => ['required', Rule::unique('departments', 'name')->where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal_id)->whereNull('deleted_at')->ignore($request->id)],
 
                 ];
 

@@ -53,7 +53,7 @@ class CityController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                    'name' => ['required', 'alpha', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
                 ];
 
                 $customMessages = [

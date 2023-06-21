@@ -19,7 +19,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <transition name="fade">
+                            <!-- <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
                                     role="alert"
@@ -37,8 +37,39 @@
                                     </button>
                                     Please Enter All Required Fields !!!
                                 </div>
-                            </transition>
+                            </transition> -->
                             <!-- Table -->
+                            <div class="row px-2 mb-4">
+                                <div class="col-md-4">
+                                    <label for="terminalFilter">Bus Class</label>
+                                    <select id="terminalFilter" class="form-control"
+                                            v-model="filterData.bus_class"
+                                            @change="fetchSchedule()">
+                                        <option value="">Select Bus Class</option>
+                                        <option v-for="(item, i) in busClasses" :key="i"
+                                                :value="item.id">
+                                            {{ item.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="routeFilter">Routes</label>
+                                    <select id="routeFilter" class="form-control"
+                                            v-model="filterData.route"
+                                            @change="fetchSchedule()">
+                                        <option value="">Select Route</option>
+                                        <option v-for="(route, i) in routes" :key="i"
+                                                :value="route.id">
+                                            {{ route.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="fromDate">Departure Date</label>
+                                    <input id="fromDate" type="date" class="form-control"
+                                            v-model="filterData.departure_date" @change="fetchSchedule()">
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
@@ -781,6 +812,11 @@ export default {
             extendDate: "",
             activeSection: 0,
             editActiveSection: 0,
+            filterData:{
+                bus_class: "",
+                route: "",
+                departure_date: ""
+            },
             data: {
                 name: "",
                 StartDate: "",
@@ -878,15 +914,19 @@ export default {
         },
         async fetchSchedule() {
 
-            const res = await this.callApi("post", "schedule");
+            const res = await this.callApi("post", "schedule",this.filterData);
             if (res.status == 200) {
                 this.schedules = res.data;
             } else {
                 console.log(res);
             }
-            setTimeout(() => {
-                $('#schedule_table').DataTable();
-            }, 300);
+            // setTimeout(() => {
+            //     $('#schedule_table').DataTable({
+            //         language: {
+            //             info: '' // Set the 'info' language option to an empty string to hide the line
+            //         }
+            //     });
+            // }, 300);
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
 
