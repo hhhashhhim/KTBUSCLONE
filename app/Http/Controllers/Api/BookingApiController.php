@@ -321,7 +321,7 @@ class BookingApiController extends Controller
                     ->where('departure_date', $request->date)
                     ->where('company_id', $request->company_id)
                     ->first();
-                $existingTicket = Ticket::where(['company_id' => $request->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id']);
+                $existingTicket = Ticket::where(['company_id' => $request->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
                 
                 $allTicket = [];
                 if (isset($request->flag) && $request->flag == 1) {
@@ -403,6 +403,7 @@ class BookingApiController extends Controller
                             'customer_id' => $customer->id,
                             'schedule_id' => $schedule->id,
                             'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
+                            'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                             'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
                             'schedule_details_id' => $scheduleDetail->id,
                             'terminal_id' => $request->terminal_id,

@@ -45,11 +45,53 @@ class ScheduleClosingController extends Controller
 
     public function merges()
     {
-        $merges = TicketClosingMerge::
-        where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
+        $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
             ->with("bus:id,bus_number")
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
-            ->get();
+            ->with("tickets:id,ticket_merge_id,seat_fare,discount","tickets.elt:id,ticket_id,elt_price")
+            ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
+
+        // this is for show sale at front
+        $merges->map(function($single){
+            
+            $single->seat_fare = $single->tickets->sum("seat_fare");
+            $single->discount = $single->tickets->sum("discount");
+
+            // elt amount
+            $eltAmount = 0;
+            foreach($single->tickets as $ticket)
+            {
+                if($ticket->elt)
+                {
+                    $eltAmount += $ticket->elt->elt_price;
+                }
+            }
+            $single->elt += $eltAmount;
+
+            // for add cancelation charges into the sale
+            $cancelTicket = Ticket::
+                onlyTrashed()
+                ->where([
+                    'company_id' => Auth::user()->company_id,
+                    'ticket_merge_id' => $single->id,
+                    'type' => "canceled",
+                ])
+                ->with("cancel_ticket:id,ticket_id,percentage")
+                ->get(["id","seat_fare","discount"]);
+
+        
+            $refundAmount = 0;
+            $cancelTicket->map(function($item) use (&$refundAmount){
+                if($item->cancel_ticket)
+                {
+                    $refundAmount += (($item->seat_fare - $item->discount) / 100) * $item->cancel_ticket->percentage;
+                }
+            });
+
+            $single->refund += $refundAmount;
+            
+        });
+        
         $data = [
             "merges" => $merges,
         ];

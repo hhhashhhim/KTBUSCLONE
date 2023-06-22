@@ -12,6 +12,7 @@ use App\Models\Route\Route;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\User;
+use App\Models\Ticket;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -37,4 +38,8 @@ class TicketClosingMerge extends Model
         return $this->hasMany( TicketClosing::class, 'ticket_merge_id', 'id' );
     }
 
+    public function tickets()
+    {
+        return $this->hasMany( Ticket::class, 'ticket_merge_id', 'id' );
+    }
 }

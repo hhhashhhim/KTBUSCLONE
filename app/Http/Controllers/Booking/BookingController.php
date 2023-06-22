@@ -82,7 +82,7 @@ class BookingController extends Controller
                 ->where('departure_date', $request->date)
                 ->where('company_id', Auth::user()->company_id)
                 ->first();
-            $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id']);
+            $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
             $allTicket = [];
             if (isset($request->flag) && $request->flag == 1) {
                 $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
@@ -187,6 +187,7 @@ class BookingController extends Controller
                         'customer_id' => $customer->id,
                         'schedule_id' => $schedule->id,
                         'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
+                        'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                         'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
                         'schedule_details_id' => $scheduleDetail->id,
                         'terminal_id' => $request->terminalId ?? Auth::user()->terminal_id,
@@ -1181,6 +1182,26 @@ class BookingController extends Controller
             ->select("tickets.*", "ticket_e_l_t_s.elt_price")
             ->get()->groupBy(["terminal_id", "destination_city_id"]);
 
+        // for add cancelation charges into the bus invoice paid by customer
+        $cancelTicket = Ticket::
+            onlyTrashed()
+            ->where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->schedule_id,
+                'schedule_date' => $uniqueDate,
+                'type' => "canceled",
+            ])
+            ->with("cancel_ticket:id,ticket_id,percentage")
+            ->get(["id","seat_fare","discount"]);
+
+        $refundAmount = 0;
+        $cancelTicket->map(function($single) use (&$refundAmount){
+            if($single->cancel_ticket)
+            {
+                $refundAmount += (($single->seat_fare - $single->discount) / 100) * $single->cancel_ticket->percentage;
+            }
+        });
+        
         $busData = TicketClosing::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -1190,7 +1211,7 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData]);
+        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundAmount" => $refundAmount]);
     }
 
     public

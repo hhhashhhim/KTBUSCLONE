@@ -31,6 +31,7 @@
                                                         <th>Departure Date</th>
                                                         <th>Return Date</th>
                                                         <th>Return Schedule</th>
+                                                        <th>Merge Sale</th>
                                                         <th v-if="checkForSubmenuButtons('add-expense')">Expense</th>
                                                     </tr>
                                                     </thead>
@@ -50,6 +51,9 @@
                                                         </td>
                                                         <td class="bg-dark-gray">
                                                             {{ merge.schedule_return_date }}
+                                                        </td>
+                                                        <td class="bg-danger">
+                                                            {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) }}
                                                         </td>
                                                         <td v-if="checkForSubmenuButtons('add-expense')">
                                                             <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"

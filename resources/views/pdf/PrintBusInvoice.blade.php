@@ -199,8 +199,12 @@
             @endif
         @endforeach
         <tr>
+            <th colspan="8">Refund Amount</th>
+            <th colspan="3">{{ $refundAmount }}</th>
+        </tr>
+        <tr>
             <th colspan="8">Gross Sale</th>
-            <th colspan="3">{{ (((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalFixCommission) - $totalAdjustCommission }}</th>
+            <th colspan="3">{{ (((($totalSale + $totalElt + $refundAmount) - $totalDiscount) - $totalCommission) - $totalFixCommission) - $totalAdjustCommission }}</th>
         </tr>
     </table>
     <br>
