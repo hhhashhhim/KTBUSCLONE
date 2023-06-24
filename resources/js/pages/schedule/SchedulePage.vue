@@ -127,15 +127,13 @@
                                                                     data-target="#editTimeModal" data-toggle="modal"
                                                                     title="Edit Time"><i
                                                                 class="fas fa-clock"></i></button>
-
-                                                            <!--                                                            <button style="display:none;" title="Delete Schedule"-->
-                                                            <!--                                                                    v-if="checkForSubmenuButtons('delete-schedule')"-->
-                                                            <!--                                                                    class="btn btn-danger btn-sm"><i-->
-                                                            <!--                                                                class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
-                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                            data-toggle="modal"-->
-                                                            <!--                                                            @click="deleteSchedule(schedule, i)"-->
+                                                            <button title="Delete Terminal"
+                                                                    v-if="checkForSubmenuButtons('delete-schedule')"
+                                                                    :data-target="'#' + hideFormID" @click="delId = schedule.id" data-toggle="modal"
+                                                                    class="btn btn-danger btn-sm mr-1"
+                                                            >
+                                                                <i class="far fa-eye-slash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -749,10 +747,17 @@
                     </button>
                 </template>
             </Edit>
-            <!-- Edit Model End -->
-            <Delete :deleteForm="deleteFormID"
-                    confirmationMessage="Are You Sure You want To Delete This Schedule ???"
-            />
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideSchedule"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
         </div>
     </section>
 </template>
@@ -760,7 +765,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
+import Hide from "../../components/Hide.vue";
 import vueMask from 'vue-jquery-mask';
 import {mapGetters} from "vuex";
 
@@ -769,7 +774,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
         vueMask,
     },
     data() {
@@ -786,7 +791,7 @@ export default {
             permissions: [],
             formID: "schedule_form",
             editFormID: "edit_schedule_form",
-            deleteFormID: "delete_schedule_form",
+            hideFormID: "hide_schedule_form",
             validationErrors: [],
             value: [],
             editDiscounts: [],
@@ -842,6 +847,7 @@ export default {
                 schedule_id: "",
             },
             dataPreview: {},
+            delId: "",
         };
     },
     async created() {
@@ -1380,13 +1386,33 @@ export default {
             this.editRoutes = resCommon.data.route;
         },
 
-        async deleteSchedule(schVal, i) {
-            const deletingObj = {
-                url: "schedule/delete",
-                data: schVal,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
+        async hideSchedule() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'schedule/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Schedule Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $('#schedule_table').DataTable().destroy();
+                this.fetchSchedule();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
+            }
         },
     },
     watch: {

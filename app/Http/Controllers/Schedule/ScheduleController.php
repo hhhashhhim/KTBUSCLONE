@@ -41,7 +41,7 @@ class ScheduleController extends Controller
                       ->whereDate("end_date", ">=", $request->departure_date);
                 }
             })
-            ->where('company_id', Auth::user()->company_id)
+            ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
             ->orderBy('id')
             ->get();
 
@@ -264,9 +264,11 @@ class ScheduleController extends Controller
             }
     }
 
-    public function deleteSchedule(Request $request)
+    public function hideSchedule(Request $request)
     {
-        return Schedule::find($request->id)->delete();
+        return Schedule::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
     public function getRoutes()
