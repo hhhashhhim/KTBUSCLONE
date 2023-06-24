@@ -163,11 +163,17 @@ class RouteController extends Controller
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
     }
+    public function hideRoute(Request $request)
+    {
+        return Route::find($request->id)->update([
+            "hide" => 1
+        ]);
+    }
     public function list()
     {
         return [
-            'cities' => City::orderBy('id')->where('company_id', Auth::user()->company_id)->select('name', 'id')->get(),
-            'routes' => Route::with('addedBy')->where('company_id', Auth::user()->company_id)->get()
+            'cities' => City::orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->select('name', 'id')->get(),
+            'routes' => Route::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get()
         ];
     }
     public function details(Request $request){

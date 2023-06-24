@@ -271,7 +271,7 @@ class ScheduleController extends Controller
 
     public function getRoutes()
     {
-        return Route::where('company_id', Auth::user()->company_id)->get();
+        return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function getCity(Request $request)
@@ -311,7 +311,7 @@ class ScheduleController extends Controller
     public function genericCommon()
     {
         return [
-            'route' => Route::where('company_id', Auth::user()->company_id)->get(),
+            'route' => Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
             'discount' => Discount::where('company_id', Auth::user()->company_id)->get(),
             'surcharge' => Surcharge::where('company_id', Auth::user()->company_id)->get(),
         ];

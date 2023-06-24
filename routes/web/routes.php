@@ -12,6 +12,7 @@ Route::group(['prefix' => 'routes', [CustomMiddleware::class]], function () {
     Route::post('/update', [RouteController::class, 'update']);
     Route::post('/list', [RouteController::class, 'list']);
     Route::post('/details', [RouteController::class, 'details']);
+    Route::post('/hide', [RouteController::class, 'hideRoute']);
 });
 
 ?>

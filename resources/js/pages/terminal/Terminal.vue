@@ -403,7 +403,7 @@
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                 <td v-else>N/A</td>
-                                                <td style="width:200px;"
+                                                <td style="width:250px;"
                                                     v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
                                                     <button title="Edit Terminal"
                                                             :data-target="'#' + editFormID"
@@ -413,13 +413,6 @@
                                                             v-if="checkForSubmenuButtons('edit-terminal')"
                                                     >
                                                         <i class="far fa-edit"></i>
-                                                    </button>
-                                                    <button style="display:none;" title="Delete Terminal"
-
-                                                            class="btn btn-danger mx-2"
-                                                            v-if="checkForSubmenuButtons('delete-terminal')"
-                                                    >
-                                                        <i class="far fa-trash-alt"></i>
                                                     </button>
                                                     <router-link target="_blank" class="btn btn-success mx-2"
                                                                  title="Commission"
@@ -433,6 +426,13 @@
                                                                  :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                         <i class="fas fa-tag"></i>
                                                     </router-link>
+                                                    <button title="Delete Terminal"
+                                                            :data-target="'#' + hideFormID" @click="delId = single.id" data-toggle="modal"
+                                                            class="btn btn-danger mx-2"
+                                                            v-if="checkForSubmenuButtons('delete-terminal')"
+                                                    >
+                                                        <i class="far fa-eye-slash"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -451,8 +451,17 @@
                 </div>
             </div>
 
-            <!-- Delete Modal -->
-            <Delete :deleteForm="deleteFormID" confirmationMessage='Are You Sure You want To Delete This Terminal ???'/>
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideTerminal"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
         </div>
     </section>
 </template>
@@ -460,7 +469,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
+import Hide from "../../components/Hide.vue";
 import vueMask from "vue-jquery-mask";
 import {mapGetters} from "vuex";
 
@@ -469,7 +478,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
         vueMask,
     },
     data() {
@@ -506,7 +515,7 @@ export default {
             companies: [],
             formID: "terminal_form",
             editFormID: "edit_terminal_form",
-            deleteFormID: "delete_terminal_form",
+            hideFormID: "hide_terminal_form",
             cities: [],
             permissions: [],
             dataTime: {},
@@ -534,6 +543,7 @@ export default {
                 seatNumberType: "all",
             },
             dataEdit: {},
+            delId: "",
             success: false,
         };
     },
@@ -779,26 +789,32 @@ export default {
                 this.errorsArray(res.data.is_main, 'Main Terminal');
             }
         },
-        async deleteModal(terminal, i) {
-            const deletingObj = {
-                url: "terminals/delete",
-                data: terminal,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
-        }
-    },
-    computed: {
-        ...mapGetters(["getDeletingObj"]),
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.terminalsDetails.splice(obj.index, 1);
-                $("#show_terminal").DataTable().destroy();
+        async hideTerminal() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'terminals/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Terminal Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $("#employee_table").DataTable().destroy();
+                await this.fetchEmployees();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
                 setTimeout(() => {
-                    $("#show_terminal").DataTable();
-                }, 300);
+                    this.loading = false
+                }, 3000);
             }
         },
     },

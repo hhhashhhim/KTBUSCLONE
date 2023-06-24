@@ -995,9 +995,9 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" v-if="cancelData.dataType == 'booked' ">
                         <div class="form-group">
-                            <label for="cancel_percentage">Percentage <span
+                            <label for="cancel_percentage">Percentage  {{cancelData.dataType}}<span
                                 class="text-muted ml-2">(Optional)</span></label>
                             <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
                                 <option value="first">Select Cancellation Percentage</option>
@@ -1014,6 +1014,10 @@
                             <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
                                       placeholder="Reason for canceling a seat"></textarea>
                         </div>
+                    </div>
+                    <div class="modal-body" v-if="cancelData.dataType == 'advance booking' ">
+                        
+                        Are you sure you want to cancel ticket ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary"
@@ -2888,6 +2892,7 @@ export default {
                 dataDeparture: data.departure_city_id,
                 dataDestination: data.destination_city_id,
                 dataSeat_no: data.seat_no,
+                dataType: data.type,
             }
             $("#cancelModel").modal('show');
         }

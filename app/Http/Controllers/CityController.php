@@ -15,7 +15,7 @@ class CityController extends Controller
 {
     public function index()
     {
-        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->orderBy('id')->get();
     }
 
     public function store(Request $request)
@@ -73,9 +73,11 @@ class CityController extends Controller
             }
     }
 
-    public function delete(Request $request)
+    public function hideCity(Request $request)
     {
-        return City::find($request->id)->delete();
+        return City::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
     public function cityTerminals(Request $request)

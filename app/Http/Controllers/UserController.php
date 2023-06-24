@@ -31,7 +31,7 @@ class UserController extends Controller
                     $q->where("role_id",$request->role);
                 }
             })
-            ->where('company_id', Auth::user()->company_id)
+            ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
             ->latest('id')
             ->get();
         
@@ -156,6 +156,13 @@ class UserController extends Controller
         $user->terminal_id = $request->terminal_id;
         $user->save();
         return $user;
+    }
+
+    public function hideUser(Request $request)
+    {
+        return User::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
 }

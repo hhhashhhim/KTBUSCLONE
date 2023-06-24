@@ -8,6 +8,6 @@ Route::group(['prefix' => 'cities', 'middleware' => 'UserAccess', [CustomMiddlew
     Route::post('/', [CityController::class, 'index']);
     Route::post('store', [CityController::class, 'store']);
     Route::post('update', [CityController::class, 'update']);
-    Route::post('delete', [CityController::class, 'delete']);
+    Route::post('hide', [CityController::class, 'hideCity']);
     Route::post('/terminals', [CityController::class, 'cityTerminals']);
 });

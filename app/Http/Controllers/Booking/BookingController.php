@@ -65,7 +65,7 @@ class BookingController extends Controller
         } else {
             $ids = json_decode(Auth::user()->departure_city_ids);
         }
-        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+        return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->whereIn('id', $ids)->get();
     }
 
     public function store(Request $request)
@@ -420,7 +420,7 @@ class BookingController extends Controller
             $ids = json_decode(Auth::user()->destination_city_ids);
             $finalArray = array_intersect(array_unique($depart_city), $ids);
         }
-        return City::whereIn('id', $finalArray)->where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return City::whereIn('id', $finalArray)->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function fetchSpecificOverIssueSeat(Request $request)
@@ -515,7 +515,7 @@ class BookingController extends Controller
     function getTerminals()
     {
         return [
-            'terminals' => Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(),
+            'terminals' => Terminal::with('city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
             'authTerminalId' => Auth::user()->terminal_id ?? 0,
         ];
     }
@@ -947,8 +947,8 @@ class BookingController extends Controller
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         $data = [
             "buses" => $buses,
             "hosts" => $hosts,

@@ -18,7 +18,7 @@ class TerminalController extends Controller
 {
     public function index()
     {
-        return City::withCount('terminal')->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+        return City::withCount(['terminal'=>function($q){$q->where("hide",0);}])->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function companies()
@@ -28,7 +28,7 @@ class TerminalController extends Controller
 
     public function cities()
     {
-        return City::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->orderBy('id')->get();
     }
 
     public function allTerminals()
@@ -41,7 +41,7 @@ class TerminalController extends Controller
 
     public function getTerminal(Request $request)
     {
-        return Terminal::with('addedBy')->where('city_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
+        return Terminal::with('addedBy')->where('city_id', $request->id)->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function getRoutes(Request $request)
@@ -101,9 +101,11 @@ class TerminalController extends Controller
 
     }
 
-    public function delete(Request $request)
+    public function hideTerminal(Request $request)
     {
-        return Terminal::find($request->id)->delete();
+        return Terminal::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
     public function update(Request $request)

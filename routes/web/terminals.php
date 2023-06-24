@@ -12,7 +12,7 @@ Route::group(['prefix' => 'terminals', 'middleware' => 'UserAccess', [CustomMidd
     Route::post('/getTerminal', [TerminalController::class, 'getTerminal']);
     Route::post('store', [TerminalController::class, 'store']);
     Route::post('update', [TerminalController::class, 'update']);
-    Route::post('delete', [TerminalController::class, 'delete']);
+    Route::post('hide', [TerminalController::class, 'hideTerminal']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
 
     Route::post('/routes', [TerminalController::class, 'getRoutes']);

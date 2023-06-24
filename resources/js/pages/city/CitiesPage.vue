@@ -44,9 +44,10 @@
                                                                     class=" text-light btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button style="display:none;" title="Delete City" v-if="checkForSubmenuButtons('delete-city')"
-                                                                    class=" text-light btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
+                                                            <button title="Delete City" v-if="checkForSubmenuButtons('delete-city')"
+                                                                    class=" text-light btn btn-danger" :data-target="'#' + hideFormID" @click="delId = city.id"
+                                                                    data-toggle="modal">
+                                                                <i class="far fa-eye-slash"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->
                                                             <!--                                                            @click="deleteModal(city,i)"-->
@@ -102,8 +103,18 @@
                 </template>
             </Edit>
 
-            <!-- Add Modal -->
-            <Delete :deleteForm="deleteFormID" confirmationMessage="Are You Sure You want To Delete This City ???"/>
+            <!-- Hide Modal -->
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideCity"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
 
         </div>
     </section>
@@ -114,7 +125,7 @@
 <script>
 import Add from '../../components/Add.vue';
 import Edit from '../../components/Edit.vue';
-import Delete from '../../components/Delete.vue';
+import Hide from '../../components/Hide.vue';
 import {mapGetters} from 'vuex';
 
 export default {
@@ -122,7 +133,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
     },
     data() {
         return {
@@ -132,7 +143,7 @@ export default {
             loading: false,
             formID: 'city_form',
             editFormID: 'edit_city_form',
-            deleteFormID: 'delete_city_form',
+            hideFormID: 'hide_city_form',
             data: {
                 name: "",
             },
@@ -261,26 +272,34 @@ export default {
                 }, 3000);
             }
         },
-        async deleteModal(city, i) {
-            const deletingObj = {
-                url: "cities/delete",
-                data: city,
-                index: i,
-            }
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-    },
-    computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.cities.splice(obj.index, 1)
+        async hideCity() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'cities/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "City Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
                 $("#city_table").DataTable().destroy();
-                this.fetchCities();
+                await this.fetchCities();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
             }
-        }
+        },
     }
 }
 </script>

@@ -9,6 +9,6 @@ Route::group(['prefix' => 'hrm/employee', [CustomMiddleware::class]], function (
     Route::post('/cities', [EmployeeController::class, 'getCities']);
     Route::post('/store', [EmployeeController::class, 'store']);
     Route::post('/update', [EmployeeController::class, 'update']);
-    Route::post('/delete', [EmployeeController::class, 'delete']);
+    Route::post('/hide', [EmployeeController::class, 'hideEmployee']);
     Route::post('/user/store', [EmployeeController::class, 'userStore']);
 });

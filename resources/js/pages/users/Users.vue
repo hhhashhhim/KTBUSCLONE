@@ -103,12 +103,13 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </a>
-                                                            <a style="display:none;"
+                                                            <a
                                                                v-if="checkForSubmenuButtons('delete-user')"
+                                                               :data-target="'#' + hideFormID" @click="delId = user.id" data-toggle="modal"
                                                                title="Delete User"
                                                                class="btn btn-danger text-light"
                                                             >
-                                                                <i class="far fa-trash-alt"></i>
+                                                                <i class="far fa-eye-slash"></i>
                                                             </a>
                                                             <!--                                                            href="#delete-modal"-->
                                                             <!--                                                            data-toggle="modal"-->
@@ -440,10 +441,18 @@
                 </template>
             </Edit>
 
-            <!-- Add Modal -->
-            <Delete
-                confirmationMessage='Are You Sure You want To Delete This "USER" ???'
-            />
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideUser"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
+
         </div>
     </section>
 </template>
@@ -451,7 +460,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
+import Hide from "../../components/Hide.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 import script from "@vueform/multiselect";
@@ -462,7 +471,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
         vueMask,
     },
     data() {
@@ -478,6 +487,7 @@ export default {
             destinationCities: [],
             formID: 'user_form',
             editFormID: 'edit_user_form',
+            hideFormID: 'hide_user_form',
             roleName: '',
             updateTerminal: 0,
             filterData: {
@@ -503,6 +513,7 @@ export default {
                 role_id: 0,
             },
             terminals: [],
+            delId: "",
             success: false,
             loading: false,
             loadingEdit: false,
@@ -901,23 +912,35 @@ export default {
                 }
             }
         },
-
-        async deleteModal(user, i) {
-            const deletingObj = {
-                url: "user/delete",
-                data: user,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-    },
-    computed: {
-        ...mapGetters(["getDeletingObj"]),
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.users.splice(obj.index, 1);
+        async hideUser() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'user/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "User Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $("#users_table").DataTable().destroy();
+                await this.fetchUsers();
+                setTimeout(() => {
+                    $("#users_table").DataTable();
+                }, 300);
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
             }
         },
     },

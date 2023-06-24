@@ -27,8 +27,8 @@ class ScheduleClosingController extends Controller
     public function index()
     {
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id])->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id])->get(["id", "user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0])->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->get(["id", "user_id", "name", "cnic"]);
         $closings = TicketClosing::
         where('company_id', Auth::user()->company_id)
             ->with("bus:id,bus_number", "schedule:id,name,route_id","schedule.route:id,name")

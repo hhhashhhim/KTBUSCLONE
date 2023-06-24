@@ -19,7 +19,7 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where('company_id', Auth::user()->company_id)->get();
+        return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
 
     }
 
@@ -187,9 +187,11 @@ class EmployeeController extends Controller
             }
     }
 
-    public function delete(Request $request)
+    public function hideEmployee(Request $request)
     {
-        return Employee::find($request->id)->delete();
+        return Employee::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
     public function userStore(Request $request)

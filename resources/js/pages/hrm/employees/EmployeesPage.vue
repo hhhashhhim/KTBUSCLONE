@@ -11,6 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
+                                    v-if="checkForSubmenuButtons('add-employee')"
                                     class="btn btn-primary" @click="clearForm()"
                                 >
                                     Add New Employee
@@ -107,16 +108,17 @@
                                                             </button>
                                                             <button :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editEmployee(employee)"
+                                                                    v-if="checkForSubmenuButtons('edit-employee')"
                                                                     class="btn btn-primary mx-1" title="Edit Employee">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <!--                                                            <button style="display:none;" title="Delete Employee"-->
-                                                            <!--                                                                    class="btn btn-danger">-->
-                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
-                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                            data-toggle="modal"-->
-                                                            <!--                                                            @click="deleteModal(employee,i)"-->
+                                                            <button title="Delete Terminal"
+                                                                    :data-target="'#' + hideFormID" @click="delId = employee.id" data-toggle="modal"
+                                                                    class="btn btn-danger mx-2"
+                                                                    v-if="checkForSubmenuButtons('delete-employee')"
+                                                            >
+                                                                <i class="far fa-eye-slash"></i>
+                                                            </button>                                                        
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -659,10 +661,19 @@
                     </button>
                 </template>
             </Edit>
-            <!--            Edit modal End-->
-            <Delete :deleteForm="deleteFormID"
-                    confirmationMessage='Are You Sure You want To Delete This Employee Record ???'
-            />
+
+
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideEmployee"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
         </div>
     </section>
 </template>
@@ -670,7 +681,7 @@
 <script>
 import Add from "../../../components/Add.vue";
 import Edit from "../../../components/Edit.vue";
-import Delete from "../../../components/Delete.vue";
+import Hide from "../../../components/Hide.vue";
 import {mapGetters} from "vuex";
 import vueMask from "vue-jquery-mask";
 
@@ -679,7 +690,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
         vueMask,
     },
     data() {
@@ -763,6 +774,7 @@ export default {
             employees: [],
             terminals: [],
             departments: [],
+            permissions: [],
             editDepartments: [],
             designations: [],
             departureCities: [],
@@ -780,7 +792,7 @@ export default {
             loadingDesignation: false,
             formID: "employees_form",
             editFormID: "edit_employees_form",
-            deleteFormID: "delete_employees_form",
+            hideFormID: "hide_employees_form",
             validationErrors: [],
             success: false,
             error: false,
@@ -800,7 +812,7 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         await this.fetchEmployees();
-
+        this.permissions = this.$store.state.permissions;
     },
 
 
@@ -1537,15 +1549,6 @@ export default {
             }
         },
 
-        async deleteModal(emp, i) {
-            const deletingObj = {
-                url: "hrm/employee/delete",
-                data: emp,
-                index: i,
-            }
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-
         async editEmployee(employ) {
             this.editEmp.userId = employ.user_id;
             this.editEmp.id = employ.id;
@@ -1582,20 +1585,37 @@ export default {
                 this.editDesignations = resEditSelective.data;
             }
         },
+        async hideEmployee() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'hrm/employee/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Employee Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $("#employee_table").DataTable().destroy();
+                await this.fetchEmployees();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
+            }
+        },
 
     },
-    computed: {
-        ...mapGetters(['getDeletingObj'])
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.employees.splice(obj.index, 1)
-                $("#employee_table").DataTable().destroy();
-                this.fetchEmployees();
-            }
-        }
-    }
+    
 };
 </script>
 <style scoped>

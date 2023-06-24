@@ -77,9 +77,10 @@
                                                                     @click="edit(route)"
                                                             ><i class="far fa-edit"></i>
                                                             </button>
-                                                            <button style="display:none;" title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
+                                                            <button title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
+                                                                :data-target="'#' + hideFormID" @click="delId = route.id" data-toggle="modal"
                                                                     class="btn btn-danger">
-                                                                <i class="far fa-trash-alt"></i>
+                                                                <i class="far fa-eye-slash"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#' + deleteFormID "-->
                                                             <!--                                                            data-toggle="modal"-->
@@ -253,9 +254,17 @@
                 <input type="hidden" name="route_id" :value="this.route_id">
             </form>
 
-            <!-- Add Modal -->
-            <Delete confirmationMessage='Are You Sure You want To Delete This "Route" ???'
-            />
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideRoute"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
         </div>
     </section>
 </template>
@@ -263,7 +272,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
+import Hide from "../../components/Hide.vue";
 import {mapGetters} from "vuex";
 
 export default {
@@ -271,7 +280,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
     },
     data() {
         return {
@@ -289,6 +298,7 @@ export default {
             routes: [],
             formID: "route_form",
             editFormID: 'edit_route_form',
+            hideFormID: 'hide_route_form',
             route_id: "",
             data: {},
             dataEdit: {},
@@ -304,6 +314,7 @@ export default {
             reverseRoute: 1,
             routeDetails: [],
             th: [],
+            delId: "",
             permissions: [],
             classFareName: ''
         };
@@ -536,25 +547,32 @@ export default {
         {
             this.$refs.farePrint.submit();
         },
-        deleteModal(terminal, i) {
-            const deletingObj = {
-                url: "terminal/delete",
-                data: terminal,
-                index: i,
-            };
-            this.$store.commit("setDeleteObj", deletingObj);
-        },
-    },
-    computed: {
-        ...mapGetters(["getDeletingObj"]),
-        heading: function () {
-            return from.name + "<i class='fa fa-user'></i>" + to.name;
-        },
-    },
-    watch: {
-        getDeletingObj(obj) {
-            if (obj.isDeleted) {
-                this.terminals.splice(obj.index, 1);
+        async hideRoute() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'routes/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Route Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $('#route_table').DataTable().destroy();
+                await this.fetchCities();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
             }
         },
     },
