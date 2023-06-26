@@ -97,7 +97,7 @@ class DailySummaryReportController extends Controller
                             {
                                 $amount = $commission->flat_commission;
                             }
-                            $ticket->commission_amount = $amount;
+                            $ticket->commission_amount = intVal($amount);
                         }
                         else
                         {
