@@ -97,7 +97,7 @@
                 @endphp
                 @foreach(getTerminals() as $keyTerminal => $singleTerminal)
                     @php
-                        $online_terminals_income = isset($online_terminals[$single->id][$singleTerminal->id]) ? $online_terminals[$single->id][$singleTerminal->id]->sum('seat_fare') - $online_terminals[$single->id][$singleTerminal->id]->sum('discount') : 0;
+                        $online_terminals_income = isset($online_terminals[$single->id][$singleTerminal->id]) ? $online_terminals[$single->id][$singleTerminal->id]->sum('seat_fare') - $online_terminals[$single->id][$singleTerminal->id]->sum('discount') - $online_terminals[$single->id][$singleTerminal->id]->sum('commission_amount') : 0;
                     @endphp
                     <td>
                         {{ $online_terminals_income }}
