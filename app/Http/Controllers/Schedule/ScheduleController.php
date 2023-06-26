@@ -99,7 +99,6 @@ class ScheduleController extends Controller
                     'end_date' => $request->EndDate,
                     'route_id' => $request->route,
                     'time' => $request->time,
-                    'updated_time' => $request->time,
                     'surcharge_id' => $request->surcharge,
                     'discount_id' => $request->discount,
                     'bus_class_id' => $request->busClass,
