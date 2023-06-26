@@ -592,7 +592,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="seat_class">Seat Class</label>
                                             <select
                                                 class="form-control"
@@ -608,7 +608,7 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="seat_type">Seat Type</label>
                                             <select
                                                 class="form-control"
@@ -620,6 +620,10 @@
                                                 <!--                                                </option>-->
                                                 <option value="not_for_sale">Not for Sale</option>
                                             </select>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="seat_type">Seat Type</label>
+                                            <input type="text" class="form-control" v-model="editSeatModify.seatNo">
                                         </div>
                                     </div>
                                     <div class="row">
@@ -678,6 +682,7 @@ export default {
             editSeatModify: {
                 class: 0,
                 type: 0,
+                seatNo: "",
             },
             success: false,
             checkAllSeatAssign: false,
@@ -918,6 +923,7 @@ export default {
             this.editSeatModify = {
                 class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
                 type: this.dataEdit.seat_map[rowId][colId].type ?? 0,
+                seatNo: this.dataEdit.seat_map[rowId][colId].seatNo ?? "",
             };
             this.editSingleSeat = {
                 rowId: rowId,
@@ -934,22 +940,67 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            } else {
-                const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
-                this.dataEdit.seat_map[rowId][colId] = {
-                    reserved: singleSeatDetails.reserved,
-                    seatNo: singleSeatDetails.seatNo,
-                    class: this.editSeatModify.class,
-                    type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type,
-                };
-                this.closeEditSeat()
-                swal({
-                    title: "Success!",
-                    text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
-                    icon: "success",
+            } 
+            
+            if (this.editSeatModify.seatNo == "") {
+                return swal({
+                    title: "required",
+                    text: "Please Enter Seat No",
+                    icon: "error",
                     timer: 2000,
                 });
+            } 
+            
+            const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
+            this.dataEdit.seat_map[rowId][colId] = {
+                reserved: singleSeatDetails.reserved,
+                seatNo: this.editSeatModify.seatNo,
+                class: this.editSeatModify.class,
+                type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type,
+            };
+
+            // let seatNo = 0;
+            // this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
+            //     for (let i = seat.length - 1; i >= 0; i--) {
+            //         if (seat[i].reserved) {
+            //             seat[i]["seatNo"] = ++seatNo;
+            //         }
+            //     }
+            //     return seat;
+            // });
+            
+            const seatNumbersSet = [];
+            for (let i = 0; i < this.dataEdit.seat_map.length; i++) {
+                const col = this.dataEdit.seat_map[i];
+                for (let j = 0; j < col.length; j++) {
+                        const obj = col[j];
+                        const seatNo = obj.seatNo;
+                        if (seatNo !== undefined) {
+                            seatNo = seatNo.toString();
+                            if (seatNumbersSet.includes(seatNo)) {
+                            
+                            console.log(`Duplicate seat number found: ${seatNo}`);
+                            return swal({
+                                title: "required",
+                                text: `Duplicate Seat Number Allowed : ${seatNo}`,
+                                icon: "error",
+                                timer: 2000,
+                            });
+                        } else {
+                            seatNumbersSet.push(seatNo);
+                        }
+                    }
+                }
             }
+            
+            this.closeEditSeat()
+            swal({
+                title: "Success!",
+                text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
+                icon: "success",
+                timer: 2000,
+            });
+
         },
 
         changeStatus: function (row, col) {
@@ -1164,15 +1215,16 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            let seatNo = 0;
-            this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
-                for (let i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i].reserved) {
-                        seat[i]["seatNo"] = ++seatNo;
-                    }
-                }
-                return seat;
-            });
+            // let seatNo = 0;
+            // this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
+            //     for (let i = seat.length - 1; i >= 0; i--) {
+            //         if (seat[i].reserved) {
+            //             seat[i]["seatNo"] = ++seatNo;
+            //         }
+            //     }
+            //     return seat;
+            // });
+            
             this.loading = true;
             const res = await this.callApi(
                 "post",

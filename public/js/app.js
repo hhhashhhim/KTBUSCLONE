@@ -32976,7 +32976,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       editSeatModify: {
         "class": 0,
-        type: 0
+        type: 0,
+        seatNo: ""
       },
       success: false,
       checkAllSeatAssign: false,
@@ -33288,11 +33289,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     getSeatDetails: function getSeatDetails(rowId, colId) {
-      var _this$dataEdit$seat_m, _this$dataEdit$seat_m2;
+      var _this$dataEdit$seat_m, _this$dataEdit$seat_m2, _this$dataEdit$seat_m3;
 
       this.editSeatModify = {
         "class": (_this$dataEdit$seat_m = this.dataEdit.seat_map[rowId][colId]["class"]) !== null && _this$dataEdit$seat_m !== void 0 ? _this$dataEdit$seat_m : 0,
-        type: (_this$dataEdit$seat_m2 = this.dataEdit.seat_map[rowId][colId].type) !== null && _this$dataEdit$seat_m2 !== void 0 ? _this$dataEdit$seat_m2 : 0
+        type: (_this$dataEdit$seat_m2 = this.dataEdit.seat_map[rowId][colId].type) !== null && _this$dataEdit$seat_m2 !== void 0 ? _this$dataEdit$seat_m2 : 0,
+        seatNo: (_this$dataEdit$seat_m3 = this.dataEdit.seat_map[rowId][colId].seatNo) !== null && _this$dataEdit$seat_m3 !== void 0 ? _this$dataEdit$seat_m3 : ""
       };
       this.editSingleSeat = {
         rowId: rowId,
@@ -33307,22 +33309,67 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           icon: "error",
           timer: 2000
         });
-      } else {
-        var singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
-        this.dataEdit.seat_map[rowId][colId] = {
-          reserved: singleSeatDetails.reserved,
-          seatNo: singleSeatDetails.seatNo,
-          "class": this.editSeatModify["class"],
-          type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type
-        };
-        this.closeEditSeat();
-        swal({
-          title: "Success!",
-          text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
-          icon: "success",
+      }
+
+      if (this.editSeatModify.seatNo == "") {
+        return swal({
+          title: "required",
+          text: "Please Enter Seat No",
+          icon: "error",
           timer: 2000
         });
       }
+
+      var singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
+      this.dataEdit.seat_map[rowId][colId] = {
+        reserved: singleSeatDetails.reserved,
+        seatNo: this.editSeatModify.seatNo,
+        "class": this.editSeatModify["class"],
+        type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type
+      }; // let seatNo = 0;
+      // this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
+      //     for (let i = seat.length - 1; i >= 0; i--) {
+      //         if (seat[i].reserved) {
+      //             seat[i]["seatNo"] = ++seatNo;
+      //         }
+      //     }
+      //     return seat;
+      // });
+
+      var seatNumbersSet = [];
+
+      for (var i = 0; i < this.dataEdit.seat_map.length; i++) {
+        var col = this.dataEdit.seat_map[i];
+
+        for (var j = 0; j < col.length; j++) {
+          var obj = col[j];
+          var seatNo = obj.seatNo;
+
+          if (seatNo !== undefined) {
+            seatNo = seatNo.toString();
+
+            if (seatNumbersSet.includes(seatNo)) {
+              console.log("Duplicate seat number found: ".concat(seatNo));
+              return swal({
+                title: "required",
+                text: "Duplicate Seat Number Allowed : ".concat(seatNo),
+                icon: "error",
+                timer: 2000
+              });
+            } else {
+              seatNumbersSet.push(seatNo);
+            }
+          }
+        }
+      }
+
+      this.closeEditSeat();
+      swal({
+        title: "Success!",
+        text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
+        icon: "success",
+        timer: 2000
+      });
     },
     changeStatus: function changeStatus(row, col) {
       if (this.data.seatMap[row][col].reserved) {
@@ -33574,7 +33621,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var seatNo, res;
+        var res;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -33620,25 +33667,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                seatNo = 0;
-                _this6.dataEdit.seat_map = _this6.dataEdit.seat_map.map(function (seat) {
-                  for (var i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i].reserved) {
-                      seat[i]["seatNo"] = ++seatNo;
-                    }
-                  }
-
-                  return seat;
-                });
+                // let seatNo = 0;
+                // this.dataEdit.seat_map = this.dataEdit.seat_map.map((seat) => {
+                //     for (let i = seat.length - 1; i >= 0; i--) {
+                //         if (seat[i].reserved) {
+                //             seat[i]["seatNo"] = ++seatNo;
+                //         }
+                //     }
+                //     return seat;
+                // });
                 _this6.loading = true;
-                _context5.next = 12;
+                _context5.next = 10;
                 return _this6.callApi("post", "bus_classes/update", _this6.dataEdit);
 
-              case 12:
+              case 10:
                 res = _context5.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 22;
+                  _context5.next = 20;
                   break;
                 }
 
@@ -33651,14 +33697,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
                 $("#bus_class_table").DataTable().destroy();
                 _this6.loading = false;
-                _context5.next = 20;
+                _context5.next = 18;
                 return _this6.fetchBussClasses();
 
-              case 20:
-                _context5.next = 23;
+              case 18:
+                _context5.next = 21;
                 break;
 
-              case 22:
+              case 20:
                 if (res.status == 422) {
                   (function () {
                     _this6.dropScheduleButton = false;
@@ -33679,7 +33725,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 23:
+              case 21:
               case "end":
                 return _context5.stop();
             }
@@ -61546,7 +61592,7 @@ var _hoisted_148 = {
   "class": "row"
 };
 var _hoisted_149 = {
-  "class": "form-group col-md-6"
+  "class": "form-group col-md-4"
 };
 
 var _hoisted_150 = /*#__PURE__*/_withScopeId(function () {
@@ -61568,7 +61614,7 @@ var _hoisted_151 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_152 = ["value"];
 var _hoisted_153 = {
-  "class": "form-group col-md-6"
+  "class": "form-group col-md-4"
 };
 
 var _hoisted_154 = /*#__PURE__*/_withScopeId(function () {
@@ -61597,9 +61643,21 @@ var _hoisted_156 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_157 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_158 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "seat_type"
+  }, "Seat Type", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_159 = {
   "class": "row"
 };
-var _hoisted_158 = {
+var _hoisted_160 = {
   "class": "col-md-12"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -62144,10 +62202,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_155, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                <option value=\"reserved_for_female\">"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                    Reserved for Female"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                </option>"), _hoisted_156], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify.type]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_157, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_158, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.editSeatModify.type]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_157, [_hoisted_158, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[37] || (_cache[37] = function ($event) {
+      return $data.editSeatModify.seatNo = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.editSeatModify.seatNo]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_159, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_160, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-block btn-primary",
-    onClick: _cache[37] || (_cache[37] = function ($event) {
+    onClick: _cache[38] || (_cache[38] = function ($event) {
       return $options.updateSeatDetail($data.editSingleSeat.rowId, $data.editSingleSeat.colId);
     }),
     "data-dismiss": "modal"
@@ -84007,9 +84073,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
