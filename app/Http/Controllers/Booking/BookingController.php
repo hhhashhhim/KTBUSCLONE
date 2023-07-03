@@ -382,7 +382,7 @@ class BookingController extends Controller
         }
 
         $allSchedules = ScheduleDetail::with('schedule')->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])->get();
-        foreach ($allSchedules as $single) {
+        foreach ($allSchedules as $key => $single) {
             $sub = 0;
             if (Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id) {
                 $checkTerminal = ScheduleTerminalSequence::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->departure_city_id, 'schedule_id' => $single->schedule_id])->orderBy('id', 'DESC')->get();
@@ -406,6 +406,11 @@ class BookingController extends Controller
             $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) - $sub);
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
+            // to remove delete schedule
+            if(Schedule::where(['id' => $single->schedule_id,'hide' => 1, 'company_id' => Auth::user()->company_id])->first())
+            {
+                unset($allSchedules[$key]);
+            }
         }
         return $allSchedules;
     }
