@@ -135,7 +135,6 @@ class ScheduleController extends Controller
                             $lastDepId = $detail->departure_city_id;
                         }
                         $scheduleEndDate = date("Y-m-d", $totalTime);
-
                         ScheduleDetail::create([
                             'company_id' => Auth::user()->company_id,
                             'added_by' => Auth::user()->id,
