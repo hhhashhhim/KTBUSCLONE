@@ -236,6 +236,18 @@
                             </option>
                         </select>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="role">User Type <span class="text-danger ml-1">*</span></label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"
+                                    id="femaleCheckBox"
+                                    v-bind:checked="data.online_user == 1"
+                                    @click="changeUser($event)"
+                                    name="">
+                            <label class="custom-control-label"
+                                    for="femaleCheckBox">Online User</label>
+                        </div>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="this.loading" @click="add()">
@@ -428,6 +440,18 @@
                             <option value="1">Checked</option>
                         </select>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="role">User Type <span class="text-danger ml-1">*</span></label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"
+                                    id="femaleCheckBox"
+                                    v-bind:checked="dataEdit.online_user == 1"
+                                    @click="changeEditUser($event)"
+                                    name="">
+                            <label class="custom-control-label"
+                                    for="femaleCheckBox">Online User</label>
+                        </div>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button
@@ -503,6 +527,7 @@ export default {
                 role: 0,
                 company_id: "",
                 terminal_id: 0,
+                online_user: 0,
                 destination: [],
                 departure: [],
             },
@@ -630,6 +655,22 @@ export default {
             // setTimeout(() => {
             //     $("#users_table").DataTable();
             // }, 300);
+        },
+
+        changeUser: function (e) {
+            if (e.target.checked) {
+                this.data.online_user = 1;
+            } else {
+                this.data.online_user = 0;
+            }
+        },
+        
+        changeEditUser: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.online_user = 1;
+            } else {
+                this.dataEdit.online_user = 0;
+            }
         },
 
         async add() {

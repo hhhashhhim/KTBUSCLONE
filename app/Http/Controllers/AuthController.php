@@ -71,7 +71,7 @@ class AuthController extends Controller
         ]);
 
         // return $request;
-        $attempt = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'hide'  => 0]);
+        $attempt = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'hide'  => 0, 'online_user' => 0]);
         if ($attempt) {
             return response()->json([
                 'message' => 'You are Logged In Successfully',
