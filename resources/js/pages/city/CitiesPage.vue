@@ -173,6 +173,15 @@ export default {
         clearForm: function () {
             this.data = {};
         },
+        
+        // async test() {
+        //     const resCity = await this.callApi("post", 'api/booking/schedules/available',{
+        //         departure_city: "multan",
+        //         destination_city: "karachi",
+        //         date: "2023-05-12",
+        //     });
+        // },
+
         async fetchCities() {
             const resCity = await this.callApi("post", 'cities');
             if (resCity.status == 200) {

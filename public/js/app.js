@@ -34328,6 +34328,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearForm: function clearForm() {
       this.data = {};
     },
+    // async test() {
+    //     const resCity = await this.callApi("post", 'api/booking/schedules/available',{
+    //         departure_city: "multan",
+    //         destination_city: "karachi",
+    //         date: "2023-05-12",
+    //     });
+    // },
     fetchCities: function fetchCities() {
       var _this2 = this;
 
@@ -52903,7 +52910,7 @@ var _hoisted_3 = {
   "class": "sidebar-brand text-center"
 };
 var _hoisted_4 = {
-  href: "/"
+  href: ""
 };
 var _hoisted_5 = ["src"];
 var _hoisted_6 = {

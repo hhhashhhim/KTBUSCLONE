@@ -2,7 +2,7 @@
     <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
             <div class="sidebar-brand text-center">
-                <a href="/">
+                <a href="">
                     <img :src="$store.state.app_url + 'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
                 </a>
             </div>
