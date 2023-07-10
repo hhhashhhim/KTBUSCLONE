@@ -86,7 +86,7 @@ class UserController extends Controller
                     'company_id' => Auth::user()->company_id,
                 ]);
                 DB::commit();
-                return $this->index();
+                
 
             } catch (\Exception $e) {
                 DB::rollBack();

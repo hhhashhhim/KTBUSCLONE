@@ -53,7 +53,7 @@ class BookingApiController extends Controller
                 $departure_id = City::where(["name"=>$request->departure_city,"company_id"=>$companyId])->first()->id??0;
                 $destination_id = City::where(["name"=>$request->destination_city,"company_id"=>$companyId])->first()->id??0;
 
-                $data = ScheduleDetail::with('schedule:id,name,bus_class_id','schedule.bus_class:id,name')->where(['departure_id' => $departure_id, 'destination_id' => $destination_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                $data = ScheduleDetail::with('schedule:id,name,bus_class_id','schedule.bus_class:id,name')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $departure_id, 'destination_id' => $destination_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 // foreach ($data as $single) {
                     
                 //     $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time));
