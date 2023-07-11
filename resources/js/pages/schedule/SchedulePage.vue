@@ -345,6 +345,7 @@
                                 id="route"
                                 @change=" getSelectiveData('route', $event);"
                                 v-model="data.route"
+                                readonly
                             >
                                 <option value="0" selected>Select Route</option>
                                 <option v-for="(route, i) in routes" :value="route.id" :key="i">
@@ -663,6 +664,7 @@
                             class="form-control"
                             id="route" @change="getSelectiveData('routeEdit', $event)"
                             v-model="dataEdit.schedules.route_id"
+                            disabled
                         >
                             <option value="0" selected>Select Route</option>
                             <option

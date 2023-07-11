@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColounmToUsers extends Migration
+class NewColoumnToBusClass extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddColounmToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('online_user')->default(0)->after('role_id');
+        Schema::table('bus_classes', function (Blueprint $table) {
+            $table->integer('hide')->default(0)->after('added_by');
         });
     }
 
@@ -25,8 +25,8 @@ class AddColounmToUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('online_user');
+        Schema::table('bus_classes', function (Blueprint $table) {
+            $table->dropColumn('hide');
         });
     }
 }

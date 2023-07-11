@@ -26,7 +26,7 @@ class BusClassController extends Controller
 
     protected function index()
     {
-        return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
+        return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
     }
 
     public function storeBusClass(Request $request)
@@ -90,9 +90,11 @@ class BusClassController extends Controller
             }
     }
 
-    public function deleteBusClass(Request $request)
+    public function hideBusClass(Request $request)
     {
-        return BusClass::find($request->id)->delete();
+        return BusClass::find($request->id)->update([
+            "hide" => 1
+        ]);
     }
 
     public function duplicateBusClass(Request $request)

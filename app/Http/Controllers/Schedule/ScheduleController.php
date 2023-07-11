@@ -385,7 +385,7 @@ class ScheduleController extends Controller
 
     public function busClasses()
     {
-        return BusClass::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
+        return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
     }
 
     public function surchargeSelective()

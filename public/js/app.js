@@ -32934,7 +32934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/Add.vue */ "./resources/js/components/Add.vue");
 /* harmony import */ var _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Edit.vue */ "./resources/js/components/Edit.vue");
-/* harmony import */ var _components_Delete_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Delete.vue */ "./resources/js/components/Delete.vue");
+/* harmony import */ var _components_Hide_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Hide.vue */ "./resources/js/components/Hide.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
@@ -32959,7 +32959,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   components: {
     Add: _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     Edit: _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Delete: _components_Delete_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    Hide: _components_Hide_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
     return {
@@ -32968,7 +32968,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       permissions: [],
       formID: "busClass_form",
       editFormID: "edit_busClass_form",
-      deleteFormID: "delete_busClass_form",
+      hideFormID: "delete_busClass_form",
       validationErrors: [],
       seatModify: {
         "class": 0,
@@ -33371,6 +33371,73 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         timer: 2000
       });
     },
+    hideBusClass: function hideBusClass() {
+      var _this5 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var resHide, _loop, key;
+
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _this5.loading = true;
+                _context4.next = 3;
+                return _this5.callApi("post", 'bus_classes/hide', {
+                  id: _this5.delId
+                });
+
+              case 3:
+                resHide = _context4.sent;
+
+                if (!(resHide.status == 200)) {
+                  _context4.next = 13;
+                  break;
+                }
+
+                $(".modal").click();
+                swal({
+                  title: "Success",
+                  text: "Bus Class Deleted Successfully",
+                  icon: "success",
+                  timer: 2000
+                });
+                _this5.loading = false;
+                $('#bus_class_table').DataTable().destroy();
+                _context4.next = 11;
+                return _this5.fetchBussClasses();
+
+              case 11:
+                _context4.next = 15;
+                break;
+
+              case 13:
+                if (resHide.status == 422) {
+                  _this5.loading = false;
+
+                  _loop = function _loop(key) {
+                    resHide.data.errors[key].forEach(function (element) {
+                      _this5.errorsArray(element, key);
+                    });
+                  };
+
+                  for (key in resHide.data.errors) {
+                    _loop(key);
+                  }
+                }
+
+                setTimeout(function () {
+                  _this5.loading = false;
+                }, 3000);
+
+              case 15:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
     changeStatus: function changeStatus(row, col) {
       if (this.data.seatMap[row][col].reserved) {
         this.data.seatMap[row][col] = {
@@ -33468,22 +33535,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     addBusClass: function addBusClass() {
-      var _this5 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var b, c, res, _loop, key;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var b, c, res, _loop2, key;
 
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 // console.log(this.data.seatMap);
-                _this5.validationErrors = []; // validation for assign all class
+                _this6.validationErrors = []; // validation for assign all class
 
                 b = 0;
                 c = 0;
 
-                _this5.data.seatMap.map(function (seat) {
+                _this6.data.seatMap.map(function (seat) {
                   for (var i = seat.length - 1; i >= 0; i--) {
                     if (seat[i].reserved == true) {
                       c = 1;
@@ -33497,11 +33564,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
                 if (!(c == 0)) {
-                  _context4.next = 6;
+                  _context5.next = 6;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required !",
                   text: "Please Select Seats",
                   icon: "error",
@@ -33510,11 +33577,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 if (!(b == 1)) {
-                  _context4.next = 8;
+                  _context5.next = 8;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required !",
                   text: "Please assign seat class first",
                   icon: "error",
@@ -33522,12 +33589,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!(_this5.data.BusClassName === "")) {
-                  _context4.next = 10;
+                if (!(_this6.data.BusClassName === "")) {
+                  _context5.next = 10;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Bus Class Name is Required",
                   icon: "error",
@@ -33535,12 +33602,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
-                if (!(typeof _this5.data.noOfRows == "undefined" || _this5.data.noOfRows == '')) {
-                  _context4.next = 12;
+                if (!(typeof _this6.data.noOfRows == "undefined" || _this6.data.noOfRows == '')) {
+                  _context5.next = 12;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required ",
                   text: "Row Field is Required",
                   icon: "error",
@@ -33548,12 +33615,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(typeof _this5.data.noOfCols == "undefined" || _this5.data.noOfCols == '')) {
-                  _context4.next = 14;
+                if (!(typeof _this6.data.noOfCols == "undefined" || _this6.data.noOfCols == '')) {
+                  _context5.next = 14;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required",
                   text: "Col Field is required",
                   icon: "error",
@@ -33561,15 +33628,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 14:
-                _this5.loading = true;
-                _context4.next = 17;
-                return _this5.callApi("post", "bus_classes/store", _this5.data);
+                _this6.loading = true;
+                _context5.next = 17;
+                return _this6.callApi("post", "bus_classes/store", _this6.data);
 
               case 17:
-                res = _context4.sent;
+                res = _context5.sent;
 
                 if (!(res.status == 201)) {
-                  _context4.next = 30;
+                  _context5.next = 30;
                   break;
                 }
 
@@ -33581,59 +33648,59 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#bus_class_table").DataTable().destroy();
-                _this5.loading = false;
-                _context4.next = 25;
-                return _this5.fetchBussClasses();
+                _this6.loading = false;
+                _context5.next = 25;
+                return _this6.fetchBussClasses();
 
               case 25:
-                _this5.data = {
+                _this6.data = {
                   busClassColor: "#000000"
                 };
-                _this5.isShowDiv = false;
+                _this6.isShowDiv = false;
                 window.scrollTo(0, 0);
-                _context4.next = 31;
+                _context5.next = 31;
                 break;
 
               case 30:
                 if (res.status == 422) {
-                  _this5.loading = false;
+                  _this6.loading = false;
 
-                  _loop = function _loop(key) {
+                  _loop2 = function _loop2(key) {
                     res.data.errors[key].forEach(function (element) {
-                      _this5.errorsArray(element, key);
+                      _this6.errorsArray(element, key);
                     });
                   };
 
                   for (key in res.data.errors) {
-                    _loop(key);
+                    _loop2(key);
                   }
                 }
 
               case 31:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     },
     updateBusClass: function updateBusClass() {
-      var _this6 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _this6.validationErrors = [];
+                _this7.validationErrors = [];
 
-                if (!(_this6.dataEdit.BusClassName === "")) {
-                  _context5.next = 3;
+                if (!(_this7.dataEdit.BusClassName === "")) {
+                  _context6.next = 3;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Bus Class name is required",
                   icon: "error",
@@ -33641,12 +33708,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (!(_this6.dataEdit.noOfRows === "0")) {
-                  _context5.next = 5;
+                if (!(_this7.dataEdit.noOfRows === "0")) {
+                  _context6.next = 5;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "row Field is required",
                   icon: "error",
@@ -33654,12 +33721,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this6.dataEdit.noOfCols === "0")) {
-                  _context5.next = 7;
+                if (!(_this7.dataEdit.noOfCols === "0")) {
+                  _context6.next = 7;
                   break;
                 }
 
-                return _context5.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Col Field is Required",
                   icon: "error",
@@ -33676,15 +33743,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 //     }
                 //     return seat;
                 // });
-                _this6.loading = true;
-                _context5.next = 10;
-                return _this6.callApi("post", "bus_classes/update", _this6.dataEdit);
+                _this7.loading = true;
+                _context6.next = 10;
+                return _this7.callApi("post", "bus_classes/update", _this7.dataEdit);
 
               case 10:
-                res = _context5.sent;
+                res = _context6.sent;
 
                 if (!(res.status == 200)) {
-                  _context5.next = 20;
+                  _context6.next = 20;
                   break;
                 }
 
@@ -33696,18 +33763,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#bus_class_table").DataTable().destroy();
-                _this6.loading = false;
-                _context5.next = 18;
-                return _this6.fetchBussClasses();
+                _this7.loading = false;
+                _context6.next = 18;
+                return _this7.fetchBussClasses();
 
               case 18:
-                _context5.next = 21;
+                _context6.next = 21;
                 break;
 
               case 20:
                 if (res.status == 422) {
                   (function () {
-                    _this6.dropScheduleButton = false;
+                    _this7.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -33727,20 +33794,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 21:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     deleteModal: function deleteModal(fare_class, i) {
-      var _this7 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var deletingObj;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 deletingObj = {
                   url: "bus_classes/delete",
@@ -33748,14 +33815,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   index: i
                 };
 
-                _this7.$store.commit("setDeleteObj", deletingObj);
+                _this8.$store.commit("setDeleteObj", deletingObj);
 
               case 2:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     edit: function edit(bus_class) {
@@ -33764,22 +33831,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
     },
     duplicate: function duplicate(id, index) {
-      var _this8 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                _this8.cloneDone = true;
-                _context7.next = 3;
-                return _this8.callApi("post", "bus_classes/duplicate", {
+                _this9.cloneDone = true;
+                _context8.next = 3;
+                return _this9.callApi("post", "bus_classes/duplicate", {
                   id: id
                 });
 
               case 3:
-                res = _context7.sent;
+                res = _context8.sent;
 
                 if (res.status == 201) {
                   swal({
@@ -33788,18 +33855,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this8.cloneDone = false;
+                  _this9.cloneDone = false;
                   $("#bus_class_table").DataTable().destroy();
 
-                  _this8.fetchBussClasses();
+                  _this9.fetchBussClasses();
 
-                  _this8.data = {
+                  _this9.data = {
                     busClassColor: "#000000"
                   };
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this8.cloneDone = false;
+                      _this9.cloneDone = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -33823,10 +33890,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     }
   },
@@ -61072,17 +61139,11 @@ var _hoisted_32 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_33 = [_hoisted_32];
-var _hoisted_34 = {
-  key: 2,
-  style: {
-    "display": "none"
-  },
-  "class": "btn btn-danger"
-};
+var _hoisted_34 = ["data-target", "onClick"];
 
 var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-trash-alt"
+    "class": "far fa-eye-slash"
   }, null, -1
   /* HOISTED */
   );
@@ -61682,6 +61743,7 @@ var _hoisted_159 = {
 var _hoisted_160 = {
   "class": "col-md-12"
 };
+var _hoisted_161 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
@@ -61689,7 +61751,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
 
-  var _component_Delete = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Delete");
+  var _component_Hide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Hide");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_ctx.checkForSubmenuButtons('add-bus-class') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
     key: 0,
@@ -61760,7 +61822,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-primary mx-1"
     }, _hoisted_33, 8
     /* PROPS */
-    , _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('delete-bus-class') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", _hoisted_34, _hoisted_36)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            :data-target=\"'#' + deleteFormID\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"deleteModal(busClass, i)\"")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    , _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('delete-bus-class') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 2,
+      "data-target": '#' + $data.hideFormID,
+      onClick: function onClick($event) {
+        return $data.delId = busClass.id;
+      },
+      "data-toggle": "modal",
+      "class": "btn btn-danger"
+    }, _hoisted_36, 8
+    /* PROPS */
+    , _hoisted_34)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -62239,12 +62311,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.updateSeatDetail($data.editSingleSeat.rowId, $data.editSingleSeat.colId);
     }),
     "data-dismiss": "modal"
-  }, " Update Seat Data ")])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Edit Modal End"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Delete, {
-    deleteForm: $data.deleteFormID,
-    confirmationMessage: "Are You Sure You want To Delete This Bus Class ???"
-  }, null, 8
+  }, " Update Seat Data ")])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("End Modal"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Hide, {
+    hideForm: $data.hideFormID,
+    confirmationMessage: "Are You Sure You want To Delete This City ???"
+  }, {
+    button: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "btn btn-danger btn-block",
+        disabled: $data.loading,
+        onClick: _cache[39] || (_cache[39] = function () {
+          return $options.hideBusClass && $options.hideBusClass.apply($options, arguments);
+        })
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Yes, I want to Delete'), 9
+      /* TEXT, PROPS */
+      , _hoisted_161)];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
   /* PROPS */
-  , ["deleteForm"])])]);
+  , ["hideForm"])])]);
 }
 
 /***/ }),
@@ -79169,7 +79257,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
           return $data.data.route = $event;
-        })
+        }),
+        readonly: ""
       }, [_hoisted_101, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: route.id,
@@ -79408,7 +79497,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         "onUpdate:modelValue": _cache[37] || (_cache[37] = function ($event) {
           return $data.dataEdit.schedules.route_id = $event;
-        })
+        }),
+        disabled: ""
       }, [_hoisted_181, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.editRoutes, function (route, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           value: route.id,

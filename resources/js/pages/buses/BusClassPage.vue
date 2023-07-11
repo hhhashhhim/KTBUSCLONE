@@ -87,13 +87,11 @@
                                                             >
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <button style="display:none;" class="btn btn-danger"
-                                                                    v-if="checkForSubmenuButtons('delete-bus-class')">
-                                                                <i class="far fa-trash-alt"></i>
+                                                            <button v-if="checkForSubmenuButtons('delete-bus-class')"
+                                                                    :data-target="'#' + hideFormID" @click="delId = busClass.id" data-toggle="modal"
+                                                                    class="btn btn-danger">
+                                                                <i class="far fa-eye-slash"></i>
                                                             </button>
-                                                            <!--                                                            :data-target="'#' + deleteFormID"-->
-                                                            <!--                                                            data-toggle="modal"-->
-                                                            <!--                                                            @click="deleteModal(busClass, i)"-->
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -645,18 +643,25 @@
             </div>
             <!--End Modal-->
 
-            <!--            Edit Modal End-->
-            <Delete
-                :deleteForm="deleteFormID"
-                confirmationMessage="Are You Sure You want To Delete This Bus Class ???"
-            />
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideBusClass"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
+
         </div>
     </section>
 </template>
 <script>
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
-import Delete from "../../components/Delete.vue";
+import Hide from "../../components/Hide.vue";
 import {mapGetters} from "vuex";
 
 export default {
@@ -664,7 +669,7 @@ export default {
     components: {
         Add,
         Edit,
-        Delete,
+        Hide,
     },
     data() {
         return {
@@ -673,7 +678,7 @@ export default {
             permissions: [],
             formID: "busClass_form",
             editFormID: "edit_busClass_form",
-            deleteFormID: "delete_busClass_form",
+            hideFormID: "delete_busClass_form",
             validationErrors: [],
             seatModify: {
                 class: 0,
@@ -929,8 +934,7 @@ export default {
                 rowId: rowId,
                 colId: colId,
             };
-        }
-        ,
+        },
 
         updateSeatDetail: function (rowId, colId) {
             if (this.editSeatModify.class == 0) {
@@ -1001,6 +1005,35 @@ export default {
                 timer: 2000,
             });
 
+        },
+        
+        async hideBusClass() {
+            this.loading = true;
+            const resHide = await this.callApi("post", 'bus_classes/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Bus Class Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                $('#bus_class_table').DataTable().destroy();
+                await this.fetchBussClasses();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
+            }
         },
 
         changeStatus: function (row, col) {
