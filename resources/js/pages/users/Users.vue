@@ -444,12 +444,12 @@
                         <label for="role">User Type <span class="text-danger ml-1">*</span></label>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"
-                                    id="femaleCheckBox"
+                                    id="femaleCheckBoxEdit"
                                     v-bind:checked="dataEdit.online_user == 1"
                                     @click="changeEditUser($event)"
                                     name="">
                             <label class="custom-control-label"
-                                    for="femaleCheckBox">Online User</label>
+                                    for="femaleCheckBoxEdit">Online User</label>
                         </div>
                     </div>
                 </div>
@@ -625,6 +625,7 @@ export default {
             this.data.destination = 0;
             this.roleName = '';
         },
+
 
         async fetchUsers() {
             const userRes = await this.callApi("post", "user",this.filterData);

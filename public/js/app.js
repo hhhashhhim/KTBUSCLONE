@@ -83444,7 +83444,7 @@ var _hoisted_133 = ["checked"];
 
 var _hoisted_134 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "class": "custom-control-label",
-  "for": "femaleCheckBox"
+  "for": "femaleCheckBoxEdit"
 }, "Online User", -1
 /* HOISTED */
 );
@@ -83938,7 +83938,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.check_allowed_seats]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [_hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
         "class": "custom-control-input",
-        id: "femaleCheckBox",
+        id: "femaleCheckBoxEdit",
         checked: $data.dataEdit.online_user == 1,
         onClick: _cache[33] || (_cache[33] = function ($event) {
           return $options.changeEditUser($event);
