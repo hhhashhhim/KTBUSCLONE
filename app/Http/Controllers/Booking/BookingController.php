@@ -1005,7 +1005,7 @@ class BookingController extends Controller
                 } else {
                     $old->update([
                         'elt_price' => $request->totalPrice,
-                        'elt_weightd' => $request->eltWeight,
+                        'elt_weight' => $request->eltWeight,
                         'elt_description' => $request->eltDescription,
                         'updated_by' => Auth::user()->company_id,
                     ]);
