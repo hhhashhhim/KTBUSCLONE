@@ -416,8 +416,8 @@ if (!function_exists('codeImage')) {
 if (!function_exists('codeImageElt')) {
     function codeImageElt($code)
     {
-        dd($code);
-        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=$code");
+        $codeEncode = urlencode($code);
+        $data = file_get_contents("https://api.qrserver.com/v1/create-qr-code/?data=$codeEncode&size=250x250");
         $id = explode("| ", $code)[10];
         $nameToStore = "ticketId" . "-" . (int)explode(":", $id)[1] . "-" . time() . ".png";
         $path = public_path() . '/Customers/Elt/';
