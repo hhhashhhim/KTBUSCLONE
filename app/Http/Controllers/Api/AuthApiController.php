@@ -11,7 +11,7 @@ class AuthApiController extends Controller
 {
     function login(Request $request)
     {
-        $user= User::where('email', $request->email)->first();
+        $user= User::where(['email'=> $request->email,"hide"=>0])->first(["id","name","email","contact"]);
         // print_r($data);
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response([
