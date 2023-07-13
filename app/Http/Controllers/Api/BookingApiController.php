@@ -18,6 +18,7 @@ use App\Models\FareClass;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\TerminalDiscount;
+use App\Models\Route\RouteFare;
 use App\Models\Ticket;
 use App\Http\Resources\SuccessResource;
 use App\Models\Booking\TicketAdvancedBooked;
@@ -33,12 +34,71 @@ use Exception;
 
 class BookingApiController extends Controller
 {
+    public function departureCities(Request $request)
+    {
+        try {
+                
+                $companyId = Auth::user()->company_id;
+                // Data
+                
+                $data = City::where(['company_id'=> $companyId,"hide"=>0])->get(["id","name"]);
+                
+                if($data->count() > 0)
+                {
+                    return new SuccessResource($data);
+                }
+                else
+                {
+                    return new EmptyResource($data);
+                }
+                
+            } catch (\Exception $e) {
+                return new BreakResource($e->getMessage());
+        }
+    }
+    
+    public function destinationCities(Request $request)
+    {
+        
+        try {
+
+                $validator = Validator::make($request->all(), [
+                    'departure_city_id' => 'required',
+                ]);
+            
+                // if validation fails
+                if ($validator->fails())
+                {
+                    return new ValidationResource($validator->errors());
+                }
+                
+                $companyId = Auth::user()->company_id;
+                // Data
+                
+                $destination_cities = RouteFare::where('departure_city_id', $request->departure_city_id)->where('company_id', $companyId)->pluck('destination_city_id')->toArray();
+                $data = City::whereIn('id', $destination_cities)->where(['company_id'=> $companyId,"hide"=>0])->get(['id', 'name']);
+                
+                
+                if($data->count() > 0)
+                {
+                    return new SuccessResource($data);
+                }
+                else
+                {
+                    return new EmptyResource($data);
+                }
+                
+            } catch (\Exception $e) {
+                return new BreakResource($e->getMessage());
+        }
+    }
+
     public function availableSchedules(Request $request)
     {
         try {
                 $validator = Validator::make($request->all(), [
-                    'departure_city' => 'required|string',
-                    'destination_city' => 'required|string',
+                    'departure_city_id' => 'required',
+                    'destination_city_id' => 'required',
                     'date' => 'required',
                 ]);
             
@@ -50,17 +110,9 @@ class BookingApiController extends Controller
                 
                 $companyId = Auth::user()->company_id;
                 // Data
-                $departure_id = City::where(["name"=>$request->departure_city,"company_id"=>$companyId])->first()->id??0;
-                $destination_id = City::where(["name"=>$request->destination_city,"company_id"=>$companyId])->first()->id??0;
 
-                $data = ScheduleDetail::with('schedule:id,name,bus_class_id','schedule.bus_class:id,name')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $departure_id, 'destination_id' => $destination_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
-                // foreach ($data as $single) {
-                    
-                //     $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time));
-                //     $single->departure_date = date("m/d/Y", strtotime($exactDate));
-                //     $single->departure_time = date("h:i A", strtotime($exactDate));
+                $data = ScheduleDetail::with('schedule:id,name,bus_class_id','schedule.bus_class:id,name')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
-                // }
                 
                 // data found | not found
                 if($data->count() > 0)

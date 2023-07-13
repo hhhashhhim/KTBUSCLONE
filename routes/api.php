@@ -37,6 +37,8 @@ Route::post('login', [AuthApiController::class, 'login']);
 Route::group(['middleware' => 'auth:sanctum'], function(){
    //All secure URL's
    Route::group(['prefix'=>'booking'],function(){
+      Route::post('/cities/departure',[BookingApiController::class,'departureCities']);
+      Route::post('/cities/destination',[BookingApiController::class,'destinationCities']);
       Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
       Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
       Route::post('/new',[BookingApiController::class,'bookSeat']);
