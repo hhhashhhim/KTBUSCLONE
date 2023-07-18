@@ -176,7 +176,7 @@ if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $company_id)
     {
         $customerAll = [];
-        foreach ($request->advance_booked_ids as $key => $single) {
+        foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
@@ -186,11 +186,11 @@ if (!function_exists('updateAdvancedSeat')) {
         }
         $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
         $updateId->update([
-            'name' => $request->customer_name,
-            'cnic' => is_null($request->customer_cnic) ? 0 : plainContactAndCnic($request->customer_cnic),
+            'name' => $request->customerName,
+            'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
             'contact' => plainContactAndCnic($request->contact),
         ]);
-        return new CreatedResource($request->advance_booked_ids);
+        return $request->alreadyBookedId[0];
     }
 }
 

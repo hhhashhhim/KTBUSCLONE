@@ -5,6 +5,7 @@ namespace App\Models\Schedule;
 use App\Models\Company;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\City;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,6 +21,14 @@ class ScheduleDetail extends Model
     public function addedBy()
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
+    }
+    public function departure_city()
+    {
+        return $this->hasOne( City::class, 'id', 'departure_id' );
+    }
+    public function destination_city()
+    {
+        return $this->hasOne( City::class, 'id', 'destination_id' );
     }
     public function schedule(){
         return $this->belongsTo( Schedule::class,'schedule_id','id');
