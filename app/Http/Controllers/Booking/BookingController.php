@@ -1104,6 +1104,7 @@ class BookingController extends Controller
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
+            'type' => "booked",
         ])->get();
 
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
