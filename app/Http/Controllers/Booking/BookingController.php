@@ -696,7 +696,8 @@ class BookingController extends Controller
             ], 422);
         }
 //        //Apply terminal discount
-        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->first();
+        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
+        ->where('end_date', '>=', date("Y-m-d"))->first();
 
         // Looping Through the seat of the bus
         $seatMap = $schedule->bus_class->seat_map;

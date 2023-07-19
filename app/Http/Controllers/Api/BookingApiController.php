@@ -109,11 +109,63 @@ class BookingApiController extends Controller
                 }
                 
                 $companyId = Auth::user()->company_id;
+                $terminalId = Auth::user()->terminal_id;
                 // Data
 
-                $data = ScheduleDetail::with('schedule:id,name,bus_class_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                $data = ScheduleDetail::with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name,seat_map',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
                 
+                $data->map(function($single) use ($companyId,$terminalId){
+                    foreach ($single->schedule->bus_class->seat_map as $i => $iValue) {
+                        foreach ($iValue as $j => $column) {
+                            if($column['reserved'])
+                            {
+                                $fare = FareTable::where([
+                                    'from_city_id'=> $single->departure_id,
+                                    'to_city_id'=> $single->destination_id,
+                                    'fare_class'=> $column['class'],
+                                    'company_id'=> $companyId,
+                                    ])
+                                    ->first()->fare;
+
+                                // to break inner both foreach loop
+                                break 2;
+                            }
+                        }
+                    }
+                    $single->total_fare = (int)$fare;
+                    $single->final_fare = (int)$fare;
+
+
+                    $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
+                    $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
+                    $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
+                    ->where('end_date', '>=', date("Y-m-d"))->first();
+                   
+                    if ($scheduleDiscount) {
+                        if ($scheduleDiscount->type == "percentage") {
+                            $number = $scheduleDiscount->percentage / 100;
+                            $percentage = (int)$single->total_fare * $number;
+                            $single->final_fare = round((int)$single->final_fare - $percentage);
+                        } else {
+                            $single->final_fare = (int)$single->final_fare - (int)$scheduleDiscount->flat;
+                        }
+                    }
+                    if ($terminalDiscount) {
+                        $tdiscount = ((int) $single->total_fare / 100) * (int)$terminalDiscount->discount;
+                        $single->final_fare = $single->final_fare - $tdiscount;
+                    }
+                    if ($scheduleSurcharge) {
+                        if ($scheduleSurcharge->type == "percentage") {
+                            $number = $scheduleSurcharge->percentage / 100;
+                            $percentage = (int)$single->total_fare * $number;
+                            $single->final_fare = round((int)$single->final_fare + $percentage);
+                        } else {
+                            $single->final_fare = (int)$single->final_fare + $scheduleSurcharge->flat;
+                        }
+                    }
+                    
+                });
                 // data found | not found
                 if($data->count() > 0)
                 {
