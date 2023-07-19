@@ -302,6 +302,7 @@
                                                 </button>
                                                 <button v-if="hideDivButtonsDrop" class="btn btn-success ml-1 btn-sm"
                                                         v-on:click="add()"
+                                                        :disabled="bookingLoading"
                                                         v-on:keyup.enter="add()">
                                                     {{
                                                         this.addForm.type == 'advance booking' ? 'Reserved Seat' :
@@ -1452,6 +1453,7 @@ export default {
             rescheduleSeatType: "booked",
             rescheduleDiscount: "",
             eltIds: "",
+            bookingLoading: false,
             EltButton: false,
             loadingRescheduleButton: false,
             dropScheduleButton: false,
@@ -2789,6 +2791,16 @@ export default {
             }
             this.addForm.pointsCardId = this.pointsCardId;
             this.addForm.usagePoints = this.checkedUsagePoints;
+            if(this.bookingLoading)
+            {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please Wait",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.bookingLoading = true;
             const resTicket = await this.callApi("post", "booking/store", this.addForm);
             if (resTicket.status == 200) {
                 iziToast.success({
@@ -2821,6 +2833,9 @@ export default {
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0;
+                setTimeout(() => {
+                    this.bookingLoading = false;
+                }, 1000);
                 this.fetchScheduleData();
                 this.resetArrays();
                 setTimeout(() => {
