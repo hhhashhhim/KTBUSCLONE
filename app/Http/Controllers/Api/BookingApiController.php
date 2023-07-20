@@ -166,15 +166,6 @@ class BookingApiController extends Controller
                             $single->final_fare = (int)$single->final_fare + $scheduleSurcharge->flat;
                         }
                     }
-
-
-                    // Unset the seat_map property
-                    if ($single->schedule->bus_class && (is_object($single->schedule->bus_class) || is_array($single->schedule->bus_class))) {
-                        // Unset the seat_map property if it exists
-                        if (property_exists($single->schedule->bus_class, 'seat_map')) {
-                            unset($single->schedule->bus_class->seat_map);
-                        }
-                    }
                     
                 });
                 // data found | not found
