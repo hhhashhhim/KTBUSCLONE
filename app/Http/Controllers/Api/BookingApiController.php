@@ -17,6 +17,7 @@ use App\Models\FareTable;
 use App\Models\FareClass;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Bus\BusClass;
 use App\Models\TerminalDiscount;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
@@ -112,11 +113,12 @@ class BookingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
                 // Data
 
-                $data = ScheduleDetail::with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name,seat_map',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                $data = ScheduleDetail::with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
                 
                 $data->map(function($single) use ($companyId,$terminalId){
-                    foreach ($single->schedule->bus_class->seat_map as $i => $iValue) {
+                    $seat_map = BusClass::find($single->schedule->bus_class_id);
+                    foreach ($seat_map->seat_map as $i => $iValue) {
                         foreach ($iValue as $j => $column) {
                             if($column['reserved'])
                             {
@@ -162,6 +164,15 @@ class BookingApiController extends Controller
                             $single->final_fare = round((int)$single->final_fare + $percentage);
                         } else {
                             $single->final_fare = (int)$single->final_fare + $scheduleSurcharge->flat;
+                        }
+                    }
+
+
+                    // Unset the seat_map property
+                    if ($single->schedule->bus_class && (is_object($single->schedule->bus_class) || is_array($single->schedule->bus_class))) {
+                        // Unset the seat_map property if it exists
+                        if (property_exists($single->schedule->bus_class, 'seat_map')) {
+                            unset($single->schedule->bus_class->seat_map);
                         }
                     }
                     
