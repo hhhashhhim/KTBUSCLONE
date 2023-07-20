@@ -95,7 +95,7 @@ class ScheduleClosingController extends Controller
             $commission += $fixcommission->sum("fix_commission");
             
             $single->elt += $eltAmount;
-            $single->commission += $commission;
+            $single->commission += (int)$commission;
 
             // for add cancelation charges into the sale
             $cancelTicket = Ticket::
