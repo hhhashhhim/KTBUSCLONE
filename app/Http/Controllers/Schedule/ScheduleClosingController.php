@@ -11,6 +11,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\TerminalCommission;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
@@ -48,7 +49,7 @@ class ScheduleClosingController extends Controller
         $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
             ->with("bus:id,bus_number")
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
-            ->with("tickets:id,ticket_merge_id,seat_fare,discount","tickets.elt:id,ticket_id,elt_price")
+            ->with("tickets:id,ticket_merge_id,seat_fare,discount,schedule_id,terminal_id","tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
 
         // this is for show sale at front
@@ -57,16 +58,44 @@ class ScheduleClosingController extends Controller
             $single->seat_fare = $single->tickets->sum("seat_fare");
             $single->discount = $single->tickets->sum("discount");
 
-            // elt amount
+            // elt amount | commission
             $eltAmount = 0;
+            $commission = 0;
+            $forFixCommission = [];
             foreach($single->tickets as $ticket)
             {
+                // elt
                 if($ticket->elt)
                 {
                     $eltAmount += $ticket->elt->elt_price;
                 }
+                // commission
+                $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->terminal_id])->first();
+                if($terminalCommission)
+                {    
+                    $forFixCommission[] = $terminalCommission->id;
+                    
+                    if($terminalCommission->flat_commission == 0)
+                        $commission += (($ticket->seat_fare - ($ticket->discount))/100)*$terminalCommission->percentage_commission;
+                    else
+                    {
+                        $commission += $terminalCommission->flat_commission;
+                    }
+                    // kt adjustment commission
+                    $commission += (($ticket->seat_fare - $ticket->discount)/100)*$terminalCommission->adjustment_commission;
+                }
+                else
+                {
+                    $commission += 0;
+                }
+                 
             }
+            
+            $fixcommission = TerminalCommission::whereIn("id",array_unique($forFixCommission))->get();
+            $commission += $fixcommission->sum("fix_commission");
+            
             $single->elt += $eltAmount;
+            $single->commission += $commission;
 
             // for add cancelation charges into the sale
             $cancelTicket = Ticket::

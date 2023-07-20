@@ -53,7 +53,7 @@
                                                             {{ merge.schedule_return_date }}
                                                         </td>
                                                         <td class="bg-danger">
-                                                            {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) }}
+                                                            {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) }}
                                                         </td>
                                                         <td v-if="checkForSubmenuButtons('add-expense')">
                                                             <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"
