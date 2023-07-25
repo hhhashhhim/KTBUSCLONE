@@ -270,7 +270,7 @@ class BookingController extends Controller
                     'departure_date' => $item['rescheduleDate'],
                     'departure_id' => $item['dataDepartureCity'],
                     'destination_id' => $item['dataDestination'],
-                    'schedule_id' => $item['dataSchedule'],
+                    'schedule_id' => $item['rescheduleSchedule'],
                 ])->first();
                 $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
@@ -279,7 +279,7 @@ class BookingController extends Controller
                 if ($item['dataDepartureCity'] != $departure_city_id || $item['dataDestination'] != $destination_city_id) {
                     $isPartial = 1;
                 }
-
+                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $scheduleDetail->schedule_date, 'schedule_id' => $scheduleDetail->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id','schedule_id']);
                 if ($item['selected_seatFare'] != $item['dataAll']['seat_fare']) {
                     RescheduleExtraAmount::create([
                         'company_id' => Auth::user()->company_id,
@@ -308,10 +308,11 @@ class BookingController extends Controller
                     'destination_city_id' => $item['dataDestination'],
                     'seat_no' => $item['selected_seatNo'],
                     'terminal_id' => $ticket['terminal_id'],
-                    'ticket_closing_id' => $ticket['ticket_closing_id'],
-                    'bus_id' => $ticket['bus_id'],
+                    'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
+                    'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
+                    'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
                     'bus_class_id' => $ticket['bus_class_id'],
-                    'seat_fare' => $ticket['seat_fare'],
+                    'seat_fare' => $item['selected_seatFare'],
                     'is_partial' => $isPartial,
                     'booking_no' => $bookingNo,
                     'schedule_date' => $scheduleDetail->schedule_date,
