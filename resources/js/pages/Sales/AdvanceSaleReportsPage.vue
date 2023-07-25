@@ -14,7 +14,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2">
+                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                             v-model="filterSales.terminal"
@@ -246,6 +246,7 @@ export default {
         return {
             terminals: [],
             users: [],
+            permissions: [],
             filters: [],
             refundFilters: [],
             filterSales: {
@@ -259,6 +260,8 @@ export default {
     },
     async created() {
         this.fetchFilters();
+        this.salesFilter();
+        this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);

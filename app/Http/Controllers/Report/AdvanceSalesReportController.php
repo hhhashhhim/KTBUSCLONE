@@ -35,8 +35,16 @@ class AdvanceSalesReportController extends Controller
         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
-            ->when($request->terminal, function ($query) use ($request) {
-                return $query->where('terminal_id', $request->terminal);
+            
+            ->where(function($query) use ($request){
+                if($request->terminal)
+                {
+                    return $query->where('terminal_id', $request->terminal);
+                }
+                else
+                {
+                    return $query->where('terminal_id', Auth::user()->terminal_id);
+                }
             })
             ->when($request->user, function ($query) use ($request) {
                 return $query->where('added_by', $request->user);
