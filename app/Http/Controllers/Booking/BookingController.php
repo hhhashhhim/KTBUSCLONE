@@ -70,6 +70,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         try {
             DB::beginTransaction();
             if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
@@ -83,9 +84,9 @@ class BookingController extends Controller
                 ->where('company_id', Auth::user()->company_id)
                 ->first();
             $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
-            $allTicket = [];
+            // $allTicket = [];
             if (isset($request->flag) && $request->flag == 1) {
-                $allTicket[] = updateAdvancedSeat($request, Auth::user()->company_id);
+                $allTicket = updateAdvancedSeat($request, Auth::user()->company_id);
             } else {
                 if (count($request->selectedSeats) == 0) {
                     return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);

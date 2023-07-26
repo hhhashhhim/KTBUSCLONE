@@ -30472,8 +30472,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context21.prev = _context21.next) {
               case 0:
-                _this22.addForm.alreadyBookedId = [];
-
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                   index = _this22.advanceSeat.indexOf(data.seatNo);
 
@@ -30501,7 +30499,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 2:
+              case 1:
               case "end":
                 return _context21.stop();
             }
@@ -30753,14 +30751,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this23.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                   _this23.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                   _this23.selectedSeats.length = 0;
-                  setTimeout(function () {
-                    _this23.bookingLoading = false;
-                  }, 1000);
+                  _this23.addForm.alreadyBookedId = [];
 
                   _this23.fetchScheduleData();
 
                   _this23.resetArrays();
 
+                  setTimeout(function () {
+                    _this23.bookingLoading = false;
+                  }, 1000);
                   setTimeout(function () {
                     if (resTicket.data.ticket[0].type == "booked") {
                       _this23.$refs.refTicket.submit();

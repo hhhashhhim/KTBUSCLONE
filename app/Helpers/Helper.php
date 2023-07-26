@@ -190,7 +190,7 @@ if (!function_exists('updateAdvancedSeat')) {
             'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
             'contact' => plainContactAndCnic($request->contact),
         ]);
-        return $request->alreadyBookedId[0];
+        return $request->alreadyBookedId;
     }
 }
 

@@ -2625,7 +2625,6 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            this.addForm.alreadyBookedId = [];
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
@@ -2832,12 +2831,13 @@ export default {
                 this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
-                this.selectedSeats.length = 0;
-                setTimeout(() => {
-                    this.bookingLoading = false;
-                }, 1000);
+                this.selectedSeats.length = 0; 
+                this.addForm.alreadyBookedId = [];           
                 this.fetchScheduleData();
                 this.resetArrays();
+                 setTimeout(() => {
+                    this.bookingLoading = false;
+                }, 1000);
                 setTimeout(() => {
                     if (resTicket.data.ticket[0].type == "booked") {
                         this.$refs.refTicket.submit();
