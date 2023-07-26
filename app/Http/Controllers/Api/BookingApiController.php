@@ -140,7 +140,7 @@ class BookingApiController extends Controller
                     }
                     $single->total_fare = (int)$fare;
                     $single->final_fare = (int)$fare;
-                    $single->available_seats = $counter;
+                    // $single->available_seats = $counter;
 
 
                     $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
