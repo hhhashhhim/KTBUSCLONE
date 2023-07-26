@@ -138,9 +138,10 @@ class BookingApiController extends Controller
                             }
                         }
                     }
+                    $bookedTickets = Ticket::where(["company_id"=>$companyId,"schedule_id"=>$single->schedule_id,"schedule_date"=>$single->schedule_date])->get()->count();
                     $single->total_fare = (int)$fare;
                     $single->final_fare = (int)$fare;
-                    // $single->available_seats = $counter;
+                    $single->available_seats = $counter - $bookedTickets;
 
 
                     $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
