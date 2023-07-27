@@ -317,6 +317,7 @@ class ScheduleClosingController extends Controller
 
         Ticket::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->update([
             "bus_id" => $request->bus,
+            "ticket_merge_id" => $checkMergeRecord ? $checkMergeRecord->id : $newRecord->id,
         ]);
     }
 
