@@ -119,6 +119,7 @@ class BookingApiController extends Controller
                 $data->map(function($single) use ($companyId,$terminalId){
                     $seat_map = BusClass::find($single->schedule->bus_class_id);
                     $counter = 0;
+                    $bus_class_id = [];
                     foreach ($seat_map->seat_map as $i => $iValue) {
                         foreach ($iValue as $j => $column) {
                             if($column['reserved'])
@@ -135,42 +136,68 @@ class BookingApiController extends Controller
                                 {
                                     $counter++;
                                 }
+                                
+                                $bus_class_id[] = $column['class'];
+                                
                             }
                         }
                     }
                     $bookedTickets = Ticket::where(["company_id"=>$companyId,"schedule_id"=>$single->schedule_id,"schedule_date"=>$single->schedule_date])->get()->count();
+                    $single->available_seats = $counter - $bookedTickets;
                     $single->total_fare = (int)$fare;
                     $single->final_fare = (int)$fare;
-                    $single->available_seats = $counter - $bookedTickets;
-
-
-                    $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
-                    $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
-                    $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
-                    ->where('end_date', '>=', date("Y-m-d"))->first();
-                   
-                    if ($scheduleDiscount) {
-                        if ($scheduleDiscount->type == "percentage") {
-                            $number = $scheduleDiscount->percentage / 100;
-                            $percentage = (int)$single->total_fare * $number;
-                            $single->final_fare = round((int)$single->final_fare - $percentage);
-                        } else {
-                            $single->final_fare = (int)$single->final_fare - (int)$scheduleDiscount->flat;
+                    
+                    // this loop get all fare classes from seat map and fetch original fare and discount fare
+                    foreach($bus_class_id as $value)
+                    {
+                        // orginal fare
+                        $name = FareClass::find($value)->name;
+                        $fare = FareTable::where([
+                            'from_city_id'=> $single->departure_id,
+                            'to_city_id'=> $single->destination_id,
+                            'fare_class'=> $value,
+                            'company_id'=> $companyId,
+                            ])
+                            ->first()->fare;
+                        $original_fare[$name] = (int)$fare; 
+                        
+                        // this is for discounted price
+                        $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
+                        $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
+                        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
+                        ->where('end_date', '>=', date("Y-m-d"))->first();
+                    
+                        $editFare = $fare;
+                        if ($scheduleDiscount) {
+                            if ($scheduleDiscount->type == "percentage") {
+                                $number = $scheduleDiscount->percentage / 100;
+                                $percentage = (int)$editFare * $number;
+                                $editFare = round((int)$editFare - $percentage);
+                            } else {
+                                $editFare = (int)$editFare - (int)$scheduleDiscount->flat;
+                            }
                         }
-                    }
-                    if ($terminalDiscount) {
-                        $tdiscount = ((int) $single->total_fare / 100) * (int)$terminalDiscount->discount;
-                        $single->final_fare = $single->final_fare - $tdiscount;
-                    }
-                    if ($scheduleSurcharge) {
-                        if ($scheduleSurcharge->type == "percentage") {
-                            $number = $scheduleSurcharge->percentage / 100;
-                            $percentage = (int)$single->total_fare * $number;
-                            $single->final_fare = round((int)$single->final_fare + $percentage);
-                        } else {
-                            $single->final_fare = (int)$single->final_fare + $scheduleSurcharge->flat;
+                        if ($terminalDiscount) {
+                            $tdiscount = ((int) $fare / 100) * (int)$terminalDiscount->discount;
+                            $editFare = $editFare - $tdiscount;
                         }
+                        if ($scheduleSurcharge) {
+                            if ($scheduleSurcharge->type == "percentage") {
+                                $number = $scheduleSurcharge->percentage / 100;
+                                $percentage = (int)$fare * $number;
+                                $editFare = round((int)$editFare + $percentage);
+                            } else {
+                                $editFare = (int)$editFare + $scheduleSurcharge->flat;
+                            }
+                        }
+                        /////////
+
+                        // after discount
+                        $discounted_fare[$name] = (int)$editFare;
                     }
+
+                    $single->total_fare = $original_fare;
+                    $single->final_fare = $discounted_fare;
                     
                 });
                 // data found | not found
