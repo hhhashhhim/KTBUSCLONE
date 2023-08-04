@@ -84284,8 +84284,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-var url = '/kt/'; // const url = '/'
+ // const url = '/kt/'
+// const url = '/'
 
 var routes = [{
   path: url + "",
