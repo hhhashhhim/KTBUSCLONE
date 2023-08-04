@@ -198,10 +198,14 @@
             @endphp
             @endif
         @endforeach
+        @php $refundAmount = 0;  @endphp
+        @foreach($refundTerminal as $refund)
         <tr>
-            <th colspan="8">Refund Amount</th>
-            <th colspan="3">{{ $refundAmount }}</th>
+            <th colspan="8">{{ $refund['terminal'] }} refund</th>
+            <th colspan="3">{{ $refund['amount'] }}</th>
+            @php $refundAmount += $refund['amount'] @endphp
         </tr>
+        @endforeach
         <tr>
             <th colspan="8">Gross Sale</th>
             <th colspan="3">{{ (((($totalSale + $totalElt + $refundAmount) - $totalDiscount) - $totalCommission) - $totalFixCommission) - $totalAdjustCommission }}</th>

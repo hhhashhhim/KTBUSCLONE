@@ -1196,16 +1196,33 @@ class BookingController extends Controller
                 'schedule_date' => $uniqueDate,
                 'type' => "canceled",
             ])
-            ->with("cancel_ticket:id,ticket_id,percentage")
-            ->get(["id","seat_fare","discount"]);
+            ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
+            ->get(["id","seat_fare","discount","terminal_id"])->groupBy("terminal_id");
 
-        $refundAmount = 0;
-        $cancelTicket->map(function($single) use (&$refundAmount){
-            if($single->cancel_ticket)
-            {
-                $refundAmount += (($single->seat_fare - $single->discount) / 100) * $single->cancel_ticket->percentage;
-            }
+        $refundTerminal = [];
+        $cancelTicket->map(function($single) use (&$refundTerminal){
+            
+            $refundAmount = 0;
+            $single->map(function($ticket) use (&$refundAmount){
+            
+                if($ticket->cancel_ticket)
+                {
+                    $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
+                }
+            });
+            $singleTerminal = [];
+            $singleTerminal["terminal"] = $single[0]->terminal->name;
+            $singleTerminal["amount"] = $refundAmount;
+
+            $refundTerminal[] = $singleTerminal;
         });
+        // $refundAmount = 0;
+        // $cancelTicket->map(function($single) use (&$refundAmount){
+        //     if($single->cancel_ticket)
+        //     {
+        //         $refundAmount += (($single->seat_fare - $single->discount) / 100) * $single->cancel_ticket->percentage;
+        //     }
+        // });
         
         $busData = TicketClosing::where([
             'company_id' => Auth::user()->company_id,
@@ -1216,7 +1233,7 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundAmount" => $refundAmount]);
+        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal]);
     }
 
     public

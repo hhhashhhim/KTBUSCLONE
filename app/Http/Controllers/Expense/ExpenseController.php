@@ -96,7 +96,7 @@ class ExpenseController extends Controller
         $singleData->city_one = explode("-", $schedule[0]->route->name)[0];
         $singleData->city_two = explode("-", $schedule[1]->route->name ?? $schedule[0]->route->name)[0];
 
-
+        
         return view('reports.dailySaleReport', [
             "singleData" => $singleData,
             "data" => $data
