@@ -88,10 +88,12 @@
                     <th>Terminal Name</th>
                     <th>Passenger Count</th>
                     <th>Amount</th>
+                    <th>Elt</th>
                 </tr>
                 @php
                     $startTotalPass = 0;
                     $startTotalAmount = 0;
+                    $startTotalElt = 0;
                 @endphp
                 @foreach($data->schedule_start as $item)
                     <tr>
@@ -131,20 +133,23 @@
                                 @endif
                             @endforeach
                             
-                            {{($item->sum('seat_fare') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission }}
+                            {{($item->sum('seat_fare') - $item->sum('discount')) - $startCommission - $startAdjustCommission - $startFixCommission }}
                         
                         </td>
                         @php
-                            $startTotalAmount += ($item->sum('seat_fare') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission;
+                            $startTotalAmount += ($item->sum('seat_fare') - $item->sum('discount')) - $startCommission - $startAdjustCommission - $startFixCommission;
                         @endphp
+                        <td>{{ $startElt }}</td>
+                        @php $startTotalElt += $startElt @endphp
                     </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 46%">Total</td>
-                    <td>{{$startTotalPass}}</td>
-                    <td style="width: 17.5%">{{$startTotalAmount}}</td>
+                    <td style="width: 44%">Total</td>
+                    <td style="width: 32%">{{$startTotalPass}}</td>
+                    <td style="width: 17%">{{$startTotalAmount}}</td>
+                    <td style="">{{$startTotalElt}}</td>
                 </tr>
             </table>
 
@@ -161,10 +166,12 @@
                     <th style="border:1px solid rgb(80, 79, 79) !important">Terminal Name</th>
                     <th style="border:1px solid rgb(80, 79, 79) !important">Passenger Count</th>
                     <th style="border-right: none !important;">Amount</th>
+                    <th style="border-right: none !important;">Elt</th>
                 </tr>
                 @php
                     $returnTotalPass = 0;
                     $returnTotalAmount = 0;
+                    $returnTotalElt = 0;
                 @endphp
                 @foreach($data->schedule_return as $item)
                     <tr>
@@ -204,19 +211,21 @@
                                 @endif
                             @endforeach
                             
-                            {{($item->sum('seat_fare') + $returnElt - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission }}
+                            {{($item->sum('seat_fare') - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission }}
                         </td>
                         @php
-                            $returnTotalAmount += ($item->sum('seat_fare') + $returnElt - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission ;
+                            $returnTotalAmount += ($item->sum('seat_fare') - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission ;
                         @endphp
+                        <td>{{ $returnElt }}</td>
                     </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 46%">Total</td>
-                    <td>{{$returnTotalPass}}</td>
+                    <td style="width: 43%">Total</td>
+                    <td style="width: 38%">{{$returnTotalPass}}</td>
                     <td style="width: 17.5%">{{$returnTotalAmount}}</td>
+                    <td style=""> {{$returnElt}}</td>
                 </tr>
 
             </table>
@@ -245,7 +254,10 @@
                 </tr>
             </table>
         </div>
-
+        @php
+            $startTotalAmount +=$startTotalElt;
+            $returnTotalAmount +=$returnTotalElt;
+        @endphp
         <div style="margin-top: 30px;">
             <table border="2" style="text-align: center;">
                 <tr>
@@ -268,6 +280,16 @@
                     <td style="width: 17.5%">{{$startTotalAmount + $returnTotalAmount}}</td>
                 </tr>
             </table>
+            @php $refundAmount = 0; @endphp
+            @foreach($refundTerminal as $refund)
+            <table border="2" style="text-align: center;">
+                <tr>
+                    <td style="width: 50%">{{ $refund['terminal'] }} refund</td>
+                    <td style="width: 50%">{{$refund['amount']}}</td>
+                </tr>
+            </table>
+            @php $refundAmount += $refund['amount'] @endphp
+            @endforeach
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 50%">Expenses</td>
@@ -277,7 +299,7 @@
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 50%">Net Profit</td>
-                    <td style="width: 50%">{{$startTotalAmount + $returnTotalAmount - $data->expense->sum('amount')}}</td>
+                    <td style="width: 50%">{{$startTotalAmount + $refundAmount + $returnTotalAmount - $data->expense->sum('amount')}}</td>
                 </tr>
             </table>
         </div>

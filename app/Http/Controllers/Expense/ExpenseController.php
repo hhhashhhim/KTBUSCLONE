@@ -73,6 +73,7 @@ class ExpenseController extends Controller
 
     public function dailySummery(Request $request)
     {
+        
         $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
         $data = (object)[];
         
@@ -96,10 +97,40 @@ class ExpenseController extends Controller
         $singleData->city_one = explode("-", $schedule[0]->route->name)[0];
         $singleData->city_two = explode("-", $schedule[1]->route->name ?? $schedule[0]->route->name)[0];
 
+        // refund amount
+        $cancelTicket = Ticket::
+            onlyTrashed()
+            ->where([
+                'company_id' => Auth::user()->company_id,
+                'ticket_merge_id' => $request->ticket_merge_id,
+                'type' => "canceled",
+            ])
+            ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
+            ->get(["id","seat_fare","discount","terminal_id"])->groupBy("terminal_id");
+
+        $refundTerminal = [];
+        $cancelTicket->map(function($single) use (&$refundTerminal){
+            
+            $refundAmount = 0;
+            $single->map(function($ticket) use (&$refundAmount){
+            
+                if($ticket->cancel_ticket)
+                {
+                    $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
+                }
+            });
+            $singleTerminal = [];
+            $singleTerminal["terminal"] = $single[0]->terminal->name;
+            $singleTerminal["amount"] = $refundAmount;
+
+            $refundTerminal[] = $singleTerminal;
+        });
+        // //////////
         
         return view('reports.dailySaleReport', [
             "singleData" => $singleData,
-            "data" => $data
+            "data" => $data,
+            "refundTerminal" => $refundTerminal
         ]);
     }
 }
