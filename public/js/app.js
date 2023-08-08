@@ -27323,11 +27323,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     // refund Table
     refundTotalCharges: function refundTotalCharges() {
+      // if (this.filters.refund) {
+      //     return this.filters.refund.reduce((sum, single) => {
+      //         return sum += single.cancelation_charges;
+      //     }, 0)
+      // }
       if (this.filters.refund) {
-        return this.filters.refund.reduce(function (sum, single) {
-          return sum += single.cancelation_charges;
-        }, 0);
+        var totalCharges = 0;
+
+        for (var key in this.filters.refund) {
+          if (this.filters.refund.hasOwnProperty(key)) {
+            totalCharges += this.filters.refund[key].cancelation_charges;
+          }
+        }
+
+        return totalCharges;
       }
+
+      return 0; // Return 0 if this.filters.refund is falsy
     },
     // Counter amount
     totalCounterAmount: function totalCounterAmount() {
@@ -27339,10 +27352,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     refundTotal: function refundTotal() {
       if (this.filters.refund) {
-        return this.filters.refund.reduce(function (sum, single) {
-          return sum += single.amount_refund;
-        }, 0);
+        var totalRefund = 0;
+
+        for (var key in this.filters.refund) {
+          if (this.filters.refund.hasOwnProperty(key)) {
+            totalRefund += this.filters.refund[key].amount_refund;
+          }
+        }
+
+        return totalRefund;
       }
+
+      return 0; // Return 0 if this.filters.refund is falsy
     },
     refundTotalSeats: function refundTotalSeats() {
       if (this.filters.refund) {

@@ -339,11 +339,21 @@ export default {
         },
         // refund Table
         refundTotalCharges: function () {
+            // if (this.filters.refund) {
+            //     return this.filters.refund.reduce((sum, single) => {
+            //         return sum += single.cancelation_charges;
+            //     }, 0)
+            // }
             if (this.filters.refund) {
-                return this.filters.refund.reduce((sum, single) => {
-                    return sum += single.cancelation_charges;
-                }, 0)
+                let totalCharges = 0;
+                for (const key in this.filters.refund) {
+                    if (this.filters.refund.hasOwnProperty(key)) {
+                        totalCharges += this.filters.refund[key].cancelation_charges;
+                    }
+                }
+                return totalCharges;
             }
+            return 0; // Return 0 if this.filters.refund is falsy
         },
         // Counter amount
         totalCounterAmount: function () {
@@ -355,10 +365,15 @@ export default {
         },
         refundTotal: function () {
             if (this.filters.refund) {
-                return this.filters.refund.reduce((sum, single) => {
-                    return sum += single.amount_refund;
-                }, 0)
+            let totalRefund = 0;
+            for (const key in this.filters.refund) {
+                if (this.filters.refund.hasOwnProperty(key)) {
+                    totalRefund += this.filters.refund[key].amount_refund;
+                }
             }
+            return totalRefund;
+        }
+        return 0; // Return 0 if this.filters.refund is falsy
         },
             refundTotalSeats: function () {
                 if (this.filters.refund) {
