@@ -27158,6 +27158,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       terminals: [],
+      loadingTable: false,
       users: [],
       permissions: [],
       filters: [],
@@ -27182,8 +27183,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this.fetchFilters();
 
-              _this.salesFilter();
-
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -27195,7 +27194,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -27252,19 +27251,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _context3.next = 2;
-                return _this3.callApi("post", 'advance/sales/fetchFilterData', _this3.filterSales);
+                if (_this3.filterSales.fromDateTime) {
+                  _context3.next = 2;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "From date is required",
+                  icon: "error",
+                  timer: 2000
+                }));
 
               case 2:
+                if (_this3.filterSales.toDateTime) {
+                  _context3.next = 4;
+                  break;
+                }
+
+                return _context3.abrupt("return", swal({
+                  title: "Required",
+                  text: "To date is required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 4:
+                _this3.loadingTable = true;
+                _context3.next = 7;
+                return _this3.callApi("post", 'advance/sales/fetchFilterData', _this3.filterSales);
+
+              case 7:
                 resFetchData = _context3.sent;
 
                 if (resFetchData.status == 200) {
                   _this3.filters.record = resFetchData.data.record;
                   _this3.filters.refund = resFetchData.data.refund;
                   _this3.filters.counterExpenses = resFetchData.data.counterExpenses;
+                  _this3.loadingTable = false;
                 }
 
-              case 4:
+              case 9:
               case "end":
                 return _context3.stop();
             }
@@ -54867,7 +54894,7 @@ var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_24 = ["value"];
 var _hoisted_25 = {
-  "class": "col-md-3"
+  "class": "col-md-2"
 };
 
 var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
@@ -54879,7 +54906,7 @@ var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_27 = {
-  "class": "col-md-3"
+  "class": "col-md-2"
 };
 
 var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
@@ -54891,26 +54918,30 @@ var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_29 = {
+  "class": "col-md-2"
+};
+var _hoisted_30 = ["disabled"];
+var _hoisted_31 = {
   "class": "row mt-2"
 };
-var _hoisted_30 = {
+var _hoisted_32 = {
   "class": "col-md-12"
 };
-var _hoisted_31 = {
+var _hoisted_33 = {
   "class": "table-responsive"
 };
-var _hoisted_32 = {
+var _hoisted_34 = {
   "class": "table table-striped table-hover text-center",
   id: "saleReportTable"
 };
 
-var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No of Seat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "User Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT Amount")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2"
   }, null, -1
@@ -54918,7 +54949,7 @@ var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2"
   }, null, -1
@@ -54926,11 +54957,11 @@ var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_36 = {
+var _hoisted_38 = {
   "class": "col-md-12 text-center"
 };
 
-var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "my-1"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
@@ -54940,23 +54971,23 @@ var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_38 = {
+var _hoisted_40 = {
   "class": "table-responsive"
 };
-var _hoisted_39 = {
+var _hoisted_41 = {
   "class": "table table-striped table-hover",
   style: {
     "border": "3px solid #b9b9b9"
   }
 };
 
-var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "SR NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "TICKET ID"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "TERMINAL"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "BUS NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "SEAT NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "REFUND AMOUNT"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CANCELATION CHARGES"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "BUS TIMING"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "REFUND BY"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CANCELATION DATE")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "4"
   }, null, -1
@@ -54964,7 +54995,7 @@ var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "3"
   }, null, -1
@@ -54972,11 +55003,11 @@ var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_43 = {
+var _hoisted_45 = {
   "class": "col-md-12 text-center"
 };
 
-var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "my-1"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
@@ -54986,23 +55017,23 @@ var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_45 = {
+var _hoisted_47 = {
   "class": "table-responsive"
 };
-var _hoisted_46 = {
+var _hoisted_48 = {
   "class": "table table-striped table-hover",
   style: {
     "border": "3px solid #b9b9b9"
   }
 };
 
-var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Narration"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, " Added By")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2"
   }, null, -1
@@ -55010,7 +55041,7 @@ var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2"
   }, null, -1
@@ -55018,11 +55049,11 @@ var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_50 = {
+var _hoisted_52 = {
   "class": "col-md-12 text-center"
 };
 
-var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "my-1"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
@@ -55032,29 +55063,13 @@ var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_52 = {
+var _hoisted_54 = {
   "class": "table-responsive w-100"
 };
-var _hoisted_53 = {
+var _hoisted_55 = {
   "class": "table table-striped table-hover",
   style: {
     "border": "3px solid #b9b9b9"
-  }
-};
-
-var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "CASH ON COUNTER", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_55 = {
-  style: {
-    "width": "25% !important"
   }
 };
 
@@ -55063,7 +55078,7 @@ var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
     style: {
       "width": "75% !important"
     }
-  }, "TOTAL ELT", -1
+  }, "CASH ON COUNTER", -1
   /* HOISTED */
   );
 });
@@ -55079,7 +55094,7 @@ var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
     style: {
       "width": "75% !important"
     }
-  }, "TOTAL REFUND", -1
+  }, "TOTAL ELT", -1
   /* HOISTED */
   );
 });
@@ -55095,7 +55110,7 @@ var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
     style: {
       "width": "75% !important"
     }
-  }, "TOTAL CANCELLATION CHARGES ", -1
+  }, "TOTAL REFUND", -1
   /* HOISTED */
   );
 });
@@ -55111,12 +55126,28 @@ var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
     style: {
       "width": "75% !important"
     }
-  }, "Total Counter Expenses ", -1
+  }, "TOTAL CANCELLATION CHARGES ", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_63 = {
+  style: {
+    "width": "25% !important"
+  }
+};
+
+var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    style: {
+      "width": "75% !important"
+    }
+  }, "Total Counter Expenses ", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_65 = {
   style: {
     "width": "25% !important"
   }
@@ -55129,9 +55160,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "form-control",
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
       return $data.filterSales.terminal = $event;
-    }),
-    onChange: _cache[1] || (_cache[1] = function ($event) {
-      return $options.salesFilter();
     })
   }, [_hoisted_15, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (terminal, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -55142,16 +55170,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_16);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
+  ))], 512
+  /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterSales.terminal]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "usernameFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return $data.filterSales.user = $event;
-    }),
-    onChange: _cache[3] || (_cache[3] = function ($event) {
-      return $options.salesFilter();
     })
   }, [_hoisted_19, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.users, function (user, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -55162,16 +55187,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_20);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
+  ))], 512
+  /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterSales.user]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "routeFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $data.filterSales.route = $event;
-    }),
-    onChange: _cache[5] || (_cache[5] = function ($event) {
-      return $options.salesFilter();
     })
   }, [_hoisted_23, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.routes, function (route, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -55182,36 +55204,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_24);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
+  ))], 512
+  /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterSales.route]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "fromDate",
     type: "datetime-local",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $data.filterSales.fromDateTime = $event;
-    }),
-    onChange: _cache[7] || (_cache[7] = function ($event) {
-      return $options.salesFilter();
     })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
+  }, null, 512
+  /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterSales.fromDateTime]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "toDate",
     type: "datetime-local",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $data.filterSales.toDateTime = $event;
-    }),
-    onChange: _cache[9] || (_cache[9] = function ($event) {
-      return $options.salesFilter();
     })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterSales.toDateTime]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.record, function (data, i) {
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterSales.toDateTime]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "btn btn-primary mt-4",
+    type: "button",
+    onClick: _cache[5] || (_cache[5] = function ($event) {
+      return $options.salesFilter();
+    }),
+    disabled: $data.loadingTable
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Fetch Record'), 9
+  /* TEXT, PROPS */
+  , _hoisted_30)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.record, function (data, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.date), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.bus_class), 1
     /* TEXT */
@@ -55228,13 +55253,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeats = $options.totalSeats()) !== null && _$options$totalSeats !== void 0 ? _$options$totalSeats : 0), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeats = $options.totalSeats()) !== null && _$options$totalSeats !== void 0 ? _$options$totalSeats : 0), 1
   /* TEXT */
-  ), _hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa = $options.totalSeatFare()) !== null && _$options$totalSeatFa !== void 0 ? _$options$totalSeatFa : 0), 1
+  ), _hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa = $options.totalSeatFare()) !== null && _$options$totalSeatFa !== void 0 ? _$options$totalSeatFa : 0), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalEltFar = $options.totalEltFare()) !== null && _$options$totalEltFar !== void 0 ? _$options$totalEltFar : 0), 1
   /* TEXT */
-  )])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund Ticket "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.refund, function (dataRefund, i) {
+  )])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund Ticket "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.refund, function (dataRefund, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
@@ -55260,13 +55285,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal = $options.refundTotalSeats()) !== null && _$options$refundTotal !== void 0 ? _$options$refundTotal : 0), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal = $options.refundTotalSeats()) !== null && _$options$refundTotal !== void 0 ? _$options$refundTotal : 0), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal2 = $options.refundTotal()) !== null && _$options$refundTotal2 !== void 0 ? _$options$refundTotal2 : 0), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal3 = $options.refundTotalCharges()) !== null && _$options$refundTotal3 !== void 0 ? _$options$refundTotal3 : 0), 1
   /* TEXT */
-  ), _hoisted_42])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.counterExpenses, function (single, i) {
+  ), _hoisted_44])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.counterExpenses, function (single, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
@@ -55282,17 +55307,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte = $options.totalCounterAmount()) !== null && _$options$totalCounte !== void 0 ? _$options$totalCounte : 0), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte = $options.totalCounterAmount()) !== null && _$options$totalCounte !== void 0 ? _$options$totalCounte : 0), 1
   /* TEXT */
-  ), _hoisted_49])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa2 = $options.totalSeatFare()) !== null && _$options$totalSeatFa2 !== void 0 ? _$options$totalSeatFa2 : 0), 1
+  ), _hoisted_51])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa2 = $options.totalSeatFare()) !== null && _$options$totalSeatFa2 !== void 0 ? _$options$totalSeatFa2 : 0), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalEltFar2 = $options.totalEltFare()) !== null && _$options$totalEltFar2 !== void 0 ? _$options$totalEltFar2 : 0), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalEltFar2 = $options.totalEltFare()) !== null && _$options$totalEltFar2 !== void 0 ? _$options$totalEltFar2 : 0), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal4 = $options.refundTotal()) !== null && _$options$refundTotal4 !== void 0 ? _$options$refundTotal4 : 0), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal4 = $options.refundTotal()) !== null && _$options$refundTotal4 !== void 0 ? _$options$refundTotal4 : 0), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal5 = $options.refundTotalCharges()) !== null && _$options$refundTotal5 !== void 0 ? _$options$refundTotal5 : 0), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal5 = $options.refundTotalCharges()) !== null && _$options$refundTotal5 !== void 0 ? _$options$refundTotal5 : 0), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte2 = $options.totalCounterAmount()) !== null && _$options$totalCounte2 !== void 0 ? _$options$totalCounte2 : 0), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte2 = $options.totalCounterAmount()) !== null && _$options$totalCounte2 !== void 0 ? _$options$totalCounte2 : 0), 1
   /* TEXT */
   )])])])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
 }

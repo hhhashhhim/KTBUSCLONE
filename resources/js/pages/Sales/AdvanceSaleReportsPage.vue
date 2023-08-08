@@ -18,7 +18,7 @@
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                             v-model="filterSales.terminal"
-                                                            @change="salesFilter()">
+                                                        >
                                                         <option value="0">Select Terminals</option>
                                                         <option v-for="(terminal, i) in terminals" :key="i"
                                                                 :value="terminal.id">
@@ -30,7 +30,7 @@
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                             v-model="filterSales.user"
-                                                            @change="salesFilter()">
+                                                        >
                                                         <option value="0">Select Users</option>
                                                         <option v-for="(user, i) in users" :key="i"
                                                                 :value="user.id">
@@ -42,7 +42,7 @@
                                                     <label for="routeFilter">Routes</label>
                                                     <select id="routeFilter" class="form-control"
                                                             v-model="filterSales.route"
-                                                            @change="salesFilter()">
+                                                        >
                                                         <option value="0">Select Route</option>
                                                         <option v-for="(route, i) in routes" :key="i"
                                                                 :value="route.id">
@@ -50,15 +50,21 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label for="fromDate">From Date Time</label>
                                                     <input id="fromDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.fromDateTime" @change="salesFilter()">
+                                                           v-model="filterSales.fromDateTime">
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label for="toDate">To Date Time</label>
                                                     <input id="toDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.toDateTime" @change="salesFilter()">
+                                                           v-model="filterSales.toDateTime">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button class="btn btn-primary mt-4" type="button" @click="salesFilter()"
+                                                            :disabled="loadingTable">
+                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="row mt-2">
@@ -80,7 +86,7 @@
 
                                                             <tbody>
                                                             <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ i }}</td>
+                                                                <td>{{ data.date }}</td>
                                                                 <td>{{ data.bus_class }}</td>
                                                                 <td>{{ data.seats }}</td>
                                                                 <td>{{ data.terminal }}</td>
@@ -245,6 +251,7 @@ export default {
     data() {
         return {
             terminals: [],
+            loadingTable: false,
             users: [],
             permissions: [],
             filters: [],
@@ -260,7 +267,6 @@ export default {
     },
     async created() {
         this.fetchFilters();
-        this.salesFilter();
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
@@ -285,11 +291,27 @@ export default {
 
         },
         async salesFilter() {
+            if (!this.filterSales.fromDateTime)
+                return swal({
+                    title: "Required",
+                    text: "From date is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.filterSales.toDateTime)
+                return swal({
+                    title: "Required",
+                    text: "To date is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.loadingTable = true;
             const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
                 this.filters.record = resFetchData.data.record;
                 this.filters.refund = resFetchData.data.refund;
                 this.filters.counterExpenses = resFetchData.data.counterExpenses;
+                this.loadingTable = false;
             }
 
         },

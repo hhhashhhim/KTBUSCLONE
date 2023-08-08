@@ -52,31 +52,46 @@ class AdvanceSalesReportController extends Controller
             ->when($request->route, function ($query) use ($request) {
                 $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
                 return $query->whereIn('schedule_id', $scheduleIds);
-            })->get();
+            })->orderBy('date', 'desc')
+            ->get();
 
         $tickets->transform(function ($single) {
             $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule->time));
             return $single;
         });
 
-        $tickets = $tickets->when($request->fromDateTime, function ($query) use ($request) {
-            return $query->where('schedule_date_time', '>=', $request->fromDateTime);
-        })
-            ->when($request->toDateTime, function ($query) use ($request) {
-                return $query->where('schedule_date_time', '<=', $request->toDateTime);
-            })
-            ->groupBy(['schedule_date_time', 'added_by']);
+        // date filter
+        if($request->fromDateTime)
+        {
+            $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
+        }
+        if($request->fromDateTime)
+        {
+            $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
+        }
+        $tickets = $tickets->groupBy(['schedule_date_time', 'added_by']); 
+      
+      
+        // $tickets = $tickets->when($request->fromDateTime, function ($query) use ($request) {
+        //     return $query->where('schedule_date_time', '>=', $request->fromDateTime);
+        // })
+        //     ->when($request->toDateTime, function ($query) use ($request) {
+        //         return $query->where('schedule_date_time', '<=', $request->toDateTime);
+        //     })
+        //     ->groupBy(['schedule_date_time', 'added_by']);
 
         // return $tickets;
         $sortData = [];
         foreach ($tickets as $outer) {
             foreach ($outer as $inner) {
+                
                 $single = [];
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;
                 $single['user'] = $inner[0]->addedBy->name;
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                 $eltSum = 0;
                 foreach ($inner as $tkt) {
                     if ($tkt->ticketElt) {
