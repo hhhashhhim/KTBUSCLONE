@@ -1178,7 +1178,7 @@ class BookingController extends Controller
             'tickets.company_id' => Auth::user()->company_id,
             'tickets.schedule_id' => $request->schedule_id,
             'tickets.schedule_date' => $uniqueDate,
-        ])->where('type', '!=', 'reschedule')->where('type', '!=', 'canceled')
+        ])->where('type', '!=', 'reschedule')->where('type', '!=', 'canceled')->where('type', '!=', 'advance booking')
             ->with("terminal:id,name", "destination_city:id,name")
             ->with(["commission" => function ($q) use ($route) {
                 return $q->where("route_id", $route->id);
