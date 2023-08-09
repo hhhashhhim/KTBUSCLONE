@@ -477,8 +477,10 @@ class BookingController extends Controller
     public
     function getCnic(Request $request)
     {
+        
         if ($request->status == 'addFormCNIC') {
-            return Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+            $cnic = plainContactAndCnic($request['cnicNumber']);
+            return Customer::where('company_id', Auth::user()->company_id)->where('cnic', $cnic)->first();
         }
         if ($request->status == 'addFormContact') {
             return Customer::where('company_id', Auth::user()->company_id)->where('contact', plainContactAndCnic($request['phoneNumber']))->first();
