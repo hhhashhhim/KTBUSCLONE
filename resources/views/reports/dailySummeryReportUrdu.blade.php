@@ -48,6 +48,7 @@
             <th>نمبر شمار</th>
             <th>بس نمبر</th>
             <th>آمدن</th>
+            <th>کمیشن</th>
             <th>خرچہ</th>
             <th>بچت</th>
             @foreach(getTerminals()  as $item)
@@ -58,6 +59,7 @@
         @php
             $totalMOd = 0;
             $totalIncome = 0;
+            $totalCommission = 0;
             $totalExpense = 0;
             $totalProfit = 0;
             $totalTerminals = [];
@@ -84,16 +86,29 @@
 
                 @php
                     $totalIncome += $single->total_income;
+                    $commission = 0;
+                @endphp
+                @if(isset($physical_terminals[$single->id]))
+                @foreach($physical_terminals[$single->id] as $schedules)
+                @foreach($schedules as $terminal)
+                    @php $commission += $terminal->sum("commission_amount") + $terminal->sum("kt_commission") + $terminal[0]->fix_commission; @endphp
+                
+                @endforeach
+                @endforeach
+                @endif
+                <td>{{ $commission }}</td>
+                @php
+                $totalCommission += $commission;
                 @endphp
                 <td>{{ $single->total_expenses }}</td>
                 
                 @php
                     $totalExpense += $single->total_expenses;
                 @endphp
-                <td>{{ $single->total_income - $single->total_expenses}}</td>
+                <td>{{ $single->total_income - $single->total_expenses - $commission}}</td>
                 @php
-                    $singleRowNet += ($single->total_income - $single->total_expenses);
-                    $totalProfit += ($single->total_income - $single->total_expenses);
+                    $singleRowNet += ($single->total_income - $single->total_expenses - $commission);
+                    $totalProfit += ($single->total_income - $single->total_expenses - $commission);
                 @endphp
                 @foreach(getTerminals() as $keyTerminal => $singleTerminal)
                     @php
@@ -118,6 +133,7 @@
             <th></th>
             <th></th>
             <th>{{ $totalIncome }}</th>
+            <th>{{ $totalCommission }}</th>
             <th>{{ $totalExpense }}</th>
             <th>{{ $totalProfit }}</th>
             @foreach($totalTerminals as $k)

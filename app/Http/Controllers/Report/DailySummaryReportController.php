@@ -63,6 +63,7 @@ class DailySummaryReportController extends Controller
                 })->pluck('id');
             $headerLink = ReportHeaderLink::where('company_id', Auth::user()->company_id)->whereIn('ticket_merge_id', $mergeIds)->get(['id', 'header_id', 'ticket_merge_id', 'value'])->groupBy(['ticket_merge_id', 'header_id']);
             $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->with("schedule:id,route_id")->where('company_id', Auth::user()->company_id)->where('online_terminal', 1)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id"])->groupBy(['ticket_merge_id', 'terminal_id']);
+            $physicalTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->with("schedule:id,route_id")->where('company_id', Auth::user()->company_id)->where('online_terminal', 0)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id"])->groupBy(['ticket_merge_id','schedule_id', 'terminal_id']);
             //Map function for single iteration
             $closings->map(function ($closing) {
                 //            get data from single iteration with relation
@@ -81,7 +82,8 @@ class DailySummaryReportController extends Controller
                 
                 return $closing;
             });
-
+            
+            
             // for applying terminal commission only online terminal
             $onlineTerminalData->map(function ($merge) {
                 $merge->map(function ($terminal) {
@@ -106,10 +108,43 @@ class DailySummaryReportController extends Controller
                     });  
                 });
             });
+            // for applying terminal commission only physical terminal
+            $physicalTerminalData->map(function ($merge) {
+                $merge->map(function ($schedule) {
+                    $schedule->map(function ($terminal) {
+                        $terminal->map(function ($ticket) {
+                            $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->schedule->route_id])->first();
+                            if($commission)
+                            {
+                                if($commission->flat_commission == 0)
+                                {
+                                    $amount = (($ticket->seat_fare - $ticket->discount) / 100) * $commission->percentage_commission;
+                                }
+                                else
+                                {
+                                    $amount = $commission->flat_commission;
+                                }
+                                $ticket->commission_amount = intVal($amount);
+                                $ticket->kt_commission = (($ticket->seat_fare - $ticket->discount) / 100) * $commission->adjustment_commission;
+                                $ticket->fix_commission = intVal($commission->fix_commission);
+                            }
+                            else
+                            {
+                                $ticket->commission_amount = 0;
+                                $ticket->fix_commission = 0;
+                                $ticket->kt_commission = 0;
+                            }
+                        });  
+                    });
+                });
+            });
+            
+            // return $physicalTerminalData;
         if (strtolower($request->language) == 'english') {
             return view('reports.dailySummeryReportEng', [
                 "data" => $closings,
                 "online_terminals" => $onlineTerminalData,
+                "physical_terminals" => $physicalTerminalData,
                 "headers_link" => $headerLink,
             ]);
         }
@@ -118,6 +153,7 @@ class DailySummaryReportController extends Controller
             return view('reports.dailySummeryReportUrdu', [
                 "data" => $closings,
                 "online_terminals" => $onlineTerminalData,
+                "physical_terminals" => $physicalTerminalData,
                 "headers_link" => $headerLink,
             ]);
         }
