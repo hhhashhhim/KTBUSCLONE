@@ -181,6 +181,7 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id->update([
                 'type' => 'booked',
                 'terminal_id' => $request->terminalId,
+                'added_by' => Auth::user()->id,
             ]);
             $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
                 $single)->first(['customer_id'])->customer_id;
