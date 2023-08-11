@@ -180,9 +180,17 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
-                'terminal_id' => $request->terminalId,
                 'added_by' => Auth::user()->id,
             ]);
+            // online terminal request will be differrent so it is in if condition
+            if($request->destinationCity)
+            {
+                $customer_id->update([
+                    'terminal_id' => $request->terminalId,
+                    'departure_city_id' => $request->departureCity,
+                    'destination_city_id' => $request->destinationCity,
+                ]);
+            }
             $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
                 $single)->first(['customer_id'])->customer_id;
         }
