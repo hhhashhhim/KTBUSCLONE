@@ -311,6 +311,11 @@
                                                 </button>
                                             </div>
                                             <div class="text-center mb-2">
+                                                <a v-if="checkForSubmenuButtons('drop-schedule') && !hideDivButtonsDrop"
+                                                    href="#"
+                                                    class="btn btn-outline-secondary mr-1 btn-sm" @click="revertDropSchedule()" :disabled="revertScheduleButton">
+                                                    Revert Schedule
+                                                </a>
                                                 <button v-if="checkForSubmenuButtons('seat-details')"
                                                         class="btn btn-outline-secondary btn-sm text-dark mr-2"
                                                         @click="seatDetails()">
@@ -1459,6 +1464,7 @@ export default {
             dropScheduleButton: false,
             showRescheduleDiscountDiv: false,
             allRescheduleButton: false,
+            revertScheduleButton: false,
             labelDrop: '',
             hideDivButtonsDrop: true,
             ticketsIds: "",
@@ -2402,6 +2408,81 @@ export default {
                         });
 
                     }
+                }
+            }
+        },
+        async revertDropSchedule () {
+
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Departure City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Please Select Destination City",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.addForm.date) {
+                return swal({
+                    title: "Required!",
+                    text: "Date is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "Required!",
+                    text: "Departure Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            const data = {
+                departure_city_id: this.addForm.departureCity,
+                destination_city_id: this.addForm.destinationCity,
+                date: this.addForm.date,
+                schedule_id: this.addForm.schedule,
+            }
+            this.revertScheduleButton = true;
+            const revertDropSchedule = await this.callApi("post", "booking/revertDropSchedule", data);
+            if (revertDropSchedule.status == 200) {
+                this.revertScheduleButton = false;
+                this.busDropCheck();
+                swal({
+                    title: "Success",
+                    text: "Schedule Revert Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.busDropCheck();
+            }
+            if (revertDropSchedule.status == 422) {
+                this.revertScheduleButton = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in revertDropSchedule.data.errors) {
+                    revertDropSchedule.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
                 }
             }
         },

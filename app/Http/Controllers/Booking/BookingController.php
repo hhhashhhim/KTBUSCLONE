@@ -857,35 +857,38 @@ class BookingController extends Controller
                     'schedule_date' => $uniqueDate,
                     'schedule_id' => $request->schedule_id,
                 ])->first();
-
+                
                 if (isset($tickets) && $tickets->ticket_closing_id != null) {
                     TicketClosingMember::where([
                         'company_id' => Auth::user()->company_id,
                         'ticket_closing_id' => $tickets->ticket_closing_id,
                     ])->delete();
 
-                    $mergeId = TicketClosing::where([
+                    
+                    $merge = TicketClosing::where([
                         'company_id' => Auth::user()->company_id,
                         'id' => $tickets->ticket_closing_id,
-                    ])->first()->ticket_merge_id;
+                    ])->first();
 
-                    TicketClosing::where([
-                        'company_id' => Auth::user()->company_id,
-                        'id' => $tickets->ticket_closing_id,
-                    ])->delete();
-
-
-                    $mergeRecord = TicketClosingMerge::find($mergeId);
-                    if ($mergeRecord->schedule_complete == 1) {
-                        TicketClosingMerge::where([
+                    if($merge)
+                    {
+                        TicketClosing::where([
                             'company_id' => Auth::user()->company_id,
-                            'id' => $mergeId,
-                        ])->update([
-                            "schedule_complete" => 0,
-                            "schedule_return_date" => null,
-                        ]);
-                    } else {
-                        $mergeRecord->delete();
+                            'id' => $tickets->ticket_closing_id,
+                        ])->delete();
+    
+                        $mergeRecord = TicketClosingMerge::find($merge->ticket_merge_id);
+                        if ($mergeRecord->schedule_complete == 1) {
+                            TicketClosingMerge::where([
+                                'company_id' => Auth::user()->company_id,
+                                'id' => $merge->ticket_merge_id,
+                            ])->update([
+                                "schedule_complete" => 0,
+                                "schedule_return_date" => null,
+                            ]);
+                        } else {
+                            $mergeRecord->delete();
+                        }
                     }
                 }
                 if (!$old) {
@@ -904,6 +907,31 @@ class BookingController extends Controller
                 }
                 DB::commit();
                 return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
+    }
+    public function revertDropSchedule(Request $request)
+    {
+        try {
+                DB::beginTransaction();
+                $uniqueDate = ScheduleDetail::where([
+                    'company_id' => Auth::user()->company_id,
+                    'schedule_id' => $request->schedule_id,
+                    'departure_date' => $request->date,
+                    'departure_id' => $request->departure_city_id,
+                    'destination_id' => $request->destination_city_id,
+                ])->first()->schedule_date;
+                DropSchedule::where([
+                    'company_id' => Auth::user()->company_id,
+                    'schedule_date' => $uniqueDate,
+                    'schedule_id' => $request->schedule_id,
+                    'is_drop' => 1,
+                ])->delete();
+                DB::commit();
             
             } catch (\Exception $e) {
                 DB::rollBack();
