@@ -89,7 +89,7 @@ class AdvanceSalesReportController extends Controller
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;
-                $single['user'] = $inner[0]->addedBy->name;
+                $single['user'] = $inner[0]->addedBy->name??'N/A';
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                 $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                 $eltSum = 0;
