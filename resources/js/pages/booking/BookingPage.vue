@@ -2947,6 +2947,9 @@ export default {
 
                     }
                 }
+                setTimeout(() => {
+                    this.bookingLoading = false;
+                }, 1000);
             }
         }
         ,

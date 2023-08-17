@@ -30950,6 +30950,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       }
                     })();
                   }
+
+                  setTimeout(function () {
+                    _this24.bookingLoading = false;
+                  }, 1000);
                 }
 
               case 27:
