@@ -70,7 +70,6 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             DB::beginTransaction();
             if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {

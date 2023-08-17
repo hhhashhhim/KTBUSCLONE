@@ -176,12 +176,31 @@ if (!function_exists('updateFare')) {
 if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $company_id)
     {
-
-        $customerAll = [];
+        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        // $customerAll = [];
+        if($customerData)
+        {
+            $customerData->update([
+                'name' => $request->customerName,
+                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                'contact' => plainContactAndCnic($request->contact),
+            ]);
+        }
+        else
+        {
+            $customerData = Customer::create([
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+                'name' => $request->customerName,
+                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                'contact' => plainContactAndCnic($request->contact),
+            ]);
+        }
         foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
+                'customer_id' => $customerData->id,
                 'added_by' => Auth::user()->id,
             ]);
 
@@ -229,15 +248,15 @@ if (!function_exists('updateAdvancedSeat')) {
                     ])->delete();
                 }
             }
-            $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
-                $single)->first(['customer_id'])->customer_id;
+            // $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
+            //     $single)->first(['customer_id'])->customer_id;
         }
-        $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
-        $updateId->update([
-            'name' => $request->customerName,
-            'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
-            'contact' => plainContactAndCnic($request->contact),
-        ]);
+        // $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
+        // $updateId->update([
+        //     'name' => $request->customerName,
+        //     'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+        //     'contact' => plainContactAndCnic($request->contact),
+        // ]);
         return $request->alreadyBookedId;
     }
 }

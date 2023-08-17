@@ -512,7 +512,7 @@ class BookingApiController extends Controller
                     } else {
                         $customer = Customer::create([
                             'company_id' => $companyId,
-                            'added_by' => 0,
+                            'added_by' => Auth::user()->id,
                             'name' => $request->customer_name,
                             'cnic' => is_null($request->customer_cnic) ? 0 : plainContactAndCnic($request->customer_cnic),
                             'contact' => plainContactAndCnic($request->contact),
@@ -559,7 +559,7 @@ class BookingApiController extends Controller
                             'gender' => $request->gender,
                             'type' => $request->book_type,
                             'discount_type' => null,
-                            'added_by' => 0,
+                            'added_by' => Auth::user()->id,
                             'discount' => 0,
                             'points_usage' => 0,
                         ]);
@@ -578,7 +578,7 @@ class BookingApiController extends Controller
                                 'schedule_id' => $ticket->schedule_id,
                                 'gender' => $ticket->gender,
                                 'type' => $ticket->type,
-                                'added_by' => 0,
+                                'added_by' => Auth::user()->id,
                             ]);
                         }
 
@@ -596,7 +596,7 @@ class BookingApiController extends Controller
                                 'schedule_id' => $ticket->schedule_id,
                                 'gender' => $ticket->gender,
                                 'type' => $ticket->type,
-                                'added_by' => 0,
+                                'added_by' => Auth::user()->id,
                             ]);
                         }
                         $allTicket[] = $ticket->id;
