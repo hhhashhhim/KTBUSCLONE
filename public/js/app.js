@@ -30632,8 +30632,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this23 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee22() {
-        var index, _ref;
-
+        var index;
         return _regeneratorRuntime().wrap(function _callee22$(_context22) {
           while (1) {
             switch (_context22.prev = _context22.next) {
@@ -30652,7 +30651,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   } else {
                     _this23.addForm.alreadyBookedId.push(data.id);
 
-                    _this23.addForm.customerCNIC = (_ref = data.customer_cnic == 0) !== null && _ref !== void 0 ? _ref : '';
+                    _this23.addForm.customerCNIC = data.customer_cnic;
                     _this23.addForm.customerName = data.customer_name;
                     _this23.addForm.contact = data.customer_phone;
                     _this23.addForm.remarks = data.remarks;
@@ -30662,6 +30661,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _this23.advanceSeat.push(data.seatNo);
 
                     _this23.addForm.flag = 1;
+                    console.log(data);
                   }
                 }
 

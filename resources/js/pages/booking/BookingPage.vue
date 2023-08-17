@@ -2715,13 +2715,14 @@ export default {
                     this.addForm.flag = 0;
                 } else {
                     this.addForm.alreadyBookedId.push(data.id);
-                    this.addForm.customerCNIC = data.customer_cnic == 0 ?? '';
+                    this.addForm.customerCNIC = data.customer_cnic;
                     this.addForm.customerName = data.customer_name;
                     this.addForm.contact = data.customer_phone;
                     this.addForm.remarks = data.remarks;
                     this.addForm.selectedSeats.push(data.seatNo);
                     this.advanceSeat.push(data.seatNo)
                     this.addForm.flag = 1;
+                    console.log(data);
                 }
             }
         },
