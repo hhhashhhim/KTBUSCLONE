@@ -332,6 +332,9 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
+                                            <div class="text-center" v-if="!hideDivButtonsDrop">
+                                                <h4>This schedule is dropped</h4>
+                                            </div>
                                         </div>
                                     </div>
                                     <!--                                        Seat Map-->
@@ -3018,6 +3021,7 @@ export default {
                     icon: "success",
                     timer: 2000
                 });
+                this.addForm.flag = 0;
                 this.fetchScheduleData();
                 this.resetArrays();
                 this.closeModal();
