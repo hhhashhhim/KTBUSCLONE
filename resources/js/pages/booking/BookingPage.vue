@@ -2890,6 +2890,7 @@ export default {
                     position: 'topRight',
                     hideAfter: 1000
                 });
+                const bookType = this.addForm.type;
                 this.addForm = {
                     totalAmount: 0,
                     discount: '',
@@ -2909,7 +2910,7 @@ export default {
                 this.addForm.date = resTicket.data.ticket[0].date;
                 this.addForm.terminalId = resTicket.data.authTerminalId;
                 this.addForm.gender = 1;
-                this.addForm.type = 'booked';
+                this.addForm.type = bookType;
                 this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);

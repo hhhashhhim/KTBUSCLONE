@@ -30742,7 +30742,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this24 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
-        var resTicket;
+        var resTicket, bookType;
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
             switch (_context23.prev = _context23.next) {
@@ -30894,6 +30894,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     position: 'topRight',
                     hideAfter: 1000
                   });
+                  bookType = _this24.addForm.type;
                   _this24.addForm = {
                     totalAmount: 0,
                     discount: '',
@@ -30912,7 +30913,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this24.addForm.date = resTicket.data.ticket[0].date;
                   _this24.addForm.terminalId = resTicket.data.authTerminalId;
                   _this24.addForm.gender = 1;
-                  _this24.addForm.type = 'booked';
+                  _this24.addForm.type = bookType;
                   _this24.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                   _this24.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                   _this24.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
@@ -84463,9 +84464,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt/'
 
-var url = '/kt/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
