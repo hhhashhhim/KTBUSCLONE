@@ -98,7 +98,7 @@
                                                         <td>{{ schedule.name }}</td>
                                                         <td>{{ schedule.start_date }}</td>
                                                         <td>{{ schedule.end_date }}</td>
-                                                        <td>{{ tConvert(schedule.time) }}</td>
+                                                        <td>{{ schedule.schedule_time ? tConvert(schedule.schedule_time.departure_time) : 'Expired' }}</td>
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
                                                                 schedule.bus_class ? schedule.bus_class.name : "N/A"
@@ -961,13 +961,15 @@ export default {
         },
 
         tConvert: function (time) {
-            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+            time = time.toString().match(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/) || [time];
             if (time.length > 1) {
                 time = time.slice(1);
-                time[5] = +time[0] < 12 ? ' AM' : ' PM';
-                time[0] = +time[0] % 12 || 12;
+                var hour = +time[0] % 12 || 12;
+                var minute = time[1];
+                var period = +time[0] < 12 ? 'AM' : 'PM';
+                return hour + ':' + minute + ' ' + period;
             }
-            return time.join('');
+            return time.join(':');
         },
 
         isNumber: function (evt) {

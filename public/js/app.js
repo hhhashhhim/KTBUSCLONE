@@ -47815,15 +47815,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     tConvert: function tConvert(time) {
-      time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)?$/) || [time];
+      time = time.toString().match(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/) || [time];
 
       if (time.length > 1) {
         time = time.slice(1);
-        time[5] = +time[0] < 12 ? ' AM' : ' PM';
-        time[0] = +time[0] % 12 || 12;
+        var hour = +time[0] % 12 || 12;
+        var minute = time[1];
+        var period = +time[0] < 12 ? 'AM' : 'PM';
+        return hour + ':' + minute + ' ' + period;
       }
 
-      return time.join('');
+      return time.join(':');
     },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
@@ -79260,7 +79262,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.end_date), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.tConvert(schedule.time)), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.schedule_time ? $options.tConvert(schedule.schedule_time.departure_time) : 'Expired'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(schedule.route ? schedule.route.name : "N/A"), 1
     /* TEXT */
