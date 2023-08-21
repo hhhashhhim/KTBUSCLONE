@@ -60008,7 +60008,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Over Issue ", 8
       /* PROPS */
-      , _hoisted_435)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('cancel-ticket') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_435)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('cancel-ticket') && innerItem.type == 'booked' || _ctx.checkForSubmenuButtons('reserved-cancel') && innerItem.type == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 5,
         type: "button",
         "class": "btn btn-danger ml-2",

@@ -1154,7 +1154,7 @@
                                                             @click="passDataToOverIssueModel(innerItem);this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
-                                                    <button v-if="checkForSubmenuButtons('cancel-ticket')" type="button"
+                                                    <button v-if="(checkForSubmenuButtons('cancel-ticket') && innerItem.type=='booked') || (checkForSubmenuButtons('reserved-cancel') && innerItem.type=='advance booking')" type="button"
                                                             class="btn btn-danger ml-2"
                                                             @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0 ">
                                                         Cancel Ticket

@@ -390,6 +390,10 @@
                         "allow": true
                     },
                     {
+                        "name": "reserved-cancel",
+                        "allow": true
+                    },
+                    {
                         "name": "check-assign-bus",
                         "allow": true
                     }
