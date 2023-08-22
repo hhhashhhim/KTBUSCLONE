@@ -29162,7 +29162,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this6.cancelAllData.cancelAllSeat = [];
                   _this6.cancelAllData.cancelAllSeatType = [];
                   _this6.cancelAllData.percentage = "0";
-                  _this6.cancelAllData.reason = "0";
+                  _this6.cancelAllData.reason = "";
 
                   _this6.closeModal();
                 }

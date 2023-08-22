@@ -1845,7 +1845,7 @@ export default {
                 this.cancelAllData.cancelAllSeat = [];
                 this.cancelAllData.cancelAllSeatType = [];
                 this.cancelAllData.percentage = "0";
-                this.cancelAllData.reason = "0";
+                this.cancelAllData.reason = "";
                 this.closeModal();
             }
             if (resCancelSeats.status == 422) {
