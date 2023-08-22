@@ -1124,6 +1124,39 @@ class BookingController extends Controller
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
     }
+    public
+    function cancelingAllBooking(Request $request)
+    {
+        try {
+                DB::beginTransaction();
+                $tickets = Ticket::whereIn("id",$request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
+
+                foreach($tickets as $ticket)
+                {
+                    $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
+                    if ($delElt) {
+                        $delElt->delete();
+                    }
+                    $ticket->update([
+                        'type' => 'canceled',
+                    ]);
+                    BookingCancel::create([
+                        'company_id' => Auth::user()->company_id,
+                        'ticket_id' => $ticket->id,
+                        'percentage' => $request->percentage,
+                        'reason' => $request->reason,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                    $ticket->delete();
+                }
+                DB::commit();
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
+    }
 
     public
     function terminalInvoice(Request $request)

@@ -29,6 +29,7 @@ Route::group(['prefix' => 'booking', [CustomMiddleware::class]], function () {
     Route::post('/overIssueAdd', [BookingController::class, 'overIssueAddNew']);
     Route::post('/advance', [BookingController::class, 'advanceData']);
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
+    Route::post('/canceling/all', [BookingController::class, 'cancelingAllBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
     Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
     Route::post('/getClosingData', [BookingController::class, 'getClosingData']);

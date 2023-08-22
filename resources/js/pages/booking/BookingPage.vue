@@ -962,7 +962,7 @@
             </div>
         </div>
 
-        <!-- Model Cancel -->
+        <!-- Model  -->
         <div class="modal fade" id="dropSchedule" tabindex="3" aria-labelledby="dropScheduleLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
@@ -1040,6 +1040,51 @@
                 </div>
             </div>
         </div>
+        <!-- Model Cancel All ticket-->
+        <div class="modal fade" id="cancel_all_ticket" tabindex="4" aria-labelledby="cancelAllModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelAllModelLabel">Cancel Ticket</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closeModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] == 'booked' ">
+                        <div class="form-group">
+                            <label for="cancel_percentage">Percentage</label>
+                            <select id="cancel_percentage" class="form-control" v-model="cancelAllData.percentage">
+                                <option value="first">Select Cancellation Percentage</option>
+                                <option value="0">0%</option>
+                                <option value="10">10%</option>
+                                <option value="20">20%</option>
+                                <option value="30">30%</option>
+                                <option value="40">40%</option>
+                                <option value="50">50%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Remarks</label>
+                            <textarea type="text" class="form-control" id="" v-model="cancelAllData.reason"
+                                      placeholder="Reason for canceling a seat"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] =='advance booking'">
+                        Are you sure you want to cancel all ticket ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"
+                                @click="allSeatCancel()">
+                            Cancel Ticket
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!--Modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
@@ -1063,6 +1108,11 @@
                                             v-if="this.allRescheduleButton && checkForSubmenuButtons('reschedule-seats')"
                                             @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                     >Reschedule All
+                                    </button>
+                                    <button v-if="(this.cancelAllData.cancelAllSeatType[0] == 'booked' && checkForSubmenuButtons('cancel-ticket') || this.cancelAllData.cancelAllSeatType[0] == 'advance booking' && checkForSubmenuButtons('reserved-cancel'))" type="button"
+                                            @click="cancelAllModal();"
+                                            class="btn btn-danger ml-2">
+                                        Cancel All Ticket
                                     </button>
                                 </div>
                             </div>
@@ -1379,6 +1429,12 @@ export default {
             overIssueSeatsRevert: [],
             cancelData: {
                 percentage: 'first',
+            },
+            cancelAllData: {
+                percentage: '0',
+                cancelAllSeat: [],
+                cancelAllSeatType: [],
+                reason:"",
             },
             checkCloseData: true,
             dataForClose: {
@@ -1713,6 +1769,24 @@ export default {
                     this.selectedSeatDataBackEnd = resSeatData.data.tickets;
                     this.allRescheduleButton = resSeatData.data.showButton;
                     $('#seatAllDetailsModal').modal('show');
+
+                    // for cancel all ticket
+                    this.cancelAllData.cancelAllSeat = [];
+                    this.cancelAllData.cancelAllSeatType = [];
+                    Object.entries(this.selectedSeatDataBackEnd).forEach(([key1, single]) => {
+                        Object.entries(single).forEach(([key2, partial]) => {
+                            this.cancelAllData.cancelAllSeat.push(partial.id)
+                            this.cancelAllData.cancelAllSeatType.push(partial.type)
+                        });
+                    });
+
+                    // to check all ticket type are same or not
+                    if(!this.cancelAllData.cancelAllSeatType.every(value => value === this.cancelAllData.cancelAllSeatType[0]))
+                    {
+                        this.cancelAllData.cancelAllSeat = [];
+                        this.cancelAllData.cancelAllSeatType = [];
+                    }
+
                 }
                 if (resSeatData.status == 422) {
                     let errorContent = "";
@@ -1753,6 +1827,46 @@ export default {
             if (resDateFilter.status == 200) {
                 if (resDateFilter.data.length != 0) {
                     this.allBookings = resDateFilter.data;
+                }
+            }
+        },
+        
+        async allSeatCancel() {
+            const resCancelSeats = await this.callApi("post", "booking/canceling/all", this.cancelAllData);
+            if (resCancelSeats.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Seats Canceled Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+                this.addForm.flag = 0;
+                this.cancelAllData.cancelAllSeat = [];
+                this.cancelAllData.cancelAllSeatType = [];
+                this.cancelAllData.percentage = "0";
+                this.cancelAllData.reason = "0";
+                this.closeModal();
+            }
+            if (resCancelSeats.status == 422) {
+                this.dropScheduleButton = false;
+                let errorContent = "";
+                let count = 0;
+                for (const key in resCancelSeats.data.errors) {
+                    resCancelSeats.data.errors[key].forEach((element) => {
+                        errorContent += (
+                            (++count) + " - " +
+                            element +
+                            "\n"
+                        );
+                    });
+                    swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                    });
+
                 }
             }
         },
@@ -2999,6 +3113,10 @@ export default {
                 dataType: data.type,
             }
             $("#cancelModel").modal('show');
+        },
+        
+        cancelAllModal: function () {
+            $("#cancel_all_ticket").modal('show');
         }
         ,
 
