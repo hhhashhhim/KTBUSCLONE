@@ -1109,6 +1109,11 @@
                                             @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
                                     >Reschedule All
                                     </button>
+                                    <button v-if="this.duplicateAllSeatType[0] == 'booked'" type="button"
+                                            @click="allTicketDuplicate();"
+                                            class="btn btn-secondary text-dark ml-2">
+                                        Duplicate All Ticket
+                                    </button>
                                     <button v-if="(this.cancelAllData.cancelAllSeatType[0] == 'booked' && checkForSubmenuButtons('cancel-ticket') || this.cancelAllData.cancelAllSeatType[0] == 'advance booking' && checkForSubmenuButtons('reserved-cancel'))" type="button"
                                             @click="cancelAllModal();"
                                             class="btn btn-danger ml-2">
@@ -1376,6 +1381,13 @@
             <input type="hidden" name="ticket_id" :value="this.ticketsId">
             <input type="hidden" name="duplicate" value=1>
         </form>
+        <!--        print Customer Duplicate All Ticket Print-->
+        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refDuplicateAllTicket"
+              target="_blank">
+            <input type="hidden" name="_token" v-bind:value="csrf">
+            <input type="hidden" name="ticket_ids" :value="this.duplicateAllTicket">
+            <input type="hidden" name="duplicate" value=0>
+        </form>
         <!--        Elt Customer PDF Form  -->
         <form :action="$store.state.app_url + 'print/pdf/customer/elt'" method="POST" ref="refElt"
               target="_blank">
@@ -1436,6 +1448,8 @@ export default {
                 cancelAllSeatType: [],
                 reason:"",
             },
+            duplicateAllTicket: [],
+            duplicateAllSeatType: [],
             checkCloseData: true,
             dataForClose: {
                 bus: '',
@@ -1770,13 +1784,17 @@ export default {
                     this.allRescheduleButton = resSeatData.data.showButton;
                     $('#seatAllDetailsModal').modal('show');
 
-                    // for cancel all ticket
+                    // for cancel all ticket and duplicate all ticket functionality
                     this.cancelAllData.cancelAllSeat = [];
                     this.cancelAllData.cancelAllSeatType = [];
+                    this.duplicateAllTicket = [];
+                    this.duplicateAllSeatType = [];
                     Object.entries(this.selectedSeatDataBackEnd).forEach(([key1, single]) => {
-                        Object.entries(single).forEach(([key2, partial]) => {
-                            this.cancelAllData.cancelAllSeat.push(partial.id)
-                            this.cancelAllData.cancelAllSeatType.push(partial.type)
+                        Object.entries(single).forEach(([key2, seat]) => {
+                            this.cancelAllData.cancelAllSeat.push(seat.id)
+                            this.cancelAllData.cancelAllSeatType.push(seat.type)
+                            this.duplicateAllTicket.push(seat.id)
+                            this.duplicateAllSeatType.push(seat.type)
                         });
                     });
 
@@ -1785,6 +1803,12 @@ export default {
                     {
                         this.cancelAllData.cancelAllSeat = [];
                         this.cancelAllData.cancelAllSeatType = [];
+                    }
+                    // to check all ticket type are same or not
+                    if(!this.duplicateAllSeatType.every(value => value === this.duplicateAllSeatType[0]))
+                    {
+                        this.duplicateAllTicket = [];
+                        this.duplicateAllSeatType = [];
                     }
 
                 }
@@ -3018,7 +3042,7 @@ export default {
                     gender: "1",
                     customerCNIC: "",
                 };
-
+                
                 this.label = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
@@ -3598,6 +3622,16 @@ export default {
                     this.closeModal();
                 }
             }, 700);
+        }
+        ,
+        // Duplicate All Ticket
+        allTicketDuplicate: function () {
+            this.duplicateAllTicket =  this.duplicateAllTicket.join('-');
+           setTimeout(() => {
+               this.$refs.refDuplicateAllTicket.submit();
+               this.closeModal();
+           }, 700);
+                
         }
         ,
 

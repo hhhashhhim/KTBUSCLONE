@@ -1316,6 +1316,8 @@ class BookingController extends Controller
         } else {
             $ids = [$request->ticket_id];
         }
+
+        // return $ids;
         $tickets = Ticket::with('customer', 'scheduleDetail:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
             $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id, 'schedule_id' => $item->schedule_id])->orderBy('id', 'DESC')->get();
