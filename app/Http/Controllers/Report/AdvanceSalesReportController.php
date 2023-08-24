@@ -34,18 +34,6 @@ class AdvanceSalesReportController extends Controller
     public function filterData(Request $request)
     {
 
-
-        return $tickets = Ticket::where("schedule_time",null)->orWhere("route_id",null)->get()->count();
-        // $tickets = Ticket::limit(4000)->get();
-        // foreach($tickets as $ticket)
-        // {
-        //     $ticket->update([
-        //         "route_id" => Schedule::find($ticket->schedule_id)->route_id,
-        //         "schedule_time" => ScheduleDetail::where(["schedule_date"=>$ticket->schedule_date,"schedule_id"=>$ticket->schedule_id])->first()->departure_time,
-        //     ]);
-        // }
-        
-        // return 'ok';
         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
