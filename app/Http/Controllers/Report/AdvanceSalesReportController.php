@@ -36,16 +36,16 @@ class AdvanceSalesReportController extends Controller
 
 
         // $tickets = Ticket::limit(4000)->get();
-        $tickets = Ticket::skip(12000)->limit(969)->get();
-        foreach($tickets as $ticket)
-        {
-            $ticket->update([
-                "route_id" => Schedule::find($ticket->schedule_id)->route_id,
-                "schedule_time" => ScheduleDetail::where(["schedule_date"=>$ticket->schedule_date,"schedule_id"=>$ticket->schedule_id])->first()->departure_time,
-            ]);
-        }
+        // $tickets = Ticket::skip(12000)->limit(969)->get();
+        // foreach($tickets as $ticket)
+        // {
+        //     $ticket->update([
+        //         "route_id" => Schedule::find($ticket->schedule_id)->route_id,
+        //         "schedule_time" => ScheduleDetail::where(["schedule_date"=>$ticket->schedule_date,"schedule_id"=>$ticket->schedule_id])->first()->departure_time,
+        //     ]);
+        // }
         
-        return 'ok';
+        // return 'ok';
         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
