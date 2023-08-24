@@ -35,8 +35,8 @@ class AdvanceSalesReportController extends Controller
     {
 
 
-        $tickets = Ticket::limit(4000)->get();
-        // $tickets = Ticket::skip(4000)->limit(4000)->get();
+        // $tickets = Ticket::limit(4000)->get();
+        $tickets = Ticket::skip(4000)->limit(4000)->get();
         foreach($tickets as $ticket)
         {
             $ticket->update([
