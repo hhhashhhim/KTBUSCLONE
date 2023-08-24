@@ -52,6 +52,7 @@ class ScheduleClosingController extends Controller
             ->with("tickets:id,ticket_merge_id,seat_fare,discount,schedule_id,terminal_id","tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
 
+            
         // this is for show sale at front
         $merges->map(function($single){
             

@@ -147,6 +147,7 @@
             },
             {
                 "name": "sales",
+                "allow": true,
                 "buttons": [
                     {
                         "name": "terminal-filter",
