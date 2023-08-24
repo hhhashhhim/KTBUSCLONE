@@ -35,8 +35,8 @@ class AdvanceSalesReportController extends Controller
     {
 
 
+        return $tickets = Ticket::where("schedule_time",null)->get()->count();
         // $tickets = Ticket::limit(4000)->get();
-        // $tickets = Ticket::skip(12000)->limit(969)->get();
         // foreach($tickets as $ticket)
         // {
         //     $ticket->update([
