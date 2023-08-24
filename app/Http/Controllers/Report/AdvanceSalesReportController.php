@@ -7,7 +7,6 @@ use App\Models\Bus\BusClass;
 use App\Models\CounterExpense;
 use App\Models\Route\Route;
 use App\Models\Schedule\Schedule;
-use App\Models\Schedule\ScheduleDetail;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\User;
@@ -33,7 +32,6 @@ class AdvanceSalesReportController extends Controller
 
     public function filterData(Request $request)
     {
-
         $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
@@ -74,15 +72,6 @@ class AdvanceSalesReportController extends Controller
         $tickets = $tickets->groupBy(['schedule_date_time', 'added_by']); 
       
       
-        // $tickets = $tickets->when($request->fromDateTime, function ($query) use ($request) {
-        //     return $query->where('schedule_date_time', '>=', $request->fromDateTime);
-        // })
-        //     ->when($request->toDateTime, function ($query) use ($request) {
-        //         return $query->where('schedule_date_time', '<=', $request->toDateTime);
-        //     })
-        //     ->groupBy(['schedule_date_time', 'added_by']);
-
-        // return $tickets;
         $sortData = [];
         foreach ($tickets as $outer) {
             foreach ($outer as $inner) {
@@ -94,6 +83,7 @@ class AdvanceSalesReportController extends Controller
                 $single['user'] = $inner[0]->addedBy->name??'N/A';
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                 $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
+                $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
                 $eltSum = 0;
                 foreach ($inner as $tkt) {
                     if ($tkt->ticketElt) {

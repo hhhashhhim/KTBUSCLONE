@@ -86,7 +86,7 @@
 
                                                             <tbody>
                                                             <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ data.date }}</td>
+                                                                <td>{{ data.date }}<br>{{ data.time }}</td>
                                                                 <td>{{ data.bus_class }}</td>
                                                                 <td>{{ data.seats }}</td>
                                                                 <td>{{ data.terminal }}</td>
