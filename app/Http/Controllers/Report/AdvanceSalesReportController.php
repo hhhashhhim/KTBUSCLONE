@@ -32,7 +32,7 @@ class AdvanceSalesReportController extends Controller
 
     public function filterData(Request $request)
     {
-        $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time')
+        $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
             
@@ -77,6 +77,7 @@ class AdvanceSalesReportController extends Controller
             foreach ($outer as $inner) {
                 
                 $single = [];
+                $single['bus_number'] = $inner[0]->bus->bus_number;
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;

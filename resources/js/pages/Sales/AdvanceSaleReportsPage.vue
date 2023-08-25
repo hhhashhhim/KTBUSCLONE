@@ -76,6 +76,7 @@
                                                             <tr>
                                                                 <th>Date</th>
                                                                 <th>Bus No</th>
+                                                                <th>Bus Class</th>
                                                                 <th>No of Seat</th>
                                                                 <th>Terminal Name</th>
                                                                 <th>User Name</th>
@@ -87,6 +88,7 @@
                                                             <tbody>
                                                             <tr v-for="(data,i) in filters.record" :key="i">
                                                                 <td>{{ data.date }}<br>{{ data.time }}</td>
+                                                                <td>{{ data.bus_number }}</td>
                                                                 <td>{{ data.bus_class }}</td>
                                                                 <td>{{ data.seats }}</td>
                                                                 <td>{{ data.terminal }}</td>
