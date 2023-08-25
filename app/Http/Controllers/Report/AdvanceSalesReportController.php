@@ -50,8 +50,8 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('added_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->whereIn('schedule_id', $scheduleIds);
+                // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
+                return $query->where('route_id', $request->route);
             })->orderBy('date', 'desc')
             ->get();
 
