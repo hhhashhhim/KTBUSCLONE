@@ -46,10 +46,14 @@ class ScheduleClosingController extends Controller
 
     public function merges()
     {
-        $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
+        $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1,"id"=>198])
             ->with("bus:id,bus_number")
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
-            ->with("tickets:id,ticket_merge_id,seat_fare,discount,schedule_id,terminal_id,ticket_closing_id","tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
+            ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
+            ->with(["tickets"=>function($q){
+                $q->where("type","booked");
+                $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
+            }])
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
 
             
