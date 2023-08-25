@@ -55231,7 +55231,7 @@ var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "2"
+    colspan: "3"
   }, null, -1
   /* HOISTED */
   );

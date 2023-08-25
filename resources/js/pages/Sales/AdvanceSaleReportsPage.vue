@@ -97,7 +97,7 @@
                                                                 <td>{{ data.elt }}</td>
                                                             </tr>
                                                             <tr>
-                                                                <th colspan="2"></th>
+                                                                <th colspan="3"></th>
                                                                 <th>{{ totalSeats() ?? 0 }}</th>
                                                                 <th colspan="2"></th>
                                                                 <th>{{ totalSeatFare() ?? 0 }}</th>

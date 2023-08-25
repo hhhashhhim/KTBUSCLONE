@@ -77,7 +77,7 @@ class AdvanceSalesReportController extends Controller
             foreach ($outer as $inner) {
                 
                 $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number;
+                $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;
