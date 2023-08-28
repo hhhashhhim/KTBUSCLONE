@@ -14,6 +14,35 @@
                             </div> -->
                         </div>
                         <div class="card-body">
+                            <div class="row px-2 mb-4">
+                                    <div class="col-md-4">
+                                        <label for="terminalFilter">Select Bus</label>
+                                        <select id="terminalFilter" class="form-control"
+                                                v-model="filterData.bus_number"
+                                                @change="fetchMerges()"
+                                                >
+                                            <option value="">Select Bus</option>
+                                            <option v-for="(bus, i) in buses" :key="i"
+                                                    :value="bus.id">
+                                                {{ bus.bus_number }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="fromDate">From Date</label>
+                                        <input id="fromDate" type="date" class="form-control"
+                                                v-model="filterData.from_date"
+                                                @change="fetchMerges()"
+                                                >
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="fromDate">From Date</label>
+                                        <input id="fromDate" type="date" class="form-control"
+                                                v-model="filterData.to_date"
+                                                @change="fetchMerges()"
+                                                >
+                                    </div>
+                                </div>
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -108,6 +137,12 @@ export default {
             loading: false,
             validationErrors: "",
             merges: [],
+            buses: [],
+            filterData: {
+                bus_number: "",
+                from_date: "",
+                to_date: "",
+            },
             // formID: "schedule_closing_form",
             // editFormID: "edit_schedule_closing_form",
             success: false,
@@ -137,14 +172,23 @@ export default {
             const res = await this.callApi("post", "booking/close/schedule/merges");
             if (res.status == 200) {
                 this.merges = res.data.merges;
+                this.buses = res.data.buses;
             } else {
                 console.log(res);
             }
-            setTimeout(() => {
-                $('#merge_table').DataTable({
-                    'order': []
-                });
-            }, 300);
+            // setTimeout(() => {
+            //     $('#merge_table').DataTable({
+            //         'order': []
+            //     });
+            // }, 300);
+        },
+        async fetchMerges() {
+            const res = await this.callApi("post", "booking/close/schedule/merges",this.filterData);
+            if (res.status == 200) {
+                this.merges = res.data.merges;
+            } else {
+                console.log(res);
+            }
         },
     },
     computed: {
@@ -154,7 +198,7 @@ export default {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.buses.splice(obj.index, 1);
-                $('#merge_table').DataTable().destroy();
+                // $('#merge_table').DataTable().destroy();
             }
         },
     },

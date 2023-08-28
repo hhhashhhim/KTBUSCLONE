@@ -44,7 +44,7 @@ class ScheduleClosingController extends Controller
         return $data;
     }
 
-    public function merges()
+    public function merges(Request $request)
     {
         $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
             ->with("bus:id,bus_number")
@@ -54,6 +54,18 @@ class ScheduleClosingController extends Controller
                 $q->where("type","booked");
                 $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
             }])
+            ->where(function($q) use ($request){
+                if($request->bus_number)
+                {
+                    $q->where("bus_id",$request->bus_number);
+                }
+                if($request->from_date && $request->to_date)
+                {
+                    $q->whereBetween("schedule_departure_date",[$request->from_date,$request->to_date]);
+                }
+            })
+            ->limit(20)
+            ->latest("schedule_departure_date")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
 
             
@@ -136,6 +148,7 @@ class ScheduleClosingController extends Controller
         
         $data = [
             "merges" => $merges,
+            "buses" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number"]),
         ];
         return $data;
     }
