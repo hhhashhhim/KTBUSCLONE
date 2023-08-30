@@ -71,17 +71,30 @@
                                                     </tr>
                                                     <tr class="mt-1">
                                                         <td></td>
-                                                        <td></td>
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <label for="totalNums">Total Sale</label>
+                                                                <input id="totalSale" type="text"
+                                                                       class="form-control mr-4" disabled
+                                                                       :value="totalSale"/>
+                                                            </div>
+                                                        </td>
                                                         <td>
                                                             <div class="form-group">
                                                                 <label for="totalNums">Total Amount</label>
                                                                 <input id="totalNums" type="text"
                                                                        class="form-control mr-4" disabled
-                                                                       @keyup="saveRow($event,'fourth',index)"
                                                                        :value="totalAmount"/>
                                                             </div>
                                                         </td>
-                                                        <td></td>
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <label for="netProfit">Net Profit</label>
+                                                                <input id="netProfit" type="text"
+                                                                       class="form-control mr-4" disabled
+                                                                       :value="netProfit"/>
+                                                            </div>
+                                                        </td>
                                                         <td></td>
                                                     </tr>
                                                     </tbody>
@@ -145,6 +158,8 @@ export default {
             editFormID: 'edit_expense_form',
             // deleteFormID:'delete_city_form',
             totalAmount: 0,
+            totalSale: 0,
+            netProfit: 0,
             postData: {
                 ticket_merge_id: "",
                 category: [],
@@ -179,6 +194,7 @@ export default {
         }, 300);
         // total amount sum only for show
         this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        
     },
 
     methods: {
@@ -194,7 +210,8 @@ export default {
         async existingExpenses() {
             const res = await this.callApi("post", 'expenses', {ticket_merge_id: this.postData.ticket_merge_id});
             if (res.status == 200) {
-                const expenses = res.data;
+                const expenses = res.data.expenses;
+                this.totalSale = res.data.sale;
                 if (expenses != "") {
                     this.loop = expenses.length;
                     for (var i = 0; i < expenses.length; i++) {
@@ -203,6 +220,8 @@ export default {
                         this.postData.amount.push(expenses[i].amount);
                         this.postData.invoice.push(expenses[i].invoice);
                     }
+                    this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    this.netProfit = this.totalSale - this.totalAmount;
                 } else {
                     this.loop = 1;
                     this.editAble = false;
@@ -226,6 +245,7 @@ export default {
 
             // total amount sum only for show
             this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+            this.netProfit = this.totalSale - this.totalAmount;
         },
         addRow() {
             this.loop++;
@@ -239,6 +259,7 @@ export default {
 
             // total amount sum only for show
             this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+            this.netProfit = this.totalSale - this.totalAmount;
         },
         async add() {
 

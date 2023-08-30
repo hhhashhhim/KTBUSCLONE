@@ -8,6 +8,7 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Schedule\Schedule;
 use App\Models\Bus\Bus;
 use App\Models\Ticket;
+use App\Models\TerminalCommission;
 use App\Models\Expense\TicketMergeExpense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,96 @@ class ExpenseController extends Controller
 
     public function index(Request $request)
     {
-        return TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $expenses = TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        
+        // for sale show at front
+        $merge = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1,"id" => $request->ticket_merge_id])
+            ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
+            ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
+            ->with(["tickets"=>function($q){
+                $q->where("type","booked");
+                $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
+            }])
+            ->first(["id","schedule_departure_date","schedule_return_date","bus_id"]);
+
+
+        $merge->seat_fare = $merge->tickets->sum("seat_fare");
+        $merge->discount = $merge->tickets->sum("discount");
+
+        // elt amount | commission
+        $eltAmount = 0;
+        $commission = 0;
+        $closingOne = [];
+        $closingTwo = [];
+        foreach($merge->tickets as $ticket)
+        {
+            // elt
+            if($ticket->elt)
+            {
+                $eltAmount += $ticket->elt->elt_price;
+            }
+            // commission
+            $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->terminal_id])->first();
+            if($terminalCommission)
+            {    
+                if($merge->closing[0]->id == $ticket->ticket_closing_id)
+                {
+                    $closingOne[] = $terminalCommission->id;
+                }
+                else
+                {
+                    $closingTwo[] = $terminalCommission->id;
+                }
+                
+                if($terminalCommission->flat_commission == 0)
+                    $commission += (($ticket->seat_fare - ($ticket->discount))/100)*$terminalCommission->percentage_commission;
+                else
+                {
+                    $commission += $terminalCommission->flat_commission;
+                }
+                // kt adjustment commission
+                $commission += (($ticket->seat_fare - $ticket->discount)/100)*$terminalCommission->adjustment_commission;
+            }
+            else
+            {
+                $commission += 0;
+            }
+                
+        }
+        
+        $commission += TerminalCommission::whereIn("id",array_unique($closingOne))->get()->sum("fix_commission");
+        $commission += TerminalCommission::whereIn("id",array_unique($closingTwo))->get()->sum("fix_commission");
+        
+        $merge->elt += $eltAmount;
+        $merge->commission += (int)$commission;
+
+        // for add cancelation charges into the sale
+        $cancelTicket = Ticket::
+            onlyTrashed()
+            ->where([
+                'company_id' => Auth::user()->company_id,
+                'ticket_merge_id' => $merge->id,
+                'type' => "canceled",
+            ])
+            ->with("cancel_ticket:id,ticket_id,percentage")
+            ->get(["id","seat_fare","discount"]);
+
+    
+        $refundAmount = 0;
+        $cancelTicket->map(function($item) use (&$refundAmount){
+            if($item->cancel_ticket)
+            {
+                $refundAmount += (($item->seat_fare - $item->discount) / 100) * $item->cancel_ticket->percentage;
+            }
+        });
+
+        $merge->refund += $refundAmount;
+        
+
+        return [
+            "expenses" => $expenses,
+            "sale" => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
+        ];
     }
 
     public function store(Request $request)
