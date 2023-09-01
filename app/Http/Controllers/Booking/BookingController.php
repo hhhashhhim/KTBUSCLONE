@@ -420,8 +420,13 @@ class BookingController extends Controller
             }
 
             $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) - $sub);
+            $single->departure_date_time = date("Y-m-d H:i:s",strtotime($exactDate));
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
+        }
+        if(checkPermissionButtons("time-lock"))
+        {
+            return $allSchedules->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) - 7200));
         }
         return $allSchedules;
     }

@@ -199,8 +199,13 @@ class BookingApiController extends Controller
 
                     $single->total_fare = $original_fare;
                     $single->final_fare = $discounted_fare;
+                    $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
                     
                 });
+                if(checkPermissionButtons("time-lock"))
+                {
+                    $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) - 7200));
+                }
                 // data found | not found
                 if($data->count() > 0)
                 {

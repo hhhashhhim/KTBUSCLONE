@@ -15,6 +15,7 @@ use App\Models\Schedule\TicketClosing;
 use App\Http\Resources\CreatedResource;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
+use App\Models\admin\Role;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,28 @@ use Rawilk\Printing\Facades\Printing;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 
+if (!function_exists('checkPermissionButtons')) {
+    function checkPermissionButtons($name)
+    {
+        $permissions = Role::find(Auth::user()->role_id)->permissions;
+        foreach($permissions as $menu)
+        {
+            foreach($menu['childs'] as $submenu)
+            {
+                if(isset($submenu['buttons']))
+                {
+                    foreach($submenu['buttons'] as $button)
+                    {
+                        if($button['name'] == $name)
+                        {
+                            return $button['allow'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 if (!function_exists('storeFare')) {
     function storeFare($request, $company_id)
     {

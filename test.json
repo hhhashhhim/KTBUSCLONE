@@ -397,6 +397,10 @@
                     {
                         "name": "check-assign-bus",
                         "allow": true
+                    },
+                    {
+                        "name": "time-lock",
+                        "allow": true
                     }
                 ]
             },
