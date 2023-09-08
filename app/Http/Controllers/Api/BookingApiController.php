@@ -205,6 +205,8 @@ class BookingApiController extends Controller
                 if(checkPermissionButtons("time-lock"))
                 {
                     $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) - 7200));
+                    $arrayData = json_decode($data, true);
+                    $data = collect(array_values($arrayData));
                 }
                 // data found | not found
                 if($data->count() > 0)
