@@ -15,6 +15,10 @@ class CounterExpense extends Model
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
+    public function added_by_data()
+    {
+        return $this->hasOne(User::class, 'id', 'added_by');
+    }
 
     public function company()
     {

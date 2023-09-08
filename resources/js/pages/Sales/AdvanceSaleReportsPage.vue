@@ -67,6 +67,21 @@
                                                     </button>
                                                 </div>
                                             </div>
+                                            <div class="d-flex justify-content-end" v-if="filters.record != null">
+                                                <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
+                                                        :disabled="loadingTable">
+                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}
+                                                </button>
+                                            </div>
+                                            <form :action="$store.state.app_url + 'advance/sales/pdf'" method="POST" ref="salePrint"
+                                                target="_blank">
+                                                <input type="hidden" name="_token" v-bind:value="csrf">
+                                                <input type="hidden" name="terminal" :value="filterSales.terminal">
+                                                <input type="hidden" name="user" :value="filterSales.user">
+                                                <input type="hidden" name="route" :value="filterSales.route">
+                                                <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
+                                                <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
+                                            </form>
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
@@ -143,8 +158,8 @@
                                                                 <td>{{ dataRefund.cancel_date }}</td>
                                                             </tr>
                                                             <tr>
-                                                                <th colspan="4"></th>
-                                                                <th>{{ refundTotalSeats() ?? 0 }}</th>
+                                                                <th colspan="5"></th>
+                                                                <!-- <th>{{ refundTotalSeats() ?? 0 }}</th> -->
                                                                 <th>{{ refundTotal() ?? 0 }}</th>
                                                                 <th>{{ refundTotalCharges() ?? 0 }}</th>
                                                                 <th colspan="3"></th>
@@ -252,6 +267,7 @@ export default {
     name: "AdvanceSaleReportsPage",
     data() {
         return {
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             terminals: [],
             loadingTable: false,
             users: [],
@@ -324,6 +340,24 @@ export default {
                     return sum += single.seats;
                 }, 0)
             }
+        },
+        // sales print
+        salesPrint: function () {
+            if (!this.filterSales.fromDateTime)
+                return swal({
+                    title: "Required",
+                    text: "From date is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.filterSales.toDateTime)
+                return swal({
+                    title: "Required",
+                    text: "To date is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            this.$refs.salePrint.submit();
         },
         totalSeatFare: function () {
             if (this.filters.record) {
