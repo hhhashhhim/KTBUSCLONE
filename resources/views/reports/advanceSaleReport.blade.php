@@ -43,7 +43,16 @@
     <div id="info">
         <div class="companyName"><span>Advance Sale Report</span></div>
     </div>
-    <br>
+    <br><br>
+
+    <table border="0">
+        <tr>
+            <td>Terminal : {{$filterData->terminal}}</td>
+            <td>User : {{$filterData->user}}</td>
+            <td>Route : {{$filterData->route}}</td>
+            <td>{{$filterData->from}} -- {{$filterData->to}}</td>
+        </tr>
+    </table>
 
     <table border="2">
         <tr>

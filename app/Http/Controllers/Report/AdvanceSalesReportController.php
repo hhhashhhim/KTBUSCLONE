@@ -279,12 +279,21 @@ class AdvanceSalesReportController extends Controller
                 ->get();
         }
 
+        $filterData = (object)[];
+        $filterData->terminal = Terminal::find($request->terminal)->name??"All";
+        $filterData->user = User::find($request->terminal)->name??"All";
+        $filterData->route = Route::find($request->terminal)->name??"All";
+        $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
+        $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
+
+       
         
     // return $counterexpenses;
         return view('reports.advanceSaleReport', [
             'record' => $sortData,
             'refund' => $refundTickets,
             'counterExpenses' => $counterexpenses ?? [],
+            'filterData' => $filterData,
         ]);
     }
 
