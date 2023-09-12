@@ -66,7 +66,7 @@ class ScheduleClosingController extends Controller
             })
             ->limit(20)
             ->latest("schedule_departure_date")
-            ->get(["id","schedule_departure_date","schedule_return_date","bus_id"]);
+            ->get(["id","schedule_departure_date","schedule_return_date","bus_id","closing_date"]);
 
             
         // this is for show sale at front
@@ -160,6 +160,13 @@ class ScheduleClosingController extends Controller
             "hosts" => TicketClosingMember::where(['type' => 2, 'company_id' => Auth::user()->company_id,"ticket_closing_id" => $request->closingId])->pluck("user_id"),
         ];
         return $data;
+    }
+    
+    public function updateClosingDate(Request $request)
+    {
+        TicketClosingMerge::where("id",$request->mergeId)->update([
+            "closing_date" => $request->closingDate,
+        ]);
     }
 
     public function fetchSchedule(Request $request)

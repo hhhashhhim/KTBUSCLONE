@@ -44,10 +44,10 @@ class DailySummaryReportController extends Controller
                         $q->where('bus_id', $request->busNO);
                     }
                     if ($request->fromDate != null) {
-                        $q->where('schedule_departure_date', '>=', $request->fromDate);
+                        $q->where('closing_date', '>=', $request->fromDate);
                     }
                     if ($request->toDate != null) {
-                        $q->where('schedule_departure_date', '<=', $request->toDate);
+                        $q->where('closing_date', '<=', $request->toDate);
                     }
                 })
                 ->get();
@@ -55,10 +55,10 @@ class DailySummaryReportController extends Controller
             $mergeIds = TicketClosingMerge::where('schedule_complete', 1)
                 ->where(function ($p) use ($request) {
                     if ($request->fromDate != null) {
-                        $p->where('schedule_departure_date', '>=', $request->fromDate);
+                        $p->where('closing_date', '>=', $request->fromDate);
                     }
                     if ($request->toDate != null) {
-                        $p->where('schedule_departure_date', '<=', $request->toDate);
+                        $p->where('closing_date', '<=', $request->toDate);
                     }
                 })->pluck('id');
             $headerLink = ReportHeaderLink::where('company_id', Auth::user()->company_id)->whereIn('ticket_merge_id', $mergeIds)->get(['id', 'header_id', 'ticket_merge_id', 'value'])->groupBy(['ticket_merge_id', 'header_id']);
@@ -139,6 +139,7 @@ class DailySummaryReportController extends Controller
                 });
             });
             
+  
             // return $physicalTerminalData;
         if (strtolower($request->language) == 'english') {
             return view('reports.dailySummeryReportEng', [

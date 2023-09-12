@@ -60,8 +60,9 @@
                                                         <th>Departure Date</th>
                                                         <th>Return Date</th>
                                                         <th>Return Schedule</th>
+                                                        <th>Closing Date</th>
                                                         <th>Merge Sale</th>
-                                                        <th v-if="checkForSubmenuButtons('add-expense')">Expense</th>
+                                                        <th v-if="checkForSubmenuButtons('add-expense')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -81,23 +82,34 @@
                                                         <td class="bg-dark-gray">
                                                             {{ merge.schedule_return_date }}
                                                         </td>
+                                                        <td>
+                                                            {{ merge.closing_date??"N/A" }}
+                                                        </td>
                                                         <td class="bg-danger">
                                                             {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) }}
                                                         </td>
                                                         <td v-if="checkForSubmenuButtons('add-expense')">
                                                             <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"
-                                                                         class="btn btn-success mx-2"
+                                                                         class="btn btn-success mx-1"
                                                                          :to="{ name:'expense-page', params: { id:merge.id }}"
                                                                          title="Add Expense">
                                                                 <i class="fas fa-plus"></i>
                                                             </router-link>
                                                             <router-link target="_blank"
                                                                          v-if="checkForSubmenuButtons('add-expense')"
-                                                                         class="btn btn-success mx-2"
+                                                                         class="btn btn-success mx-1"
                                                                          :to="{ name:'header-link-page', params: { id:merge.id }}"
                                                                          title="header link">
-                                                                Link Headers
+                                                                Link
                                                             </router-link>
+                                                            <button title="Closing Date"
+                                                                data-target="#date-modal"
+                                                                data-toggle="modal"
+                                                                @click="closingData.mergeId = merge.id; closingData.closingDate = merge.closing_date"
+                                                                class="btn btn-info mx-1"
+                                                            >
+                                                                <i class="far fa-clock"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -108,6 +120,40 @@
                                 </div>
                             </div>
                             <!-- END TABLE -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- closing date -->
+            <div class="modal fade" id="date-modal" tabindex="-1" aria-labelledby="addDaysModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content ">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="">Closing Date</h5>
+                            <button type="button" class="close" @click="close()" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12 class form-group">
+                                    <label for="start">Closing Date <span class="text-danger ml-1">*</span></label>
+                                    <input
+                                        type="date"
+                                        id="start"
+                                        class="form-control"
+                                        v-model="closingData.closingDate"
+                                        
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" @click="updateClosingDate()" :disabled="loading">
+                                {{ loading ? 'Loading... ' : 'Update Date' }}
+                            </button>
+                            <button type="button" @click="close()" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -138,6 +184,10 @@ export default {
             validationErrors: "",
             merges: [],
             buses: [],
+            closingData: {
+                closingDate: "",
+                mergeId: "",
+            },
             filterData: {
                 bus_number: "",
                 from_date: "",
@@ -168,6 +218,9 @@ export default {
         clearForm: function () {
             this.data = {};
         },
+        close() {
+            $("#date-modal").click();
+        },
         async fetchData() {
             const res = await this.callApi("post", "booking/close/schedule/merges");
             if (res.status == 200) {
@@ -188,6 +241,51 @@ export default {
                 this.merges = res.data.merges;
             } else {
                 console.log(res);
+            }
+        },
+        async updateClosingDate() {
+            if (this.closingData.closingDate == "") {
+                return swal({
+                    title: "Required!",
+                    text: "Date Field is Required ",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.loading = true;
+            const res = await this.callApi("post", "booking/close/schedule/closing/date/update", this.closingData);
+            if (res.status == 200) {
+                this.close();
+                swal({
+                    title: "Success",
+                    text: "Update Closing Date Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                this.fetchMerges();
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
             }
         },
     },
