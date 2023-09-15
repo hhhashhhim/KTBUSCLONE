@@ -6,12 +6,12 @@
                     <div class="card card-primary">
                         <div class="card-header">
                             <h4>Schedule Closing Detail</h4>
-                            <div class="card-header-action">
+                            <!-- <div class="card-header-action">
                                 <a href="#" :data-target="'#' + formID" data-toggle="modal" class="btn btn-primary"
                                    @click="clearForm()" v-if="checkForSubmenuButtons('add-close-booking')">
                                     Close Booking
                                 </a>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -70,6 +70,12 @@
                                                                     @click="editSchedule(close)"
                                                                     class="btn btn-primary mx-1">
                                                                     <i class="far fa-edit" title="Edit Closing"></i>
+                                                                </button>
+                                                                <button
+                                                                    v-if="checkForSubmenuButtons('edit-close-booking')"
+                                                                    @click="releaseSchedule(close.id)"
+                                                                    class="btn btn-danger mx-1">
+                                                                    Release
                                                                 </button>
                                                             </td>
                                                         </tr>
@@ -199,7 +205,7 @@
                 <div class="row">
                     <div class=" form-group col-md-6">
                         <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" v-model="editData.bus">
+                        <select class="form-control" v-model="editData.bus" disabled>
                             <option value="">Select Bus Class</option>
                             <option
                                 v-for="(bus, i) in buses"
@@ -596,6 +602,33 @@ export default {
                 $('#closing_table').DataTable().destroy();
                 this.loading = false;
                 // this.fetchData();
+                this.$router.go(0);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+            }
+        },
+        async releaseSchedule(id) {
+            this.validationErrors = [];
+            this.loading = true;
+            const res = await this.callApi("post", "booking/close/schedule/closing/release", {closingId:id});
+            if (res.status === 200) {
+                swal({
+                    title: "Success",
+                    text: "Schedule Released Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                $('#closing_table').DataTable().destroy();
+                this.loading = false;
+                this.fetchData();
                 this.$router.go(0);
             } else {
                 if (res.status == 422) {
