@@ -283,6 +283,94 @@ if (!function_exists('updateAdvancedSeat')) {
         return $request->alreadyBookedId;
     }
 }
+//Updated Already advanced Booked Seat Api
+if (!function_exists('updateAdvancedSeatApi')) {
+    function updateAdvancedSeatApi($request, $company_id)
+    {
+        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customer_cnic))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        // $customerAll = [];
+        if($customerData)
+        {
+            $customerData->update([
+                'name' => $request->customerName,
+                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                'contact' => plainContactAndCnic($request->contact),
+            ]);
+        }
+        else
+        {
+            $customerData = Customer::create([
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+                'name' => $request->customerName,
+                'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                'contact' => plainContactAndCnic($request->contact),
+            ]);
+        }
+        foreach ($request->alreadyBookedId as $key => $single) {
+            $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
+            $customer_id->update([
+                'type' => 'booked',
+                'customer_id' => $customerData->id,
+                'added_by' => Auth::user()->id,
+            ]);
+
+            // online terminal request will be differrent so it is in if condition
+            if($request->destinationCity)
+            {
+            // checking partial
+                $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+                $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+                $isPartial = 0;
+                if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
+                    $isPartial = 1;
+                }
+                
+                $customer_id->update([
+                    'terminal_id' => $request->terminalId,
+                    'departure_city_id' => $request->departureCity,
+                    'is_partial' => $isPartial,
+                    'destination_city_id' => $request->destinationCity,
+                ]);
+                
+
+                if ($isPartial == 1) {
+                    TicketIsPartial::create([
+                        'company_id' => Auth::user()->company_id,
+                        'departure_city_id' => $customer_id->departure_city_id,
+                        'destination_city_id' => $customer_id->destination_city_id,
+                        'ticket_id' => $customer_id->id,
+                        'seat_no' => $customer_id->seat_no,
+                        'seat_fare' => $customer_id->seat_fare,
+                        'booking_no' => $customer_id->booking_no,
+                        'date' => $customer_id->date,
+                        'customer_id' => $customer_id->customer_id,
+                        'schedule_id' => $customer_id->schedule_id,
+                        'gender' => $customer_id->gender,
+                        'type' => $customer_id->type,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+                else
+                {
+                    TicketIsPartial::where([
+                        'ticket_id' => $customer_id->id,
+                    ])->delete();
+                }
+            }
+            // $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
+            //     $single)->first(['customer_id'])->customer_id;
+        }
+        // $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
+        // $updateId->update([
+        //     'name' => $request->customerName,
+        //     'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+        //     'contact' => plainContactAndCnic($request->contact),
+        // ]);
+        return $request->alreadyBookedId;
+    }
+}
 
 //updated Fare Table for first time
 if (!function_exists('updateFareTable')) {

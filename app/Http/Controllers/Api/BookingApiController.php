@@ -486,7 +486,7 @@ class BookingApiController extends Controller
                         $error = ["Some of your seat combinations are not reserved for confirm booking"];
                         return new ConflictResource($error);
                     }
-                    $allTicket = updateAdvancedSeat($request, $companyId);
+                    $allTicket = updateAdvancedSeatApi($request, $companyId);
                 } else {
 
                     // checking booking available with these seat selection
