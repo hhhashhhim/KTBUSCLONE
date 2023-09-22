@@ -11,6 +11,7 @@ use App\Http\Controllers\Surcharge\SurchargeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\BookingApiController;
+use App\Http\Controllers\Api\TicketingApiController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -42,5 +43,11 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
       Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
       Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
       Route::post('/new',[BookingApiController::class,'bookSeat']);
+   });
+   
+   Route::group(['prefix'=>'ticketing'],function(){
+      Route::post('/schedules/available',[TicketingApiController::class,'availableSchedules']);
+      Route::post('/schedule/preview',[TicketingApiController::class,'previewSchedule']);
+      Route::post('/new',[TicketingApiController::class,'bookSeat']);
    });
 });
