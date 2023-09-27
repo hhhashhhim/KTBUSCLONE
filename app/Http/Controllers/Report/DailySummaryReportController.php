@@ -8,6 +8,7 @@ use App\Models\Expense\TicketMergeExpense;
 use App\Models\ReportHeaderLink;
 use App\Models\Route\Route;
 use App\Models\Schedule\Schedule;
+use App\Models\OfficeExpense;
 use App\Models\TerminalCommission;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
@@ -156,6 +157,7 @@ class DailySummaryReportController extends Controller
                 "online_terminals" => $onlineTerminalData,
                 "physical_terminals" => $physicalTerminalData,
                 "headers_link" => $headerLink,
+                "office_expense" => OfficeExpense::where("company_id",Auth::user()->company_id)->whereBetween("closing_date",[$request->fromDate,$request->toDate])->get()->sum("amount"),
             ]);
         }
     }

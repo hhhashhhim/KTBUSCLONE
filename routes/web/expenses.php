@@ -18,3 +18,11 @@ Route::group(['prefix' => 'expenses', [CustomMiddleware::class]], function () {
         // Route::post('delete', [CityController::class, 'delete']);
     });
 });
+
+Route::group(['prefix' => 'office/expenses', [CustomMiddleware::class]], function () {
+    
+    Route::post('/', [ExpenseController::class, 'officeExpenses']);
+    Route::post('store', [ExpenseController::class, 'officeExpenStore']);
+    Route::post('update', [ExpenseController::class, 'officeExpenUpdate']);
+    
+});

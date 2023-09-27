@@ -37,15 +37,15 @@
 </head>
 
 <body>
-<div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
+<div style="border: 0px solid black; padding: 15px 3px 5px 3px !important;">
     <div id="info">
-        <div class="companyName"><span>(شہر نام) Closing {{ date('d/m/Y') }}</span></div>
+        <div class="companyName"><span>Closing</span></div>
     </div>
     <br>
 
     <table border="2" dir="rtl" style="text-align: center;">
         <tr>
-            <th>نمبر شمار</th>
+            <!-- <th>نمبر شمار</th> -->
             <th>بس نمبر</th>
             <th>آمدن</th>
             <th>کمیشن</th>
@@ -76,7 +76,7 @@
                 $singleRowNet = 0;
             @endphp
             <tr>
-                <td>{{$key + 1}}</td>
+                <!-- <td>{{$key + 1}}</td> -->
                 <td>{{ getBusName($single->closing[0]->bus_id)  }}</td>
                 
                 @php
@@ -105,7 +105,7 @@
                 @php
                     $totalExpense += $single->total_expenses;
                 @endphp
-                <td>{{ $single->total_income - $single->total_expenses - $commission}}</td>
+                <td dir="ltr">{{ $single->total_income - $single->total_expenses - $commission}}</td>
                 @php
                     $singleRowNet += ($single->total_income - $single->total_expenses - $commission);
                     $totalProfit += ($single->total_income - $single->total_expenses - $commission);
@@ -122,7 +122,7 @@
                         $totalTerminals[$keyTerminal] += (int)$online_terminals_income;
                     @endphp
                 @endforeach
-                <td>{{ $singleRowNet }}</td>
+                <td dir="ltr">{{ $singleRowNet }}</td>
             </tr>
             @php
                 $totalNetCash += $singleRowNet;
@@ -131,15 +131,34 @@
         <!-- Total Row -->
         <tr>
             <th></th>
-            <th></th>
             <th>{{ $totalIncome }}</th>
             <th>{{ $totalCommission }}</th>
             <th>{{ $totalExpense }}</th>
-            <th>{{ $totalProfit }}</th>
+            <th dir="ltr">{{ $totalProfit }}</th>
             @foreach($totalTerminals as $k)
                 <th> {{ $k }}</th>
             @endforeach
-            <th> {{ $totalNetCash }}</th>
+            <th dir="ltr"> {{ $totalNetCash }}</th>
+        </tr>
+        
+        <tr>
+            <th> --- </th>
+            <th> --- </th>
+        </tr>
+        
+        <tr>
+            <th> بنام / بچت </th>
+            <th dir="ltr"> {{ $totalNetCash }}</th>
+        </tr>
+        
+        <tr>
+            <th> متفرق خرچہ </th>
+            <th dir="ltr"> {{ $office_expense }}</th>
+        </tr>
+        
+        <tr>
+            <th> بنام / بچت </th>
+            <th dir="ltr"> {{ $totalNetCash + $office_expense }}</th>
         </tr>
     </table>
 </div>

@@ -51,6 +51,7 @@ import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 import ScheduleDropReportPage from "./pages/ScheduleDrop/ScheduleDropReportPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
+import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
 
 // const url = '/kt/'
@@ -296,6 +297,11 @@ const routes = [
         path: url + "reports/summary/close/trip",
         component: CloseSummeryReportPage,
         name: "summery-report"
+    },
+    {
+        path: url + "office/expenses",
+        component: OfficeExpensesPage,
+        name: "office-expenses-page"
     },
     {
         path: url + "reports/advance/sale",

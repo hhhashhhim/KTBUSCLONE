@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
                         <div class="card-header">
-                            <h4>Close Trip Summery Report</h4>
+                            <h4>Close Trip Summary Report</h4>
                             <div class="card-header-action">
                             </div>
                         </div>
@@ -73,8 +73,7 @@
                                                             @click="getSummeryReport('english')">Export Report
                                                     </button>
                                                     <button class="btn btn-outline-danger mr-2"
-                                                            @click="getSummeryReport('urdu')">Export Report
-                                                        (Urdu)
+                                                            @click="getSummeryReport('urdu')">Final Closing Report
                                                     </button>
                                                 </div>
                                             </div>
@@ -150,6 +149,13 @@ export default {
             return year + '-' + month + '-' + day;
         },
         async getSummeryReport(value) {
+            if ($("#fromDate").val() == "" || $("#toDate").val() == "")
+                return swal({
+                    title: "Required",
+                    text: "Enter Date Range",
+                    icon: "error",
+                    timer: 2000
+                });
             $("#languageReport").val(value);
             this.$refs.refDailySummeryReport.submit();
 

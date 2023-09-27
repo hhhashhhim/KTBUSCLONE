@@ -8,6 +8,7 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Schedule\Schedule;
 use App\Models\Bus\Bus;
 use App\Models\Ticket;
+use App\Models\OfficeExpense;
 use App\Models\TerminalCommission;
 use App\Models\Expense\TicketMergeExpense;
 use Illuminate\Http\Request;
@@ -17,16 +18,6 @@ use Illuminate\Support\Facades\Log;
 
 class ExpenseController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
 
     public function index(Request $request)
     {
@@ -222,5 +213,76 @@ class ExpenseController extends Controller
             "data" => $data,
             "refundTerminal" => $refundTerminal
         ]);
+    }
+
+    public function officeExpenses(Request $request)
+    {
+        return OfficeExpense::where(['company_id' => Auth::user()->company_id])->latest("closing_date")->get();
+    }
+
+    public function officeExpenStore(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $rules = [
+                'date' => 'required',
+                'amount' => 'required | integer',
+                'narration' => 'required',
+            ];
+
+            $customMessages = [
+                'date.required' => 'Closing Date is Required!',
+                'amount.required' => 'Expenses Amount is Required!',
+                'narration.required' => 'Expenses Narration is Required!',
+            ];
+            $this->validate($request, $rules, $customMessages);
+            
+            OfficeExpense::create([
+                'closing_date' => $request->date,
+                'amount' => $request->amount,
+                'narration' => $request->narration,
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+            DB::commit();
+        
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+    }
+    
+    public function officeExpenUpdate(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $rules = [
+                'closing_date' => 'required',
+                'amount' => 'required | integer',
+                'narration' => 'required',
+            ];
+
+            $customMessages = [
+                'closing_date.required' => 'Closing Date is Required!',
+                'amount.required' => 'Expenses Amount is Required!',
+                'narration.required' => 'Expenses Narration is Required!',
+            ];
+
+            $this->validate($request, $rules, $customMessages);
+            
+            OfficeExpense::where("id",$request->id)->update([
+                'closing_date' => $request->closing_date,
+                'amount' => $request->amount,
+                'narration' => $request->narration,
+                'updated_by' => Auth::user()->id,
+            ]);
+            DB::commit();
+        
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 }

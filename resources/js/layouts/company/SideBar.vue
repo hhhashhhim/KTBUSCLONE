@@ -95,6 +95,11 @@
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'office-expenses-page' }">
+                                <i class="fas fa-bookmark"></i> Office Expenses
+                            </router-link>
+                        </li>
                         <!--                        <li class="dropdown" v-if="checkForSubmenu('commission')">-->
                         <!--                            <router-link class="nav-link text-capitalize" to="">-->
                         <!--                                <i class="fas fa-table"></i> Commission Reports-->
