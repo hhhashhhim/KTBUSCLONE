@@ -15,7 +15,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-end">
-                                                <button class="btn btn-primary" @click="mergeSchedule()">
+                                                <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
                                                     Merge Schedule
                                                 </button>
                                             </div>
@@ -71,6 +71,10 @@
                                                             </td>
                                                         </tr>
                                                     </template>
+                                                    <tr v-if="closings.length==0">
+                                                        <td class="text-center" colspan="6">No data found</td>
+                                                    </tr>
+                                                    
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -178,16 +182,18 @@ export default {
                     icon: 'error',
                     timer: 2000
                 });
-            this.loadig = true;
+            this.loading = true;
             const res = await this.callApi("post", "booking/close/schedule/closing/merge", this.addData);
             if (res.status == 200) {
-                this.loading = false;
                 swal({
                     title: "Success",
                     text: "Schedule Merge Successfully",
                     icon: "success",
                     timer: 2000
                 });
+                setTimeout(() => {
+                    this.loading = false;
+                }, 1000);
                 this.addData.mergeIds = [];
                 this.fetchData();
 
