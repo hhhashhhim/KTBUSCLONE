@@ -92,12 +92,24 @@ class BookingController extends Controller
                 if (count($request->selectedSeats) == 0) {
                     return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
                 }
-                // check seat duplication
+                // check seat duplication 
+                $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $lastFare = $schedule->route->fares->last();
+                $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+                array_push($allFaresOfRoute, $lastFare->destination_city_id);
+                $scheduleDepIndex = array_search($request->departureCity,$allFaresOfRoute);
+                $scheduleDesIndex = array_search($request->destinationCity,$allFaresOfRoute);
                 $checkAlreadyBooked = Ticket::whereIn("seat_no",$request->selectedSeats)->where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->get();
-                if($checkAlreadyBooked->count() > 0)
+                foreach($checkAlreadyBooked as $tkt)
                 {
-                    return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
+                    $ticketDepIndex = array_search($tkt->departure_city_id,$allFaresOfRoute);
+                    $ticketDesIndex = array_search($tkt->destination_city_id,$allFaresOfRoute);
+                    if(($ticketDepIndex > $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                    {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
+                    }
                 }
+                
                 if ($request->usagePoints == true) {
 //                  Get Customer's Loyalty Card
                     $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
@@ -135,7 +147,7 @@ class BookingController extends Controller
                         $checkCard->increment("starting_points", $addPoint);
                     }
                 }
-                $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                 $isPartial = 0;

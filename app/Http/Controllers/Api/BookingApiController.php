@@ -490,14 +490,25 @@ class BookingApiController extends Controller
                 } else {
 
                     // checking booking available with these seat selection
+                    // check seat duplication 
+                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                    $lastFare = $schedule->route->fares->last();
+                    $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+                    array_push($allFaresOfRoute, $lastFare->destination_city_id);
+                    $scheduleDepIndex = array_search($request->departure_city_id,$allFaresOfRoute);
+                    $scheduleDesIndex = array_search($request->destination_city_id,$allFaresOfRoute);
                     $checkAlreadyBooked = Ticket::whereIn("seat_no",$request->selected_seats)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
-                    if($checkAlreadyBooked->count() > 0)
+                    foreach($checkAlreadyBooked as $tkt)
                     {
-                        $error = ["One seat of your combination already booked"];
-                        return new ConflictResource($error);
+                        $ticketDepIndex = array_search($tkt->departure_city_id,$allFaresOfRoute);
+                        $ticketDesIndex = array_search($tkt->destination_city_id,$allFaresOfRoute);
+                        if(($ticketDepIndex > $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                        {
+                            return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
+                        }
                     }
 
-                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                    
                     $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                     $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                     $isPartial = 0;

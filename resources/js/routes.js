@@ -54,8 +54,8 @@ import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
 
-// const url = '/kt/'
-const url = '/'
+const url = '/kt/'
+// const url = '/'
 
 const routes = [
     {
