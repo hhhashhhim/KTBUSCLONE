@@ -21,6 +21,7 @@ use App\Models\Bus\BusClass;
 use App\Models\TerminalDiscount;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
+use App\Models\Invoice;
 use App\Http\Resources\SuccessResource;
 use App\Models\Booking\TicketAdvancedBooked;
 use App\Http\Resources\EmptyResource;
@@ -383,6 +384,39 @@ class TicketingApiController extends Controller
     public function bookSeat(Request $request)
     {
         try {
+                $companyId = Auth::user()->company_id;
+                $terminalId = Auth::user()->terminal_id;
+
+                // for reserved to confirm
+                if (isset($request->flag) && $request->flag == 1) 
+                {
+                    $validator = Validator::make($request->all(), [
+                        'invoice_id' => 'required|integer',
+                    ]);
+                    if ($validator->fails())
+                    {
+                        return new ValidationResource($validator->errors());
+                    }
+                    // checking only reserved seats will go through this process
+                    $checkAlreadyBooked = Ticket::where("invoice_id",$request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])->get();
+                    if($checkAlreadyBooked->count() > 0 )
+                    {
+                        Ticket::where("invoice_id",$request->invoice_id)->update([
+                            'type' => 'booked',
+                            'added_by' => Auth::user()->id,
+                        ]);
+
+                        return new CreatedResource(["invoice_id"=>$request->invoice_id]);
+                       
+                    }
+                    else
+                    {
+                        $error = ["your seat combinations are not reserved for confirm booking"];
+                        return new ConflictResource($error);
+                    }
+                } 
+
+                // for new
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
                     'destination_city_id' => 'required',
@@ -400,9 +434,6 @@ class TicketingApiController extends Controller
 
                 $depId = ($request->departure_city_id == 98) ? 1 : (($request->departure_city_id == 36) ? 3 : 0);
                 $desId = ($request->destination_city_id == 98) ? 1 : (($request->destination_city_id == 36) ? 3 : 0);
-
-                $companyId = Auth::user()->company_id;
-                $terminalId = Auth::user()->terminal_id;
                 
                 if($request->book_type != "booked" && $request->book_type != "advance booking")
                 {
@@ -441,16 +472,16 @@ class TicketingApiController extends Controller
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
                 
                 $allTicket = [];
-                if (isset($request->flag) && $request->flag == 1) {
-                    // checking only reserved seats will go through this process
-                    $checkAlreadyBooked = Ticket::whereIn("id",$request->alreadyBookedId)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id,"type" => "advance booking"])->get();
-                    if($checkAlreadyBooked->count() != count($request->alreadyBookedId))
-                    {
-                        $error = ["Some of your seat combinations are not reserved for confirm booking"];
-                        return new ConflictResource($error);
-                    }
-                    $allTicket = updateAdvancedSeatApi($request, $companyId);
-                } else {
+                // if (isset($request->flag) && $request->flag == 1) {
+                //     // checking only reserved seats will go through this process
+                //     $checkAlreadyBooked = Ticket::whereIn("id",$request->alreadyBookedId)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id,"type" => "advance booking"])->get();
+                //     if($checkAlreadyBooked->count() != count($request->alreadyBookedId))
+                //     {
+                //         $error = ["Some of your seat combinations are not reserved for confirm booking"];
+                //         return new ConflictResource($error);
+                //     }
+                //     $allTicket = updateAdvancedSeatApi($request, $companyId);
+                // } else {
 
                     // checking booking available with these seat selection
                     $checkAlreadyBooked = Ticket::whereIn("seat_no",$request->selected_seats)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
@@ -497,13 +528,22 @@ class TicketingApiController extends Controller
                         $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
                         ++$bookingNo;
                     }
-                    $scheduleDetail = ScheduleDetail::where([
-                        'company_id' => $companyId,
-                        'departure_date' => $request->date,
-                        'departure_id' => $depId,
-                        'destination_id' => $desId,
-                        'schedule_id' => $schedule->id,
-                    ])->first();
+                    // $scheduleDetail = ScheduleDetail::where([
+                    //     'company_id' => $companyId,
+                    //     'departure_date' => $request->date,
+                    //     'departure_id' => $depId,
+                    //     'destination_id' => $desId,
+                    //     'schedule_id' => $schedule->id,
+                    // ])->first();
+                    $invoice = Invoice::create([
+                        "schedule_id" => $schedule->id,
+                        "route_id" => $schedule->route_id,
+                        "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                        "schedule_date" => $detail->schedule_date,
+                        "schedule_time" => $detail->departure_time,
+                        "company_id" => Auth::user()->company_id,
+                        "added_by" => Auth::user()->id,
+                    ]);
                     $allTicket = [];
                     foreach ($request->selected_seats as $i => $seat) {
                         $ticket = Ticket::create([
@@ -515,8 +555,9 @@ class TicketingApiController extends Controller
                             'seat_fare' => $request->selected_seats_fare[$i],
                             'is_partial' => $isPartial,
                             'booking_no' => $bookingNo,
+                            'invoice_id' => $invoice->id,
                             'schedule_date' => $detail->schedule_date,
-                            'schedule_time' => ScheduleDetail::where(["schedule_date"=>$detail->schedule_date,"schedule_id"=>$schedule->id])->first()->departure_time,
+                            'schedule_time' => $detail->departure_time,
                             'date' => $request->date,
                             'customer_id' => $customer->id,
                             'schedule_id' => $schedule->id,
@@ -524,7 +565,7 @@ class TicketingApiController extends Controller
                             'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                             'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                             'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
-                            'schedule_details_id' => $scheduleDetail->id,
+                            'schedule_details_id' => $detail->id,
                             'terminal_id' => $terminalId,
                             'terminal_name' => Terminal::find($terminalId)->name,
                             'online_terminal' => Terminal::find($terminalId)->is_online_terminal,
@@ -574,10 +615,10 @@ class TicketingApiController extends Controller
                         }
                         $allTicket[] = $ticket->id;
                     }
-                }
+                // }
                 DB::commit();
                 
-                return new CreatedResource($allTicket);
+                return new CreatedResource(["invoice_id"=>$invoice->id]);
                 
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());

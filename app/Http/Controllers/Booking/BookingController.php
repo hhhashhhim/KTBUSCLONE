@@ -34,6 +34,7 @@ use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
 use App\Models\Ticket;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -184,13 +185,22 @@ class BookingController extends Controller
                     $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
-                $scheduleDetail = ScheduleDetail::where([
-                    'company_id' => Auth::user()->company_id,
-                    'departure_date' => $request->date,
-                    'departure_id' => $request->departureCity,
-                    'destination_id' => $request->destinationCity,
-                    'schedule_id' => $schedule->id,
-                ])->first();
+                // $scheduleDetail = ScheduleDetail::where([
+                //     'company_id' => Auth::user()->company_id,
+                //     'departure_date' => $request->date,
+                //     'departure_id' => $request->departureCity,
+                //     'destination_id' => $request->destinationCity,
+                //     'schedule_id' => $schedule->id,
+                // ])->first();
+                $invoice = Invoice::create([
+                    "schedule_id" => $schedule->id,
+                    "route_id" => $schedule->route_id,
+                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                    "schedule_date" => $detail->schedule_date,
+                    "schedule_time" => $detail->departure_time,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
                 $allTicket = [];
                 foreach ($request->selectedSeats as $i => $seat) {
                     $ticket = Ticket::create([
@@ -202,8 +212,9 @@ class BookingController extends Controller
                         'seat_fare' => $request->selectedSeatsFare[$i],
                         'is_partial' => $isPartial,
                         'booking_no' => $bookingNo,
+                        'invoice_id' => $invoice->id,
                         'schedule_date' => $detail->schedule_date,
-                        'schedule_time' => ScheduleDetail::where(["schedule_date"=>$detail->schedule_date,"schedule_id"=>$schedule->id])->first()->departure_time,
+                        'schedule_time' => $detail->departure_time,
                         'date' => $request->date,
                         'customer_id' => $customer->id,
                         'schedule_id' => $schedule->id,
@@ -211,7 +222,7 @@ class BookingController extends Controller
                         'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                         'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                         'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
-                        'schedule_details_id' => $scheduleDetail->id,
+                        'schedule_details_id' => $detail->id,
                         'terminal_id' => $request->terminalId ?? Auth::user()->terminal_id,
                         'terminal_name' => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->name,
                         'online_terminal' => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->is_online_terminal,
