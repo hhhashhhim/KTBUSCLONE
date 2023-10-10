@@ -240,6 +240,11 @@ class TicketingApiController extends Controller
                 foreach ($seatMap as $i => $iValue) {
                     foreach ($iValue as $j => $column) {
                         // adding fare to each seat
+                        if ($column['reserved'] == false)
+                        {
+                            unset($seatMap[$i][$j]);
+                        }
+                        
                         if ($column['reserved']) {
                             $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                             $seatMap[$i][$j]['fare'] = (int)$data->fare;
