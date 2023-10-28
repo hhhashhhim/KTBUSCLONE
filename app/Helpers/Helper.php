@@ -590,6 +590,29 @@ if (!function_exists('codeImage')) {
     }
 }
 
+//Custom round value function
+if (!function_exists('customRound')) {
+    function customRound($value)
+    {
+        $result = $value % 100;
+        if($result < 25)
+        {
+            $round = 0;
+        }
+        elseif($result >= 25 && $result < 75)
+        {
+            $round = 50;
+        }
+        elseif($result >= 75 )
+        {
+            $round = 100;
+        }
+        $result = $value - $result + $round;
+        
+        return $result;
+    }
+}
+
 //Upload ELt Image API
 if (!function_exists('codeImageElt')) {
     function codeImageElt($code)

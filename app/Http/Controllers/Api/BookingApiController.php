@@ -405,6 +405,7 @@ class BookingApiController extends Controller
                                 }
                             }
                         }
+                        $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
                     }
                 }
                 $schedule->bus_class->seat_map = $seatMap;
