@@ -39,6 +39,7 @@ class TerminalTimeDifferenceController extends Controller
                         'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,
                     ]);
+                    DB::commit();
                     return response()->json([
                         "success" => ["Time Difference Added Successfully"],
                     ], 200);
