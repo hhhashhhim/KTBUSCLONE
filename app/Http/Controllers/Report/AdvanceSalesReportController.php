@@ -56,7 +56,7 @@ class AdvanceSalesReportController extends Controller
             ->get();
 
         $tickets->transform(function ($single) {
-            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule->time));
+            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time));
             return $single;
         });
 
