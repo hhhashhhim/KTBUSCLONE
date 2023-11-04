@@ -1243,8 +1243,9 @@ class BookingController extends Controller
             $refundData += $final;
         }
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
-        $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
-        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'format' => $format]);
+        // $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
+        $terminal = Terminal::find(Auth::user()->terminal_id);
+        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal]);
     }
 
     public
