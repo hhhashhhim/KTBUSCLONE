@@ -224,7 +224,7 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id->update([
                 'type' => 'booked',
                 'customer_id' => $customerData->id,
-                'added_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
             ]);
 
             // online terminal request will be differrent so it is in if condition
@@ -312,7 +312,7 @@ if (!function_exists('updateAdvancedSeatApi')) {
             $customer_id->update([
                 'type' => 'booked',
                 'customer_id' => $customerData->id,
-                'added_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
             ]);
 
             // online terminal request will be differrent so it is in if condition

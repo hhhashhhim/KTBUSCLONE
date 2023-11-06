@@ -411,7 +411,7 @@ class TicketingApiController extends Controller
                     {
                         Ticket::where("invoice_id",$request->invoice_id)->update([
                             'type' => 'booked',
-                            'added_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id,
                         ]);
 
                         return new CreatedResource(["invoice_id"=>$request->invoice_id]);
