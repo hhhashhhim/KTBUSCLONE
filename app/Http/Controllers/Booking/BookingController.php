@@ -231,6 +231,7 @@ class BookingController extends Controller
                         'type' => $request->type,
                         'discount_type' => $request->usagePoints ? 'card' : null,
                         'added_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
                         'discount' => $request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
                         'points_usage' => $request->pointsUseInput / count($request->selectedSeats),
                     ]);
