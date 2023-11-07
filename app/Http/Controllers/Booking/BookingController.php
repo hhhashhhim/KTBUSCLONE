@@ -714,7 +714,7 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
         ])->first(['schedule_date']);
         // Getting Already Booked Tickets
-        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
+        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
@@ -785,7 +785,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name']??"N/A";
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name']??"N/A";
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
@@ -801,7 +801,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
                             $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
                             $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
-                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['addedBy']['name']??'N/A';
+                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name']??'N/A';
                             $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
                             $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
                             $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
