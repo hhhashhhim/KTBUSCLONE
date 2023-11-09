@@ -19,7 +19,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Activity By</th>
-                                                            <th width="600px" style="max-width: 200px;word-wrap: break-word;">Message</th>
+                                                            <th width="600px">Message</th>
                                                             <th>Time</th>
                                                         </tr>
                                                     </thead>
