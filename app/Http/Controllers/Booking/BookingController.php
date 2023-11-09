@@ -1215,7 +1215,7 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
         ])->first()->departure_time;
 
-        $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
+        $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name','updated_name:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,

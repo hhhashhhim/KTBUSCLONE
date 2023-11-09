@@ -144,7 +144,7 @@
                 <td>{{ $item->ticketElt == null ? 0 : $item->ticketElt->elt_price }}</td>
                 <td>{{ $item->seat_fare }}</td>
                 <td>{{ ucfirst($item->terminal->name) }}</td>
-                <td>{{ ucfirst($item->addedBy->name) }}</td>
+                <td>{{ ucfirst($item->updated_name->name) }}</td>
 
             </tr>
         @endforeach
