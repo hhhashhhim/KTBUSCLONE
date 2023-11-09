@@ -380,6 +380,12 @@
                                 <i class="fas fa-users"></i> Ticket Format
                             </router-link>
                         </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'activityLog' }"
+                                         v-if="checkForSubmenu('ActivityLog')">
+                                <i class="fas fa-users"></i> Activity Log
+                            </router-link>
+                        </li>
                         <!--                        <li>-->
                         <!--                            <router-link class="nav-link text-capitalize" :to="{ name:'profileSettings' }"-->
                         <!--                                         v-if="checkForSubmenu('employee')">-->

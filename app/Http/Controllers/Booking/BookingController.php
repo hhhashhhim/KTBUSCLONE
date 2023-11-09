@@ -21,6 +21,7 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalCommission;
+use App\Models\ActivityLog;
 use App\Models\Customer;
 use App\Models\FareClass;
 use App\Models\FareTable;
@@ -273,6 +274,11 @@ class BookingController extends Controller
                     $allTicket[] = $ticket->id;
                 }
             }
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats),
+                "requested_host" => $request->ip(),
+            ]);
             DB::commit();
             return [
                 'ids' => implode('-', $allTicket),

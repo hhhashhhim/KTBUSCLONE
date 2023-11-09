@@ -709,6 +709,10 @@
                         "allow": true
                     }
                 ]
+            },
+            {
+                "name": "ActivityLog",
+                "allow": true
             }
         ]
     },

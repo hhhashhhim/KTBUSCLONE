@@ -15,10 +15,10 @@ class CreateActivityLogsTable extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('message');
             $table->integer('activity_by');
+            $table->string('message');
             $table->ipAddress('requested_host');
-            $table->enum('status', ['Read', 'Unread']);
+            $table->integer('company_id')->nullable();
             $table->timestamp('time')->useCurrent();
             $table->softDeletes();
             $table->timestamps();

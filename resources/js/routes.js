@@ -27,6 +27,7 @@ import LeavePage from "./pages/hrm/leave/LeavePage.vue";
 import DepartmentPage from "./pages/hrm/department/DepartmentPage.vue";
 import DesignationPage from "./pages/hrm/designation/DesignationPage.vue";
 import TicketSettingPage from "./pages/settings/tickets/TicketSettingsPage.vue";
+import ActivityLogPage from "./pages/settings/ActivityLogPage.vue";
 import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
 import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
 import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
@@ -237,6 +238,11 @@ const routes = [
         path: url + "settings/tickets",
         component: TicketSettingPage,
         name: "ticketSettings"
+    },
+    {
+        path: url + "settings/activity/log",
+        component: ActivityLogPage,
+        name: "activityLog"
     },
     {
         path: url + "settings/profile",
