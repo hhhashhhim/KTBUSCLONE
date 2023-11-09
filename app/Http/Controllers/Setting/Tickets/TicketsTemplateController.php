@@ -109,7 +109,7 @@ class TicketsTemplateController extends Controller
         return ActivityLog::with("activity")
             ->where("created_at",'>=', now()->subDays(3))
             ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
-            ->orderBy("id","DESC")
+            ->orderBy("created_at","DESC")
             ->get();
     }
 }
