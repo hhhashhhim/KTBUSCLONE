@@ -18,6 +18,7 @@ use App\Models\FareClass;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Bus\BusClass;
+use App\Models\ActivityLog;
 use App\Models\TerminalDiscount;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
@@ -413,7 +414,11 @@ class TicketingApiController extends Controller
                             'type' => 'booked',
                             'updated_by' => Auth::user()->id,
                         ]);
-
+                        ActivityLog::create([
+                            "activity_by" => Auth::user()->id,
+                            "message" => Auth::user()->name." | stored ticket (advance booking) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | seat no :".json_encode($request->selected_seats),
+                            "requested_host" => $request->ip(),
+                        ]);
                         return new CreatedResource(["invoice_id"=>$request->invoice_id]);
                        
                     }

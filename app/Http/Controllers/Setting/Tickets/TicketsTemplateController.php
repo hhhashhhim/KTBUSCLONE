@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Setting\Tickets;
 use App\Http\Controllers\Controller;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Terminal;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -103,5 +104,12 @@ class TicketsTemplateController extends Controller
             }
     }
 
-
+    public function activityLog()
+    {
+        return ActivityLog::with("activity")
+            ->where("created_at",'>=', now()->subDays(3))
+            ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
+            ->orderBy("id","DESC")
+            ->get();
+    }
 }

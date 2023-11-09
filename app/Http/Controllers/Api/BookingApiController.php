@@ -18,6 +18,7 @@ use App\Models\FareClass;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Bus\BusClass;
+use App\Models\ActivityLog;
 use App\Models\TerminalDiscount;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
@@ -635,6 +636,11 @@ class BookingApiController extends Controller
                         $allTicket[] = $ticket->id;
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | stored ticket ($request->book_type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selected_seats),
+                    "requested_host" => $request->ip(),
+                ]);
                 DB::commit();
                 
                 return new CreatedResource($allTicket);

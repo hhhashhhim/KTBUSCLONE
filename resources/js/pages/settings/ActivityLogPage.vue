@@ -18,43 +18,16 @@
                                                     id="ticket_templates">
                                                     <thead>
                                                         <tr>
-                                                            <th>Sr No.</th>
-                                                            <th>Terminal</th>
-                                                            <th>Address</th>
-                                                            <th>UAN #</th>
-                                                            <th>Phone #</th>
-                                                            <th>Terms & Condition</th>
-                                                            <th>status</th>
-                                                            <th v-if="checkForSubmenuButtons('edit-template')">Action</th>
+                                                            <th>Activity By</th>
+                                                            <th width="600px">Message</th>
+                                                            <th>Time</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="(template, i) in templates" :key="i">
-                                                            <td>{{ i + 1 }}</td>
-                                                            <td v-if="template.terminal_id != null">
-                                                                {{ template.terminal.city.name }} -
-                                                                {{ template.terminal.name }}
-                                                            </td>
-                                                            <td v-else>N/A</td>
-                                                            <td class="text-break">{{ template.address }}</td>
-                                                            <td>{{ template.uan }}</td>
-                                                            <td>{{ template.phone }}</td>
-                                                            <td class="text-break">{{ template.terms_condition }}</td>
-                                                            <td v-if="template.status == 1">
-                                                                <div class="badge badge-success">Active</div>
-                                                            </td>
-                                                            <td v-else>
-                                                                <div class="badge badge-danger">InActive</div>
-                                                            </td>
-                                                            <td v-if="checkForSubmenuButtons('edit-template')">
-                                                                <button v-if="checkForSubmenuButtons('edit-template')"
-                                                                    :data-target="'#' + editFormID" data-toggle="modal"
-                                                                    @click="edit(template)"
-                                                                    class=" text-light btn btn-primary mx-1"
-                                                                    title="Edit Template">
-                                                                    <i class="far fa-edit"></i>
-                                                                </button>
-                                                            </td>
+                                                        <tr v-for="(log, i) in logs" :key="i">
+                                                            <td>{{ log.activity.email }}</td>
+                                                           <td>{{ log.message }}</td>
+                                                            <td>{{ log.formatted_created_at }}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -85,27 +58,11 @@ export default {
     },
     data() {
         return {
-            optionsUan: {
-                placeholder: "xx-xxx-xxx-xxx",
-            },
             permissions: [],
-            optionsPhone: {
-                placeholder: "03xx-xxxxxxx",
-            },
-            countWordsLength: 0,
-            countAddressLength: 0,
-            templates: [],
-            terminals: [],
-            addForm: {
-                terminal: 0,
-            },
-            dataEdit: {},
+            logs: [],
             loading: false,
             loadingEdit: false,
             validationErrors: [],
-            formID: "ticket_template",
-            editFormID: "edit_ticket_template",
-            deleteFormID: "delete_ticket_template",
         };
     },
     async created() {
@@ -118,210 +75,24 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
-        this.fetchTemplates();
+        this.fetchLogs();
         this.permissions = this.$store.state.permissions;
     },
 
     methods: {
-        clearForm: function () {
-            this.addForm.terminal = 0;
-            this.addForm.termsCondition = '';
-            this.addForm.address = '';
-            this.addForm.phoneNumber = '';
-            this.addForm.uanNumber = '';
-            this.countWordsLength = 0;
-            this.countAddressLength = 0
-        },
-        // uanFormat: function (string) {
-        //     return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
-        // },
-        // phoneFormat: function (string) {
-        //     return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
-        // },
-        // countWords: function (count, flag, maxvalue) {
-        //     if (flag == 'terms' && maxvalue == 140) {
-        //         this.countWordsLength = count;
-        //     }
-        //     if (flag == 'address' && maxvalue == 45) {
-        //         this.countAddressLength = count;
-        //     }
-        //     // swal({
-        //     //     title: "OOPs !!!",
-        //     //     text: "Characters Must be less then or equal to Max Value",
-        //     //     icon: "error",
-        //     //     timer: 2000,
-        //     // });
-        //
-        // },
-        async fetchTemplates() {
-            const resTicketTemplate = await this.callApi("post", 'settings/tickets');
-            console.log(resTicketTemplate);
-            if (resTicketTemplate.status == 200) {
-                this.templates = resTicketTemplate.data;
+        async fetchLogs() {
+            const resLogs = await this.callApi("post", 'settings/activity/logs');
+            if (resLogs.status == 200) {
+                this.logs = resLogs.data;
             }
-            if (resTicketTemplate.status == 422) {
+            if (resLogs.status == 422) {
                 console.log(resTicketTemplate)
             }
-
-            const resAllTerminals = await this.callApi("post", 'settings/tickets/terminals');
-            if (resAllTerminals.status == 200) {
-                this.terminals = resAllTerminals.data
-            } else {
-                console.log(resAllTerminals);
-            }
-
 
             setTimeout(function () {
                 $("#ticket_templates").DataTable();
             }, 300);
-
         },
-
-        async addTemplate() {
-            if (this.addForm.terminal == '0') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Please Select any Terminal",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            // if (this.addForm.uanNumber == '' || typeof this.addForm.uanNumber == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "UAN Number is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
-            if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Terms & Condition is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            this.loading = true;
-            const resAddTemplate = await this.callApi("post", 'settings/tickets/store', this.addForm);
-            if (resAddTemplate.status == 201) {
-                this.loading = false;
-                swal({
-                    title: "Success !!",
-                    text: "Template Added Successfully",
-                    icon: "success",
-                    timer: 2000,
-                });
-                $("#ticket_templates").DataTable().destroy();
-                this.clearForm();
-                this.fetchTemplates();
-            }
-            if (resAddTemplate.status == 422) {
-                this.loading = false;
-                let errorContent = "";
-                let count = 0;
-                for (const key in resAddTemplate.data.errors) {
-                    resAddTemplate.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                    });
-
-                }
-            }
-
-        },
-
-        async edit(template) {
-            console.log(template)
-            this.dataEdit = template;
-        },
-
-        async updateTemplate() {
-            if (this.dataEdit.terminal_id == '0') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Please Select any Terminal",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            // if (this.dataEdit.uan == '' || typeof this.dataEdit.uan == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "UAN Number is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
-            if (this.dataEdit.phone == '' || typeof this.dataEdit.phone == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Phone Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.dataEdit.address == '' || typeof this.dataEdit.address == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Address is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.dataEdit.terms_condition == '' || typeof this.dataEdit.terms_condition == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Terms &Condition is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            this.loadingEdit = true;
-            const resEditTemplate = await this.callApi("post", 'settings/tickets/update', this.dataEdit);
-            if (resEditTemplate.status == 200) {
-                this.loadingEdit = false;
-                swal({
-                    title: "Success",
-                    text: "Template Update Successfully ",
-                    icon: "success",
-                    timer: 2000
-                });
-                $("#ticket_templates").DataTable().destroy();
-                this.fetchTemplates();
-            }
-            if (resEditTemplate.status == 422) {
-                this.loadingEdit = false;
-                let errorContent = "";
-                let count = 0;
-                for (const key in resEditTemplate.data.errors) {
-                    resEditTemplate.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " + //creating serial no.
-                            element + // main error
-                            "\n" // creating new line
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                    });
-
-                }
-            }
-        }
-
     },
 };
 </script>

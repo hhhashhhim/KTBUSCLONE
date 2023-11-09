@@ -49539,27 +49539,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   components: {},
   data: function data() {
     return {
-      optionsUan: {
-        placeholder: "xx-xxx-xxx-xxx"
-      },
       permissions: [],
-      optionsPhone: {
-        placeholder: "03xx-xxxxxxx"
-      },
-      countWordsLength: 0,
-      countAddressLength: 0,
-      templates: [],
-      terminals: [],
-      addForm: {
-        terminal: 0
-      },
-      dataEdit: {},
+      logs: [],
       loading: false,
       loadingEdit: false,
-      validationErrors: [],
-      formID: "ticket_template",
-      editFormID: "edit_ticket_template",
-      deleteFormID: "delete_ticket_template"
+      validationErrors: []
     };
   },
   created: function created() {
@@ -49581,7 +49565,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _this.fetchTemplates();
+              _this.fetchLogs();
 
               _this.permissions = _this.$store.state.permissions;
 
@@ -49594,301 +49578,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   methods: {
-    clearForm: function clearForm() {
-      this.addForm.terminal = 0;
-      this.addForm.termsCondition = '';
-      this.addForm.address = '';
-      this.addForm.phoneNumber = '';
-      this.addForm.uanNumber = '';
-      this.countWordsLength = 0;
-      this.countAddressLength = 0;
-    },
-    // uanFormat: function (string) {
-    //     return (string.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1-$2-$3-$4"));
-    // },
-    // phoneFormat: function (string) {
-    //     return (string.replace(/(\d{4})(\d{7})/, "$1-$2"));
-    // },
-    // countWords: function (count, flag, maxvalue) {
-    //     if (flag == 'terms' && maxvalue == 140) {
-    //         this.countWordsLength = count;
-    //     }
-    //     if (flag == 'address' && maxvalue == 45) {
-    //         this.countAddressLength = count;
-    //     }
-    //     // swal({
-    //     //     title: "OOPs !!!",
-    //     //     text: "Characters Must be less then or equal to Max Value",
-    //     //     icon: "error",
-    //     //     timer: 2000,
-    //     // });
-    //
-    // },
-    fetchTemplates: function fetchTemplates() {
+    fetchLogs: function fetchLogs() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var resTicketTemplate, resAllTerminals;
+        var resLogs;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'settings/tickets');
+                return _this2.callApi("post", 'settings/activity/logs');
 
               case 2:
-                resTicketTemplate = _context2.sent;
-                console.log(resTicketTemplate);
+                resLogs = _context2.sent;
 
-                if (resTicketTemplate.status == 200) {
-                  _this2.templates = resTicketTemplate.data;
+                if (resLogs.status == 200) {
+                  _this2.logs = resLogs.data;
                 }
 
-                if (resTicketTemplate.status == 422) {
+                if (resLogs.status == 422) {
                   console.log(resTicketTemplate);
-                }
-
-                _context2.next = 8;
-                return _this2.callApi("post", 'settings/tickets/terminals');
-
-              case 8:
-                resAllTerminals = _context2.sent;
-
-                if (resAllTerminals.status == 200) {
-                  _this2.terminals = resAllTerminals.data;
-                } else {
-                  console.log(resAllTerminals);
                 }
 
                 setTimeout(function () {
                   $("#ticket_templates").DataTable();
                 }, 300);
 
-              case 11:
+              case 6:
               case "end":
                 return _context2.stop();
             }
           }
         }, _callee2);
-      }))();
-    },
-    addTemplate: function addTemplate() {
-      var _this3 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var resAddTemplate;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                if (!(_this3.addForm.terminal == '0')) {
-                  _context3.next = 2;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Please Select any Terminal",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this3.addForm.termsCondition == '' || typeof _this3.addForm.termsCondition == 'undefined')) {
-                  _context3.next = 4;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Terms & Condition is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                _this3.loading = true;
-                _context3.next = 7;
-                return _this3.callApi("post", 'settings/tickets/store', _this3.addForm);
-
-              case 7:
-                resAddTemplate = _context3.sent;
-
-                if (resAddTemplate.status == 201) {
-                  _this3.loading = false;
-                  swal({
-                    title: "Success !!",
-                    text: "Template Added Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  $("#ticket_templates").DataTable().destroy();
-
-                  _this3.clearForm();
-
-                  _this3.fetchTemplates();
-                }
-
-                if (resAddTemplate.status == 422) {
-                  (function () {
-                    _this3.loading = false;
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in resAddTemplate.data.errors) {
-                      resAddTemplate.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 10:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }))();
-    },
-    edit: function edit(template) {
-      var _this4 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                console.log(template);
-                _this4.dataEdit = template;
-
-              case 2:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }))();
-    },
-    updateTemplate: function updateTemplate() {
-      var _this5 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var resEditTemplate;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                if (!(_this5.dataEdit.terminal_id == '0')) {
-                  _context5.next = 2;
-                  break;
-                }
-
-                return _context5.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Please Select any Terminal",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this5.dataEdit.phone == '' || typeof _this5.dataEdit.phone == 'undefined')) {
-                  _context5.next = 4;
-                  break;
-                }
-
-                return _context5.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Phone Number is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                if (!(_this5.dataEdit.address == '' || typeof _this5.dataEdit.address == 'undefined')) {
-                  _context5.next = 6;
-                  break;
-                }
-
-                return _context5.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Address is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 6:
-                if (!(_this5.dataEdit.terms_condition == '' || typeof _this5.dataEdit.terms_condition == 'undefined')) {
-                  _context5.next = 8;
-                  break;
-                }
-
-                return _context5.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Terms &Condition is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                _this5.loadingEdit = true;
-                _context5.next = 11;
-                return _this5.callApi("post", 'settings/tickets/update', _this5.dataEdit);
-
-              case 11:
-                resEditTemplate = _context5.sent;
-
-                if (resEditTemplate.status == 200) {
-                  _this5.loadingEdit = false;
-                  swal({
-                    title: "Success",
-                    text: "Template Update Successfully ",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  $("#ticket_templates").DataTable().destroy();
-
-                  _this5.fetchTemplates();
-                }
-
-                if (resEditTemplate.status == 422) {
-                  (function () {
-                    _this5.loadingEdit = false;
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in resEditTemplate.data.errors) {
-                      resEditTemplate.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 14:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5);
       }))();
     }
   }
@@ -82172,111 +81894,23 @@ var _hoisted_13 = {
   id: "ticket_templates"
 };
 
-var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No.", -1
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Activity By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  width: "600px"
+}, "Message"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time")])], -1
 /* HOISTED */
 );
 
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal", -1
-/* HOISTED */
-);
-
-var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Address", -1
-/* HOISTED */
-);
-
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "UAN #", -1
-/* HOISTED */
-);
-
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Phone #", -1
-/* HOISTED */
-);
-
-var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terms & Condition", -1
-/* HOISTED */
-);
-
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "status", -1
-/* HOISTED */
-);
-
-var _hoisted_21 = {
-  key: 0
-};
-var _hoisted_22 = {
-  key: 0
-};
-var _hoisted_23 = {
-  key: 1
-};
-var _hoisted_24 = {
-  "class": "text-break"
-};
-var _hoisted_25 = {
-  "class": "text-break"
-};
-var _hoisted_26 = {
-  key: 2
-};
-
-var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "badge badge-success"
-}, "Active", -1
-/* HOISTED */
-);
-
-var _hoisted_28 = [_hoisted_27];
-var _hoisted_29 = {
-  key: 3
-};
-
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "badge badge-danger"
-}, "InActive", -1
-/* HOISTED */
-);
-
-var _hoisted_31 = [_hoisted_30];
-var _hoisted_32 = {
-  key: 4
-};
-var _hoisted_33 = ["data-target", "onClick"];
-
-var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-edit"
-}, null, -1
-/* HOISTED */
-);
-
-var _hoisted_35 = [_hoisted_34];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_14, _hoisted_15, _hoisted_16, _hoisted_17, _hoisted_18, _hoisted_19, _hoisted_20, _ctx.checkForSubmenuButtons('edit-template') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_21, "Action")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.templates, function (template, i) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.logs, function (log, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.activity.email), 1
     /* TEXT */
-    ), template.terminal_id != null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.terminal.city.name) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.terminal.name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.message), 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_23, "N/A")), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.address), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.formatted_created_at), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.uan), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.phone), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.terms_condition), 1
-    /* TEXT */
-    ), template.status == 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_26, _hoisted_28)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_29, _hoisted_31)), _ctx.checkForSubmenuButtons('edit-template') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_32, [_ctx.checkForSubmenuButtons('edit-template') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 0,
-      "data-target": '#' + $data.editFormID,
-      "data-toggle": "modal",
-      onClick: function onClick($event) {
-        return $options.edit(template);
-      },
-      "class": "text-light btn btn-primary mx-1",
-      title: "Edit Template"
-    }, _hoisted_35, 8
-    /* PROPS */
-    , _hoisted_33)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    )]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
