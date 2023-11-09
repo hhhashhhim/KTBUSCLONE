@@ -89,9 +89,9 @@ export default {
                 console.log(resTicketTemplate)
             }
 
-            setTimeout(function () {
-                $("#ticket_templates").DataTable();
-            }, 300);
+            // setTimeout(function () {
+            //     $("#ticket_templates").DataTable();
+            // }, 300);
         },
     },
 };

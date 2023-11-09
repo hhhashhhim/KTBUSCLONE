@@ -49599,13 +49599,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resLogs.status == 422) {
                   console.log(resTicketTemplate);
-                }
+                } // setTimeout(function () {
+                //     $("#ticket_templates").DataTable();
+                // }, 300);
 
-                setTimeout(function () {
-                  $("#ticket_templates").DataTable();
-                }, 300);
 
-              case 6:
+              case 5:
               case "end":
                 return _context2.stop();
             }
