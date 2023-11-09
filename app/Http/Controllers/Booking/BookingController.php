@@ -164,7 +164,7 @@ class BookingController extends Controller
                     $customer = false;
                 }
                 // Fare Fetching About the Schedule
-                if ($customer) {
+                if ($customer && $request->type == "booked") {
                     $customer->name = $request->customerName;
                     $customer->cnic = is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC);
                     $customer->contact = plainContactAndCnic($request->contact);

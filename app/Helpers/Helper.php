@@ -199,7 +199,8 @@ if (!function_exists('updateFare')) {
 if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $company_id)
     {
-        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        // $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->first();
         // $customerAll = [];
         if($customerData)
         {

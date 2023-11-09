@@ -2426,11 +2426,17 @@ export default {
                     timer: 2000
                 });
             }
+            
             this.resetArrays();
             this.schedule = [];
+            this.addForm.customerCNIC = "";
+            this.addForm.customerName = "";
+            this.addForm.contact = "";
+            this.addForm.remarks = "";
             this.addForm.totalFare = 0;
             this.addForm.totalAmount = 0;
             this.addForm.discount = '';
+            this.advanceSeat = [];
             this.validationErrors = [];
             this.loading = true;
             this.showBookingDiv = false;
@@ -2853,12 +2859,14 @@ export default {
                     this.advanceSeat.splice(index, 1);
                     this.addForm.alreadyBookedId.splice(index, 1);
                     this.addForm.flag = 0;
+                    this.addForm.customerName = "";
+                    this.addForm.contact = "";
                 } else {
                     this.addForm.alreadyBookedId.push(data.id);
-                    this.addForm.customerCNIC = data.customer_cnic;
+                    // this.addForm.customerCNIC = data.customer_cnic;
                     this.addForm.customerName = data.customer_name;
                     this.addForm.contact = data.customer_phone;
-                    this.addForm.remarks = data.remarks;
+                    // this.addForm.remarks = data.remarks;
                     this.addForm.selectedSeats.push(data.seatNo);
                     this.advanceSeat.push(data.seatNo)
                     this.addForm.flag = 1;
