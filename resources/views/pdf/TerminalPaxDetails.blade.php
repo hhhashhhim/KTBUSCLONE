@@ -133,7 +133,7 @@
 
     </tr>
     @if(count($data['record']) > 0)
-        @foreach ($data['record'] as $key => $item)
+        @foreach ($data['record']->sortBy('seat_no') as $key => $item)
             <tr>
                 <td>{{ $key +1 }}</td>
                 <td>{{ $item->seat_no }}</td>
