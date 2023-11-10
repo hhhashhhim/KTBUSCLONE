@@ -418,6 +418,7 @@ class TicketingApiController extends Controller
                             "activity_by" => Auth::user()->id,
                             "message" => Auth::user()->name." | stored ticket (advance booking) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | seat no :".json_encode($request->selected_seats),
                             "requested_host" => $request->ip(),
+                            "company_id" => Auth::user()->company_id
                         ]);
                         return new CreatedResource(["invoice_id"=>$request->invoice_id]);
                        

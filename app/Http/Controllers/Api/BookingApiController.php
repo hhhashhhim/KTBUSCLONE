@@ -640,6 +640,7 @@ class BookingApiController extends Controller
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | stored ticket ($request->book_type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selected_seats),
                     "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 

@@ -18,14 +18,14 @@
                                                     id="ticket_templates">
                                                     <thead>
                                                         <tr>
-                                                            <th width="200px">Activity By</th>
-                                                            <th width="200px">Time</th>
+                                                            <th style="min-width:200px">Activity By</th>
+                                                            <th style="min-width:200px">Time</th>
                                                             <th>Message</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(log, i) in logs" :key="i">
-                                                            <td>{{ log.activity.email }}</td>
+                                                            <td>{{ log.activity.email??'N/A' }}</td>
                                                             <td>{{ log.formatted_created_at }}</td>
                                                            <td>{{ log.message }}</td>
                                                         </tr>
