@@ -19,15 +19,15 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Activity By</th>
-                                                            <th width="600px">Message</th>
                                                             <th>Time</th>
+                                                            <th width="600px">Message</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(log, i) in logs" :key="i">
                                                             <td>{{ log.activity.email }}</td>
-                                                           <td>{{ log.message }}</td>
                                                             <td>{{ log.formatted_created_at }}</td>
+                                                           <td>{{ log.message }}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
