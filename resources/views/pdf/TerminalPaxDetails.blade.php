@@ -132,10 +132,11 @@
         <th>Ticket Booked By</th>
 
     </tr>
+    @php $i = 1; @endphp
     @if(count($data['record']) > 0)
         @foreach ($data['record']->sortBy('seat_no') as $key => $item)
             <tr>
-                <td>{{ $key +1 }}</td>
+                <td>{{ $i++ }}</td>
                 <td>{{ $item->seat_no }}</td>
                 <td>{{ ucfirst($item->customer->name) }}</td>
                 <td>{{ formatCNIC($item->customer->cnic) }}</td>
@@ -144,7 +145,7 @@
                 <td>{{ $item->ticketElt == null ? 0 : $item->ticketElt->elt_price }}</td>
                 <td>{{ $item->seat_fare }}</td>
                 <td>{{ ucfirst($item->terminal->name) }}</td>
-                <td>{{ ucfirst($item->updated_name->name) }}</td>
+                <td>{{ ucfirst($item->updated_name->name??'N/A') }}</td>
 
             </tr>
         @endforeach
