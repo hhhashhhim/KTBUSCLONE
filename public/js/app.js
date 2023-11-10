@@ -30803,9 +30803,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                     _this24.addForm.alreadyBookedId.splice(index, 1);
 
-                    _this24.addForm.flag = 0;
                     _this24.addForm.customerName = "";
                     _this24.addForm.contact = "";
+
+                    if (_this24.advanceSeat.length == 0) {
+                      _this24.addForm.flag = 0;
+                    }
                   } else {
                     _this24.addForm.alreadyBookedId.push(data.id); // this.addForm.customerCNIC = data.customer_cnic;
 

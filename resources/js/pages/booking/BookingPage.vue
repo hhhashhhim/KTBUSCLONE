@@ -2858,9 +2858,12 @@ export default {
                     this.addForm.selectedSeats.splice(index, 1);
                     this.advanceSeat.splice(index, 1);
                     this.addForm.alreadyBookedId.splice(index, 1);
-                    this.addForm.flag = 0;
                     this.addForm.customerName = "";
                     this.addForm.contact = "";
+                    if(this.advanceSeat.length == 0)
+                    {
+                        this.addForm.flag = 0;
+                    }
                 } else {
                     this.addForm.alreadyBookedId.push(data.id);
                     // this.addForm.customerCNIC = data.customer_cnic;
