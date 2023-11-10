@@ -108,6 +108,7 @@ class TicketsTemplateController extends Controller
     {
         return ActivityLog::with("activity")
             ->where("created_at",'>=', now()->subDays(3))
+            ->where("company_id",Auth::user()->company_id)
             ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
             ->orderBy("created_at","DESC")
             ->get();
