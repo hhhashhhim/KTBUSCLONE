@@ -18,9 +18,9 @@
                                                     id="ticket_templates">
                                                     <thead>
                                                         <tr>
-                                                            <th>Activity By</th>
-                                                            <th>Time</th>
-                                                            <th width="600px">Message</th>
+                                                            <th width="200px">Activity By</th>
+                                                            <th width="200px">Time</th>
+                                                            <th>Message</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
