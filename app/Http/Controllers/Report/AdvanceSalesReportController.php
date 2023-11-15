@@ -32,7 +32,7 @@ class AdvanceSalesReportController extends Controller
 
     public function filterData(Request $request)
     {
-        $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
             
@@ -71,7 +71,7 @@ class AdvanceSalesReportController extends Controller
         }
         $tickets = $tickets->groupBy(['schedule_date_time', 'added_by']); 
       
-      
+        
         $sortData = [];
         foreach ($tickets as $outer) {
             foreach ($outer as $inner) {
@@ -81,7 +81,7 @@ class AdvanceSalesReportController extends Controller
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;
-                $single['user'] = $inner[0]->addedBy->name??'N/A';
+                $single['user'] = $inner[0]->updated_name->name??'N/A';
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                 $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                 $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
@@ -161,7 +161,7 @@ class AdvanceSalesReportController extends Controller
 
     public function advanceSalePdf(Request $request)
     {
-        $tickets = Ticket::with('addedBy:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
             
@@ -210,7 +210,7 @@ class AdvanceSalesReportController extends Controller
                 $single['bus_class'] = $inner[0]->busClass->name;
                 $single['seats'] = $inner->count();
                 $single['terminal'] = $inner[0]->terminal->name;
-                $single['user'] = $inner[0]->addedBy->name??'N/A';
+                $single['user'] = $inner[0]->updated_name->name??'N/A';
                 $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                 $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                 $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));

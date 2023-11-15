@@ -187,6 +187,10 @@
                 <p class="float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['date'])) }}</p>
             </div>
             <div class="clear-both">
+                <p class="font-weight-bold float-left">Departure Time :</p>
+                <p class="float-right">{{ date('H:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+            </div>
+            <div class="clear-both">
                 <p class="font-weight-bold float-left">Customer Name :</p>
                 <p class="float-right">{{ ucfirst($data['tickets'][$key]->customer->name)}}</p>
             </div>

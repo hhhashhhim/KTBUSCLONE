@@ -359,7 +359,7 @@ class BookingController extends Controller
                     'is_partial' => $isPartial,
                     'booking_no' => $bookingNo,
                     'schedule_date' => $scheduleDetail->schedule_date,
-                    'schedule_time' => ScheduleDetail::where(["schedule_date"=>$scheduleDetail->schedule_date,"schedule_id"=>$schedule->id])->first()->departure_time,
+                    'schedule_time' => $scheduleDetail->departure_time,
                     'date' => $item['rescheduleDate'],
                     'schedule_details_id' => $scheduleDetail->id,
                     'customer_id' => $item['dataCustomer'],
@@ -406,6 +406,12 @@ class BookingController extends Controller
                 ]);
                 $old_ticket->delete();
             }
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | rescheduled ticket seat no : ".$ticket['seat_no']." to  ".$item['selected_seatNo']." | to time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             DB::commit();
             return response()->json(['success' => 'Success'], 200);
 
