@@ -1079,8 +1079,8 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            if (vm.data.noOfRows <= 15) {
-                if (vm.data.noOfCols <= 7) {
+            if (vm.data.noOfRows <= 17) {
+                if (vm.data.noOfCols <= 9) {
                     let arr,
                         count = 0;
                     var map = new Array(parseInt(vm.data.noOfRows)); // creating rows
@@ -1101,7 +1101,7 @@ export default {
                 } else {
                     return swal({
                         title: "Limited",
-                        text: "No of Cols must be less then or equal to 7",
+                        text: "No of Cols must be less then or equal to 9",
                         icon: "error",
                         timer: 2000,
                     });
@@ -1109,7 +1109,7 @@ export default {
             } else {
                 return swal({
                     title: "Limited",
-                    text: "No of Rows must be less then or equal to 15",
+                    text: "No of Rows must be less then or equal to 17",
                     icon: "error",
                     timer: 2000,
                 });
