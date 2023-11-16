@@ -39,8 +39,8 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label for="routeFilter">Routes</label>
-                                                    <select id="routeFilter" class="form-control"
+                                                    <label for="routeIds">Routes</label>
+                                                    <select id="routeIds" class="form-control" multiple
                                                             v-model="filterSales.route"
                                                         >
                                                         <option value="0">Select Route</option>
@@ -277,7 +277,7 @@ export default {
             filterSales: {
                 terminal: 0,
                 user: 0,
-                route: 0,
+                route: [],
                 fromDateTime: '',
                 toDateTime: '',
             },
@@ -294,8 +294,20 @@ export default {
             window.removeEventListener('keydown', this.enterKey);
             window.removeEventListener('keydown', this.altM);
         }
+        setTimeout(() => {
+            $("#routeIds").select2();
+        }, 300);
     },
-
+    mounted() {
+        const self = this;
+        // route
+        const routeIds = $('#routeIds');
+        routeIds.on('change', function() {
+            const selectedValues = $(this).val();
+            self.filterSales.route = selectedValues;
+        });
+       
+    },
     methods: {
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');

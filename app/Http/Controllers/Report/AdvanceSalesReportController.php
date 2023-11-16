@@ -51,7 +51,7 @@ class AdvanceSalesReportController extends Controller
             })
             ->when($request->route, function ($query) use ($request) {
                 // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->where('route_id', $request->route);
+                return $query->whereIn('route_id', $request->route);
             })->orderBy('date', 'desc')
             ->get();
 
@@ -148,11 +148,11 @@ class AdvanceSalesReportController extends Controller
                     return $query->where('time', '<=', $request->toDateTime);
                 })
                 ->get();
-        }
-
-
-        return [
-            'record' => $sortData,
+            }
+            
+            
+            return [
+                'record' => $sortData,
             'refund' => $refundTickets,
             'counterExpenses' => $counterexpenses ?? [],
         ];
@@ -161,6 +161,7 @@ class AdvanceSalesReportController extends Controller
 
     public function advanceSalePdf(Request $request)
     {
+        $route = explode(",",$request->route);
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'booked')
@@ -178,9 +179,9 @@ class AdvanceSalesReportController extends Controller
             ->when($request->user, function ($query) use ($request) {
                 return $query->where('added_by', $request->user);
             })
-            ->when($request->route, function ($query) use ($request) {
+            ->when($route, function ($query) use ($route) {
                 // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->where('route_id', $request->route);
+                return $query->whereIn('route_id', $route);
             })->orderBy('date', 'desc')
             ->get();
 
@@ -199,7 +200,7 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         $tickets = $tickets->groupBy(['schedule_date_time', 'added_by']); 
-      
+        
       
         $sortData = [];
         foreach ($tickets as $outer) {
@@ -277,15 +278,13 @@ class AdvanceSalesReportController extends Controller
                     return $query->where('time', '<=', $request->toDateTime);
                 })
                 ->get();
-        }
-
+            }
         $filterData = (object)[];
         $filterData->terminal = Terminal::find($request->terminal)->name??"All";
         $filterData->user = User::find($request->terminal)->name??"All";
-        $filterData->route = Route::find($request->terminal)->name??"All";
+        $filterData->route = Route::whereIn("id",$route)->pluck("name")->toArray()??"All";
         $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
         $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
-
        
         
     // return $counterexpenses;

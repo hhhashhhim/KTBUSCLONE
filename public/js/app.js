@@ -27167,7 +27167,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       filterSales: {
         terminal: 0,
         user: 0,
-        route: 0,
+        route: [],
         fromDateTime: '',
         toDateTime: ''
       }
@@ -27195,13 +27195,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 4:
+              setTimeout(function () {
+                $("#routeIds").select2();
+              }, 300);
+
+            case 5:
             case "end":
               return _context.stop();
           }
         }
       }, _callee);
     }))();
+  },
+  mounted: function mounted() {
+    var self = this; // route
+
+    var routeIds = $('#routeIds');
+    routeIds.on('change', function () {
+      var selectedValues = $(this).val();
+      self.filterSales.route = selectedValues;
+    });
   },
   methods: {
     fetchFilters: function fetchFilters() {
@@ -56131,7 +56144,7 @@ var _hoisted_21 = {
 
 var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "routeFilter"
+    "for": "routeIds"
   }, "Routes", -1
   /* HOISTED */
   );
@@ -56461,8 +56474,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ))], 512
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterSales.user]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    id: "routeFilter",
+    id: "routeIds",
     "class": "form-control",
+    multiple: "",
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $data.filterSales.route = $event;
     })

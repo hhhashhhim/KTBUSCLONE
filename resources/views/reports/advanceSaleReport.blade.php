@@ -49,7 +49,7 @@
         <tr>
             <td>Terminal : {{$filterData->terminal}}</td>
             <td>User : {{$filterData->user}}</td>
-            <td>Route : {{$filterData->route}}</td>
+            <td>Route : {{implode(",",$filterData->route)}}</td>
             <td>{{$filterData->from}} -- {{$filterData->to}}</td>
         </tr>
     </table>
