@@ -27,8 +27,8 @@ class ScheduleController extends Controller
     {
         $schedules = Schedule::
             with('fare_class', 'route', 'bus_class', 'addedBy')
-            ->with(["schedule_time"=>function($q){
-                $q->where("schedule_date",'=',date("Y-m-d"))->select("schedule_id","schedule_date","departure_time");
+            ->with(["schedule_time"=>function($q) use ($request){
+                $q->where("schedule_date",'=',$request->departure_date??date("Y-m-d"))->select("schedule_id","schedule_date","departure_time");
             }])
             ->where(function($q) use ($request){
                 if($request->bus_class)
