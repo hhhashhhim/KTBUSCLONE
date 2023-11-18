@@ -98,7 +98,7 @@
                                                         <td>{{ schedule.name }}</td>
                                                         <td>{{ schedule.start_date }}</td>
                                                         <td>{{ schedule.end_date }}</td>
-                                                        <td>{{ schedule.schedule_time ? tConvert(schedule.schedule_time.departure_time) : 'Expired' }}</td>
+                                                        <td>{{ schedule.schedule_time ? tConvert(schedule.schedule_time.departure_time) : schedule.time + ' | Exp' }}</td>
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
                                                                 schedule.bus_class ? schedule.bus_class.name : "N/A"
