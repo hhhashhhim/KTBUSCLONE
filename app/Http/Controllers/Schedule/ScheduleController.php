@@ -55,27 +55,27 @@ class ScheduleController extends Controller
     {
         try {
                 DB::beginTransaction();
-                $cityIds = array_column($request->cities, 'id');
-                foreach ($cityIds as $first) {
-                    foreach ($cityIds as $second) {
-                        if ($first != $second) {
-                            $checkTimeDiff = FareTable::where([
-                                "company_id" => Auth::user()->company_id,
-                                "from_city_id" => $first,
-                                "to_city_id" => $second,
-                                "time_difference" => null
-                            ])->first();
+                // $cityIds = array_column($request->cities, 'id');
+                // foreach ($cityIds as $first) {
+                //     foreach ($cityIds as $second) {
+                //         if ($first != $second) {
+                //             $checkTimeDiff = FareTable::where([
+                //                 "company_id" => Auth::user()->company_id,
+                //                 "from_city_id" => $first,
+                //                 "to_city_id" => $second,
+                //                 "time_difference" => null
+                //             ])->first();
 
-                            if ($checkTimeDiff) {
-                                return response()->json([
-                                    "errors" => [
-                                        "Time Error" => ["Time difference should be added against these cities."]
-                                    ]
-                                ], 422);
-                            }
-                        }
-                    }
-                }
+                //             if ($checkTimeDiff) {
+                //                 return response()->json([
+                //                     "errors" => [
+                //                         "Time Error" => ["Time difference should be added against these cities."]
+                //                     ]
+                //                 ], 422);
+                //             }
+                //         }
+                //     }
+                // }
 
 
                 $rules = [
@@ -131,7 +131,7 @@ class ScheduleController extends Controller
                         if ($lastDepId == $detail->departure_city_id) {
                             $departureTime = date("Y-m-d H:i", $totalTime);
                         } else {
-                            $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference;
+                            $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
                             $timeDiff = explode(':', $fareTableTime);
                             $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
                             $departureTime = date("Y-m-d H:i", $totalTime);
