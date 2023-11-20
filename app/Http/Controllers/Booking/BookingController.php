@@ -521,6 +521,12 @@ class BookingController extends Controller
                 'added_by' => Auth::user()->id,
             ]);
             $ticket->delete();
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | added seat ($ticket->seat_no) to over issue | time : $ticket->schedule_date $ticket->schedule_time",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             DB::commit();
             return $ticket;
         } catch (\Exception $e) {
@@ -895,23 +901,23 @@ class BookingController extends Controller
     {
         try {
                 DB::beginTransaction();
-                $uniqueDate = ScheduleDetail::where([
+                $scheduleDetail = ScheduleDetail::where([
                     'company_id' => Auth::user()->company_id,
                     'schedule_id' => $request->schedule_id,
                     'departure_date' => $request->date,
                     'departure_id' => $request->departure_city_id,
                     'destination_id' => $request->destination_city_id,
-                ])->first()->schedule_date;
+                ])->first();
 
                 $tickets = Ticket::where([
                     'company_id' => Auth::user()->company_id,
                     'schedule_id' => $request->schedule_id,
-                    'schedule_date' => $uniqueDate,
+                    'schedule_date' => $scheduleDetail->schedule_date,
                 ])->first();
                 $old = DropSchedule::where([
                     'company_id' => Auth::user()->company_id,
                     'date' => $request->date,
-                    'schedule_date' => $uniqueDate,
+                    'schedule_date' => $scheduleDetail->schedule_date,
                     'schedule_id' => $request->schedule_id,
                 ])->first();
                 
@@ -953,11 +959,17 @@ class BookingController extends Controller
                         'company_id' => Auth::user()->company_id,
                         'terminal_id' => Auth::user()->terminal_id,
                         'date' => $request->date,
-                        'schedule_date' => $uniqueDate,
+                        'schedule_date' => $scheduleDetail->schedule_date,
                         'schedule_id' => $request->schedule_id,
                         'added_by' => Auth::user()->id,
                         'is_drop' => 1,
                         'reason' => $request->reason,
+                    ]);
+                    ActivityLog::create([
+                        "activity_by" => Auth::user()->id,
+                        "message" => Auth::user()->name." | dropped schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                        "requested_host" => $request->ip(),
+                        "company_id" => Auth::user()->company_id
                     ]);
                     DB::commit();
                     return response()->json(['success' => 'Success'], 200);
@@ -975,21 +987,26 @@ class BookingController extends Controller
     {
         try {
                 DB::beginTransaction();
-                $uniqueDate = ScheduleDetail::where([
+                $scheduleDetail = ScheduleDetail::where([
                     'company_id' => Auth::user()->company_id,
                     'schedule_id' => $request->schedule_id,
                     'departure_date' => $request->date,
                     'departure_id' => $request->departure_city_id,
                     'destination_id' => $request->destination_city_id,
-                ])->first()->schedule_date;
+                ])->first();
                 DropSchedule::where([
                     'company_id' => Auth::user()->company_id,
-                    'schedule_date' => $uniqueDate,
+                    'schedule_date' => $scheduleDetail->schedule_date,
                     'schedule_id' => $request->schedule_id,
                     'is_drop' => 1,
                 ])->delete();
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | revert schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
-            
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
@@ -1066,7 +1083,7 @@ class BookingController extends Controller
                     'departure_city_id' => $request->departure_id,
                     'destination_city_id' => $request->destination_id,
                     'seat_no' => $request->seat_no,
-                ])->first(['id']);
+                ])->first();
                 $old = TicketELT::where([
                     'company_id' => Auth::user()->company_id,
                     'ticket_id' => $ticket->id,
@@ -1091,6 +1108,12 @@ class BookingController extends Controller
                         'elt_description' => $request->eltDescription,
                         'added_by' => Auth::user()->id,
                     ]);
+                    ActivityLog::create([
+                        "activity_by" => Auth::user()->id,
+                        "message" => Auth::user()->name." | stored elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                        "requested_host" => $request->ip(),
+                        "company_id" => Auth::user()->company_id
+                    ]);
                     DB::commit();
                     return $ticketElt;
                 } else {
@@ -1099,6 +1122,12 @@ class BookingController extends Controller
                         'elt_weight' => $request->eltWeight,
                         'elt_description' => $request->eltDescription,
                         'updated_by' => Auth::user()->company_id,
+                    ]);
+                    ActivityLog::create([
+                        "activity_by" => Auth::user()->id,
+                        "message" => Auth::user()->name." | update elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                        "requested_host" => $request->ip(),
+                        "company_id" => Auth::user()->company_id
                     ]);
                     DB::commit();
                     return $old;
@@ -1164,6 +1193,12 @@ class BookingController extends Controller
                     'reason' => $request->remarks,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | canceled booking. seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $ticket->delete();
             
@@ -1198,6 +1233,12 @@ class BookingController extends Controller
                     ]);
                     $ticket->delete();
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | canceled booking. seat no ".(implode(',',$tickets->pluck('seat_no')->toArray()))." | time : ".$tickets[0]->schedule_date." ".$tickets[0]->schedule_time,
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             
             } catch (\Exception $e) {
