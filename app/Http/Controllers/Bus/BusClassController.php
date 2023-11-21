@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\BusClass;
 use App\Models\FareClass;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,12 @@ class BusClassController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | stored bus class $request->BusClassName ($request->noOfRows by $request->noOfCols)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $busClass;
             
@@ -80,6 +87,12 @@ class BusClassController extends Controller
                     'no_of_cols' => $request->no_of_cols,
                     'is_active' => $request->is_active,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated bus class $request->name ($request->no_of_rows by $request->no_of_cols)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $busClass;
             
@@ -92,7 +105,14 @@ class BusClassController extends Controller
 
     public function hideBusClass(Request $request)
     {
-        return BusClass::find($request->id)->update([
+        $busClass = BusClass::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted bus class $busClass->name ($busClass->no_of_rows by $busClass->no_of_cols)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $busClass->update([
             "hide" => 1
         ]);
     }
@@ -107,6 +127,12 @@ class BusClassController extends Controller
                 $new = $busClass->replicate();
                 $new->created_at  = now();
                 $new->save();
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | duplicated bus class $busClass->name",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $new;
             } catch (\Exception $e) {
@@ -138,6 +164,12 @@ class BusClassController extends Controller
                     'is_active' => 1,
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added fare class $request->FareClassName",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $fareClass;

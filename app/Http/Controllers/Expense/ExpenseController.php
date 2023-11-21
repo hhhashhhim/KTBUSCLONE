@@ -8,6 +8,7 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Schedule\Schedule;
 use App\Models\Bus\Bus;
 use App\Models\Ticket;
+use App\Models\ActivityLog;
 use App\Models\OfficeExpense;
 use App\Models\TerminalCommission;
 use App\Models\Expense\TicketMergeExpense;
@@ -143,6 +144,12 @@ class ExpenseController extends Controller
                     ]);
 
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated expense against merge id (".$request->ticket_merge_id.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -244,6 +251,12 @@ class ExpenseController extends Controller
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | added office expense of closing date (".$request->date.")",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             DB::commit();
         
         } catch (\Exception $e) {
@@ -276,6 +289,12 @@ class ExpenseController extends Controller
                 'amount' => $request->amount,
                 'narration' => $request->narration,
                 'updated_by' => Auth::user()->id,
+            ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | updated office expense of closing date (".$request->closing_date.")",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
         

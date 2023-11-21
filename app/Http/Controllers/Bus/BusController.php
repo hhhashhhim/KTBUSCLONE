@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\Bus\BusSeatMap;
+use App\Models\ActivityLog;
 use App\Models\FareClass;
 use App\Models\Schedule\TicketClosing;
 use Carbon\Carbon;
@@ -60,6 +61,12 @@ class BusController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added bus $bus->bus_number",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $bus;
             
@@ -93,6 +100,12 @@ class BusController extends Controller
                     'fare_class_id' => $request->fare_class_id,
                     'company_id' => Auth::user()->company_id,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated bus $request->bus_number",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $bus;

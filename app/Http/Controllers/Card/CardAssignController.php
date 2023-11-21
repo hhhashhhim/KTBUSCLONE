@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\LoyaltyCard\CardAssign;
 use App\Models\LoyaltyCard\CardCategory;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,12 @@ class CardAssignController extends Controller
                         'starting_points' => $request->startingPoints,
                         'added_by' => Auth::user()->id,
                     ]);
+                    ActivityLog::create([
+                        "activity_by" => Auth::user()->id,
+                        "message" => Auth::user()->name." | assigned card (".CardCategory::find($request->cardCategory)->name.") to customer ".$request->customerName ?? $customer->name,
+                        "requested_host" => $request->ip(),
+                        "company_id" => Auth::user()->company_id
+                    ]);
                     DB::commit();
                     return $assignCard;
                 } else {
@@ -69,11 +76,18 @@ class CardAssignController extends Controller
     {
         try {
                 DB::beginTransaction();
-                $assignCard =  CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->update([
+                $assignCard =  CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->first();
+                $assignCard->update([
                     'card_category_id' => $request->card_category_id,
                     'expiry_date' => $request->expiry_date,
                     'starting_points' => $request->starting_points,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated card assignation of customer (".$assignCard->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $assignCard;

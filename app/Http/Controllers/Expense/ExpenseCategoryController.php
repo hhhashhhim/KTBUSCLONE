@@ -9,6 +9,7 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Account\AccountCategory;
+use App\Models\ActivityLog;
 use App\Models\Expense\ExpenseCategory;
 use App\Models\Route\RouteFare;
 use App\Models\Terminal;
@@ -53,6 +54,12 @@ class ExpenseCategoryController extends Controller
                     "company_id" => Auth::user()->company_id,
                     "added_by" => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added expense category (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $category;
             } catch (\Exception $e) {
@@ -83,6 +90,12 @@ class ExpenseCategoryController extends Controller
 
                 $data =  $expCtg->update([
                     'name' => $request->name,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated expense category (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $data;

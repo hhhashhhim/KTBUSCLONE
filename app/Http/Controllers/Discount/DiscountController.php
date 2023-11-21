@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Discount;
 use App\Http\Controllers\Controller;
 use App\Models\Discount\Discount;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,12 @@ class DiscountController extends Controller
                     'is_active' => $request->active,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | stored discount (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return Discount::with('addedBy')->find($discount->id);
         } catch (\Exception $e) {
@@ -78,6 +85,12 @@ class DiscountController extends Controller
                     'flat' => $request->type == "flat" ? $request->flat: null,
                     'is_active' => $request->is_active,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated discount (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $discount;

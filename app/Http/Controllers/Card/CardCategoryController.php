@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Card;
 use App\Http\Controllers\Controller;
 use App\Models\LoyaltyCard\CardCategory;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,12 @@ class CardCategoryController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added card category $request->name",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $category;
             
@@ -66,6 +73,12 @@ class CardCategoryController extends Controller
                     'point_flat' => $request->point_flat ?? 0,
                     'point_distance' => $request->point_distance ?? 0,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated card category $request->name",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $category;
