@@ -2859,6 +2859,7 @@ export default {
                     this.advanceSeat.splice(index, 1);
                     this.addForm.alreadyBookedId.splice(index, 1);
                     this.addForm.customerName = "";
+                    this.addForm.customerCNIC = "";
                     this.addForm.contact = "";
                     if(this.advanceSeat.length == 0)
                     {
@@ -2866,7 +2867,7 @@ export default {
                     }
                 } else {
                     this.addForm.alreadyBookedId.push(data.id);
-                    // this.addForm.customerCNIC = data.customer_cnic;
+                    this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                     this.addForm.customerName = data.customer_name;
                     this.addForm.contact = data.customer_phone;
                     // this.addForm.remarks = data.remarks;

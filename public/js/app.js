@@ -30817,15 +30817,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _this24.addForm.alreadyBookedId.splice(index, 1);
 
                     _this24.addForm.customerName = "";
+                    _this24.addForm.customerCNIC = "";
                     _this24.addForm.contact = "";
 
                     if (_this24.advanceSeat.length == 0) {
                       _this24.addForm.flag = 0;
                     }
                   } else {
-                    _this24.addForm.alreadyBookedId.push(data.id); // this.addForm.customerCNIC = data.customer_cnic;
+                    _this24.addForm.alreadyBookedId.push(data.id);
 
-
+                    _this24.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                     _this24.addForm.customerName = data.customer_name;
                     _this24.addForm.contact = data.customer_phone; // this.addForm.remarks = data.remarks;
 
