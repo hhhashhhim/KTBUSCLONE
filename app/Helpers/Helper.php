@@ -224,6 +224,7 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
+                'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
             ]);
