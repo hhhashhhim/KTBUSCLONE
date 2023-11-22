@@ -7,6 +7,7 @@ use App\Models\ReportsHeader;
 use App\Models\ReportHeaderLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ActivityLog;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,12 @@ class ReportsHeaderController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added report header ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $header;
             } catch (\Exception $e) {
@@ -64,6 +71,12 @@ class ReportsHeaderController extends Controller
                 $data = $expCtg->update([
                     'name' => $request->name,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated report header ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $data;
@@ -109,6 +122,12 @@ class ReportsHeaderController extends Controller
                         'added_by' => Auth::user()->id,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | linked report header",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();

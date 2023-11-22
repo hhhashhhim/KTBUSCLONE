@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -57,6 +58,12 @@ class CompanyController extends Controller
                     'departure_city_ids' => "all",
                     'company_id' => $company->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added company ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $company;
             } catch (\Exception $e) {
@@ -88,7 +95,8 @@ class CompanyController extends Controller
                     'contact' => 'required',
                     'email' => 'required|email',
                 ]);
-                Company::find($request->id)->update([
+                $company = Company::find($request->id);
+                $company->update([
                     'name' => $request->name,
                     'user_name' => $request->user_name,
                     'contact' => plainContactAndCnic($request->contact),
@@ -113,6 +121,12 @@ class CompanyController extends Controller
                 }
                 Role::where('company_id', $request->id)->where('name', 'admin')->update([
                     'permissions' => $request->modules,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated company ($company->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return response()->json([

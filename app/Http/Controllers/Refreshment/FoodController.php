@@ -10,6 +10,7 @@ use App\Models\Refreshment\Hotel;
 use App\Models\Bus\Bus;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -54,6 +55,12 @@ class FoodController extends Controller
                     "company_id" => Auth::user()->company_id,
                     "added_by" => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added food ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $hotelFood;
             } catch (\Exception $e) {
@@ -78,6 +85,12 @@ class FoodController extends Controller
                     "price" => $request->price,
                     "unit" => $request->unit,
                     "description" => $request->description,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated food ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $hotelFood;

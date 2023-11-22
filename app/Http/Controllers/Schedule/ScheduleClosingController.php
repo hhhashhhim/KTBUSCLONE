@@ -12,6 +12,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\TerminalCommission;
+use App\Models\ActivityLog;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
@@ -85,6 +86,12 @@ class ScheduleClosingController extends Controller
                 Ticket::whereIn("ticket_closing_id",$closingIds)->update([
                     "ticket_merge_id" => $merge->id
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | closed merge ($closingIds[0] $closingIds[1] $merge->id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
             DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -124,6 +131,12 @@ class ScheduleClosingController extends Controller
                 $closings[1]->update([
                     "ticket_merge_id" => $mergeTwo->id
                 ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | released merge (".$closings[0]->id." ".$closings[1]->id." $mergeOne->id $mergeTwo->id)",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -255,6 +268,12 @@ class ScheduleClosingController extends Controller
         TicketClosingMerge::where("id",$request->mergeId)->update([
             "closing_date" => $request->closingDate,
         ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | updated closing date ($request->closingDate)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
     }
 
     public function fetchSchedule(Request $request)
@@ -357,6 +376,12 @@ class ScheduleClosingController extends Controller
                 "bus_id" => $request->bus,
                 "ticket_closing_id" => $closingRecord->id,
             ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | closed schedule ($closingRecord->id)",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
         DB::commit();
         return $closingRecord;
         } catch (\Exception $e) {
@@ -405,6 +430,12 @@ class ScheduleClosingController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
             }
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | updated closed schedule ($request->closingId)",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
         DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

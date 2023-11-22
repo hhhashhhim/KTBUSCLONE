@@ -8,6 +8,7 @@ use App\Models\UserPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -86,6 +87,12 @@ class UserController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added user ($request->email)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 
 
@@ -139,6 +146,12 @@ class UserController extends Controller
                         'user_password' => $request->password,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated user ($request->email)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
 
                 return response()->json([
@@ -162,7 +175,14 @@ class UserController extends Controller
 
     public function hideUser(Request $request)
     {
-        return User::find($request->id)->update([
+        $user = User::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted user ($user->email)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $user->update([
             "hide" => 1
         ]);
     }

@@ -8,6 +8,7 @@ use App\Models\Terminal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -39,6 +40,12 @@ class CityController extends Controller
                 ]);
                 $this->cityCombinations($city);
                 updateFareTable(Auth::user()->company_id);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added city ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return City::with('addedBy')->find($city->id);
             } catch (\Exception $e) {
@@ -65,6 +72,12 @@ class CityController extends Controller
                 City::find($request->id)->update([
                     'name' => $request->name,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated city ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -75,7 +88,14 @@ class CityController extends Controller
 
     public function hideCity(Request $request)
     {
-        return City::find($request->id)->update([
+        $city = City::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted city ($city->name)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $city->update([
             "hide" => 1
         ]);
     }

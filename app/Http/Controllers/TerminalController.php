@@ -9,6 +9,7 @@ use App\Models\TerminalCommission;
 use App\Models\TerminalDiscount;
 use App\Models\Route\Route;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,12 @@ class TerminalController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added terminal ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $this->index();
             } catch (\Exception $e) {
@@ -103,7 +110,14 @@ class TerminalController extends Controller
 
     public function hideTerminal(Request $request)
     {
-        return Terminal::find($request->id)->update([
+        $terminal = Terminal::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted terminal ($terminal->name)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $terminal->update([
             "hide" => 1
         ]);
     }
@@ -137,6 +151,12 @@ class TerminalController extends Controller
                     'allowed_type' => $request->allowed_type,
                     'active_sms' => $request->active_sms ? 1 : 0,
                     'status' => (int)$request->status,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated terminal ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
 
@@ -189,6 +209,12 @@ class TerminalController extends Controller
                         ]);
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated terminal commission ($request->terminal_id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -235,6 +261,12 @@ class TerminalController extends Controller
                         ]);
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated terminal discount ($request->terminal_id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();

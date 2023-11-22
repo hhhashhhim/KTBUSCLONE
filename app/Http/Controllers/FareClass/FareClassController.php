@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FareClass;
 use App\Http\Controllers\Controller;
 use App\Models\FareClass;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,12 @@ class FareClassController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
                 updateFareTable(Auth::user()->company_id);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added fare class (".$request->FareClassName.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $fareClass;
             
@@ -69,6 +76,12 @@ class FareClassController extends Controller
                     'color' => $request->color,
                     'is_active' => $request->is_active,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated fare class (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $fareClass;

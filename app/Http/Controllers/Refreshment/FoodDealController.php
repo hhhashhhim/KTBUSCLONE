@@ -9,6 +9,7 @@ use App\Models\Refreshment\HotelFoodDealDetail;
 use App\Models\Refreshment\HotelFood;
 use App\Models\Refreshment\Hotel;
 use App\Models\Bus\Bus;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -73,7 +74,13 @@ class FoodDealController extends Controller
                         ]);
                     }
                 }
-                DB::commit();
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added food deal ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();   
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
@@ -115,6 +122,12 @@ class FoodDealController extends Controller
                         ]);
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated food deal ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();

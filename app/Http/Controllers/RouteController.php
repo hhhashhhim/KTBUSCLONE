@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\FareClass;
 use App\Models\FareTable;
+use App\Models\ActivityLog;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
@@ -130,6 +131,12 @@ class RouteController extends Controller
                     }
                 }
             }
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | added route ($route->name)",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             DB::commit();
             return ['message' => 'success'];
         } catch (\Exception $e) {
@@ -154,6 +161,12 @@ class RouteController extends Controller
                     'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
                     'via' => $request['routeVia'],
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated route (".$request['routeStartName'] . '-' . $request['routeEndName'].")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return ['message' => 'success'];
             
@@ -165,7 +178,14 @@ class RouteController extends Controller
     }
     public function hideRoute(Request $request)
     {
-        return Route::find($request->id)->update([
+        $route = Route::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted route ($route->name)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $route->update([
             "hide" => 1
         ]);
     }

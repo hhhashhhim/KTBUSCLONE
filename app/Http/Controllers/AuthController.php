@@ -8,6 +8,7 @@ use App\Models\Expense\TicketMergeExpense;
 use App\Models\ReportHeaderLink;
 use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Ticket;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -53,11 +54,22 @@ class AuthController extends Controller
         User::where("id",Auth::user()->id)->update([
             "password" => Hash::make($request->newPassword)
         ]);
-
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | updated password",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | logout",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
         Auth::logout();
         return redirect("/login");
     }
@@ -73,6 +85,12 @@ class AuthController extends Controller
         // return $request;
         $attempt = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'hide'  => 0, 'online_user' => 0]);
         if ($attempt) {
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | login",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
             return response()->json([
                 'message' => 'You are Logged In Successfully',
                 'success' => true,

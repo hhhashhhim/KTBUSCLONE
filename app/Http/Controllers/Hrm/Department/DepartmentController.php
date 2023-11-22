@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hrm\Department\Department;
 use App\Models\Terminal;
 use Illuminate\Validation\Rule;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,12 @@ class DepartmentController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added department (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $department;
             } catch (\Exception $e) {
@@ -77,6 +84,13 @@ class DepartmentController extends Controller
                     'name' => $request->name,
                     'terminal_id' => $request->terminal_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated department (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
                 return $department;
             } catch (\Exception $e) {
                 DB::rollBack();

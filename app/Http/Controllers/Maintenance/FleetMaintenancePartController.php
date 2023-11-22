@@ -7,6 +7,7 @@ use App\Models\Hrm\Department\Department;
 use App\Models\Maintenance\MaintenancePart;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +50,12 @@ class FleetMaintenancePartController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added maintenance part ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $part;
             } catch (\Exception $e) {
@@ -75,6 +82,12 @@ class FleetMaintenancePartController extends Controller
                 $this->validate($request, $rules, $customMessages);
                 $part = MaintenancePart::where('id', $request->id)->update([
                     'name' => $request->name,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated maintenance part ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $part;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Terminal;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Terminal;
+use App\Models\ActivityLog;
 use App\Models\Terminal\TerminalTimeDifference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +61,12 @@ class TerminalTimeDifferenceController extends Controller
                         'time_difference' => $request->time_difference,
                         'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,
+                    ]);
+                    ActivityLog::create([
+                        "activity_by" => Auth::user()->id,
+                        "message" => Auth::user()->name." | added terminal time difference ",
+                        "requested_host" => $request->ip(),
+                        "company_id" => Auth::user()->company_id
                     ]);
                     DB::commit();
                     return response()->json([

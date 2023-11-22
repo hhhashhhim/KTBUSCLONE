@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hrm\Department\Department;
 use App\Models\Hrm\Designation\Designation;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,12 @@ class DesignationController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added designation (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $designation;
             } catch (\Exception $e) {
@@ -80,6 +87,12 @@ class DesignationController extends Controller
                 $designation =  Designation::where('id', $request->id)->update([
                     'department_id' => $request->department_id,
                     'name' => $request->name,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated designation (".$request->name.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $designation;

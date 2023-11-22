@@ -8,6 +8,7 @@ use App\Models\Hrm\Employee\Employee;
 use App\Models\User;
 use App\Models\UserPassword;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -103,6 +104,12 @@ class EmployeeController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added employee cnic (".$request->EmployeeCNIC.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $employee;
             } catch (\Exception $e) {
@@ -179,6 +186,12 @@ class EmployeeController extends Controller
                         'attachments' => $this->attachment($request->attachment),
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated employee cnic (".$request->EmployeeCNIC.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -189,27 +202,48 @@ class EmployeeController extends Controller
 
     public function hideEmployee(Request $request)
     {
-        return Employee::find($request->id)->update([
+        $employee = Employee::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted employee cnic (".$employee->cnic.")",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $employee->update([
             "hide" => 1
         ]);
     }
 
     public function userStore(Request $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'contact' => formatContact($request->contact),
-            'password' => Hash::make($request->password),
-            'terminal_id' => $request->terminal_id,
-            'destination_city_ids' => json_encode($request->destination),
-            'departure_city_ids' => json_encode($request->departure),
-            'company_id' => Auth::user()->company_id,
-        ]);
-
-        return Employee::where('id', $request->employee_id)->update([
-            'user_id' => $user->id,
-        ]);
+        try {
+                DB::beginTransaction();
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'contact' => formatContact($request->contact),
+                    'password' => Hash::make($request->password),
+                    'terminal_id' => $request->terminal_id,
+                    'destination_city_ids' => json_encode($request->destination),
+                    'departure_city_ids' => json_encode($request->departure),
+                    'company_id' => Auth::user()->company_id,
+                ]);
+                $employee = Employee::where('id', $request->employee_id)->first();
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | created user (".$request->email.") of employee cnic (".$employee->cnic.")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                $employee->update([
+                    'user_id' => $user->id,
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     // Image Upload

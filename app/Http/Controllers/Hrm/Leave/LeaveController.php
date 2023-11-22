@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\admin\Role;
 use App\Models\Hrm\Leave\Leave;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -60,6 +61,12 @@ class LeaveController extends Controller
                     'added_by' => Auth::user()->id,
                     'company_id' => Auth::user()->company_id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | applied leave from $request->from to $request->to",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $leave;
             } catch (\Exception $e) {
@@ -94,6 +101,12 @@ class LeaveController extends Controller
                     'status' => 'P',
                     'applied_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated leave from $request->from to $request->to",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $leave;
             } catch (\Exception $e) {
@@ -123,6 +136,12 @@ class LeaveController extends Controller
             'status'=>$request->status,
             'decider_id'=>Auth::user()->id,
 
+        ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | change status of leave $request->status",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
         ]);
         return Leave::with('addedBy', 'company', 'decision')->where('id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }

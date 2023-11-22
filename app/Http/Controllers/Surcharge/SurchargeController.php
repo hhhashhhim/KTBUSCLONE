@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Surcharge\StoreSurchargeRequest;
 use App\Models\Surcharge\Surcharge;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,12 @@ class SurchargeController extends Controller
                     'is_active' => $request->active,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added surcharge ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $surcharge;
             } catch (\Exception $e) {
@@ -79,6 +86,12 @@ class SurchargeController extends Controller
                     'flat' => $request->type == "flat" ? $request->flat : null,
                     'is_active'=> $request->is_active,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated surcharge ($request->name)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $surcharge;

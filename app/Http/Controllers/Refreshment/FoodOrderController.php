@@ -8,6 +8,7 @@ use App\Models\Refreshment\HotelFoodDeal;
 use App\Models\Refreshment\HotelFoodDealDetail;
 use App\Models\Refreshment\HotelFood;
 use App\Models\Refreshment\HotelFoodOrder;
+use App\Models\ActivityLog;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Refreshment\Hotel;
@@ -164,6 +165,12 @@ class FoodOrderController extends Controller
                         "added_by" => Auth::user()->id,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added order",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -178,6 +185,12 @@ class FoodOrderController extends Controller
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "received"
         ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | changed status to (received)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
     }
     
     public function orderReady(Request $request)
@@ -185,12 +198,24 @@ class FoodOrderController extends Controller
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "ready"
         ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | changed status to (ready)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
     
     }
     public function orderDelivered(Request $request)
     {
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "delivered"
+        ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | changed status to (delivered)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
         ]);
     }
 

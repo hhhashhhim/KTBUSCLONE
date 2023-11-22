@@ -49,6 +49,12 @@ class TicketsTemplateController extends Controller
                     'status' => 1,
                     'added_by' => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added ticket template",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $template;
             } catch (\Exception $e) {
@@ -94,6 +100,12 @@ class TicketsTemplateController extends Controller
                     'terms_condition' => $request->terms_condition,
                     'status' => $request->status,
                     'updated_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated ticket template",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $template;

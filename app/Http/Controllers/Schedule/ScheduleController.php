@@ -11,6 +11,7 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
+use App\Models\ActivityLog;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalSequence;
@@ -155,6 +156,12 @@ class ScheduleController extends Controller
                 Schedule::where("id", $schedule->id)->update([
                     'schedule_days' => $schedule_days,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added schedule ($request->name $schedule->id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $schedule;
             } catch (\Exception $e) {
@@ -220,6 +227,12 @@ class ScheduleController extends Controller
                         "departure_time" => date("H:i:s",strtotime($updatedTime)),
                     ]);  
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -256,6 +269,12 @@ class ScheduleController extends Controller
                         'added_by' => Auth::user()->id,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated schedule (".$req['name']." ".$req['id'].")",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $schedule;
             } catch (\Exception $e) {
@@ -267,7 +286,14 @@ class ScheduleController extends Controller
 
     public function hideSchedule(Request $request)
     {
-        return Schedule::find($request->id)->update([
+        $schedule = Schedule::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | deleted schedule (".$schedule->name." ".$schedule->id.")",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $schedule->update([
             "hide" => 1
         ]);
     }
@@ -361,6 +387,12 @@ class ScheduleController extends Controller
                         ]);
                     }
                 };
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $schedule;
             } catch (\Exception $e) {

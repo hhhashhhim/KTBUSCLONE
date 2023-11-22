@@ -7,6 +7,7 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use Illuminate\Http\Request;
 use App\Models\Route\RouteFare;
+use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdateSchedulesTime;
@@ -29,6 +30,12 @@ class FareTableController extends Controller
                 } else {
                     storeFare($request, $company_id);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated fare table ($request->from $request->to $request->fare_class)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $this->getFarePrices($request->fare_class);
 
@@ -106,6 +113,12 @@ class FareTableController extends Controller
                         'updated_by' => Auth::user()->id,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated fare table ($request->fromCity $request->toCity $request->fareClass)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return response()->json([
                     'message' => 'Updated Successfully',

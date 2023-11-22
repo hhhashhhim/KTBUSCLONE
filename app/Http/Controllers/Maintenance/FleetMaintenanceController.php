@@ -8,6 +8,7 @@ use App\Models\Maintenance\MaintenancePart;
 use App\Models\Maintenance\MaintenancePartLink;
 use App\Models\Maintenance\FleetMaintenance;
 use App\Models\Bus\Bus;
+use App\Models\ActivityLog;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,6 +83,12 @@ class FleetMaintenanceController extends Controller
                         ]);
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | linked maintenance part at reading ($request->currentReading)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -124,6 +131,12 @@ class FleetMaintenanceController extends Controller
                         ]);
                     }
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated maintenance part at reading ($request->currentReading)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -157,7 +170,8 @@ class FleetMaintenanceController extends Controller
     {
         try {
                 DB::beginTransaction();
-                Bus::where("id",$request->fleetId)->update([
+                $bus = Bus::where("id",$request->fleetId)->first();
+                $bus->update([
                     "current_reading" => $request->currentReading,
                     "reading_date" => date('Y-m-d'),
                 ]);
@@ -176,6 +190,12 @@ class FleetMaintenanceController extends Controller
                     "detail" => $request->detail,
                     "maintenance_type" => $request->maintenanceType,
                     'company_id' => Auth::user()->company_id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added due maintenance of bus ($bus->bus_number)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
                 return $maintenance;
@@ -202,6 +222,12 @@ class FleetMaintenanceController extends Controller
                     "company_paid" => $request->companyPaid,
                     "detail" => $request->detail,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated due maintenance",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $maintenance;
             } catch (\Exception $e) {
@@ -225,9 +251,16 @@ class FleetMaintenanceController extends Controller
                         ]
                     ], 422);
                 }
-                Bus::where("id",$request->fleetId)->update([
+                $bus = Bus::where("id",$request->fleetId)->first();
+                $bus->update([
                     "current_reading" => $request->currentReading,
                     "reading_date" => date("Y-m-d")
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated meter reading of ($bus->bus_number)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
             } catch (\Exception $e) {

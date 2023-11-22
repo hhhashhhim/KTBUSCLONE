@@ -9,6 +9,7 @@ use App\Models\Maintenance\MaintenancePartLink;
 use App\Models\Refreshment\Hotel;
 use App\Models\Bus\Bus;
 use App\Models\User;
+use App\Models\ActivityLog;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,6 +78,12 @@ class HotelController extends Controller
                     "company_id" => Auth::user()->company_id,
                     "added_by" => Auth::user()->id,
                 ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | added hotel ($request->hotelName)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 return $hotel;
             } catch (\Exception $e) {
@@ -129,6 +136,12 @@ class HotelController extends Controller
                         "logo" => $request->logo ? $this->image($request->logo) : null,
                     ]);
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated hotel ($request->hotelName)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
