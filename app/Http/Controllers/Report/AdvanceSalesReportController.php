@@ -65,12 +65,13 @@ class AdvanceSalesReportController extends Controller
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->fromDateTime)
+        if($request->toDateTime)
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
+        // return $tickets;
         $tickets = $tickets->groupBy(['schedule_date_time', 'updated_by']); 
-      
+
         $sortData = [];
         foreach ($tickets as $outer) {
             foreach ($outer as $inner) {
