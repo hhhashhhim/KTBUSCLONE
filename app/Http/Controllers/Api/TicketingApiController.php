@@ -142,11 +142,11 @@ class TicketingApiController extends Controller
                         /////////
 
                         // after discount
-                        $discounted_fare[$name] = (int)$editFare;
+                        $discounted_fare[$name] = customRound((int)$editFare);
                     }
 
                     $single->total_fare = $original_fare;
-                    $single->final_fare = customRound($discounted_fare);
+                    $single->final_fare = $discounted_fare;
                     $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
                     $single->departure_time = date("h:i A", strtotime($single->departure_time));
                     
