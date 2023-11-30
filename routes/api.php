@@ -34,6 +34,9 @@ use Illuminate\Support\Facades\Route;
 
 // Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [AuthApiController::class, 'login']);
+Route::get('check', function(){
+   return "this is working";
+});
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
    //All secure URL's
