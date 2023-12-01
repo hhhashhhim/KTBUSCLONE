@@ -288,7 +288,7 @@ class BookingController extends Controller
                 'authTerminalId' => Auth::user()->terminal_id,
             ];
         // });
-        return $lock;
+        // return $lock;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
