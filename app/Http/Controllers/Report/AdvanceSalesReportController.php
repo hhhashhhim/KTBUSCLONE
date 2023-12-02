@@ -71,7 +71,7 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->groupBy(['schedule_date_time', 'updated_by']); 
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'updated_by']); 
 
         $sortData = [];
         foreach ($tickets as $outer) {
@@ -184,7 +184,6 @@ class AdvanceSalesReportController extends Controller
                 // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
                 return $query->whereIn('route_id', $request->route);
             })
-            ->orderBy('date', 'desc')
             ->get();
 
         $tickets->transform(function ($single) {
@@ -202,7 +201,7 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->groupBy(['schedule_date_time', 'updated_by']); 
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'updated_by']); 
 
         $sortData = [];
         foreach ($tickets as $outer) {
