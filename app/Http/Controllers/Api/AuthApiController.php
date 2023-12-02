@@ -24,8 +24,9 @@ class AuthApiController extends Controller
             return new ValidationResource($validator->errors());
         }
 
-        return $user= User::where(['email'=> $request->email,"hide"=>0])->first(["id","name","email","contact","password"]);
+        $user= User::where(['email'=> $request->email,"hide"=>0])->first(["id","name","email","contact","password"]);
         // print_r($data);
+        return Hash::check($request->password, $user->password);
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response([
                     'message' => ['These credentials do not match our records.']
