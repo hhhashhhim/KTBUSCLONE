@@ -151,12 +151,11 @@ class TicketingApiController extends Controller
                     $single->departure_time = date("h:i A", strtotime($single->departure_time));
                     
                 });
-                if(checkPermissionButtons("time-lock"))
-                {
-                    $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) - 7200));
-                    $arrayData = json_decode($data, true);
-                    $data = collect(array_values($arrayData));
-                }
+                
+                $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) + 5400));
+                $arrayData = json_decode($data, true);
+                $data = collect(array_values($arrayData));
+                
                 // data found | not found
                 if($data->count() > 0)
                 {
