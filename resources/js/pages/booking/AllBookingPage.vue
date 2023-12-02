@@ -116,6 +116,7 @@
                                                             <th>Sr No.</th>
                                                             <th>Route</th>
                                                             <th>Bus No</th>
+                                                            <th>Bus Date</th>
                                                             <th>Bus Time</th>
                                                             <th>Terminal name</th>
                                                             <th>Booked By</th>
@@ -136,8 +137,13 @@
                                                             <td>{{ record.schedule.route.name }}</td>
                                                             <td v-if="record.bus">{{ record.bus.bus_number }}</td>
                                                             <td v-else>N/A</td>
-                                                            <td v-if="record.schedule_detail">{{
-                                                                    record.schedule_detail.departure_time
+                                                            <td v-if="record.schedule_date">{{
+                                                                    record.schedule_date
+                                                                }}
+                                                            </td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="record.schedule_time">{{
+                                                                    record.schedule_time
                                                                 }}
                                                             </td>
                                                             <td v-else>N/A</td>
