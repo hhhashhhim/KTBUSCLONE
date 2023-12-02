@@ -178,12 +178,13 @@ class AdvanceSalesReportController extends Controller
                 }
             })
             ->when($request->user, function ($query) use ($request) {
-                return $query->where('added_by', $request->user);
+                return $query->where('updated_by', $request->user);
             })
-            ->when($route, function ($query) use ($route) {
+            ->when($request->route, function ($query) use ($request) {
                 // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->whereIn('route_id', $route);
-            })->orderBy('date', 'desc')
+                return $query->whereIn('route_id', $request->route);
+            })
+            ->orderBy('date', 'desc')
             ->get();
 
         $tickets->transform(function ($single) {
@@ -196,13 +197,13 @@ class AdvanceSalesReportController extends Controller
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->fromDateTime)
+        if($request->toDateTime)
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
-        $tickets = $tickets->groupBy(['schedule_date_time', 'added_by']); 
-        
-      
+        // return $tickets;
+        $tickets = $tickets->groupBy(['schedule_date_time', 'updated_by']); 
+
         $sortData = [];
         foreach ($tickets as $outer) {
             foreach ($outer as $inner) {
@@ -265,7 +266,7 @@ class AdvanceSalesReportController extends Controller
         });
         // Counter expenses data
         if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
-            $counterexpenses = CounterExpense::with('added_by_data', 'terminal')->where('company_id', Auth::user()->company_id)
+            $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
                 ->when($request->terminal, function ($query) use ($request) {
                     return $query->where('terminal_id', $request->terminal);
                 })
