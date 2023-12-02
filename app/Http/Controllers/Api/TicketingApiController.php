@@ -39,7 +39,7 @@ class TicketingApiController extends Controller
 {
     
     public function availableSchedules(Request $request)
-    {
+    {return 'helo';
         try {
             
                 $validator = Validator::make($request->all(), [
@@ -140,7 +140,6 @@ class TicketingApiController extends Controller
                             }
                         }
                         /////////
-
                         // after discount
                         $discounted_fare[$name] = customRound((int)$editFare);
                     }
