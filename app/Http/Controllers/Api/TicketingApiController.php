@@ -40,7 +40,7 @@ class TicketingApiController extends Controller
     
     public function availableSchedules(Request $request)
     {
-        try {
+        try {return 'helo';
             
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
