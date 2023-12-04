@@ -85,7 +85,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="dateFilter">Date</label>
+                                                        <label for="dateFilter">Departure Date</label>
                                                         <input type="date" class="form-control" id="dateFilter"
                                                                v-model="filterForm.dateFilter"
                                                                @change="filterFunction()">
@@ -98,8 +98,8 @@
                                                                 v-model="filterForm.statusFilter"
                                                                 @change="filterFunction()">
                                                             <option value="">---Select Status---</option>
-                                                            <option value="booked">Booked</option>
-                                                            <option value="advance booking">Advance Booked</option>
+                                                            <option value="booked">Booked / Confirm Booked</option>
+                                                            <option value="advance booking">Advance Booked / Reserved</option>
                                                             <option value="canceled">Cancelled</option>
 <!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
 <!--                                                            <option value="over-issue">Over Issue Ticket</option>-->

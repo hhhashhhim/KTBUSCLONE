@@ -57875,7 +57875,7 @@ var _hoisted_38 = {
 
 var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "dateFilter"
-}, "Date", -1
+}, "Departure Date", -1
 /* HOISTED */
 );
 
@@ -57900,13 +57900,13 @@ var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "booked"
-}, "Booked", -1
+}, "Booked / Confirm Booked", -1
 /* HOISTED */
 );
 
 var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "advance booking"
-}, "Advance Booked", -1
+}, "Advance Booked / Reserved", -1
 /* HOISTED */
 );
 
@@ -86622,9 +86622,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt-dev/'
 
-var url = '/';
+var url = '/kt-dev/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
