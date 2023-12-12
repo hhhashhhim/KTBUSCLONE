@@ -33,24 +33,4 @@ use Illuminate\Support\Facades\Route;
 //
 
 // Route::post('register', [RegisterController::class, 'register']);
-Route::post('login', [AuthApiController::class, 'login']);
-Route::get('check', function(){
-   return "this is working";
-});
 
-Route::group(['middleware' => 'auth:sanctum'], function(){
-   //All secure URL's
-   Route::group(['prefix'=>'booking'],function(){
-      Route::post('/cities/departure',[BookingApiController::class,'departureCities']);
-      Route::post('/cities/destination',[BookingApiController::class,'destinationCities']);
-      Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
-      Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
-      Route::post('/new',[BookingApiController::class,'bookSeat']);
-   });
-   
-   Route::group(['prefix'=>'ticketing'],function(){
-      Route::post('/schedules/available',[TicketingApiController::class,'availableSchedules']);
-      Route::post('/schedule/preview',[TicketingApiController::class,'previewSchedule']);
-      Route::post('/new',[TicketingApiController::class,'bookSeat']);
-   });
-});

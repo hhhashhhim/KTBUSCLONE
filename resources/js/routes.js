@@ -58,7 +58,6 @@ import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 // const url = '/kt-dev/'
 const url = '/'
 
-
 const routes = [
     {
         path: url + "",
