@@ -193,7 +193,7 @@ class BookingApiController extends Controller
                         /////////
 
                         // after discount
-                        $discounted_fare[$name] = (int)$editFare;
+                        $discounted_fare[$name] = customRound((int)$editFare);
                     }
 
                     $single->total_fare = $original_fare;
