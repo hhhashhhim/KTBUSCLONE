@@ -427,7 +427,7 @@ class BookingApiController extends Controller
 
     public function bookSeat(Request $request)
     {
-        try {return $request->book_type;
+        try {return $request->selected_seats;
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
@@ -481,16 +481,16 @@ class BookingApiController extends Controller
                 ]);
 
                 
-                if($request->book_type != "booked" && $request->book_type != "advance booking")
-                {
-                    $error = ["Please Enter Type booked/advance booking"];
-                    return new ConflictResource($error);
-                }
-
                 // if validation fails
                 if ($validator->fails())
                 {
                     return new ValidationResource($validator->errors());
+                }
+                
+                if($request->book_type != "booked" && $request->book_type != "advance booking")
+                {
+                    $error = ["Please Enter Type booked/advance booking"];
+                    return new ConflictResource($error);
                 }
             
                 // Data
