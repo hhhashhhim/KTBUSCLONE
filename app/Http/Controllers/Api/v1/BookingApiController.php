@@ -427,7 +427,7 @@ class BookingApiController extends Controller
 
     public function bookSeat(Request $request)
     {
-        try {
+        try {return $request;
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
@@ -482,7 +482,7 @@ class BookingApiController extends Controller
 
                 
                 if($request->book_type != "booked" && $request->book_type != "advance booking")
-                {return $request;
+                {
                     $error = ["Please Enter Type booked/advance booking"];
                     return new ConflictResource($error);
                 }
