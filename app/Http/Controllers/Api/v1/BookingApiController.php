@@ -427,7 +427,7 @@ class BookingApiController extends Controller
 
     public function bookSeat(Request $request)
     {
-        try {return $request;
+        try {return 'helo';
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
