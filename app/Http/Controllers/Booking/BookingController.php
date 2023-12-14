@@ -74,7 +74,7 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         try {
-            $lock = Cache::lock("ticket")->block(5, function () use ($request) {
+            $lock = Cache::lock("tickets")->block(5, function () use ($request) {
             DB::beginTransaction();
             if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
                 return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
