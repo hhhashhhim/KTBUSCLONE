@@ -429,7 +429,7 @@ class BookingApiController extends Controller
     public function bookSeat(Request $request)
     {
         Log::error('Er->: ' . $request);
-        return $request->selected_seats;
+        
         try {
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
