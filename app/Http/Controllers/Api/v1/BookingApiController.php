@@ -482,7 +482,7 @@ class BookingApiController extends Controller
 
                 
                 if($request->book_type != "booked" && $request->book_type != "advance booking")
-                {
+                {return $request;
                     $error = ["Please Enter Type booked/advance booking"];
                     return new ConflictResource($error);
                 }
