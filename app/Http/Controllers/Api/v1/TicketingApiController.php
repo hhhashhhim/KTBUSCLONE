@@ -578,6 +578,7 @@ class TicketingApiController extends Controller
                             'type' => $request->book_type,
                             'discount_type' => null,
                             'added_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id,
                             'discount' => 0,
                             'points_usage' => 0,
                         ]);
