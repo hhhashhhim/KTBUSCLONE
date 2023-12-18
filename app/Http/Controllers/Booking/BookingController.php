@@ -370,6 +370,7 @@ class BookingController extends Controller
                     'type' => $item['rescheduleType'],
                     'reschedule_type' => $item['overIssueReschedule'],
                     'added_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
                     'discount' => $item['rescheduleDiscount'] ?? 0,
                 ]);
                 TicketReschedule::create([
