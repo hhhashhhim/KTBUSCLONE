@@ -172,6 +172,33 @@ class TicketingApiController extends Controller
     public function previewSchedule(Request $request)
     {
         try {
+                // to make array of terminal's available seats
+                $available_seats = Terminal::where('id', Auth::user()->terminal_id)->value('available_seats');
+                if (!is_null($available_seats)) {
+                    if (strpos($available_seats, '-') !== false) {
+                        $rangeSeats = explode("|", str_replace(',', '|', $available_seats));
+                        $output = [];
+                        foreach ($rangeSeats as $range) {
+                            $parts = explode("-", $range);
+                            $start = intval($parts[0]);
+                            $end = intval($parts[1]);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $output[] = (int)str_pad($i, 2, "0", STR_PAD_LEFT);
+                            }
+                        }
+                        $seats = array_unique($output);
+                    }
+                    else
+                    {
+                        $arrays = explode(",", $available_seats);
+                        $seats = [];
+                        foreach ($arrays as $item) {
+                            $seats[] = (int)$item;
+                        }
+                    }
+                    
+                }
+
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
                     'destination_city_id' => 'required',
@@ -243,8 +270,8 @@ class TicketingApiController extends Controller
                         {
                             unset($seatMap[$i][$j]);
                         }
-                        
                         if ($column['reserved']) {
+                            
                             $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                             $seatMap[$i][$j]['fare'] = (int)$data->fare;
                             if ($scheduleDiscount) {
@@ -268,6 +295,16 @@ class TicketingApiController extends Controller
                                 } else {
                                     $seatMap[$i][$j]['fare'] = (int)$data->fare + $scheduleSurcharge->flat;
                                 }
+                            }
+
+                            // allow seat manage
+                            if(isset($seats) && !in_array($column['seatNo'], $seats))
+                            {
+                                $seatMap[$i][$j]['terminal_allow'] = false;
+                            }
+                            else
+                            {
+                                $seatMap[$i][$j]['terminal_allow'] = true;
                             }
                         }
                         $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
@@ -462,7 +499,32 @@ class TicketingApiController extends Controller
                 {
                     return new ValidationResource($validator->errors());
                 }
-            
+                // to make array of terminal's available seats
+                $available_seats = Terminal::where('id', Auth::user()->terminal_id)->value('available_seats');
+                if (!is_null($available_seats)) {
+                    if (strpos($available_seats, '-') !== false) {
+                        $rangeSeats = explode("|", str_replace(',', '|', $available_seats));
+                        $output = [];
+                        foreach ($rangeSeats as $range) {
+                            $parts = explode("-", $range);
+                            $start = intval($parts[0]);
+                            $end = intval($parts[1]);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $output[] = (int)str_pad($i, 2, "0", STR_PAD_LEFT);
+                            }
+                        }
+                        $seats = array_unique($output);
+                    }
+                    else
+                    {
+                        $arrays = explode(",", $available_seats);
+                        $seats = [];
+                        foreach ($arrays as $item) {
+                            $seats[] = (int)$item;
+                        }
+                    }
+                    
+                }
                 // Data
                 DB::beginTransaction();
                 
@@ -493,6 +555,16 @@ class TicketingApiController extends Controller
                     {
                         $error = ["One seat of your combination already booked"];
                         return new ConflictResource($error);
+                    }
+                    // check allow seat
+                    foreach($request->selected_seats as $seatNo)
+                    {
+                        // allow seat manage
+                        if(isset($seats) && !in_array($seatNo, $seats))
+                        {
+                            $error = ["One seat of your combination is not allow to book"];
+                            return new ConflictResource($error);
+                        }
                     }
 
                     $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
