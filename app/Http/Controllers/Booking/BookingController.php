@@ -1423,27 +1423,34 @@ class BookingController extends Controller
 
             $item->acutal_time = $item->date . " " . $item->scheduleDetail->departure_time; //if ticket booked from another terminal
 
-            $ticketTerminal = Terminal::find($item->terminal_id);
-            if ($ticketTerminal->city_id == $item->departure_city_id) {
-                if ($checkTerminal->count() > 0) {
-                    //              if ticket terminal id at last of sequence it mean no need to calculation
-                    // if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
-                    if (in_array($item->terminal_id, $checkTerminal->pluck("terminal_id")->toArray())) {
-                        foreach ($checkTerminal as $key => $single) {
-                            if ($item->terminal_id == $single->terminal_id) {
-                                break;
-                            } else {
-                                $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
-                                if ($terminalTime) {
-                                    $time = explode(":", $terminalTime->time_difference);
-                                    $subTime += ($time[0] * 60 * 60) + ($time[1] * 60);
-                                }
-                            }
-                        }
-                    }
-                }
-                $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->scheduleDetail->departure_time) - $subTime);
+            $sub = 0;
+            $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
+            if($terminalTime)
+            {
+                $sub = $terminalTime->time_difference * 60;
             }
+
+            // $ticketTerminal = Terminal::find($item->terminal_id);
+            // if ($ticketTerminal->city_id == $item->departure_city_id) {
+            //     if ($checkTerminal->count() > 0) {
+            //         //              if ticket terminal id at last of sequence it mean no need to calculation
+            //         // if ($checkTerminal->first()->terminal_id != $item->terminal_id) {
+            //         if (in_array($item->terminal_id, $checkTerminal->pluck("terminal_id")->toArray())) {
+            //             foreach ($checkTerminal as $key => $single) {
+            //                 if ($item->terminal_id == $single->terminal_id) {
+            //                     break;
+            //                 } else {
+            //                     $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_from_id' => $single->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
+            //                     if ($terminalTime) {
+            //                         $time = explode(":", $terminalTime->time_difference);
+            //                         $subTime += ($time[0] * 60 * 60) + ($time[1] * 60);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->scheduleDetail->departure_time) + $sub);
         });
         $format = Terminal::find($tickets[0]->terminal_id);
         $finalData = [
