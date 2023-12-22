@@ -368,7 +368,8 @@ class ScheduleController extends Controller
                         if ($lastDepId == $detail->departure_city_id) {
                             $departureTime = date("Y-m-d H:i", $totalTime);
                         } else {
-                            $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference;
+                            return $lastDepId.' '.$detail->departure_city_id;
+                            $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
                             $timeDiff = explode(':', $fareTableTime);
                             $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
                             $departureTime = date("Y-m-d H:i", $totalTime);

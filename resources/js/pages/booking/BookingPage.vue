@@ -2432,6 +2432,8 @@ export default {
             this.addForm.customerCNIC = "";
             this.addForm.customerName = "";
             this.addForm.contact = "";
+            this.addForm.flag = 0;
+            this.addForm.alreadyBookedId = [];
             this.addForm.remarks = "";
             this.addForm.totalFare = 0;
             this.addForm.totalAmount = 0;

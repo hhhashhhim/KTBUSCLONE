@@ -85,7 +85,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="dateFilter">Date</label>
+                                                        <label for="dateFilter">Departure Date</label>
                                                         <input type="date" class="form-control" id="dateFilter"
                                                                v-model="filterForm.dateFilter"
                                                                @change="filterFunction()">
@@ -98,8 +98,8 @@
                                                                 v-model="filterForm.statusFilter"
                                                                 @change="filterFunction()">
                                                             <option value="">---Select Status---</option>
-                                                            <option value="booked">Booked</option>
-                                                            <option value="advance booking">Advance Booked</option>
+                                                            <option value="booked">Booked / Confirm Booked</option>
+                                                            <option value="advance booking">Advance Booked / Reserved</option>
                                                             <option value="canceled">Cancelled</option>
 <!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
 <!--                                                            <option value="over-issue">Over Issue Ticket</option>-->
@@ -116,6 +116,7 @@
                                                             <th>Sr No.</th>
                                                             <th>Route</th>
                                                             <th>Bus No</th>
+                                                            <th>Bus Date</th>
                                                             <th>Bus Time</th>
                                                             <th>Terminal name</th>
                                                             <th>Booked By</th>
@@ -136,8 +137,13 @@
                                                             <td>{{ record.schedule.route.name }}</td>
                                                             <td v-if="record.bus">{{ record.bus.bus_number }}</td>
                                                             <td v-else>N/A</td>
-                                                            <td v-if="record.schedule_detail">{{
-                                                                    record.schedule_detail.departure_time
+                                                            <td v-if="record.schedule_date">{{
+                                                                    record.schedule_date
+                                                                }}
+                                                            </td>
+                                                            <td v-else>N/A</td>
+                                                            <td v-if="record.schedule_time">{{
+                                                                    record.schedule_time
                                                                 }}
                                                             </td>
                                                             <td v-else>N/A</td>

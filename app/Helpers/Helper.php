@@ -225,6 +225,7 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id->update([
                 'type' => 'booked',
                 'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
+                'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
             ]);
