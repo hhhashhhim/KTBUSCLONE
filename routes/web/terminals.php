@@ -26,4 +26,9 @@ Route::group(['prefix' => 'terminals', 'middleware' => 'UserAccess', [CustomMidd
         Route::post('/', [TerminalController::class, 'terminalDiscounts']);
         Route::post('/store', [TerminalController::class, 'discountStore']);
     });
+    
+    Route::group(['prefix' => '/times', [CustomMiddleware::class]], function () {
+        Route::post('/', [TerminalController::class, 'terminalTimes']);
+        Route::post('/store', [TerminalController::class, 'timeStore']);
+    });
 });

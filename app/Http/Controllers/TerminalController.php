@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\Company;
 use App\Models\Terminal;
 use App\Models\TerminalCommission;
+use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalDiscount;
 use App\Models\Route\Route;
 use Illuminate\Http\Request;
@@ -131,6 +132,7 @@ class TerminalController extends Controller
                     'urdu_name' => 'required',
                     'contact' => 'required',
                 ]);
+                Terminal::where("city_id",$request->city_id)->update(["is_main"=>0]);
                 Terminal::find($request->id)->update([
                     'name' => $request->name,
                     'urdu_name' => $request->urdu_name,
@@ -275,4 +277,53 @@ class TerminalController extends Controller
             }
     }
 
+    public function terminalTimes(Request $request)
+    {
+
+        $terminalTimes = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+        return [
+            "terminalTimes" => $terminalTimes,
+            "terminal" => $terminal,
+        ];
+    }
+
+    public function timeStore(Request $request)
+    {
+        try {
+                DB::beginTransaction();
+                $request->validate([
+                    "terminal_id" => 'required',
+                    "route" => 'required',
+                    "time" => 'required',
+                ]);
+
+                TerminalTimeDifference::where("terminal_id", $request->terminal_id)->delete();
+                $city_id = Terminal::find($request->terminal_id)->city_id;
+                foreach ($request->route as $key => $value) {
+                    $checkExist = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
+                    if (!$checkExist) {
+                        TerminalTimeDifference::create([
+                            'terminal_id' => $request->terminal_id,
+                            'city_id' => $city_id,
+                            'route_id' => $request->route[$key],
+                            'time_difference' => $request->time[$key],
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
+                }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated terminal time ($request->terminal_id)",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
+    }
 }

@@ -12,8 +12,8 @@ class CreateTerminalTimeDifferencesTable extends Migration
             $table->id();
             $table->string('time_difference')->nullable();
             $table->integer('city_id')->nullable();
-            $table->integer('terminal_from_id')->nullable();
-            $table->integer('terminal_to_id')->nullable();
+            $table->integer('terminal_id')->nullable();
+            $table->integer('route_id')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
             $table->timestamp('time')->useCurrent();

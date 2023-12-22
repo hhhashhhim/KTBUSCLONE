@@ -201,6 +201,15 @@
                             </span>
                         </label>
                     </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">Mian Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="data.is_main"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
@@ -353,6 +362,16 @@
                             </span>
                         </label>
                     </div>
+                    <div class="form-group col-md-2 d-flex align-items-center">
+                        <label class="mt-4" for="sms">Main Terminal</label>
+                        <label class="colorinput mx-3 mt-3">
+                            <span>
+                                <input type="checkbox" class="colorinput-input" v-model="dataEdit.is_main"
+                                       v-bind:checked="dataEdit.is_main == 1"/>
+                                <span class="colorinput-color bg-primary"></span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
@@ -403,32 +422,38 @@
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.added_by">{{ single.added_by.name }}</td>
                                                 <td v-else>N/A</td>
-                                                <td style="width:250px;"
+                                                <td style="width:270px;"
                                                     v-if="checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
                                                     <button title="Edit Terminal"
                                                             :data-target="'#' + editFormID"
                                                             data-toggle="modal"
                                                             @click="editTerminal(single)"
-                                                            class="btn btn-warning mx-2"
+                                                            class="btn btn-warning mx-1"
                                                             v-if="checkForSubmenuButtons('edit-terminal')"
                                                     >
                                                         <i class="far fa-edit"></i>
                                                     </button>
-                                                    <router-link target="_blank" class="btn btn-success mx-2"
+                                                    <router-link target="_blank" class="btn btn-success mx-1"
                                                                  title="Commission"
                                                                  v-if="checkForSubmenuButtons('commission')"
                                                                  :to="{ name:'terminal-commission', params: { id:single.id }}">
                                                         <i class="fas fa-percent"></i>
                                                     </router-link>
-                                                    <router-link target="_blank" class="btn btn-primary mx-2"
+                                                    <router-link target="_blank" class="btn btn-primary mx-1"
                                                                  title="Discount"
                                                                  v-if="checkForSubmenuButtons('discount')"
                                                                  :to="{ name:'terminal-discount', params: { id:single.id }}">
                                                         <i class="fas fa-tag"></i>
                                                     </router-link>
+                                                    <router-link target="_blank" class="btn btn-warning mx-1"
+                                                                 title="Terminal Time"
+                                                                 v-if="checkForSubmenuButtons('edit-terminal')"
+                                                                 :to="{ name:'terminal-time', params: { id:single.id }}">
+                                                        <i class="fas fa-clock"></i>
+                                                    </router-link>
                                                     <button title="Delete Terminal"
                                                             :data-target="'#' + hideFormID" @click="delId = single.id" data-toggle="modal"
-                                                            class="btn btn-danger mx-2"
+                                                            class="btn btn-danger mx-1"
                                                             v-if="checkForSubmenuButtons('delete-terminal')"
                                                     >
                                                         <i class="far fa-eye-slash"></i>
@@ -529,6 +554,7 @@ export default {
                 address: "",
                 time_difference: '',
                 active_sms: "",
+                is_main: "",
                 advance_booking: "",
                 longitude: "",
                 latitude: "",
