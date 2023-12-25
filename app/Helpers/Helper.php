@@ -245,6 +245,8 @@ if (!function_exists('updateAdvancedSeat')) {
                 $customer_id->update([
                     'terminal_id' => $request->terminalId,
                     'departure_city_id' => $request->departureCity,
+                    'terminal_name' => "",
+                    'online_terminal' => 0,
                     'is_partial' => $isPartial,
                     'destination_city_id' => $request->destinationCity,
                 ]);

@@ -32,7 +32,10 @@ class DailySummaryReportController extends Controller
     {
         
             $closings = TicketClosingMerge::
-            with('closing:id,ticket_merge_id,bus_id', 'closing.tickets:id,ticket_closing_id,seat_fare,discount,terminal_id', 'closing.tickets.elt:id,elt_price,ticket_id')
+            with(['closing:id,ticket_merge_id,bus_id', 'closing.tickets.elt:id,elt_price,ticket_id','closing.tickets'=>function($q){
+                        $q->where("type","booked");
+                        $q->select(["id","ticket_closing_id","seat_fare","discount","terminal_id"]);
+                    }])
                 ->where('schedule_complete', 1)
                 ->where('company_id', Auth::user()->company_id)
                 ->where(function ($q) use ($request) {
@@ -63,8 +66,8 @@ class DailySummaryReportController extends Controller
                     }
                 })->pluck('id');
             $headerLink = ReportHeaderLink::where('company_id', Auth::user()->company_id)->whereIn('ticket_merge_id', $mergeIds)->get(['id', 'header_id', 'ticket_merge_id', 'value'])->groupBy(['ticket_merge_id', 'header_id']);
-            $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->with("schedule:id,route_id")->where('company_id', Auth::user()->company_id)->where('online_terminal', 1)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id"])->groupBy(['ticket_merge_id', 'terminal_id']);
-            $physicalTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->with("schedule:id,route_id")->where('company_id', Auth::user()->company_id)->where('online_terminal', 0)->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id"])->groupBy(['ticket_merge_id','schedule_id', 'terminal_id']);
+            $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal'=>1,'type'=>"booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id","route_id"])->groupBy(['ticket_merge_id', 'terminal_id']);
+            $physicalTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal'=>0,'type'=>"booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id","route_id"])->groupBy(['ticket_merge_id','schedule_id', 'terminal_id']);
             //Map function for single iteration
             $closings->map(function ($closing) {
                 //            get data from single iteration with relation
@@ -89,7 +92,7 @@ class DailySummaryReportController extends Controller
             $onlineTerminalData->map(function ($merge) {
                 $merge->map(function ($terminal) {
                     $terminal->map(function ($ticket) {
-                        $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->schedule->route_id])->first();
+                        $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->route_id])->first();
                         if($commission)
                         {
                             if($commission->flat_commission == 0)
@@ -114,7 +117,7 @@ class DailySummaryReportController extends Controller
                 $merge->map(function ($schedule) {
                     $schedule->map(function ($terminal) {
                         $terminal->map(function ($ticket) {
-                            $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->schedule->route_id])->first();
+                            $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->route_id])->first();
                             if($commission)
                             {
                                 if($commission->flat_commission == 0)
@@ -141,7 +144,7 @@ class DailySummaryReportController extends Controller
             });
             
   
-            // return $physicalTerminalData;
+            // return $onlineTerminalData;
         if (strtolower($request->language) == 'english') {
             return view('reports.dailySummeryReportEng', [
                 "data" => $closings,

@@ -107,6 +107,13 @@
                 @endforeach
                 @endforeach
                 @endif
+
+                @if(isset($online_terminals[$single->id]))
+                @foreach($online_terminals[$single->id] as $terminal)
+                    @php $commission += $terminal->sum("commission_amount"); @endphp
+                @endforeach
+                @endif
+
                 <td>{{ $commission }}</td>
                 @php
                 $totalCommission += $commission;
