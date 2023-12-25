@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ValidationResource;
 use App\Http\Resources\ConflictResource;
+use App\Models\v1\DropSchedule;
 use App\Http\Resources\CreatedResource;
 use App\Models\v1\Discount;
 use App\Models\v1\Surcharge;
@@ -61,7 +62,12 @@ class TicketingApiController extends Controller
                 $data = ScheduleDetail::with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $depId, 'destination_id' => $desId, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
                 
-                $data->map(function($single) use ($companyId,$terminalId){
+                $data->map(function($single,$key) use ($data,$companyId,$terminalId){
+                    $scheduleDrop = DropSchedule::where(["schedule_date"=>$single->schedule_date,"schedule_id"=>$single->schedule_id])->first();
+                    if($scheduleDrop)
+                    {
+                        unset($data[$key]);
+                    }
                     $seat_map = BusClass::find($single->schedule->bus_class_id);
                     $counter = 0;
                     $bus_class_id = [];
