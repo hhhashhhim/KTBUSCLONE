@@ -44,6 +44,16 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
+                                                        <label for="name">Invoice</label>
+                                                        <input id="name" type="text" class="form-control"
+                                                               v-model="filterForm.invoiceFilter"
+                                                               @keyup="filterFunction()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
                                                         <label for="routeFilter">Route</label>
                                                         <select id="routeFilter" class="form-control"
                                                                 v-model="filterForm.routeFilter"
@@ -56,7 +66,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="terminalsFilter">Terminals</label>
                                                         <select id="terminalsFilter" class="form-control"
@@ -70,7 +80,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="busFilter">Bus #</label>
                                                         <select id="busFilter" class="form-control"
@@ -83,15 +93,9 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-group">
-                                                        <label for="dateFilter">Departure Date</label>
-                                                        <input type="date" class="form-control" id="dateFilter"
-                                                               v-model="filterForm.dateFilter"
-                                                               @change="filterFunction()">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="statusFilter">Status</label>
                                                         <select id="statusFilter" class="form-control"
@@ -101,9 +105,25 @@
                                                             <option value="booked">Booked / Confirm Booked</option>
                                                             <option value="advance booking">Advance Booked / Reserved</option>
                                                             <option value="canceled">Cancelled</option>
-<!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
-<!--                                                            <option value="over-issue">Over Issue Ticket</option>-->
+        <!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
+        <!--                                                            <option value="over-issue">Over Issue Ticket</option>-->
                                                         </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="dateFilter">Departure Date From</label>
+                                                        <input type="date" class="form-control" id="dateFilter"
+                                                               v-model="filterForm.fromDateFilter"
+                                                               @change="filterFunction()">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="dateFilter">Departure Date To</label>
+                                                        <input type="date" class="form-control" id="dateFilter"
+                                                               v-model="filterForm.toDateFilter"
+                                                               @change="filterFunction()">
                                                     </div>
                                                 </div>
                                             </div>
@@ -120,6 +140,7 @@
                                                             <th>Bus Time</th>
                                                             <th>Terminal name</th>
                                                             <th>Booked By</th>
+                                                            <th>Invoice</th>
                                                             <th>Seat No</th>
                                                             <th>Passenger Name</th>
                                                             <th>CNIC</th>
@@ -150,6 +171,7 @@
                                                             <td v-if="record.terminal">{{ record.terminal.name }}</td>
                                                             <td v-else>N/A</td>
                                                             <td>{{ record.added_by.name }}</td>
+                                                            <td>{{ record.invoice_id }}</td>
                                                             <td>{{ record.seat_no }}</td>
                                                             <td>{{ record.name }}</td>
                                                             <td>{{ record.cnic }}</td>
@@ -212,8 +234,10 @@ export default {
             allRecords: [],
             filterForm: {
                 cnicFilter: "",
-                dateFilter: "",
+                fromDateFilter: "",
+                toDateFilter: "",
                 nameFilter: "",
+                invoiceFilter: "",
                 phoneFilter: "",
                 terminalFilter: "",
                 routeFilter: "",
@@ -227,7 +251,8 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        this.filterForm.dateFilter = new Date().toISOString().substr(0, 10);
+        this.filterForm.fromDateFilter = new Date().toISOString().substr(0, 10);
+        this.filterForm.toDateFilter = new Date().toISOString().substr(0, 10);
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);

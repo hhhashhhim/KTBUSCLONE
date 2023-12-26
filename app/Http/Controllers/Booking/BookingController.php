@@ -86,16 +86,26 @@ class BookingController extends Controller
                 ->where('departure_date', $request->date)
                 ->where('company_id', Auth::user()->company_id)
                 ->first();
+            $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
-            // $allTicket = [];
+            
+            $invoice = Invoice::create([
+                "schedule_id" => $schedule->id,
+                "route_id" => $schedule->route_id,
+                "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                "schedule_date" => $detail->schedule_date,
+                "schedule_time" => $detail->departure_time,
+                "company_id" => Auth::user()->company_id,
+                "added_by" => Auth::user()->id,
+            ]);
+
             if (isset($request->flag) && $request->flag == 1) {
-                $allTicket = updateAdvancedSeat($request, Auth::user()->company_id);
+                $allTicket = updateAdvancedSeat($request, $invoice);
             } else {
                 if (count($request->selectedSeats) == 0) {
                     return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
                 }
                 // check seat duplication 
-                $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $lastFare = $schedule->route->fares->last();
                 $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
                 array_push($allFaresOfRoute, $lastFare->destination_city_id);
@@ -186,22 +196,7 @@ class BookingController extends Controller
                     $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
-                // $scheduleDetail = ScheduleDetail::where([
-                //     'company_id' => Auth::user()->company_id,
-                //     'departure_date' => $request->date,
-                //     'departure_id' => $request->departureCity,
-                //     'destination_id' => $request->destinationCity,
-                //     'schedule_id' => $schedule->id,
-                // ])->first();
-                $invoice = Invoice::create([
-                    "schedule_id" => $schedule->id,
-                    "route_id" => $schedule->route_id,
-                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
-                    "schedule_date" => $detail->schedule_date,
-                    "schedule_time" => $detail->departure_time,
-                    "company_id" => Auth::user()->company_id,
-                    "added_by" => Auth::user()->id,
-                ]);
+                
                 $allTicket = [];
                 foreach ($request->selectedSeats as $i => $seat) {
                     $ticket = Ticket::create([

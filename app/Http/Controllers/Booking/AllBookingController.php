@@ -14,12 +14,12 @@ class AllBookingController extends Controller
 {
     public function routes()
     {
-        return Route::where('company_id', Auth::user()->company_id)->get();
+        return Route::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function terminals()
     {
-        return Terminal::where('company_id', Auth::user()->company_id)->get();
+        return Terminal::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function buses()
@@ -29,7 +29,6 @@ class AllBookingController extends Controller
 
     public function filter(Request $request)
     {
-
         $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
 
             // Within Customer Table
@@ -43,11 +42,20 @@ class AllBookingController extends Controller
                 if ($request->terminalFilter) {
                     $q->where("terminal_id", $request->terminalFilter);
                 }
+                if ($request->invoiceFilter) {
+                    $q->where("invoice_id",'like','%' . $request->invoiceFilter . '%');
+                }
                 if ($request->busFilter) {
                     $q->where("bus_id", $request->busFilter);
                 }
-                if ($request->dateFilter) {
-                    $q->where("date", $request->dateFilter);
+                if ($request->fromDateFilter) {
+                    $q->where("date",'>=', $request->fromDateFilter);
+                }
+                if ($request->fromDateFilter) {
+                    $q->where("date",'<=', $request->fromDateFilter);
+                }
+                if ($request->routeFilter) {
+                    $q->where("route_id", $request->routeFilter);
                 }
                 if ($request->statusFilter == "reschedule") {
                     $q->where("reschedule_type", '!=', $request->statusFilter);
@@ -57,11 +65,7 @@ class AllBookingController extends Controller
                 return $q;
             });
 
-        // with route filter
-        if ($request->routeFilter) {
-            $data->join("schedules", "schedules.id", "tickets.schedule_id");
-            $data->where("schedules.route_id", $request->routeFilter);
-        }
+        
         // Within Ticket Table
         if ($request->statusFilter == "canceled") {
             $data->where("type", $request->statusFilter)->withTrashed();
