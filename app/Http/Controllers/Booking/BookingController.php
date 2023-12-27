@@ -360,7 +360,7 @@ class BookingController extends Controller
                     'customer_id' => $item['dataCustomer'],
                     'schedule_id' => $item['newDepartureTime'],
                     'route_id' => $schedule->route_id,
-                    'remarks' => $item['reason'],
+                    'remarks' => $item['reason']??"",
                     'gender' => $ticket['gender'],
                     'type' => $item['rescheduleType'],
                     'reschedule_type' => $item['overIssueReschedule'],
