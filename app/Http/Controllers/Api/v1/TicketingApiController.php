@@ -455,7 +455,7 @@ class TicketingApiController extends Controller
                         ]);
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,
-                            "message" => Auth::user()->name." | stored ticket (advance booking) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | seat no :".json_encode($request->selected_seats),
+                            "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id,
                             "requested_host" => $request->ip(),
                             "company_id" => Auth::user()->company_id
                         ]);
@@ -699,6 +699,12 @@ class TicketingApiController extends Controller
                         $allTicket[] = $ticket->id;
                     }
                 // }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | stored ticket ($request->book_type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selected_seats),
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
                 
                 return new CreatedResource(["invoice_id"=>$invoice->id]);
