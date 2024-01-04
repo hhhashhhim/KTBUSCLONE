@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\admin\Role;
 use App\Models\Company;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -80,6 +81,12 @@ class RoleController extends Controller
             'company_id' => Auth::user()->company_id,
             'permissions' => [],
         ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | added role ($request->name)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
         return Role::with('company')->find($role->id);
     }
     public function update(Request $request)
@@ -88,6 +95,12 @@ class RoleController extends Controller
             'name' => $request->name,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
             'permissions' => $request->permissions,
+        ]);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | updated role ($request->name)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
         ]);
         return response()->json([
             'message' => 'updated successfully',
