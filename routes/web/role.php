@@ -1,7 +1,7 @@
 <?php
 
 
-use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\RoleController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
