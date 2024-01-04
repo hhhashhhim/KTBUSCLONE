@@ -41,7 +41,6 @@ import ExpenseCategoryPage from "./pages/expense/ExpenseCategoryPage.vue";
 import ExpensePage from "./pages/expense/ExpensePage.vue";
 import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue";
 import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
-import TerminalTimePage from "./pages/terminal/TerminalTimePage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
 import AccountCategoryPage from "./pages/account/AccountCategoryPage.vue";
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
@@ -56,8 +55,8 @@ import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
 
-const url = '/kt/'
-// const url = '/'
+// const url = '/kt-dev/'
+const url = '/'
 
 const routes = [
     {
@@ -274,11 +273,6 @@ const routes = [
         path: url + "terminals/:id/discounts",
         component: TerminalDiscountPage,
         name: "terminal-discount"
-    },
-    {
-        path: url + "terminals/:id/times",
-        component: TerminalTimePage,
-        name: "terminal-time"
     },
     {
         path: url + "terminal/time/difference",
