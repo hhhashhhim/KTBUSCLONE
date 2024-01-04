@@ -55,8 +55,6 @@ import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
-// kt code
-
 // const url = '/kt/'
 const url = '/'
 
