@@ -1339,7 +1339,7 @@
         <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
 
         <!--Print Passesnger List Form-->
-        <form :action="$store.state.app_url + 'print/pdf/passenger/list'" method="POST" ref="refPassengerList"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/passenger/list'" method="POST" ref="refPassengerList"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
@@ -1348,7 +1348,7 @@
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
         </form>
         <!--Print Terminal Invoice-->
-        <form :action="$store.state.app_url + 'print/pdf/terminal/invoice'" method="POST" ref="refTerminalInvoice"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/terminal/invoice'" method="POST" ref="refTerminalInvoice"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
@@ -1358,7 +1358,7 @@
             <input type="hidden" name="terminal_id" :value="this.addForm.terminalId">
         </form>
         <!--Print Bus Invoice -->
-        <form :action="$store.state.app_url + 'print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
@@ -1367,28 +1367,28 @@
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
         </form>
         <!--        print Customer Ticket Print-->
-        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refTicket"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/customer/ticket'" method="POST" ref="refTicket"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="ticket_ids" :value="this.ticketsIds">
             <input type="hidden" name="duplicate" value=0>
         </form>
         <!--        print Customer Duplicate Ticket Print-->
-        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refDuplicateTicket"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/customer/ticket'" method="POST" ref="refDuplicateTicket"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="ticket_id" :value="this.ticketsId">
             <input type="hidden" name="duplicate" value=1>
         </form>
         <!--        print Customer Duplicate All Ticket Print-->
-        <form :action="$store.state.app_url + 'print/pdf/customer/ticket'" method="POST" ref="refDuplicateAllTicket"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/customer/ticket'" method="POST" ref="refDuplicateAllTicket"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="ticket_ids" :value="this.duplicateAllTicket">
             <input type="hidden" name="duplicate" value=0>
         </form>
         <!--        Elt Customer PDF Form  -->
-        <form :action="$store.state.app_url + 'print/pdf/customer/elt'" method="POST" ref="refElt"
+        <form :action="$store.state.app_url + 'api/v1/print/pdf/customer/elt'" method="POST" ref="refElt"
               target="_blank">
             <input type="hidden" name="_token" v-bind:value="csrf">
             <input type="hidden" name="elt_ids" :value="this.eltIds">

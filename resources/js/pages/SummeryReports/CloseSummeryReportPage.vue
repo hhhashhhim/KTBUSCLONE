@@ -14,7 +14,7 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <form :action="$store.state.app_url + 'reports/reportExport'"
+                                            <form :action="$store.state.app_url + 'api/v1/reports/reportExport'"
                                                   target="_blank"
                                                   method="POST" ref="refDailySummeryReport">
                                                 <input type="hidden" name="_token" v-bind:value="csrf">

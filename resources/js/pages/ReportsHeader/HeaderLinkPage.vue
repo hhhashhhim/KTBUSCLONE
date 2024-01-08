@@ -67,7 +67,7 @@
             </div>
 
             <!--Daily Summery Report Form-->
-            <form :action="$store.state.app_url + 'print/pdf/daily/summary/report'" method="POST"
+            <form :action="$store.state.app_url + 'api/v1/print/pdf/daily/summary/report'" method="POST"
                   ref="refDailySummaryReport"
                   target="_blank">
                 <input type="hidden" name="_token" v-bind:value="csrf">

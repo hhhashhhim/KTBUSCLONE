@@ -44,7 +44,7 @@
                                                 </div>
                                                 <!--Print Confirmation Cancel report-->
                                                 <form
-                                                    :action="$store.state.app_url + 'print/pdf/confirm/cancellation/report'"
+                                                    :action="$store.state.app_url + 'api/v1/print/pdf/confirm/cancellation/report'"
                                                     method="POST" ref="refConfirmCancle"
                                                     target="_blank">
                                                     <input type="hidden" name="_token" v-bind:value="csrf">

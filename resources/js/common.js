@@ -12,7 +12,7 @@ export default {
             try {
                 return await axios({
                     method: method,
-                    url: this.$store.state.app_url + url,
+                    url: this.$store.state.app_url + "api/v1/" + url,
                     data: data
                 });
             } catch (error) {
