@@ -26304,7 +26304,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['user', 'app_url', 'permissions'],
+  props: ['app_url', 'permissions'],
   name: "App",
   components: {
     NavBar: _NavBar_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -26315,10 +26315,6 @@ __webpack_require__.r(__webpack_exports__);
     CompanySideBar: _company_SideBar_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   created: function created() {
-    if (this.user) {
-      this.$store.commit('updateUser', this.user);
-    }
-
     this.$store.commit('updateAppUrl', this.app_url);
   }
 });
@@ -28171,11 +28167,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 8:
                 res = _context.sent;
 
-                if (res.status == 200) {
-                  _this.success = "Logged In Successfully";
-                  _this.data.email = _this.data.password = "";
-                  window.location = "admin/dashboard";
-                  _this.success = "";
+                if (res.status == 201) {
+                  if (res.data) {
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                    localStorage.setItem("token", res.data.token);
+                    _this.data.email = _this.data.password = "";
+                    window.location = "admin/dashboard";
+                  }
                 } else {
                   if (res.status == 422) {
                     _loop = function _loop(key) {
@@ -87507,6 +87505,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
   state: function state() {
+    var _JSON$parse;
+
     return {
       deletingObj: {
         url: "",
@@ -87514,9 +87514,9 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
         index: -1,
         isDeleted: false
       },
-      user: false,
+      user: (_JSON$parse = JSON.parse(localStorage.getItem("user"))) !== null && _JSON$parse !== void 0 ? _JSON$parse : false,
       app_url: false,
-      permissions: false,
+      permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };
   },

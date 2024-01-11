@@ -29,7 +29,7 @@ import CompanyNavBar from "../company/NavBar.vue";
 import CompanySideBar from "../company/SideBar.vue";
 
 export default {
-    props:['user','app_url','permissions'],
+    props:['app_url','permissions'],
     name:"App",
     components:{
         NavBar,
@@ -40,9 +40,6 @@ export default {
         CompanySideBar,
     },
     created(){
-        if (this.user) {
-            this.$store.commit('updateUser',this.user);
-        }
         this.$store.commit('updateAppUrl',this.app_url);
     }
 }

@@ -122,7 +122,7 @@ export default {
 
     methods: {
         async login(e) {
-            e.preventDefault()
+            e.preventDefault();
             this.validationErrors = [];
             if (this.data.email == "")
                 return this.errorsArray("Email is Required", "Email");
@@ -130,11 +130,14 @@ export default {
                 return this.errorsArray("Password is Required", "Password");
 
             const res = await this.callApi("post", "login", this.data);
-            if (res.status == 200) {
-                this.success = "Logged In Successfully";
-                this.data.email = this.data.password = "";
-                window.location = "admin/dashboard"
-                this.success = "";
+            
+            if (res.status == 201) {
+                if (res.data) {
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                    localStorage.setItem("token", res.data.token);
+                    this.data.email = this.data.password = "";
+                    window.location = "admin/dashboard"
+                }
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {

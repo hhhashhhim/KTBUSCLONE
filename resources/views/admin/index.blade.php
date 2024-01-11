@@ -33,14 +33,10 @@
 <body>
 <div class="loader"></div>
 <div id="app">
-    @if (Auth::check())
 
-        <main-app :user="{{ \App\Models\User::with('role','company')->find(Auth::id()) }}" app_url="{{ config('app.url') }}">
-        </main-app>
-    @else
-        {{-- <test-app :user="false" app_url="{{ config('app.url') }}"></test-app> --}}
-        <main-app :user="false" app_url="{{ config('app.url') }}"></main-app>
-    @endif
+    <main-app app_url="{{ config('app.url') }}">
+    </main-app>
+   
 </div>
 <!-- General JS Scripts -->
 <script src="{{ asset('assets/js/app.min.js') }}"></script>

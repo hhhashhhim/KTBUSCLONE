@@ -7,6 +7,8 @@ use App\Models\Customer;
 use App\Models\Expense\TicketMergeExpense;
 use App\Models\ReportHeaderLink;
 use App\Models\Schedule\TicketClosingMerge;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\ValidationResource;
 use App\Models\Ticket;
 use App\Models\ActivityLog;
 use App\Models\User;
@@ -77,30 +79,33 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $this->validate($request, [
-            'email' => 'required|email',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required',
             'password' => 'required',
         ]);
-
-        // return $request;
-        $attempt = Auth::attempt(['email' => $request->email, 'password' => $request->password, 'hide'  => 0, 'online_user' => 0]);
-        if ($attempt) {
-            ActivityLog::create([
-                "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name." | login",
-                "requested_host" => $request->ip(),
-                "company_id" => Auth::user()->company_id
-            ]);
-            return response()->json([
-                'message' => 'You are Logged In Successfully',
-                'success' => true,
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Invalid Credentials !!!!',
-                'success' => false,
-            ], 401);
+    
+        // if validation fails
+        if ($validator->fails())
+        {
+            return new ValidationResource($validator->errors());
         }
+
+        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id"]);
+        // print_r($data);
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response([
+                    'message' => ['These credentials do not match our records.']
+                ], 404);
+            }
+        
+            $token = $user->createToken('my-app-token')->plainTextToken;
+            
+            $response = [
+                'user' => $user,
+                'token' => $token
+            ];
+        
+            return response($response, 201);
     }
 
     public function doubleCheck(Request $request)
