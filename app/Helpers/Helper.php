@@ -1,23 +1,23 @@
 <?php
 
 use App\Models\Booking\TicketELT;
-use App\Models\v1\City;
-use App\Models\v1\Customer;
-use App\Models\v1\FareClass;
-use App\Models\v1\FareTable;
+use App\Models\City;
+use App\Models\Customer;
+use App\Models\FareClass;
+use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
-use App\Models\v1\Route;
-use App\Models\v1\RouteFare;
-use App\Models\v1\Schedule;
-use App\Models\v1\TicketIsPartial;
-use App\Models\v1\ScheduleDetail;
-use App\Models\v1\TicketClosing;
+use App\Models\Route\Route;
+use App\Models\Route\RouteFare;
+use App\Models\Schedule\Schedule;
+use App\Models\Booking\TicketIsPartial;
+use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\TicketClosing;
 use App\Http\Resources\CreatedResource;
 use App\Models\Schedule\TicketClosingMember;
 use App\Models\Schedule\TicketClosingMerge;
-use App\Models\v1\Role;
+use App\Models\admin\Role;
 use App\Models\Setting\Tickets\TicketsTemplate;
-use App\Models\v1\Ticket;
+use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Rawilk\Printing\Facades\Printing;
