@@ -1,0 +1,753 @@
+[
+    {
+        "name": "admin",
+        "allow": true,
+        "childs": [
+            {
+                "name": "cities",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-city",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-city",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-city",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "terminals",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "view-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-terminal",
+                        "allow": true
+                    },
+                    {
+                        "name": "commission",
+                        "allow": true
+                    },
+                    {
+                        "name": "discount",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "difference",
+                "allow": true
+            },
+            {
+                "name": "fare-class",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-class",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-class",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-class",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "fare-table",
+                "allow": true
+            },
+            {
+                "name": "routes",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-routes",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-routes",
+                        "allow": true
+                    },
+                    {
+                        "name": "details-routes",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-routes",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "discounts",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-discount",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-discount",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-discount",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "surcharge",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-surcharge",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-surcharge",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-surcharge",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "reports",
+        "allow": true,
+        "childs": [
+            {
+                "name": "confirm-cancel",
+                "allow": true
+            },
+            {
+                "name": "sales",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "terminal-filter",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "schedule-drop",
+                "allow": true
+            },
+            {
+                "name": "close-trip",
+                "allow": true
+            },
+            {
+                "name": "commission",
+                "allow": true
+            },
+            {
+                "name": "complaints",
+                "allow": true
+            },
+            {
+                "name": "over-issue",
+                "allow": true
+            },
+            {
+                "name": "expenses",
+                "allow": true
+            }
+        ]
+    },
+    {
+        "name": "buses",
+        "allow": true,
+        "childs": [
+            {
+                "name": "bus-class",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-bus-class",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-bus-Class",
+                        "allow": true
+                    },
+                    {
+                        "name": "duplicate-bus-Class",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-bus-class",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "buses",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-buses",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-buses",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-buses",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "schedules",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "update-time",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "extend-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-schedule",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "merges",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-expense",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "users",
+        "allow": true,
+        "childs": [
+            {
+                "name": "users",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-users",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-users",
+                        "allow": true
+                    },
+                    {
+                        "name": "assign-terminal-admin",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-user",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "roles",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "assign-role",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-role",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "ticketing",
+        "allow": true,
+        "childs": [
+            {
+                "name": "bookings",
+                "allow": true,
+                "buttons":
+                [
+                    {
+                        "name": "previous-date",
+                        "allow": true
+                    },
+                    {
+                        "name": "assign-bus",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-id",
+                        "allow": true
+                    },
+                    {
+                        "name": "discount-field",
+                        "allow": true
+                    },
+                    {
+                        "name": "bus-invoice",
+                        "allow": true
+                    },
+                    {
+                        "name": "pax-list",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details",
+                        "allow": true
+                    },
+                    {
+                        "name": "drop-schedule",
+                        "allow": true
+                    },
+                    {
+                        "name": "seat-details-shortcut",
+                        "allow": true
+                    },
+                    {
+                        "name": "advance-booking",
+                        "allow": true
+                    },
+                    {
+                        "name": "duplicate-ticket",
+                        "allow": true
+                    },
+                    {
+                        "name": "resend-sms",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-elt",
+                        "allow": true
+                    },
+                    {
+                        "name": "reschedule-seats",
+                        "allow": true
+                    },
+                    {
+                        "name": "overissue-seat",
+                        "allow": true
+                    },
+                    {
+                        "name": "cancel-ticket",
+                        "allow": true
+                    },
+                    {
+                        "name": "reserved-cancel",
+                        "allow": true
+                    },
+                    {
+                        "name": "check-assign-bus",
+                        "allow": true
+                    },
+                    {
+                        "name": "time-lock",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "closing",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-close-booking",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-close-booking",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "all-booking",
+                "allow": true
+            },
+            {
+                "name": "counter-expenses",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-counter-expenses",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-counter-expenses",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "expenses",
+        "allow": true,
+        "childs": [
+            {
+                "name": "categories",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-category",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-category",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-category",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "hrm",
+        "allow": true,
+        "childs": [
+            {
+                "name": "employees",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-employee",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-employee",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-employee",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "leaves",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "apply-leave",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-leave",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-leave",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "departments",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-department",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-department",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-department",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "designations",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-designation",
+                        "allow": true
+                    },
+                    {
+                        "name": "view-designation",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "fleet-maintenance",
+        "allow": true,
+        "childs": [
+            {
+                "name": "part",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-part",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-part",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-part",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "linking",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "view-link-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "delete-link-maintenance",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "dues",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "update-meter-reading",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-irregular-maintenance",
+                        "allow": true
+                    },
+                    {
+                        "name": "add-maintenance",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "records",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "edit-maintenance",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "refreshment",
+        "allow": true,
+        "childs": [
+            {
+                "name": "hotels",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-hotel",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-hotel",
+                        "allow": true
+                    },
+                    {
+                        "name": "food",
+                        "allow": true
+                    },
+                    {
+                        "name": "food-add-food",
+                        "allow": true
+                    },
+                    {
+                        "name": "food-edit-food",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal-add-deal",
+                        "allow": true
+                    },
+                    {
+                        "name": "deal-edit-deal",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "order",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-order",
+                        "allow": true
+                    },
+                    {
+                        "name": "received-order",
+                        "allow": true
+                    },
+                    {
+                        "name": "ready-order",
+                        "allow": true
+                    },
+                    {
+                        "name": "delivered-order",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "accounts",
+        "allow": true,
+        "childs": [
+            {
+                "name": "chart-of-accounts",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-category",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "settings",
+        "allow": true,
+        "childs": [
+            {
+                "name": "tickets",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-template",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-template",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "ActivityLog",
+                "allow": true
+            }
+        ]
+    },
+    {
+        "name": "loyaltyCard",
+        "allow": true,
+        "childs": [
+            {
+                "name": "loyaltyCardCategory",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-card-category",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-card-category",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "loyaltyCardAssign",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "add-assign-card",
+                        "allow": true
+                    },
+                    {
+                        "name": "edit-assign-card",
+                        "allow": true
+                    }
+                ]
+            }
+        ]
+    }
+]
