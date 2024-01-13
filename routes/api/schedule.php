@@ -4,7 +4,7 @@ use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'v1/schedule', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/schedule', [CustomMiddleware::class]], function () {
     Route::post('/', [ScheduleController::class, 'index']);
     Route::post('/store', [ScheduleController::class, 'storeSchedule']);
     Route::post('/edit', [ScheduleController::class, 'editSchedule']);

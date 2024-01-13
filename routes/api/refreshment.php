@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 
 
 
-Route::group(['prefix' => 'v1/refreshments', 'middleware', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/refreshments', 'middleware', [CustomMiddleware::class]], function () {
 
     Route::group(['prefix' => '/hotels', 'middleware', [CustomMiddleware::class]], function () {
         Route::post('/', [HotelController::class, 'index']);

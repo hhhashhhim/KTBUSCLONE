@@ -4,7 +4,7 @@ use App\Http\Controllers\Setting\Tickets\TicketsTemplateController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'v1/settings', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/settings', [CustomMiddleware::class]], function () {
     Route::post('/activity/logs', [TicketsTemplateController::class, 'activityLog']);
     
     Route::group(['prefix' => 'v1/tickets'], function () {

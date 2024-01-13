@@ -4,7 +4,7 @@ use App\Http\Controllers\Bus\BusController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'v1/buses', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/buses', [CustomMiddleware::class]], function () {
     Route::post('/', [BusController::class, 'index']);
     Route::post('/store', [BusController::class, 'storeBus']);
     Route::post('/update', [BusController::class, 'updateBus']);
