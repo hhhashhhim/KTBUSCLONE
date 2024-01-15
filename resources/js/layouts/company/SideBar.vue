@@ -3,13 +3,13 @@
         <aside id="sidebar-wrapper">
             <div class="sidebar-brand text-center">
                 <a href="">
-                    <img :src="$store.state.app_url + 'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
+                    <img :src="app_url + 'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
                 </a>
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
                 <li class="dropdown active">
-                    <a :href="$store.state.app_url + 'api/v1/admin/dashboard'" class="nav-link">
+                    <a :href="app_url + 'admin/dashboard'" class="nav-link">
                         <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
                 <!-- Admin Panel -->
@@ -409,6 +409,7 @@ export default {
                 company: "fa-building",
             },
             permissions: [],
+            app_url: process.env.MIX_APP_URL,
         }
     },
     created() {

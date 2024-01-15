@@ -10,6 +10,7 @@ const store = createStore({
                 isDeleted:false,
             },
             user:JSON.parse(localStorage.getItem("user")),
+            token:localStorage.getItem("token"),
             app_url:false,
             permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
             companyModules:false,

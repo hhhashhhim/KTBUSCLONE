@@ -53,6 +53,7 @@ export default {
             
             if (res.status == 200) {
                 localStorage.removeItem("user");
+                localStorage.removeItem("token");
                 window.location.href = process.env.MIX_APP_URL;
             } 
         }

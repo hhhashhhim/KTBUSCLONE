@@ -146,13 +146,14 @@ export default {
                 return this.errorsArray("Email is Required", "Email");
             if (this.data.password == "")
                 return this.errorsArray("Password is Required", "Password");
-
+            
             const res = await this.callApi("post", "login", this.data);
             
             if (res.status == 201) {
                 
                 if (res.data.user) {
-                    localStorage.setItem("user",JSON.stringify(res.data.user))
+                    localStorage.setItem("user",JSON.stringify(res.data.user));
+                    localStorage.setItem("token",res.data.token);
                     this.data.email = this.data.password = "";
                     window.location.href = process.env.MIX_APP_URL + "admin/dashboard";
                 }

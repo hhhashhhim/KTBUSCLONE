@@ -9,11 +9,15 @@ export default {
     methods: {
 
         async callApi(method, url, data) {
+           
             try {
                 return await axios({
                     method: method,
-                    url: process.env.MIX_API_URL + "api/web/v1/" + url,
-                    data: data
+                    url: process.env.MIX_API_URL + "public/api/web/v1/" + url,
+                    data: data,
+                    headers: {
+                        'Authorization': 'Bearer ' + this.$store.state.token
+                    }
                 });
             } catch (error) {
                 return error.response

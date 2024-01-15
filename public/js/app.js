@@ -26443,6 +26443,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status == 200) {
                   localStorage.removeItem("user");
+                  localStorage.removeItem("token");
                   window.location.href = "http://localhost/kt-dev/";
                 }
 
@@ -26479,7 +26480,8 @@ __webpack_require__.r(__webpack_exports__);
         roles: "fa-map-signs",
         company: "fa-building"
       },
-      permissions: []
+      permissions: [],
+      app_url: "http://localhost/kt-dev/"
     };
   },
   created: function created() {
@@ -28231,6 +28233,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (res.status == 201) {
                   if (res.data.user) {
                     localStorage.setItem("user", JSON.stringify(res.data.user));
+                    localStorage.setItem("token", res.data.token);
                     _this.data.email = _this.data.password = "";
                     window.location.href = "http://localhost/kt-dev/" + "admin/dashboard";
                   }
@@ -55265,7 +55268,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("aside", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: _ctx.$store.state.app_url + 'assets/img/kt-logo.png',
+    src: $data.app_url + 'assets/img/kt-logo.png',
     style: {
       "width": "250px !important"
     },
@@ -55273,7 +55276,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , _hoisted_5)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    href: _ctx.$store.state.app_url + 'api/v1/admin/dashboard',
+    href: $data.app_url + 'admin/dashboard',
     "class": "nav-link"
   }, _hoisted_12, 8
   /* PROPS */
@@ -87147,6 +87150,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   methods: {
     callApi: function callApi(method, url, data) {
+      var _this = this;
+
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
@@ -87156,8 +87161,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context.next = 3;
                 return axios__WEBPACK_IMPORTED_MODULE_0___default()({
                   method: method,
-                  url: "http://api.techhord.com/" + "api/web/v1/" + url,
-                  data: data
+                  url: "http://api.techhord.com/" + "public/api/web/v1/" + url,
+                  data: data,
+                  headers: {
+                    'Authorization': 'Bearer ' + _this.$store.state.token
+                  }
                 });
 
               case 3:
@@ -87329,9 +87337,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt-dev/'
 
-var url = '/kt-dev/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -87593,6 +87601,7 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
         isDeleted: false
       },
       user: JSON.parse(localStorage.getItem("user")),
+      token: localStorage.getItem("token"),
       app_url: false,
       permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
