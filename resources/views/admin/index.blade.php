@@ -33,10 +33,9 @@
 <body>
 <div class="loader"></div>
 <div id="app">
-
-    <main-app app_url="{{ config('app.url') }}">
-    </main-app>
-   
+    
+    <main-app></main-app>
+    
 </div>
 <!-- General JS Scripts -->
 <script src="{{ asset('assets/js/app.min.js') }}"></script>

@@ -31,92 +31,92 @@ class AuthController extends Controller
     }
 
 
-    public function checkForPermission($user, $request)
-    {
-        $permission = collect($user->role
-            ->permissions);
-        return $permission->where('name', $request->path())
-            ->where('read', true)
-            ->first();
-    }
+    // public function checkForPermission($user, $request)
+    // {
+    //     $permission = collect($user->role
+    //         ->permissions);
+    //     return $permission->where('name', $request->path())
+    //         ->where('read', true)
+    //         ->first();
+    // }
     
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            "currentPassword" => 'required',
-            "newPassword" => 'required',
-            "confirmPassword" => 'required|same:newPassword',
-        ]);
+    // public function updatePassword(Request $request)
+    // {
+    //     $request->validate([
+    //         "currentPassword" => 'required',
+    //         "newPassword" => 'required',
+    //         "confirmPassword" => 'required|same:newPassword',
+    //     ]);
 
-        if(!Hash::check($request->currentPassword, Auth::user()->password))
-        {
-            return response()->json(["errors" => ["Error" => ['Current Password Not Matched']]], 422);
-        }
+    //     if(!Hash::check($request->currentPassword, Auth::user()->password))
+    //     {
+    //         return response()->json(["errors" => ["Error" => ['Current Password Not Matched']]], 422);
+    //     }
 
-        User::where("id",Auth::user()->id)->update([
-            "password" => Hash::make($request->newPassword)
-        ]);
-        ActivityLog::create([
-            "activity_by" => Auth::user()->id,
-            "message" => Auth::user()->name." | updated password",
-            "requested_host" => $request->ip(),
-            "company_id" => Auth::user()->company_id
-        ]);
-    }
+    //     User::where("id",Auth::user()->id)->update([
+    //         "password" => Hash::make($request->newPassword)
+    //     ]);
+    //     ActivityLog::create([
+    //         "activity_by" => Auth::user()->id,
+    //         "message" => Auth::user()->name." | updated password",
+    //         "requested_host" => $request->ip(),
+    //         "company_id" => Auth::user()->company_id
+    //     ]);
+    // }
 
-    public function logout(Request $request)
-    {
-        ActivityLog::create([
-            "activity_by" => Auth::user()->id,
-            "message" => Auth::user()->name." | logout",
-            "requested_host" => $request->ip(),
-            "company_id" => Auth::user()->company_id
-        ]);
-        Auth::logout();
-        return redirect("/login");
-    }
+    // public function logout(Request $request)
+    // {
+    //     ActivityLog::create([
+    //         "activity_by" => Auth::user()->id,
+    //         "message" => Auth::user()->name." | logout",
+    //         "requested_host" => $request->ip(),
+    //         "company_id" => Auth::user()->company_id
+    //     ]);
+    //     Auth::logout();
+    //     return redirect("/login");
+    // }
 
-    public function login(Request $request)
-    {
+    // public function login(Request $request)
+    // {
 
-        $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required',
-        ]);
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => 'required',
+    //         'password' => 'required',
+    //     ]);
     
-        // if validation fails
-        if ($validator->fails())
-        {
-            return new ValidationResource($validator->errors());
-        }
+    //     // if validation fails
+    //     if ($validator->fails())
+    //     {
+    //         return new ValidationResource($validator->errors());
+    //     }
 
-        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id"]);
-        // print_r($data);
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                return response([
-                    'message' => ['These credentials do not match our records.']
-                ], 404);
-            }
+    //     $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id"]);
+    //     // print_r($data);
+    //         if (!$user || !Hash::check($request->password, $user->password)) {
+    //             return response([
+    //                 'message' => ['These credentials do not match our records.']
+    //             ], 404);
+    //         }
         
-            $token = $user->createToken('my-app-token')->plainTextToken;
+    //         $token = $user->createToken('my-app-token')->plainTextToken;
             
-            $response = [
-                'user' => $user,
-                'token' => $token
-            ];
+    //         $response = [
+    //             'user' => $user,
+    //             'token' => $token
+    //         ];
         
-            return response($response, 201);
-    }
+    //         return response($response, 201);
+    // }
 
-    public function doubleCheck(Request $request)
-    {
-        $request->validate([
-            'password' => 'required',
-        ]);
-        if (Hash::check($request->password, auth()->user()->password)) {
-            return response()->json([], 200);
-        } else {
-            return response()->json([], 403);
-        }
-    }
+    // public function doubleCheck(Request $request)
+    // {
+    //     $request->validate([
+    //         'password' => 'required',
+    //     ]);
+    //     if (Hash::check($request->password, auth()->user()->password)) {
+    //         return response()->json([], 200);
+    //     } else {
+    //         return response()->json([], 403);
+    //     }
+    // }
 }

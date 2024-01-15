@@ -6,7 +6,7 @@
                     <div class="col-md-4 mx-auto">
                         <div class="card card-success">
                             <div class="card-header text-center">
-                                <img :src="$store.state.app_url+'assets/img/kt-logo.png'"
+                                <img :src="app_url + 'assets/img/kt-logo.png'"
                                      style="width:350px !important;" alt="">
                             </div>
                             <div class="card-body">
@@ -30,6 +30,22 @@
                                             {{ error.desc }}
                                         </li>
                                     </ul>
+                                </div>
+                                <div
+                                    class="alert alert-danger alert-dismissible fade show"
+                                    role="alert"
+                                    v-if="error"
+                                >
+                                    <button
+                                        type="button"
+                                        class="close"
+                                        data-dismiss="alert"
+                                        aria-label="Close"
+                                    >
+                                        <span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">Close</span>
+                                    </button>
+                                    {{error}}
                                 </div>
                                 <div
                                     class="alert alert-success alert-dismissible fade show"
@@ -116,7 +132,9 @@ export default {
                 password: "",
             },
             success: false,
-            errors: []
+            errors: [],
+            error: "",
+            app_url: process.env.MIX_APP_URL
         };
     },
 
@@ -132,12 +150,15 @@ export default {
             const res = await this.callApi("post", "login", this.data);
             
             if (res.status == 201) {
-                if (res.data) {
-                    localStorage.setItem("user", JSON.stringify(res.data.user));
-                    localStorage.setItem("token", res.data.token);
+                
+                if (res.data.user) {
+                    localStorage.setItem("user",JSON.stringify(res.data.user))
                     this.data.email = this.data.password = "";
-                    window.location = "admin/dashboard"
+                    window.location.href = process.env.MIX_APP_URL + "admin/dashboard";
                 }
+               
+            } else if(res.status == 404){
+                this.error = "These credentials do not match our records.";
             } else {
                 if (res.status == 422) {
                     for (const key in res.data.errors) {

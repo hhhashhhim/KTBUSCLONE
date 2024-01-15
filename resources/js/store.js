@@ -9,12 +9,14 @@ const store = createStore({
                 index:-1,
                 isDeleted:false,
             },
-            user:JSON.parse(localStorage.getItem("user"))??false,
+            user:JSON.parse(localStorage.getItem("user")),
             app_url:false,
-            permissions:JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
+            permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
             companyModules:false,
         }
     },
+
+    
     getters:{
         getDeletingObj(state){
             return state.deletingObj;
@@ -50,5 +52,5 @@ const store = createStore({
         //     state.permissions=obj.permissions;
         // }
     }
-})
+});
 export default store;

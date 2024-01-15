@@ -25,13 +25,13 @@
 
             <li class="dropdown"><a href="#" data-toggle="dropdown"
                     class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image"
-                        :src="$store.state.app_url+'assets/img/user.png'" class="user-img-radious-style"> <span
+                        :src="app_url+'assets/img/user.png'" class="user-img-radious-style"> <span
                         class="d-sm-none d-lg-inline-block"></span></a>
                 <div class="dropdown-menu dropdown-menu-right pullDown">
                     <div class="dropdown-title">Hello {{ $store.state.user.name }}</div>
 
                     <div class="dropdown-divider"></div>
-                    <a :href="$store.state.app_url + 'api/v1/logout'" class="dropdown-item has-icon text-danger"> <i
+                    <a href="#" @click="logout" class="dropdown-item has-icon text-danger"> <i
                             class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>
@@ -40,3 +40,22 @@
         </ul>
     </nav>
 </template>
+<script>
+export default {
+    data() {
+        return {
+            app_url: process.env.MIX_APP_URL
+        }
+    },
+    methods: {       
+        async logout() {
+           const res = await this.callApi("post", "logout", this.data);
+            
+            if (res.status == 200) {
+                localStorage.removeItem("user");
+                window.location.href = process.env.MIX_APP_URL;
+            } 
+        }
+    }
+}
+</script>
