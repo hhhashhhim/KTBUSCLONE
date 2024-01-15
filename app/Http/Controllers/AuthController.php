@@ -65,7 +65,7 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request)
-    {return 'helo';
+    {
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
             "message" => Auth::user()->name." | logout",
@@ -73,7 +73,7 @@ class AuthController extends Controller
             "company_id" => Auth::user()->company_id
         ]);
         Auth::logout();
-        return redirect("/login");
+        return response(["message"=>"logout successfully"], 200);
     }
 
     public function login(Request $request)
