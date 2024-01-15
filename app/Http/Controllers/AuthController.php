@@ -66,12 +66,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        ActivityLog::create([
-            "activity_by" => Auth::user()->id,
-            "message" => Auth::user()->name." | logout",
-            "requested_host" => $request->ip(),
-            "company_id" => Auth::user()->company_id
-        ]);
+        return "ok";
+        // ActivityLog::create([
+        //     "activity_by" => Auth::user()->id,
+        //     "message" => Auth::user()->name." | logout",
+        //     "requested_host" => $request->ip(),
+        //     "company_id" => Auth::user()->company_id
+        // ]);
         // Auth::logout();
         // return response(["message"=>"logout successfully"], 200);
     }
