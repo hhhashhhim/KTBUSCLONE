@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Log;
 
 class CityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        return $request->header();
         return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->orderBy('id')->get();
     }
 
