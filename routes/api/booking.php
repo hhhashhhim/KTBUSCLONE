@@ -6,12 +6,12 @@ use App\Http\Controllers\Schedule\ScheduleClosingController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'web/v1/counter/expenses', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/counter/expenses','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [CounterExpensesController::class, 'index']);
     Route::post('/store', [CounterExpensesController::class, 'store']);
     Route::post('/update', [CounterExpensesController::class, 'update']);
 });
-Route::group(['prefix' => 'web/v1/booking', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/cities', [BookingController::class, 'cities']);
     Route::post('/store', [BookingController::class, 'store']);

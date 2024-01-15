@@ -4,7 +4,7 @@ use App\Http\Controllers\Hrm\Department\DepartmentController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'web/v1/hrm/department', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/hrm/department','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [DepartmentController::class, 'index']);
     Route::post('/store', [DepartmentController::class, 'store']);
     Route::post('/update', [DepartmentController::class, 'update']);

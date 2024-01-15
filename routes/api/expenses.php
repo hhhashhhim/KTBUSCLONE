@@ -6,7 +6,7 @@ use App\Http\Controllers\Expense\ExpenseController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'web/v1/expenses', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/expenses','middleware' => ['auth:sanctum']], function () {
     
     Route::post('/', [ExpenseController::class, 'index']);
     Route::post('store', [ExpenseController::class, 'store']);
@@ -19,7 +19,7 @@ Route::group(['prefix' => 'web/v1/expenses', [CustomMiddleware::class]], functio
     });
 });
 
-Route::group(['prefix' => 'web/v1/office/expenses', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/office/expenses','middleware' => ['auth:sanctum']], function () {
     
     Route::post('/', [ExpenseController::class, 'officeExpenses']);
     Route::post('store', [ExpenseController::class, 'officeExpenStore']);

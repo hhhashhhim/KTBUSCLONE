@@ -4,7 +4,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'web/v1/company', 'middleware', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/company','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [CompanyController::class, 'index']);
     Route::post('store', [CompanyController::class, 'store']);
     Route::post('logo-upload', [CompanyController::class, 'logoUpload']);

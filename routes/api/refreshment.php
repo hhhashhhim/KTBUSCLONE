@@ -15,22 +15,22 @@ use Illuminate\Support\Facades\Mail;
 
 
 
-Route::group(['prefix' => 'web/v1/refreshments', 'middleware', [CustomMiddleware::class]], function () {
+Route::group(['prefix' => 'web/v1/refreshments','middleware' => ['auth:sanctum']], function () {
 
-    Route::group(['prefix' => '/hotels', 'middleware', [CustomMiddleware::class]], function () {
+    Route::group(['prefix' => '/hotels'], function () {
         Route::post('/', [HotelController::class, 'index']);
         Route::post('/store', [HotelController::class, 'store']);
         Route::post('/update', [HotelController::class, 'update']);
         
         Route::post('/items', [FoodOrderController::class, 'hotelAllItems']);
 
-        Route::group(['prefix' => '/specific/foods', 'middleware', [CustomMiddleware::class]], function () {
+        Route::group(['prefix' => '/specific/foods'], function () {
             Route::post('/', [FoodController::class, 'index']);
             Route::post('/store', [FoodController::class, 'store']);
             Route::post('/update', [FoodController::class, 'update']);
             Route::post('/items', [FoodOrderController::class, 'hotelItems']);
             
-            Route::group(['prefix' => '/deals', 'middleware', [CustomMiddleware::class]], function () {
+            Route::group(['prefix' => '/deals'], function () {
                 Route::post('/', [FoodDealController::class, 'index']);
                 Route::post('/store', [FoodDealController::class, 'store']);
                 Route::post('/update', [FoodDealController::class, 'update']);
@@ -38,7 +38,7 @@ Route::group(['prefix' => 'web/v1/refreshments', 'middleware', [CustomMiddleware
 
         });
 
-        Route::group(['prefix' => '/orders', 'middleware', [CustomMiddleware::class]], function () {
+        Route::group(['prefix' => '/orders'], function () {
             // Route::post('/', [FoodDealController::class, 'index']);
             Route::post('/food', [FoodOrderController::class, 'orderFoodIndex']);
             Route::post('/book', [FoodOrderController::class, 'orderBook']);
