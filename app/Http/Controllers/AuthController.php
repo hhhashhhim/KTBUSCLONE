@@ -65,7 +65,7 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request)
-    {
+    {return 'helo';
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
             "message" => Auth::user()->name." | logout",
