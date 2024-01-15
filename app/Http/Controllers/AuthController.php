@@ -72,8 +72,8 @@ class AuthController extends Controller
             "requested_host" => $request->ip(),
             "company_id" => Auth::user()->company_id
         ]);
-        Auth::logout();
-        return response(["message"=>"logout successfully"], 200);
+        // Auth::logout();
+        // return response(["message"=>"logout successfully"], 200);
     }
 
     public function login(Request $request)
