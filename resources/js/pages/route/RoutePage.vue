@@ -247,10 +247,10 @@
             </Edit>
             
             <!--Daily Summery Report Form-->
-            <form :action="$store.state.app_url + 'api/v1/fare-table/fare/print'" method="POST"
+            <form :action="$store.state.api_url + 'api/web/v1/fare-table/fare/print'" method="POST"
                   ref="farePrint"
                   target="_blank">
-                <input type="hidden" name="_token" v-bind:value="csrf">
+                <input type="hidden" name="token" :value="this.$store.state.token">
                 <input type="hidden" name="route_id" :value="this.route_id">
             </form>
 

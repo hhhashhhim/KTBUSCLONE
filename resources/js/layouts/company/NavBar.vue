@@ -25,7 +25,7 @@
 
             <li class="dropdown"><a href="#" data-toggle="dropdown"
                     class="nav-link dropdown-toggle nav-link-lg nav-link-user"> <img alt="image"
-                        :src="app_url+'assets/img/user.png'" class="user-img-radious-style"> <span
+                        :src="$store.state.main_url+'assets/img/user.png'" class="user-img-radious-style"> <span
                         class="d-sm-none d-lg-inline-block"></span></a>
                 <div class="dropdown-menu dropdown-menu-right pullDown">
                     <div class="dropdown-title">Hello {{ $store.state.user.name }}</div>
@@ -44,7 +44,7 @@
 export default {
     data() {
         return {
-            app_url: process.env.MIX_APP_URL
+            
         }
     },
     methods: {       
@@ -54,7 +54,7 @@ export default {
             if (res.status == 200) {
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                window.location.href = process.env.MIX_APP_URL;
+                window.location.href = this.$store.state.main_url;
             } 
         }
     }

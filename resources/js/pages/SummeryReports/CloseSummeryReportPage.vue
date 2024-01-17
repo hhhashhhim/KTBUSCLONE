@@ -14,10 +14,10 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <form :action="$store.state.app_url + 'api/v1/reports/reportExport'"
+                                            <form :action="$store.state.api_url + 'api/web/v1/reports/reportExport'"
                                                   target="_blank"
                                                   method="POST" ref="refDailySummeryReport">
-                                                <input type="hidden" name="_token" v-bind:value="csrf">
+                                                <input type="hidden" name="token" :value="$store.state.token">
                                                 <input type="hidden" name="language" id="languageReport">
                                                 <div class="row">
                                                     <div class="col-md-3">

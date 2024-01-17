@@ -124,10 +124,10 @@
             </div>
 
             <!--Daily Summery Report Form-->
-            <form :action="$store.state.app_url + 'api/v1/print/pdf/daily/summary/report'" method="POST"
+            <form :action="$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'" method="POST"
                   ref="refDailySummaryReport"
                   target="_blank">
-                <input type="hidden" name="_token" v-bind:value="csrf">
+                <input type="hidden" name="token" :value="this.$store.state.token">
                 <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
             </form>
         </div>

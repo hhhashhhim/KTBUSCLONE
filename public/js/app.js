@@ -26421,9 +26421,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
-    return {
-      app_url: "http://localhost/kt-dev/"
-    };
+    return {};
   },
   methods: {
     logout: function logout() {
@@ -26444,7 +26442,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (res.status == 200) {
                   localStorage.removeItem("user");
                   localStorage.removeItem("token");
-                  window.location.href = "http://localhost/kt-dev/";
+                  window.location.href = _this.$store.state.main_url;
                 }
 
               case 4:
@@ -26480,8 +26478,7 @@ __webpack_require__.r(__webpack_exports__);
         roles: "fa-map-signs",
         company: "fa-building"
       },
-      permissions: [],
-      app_url: "http://localhost/kt-dev/"
+      permissions: []
     };
   },
   created: function created() {
@@ -28190,8 +28187,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       success: false,
       errors: [],
-      error: "",
-      app_url: "http://localhost/kt-dev/"
+      error: ""
     };
   },
   methods: {
@@ -28235,7 +28231,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     localStorage.setItem("user", JSON.stringify(res.data.user));
                     localStorage.setItem("token", res.data.token);
                     _this.data.email = _this.data.password = "";
-                    window.location.href = "http://localhost/kt-dev/" + "admin/dashboard";
+                    window.location.href = _this.$store.state.main_url + "admin/dashboard";
                   }
                 } else if (res.status == 404) {
                   _this.error = "These credentials do not match our records.";
@@ -54592,7 +54588,7 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("nav", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     alt: "image",
-    src: $data.app_url + 'assets/img/user.png',
+    src: _ctx.$store.state.main_url + 'assets/img/user.png',
     "class": "user-img-radious-style"
   }, null, 8
   /* PROPS */
@@ -55268,7 +55264,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("aside", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: $data.app_url + 'assets/img/kt-logo.png',
+    src: _ctx.$store.state.main_url + 'assets/img/kt-logo.png',
     style: {
       "width": "250px !important"
     },
@@ -55276,7 +55272,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , _hoisted_5)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    href: $data.app_url + 'admin/dashboard',
+    href: _ctx.$store.state.main_url + 'admin/dashboard',
     "class": "nav-link"
   }, _hoisted_12, 8
   /* PROPS */
@@ -55974,14 +55970,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.getPdfPrint();
     })
   }, "Print Report ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Confirmation Cancel report"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/confirm/cancellation/report',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/confirm/cancellation/report',
     method: "POST",
     ref: "refConfirmCancle",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -56170,14 +56166,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, "Edit ", 8
   /* PROPS */
   , _hoisted_20))])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Daily Summery Report Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/daily/summary/report',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report',
     method: "POST",
     ref: "refDailySummaryReport",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: _ctx.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -56913,14 +56909,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Print Record'), 9
   /* TEXT, PROPS */
   , _hoisted_32)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/advance/sales/pdf',
+    action: _ctx.$store.state.api_url + 'api/web/v1/advance/sales/pdf',
     method: "POST",
     ref: "salePrint",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_34), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -57290,14 +57286,14 @@ var _hoisted_37 = {
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/reports/reportExport',
+    action: _ctx.$store.state.api_url + 'api/web/v1/reports/reportExport',
     target: "_blank",
     method: "POST",
     ref: "refDailySummeryReport"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: _ctx.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_13), _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_19, [_hoisted_20, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
@@ -57938,7 +57934,7 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: $data.app_url + 'assets/img/kt-logo.png',
+    src: _ctx.$store.state.main_url + 'assets/img/kt-logo.png',
     style: {
       "width": "350px !important"
     },
@@ -61962,14 +61958,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , ["formID", "details", "deleteFormID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Passesnger List Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/passenger/list',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/passenger/list',
     method: "POST",
     ref: "refPassengerList",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_481), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -61999,14 +61995,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_485)], 8
   /* PROPS */
   , _hoisted_480), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Terminal Invoice"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/terminal/invoice',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/terminal/invoice',
     method: "POST",
     ref: "refTerminalInvoice",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_487), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -62042,14 +62038,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_492)], 8
   /* PROPS */
   , _hoisted_486), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Bus Invoice "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/bus/invoice',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice',
     method: "POST",
     ref: "refBusInvoice",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_494), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -62079,14 +62075,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_498)], 8
   /* PROPS */
   , _hoisted_493), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/customer/ticket',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refTicket",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_500), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -62098,14 +62094,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_501), _hoisted_502], 8
   /* PROPS */
   , _hoisted_499), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/customer/ticket',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refDuplicateTicket",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_504), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -62117,14 +62113,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_505), _hoisted_506], 8
   /* PROPS */
   , _hoisted_503), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate All Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/customer/ticket',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refDuplicateAllTicket",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_508), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -62136,14 +62132,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_509), _hoisted_510], 8
   /* PROPS */
   , _hoisted_507), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Elt Customer PDF Form  "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/customer/elt',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/elt',
     method: "POST",
     ref: "refElt",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_512), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -67576,14 +67572,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.editAble = true;
     })
   }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Daily Summery Report Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/print/pdf/daily/summary/report',
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report',
     method: "POST",
     ref: "refDailySummaryReport",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -79561,14 +79557,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, 8
   /* PROPS */
   , ["errors", "success", "editForm"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Daily Summery Report Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    action: _ctx.$store.state.app_url + 'api/v1/fare-table/fare/print',
+    action: _ctx.$store.state.api_url + 'api/web/v1/fare-table/fare/print',
     method: "POST",
     ref: "farePrint",
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
-    name: "_token",
-    value: $data.csrf
+    name: "token",
+    value: this.$store.state.token
   }, null, 8
   /* PROPS */
   , _hoisted_77), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -87161,7 +87157,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context.next = 3;
                 return axios__WEBPACK_IMPORTED_MODULE_0___default()({
                   method: method,
-                  url: "http://api.techhord.com/" + "public/api/web/v1/" + url,
+                  url: _this.$store.state.api_url + "public/api/web/v1/" + url,
                   data: data,
                   headers: {
                     'Authorization': 'Bearer ' + _this.$store.state.token
@@ -87337,9 +87333,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt-dev/'
 
-var url = '/';
+var url = '/kt-dev/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -87602,7 +87598,8 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      app_url: false,
+      main_url: "http://localhost/kt-dev/",
+      api_url: "http://localhost/kt-api/",
       permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };

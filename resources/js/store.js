@@ -11,7 +11,8 @@ const store = createStore({
             },
             user:JSON.parse(localStorage.getItem("user")),
             token:localStorage.getItem("token"),
-            app_url:false,
+            main_url:process.env.MIX_MAIN_URL,
+            api_url:process.env.MIX_API_URL,
             permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
             companyModules:false,
         }

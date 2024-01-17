@@ -44,10 +44,10 @@
                                                 </div>
                                                 <!--Print Confirmation Cancel report-->
                                                 <form
-                                                    :action="$store.state.app_url + 'api/v1/print/pdf/confirm/cancellation/report'"
+                                                    :action="$store.state.api_url + 'api/web/v1/print/pdf/confirm/cancellation/report'"
                                                     method="POST" ref="refConfirmCancle"
                                                     target="_blank">
-                                                    <input type="hidden" name="_token" v-bind:value="csrf">
+                                                    <input type="hidden" name="token" :value="this.$store.state.token">
                                                     <input type="hidden" name="terminal"
                                                            :value="this.filterCancel.terminal">
                                                     <input type="hidden" name="fromDate"

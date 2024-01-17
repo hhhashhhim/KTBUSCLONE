@@ -6,7 +6,7 @@
                     <div class="col-md-4 mx-auto">
                         <div class="card card-success">
                             <div class="card-header text-center">
-                                <img :src="app_url + 'assets/img/kt-logo.png'"
+                                <img :src="$store.state.main_url + 'assets/img/kt-logo.png'"
                                      style="width:350px !important;" alt="">
                             </div>
                             <div class="card-body">
@@ -134,7 +134,6 @@ export default {
             success: false,
             errors: [],
             error: "",
-            app_url: process.env.MIX_APP_URL
         };
     },
 
@@ -155,7 +154,7 @@ export default {
                     localStorage.setItem("user",JSON.stringify(res.data.user));
                     localStorage.setItem("token",res.data.token);
                     this.data.email = this.data.password = "";
-                    window.location.href = process.env.MIX_APP_URL + "admin/dashboard";
+                    window.location.href = this.$store.state.main_url + "admin/dashboard";
                 }
                
             } else if(res.status == 404){

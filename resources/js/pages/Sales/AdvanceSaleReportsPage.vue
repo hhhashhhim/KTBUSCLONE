@@ -73,9 +73,9 @@
                                                     {{ loadingTable ? 'Loading...' : 'Print Record' }}
                                                 </button>
                                             </div>
-                                            <form :action="$store.state.app_url + 'api/v1/advance/sales/pdf'" method="POST" ref="salePrint"
+                                            <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                 target="_blank">
-                                                <input type="hidden" name="_token" v-bind:value="csrf">
+                                                <input type="hidden" name="token" :value="this.$store.state.token">
                                                 <input type="hidden" name="terminal" :value="filterSales.terminal">
                                                 <input type="hidden" name="user" :value="filterSales.user">
                                                 <input type="hidden" name="route" :value="filterSales.route">
