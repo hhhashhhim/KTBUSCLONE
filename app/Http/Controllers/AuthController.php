@@ -91,22 +91,29 @@ class AuthController extends Controller
             return new ValidationResource($validator->errors());
         }
 
-        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id"]);
-        // print_r($data);
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                return response([
-                    'message' => ['These credentials do not match our records.']
-                ], 404);
-            }
+        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id","company_id"]);
         
-            $token = $user->createToken('my-app-token')->plainTextToken;
-            
-            $response = [
-                'user' => $user,
-                'token' => $token
-            ];
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response([
+                'message' => ['These credentials do not match our records.']
+            ], 404);
+        }
         
-            return response($response, 201);
+        $token = $user->createToken('my-app-token')->plainTextToken;
+        
+        ActivityLog::create([
+            "activity_by" => $user->id,
+            "message" => $user->name." | login",
+            "requested_host" => $request->ip(),
+            "company_id" => $user->company_id
+        ]);
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+    
+        return response($response, 201);
     }
 
     public function doubleCheck(Request $request)
