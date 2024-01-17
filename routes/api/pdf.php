@@ -7,7 +7,7 @@ use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
 
-Route::group(['prefix' => 'web/v1/fleet/maintenance/part','middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['custom.sanctum.token.verify']], function () {
     Route::post('web/v1/print/pdf/terminal/invoice', [BookingController::class, 'terminalInvoice']);
     Route::post('web/v1/print/pdf/bus/invoice', [BookingController::class, 'busInvoice']);
     Route::post('web/v1/print/pdf/passenger/list', [BookingController::class, 'passengerListPdf']);
