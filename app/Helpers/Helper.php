@@ -197,10 +197,10 @@ if (!function_exists('updateFare')) {
 
 //Updated Already advanced Booked Seat
 if (!function_exists('updateAdvancedSeat')) {
-    function updateAdvancedSeat($request, $company_id)
+    function updateAdvancedSeat($request, $invoice)
     {
-        // $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
-        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->first();
+        // $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->first();
         // $customerAll = [];
         if($customerData)
         {
@@ -221,10 +221,12 @@ if (!function_exists('updateAdvancedSeat')) {
             ]);
         }
         foreach ($request->alreadyBookedId as $key => $single) {
-            $customer_id = Ticket::where('company_id', $company_id)->where('id', $single)->first();
+            $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
+                'invoice_id' => $invoice->id,
                 'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
+                'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
             ]);
@@ -244,6 +246,8 @@ if (!function_exists('updateAdvancedSeat')) {
                 $customer_id->update([
                     'terminal_id' => $request->terminalId,
                     'departure_city_id' => $request->departureCity,
+                    'terminal_name' => "",
+                    'online_terminal' => 0,
                     'is_partial' => $isPartial,
                     'destination_city_id' => $request->destinationCity,
                 ]);
@@ -273,10 +277,10 @@ if (!function_exists('updateAdvancedSeat')) {
                     ])->delete();
                 }
             }
-            // $customerAll[] = Ticket::where('company_id', $company_id)->where('id',
+            // $customerAll[] = Ticket::where('company_id', Auth::user()->company_id)->where('id',
             //     $single)->first(['customer_id'])->customer_id;
         }
-        // $updateId = Customer::where('company_id', $company_id)->where('id', array_unique($customerAll)[0])->first();
+        // $updateId = Customer::where('company_id', Auth::user()->company_id)->where('id', array_unique($customerAll)[0])->first();
         // $updateId->update([
         //     'name' => $request->customerName,
         //     'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
@@ -294,7 +298,7 @@ if (!function_exists('updateAdvancedSeatApi')) {
         if($customerData)
         {
             $customerData->update([
-                'name' => $request->customer_name,
+                'name' => $request->customerName,
                 'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
                 'contact' => plainContactAndCnic($request->contact),
             ]);
@@ -304,7 +308,7 @@ if (!function_exists('updateAdvancedSeatApi')) {
             $customerData = Customer::create([
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
-                'name' => $request->customer_name,
+                'name' => $request->customerName,
                 'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
                 'contact' => plainContactAndCnic($request->contact),
             ]);
