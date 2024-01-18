@@ -66,15 +66,24 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        return "ok";
-        // ActivityLog::create([
-        //     "activity_by" => Auth::user()->id,
-        //     "message" => Auth::user()->name." | logout",
-        //     "requested_host" => $request->ip(),
-        //     "company_id" => Auth::user()->company_id
-        // ]);
-        // Auth::logout();
-        // return response(["message"=>"logout successfully"], 200);
+        $user = $request->user();
+
+        if ($user) {
+            // Revoke the user's personal access token
+            $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
+            
+            // Log the logout activity
+            ActivityLog::create([
+                "activity_by" => $user->id,
+                "message" => $user->name . " | logout",
+                "requested_host" => $request->ip(),
+                "company_id" => $user->company_id
+            ]);
+        }
+        // Logout the user
+        Auth::guard('web')->logout();
+        
+        return response(['message' => 'Successfully logged out']);
     }
 
     public function login(Request $request)
