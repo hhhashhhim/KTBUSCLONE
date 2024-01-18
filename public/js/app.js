@@ -28226,6 +28226,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 8:
                 res = _context.sent;
 
+                // token created and login
                 if (res.status == 201) {
                   if (res.data.user) {
                     localStorage.setItem("user", JSON.stringify(res.data.user));

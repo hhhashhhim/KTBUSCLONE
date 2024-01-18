@@ -148,6 +148,7 @@ export default {
             
             const res = await this.callApi("post", "login", this.data);
             
+            // token created and login
             if (res.status == 201) {
                 
                 if (res.data.user) {
