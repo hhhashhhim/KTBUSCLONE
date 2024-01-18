@@ -87170,9 +87170,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 6:
                 _context.prev = 6;
                 _context.t0 = _context["catch"](0);
+
+                if (_context.t0.response.status == 401) {
+                  localStorage.removeItem("user");
+                  localStorage.removeItem("token");
+                  window.location.href = _this.$store.state.main_url;
+                }
+
                 return _context.abrupt("return", _context.t0.response);
 
-              case 9:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -87333,9 +87340,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt-dev/'
 
-var url = '/kt-dev/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],

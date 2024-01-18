@@ -20,6 +20,12 @@ export default {
                     }
                 });
             } catch (error) {
+                if(error.response.status == 401)
+                {
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("token");
+                    window.location.href = this.$store.state.main_url;
+                }
                 return error.response
             }
         },
