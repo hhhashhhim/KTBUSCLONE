@@ -91,7 +91,7 @@
                 @if(isset($physical_terminals[$single->id]))
                 @foreach($physical_terminals[$single->id] as $schedules)
                 @foreach($schedules as $terminal)
-                    @php $commission += $terminal->sum("commission_amount") + $terminal->sum("kt_commission") + $terminal[0]->fix_commission; @endphp
+                    @php $commission += $terminal->sum("commission_amount") + $terminal[0]->fix_commission; @endphp
                 
                 @endforeach
                 @endforeach

@@ -48,7 +48,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/revert/over/issue/seat', [BookingController::class, 'revertOverIssueSeat']);
 
     // Schedule Closing
-    Route::group(['prefix' => '/web/v1/close/schedule', [CustomMiddleware::class]], function () {
+    Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {
         Route::post('/fetch', [ScheduleClosingController::class, 'fetchSchedule']);
 
         Route::post('/unclosing', [ScheduleClosingController::class, 'unclosing']);
