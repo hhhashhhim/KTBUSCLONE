@@ -100,26 +100,6 @@
                                 <i class="fas fa-bookmark"></i> Office Expenses
                             </router-link>
                         </li>
-                        <!--                        <li class="dropdown" v-if="checkForSubmenu('commission')">-->
-                        <!--                            <router-link class="nav-link text-capitalize" to="">-->
-                        <!--                                <i class="fas fa-table"></i> Commission Reports-->
-                        <!--                            </router-link>-->
-                        <!--                        </li>-->
-                        <!--                        <li class="dropdown" v-if="checkForSubmenu('complaints')">-->
-                        <!--                            <router-link class="nav-link text-capitalize" to="">-->
-                        <!--                                <i class="fas fa-table"></i> Complaints Reports-->
-                        <!--                            </router-link>-->
-                        <!--                        </li>-->
-                        <!--                        <li class="dropdown" v-if="checkForSubmenu('over-issue')">-->
-                        <!--                            <router-link class="nav-link text-capitalize" to="">-->
-                        <!--                                <i class="fa fa-bus"></i> Over-Issue Reports-->
-                        <!--                            </router-link>-->
-                        <!--                        </li>-->
-                        <!--                        <li class="dropdown" v-if="checkForSubmenu('expenses')">-->
-                        <!--                            <router-link class="nav-link text-capitalize" to="">-->
-                        <!--                                <i class="fa fa-bus"></i> Expenses Report-->
-                        <!--                            </router-link>-->
-                        <!--                        </li>-->
                     </ul>
                 </li>
                 <!-- Buses panel -->
@@ -386,12 +366,6 @@
                                 <i class="fas fa-users"></i> Activity Log
                             </router-link>
                         </li>
-                        <!--                        <li>-->
-                        <!--                            <router-link class="nav-link text-capitalize" :to="{ name:'profileSettings' }"-->
-                        <!--                                         v-if="checkForSubmenu('employee')">-->
-                        <!--                                <i class="fas fa-users"></i>Profile-->
-                        <!--                            </router-link>-->
-                        <!--                        </li>-->
                     </ul>
                 </li>
             </ul>
@@ -443,5 +417,5 @@ export default {
 
         },
     }
-}
+};
 </script>

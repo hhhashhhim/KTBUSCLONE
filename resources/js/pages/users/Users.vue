@@ -569,8 +569,12 @@ export default {
             const editDestinations = $('#editDestinations');
 
             // Initialize Select2
-            departure.select2();
-            destinations.select2();
+            departure.select2({
+                closeOnSelect: false
+            });
+            destinations.select2({
+                closeOnSelect: false
+            });
 
             // Handle Select2 change event
             const self = this;
@@ -857,8 +861,12 @@ export default {
                 this.dataEdit = resEditUser.data;
                 this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
                 setTimeout(() => {
-                    $("#editDeparture").select2();
-                    $("#editDestinations").select2();
+                    $("#editDeparture").select2({
+                        closeOnSelect: false
+                    });
+                    $("#editDestinations").select2({
+                        closeOnSelect: false
+                    });
                 }, 200);
             } else {
                 console.log(resEditUser);

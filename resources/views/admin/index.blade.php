@@ -64,6 +64,15 @@
         $(document).on('show.bs.modal', '.modal', function () {
             $(this).appendTo('body');
         });
+
+        $(".menu-toggle").click(function(){
+            $(".menu-toggle").removeClass("toggled");
+            $(this).addClass("toggled");
+            
+
+            $(".dropdown-menu").css("display","none");
+            $(this).next().css("display","block");
+        });
     })
 </script>
 <script src="{{ asset('assets/bundles/sweetalert/sweetalert.min.js') }}"></script>

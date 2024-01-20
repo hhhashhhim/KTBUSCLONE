@@ -25,7 +25,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr v-for="(log, i) in logs" :key="i">
-                                                            <td>{{ log.activity.email??'N/A' }}</td>
+                                                            <td>{{ log.activity ? log.activity.email : 'N/A' }}</td>
                                                             <td>{{ log.formatted_created_at }}</td>
                                                            <td>{{ log.message }}</td>
                                                         </tr>
