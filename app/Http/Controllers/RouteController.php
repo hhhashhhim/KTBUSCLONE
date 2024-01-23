@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\FareClass;
 use App\Models\FareTable;
+use App\Models\Terminal\TerminalVisibility;
 use App\Models\ActivityLog;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
@@ -94,9 +95,19 @@ class RouteController extends Controller
                                 ]);
                             }
                         }
+
+                        TerminalVisibility::create([
+                            'route_id' => $route->id,
+                            'departure_city_id' => $used_cities[$index],
+                            'destination_city_id' => $innerCity,
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => auth()->user()->id
+                        ]);
+
                     }
                 }
             }
+            
             if ($request['revereRoute'] == 1) {
                 // Reverse Route
                 $route = Route::create([
@@ -127,6 +138,14 @@ class RouteController extends Controller
                                     ]);
                                 }
                             }
+
+                            TerminalVisibility::create([
+                                'route_id' => $route->id,
+                                'departure_city_id' => $used_cities[$index],
+                                'destination_city_id' => $innerCity,
+                                'company_id' => Auth::user()->company_id,
+                                'added_by' => auth()->user()->id
+                            ]);
                         }
                     }
                 }
@@ -188,6 +207,48 @@ class RouteController extends Controller
         return $route->update([
             "hide" => 1
         ]);
+    }
+    public function routeVisibilities(Request $request)
+    {
+        $subroute = RouteFare::get()->groupBy("fare_class_id")->first();
+        foreach($subroute as $single)
+        {
+            TerminalVisibility::create([
+                'route_id' => $single->route_id,
+                'departure_city_id' => $single->departure_city_id,
+                'destination_city_id' => $single->destination_city_id,
+                'company_id' => Auth::user()->company_id,
+                'added_by' => auth()->user()->id
+            ]);
+        }
+        return 'helog';
+        return [
+            'visibilities' => TerminalVisibility::where(["route_id"=>$request->id,"company_id"=>Auth::user()->company_id])->with("departure:id,name","destination:id,name")->get(),
+        ];
+    }
+    public function visibilityUpdate(Request $request)
+    {
+        try {
+                DB::beginTransaction();
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | update visibility",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                foreach($request->subroutes as $single)
+                {
+                    TerminalVisibility::where("id",$single['subroute_id'])->update([
+                        "online_visibilty" => $single['visibility']
+                    ]);
+                }
+                DB::commit();
+            
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
     public function list()
     {

@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\FareClass;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration
+class CreateFareClassesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +14,16 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('fare_classes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->integer('role_id');
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('name')->nullable();
+            $table->string('color')->nullable();
+            $table->boolean('is_active')->default(1);
+            $table->integer('company_id')->nullable();
+            $table->integer('added_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamp('time')->useCurrent();
             $table->softDeletes();
-            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('fare_classes');
     }
 }

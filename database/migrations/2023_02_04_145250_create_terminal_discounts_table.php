@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration
+class CreateTerminalDiscountsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,17 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('terminal_discounts', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->integer('role_id');
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->integer('terminal_id');
+            $table->integer('route_id');
+            $table->decimal('discount',12,2);
+            $table->date('start_date',12,2);
+            $table->date('end_date',12,2);
+            $table->integer('company_id')->nullable();
+            $table->integer('added_by');
             $table->timestamp('time')->useCurrent();
             $table->softDeletes();
-            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('terminal_discounts');
     }
 }

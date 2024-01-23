@@ -24,6 +24,7 @@ use App\Models\TerminalCommission;
 use App\Models\ActivityLog;
 use App\Models\Customer;
 use App\Models\FareClass;
+use App\Models\Terminal\TerminalVisibility;
 use App\Models\FareTable;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\DropSchedule;
@@ -434,30 +435,13 @@ class BookingController extends Controller
         $allSchedules = ScheduleDetail::with('schedule')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])->oldest("departure_time")->get();
         
         foreach ($allSchedules as $key => $single) {
+            
             $sub = 0;
             $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id, 'route_id' => $single->schedule->route_id])->first();
             if($terminalTime)
             {
                 $sub = $terminalTime->time_difference * 60;
             }
-            // if (Terminal::find(Auth::user()->terminal_id)->city_id == $request->departure_city_id) {
-                // 
-                // if ($checkTerminal->count() > 0) {
-                //     if (in_array(Auth::user()->terminal_id, $checkTerminal->pluck("terminal_id")->toArray())) {
-                //         foreach ($checkTerminal as $key => $terminalSequence) {
-                //             if (Auth::user()->terminal_id == $terminalSequence->terminal_id) {
-                //                 break;
-                //             } else {
-                //                 $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'terminal_from_id' => $terminalSequence->terminal_id, 'terminal_to_id' => $checkTerminal[$key + 1]->terminal_id])->first();
-                //                 if ($terminalTime) {
-                //                     $time = explode(":", $terminalTime->time_difference);
-                //                     $sub += ($time[0] * 60 * 60) + ($time[1] * 60);
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-            // }
 
             $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) + $sub);
             $single->departure_date_time = date("Y-m-d H:i:s",strtotime($exactDate));

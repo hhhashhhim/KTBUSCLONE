@@ -12,6 +12,7 @@ use App\Models\Schedule\ScheduleDetail;
 use App\Models\Booking\TicketAdvancedBooked;
 use App\Models\Bus\BusClass;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Terminal\TerminalVisibility;
 use App\Models\Schedule\DropSchedule;
 use App\Http\Resources\CreatedResource;
 use App\Models\Discount\Discount;
@@ -65,6 +66,11 @@ class TicketingApiController extends Controller
                 $data->map(function($single,$key) use ($data,$companyId,$terminalId){
                     $scheduleDrop = DropSchedule::where(["schedule_date"=>$single->schedule_date,"schedule_id"=>$single->schedule_id])->first();
                     if($scheduleDrop)
+                    {
+                        unset($data[$key]);
+                    }
+                    $visibility =TerminalVisibility::where(["departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id,"route_id"=>$single->schedule->route_id])->first();
+                    if(isset($visibility) && $visibility->online_visibilty == 1)
                     {
                         unset($data[$key]);
                     }
