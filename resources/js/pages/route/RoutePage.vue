@@ -72,6 +72,13 @@
                                                                     data-target="#showDetails"
                                                                     @click="fetchRouteDetails( route.id )">See Details
                                                             </button>
+                                                            <button title="Show Route Details" v-if="checkForSubmenuButtons('details-routes')"
+                                                                    class="btn btn-outline-primary ml-1"
+                                                                    data-toggle="modal"
+                                                                    data-target="#terminalVisibility"
+                                                                    @click="editVisibility( route.id )">
+                                                                    <i class="far fa-clock"></i>
+                                                            </button>
                                                             <button class="btn btn-primary mx-1" title="Edit Routes" v-if="checkForSubmenuButtons('edit-routes')"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(route)"
@@ -215,6 +222,56 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="modal fade" id="terminalVisibility" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Route Fare Chart</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                    <label for="name">Departure City</label>
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="name">Destination City</label>
+                                </div>
+                                
+                                <div class="form-group col-md-4">
+                                    <label for="name" class="d-block">Hide Subroute</label>
+                                </div>
+                            </div>
+                            <div class="row"  v-for="(subroute, i) in subroutes" :key="i">
+                                <div class="form-group col-md-4">
+                                    <select class="form-control" >
+                                        <option :value="subroute.departure_id" selected>{{subroute.departure_name}}</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <select class="form-control">
+                                        <option :value="subroute.destination_id" selected>{{subroute.destination_name}}</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group col-md-4">
+                                    <input type="checkbox" v-model="subroutes[i].visibility"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" :disabled="visibleLoading" @click="updateVisibility()">{{ visibleLoading ? 'Loading...' : 'Update Visiblility' }}</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <Edit
                 heading="Edit Route Name"
@@ -287,12 +344,14 @@ export default {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             loading: false,
             editLoading: false,
+            visibleLoading: false,
             cities: [],
             validationErrors: [],
             city: 0,
             addCities: [],
             companies: [],
             terminals: [],
+            subroutes: [],
             fetchedData: [],
             addTerminalsOnClick: [],
             routes: [],
@@ -353,6 +412,60 @@ export default {
                 routeStartName: route.name.split('-')[0],
                 routeEndName: route.name.split('-')[1],
                 routeVia: route.via,
+            }
+        },
+        async editVisibility(id) {
+            this.subroutes = [];
+            const routeVisibilities = await this.callApi("post", "routes/visibilities", {
+                id: id
+            });
+            if (routeVisibilities.status === 200) {
+                const data = routeVisibilities.data.visibilities;
+                for (let i = 0; i < data.length; i++) {
+                    this.subroutes.push(
+                        { 
+                            subroute_id:data[i].id , 
+                            departure_name:data[i].departure.name , 
+                            destination_name:data[i].destination.name,
+                            visibility:data[i].online_visibilty==0 ? false : true,
+                        });
+                }
+            }
+        },
+        async updateVisibility() {
+            this.visibleLoading = true;
+            const res = await this.callApi("post", "routes/visibilities/update", {subroutes:this.subroutes});
+            if (res.status == 200) {
+                $(".modal").click();
+                this.visibleLoading = false;
+                swal({
+                    title: "Success",
+                    text: "Visibility Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+            } else {
+                this.visibleLoading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
             }
         },
         async addRoute() {

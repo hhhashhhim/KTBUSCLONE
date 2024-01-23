@@ -46874,12 +46874,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       loading: false,
       editLoading: false,
+      visibleLoading: false,
       cities: [],
       validationErrors: [],
       city: 0,
       addCities: [],
       companies: [],
       terminals: [],
+      subroutes: [],
       fetchedData: [],
       addTerminalsOnClick: [],
       routes: [],
@@ -46941,21 +46943,121 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         routeVia: route.via
       };
     },
-    addRoute: function addRoute() {
+    editVisibility: function editVisibility(id) {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var data, res;
+        var routeVisibilities, data, i;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!(_this.routeStartName == '' || typeof _this.routeStartName == 'undefined')) {
-                  _context.next = 2;
+                _this.subroutes = [];
+                _context.next = 3;
+                return _this.callApi("post", "routes/visibilities", {
+                  id: id
+                });
+
+              case 3:
+                routeVisibilities = _context.sent;
+
+                if (routeVisibilities.status === 200) {
+                  data = routeVisibilities.data.visibilities;
+
+                  for (i = 0; i < data.length; i++) {
+                    _this.subroutes.push({
+                      subroute_id: data[i].id,
+                      departure_name: data[i].departure.name,
+                      destination_name: data[i].destination.name,
+                      visibility: data[i].online_visibilty == 0 ? false : true
+                    });
+                  }
+                }
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    updateVisibility: function updateVisibility() {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _this2.visibleLoading = true;
+                _context2.next = 3;
+                return _this2.callApi("post", "routes/visibilities/update", {
+                  subroutes: _this2.subroutes
+                });
+
+              case 3:
+                res = _context2.sent;
+
+                if (res.status == 200) {
+                  $(".modal").click();
+                  _this2.visibleLoading = false;
+                  swal({
+                    title: "Success",
+                    text: "Visibility Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                } else {
+                  _this2.visibleLoading = false;
+
+                  if (res.status == 422) {
+                    (function () {
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
+                }
+
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    addRoute: function addRoute() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var data, res;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!(_this3.routeStartName == '' || typeof _this3.routeStartName == 'undefined')) {
+                  _context3.next = 2;
                   break;
                 }
 
-                return _context.abrupt("return", swal({
+                return _context3.abrupt("return", swal({
                   title: "Required!!",
                   text: "Route Start Name is Required",
                   icon: "error",
@@ -46963,12 +47065,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this.routeEndName == '' || typeof _this.routeEndName == 'undefined')) {
-                  _context.next = 4;
+                if (!(_this3.routeEndName == '' || typeof _this3.routeEndName == 'undefined')) {
+                  _context3.next = 4;
                   break;
                 }
 
-                return _context.abrupt("return", swal({
+                return _context3.abrupt("return", swal({
                   title: "Required!!",
                   text: "Route End Name is Required",
                   icon: "error",
@@ -46977,27 +47079,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 4:
                 data = {
-                  routeStart: _this.routeStartName,
-                  routeEnd: _this.routeEndName,
-                  routeVia: _this.routeVia,
-                  cities: _this.addCities,
-                  revereRoute: _this.reverseRoute,
-                  terminals: _this.addTerminalsOnClick
+                  routeStart: _this3.routeStartName,
+                  routeEnd: _this3.routeEndName,
+                  routeVia: _this3.routeVia,
+                  cities: _this3.addCities,
+                  revereRoute: _this3.reverseRoute,
+                  terminals: _this3.addTerminalsOnClick
                 };
-                _this.loading = true;
-                _context.next = 8;
-                return _this.callApi("post", "routes/store", data);
+                _this3.loading = true;
+                _context3.next = 8;
+                return _this3.callApi("post", "routes/store", data);
 
               case 8:
-                res = _context.sent;
+                res = _context3.sent;
 
                 if (!(res.status === 200)) {
-                  _context.next = 25;
+                  _context3.next = 25;
                   break;
                 }
 
                 $(".modal").click();
-                _this.loading = false;
+                _this3.loading = false;
                 swal({
                   title: "Success",
                   text: "Route Created Successfully",
@@ -47005,22 +47107,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $('#route_table').DataTable().destroy();
-                _this.routeStartName = "";
-                _this.routeEndName = "";
-                _this.routeVia = "";
-                _this.loop = 1;
-                _this.addCities = 0;
-                _this.cities = 0;
-                _this.routeDetails = [];
-                _context.next = 23;
-                return _this.fetchCities();
+                _this3.routeStartName = "";
+                _this3.routeEndName = "";
+                _this3.routeVia = "";
+                _this3.loop = 1;
+                _this3.addCities = 0;
+                _this3.cities = 0;
+                _this3.routeDetails = [];
+                _context3.next = 23;
+                return _this3.fetchCities();
 
               case 23:
-                _context.next = 27;
+                _context3.next = 27;
                 break;
 
               case 25:
-                _this.loading = false;
+                _this3.loading = false;
 
                 if (res.status == 422) {
                   (function () {
@@ -47046,27 +47148,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 27:
               case "end":
-                return _context.stop();
+                return _context3.stop();
             }
           }
-        }, _callee);
+        }, _callee3);
       }))();
     },
     updateRoute: function updateRoute() {
-      var _this2 = this;
+      var _this4 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(_this2.dataEdit.routeStartName == '' || typeof _this2.dataEdit.routeStartName == 'undefined')) {
-                  _context2.next = 2;
+                if (!(_this4.dataEdit.routeStartName == '' || typeof _this4.dataEdit.routeStartName == 'undefined')) {
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context2.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "Required!!",
                   text: "Route Start Name is Required",
                   icon: "error",
@@ -47074,12 +47176,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this2.dataEdit.routeEndName == '' || typeof _this2.dataEdit.routeEndName == 'undefined')) {
-                  _context2.next = 4;
+                if (!(_this4.dataEdit.routeEndName == '' || typeof _this4.dataEdit.routeEndName == 'undefined')) {
+                  _context4.next = 4;
                   break;
                 }
 
-                return _context2.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "Required!!",
                   text: "Route End Name is Required",
                   icon: "error",
@@ -47087,20 +47189,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                _this2.editLoading = true;
-                _context2.next = 7;
-                return _this2.callApi("post", "routes/update", _this2.dataEdit);
+                _this4.editLoading = true;
+                _context4.next = 7;
+                return _this4.callApi("post", "routes/update", _this4.dataEdit);
 
               case 7:
-                res = _context2.sent;
+                res = _context4.sent;
 
                 if (!(res.status == 200)) {
-                  _context2.next = 17;
+                  _context4.next = 17;
                   break;
                 }
 
                 $(".modal").click();
-                _this2.editLoading = false;
+                _this4.editLoading = false;
                 $('#route_table').DataTable().destroy();
                 swal({
                   title: "Success",
@@ -47108,15 +47210,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _context2.next = 15;
-                return _this2.fetchCities();
+                _context4.next = 15;
+                return _this4.fetchCities();
 
               case 15:
-                _context2.next = 19;
+                _context4.next = 19;
                 break;
 
               case 17:
-                _this2.editLoading = false;
+                _this4.editLoading = false;
 
                 if (res.status == 422) {
                   (function () {
@@ -47142,10 +47244,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 19:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2);
+        }, _callee4);
       }))();
     },
     checkBox: function checkBox(e) {
@@ -47177,47 +47279,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     fetchTerminals: function fetchTerminals(event, index) {
-      var _this3 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var value, indexI;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 value = event.target.value;
-                indexI = _this3.addCities.indexOf(value);
+                indexI = _this5.addCities.indexOf(value);
 
                 if (indexI == -1) {
-                  _this3.addCities.push(value);
+                  _this5.addCities.push(value);
                 }
 
               case 3:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3);
+        }, _callee5);
       }))();
     },
     fetchCities: function fetchCities() {
-      var _this4 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var cityRes;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context4.next = 2;
-                return _this4.callApi("post", "routes/list");
+                _context6.next = 2;
+                return _this6.callApi("post", "routes/list");
 
               case 2:
-                cityRes = _context4.sent;
+                cityRes = _context6.sent;
 
                 if (cityRes.status === 200) {
-                  _this4.cities = cityRes.data.cities;
-                  _this4.routes = cityRes.data.routes;
+                  _this6.cities = cityRes.data.cities;
+                  _this6.routes = cityRes.data.routes;
                 }
 
                 setTimeout(function () {
@@ -47226,10 +47328,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4);
+        }, _callee6);
       }))();
     },
     changeInfo: function changeInfo(from, to) {
@@ -47239,60 +47341,60 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data.to = to.id;
     },
     fetchRouteDetails: function fetchRouteDetails(id) {
-      var _this5 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var routeDetailRes;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this5.route_id = id;
-                _context5.next = 3;
-                return _this5.callApi("post", "routes/details", {
+                _this7.route_id = id;
+                _context7.next = 3;
+                return _this7.callApi("post", "routes/details", {
                   id: id
                 });
 
               case 3:
-                routeDetailRes = _context5.sent;
+                routeDetailRes = _context7.sent;
 
                 if (routeDetailRes.status === 200) {
-                  _this5.routeDetails = routeDetailRes.data.data;
-                  _this5.th = routeDetailRes.data.th;
+                  _this7.routeDetails = routeDetailRes.data.data;
+                  _this7.th = routeDetailRes.data.th;
                 }
 
               case 5:
               case "end":
-                return _context5.stop();
+                return _context7.stop();
             }
           }
-        }, _callee5);
+        }, _callee7);
       }))();
     },
     printPrice: function printPrice() {
       this.$refs.farePrint.submit();
     },
     hideRoute: function hideRoute() {
-      var _this6 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var resHide, _loop, key;
 
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                _this6.loading = true;
-                _context6.next = 3;
-                return _this6.callApi("post", 'routes/hide', {
-                  id: _this6.delId
+                _this8.loading = true;
+                _context8.next = 3;
+                return _this8.callApi("post", 'routes/hide', {
+                  id: _this8.delId
                 });
 
               case 3:
-                resHide = _context6.sent;
+                resHide = _context8.sent;
 
                 if (!(resHide.status == 200)) {
-                  _context6.next = 13;
+                  _context8.next = 13;
                   break;
                 }
 
@@ -47303,22 +47405,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   icon: "success",
                   timer: 2000
                 });
-                _this6.loading = false;
+                _this8.loading = false;
                 $('#route_table').DataTable().destroy();
-                _context6.next = 11;
-                return _this6.fetchCities();
+                _context8.next = 11;
+                return _this8.fetchCities();
 
               case 11:
-                _context6.next = 15;
+                _context8.next = 15;
                 break;
 
               case 13:
                 if (resHide.status == 422) {
-                  _this6.loading = false;
+                  _this8.loading = false;
 
                   _loop = function _loop(key) {
                     resHide.data.errors[key].forEach(function (element) {
-                      _this6.errorsArray(element, key);
+                      _this8.errorsArray(element, key);
                     });
                   };
 
@@ -47328,15 +47430,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 setTimeout(function () {
-                  _this6.loading = false;
+                  _this8.loading = false;
                 }, 3000);
 
               case 15:
               case "end":
-                return _context6.stop();
+                return _context8.stop();
             }
           }
-        }, _callee6);
+        }, _callee8);
       }))();
     }
   }
@@ -79042,11 +79144,11 @@ var _hoisted_27 = {
   key: 0
 };
 var _hoisted_28 = ["onClick"];
-var _hoisted_29 = ["data-target", "onClick"];
+var _hoisted_29 = ["onClick"];
 
 var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-edit"
+    "class": "far fa-clock"
   }, null, -1
   /* HOISTED */
   );
@@ -79057,21 +79159,32 @@ var _hoisted_32 = ["data-target", "onClick"];
 
 var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-eye-slash"
+    "class": "far fa-edit"
   }, null, -1
   /* HOISTED */
   );
 });
 
 var _hoisted_34 = [_hoisted_33];
-var _hoisted_35 = {
+var _hoisted_35 = ["data-target", "onClick"];
+
+var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "far fa-eye-slash"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_37 = [_hoisted_36];
+var _hoisted_38 = {
   "class": "row"
 };
-var _hoisted_36 = {
+var _hoisted_39 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route Start Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -79081,11 +79194,11 @@ var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_38 = {
+var _hoisted_41 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route End Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -79095,11 +79208,11 @@ var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_40 = {
+var _hoisted_43 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, "Via", -1
@@ -79107,11 +79220,11 @@ var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_42 = {
+var _hoisted_45 = {
   "class": "col-md-12 d-flex align-items-center"
 };
 
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-6"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Select Cities")], -1
@@ -79119,11 +79232,11 @@ var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_44 = {
+var _hoisted_47 = {
   "class": "col-md-6"
 };
 
-var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "reverseSeats",
     "class": "text-dark mr-3"
@@ -79132,12 +79245,12 @@ var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_46 = {
+var _hoisted_49 = {
   "class": "colorinput"
 };
-var _hoisted_47 = ["checked"];
+var _hoisted_50 = ["checked"];
 
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "colorinput-color bg-primary"
   }, null, -1
@@ -79145,22 +79258,22 @@ var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_49 = {
+var _hoisted_52 = {
   "class": "form-group col-md-12 d-flex align-items-center"
 };
-var _hoisted_50 = {
+var _hoisted_53 = {
   "class": "table table-striped"
 };
 
-var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City From"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_52 = ["onChange"];
+var _hoisted_55 = ["onChange"];
 
-var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0",
     selected: ""
@@ -79169,9 +79282,9 @@ var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_54 = ["value"];
-var _hoisted_55 = ["disabled"];
-var _hoisted_56 = {
+var _hoisted_57 = ["value"];
+var _hoisted_58 = ["disabled"];
+var _hoisted_59 = {
   "class": "modal fade",
   id: "showDetails",
   tabindex: "-1",
@@ -79179,18 +79292,18 @@ var _hoisted_56 = {
   "aria-labelledby": "exampleModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_57 = {
+var _hoisted_60 = {
   "class": "modal-dialog modal-xl",
   role: "document"
 };
-var _hoisted_58 = {
+var _hoisted_61 = {
   "class": "modal-content"
 };
-var _hoisted_59 = {
+var _hoisted_62 = {
   "class": "modal-header"
 };
 
-var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: "exampleModalLabel"
@@ -79199,7 +79312,7 @@ var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -79207,37 +79320,102 @@ var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_62 = [_hoisted_61];
-var _hoisted_63 = {
+var _hoisted_65 = [_hoisted_64];
+var _hoisted_66 = {
   "class": "modal-body"
 };
-var _hoisted_64 = {
+var _hoisted_67 = {
   "class": "table table-striped"
 };
 
-var _hoisted_65 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City From", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_69 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City To", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_67 = {
+var _hoisted_70 = {
   "class": "modal-footer"
 };
-var _hoisted_68 = {
+var _hoisted_71 = {
+  "class": "modal fade",
+  id: "terminalVisibility",
+  tabindex: "-1",
+  role: "dialog",
+  "aria-labelledby": "exampleModalLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_72 = {
+  "class": "modal-dialog modal-xl",
+  role: "document"
+};
+var _hoisted_73 = {
+  "class": "modal-content"
+};
+var _hoisted_74 = {
+  "class": "modal-header"
+};
+
+var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "exampleModalLabel"
+  }, "Route Fare Chart", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_77 = [_hoisted_76];
+var _hoisted_78 = {
+  "class": "modal-body"
+};
+
+var _hoisted_79 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row\" data-v-66b5e4b9><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Departure City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Destination City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" class=\"d-block\" data-v-66b5e4b9>Hide Subroute</label></div></div>", 1);
+
+var _hoisted_80 = {
+  "class": "form-group col-md-4"
+};
+var _hoisted_81 = {
+  "class": "form-control"
+};
+var _hoisted_82 = ["value"];
+var _hoisted_83 = {
+  "class": "form-group col-md-4"
+};
+var _hoisted_84 = {
+  "class": "form-control"
+};
+var _hoisted_85 = ["value"];
+var _hoisted_86 = {
+  "class": "form-group col-md-4"
+};
+var _hoisted_87 = ["onUpdate:modelValue"];
+var _hoisted_88 = {
+  "class": "modal-footer"
+};
+var _hoisted_89 = ["disabled"];
+var _hoisted_90 = {
   "class": "row"
 };
-var _hoisted_69 = {
+var _hoisted_91 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_92 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route Start Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -79247,11 +79425,11 @@ var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_71 = {
+var _hoisted_93 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_94 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route End Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -79261,11 +79439,11 @@ var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_73 = {
+var _hoisted_95 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, "Via", -1
@@ -79273,11 +79451,11 @@ var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_75 = ["disabled"];
-var _hoisted_76 = ["action"];
-var _hoisted_77 = ["value"];
-var _hoisted_78 = ["value"];
-var _hoisted_79 = ["disabled"];
+var _hoisted_97 = ["disabled"];
+var _hoisted_98 = ["action"];
+var _hoisted_99 = ["value"];
+var _hoisted_100 = ["value"];
+var _hoisted_101 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
@@ -79339,8 +79517,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, "See Details ", 8
     /* PROPS */
-    , _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('edit-routes') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    , _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('details-routes') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 1,
+      title: "Show Route Details",
+      "class": "btn btn-outline-primary ml-1",
+      "data-toggle": "modal",
+      "data-target": "#terminalVisibility",
+      onClick: function onClick($event) {
+        return $options.editVisibility(route.id);
+      }
+    }, _hoisted_31, 8
+    /* PROPS */
+    , _hoisted_29)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('edit-routes') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 2,
       "class": "btn btn-primary mx-1",
       title: "Edit Routes",
       "data-target": '#' + $data.editFormID,
@@ -79348,10 +79537,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.edit(route);
       }
-    }, _hoisted_31, 8
+    }, _hoisted_34, 8
     /* PROPS */
-    , _hoisted_29)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('delete-routes') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 2,
+    , _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('delete-routes') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 3,
       title: "Delete Route",
       "data-target": '#' + $data.hideFormID,
       onClick: function onClick($event) {
@@ -79359,9 +79548,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       },
       "data-toggle": "modal",
       "class": "btn btn-danger"
-    }, _hoisted_34, 8
+    }, _hoisted_37, 8
     /* PROPS */
-    , _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            :data-target=\"'#' + deleteFormID \""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"deleteModal(fareClass,i)\"")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    , _hoisted_35)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            :data-target=\"'#' + deleteFormID \""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            data-toggle=\"modal\""), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            @click=\"deleteModal(fareClass,i)\"")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -79380,10 +79569,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save Route'), 9
       /* TEXT, PROPS */
-      , _hoisted_55)];
+      , _hoisted_58)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
@@ -79391,7 +79580,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
@@ -79399,7 +79588,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
@@ -79407,7 +79596,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeVia]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.routeVia]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         name: "color",
         type: "checkbox",
         id: "reverseSeats",
@@ -79418,7 +79607,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 40
       /* PROPS, HYDRATE_EVENTS */
-      , _hoisted_47), _hoisted_48])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
+      , _hoisted_50), _hoisted_51])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -79427,18 +79616,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           onChange: function onChange($event) {
             return $options.fetchTerminals($event, index);
           }
-        }, [_hoisted_53, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (city, i) {
+        }, [_hoisted_56, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (city, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             value: city.id,
             key: i
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 9
           /* TEXT, PROPS */
-          , _hoisted_54);
+          , _hoisted_57);
         }), 128
         /* KEYED_FRAGMENT */
         ))], 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_52)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        , _hoisted_55)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
           onClick: _cache[6] || (_cache[6] = function () {
             return $options.addRow && $options.addRow.apply($options, arguments);
@@ -79458,7 +79647,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
@@ -79466,7 +79655,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[9] || (_cache[9] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_62)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_65, _hoisted_66, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.th, function (heading, i) {
+  }, _hoisted_65)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_68, _hoisted_69, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.th, function (heading, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(heading.name), 1
@@ -79500,7 +79689,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     );
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
     "data-dismiss": "modal",
@@ -79514,6 +79703,55 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[11] || (_cache[11] = function ($event) {
       return $options.closeModal();
     })
+  }, "Close")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [_hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close",
+    onClick: _cache[12] || (_cache[12] = function ($event) {
+      return $options.closeModal();
+    })
+  }, _hoisted_77)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [_hoisted_79, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.subroutes, function (subroute, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      "class": "row",
+      key: i
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+      value: subroute.departure_id,
+      selected: ""
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(subroute.departure_name), 9
+    /* TEXT, PROPS */
+    , _hoisted_82)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+      value: subroute.destination_id,
+      selected: ""
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(subroute.destination_name), 9
+    /* TEXT, PROPS */
+    , _hoisted_85)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "checkbox",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.subroutes[i].visibility = $event;
+      }
+    }, null, 8
+    /* PROPS */
+    , _hoisted_87), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.subroutes[i].visibility]])])]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-primary",
+    "data-dismiss": "modal",
+    disabled: $data.visibleLoading,
+    onClick: _cache[13] || (_cache[13] = function ($event) {
+      return $options.updateVisibility();
+    })
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.visibleLoading ? 'Loading...' : 'Update Visiblility'), 9
+  /* TEXT, PROPS */
+  , _hoisted_89), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal",
+    onClick: _cache[14] || (_cache[14] = function ($event) {
+      return $options.closeModal();
+    })
   }, "Close")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
     heading: "Edit Route Name",
     errors: this.validationErrors,
@@ -79525,34 +79763,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-primary",
         disabled: $data.editLoading,
-        onClick: _cache[15] || (_cache[15] = function ($event) {
+        onClick: _cache[18] || (_cache[18] = function ($event) {
           return $options.updateRoute();
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.editLoading ? 'Loading...' : 'Update Route'), 9
       /* TEXT, PROPS */
-      , _hoisted_75)];
+      , _hoisted_97)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
           return $data.dataEdit.routeStartName = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
           return $data.dataEdit.routeEndName = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
           return $data.dataEdit.routeVia = $event;
         })
       }, null, 512
@@ -79575,15 +79813,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_77), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_99), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "route_id",
     value: this.route_id
   }, null, 8
   /* PROPS */
-  , _hoisted_78)], 8
+  , _hoisted_100)], 8
   /* PROPS */
-  , _hoisted_76), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Hide, {
+  , _hoisted_98), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Hide, {
     hideForm: $data.hideFormID,
     confirmationMessage: "Are You Sure You want To Delete This City ???"
   }, {
@@ -79592,12 +79830,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-danger btn-block",
         disabled: $data.loading,
-        onClick: _cache[16] || (_cache[16] = function () {
+        onClick: _cache[19] || (_cache[19] = function () {
           return $options.hideRoute && $options.hideRoute.apply($options, arguments);
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Yes, I want to Delete'), 9
       /* TEXT, PROPS */
-      , _hoisted_79)];
+      , _hoisted_101)];
     }),
     _: 1
     /* STABLE */
