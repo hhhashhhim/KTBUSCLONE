@@ -210,18 +210,18 @@ class RouteController extends Controller
     }
     public function routeVisibilities(Request $request)
     {
-        $subroute = RouteFare::get()->groupBy("fare_class_id")->first();
-        foreach($subroute as $single)
-        {
-            TerminalVisibility::create([
-                'route_id' => $single->route_id,
-                'departure_city_id' => $single->departure_city_id,
-                'destination_city_id' => $single->destination_city_id,
-                'company_id' => Auth::user()->company_id,
-                'added_by' => auth()->user()->id
-            ]);
-        }
-        return 'helog';
+        // $subroute = RouteFare::get()->groupBy("fare_class_id")->first();
+        // foreach($subroute as $single)
+        // {
+        //     TerminalVisibility::create([
+        //         'route_id' => $single->route_id,
+        //         'departure_city_id' => $single->departure_city_id,
+        //         'destination_city_id' => $single->destination_city_id,
+        //         'company_id' => Auth::user()->company_id,
+        //         'added_by' => auth()->user()->id
+        //     ]);
+        // }
+        // return 'helog';
         return [
             'visibilities' => TerminalVisibility::where(["route_id"=>$request->id,"company_id"=>Auth::user()->company_id])->with("departure:id,name","destination:id,name")->get(),
         ];
