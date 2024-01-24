@@ -358,7 +358,7 @@ class ScheduleController extends Controller
                 ]);
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
                 $days = $this->getDays($lastEndDate, $schedule->end_date);
-
+                $end_date = $schedule->end_date;
                 for ($i = 0; $i <= $days; $i++) {
                     $lastDepId = $routeDetails[0]->departure_city_id;
                     $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
@@ -368,7 +368,7 @@ class ScheduleController extends Controller
                         if ($lastDepId == $detail->departure_city_id) {
                             $departureTime = date("Y-m-d H:i", $totalTime);
                         } else {
-                            return $lastDepId.' '.$detail->departure_city_id;
+                            $lastDepId.' '.$detail->departure_city_id;
                             $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
                             $timeDiff = explode(':', $fareTableTime);
                             $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
@@ -386,8 +386,12 @@ class ScheduleController extends Controller
                             'departure_date' => date('Y-m-d', strtotime($departureTime)),
                             'schedule_date' => $scheduleStartDate, // schedule departure date
                         ]);
+                        $end_date = date('Y-m-d', strtotime($departureTime));
                     }
                 };
+                $schedule->update([
+                    "end_date" => $end_date,
+                ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",
