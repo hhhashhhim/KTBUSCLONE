@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
 
     protected $commands = [
-        Commands\OnlineReservedCancelTicket::class,
+        \App\Console\Commands\OnlineReservedCancelTicket::class,
     ];
 
     protected function schedule(Schedule $schedule)
