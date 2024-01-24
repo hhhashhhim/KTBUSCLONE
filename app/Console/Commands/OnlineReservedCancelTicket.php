@@ -45,39 +45,33 @@ class OnlineReservedCancelTicket extends Command
         $tickets = Ticket::with("terminal:id,name,reservation_cancel")->where(["type"=>"advance booking"])->get();
         try {
             DB::beginTransaction();
-            // foreach($tickets as $ticket)
-            // {
-            //     if($ticket->terminal->reservation_cancel == null || $ticket->terminal->reservation_cancel == 0) 
-            //     {
-            //         continue;
-            //     }
-            //     if($ticket->created_at < Carbon::now()->subMinutes($ticket->terminal->reservation_cancel))
-            //     {
-            //         $ticket->update([
-            //             'type' => 'canceled',
-            //         ]);
-            //         BookingCancel::create([
-            //             'company_id' => $ticket->company_id,
-            //             'ticket_id' => $ticket->id,
-            //             'percentage' => 0,
-            //             'reason' => "auto cancel",
-            //             'added_by' => 0,
-            //         ]);
-            //         ActivityLog::create([
-            //             "activity_by" => 0,
-            //             "message" => "Auto | canceled booking. tickets".$ticket->id,
-            //             "requested_host" => "0:0",
-            //             "company_id" => $ticket->company_id
-            //         ]);
-            //         $ticket->delete();
-            //     }
-            // }
-            ActivityLog::create([
-                "activity_by" => 0,
-                "message" => "Auto | canceled booking. tickets 1",
-                "requested_host" => "0:0",
-                "company_id" =>0
-            ]);
+            foreach($tickets as $ticket)
+            {
+                if($ticket->terminal->reservation_cancel == null || $ticket->terminal->reservation_cancel == 0) 
+                {
+                    continue;
+                }
+                if($ticket->created_at < Carbon::now()->subMinutes($ticket->terminal->reservation_cancel))
+                {
+                    $ticket->update([
+                        'type' => 'canceled',
+                    ]);
+                    BookingCancel::create([
+                        'company_id' => $ticket->company_id,
+                        'ticket_id' => $ticket->id,
+                        'percentage' => 0,
+                        'reason' => "auto cancel",
+                        'added_by' => 0,
+                    ]);
+                    ActivityLog::create([
+                        "activity_by" => 0,
+                        "message" => "Auto | canceled booking. tickets".$ticket->id,
+                        "requested_host" => "0:0",
+                        "company_id" => $ticket->company_id
+                    ]);
+                    $ticket->delete();
+                }
+            }
             DB::commit();
         
         } catch (\Exception $e) {
