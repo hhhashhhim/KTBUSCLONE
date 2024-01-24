@@ -80,6 +80,7 @@ class TerminalController extends Controller
                     'time_difference' => $request->time_difference,
                     'available_seats' => $request->available_seats,
                     'advance_booking' => $request->advance_booking,
+                    'reservation_cancel' => $request->reservation_cancel,
                     'active_sms' => $request->active_sms ? 1 : 0,
                     'city_id' => $request->city_id,
                     'online_terminal_name' => $request->online_terminal_name ?? " ",
@@ -130,6 +131,7 @@ class TerminalController extends Controller
                 $this->validate($request, [
                     'name' => 'required',
                     'urdu_name' => 'required',
+                    'online_terminal_name' => 'required',
                     'contact' => 'required',
                 ]);
                 Terminal::where("city_id",$request->city_id)->update(["is_main"=>0]);
@@ -142,6 +144,7 @@ class TerminalController extends Controller
                     'latitude' => $request->latitude,
                     'time_difference' => $request->time_difference,
                     'advance_booking' => $request->advance_booking,
+                    'reservation_cancel' => $request->reservation_cancel,
                     'available_seats' => $request->available_seats,
                     'city_id' => $request->city_id,
                     'online_terminal_name' => $request->online_terminal_name,

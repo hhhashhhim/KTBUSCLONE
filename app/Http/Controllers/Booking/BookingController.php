@@ -76,6 +76,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+
         try {
             $lock = Cache::lock("tickets")->block(5, function () use ($request) {
             DB::beginTransaction();
