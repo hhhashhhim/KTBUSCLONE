@@ -165,17 +165,22 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
+                        <label for="">Reservation Cancel(in minutes)</label>
+                        <input type="text" class="form-control" @keypress="isNumber($event)"
+                                v-model="data.reservation_cancel" placeholder="">
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
                                v-model="data.advance_booking" placeholder="Enter Advance Booking Allowed">
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="longitude">Longitude</label>
                         <input type="text" class="form-control" v-model="data.longitude" placeholder="Enter Longitude">
                         <small><a href="https://www.google.com/maps" target="_blank">Click Here to get</a></small>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="data.latitude" placeholder="Enter Latitude">
                     </div>
@@ -325,16 +330,21 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
+                        <label for="">Reservation Cancel(in minutes)</label>
+                        <input type="text" class="form-control" @keypress="isNumber($event)"
+                                v-model="dataEdit.reservation_cancel" placeholder="">
+                    </div>
+                    <div class="form-group col-md-3">
                         <label for="advance_booking">Advance Booking Allowed(Days)</label>
                         <input type="text" class="form-control" @keypress="isNumber($event)"
                                v-model="dataEdit.advance_booking">
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="longitude">Longitude</label>
                         <input type="text" class="form-control" v-model="dataEdit.longitude">
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="Latitude">Latitude</label>
                         <input type="text" class="form-control" v-model="dataEdit.latitude">
                     </div>
@@ -556,6 +566,7 @@ export default {
                 active_sms: "",
                 is_main: "",
                 advance_booking: "",
+                reservation_cancel: "",
                 longitude: "",
                 latitude: "",
                 city_id: 0,
@@ -736,7 +747,6 @@ export default {
             }
         },
         async editTerminal(single) {
-            console.log(single);
             this.dataEdit = single;
         },
         async terminalDetail(id) {
@@ -749,7 +759,7 @@ export default {
         },
         async update() {
             this.validationErrors = [];
-
+            
             if (this.dataEdit.city_id == "")
                 return swal({
                     title: "Required",
@@ -769,6 +779,13 @@ export default {
                 return swal({
                     title: "Required",
                     text: "Terminal urdu name is required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEdit.online_terminal_name == " " || this.dataEdit.online_terminal_name == "")
+                return swal({
+                    title: "Required",
+                    text: "Online terminal name is required",
                     icon: "error",
                     timer: 2000
                 });
