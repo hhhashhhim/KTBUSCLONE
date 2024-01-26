@@ -117,7 +117,8 @@ class AdvanceSalesReportController extends Controller
             ->get();
         $refundTickets->map(function ($q) {
             $q->cancel_percentage = $q->cancel_ticket->percentage;
-            $q->refund_by = User::find($q->cancel_ticket->added_by)->name;
+            $user = User::find($q->cancel_ticket->added_by);
+            $q->refund_by = $user ? $user->name : '-';
             $q->cancel_date = $q->cancel_ticket->time;
             $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->bus_NO = BusClass::find($q->bus_class_id)->name;
