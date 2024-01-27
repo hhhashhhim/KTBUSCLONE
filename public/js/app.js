@@ -87906,7 +87906,7 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      main_url: "https://techhord.com/",
+      main_url: "https://www.bookvirtually.com/",
       api_url: "https://api.techhord.com/",
       permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
