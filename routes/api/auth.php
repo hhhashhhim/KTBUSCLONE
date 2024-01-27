@@ -4,6 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::post("/test", function(){
+    return "working";
+});
+
 Route::post("/web/v1/login", [AuthController::class, 'login']);
 Route::post("/web/v1/double-check", [AuthController::class, 'doubleCheck']);
 
