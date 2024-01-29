@@ -184,6 +184,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllDepartures">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllDepartures">Deselect All</button>
                         <select class="form-control" id="departure" multiple
                                 v-model="data.departure">
                             <option
@@ -196,6 +198,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllDestination">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllDestination">Deselect All</button>
                         <select class="form-control" id="destinations" multiple
                                 v-model="data.destination">
                             <option
@@ -380,6 +384,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllEditDepartures">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllEditDepartures">Deselect All</button>
                         <select class="form-control" id="editDeparture" multiple
                                 v-model="dataEdit.departure_city_ids">
                             <option
@@ -392,6 +398,8 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllEditDestination">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllEditDestination">Deselect All</button>
                         <select class="form-control" id="editDestinations" multiple
                                 v-model="dataEdit.destination_city_ids">
                             <option
@@ -631,6 +639,45 @@ export default {
             this.roleName = '';
         },
 
+        selectAllDepartures() {
+            $("#departure > option").prop("selected", true);
+            $("#departure").trigger("change"); 
+        },
+
+        deselectAllDepartures() {
+            $("#departure > option").prop("selected", false);
+            $("#departure").trigger("change");
+        },
+        
+        selectAllDestination() {
+            $("#destinations > option").prop("selected", true);
+            $("#destinations").trigger("change"); 
+        },
+
+        deselectAllDestination() {
+            $("#destinations > option").prop("selected", false);
+            $("#destinations").trigger("change");
+        },
+        
+        selectAllEditDepartures() {
+            $("#editDeparture > option").prop("selected", true);
+            $("#editDeparture").trigger("change"); 
+        },
+
+        deselectAllEditDepartures() {
+            $("#editDeparture > option").prop("selected", false);
+            $("#editDeparture").trigger("change");
+        },
+        
+        selectAllEditDestination() {
+            $("#editDestinations > option").prop("selected", true);
+            $("#editDestinations").trigger("change"); 
+        },
+
+        deselectAllEditDestination() {
+            $("#editDestinations > option").prop("selected", false);
+            $("#editDestinations").trigger("change");
+        },
 
         async fetchUsers() {
             const userRes = await this.callApi("post", "user",this.filterData);
