@@ -2964,7 +2964,6 @@ export default {
         },
 
         getClasses: function (col) {
-            
             let gender = "";
             if(col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking")
             {
@@ -3002,6 +3001,7 @@ export default {
             else
             {
                 gender = "";
+                alert('helo');
             }
             let selected = col.selected ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
