@@ -111,15 +111,15 @@ class ScheduleController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
 
-                foreach ($request->addTerminalsOnClick as $key => $single) {
-                    ScheduleTerminalSequence::create([
-                        'schedule_id' => $schedule->id,
-                        'city_id' => $single['city_id'],
-                        'terminal_id' => $single['terminal_id'],
-                        'company_id' => Auth::user()->company_id,
-                        'added_by' => Auth::user()->id,
-                    ]);
-                }
+                // foreach ($request->addTerminalsOnClick as $key => $single) {
+                //     ScheduleTerminalSequence::create([
+                //         'schedule_id' => $schedule->id,
+                //         'city_id' => $single['city_id'],
+                //         'terminal_id' => $single['terminal_id'],
+                //         'company_id' => Auth::user()->company_id,
+                //         'added_by' => Auth::user()->id,
+                //     ]);
+                // }
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
                 $days = $this->getDays($schedule->start_date, $schedule->end_date);
 
