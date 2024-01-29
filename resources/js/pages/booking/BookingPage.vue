@@ -396,10 +396,16 @@
                                         </div>
                                     </div>
                                     <!-- side bar -->
-                                    <div class="col-md-2 pl-3 " style="overflow-x: hidden; overflow-y: auto;">
+                                    <div class="col-md-2 px-2 " style="overflow-x: hidden; overflow-y: auto;">
                                         <div class="">
                                             <div class="col-md-12 mb-2 px-0 d-flex flex-wrap">
                                                 <div class="border-bottom w-100">
+                                                    <div class="my-1">
+                                                        <div 
+                                                            class="bg-danger text-dark circles mr-1 border shadow">
+                                                            <i class="fas fa-minus-circle"></i></div>
+                                                        <span class="text-wrap">Not For Sale</span>
+                                                    </div>
                                                     <div class="my-1">
                                                         <div
                                                             class="selected circles mr-1 border shadow"></div>
@@ -407,16 +413,52 @@
                                                     </div>
                                                     <div class="my-1">
                                                         <div
-                                                            class="for-female circles mr-1 border shadow"></div>
-                                                        <span class="text-wrap">Female</span>
+                                                            class="for-male-reserved circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Male Reserved</span>
                                                     </div>
                                                     <div class="my-1">
                                                         <div
-                                                            class="for-male circles mr-1 border shadow"></div>
-                                                        <span class="text-wrap">Male</span>
+                                                            class="for-female-reserved circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Female Reserved</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-male-booked circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Male Confirmed</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-female-booked circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Female Confirmed</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-online-male-reserved circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Online M Reserved</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-online-female-reserved circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Online F Reserved</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-online-male-booked circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Online M Confirmed</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="for-online-female-booked circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Online F Confirmed</span>
+                                                    </div>
+                                                    <div class="my-1">
+                                                        <div
+                                                            class="partial-seat circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap"
+                                                              >Partial Seat</span>
                                                     </div>
                                                 </div>
-                                                <div class="border-bottom w-100">
+                                                <!-- <div class="border-bottom w-100">
                                                     <div class="my-1" style="padding-bottom: 10px !important;">
                                                         <div class="bg-danger text-dark circles mr-1 border shadow"><i
                                                             class="fas fa-minus-circle"></i></div>
@@ -448,7 +490,7 @@
                                                         <span
                                                             class="text-wrap mrn">Over Issue</span>
                                                     </div>
-                                                </div>
+                                                </div> -->
 
                                                 <div class="my-1" v-for="(seatClass,i) in allSeatClasses" :key="i">
                                                     <div class="circles mr-1 border shadow"
@@ -2922,7 +2964,44 @@ export default {
         },
 
         getClasses: function (col) {
-            let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
+            let gender = "";
+            if(col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking")
+            {
+                gender = "for-male-reserved";
+            }
+            else if(col.online_terminal == 0 && col.gender == 1 && col.type == "booked")
+            {
+                gender = "for-male-booked";
+            }
+            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking")
+            {
+                gender = "for-female-reserved";
+            }
+            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "booked")
+            {
+                gender = "for-female-booked";
+            }
+
+            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking")
+            {
+                gender = "for-online-male-reserved";
+            }
+            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "booked")
+            {
+                gender = "for-online-male-booked";
+            }
+            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking")
+            {
+                gender = "for-online-female-reserved";
+            }
+            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "booked")
+            {
+                gender = "for-online-female-booked";
+            }
+            else
+            {
+                gender = "";
+            }
             let selected = col.selected ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
@@ -2931,7 +3010,44 @@ export default {
         },
 
         getClassesReschedule: function (col) {
-            let gender = col.gender != undefined && col.gender == 0 ? "for-female" : col.gender && col.gender == 1 ? "for-male" : "";
+            let gender = "";
+            if(col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking")
+            {
+                gender = "for-male-reserved";
+            }
+            else if(col.online_terminal == 0 && col.gender == 1 && col.type == "booked")
+            {
+                gender = "for-male-booked";
+            }
+            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking")
+            {
+                gender = "for-female-reserved";
+            }
+            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "booked")
+            {
+                gender = "for-female-booked";
+            }
+
+            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking")
+            {
+                gender = "for-online-male-reserved";
+            }
+            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "booked")
+            {
+                gender = "for-online-male-booked";
+            }
+            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking")
+            {
+                gender = "for-online-female-reserved";
+            }
+            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "booked")
+            {
+                gender = "for-online-female-booked";
+            }
+            else
+            {
+                gender = "";
+            }
             let selected = col.alreadyBooked ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
@@ -3885,13 +4001,32 @@ export default {
     border: 3px solid gold !important;
 }
 
-.for-female {
-    background-color: hotpink !important;
-}
-
-.for-male {
+.for-male-reserved {
     background-color: #3d8ff2 !important;
 }
+.for-female-reserved {
+    background-color: hotpink !important;
+}
+.for-male-booked {
+    background-color: #731631 !important;
+}
+.for-female-booked {
+    background-color: #ff7276 !important;
+}
+
+.for-online-male-reserved {
+    background-color: #0c6077 !important;
+}
+.for-online-female-reserved {
+    background-color: #9d92f0 !important;
+}
+.for-online-male-booked {
+    background-color: #6e819a !important;
+}
+.for-online-female-booked {
+    background-color: #d1b8c0 !important;
+}
+
 
 .not-for-sale {
     background-color: #D40B0BFF !important;
