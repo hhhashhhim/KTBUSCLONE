@@ -696,7 +696,7 @@ class BookingApiController extends Controller
                             'terminal_name' => Terminal::find($terminalId)->name,
                             'online_terminal' => Terminal::find($terminalId)->is_online_terminal,
                             'remarks' => $request->remarks,
-                            'gender' => $request->gender,
+                            'gender' => $request->gender[$i],
                             'type' => $request->book_type,
                             'discount_type' => null,
                             'added_by' => Auth::user()->id,
@@ -717,7 +717,7 @@ class BookingApiController extends Controller
                                 'date' => $ticket->date,
                                 'customer_id' => $ticket->customer_id,
                                 'schedule_id' => $ticket->schedule_id,
-                                'gender' => $ticket->gender,
+                                'gender' => $request->gender[$i],
                                 'type' => $ticket->type,
                                 'added_by' => Auth::user()->id,
                             ]);
@@ -735,7 +735,7 @@ class BookingApiController extends Controller
                                 'date' => $ticket->date,
                                 'customer_id' => $ticket->customer_id,
                                 'schedule_id' => $ticket->schedule_id,
-                                'gender' => $ticket->gender,
+                                'gender' => $request->gender[$i],
                                 'type' => $ticket->type,
                                 'added_by' => Auth::user()->id,
                             ]);
