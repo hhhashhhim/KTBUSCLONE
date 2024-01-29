@@ -3,7 +3,7 @@
         <aside id="sidebar-wrapper">
             <div class="sidebar-brand text-center">
                 <a href="/">
-                    <img :src="$store.state.app_url+'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
+                    <img :src="$store.state.main_url+'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
                 </a>
             </div>
             <ul class="sidebar-menu">
