@@ -794,6 +794,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
+                    $seatMap[$i][$j]['online_terminal'] = $tickets[$result]['online_terminal'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name']??"N/A";
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
@@ -810,6 +811,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
                             $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
                             $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
+                            $seatMap[$i][$j]['online_terminal'] = $tickets[$singlePartial]['online_terminal'];
                             $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name']??'N/A';
                             $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
                             $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
