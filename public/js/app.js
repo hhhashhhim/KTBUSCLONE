@@ -30974,7 +30974,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         gender = "";
       }
 
-      console.log(col);
       var selected = col.selected ? "selected" : "";
       var partial = col.partial == 1 ? "partial" : "";
       var over = col.type == 'over-issue' ? "bg-secondary" : "";
