@@ -3002,7 +3002,6 @@ export default {
             {
                 gender = "";
             }
-            console.log(col);
             let selected = col.selected ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
