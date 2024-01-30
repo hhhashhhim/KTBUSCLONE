@@ -338,14 +338,12 @@
                     :class="activeSection != 'step1' ? 'd-none' : ''"
                 >
                     <div class="row">
-                        <div class="col-md-8 class form-group">
+                        <div class="col-md-6 class form-group">
                             <label for="route">Routes <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
                                 id="route"
-                                @change=" getSelectiveData('route', $event);"
                                 v-model="data.route"
-                                readonly
                             >
                                 <option value="0" selected>Select Route</option>
                                 <option v-for="(route, i) in routes" :value="route.id" :key="i">
@@ -354,7 +352,7 @@
                             </select>
                         </div>
 
-                        <div class="col-md-4 class form-group">
+                        <div class="col-md-6 class form-group">
                             <label for="busCLass">Bus Class <span class="text-danger ml-1">*</span></label>
                             <select
                                 class="form-control"
@@ -372,55 +370,19 @@
                             </select>
                         </div>
                     </div>
-                    <div
-                        class="row d-flex justify-content-center"
-                        v-if="stepTwoAddSchedule"
-                    >
-                        <div class="col-md-9 class form-group">
-                            <div class="table-responsive">
-                                <table
-                                    class="table table-striped table-hover"
-                                    id="addScheduleStep2"
-                                >
-                                    <thead>
-                                    <tr>
-                                        <th>Sr No.</th>
-                                        <th>City Name</th>
-                                        <th>Terminals</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="(city, i) in cities" :key="i">
-                                        <template v-if="city.terminal.length >= 2">
-                                            <td>{{ i + 1 }}</td>
-                                            <td>{{ city.name }}</td>
-                                            <td><span v-for="item in city.terminal" :key="item.id">
-                                                    <label class="colorinput mx-3">
-                                                        <span>
-                                                            <input type="checkbox" class="colorinput-input"
-                                                                   @click="addTerminal($event, city.id)"
-                                                                   id="routeTerminalName"
-                                                                   :value="item.id"/>
-                                                            <span class="colorinput-color bg-primary"></span>
-                                                        </span>
-                                                    </label>
-                                                    <label class="checkbox-inputs" for="terminal">{{
-                                                            item.name
-                                                        }}</label>
-                                            </span>
-                                            </td>
-                                        </template>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-md-3 class form-group px-0">
-                            <span class="text-dark h5 pb-5"
-                                  v-if="terminalNames.length !== 0 && this.data.route !== 0"> Selected Terminal Sequence</span>
-                            <ul>
-                                <li v-for="name in terminalNames">{{ name }}</li>
-                            </ul>
+                    <div class="row">
+                        <div class="col-md-12 class form-group">
+                            <label for="route">Terminals </label>
+                            <button class="btn btn-success btn-sm m-1" @click="selectAllTerminals">Select All</button>
+                            <button class="btn btn-danger btn-sm " @click="deselectAllTerminals">Deselect All</button>
+                            <select
+                                class="form-control"
+                                id="terminal" multiple
+                            >
+                                <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
+                                    {{ terminal.name }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                     <div class="row">
@@ -662,7 +624,7 @@
                         <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
                         <select
                             class="form-control"
-                            id="route" @change="getSelectiveData('routeEdit', $event)"
+                            id="route"
                             v-model="dataEdit.schedules.route_id"
                             disabled
                         >
@@ -694,55 +656,22 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="row" v-if="this.showTableDiv">
-                    <div class="col-md-9 class form-group">
-                        <div class="table-responsive">
-                            <table
-                                class="table table-striped table-hover"
-                                id="addScheduleStep2"
+                <div class="row">
+                        <div class="col-md-12 class form-group">
+                            <label for="route">Terminals </label>
+                            <button class="btn btn-success btn-sm m-1" @click="selectAllEditTerminals">Select All</button>
+                            <button class="btn btn-danger btn-sm " @click="deselectAllEditTerminals">Deselect All</button>
+                            <select
+                                class="form-control"
+                                id="editTerminal" multiple
+                                v-model="dataEdit.terminals"
                             >
-                                <thead>
-                                <tr>
-                                    <th>Sr No.</th>
-                                    <th>City Name</th>
-                                    <th>Terminals</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="(city, i) in dataEdit.cities" :key="i">
-                                    <template v-if="city.terminal.length >= 2">
-                                        <td>{{ i + 1 }}</td>
-                                        <td>{{ city.name }}</td>
-                                        <td><span v-for="item in city.terminal" :key="item.id">
-                                        <label class="colorinput mx-3">
-                                        <span>
-                                            <input type="checkbox" class="colorinput-input routeEditTerminals"
-                                                   @click="editTerminal($event, city.id)"
-                                                   v-bind:checked="this.dataEdit.schedules.terminalId.includes(item.id)"
-                                                   :value="item.id"/>
-                                        <span
-                                            class="colorinput-color bg-primary"></span>
-                                        </span>
-                                        </label>
-                                        <label class="checkbox-inputs"
-                                               for="terminal">{{ item.name }}</label>
-                                        </span>
-                                        </td>
-                                    </template>
-                                </tr>
-                                </tbody>
-                            </table>
+                                <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
+                                    {{ terminal.name }}
+                                </option>
+                            </select>
                         </div>
                     </div>
-                    <div class="col-md-3 class form-group px-0">
-                            <span class="text-dark h5 pb-5"
-                                  v-if="this.dataEdit.editSequence !== 0 "> Selected Terminal Sequence</span>
-                        <ul>
-                            <li v-for="name in dataEdit.editSequence">{{ name }}</li>
-                        </ul>
-                    </div>
-                </div>
                 <template v-slot:button>
                     <button id="submitFormButton" class="btn btn-success" @click="updateSchedule"
                             :disabled="loading"> {{ loading ? 'Loading...' : 'Update Schedule' }}
@@ -791,6 +720,7 @@ export default {
             discounts: [],
             surcharges: [],
             permissions: [],
+            allTerminals: [],
             formID: "schedule_form",
             editFormID: "edit_schedule_form",
             hideFormID: "hide_schedule_form",
@@ -798,10 +728,6 @@ export default {
             value: [],
             editDiscounts: [],
             editSurcharges: [],
-            editTerminals: [],
-            groupByCategory: [],
-            allTerminalsIds: [],
-            terminalNames: [],
             editRoutes: [],
             success: false,
             error: false,
@@ -809,7 +735,6 @@ export default {
             cities: "",
             terminals: "",
             classes: "",
-            routeClasses: "",
             isShowEditDiv: false,
             showTableDiv: true,
             stepTwoAddSchedule: false,
@@ -834,13 +759,12 @@ export default {
                 discount: 0,
                 busClass: 0,
                 fareClass: 0,
-                addTerminalsOnClick: [],
+                terminals: [],
             },
             dataEdit: {
                 schedules: [],
                 cities: [],
                 terminals: [],
-                compare_array: [],
             },
             dataEditTime: {
                 start_date: "",
@@ -865,10 +789,54 @@ export default {
         this.fetchSchedule();
         this.permissions = this.$store.state.permissions;
     },
+    mounted() {
+        setTimeout(() => {
+            const terminal = $('#terminal');
+            const editTerminal = $('#editTerminal');
 
+            // Initialize Select2
+            terminal.select2({
+                closeOnSelect: false
+            });
+            editTerminal.select2({
+                closeOnSelect: false
+            });
+
+            // Handle Select2 change event
+            const self = this;
+
+            terminal.on('change', function() {
+                const selectedValues = $(this).val();
+                self.data.terminals = selectedValues;
+            });
+            editTerminal.on('change', function() {
+                const selectedValues = $(this).val();
+                self.dataEdit.terminals = selectedValues;
+            });
+        }, 1000);
+    },
     methods: {
         close() {
             $(".modal").click();
+        },
+        selectAllTerminals() {
+            $("#terminal > option").prop("selected", true);
+            $("#terminal").trigger("change"); 
+        },
+
+        deselectAllTerminals() {
+            $("#terminal > option").prop("selected", false);
+            $("#terminal").trigger("change");
+        },
+        
+        selectAllEditTerminals() {
+            $("#editTerminal > option").prop("selected", true);
+            $("#editTerminal").trigger("change"); 
+        },
+
+        deselectAllEditTerminals() {
+            $("#editTerminal > option").prop("selected", false);
+            $("#editTerminal").trigger("change");
         },
         async addDays(schedule) {
             this.extendDate = schedule;
@@ -937,6 +905,9 @@ export default {
             // }, 300);
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
+            
+            const resGetAllTerminals = await this.callApi("post", "schedule/getTerminals");
+            this.allTerminals = resGetAllTerminals.data;
 
             const resGetAllClasses = await this.callApi("post", "schedule/fare-class");
             this.fareClasses = resGetAllClasses.data;
@@ -1012,65 +983,6 @@ export default {
             }
         },
 
-        editTerminal(event, id) {
-            const value = event.target.value
-            if (event.target.checked) {
-                const index = this.dataEdit.schedules.route_city_terminal.indexOf(value);
-                if (index == -1) {
-                    this.dataEdit.schedules.route_city_terminal.push({
-                        city_id: id,
-                        terminal_id: parseInt(value),
-                        allow: true,
-                    });
-                }
-            } else {
-                const removeIndex = this.dataEdit.schedules.route_city_terminal.findIndex(t => t.terminal_id == parseInt(value));
-                if (removeIndex !== -1) {
-                    this.dataEdit.schedules.route_city_terminal.splice(removeIndex, 1);
-                }
-            }
-        },
-
-        async getSelectiveData(name, evt) {
-            if (name == "route") {
-                if (evt.target.value == "0") {
-                    this.stepTwoAddSchedule = false;
-                    this.terminalNames = [];
-                    this.data.addTerminalsOnClick = [];
-                    $("#routeTerminalName input:checkbox:checked").prop('checked', false);
-                } else {
-                    this.stepTwoAddSchedule = true;
-                    this.terminalNames = [];
-                    this.data.addTerminalsOnClick = [];
-                    $("#routeTerminalName input:checkbox:checked").prop('checked', false);
-                    const resRoute = await this.callApi("post", "schedule/getCity", {
-                        id: this.data.route,
-                    });
-                    this.cities = resRoute.data;
-                }
-            }
-            if (name == "routeEdit") {
-                if (evt.target.value == "0") {
-                    this.showTableDiv = false;
-                    this.dataEdit.cities = [];
-                    this.dataEdit.editSequence = [];
-                    this.dataEdit.schedules.route_city_terminal = [];
-                    this.dataEdit.schedules.terminalId = [];
-                    $(".routeEditTerminals input:checkbox:checked").prop('checked', false);
-                } else {
-                    this.showTableDiv = true;
-                    const resRouteEdit = await this.callApi("post", "schedule/getCity", {
-                        id: this.dataEdit.schedules.route_id,
-                    });
-                    this.dataEdit.schedules.terminalId = [];
-                    this.dataEdit.schedules.route_city_terminal = [];
-                    this.dataEdit.editSequence = [];
-                    this.dataEdit.cities = resRouteEdit.data;
-                    $(".routeEditTerminals input:checkbox:checked").prop('checked', false);
-
-                }
-            }
-        },
 
         clearForm() {
             this.data = {
@@ -1277,7 +1189,7 @@ export default {
                 $(`#${this.editFormID}`).modal('hide');
                 swal({
                     title: "Success",
-                    text: "Schedule Updated Successfully \n Go to Fare Table Page, Click Update Schedule Button to Update all Schedules & Schedule Time",
+                    text: "Schedule Updated Successfully",
                     icon: "success",
                     timer: 4000
                 });
@@ -1373,8 +1285,12 @@ export default {
             const resEditSchedule = await this.callApi("post", "schedule/edit", {id: schedule.id});
             if (resEditSchedule.status == 200) {
                 this.dataEdit.schedules = resEditSchedule.data.schedules;
-                this.dataEdit.editSequence = resEditSchedule.data.schedules.terminalName;
-                this.dataEdit.cities = resEditSchedule.data.compare;
+                this.dataEdit.terminals = resEditSchedule.data.visibilities;
+                setTimeout(() => {
+                    $("#editTerminal").select2({
+                        closeOnSelect: false
+                    });
+                }, 200);
             }
             $(`#${this.editFormID}`).modal('show');
         },

@@ -2248,6 +2248,7 @@ export default {
                 departure_city_id: this.addForm.departureCity,
                 destination_city_id: this.addForm.destinationCity,
                 date: this.addForm.date,
+                terminal: this.addForm.terminalId,
             }
             const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
             if (resFetchSchedule.status == 200) {
