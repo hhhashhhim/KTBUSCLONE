@@ -176,24 +176,6 @@ class ScheduleController extends Controller
 
     public function editSchedule(Request $request)
     {
-        $schedules = Schedule::get();
-        $terminals = Terminal::get();
-
-        ScheduleTerminalVisibility::truncate();
-        foreach($schedules as $schedule)
-        {
-            foreach ($terminals as $single) {
-                ScheduleTerminalVisibility::create([
-                    'route_id' => $schedule->route_id,
-                    'schedule_id' => $schedule->id,
-                    'terminal_id' => $single->id,
-                    'visibility' => 1,
-                    'company_id' => Auth::user()->company_id,
-                    'added_by' => Auth::user()->id,
-                ]);
-            }
-        }
-        return 'helo';
         $schedule = Schedule::find($request->id);
         $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
         return [
