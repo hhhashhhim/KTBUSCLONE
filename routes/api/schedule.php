@@ -12,6 +12,7 @@ Route::group(['prefix' => 'web/v1/schedule','middleware' => ['auth:sanctum']], f
     Route::post('/time/update', [ScheduleController::class, 'updateScheduleTime']);
     Route::post('/hide', [ScheduleController::class, 'hideSchedule']);
     Route::post('/getRoute', [ScheduleController::class, 'getRoutes']);
+    Route::post('/getTerminals', [ScheduleController::class, 'getTerminals']);
     Route::post('/getCity', [ScheduleController::class, 'getCity']);
     Route::post('/getEntire', [ScheduleController::class, 'getEntire']);
     Route::post('/getRouteFare', [ScheduleController::class, 'getRouteFareClass']);

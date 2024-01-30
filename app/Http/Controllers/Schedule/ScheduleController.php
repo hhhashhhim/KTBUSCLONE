@@ -13,6 +13,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\ActivityLog;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Surcharge\Surcharge;
@@ -111,15 +112,17 @@ class ScheduleController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
 
-                // foreach ($request->addTerminalsOnClick as $key => $single) {
-                //     ScheduleTerminalSequence::create([
-                //         'schedule_id' => $schedule->id,
-                //         'city_id' => $single['city_id'],
-                //         'terminal_id' => $single['terminal_id'],
-                //         'company_id' => Auth::user()->company_id,
-                //         'added_by' => Auth::user()->id,
-                //     ]);
-                // }
+                foreach ($request->terminals as $single) {
+                    ScheduleTerminalVisibility::create([
+                        'route_id' => $request->route,
+                        'schedule_id' => $schedule->id,
+                        'terminal_id' => $single,
+                        'visibility' => 1,
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+                
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
                 $days = $this->getDays($schedule->start_date, $schedule->end_date);
 
@@ -173,31 +176,29 @@ class ScheduleController extends Controller
 
     public function editSchedule(Request $request)
     {
-        $schedule = Schedule::find($request->id);
-        $routeFares = RouteFare::where('route_id', $schedule->route_id)->select('departure_city_id', 'destination_city_id')->get();
-        $data = [];
-        foreach ($routeFares as $i => $routeFare) {
-            if ($i == 0) {
-                $data[] = $routeFare->departure_city_id;
+        $schedules = Schedule::get();
+        $terminals = Terminal::get();
+
+        ScheduleTerminalVisibility::truncate();
+        foreach($schedules as $schedule)
+        {
+            foreach ($terminals as $single) {
+                ScheduleTerminalVisibility::create([
+                    'route_id' => $schedule->route_id,
+                    'schedule_id' => $schedule->id,
+                    'terminal_id' => $single->id,
+                    'visibility' => 1,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
             }
-            $data[] = $routeFare->destination_city_id;
         }
-        $data = collect($data)->unique();
-        $compare = City::with(['terminal' => function ($q) {
-            $q->where("is_online_terminal", null);
-            return $q->orWhere("is_online_terminal", 0)->select('id', 'city_id', 'name');
-        }])->whereIn('id', $data)->get();
-        $terminalID = [];
-        foreach ($schedule->route_city_terminal as $key => $item) {
-            $terminalID[] = $item['terminal_id'];
-
-        }
-
-        $schedule['terminalId'] = $terminalID;
-        $schedule['terminalName'] = Terminal::whereIn('id', $terminalID)->pluck('name');
+        return 'helo';
+        $schedule = Schedule::find($request->id);
+        $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
         return [
             'schedules' => $schedule,
-            'compare' => $compare,
+            'visibilities' => $visibilities,
         ];
     }
 
@@ -258,17 +259,20 @@ class ScheduleController extends Controller
                     'bus_class_id' => $req['bus_class_id'],
                     'route_city_terminal' => $req['route_city_terminal'] ?? [],
                 ]);
-                ScheduleTerminalSequence::where('schedule_id', $req['id'])->delete();
+                
+                ScheduleTerminalVisibility::where("schedule_id",$req['id'])->delete();
 
-                foreach ($req['route_city_terminal'] as $key => $single) {
-                    ScheduleTerminalSequence::create([
+                foreach ($request->terminals as $single) {
+                    ScheduleTerminalVisibility::create([
+                        'route_id' => $req['route_id'],
                         'schedule_id' => $req['id'],
-                        'city_id' => $single['city_id'],
-                        'terminal_id' => $single['terminal_id'],
+                        'terminal_id' => $single,
+                        'visibility' => 1,
                         'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,
                     ]);
                 }
+                
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated schedule (".$req['name']." ".$req['id'].")",
@@ -301,6 +305,11 @@ class ScheduleController extends Controller
     public function getRoutes()
     {
         return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
+    }
+    
+    public function getTerminals()
+    {
+        return Terminal::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(["id","name"]);
     }
 
     public function getCity(Request $request)

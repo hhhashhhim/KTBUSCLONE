@@ -30,6 +30,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Schedule\DropSchedule;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Hrm\Employee\Employee;
@@ -432,7 +433,7 @@ class BookingController extends Controller
         if (!$request->date) {
             return "Date is Required";
         }
-
+        // $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
         $allSchedules = ScheduleDetail::with('schedule')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])->oldest("departure_time")->get();
         
         foreach ($allSchedules as $key => $single) {
