@@ -4022,10 +4022,10 @@ export default {
     background-color: #9d92f0 !important;
 }
 .for-online-male-booked {
-    background-color: #6e819a !important;
+    background-color: #343434 !important;
 }
 .for-online-female-booked {
-    background-color: #d1b8c0 !important;
+    background-color: #d71e7a !important;
 }
 
 
