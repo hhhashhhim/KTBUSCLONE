@@ -29,6 +29,7 @@ use App\Http\Resources\EmptyResource;
 use App\Models\Terminal;
 use App\Models\Customer;
 use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
@@ -113,8 +114,8 @@ class BookingApiController extends Controller
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
                 // Data
-
-                $data = ScheduleDetail::with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
+                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
                 
                 $data->map(function($single,$key) use ($data,$companyId,$terminalId){
