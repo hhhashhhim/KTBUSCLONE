@@ -185,6 +185,25 @@
                                                             </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th>{{totalFare}}</th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -232,6 +251,7 @@ export default {
             buses: [],
             validationErrors: [],
             allRecords: [],
+            totalFare: "",
             filterForm: {
                 cnicFilter: "",
                 fromDateFilter: "",
@@ -288,7 +308,8 @@ export default {
         async filterFunction() {
             const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
             if (resFilter.status == 200) {
-                this.allRecords = resFilter.data;
+                this.allRecords = resFilter.data.data;
+                this.totalFare = resFilter.data.total_fare;
             }
         },
     },
