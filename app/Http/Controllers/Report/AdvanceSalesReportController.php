@@ -111,16 +111,18 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('added_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->whereIn('schedule_id', $scheduleIds);
+                return $query->where('route_id', $request->route);
             })
-            ->get();
+            ->when($request->fromDateTime, function ($query) use ($request) {
+                return $query->where('schedule_time', '>=', $request->fromDateTime);
+            })->when($request->toDateTime, function ($query) use ($request) {
+                return $query->where('schedule_time', '<=', $request->toDateTime);
+            })->get();
         $refundTickets->map(function ($q) {
             $q->cancel_percentage = $q->cancel_ticket->percentage;
             $user = User::find($q->cancel_ticket->added_by);
             $q->refund_by = $user ? $user->name : '-';
             $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->bus_NO = BusClass::find($q->bus_class_id)->name;
             $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
             $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
@@ -128,11 +130,6 @@ class AdvanceSalesReportController extends Controller
             $q->amount_refund = round((int)$q->seat_fare - $final);
             $q->cancelation_charges = round($final);
             unset($q->cancel_ticket, $q->schedule);
-        });
-        $refundTickets = $refundTickets->when($request->fromDateTime, function ($query) use ($request) {
-            return $query->where('bus_time', '>=', $request->fromDateTime);
-        })->when($request->toDateTime, function ($query) use ($request) {
-            return $query->where('bus_time', '<=', $request->toDateTime);
         });
         // Counter expenses data
         if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
