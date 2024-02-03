@@ -65,7 +65,7 @@
                                                                 v-model="addForm.schedule">
                                                             <option value="0">Select Departure Time</option>
                                                             <option v-for="(schedule, i) in allSchedules"
-                                                                    :value="schedule.schedule_id"
+                                                                    :value="schedule.schedule_id + '_' + schedule.variation_time"
 
                                                                     :key="i">
                                                                 {{ scheduleDropdown(schedule) }}
@@ -873,7 +873,7 @@
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
 
-                                            :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
+                                            :value="schedule.schedule_id + '_' + schedule.variation_time" :key="i">{{ scheduleDropdown(schedule) }}
                                     </option>
                                 </select>
                                 <!--                                :disabled="disabledOptionsReschedule.includes(schedule)"-->
