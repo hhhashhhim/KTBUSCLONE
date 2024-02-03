@@ -208,6 +208,7 @@ class ScheduleController extends Controller
                     $single->update([
                         "departure_date" => date("Y-m-d",strtotime($updatedTime)),
                         "departure_time" => date("H:i:s",strtotime($updatedTime)),
+                        "variation_time" => 1,
                     ]);  
                 }
                 ActivityLog::create([

@@ -712,23 +712,26 @@ class BookingController extends Controller
     public
     function selected(Request $request)
     {
+        $id = explode("_",$request->id)[0];
+        $variation_time = explode("_",$request->id)[1];
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
         }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
-            'schedule_id' => $request->id,
+            'schedule_id' => $id,
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
+            'variation_time' => $variation_time,
         ])->first(['schedule_date']);
         // Getting Already Booked Tickets
         $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
-            ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
+            ->where('company_id', Auth::user()->company_id)->where('schedule_id', $id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-        $schedule = Schedule::where('id', $request->id)
+        $schedule = Schedule::where('id', $id)
             ->where('company_id', Auth::user()->company_id)
             ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
