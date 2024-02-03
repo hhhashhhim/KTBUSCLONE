@@ -466,7 +466,7 @@
                                                             class="btn btn-danger mx-1"
                                                             v-if="checkForSubmenuButtons('delete-terminal')"
                                                     >
-                                                        <i class="far fa-eye-slash"></i>
+                                                        <i class="far fas fa-trash"></i>
                                                     </button>
                                                 </td>
                                             </tr>

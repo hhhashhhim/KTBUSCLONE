@@ -295,7 +295,9 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         setTimeout(() => {
-            $("#routeIds").select2();
+            $("#routeIds").select2({
+                closeOnSelect: false
+            });
         }, 300);
     },
     mounted() {

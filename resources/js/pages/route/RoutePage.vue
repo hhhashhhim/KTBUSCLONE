@@ -87,7 +87,7 @@
                                                             <button title="Delete Route" v-if="checkForSubmenuButtons('delete-routes')"
                                                                 :data-target="'#' + hideFormID" @click="delId = route.id" data-toggle="modal"
                                                                     class="btn btn-danger">
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="fas fa-trash"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#' + deleteFormID "-->
                                                             <!--                                                            data-toggle="modal"-->
@@ -150,10 +150,10 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="index in loop" :key="index">
+                            <tr v-for="(value,index) in addCities" :key="index">
                                 <td>
-                                    <select class="form-control rounded-0" id="selectCities"
-                                            @change="fetchTerminals($event , index)">
+                                    <select class="form-control rounded-0" id="selectCities" v-model="addCities[index]"
+                                           @change="updateRow($event , index)">
                                         <option value="0" selected>Select City</option>
                                         <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                             {{ city.name }}
@@ -161,8 +161,8 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-                                    <button class="btn btn-outline-danger" @click="removeRow">Remove</button>
+                                    <button class="btn btn-outline-primary mx-2" @click="addRow(index)">Add</button>
+                                    <button class="btn btn-outline-danger" @click="removeRow(index)">Remove</button>
                                 </td>
                             </tr>
                             </tbody>
@@ -294,8 +294,44 @@
                         <label for="name">Via</label>
                         <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
                     </div>
+                    <div class="form-group col-md-12">
+                        <label for="available_seats">Allowed Seats</label>
+                        <vue-mask
+                            class="form-control"
+                            v-model="dataEdit.online_seat_choices"
+                            mask="00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"
+                            :raw="false"
+                            :options="optionComma">
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-12 d-flex align-items-center">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>City From</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(value,index) in dataEdit.cityIds" :key="index">
+                                <td>
+                                    <select class="form-control rounded-0" id="" v-model="dataEdit.cityIds[index]"
+                                           @change="updateEditRow($event , index)">
+                                        <option value="0" selected>Select City</option>
+                                        <option v-for="(city, i) in cities" :value="city.id" :key="i">
+                                            {{ city.name }}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-primary mx-2" @click="addEditRow(index)">Add</button>
+                                    <button class="btn btn-outline-danger" @click="removeEditRow(index)">Remove</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="editLoading" @click="updateRoute()">
                         {{ editLoading ? 'Loading...' : 'Update Route' }}
@@ -330,6 +366,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Hide from "../../components/Hide.vue";
+import vueMask from "vue-jquery-mask";
 import {mapGetters} from "vuex";
 
 export default {
@@ -338,6 +375,7 @@ export default {
         Add,
         Edit,
         Hide,
+        vueMask,
     },
     data() {
         return {
@@ -348,7 +386,7 @@ export default {
             cities: [],
             validationErrors: [],
             city: 0,
-            addCities: [],
+            addCities: [0],
             companies: [],
             terminals: [],
             subroutes: [],
@@ -388,11 +426,10 @@ export default {
             $(".modal").click();
         },
         clearForm: function () {
-            route
             this.data = {};
             this.reverseRoute = 1;
             this.loop = 1;
-            this.addCities = [];
+            this.addCities = [0];
             $("select#selectCities").prop('selectedIndex', 0);
         },
         fareClassValue(data, className) {
@@ -406,12 +443,20 @@ export default {
             });
             return new_name ? new_name + ' PKR' : 'N/A';
         },
-        edit(route) {
-            this.dataEdit = {
-                id: route.id,
-                routeStartName: route.name.split('-')[0],
-                routeEndName: route.name.split('-')[1],
-                routeVia: route.via,
+        async edit(route) {
+            const routeData = await this.callApi("post", "routes/edit", {
+                id: route.id
+            });
+            if (routeData.status === 200) {
+                
+                this.dataEdit = {
+                    id: routeData.data.route.id,
+                    routeStartName: routeData.data.route.name.split('-')[0],
+                    routeEndName: routeData.data.route.name.split('-')[1],
+                    routeVia: routeData.data.route.via,
+                    cityIds: routeData.data.cityIds,
+                    online_seat_choices: routeData.data.route.online_seat_choices
+                }
             }
         },
         async editVisibility(id) {
@@ -486,13 +531,48 @@ export default {
                     timer: 2000
                 });
             }
+
+            // check duplication
+            const obj = this.addCities;
+            const valuesArray = Object.values(obj);
+            const checkDuplicate = new Set(valuesArray).size !== valuesArray.length;
+            if(checkDuplicate)
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Same city not allowed",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // check empty city value
+            if(Object.values(this.addCities).includes(0))
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Please select all dropdown",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // if one city is selected
+            if(this.addCities.length <= 1)
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Please select minimum two city",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
             const data = {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
                 routeVia: this.routeVia,
                 cities: this.addCities,
                 revereRoute: this.reverseRoute,
-                terminals: this.addTerminalsOnClick
+                terminals: this.addTerminalsOnClick,
             }
             this.loading = true;
             const res = await this.callApi("post", "routes/store", data);
@@ -558,6 +638,41 @@ export default {
                     timer: 2000
                 });
             }
+
+            // check duplication
+            const obj = this.dataEdit.cityIds;
+            const valuesArray = Object.values(obj);
+            const checkDuplicate = new Set(valuesArray).size !== valuesArray.length;
+            if(checkDuplicate)
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Same city not allowed",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // check empty city value
+            if(Object.values(this.dataEdit.cityIds).includes(0))
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Please select all dropdown",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            // if one city is selected
+            if(this.dataEdit.cityIds.length <= 1)
+            {
+                return swal({
+                    title: "Required!!",
+                    text: "Please select minimum two city",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            
             this.editLoading = true;
             const res = await this.callApi("post", "routes/update", this.dataEdit);
             if (res.status == 200) {
@@ -566,7 +681,7 @@ export default {
                 $('#route_table').DataTable().destroy();
                 swal({
                     title: "Success",
-                    text: "Route Name Updated Successfully",
+                    text: "Route Updated Successfully",
                     icon: "success",
                     timer: 2000
                 });
@@ -602,11 +717,11 @@ export default {
                 this.reverseRoute = 0;
             }
         },
-        addRow() {
-            this.loop++;
+        addRow(index) {
+           this.addCities.splice(index+1, 0, 0);
         },
-        removeRow() {
-            this.loop--;
+        removeRow(index) {
+            this.addCities.splice(index, 1);
         },
         addTerminal(event) {
             const value = event.target.value
@@ -620,13 +735,28 @@ export default {
                 this.addTerminalsOnClick.splice(index, 1);
             }
         },
-        async fetchTerminals(event, index) {
-            const value = event.target.value;
-            const indexI = this.addCities.indexOf(value);
-            if (indexI == -1) {
-                this.addCities.push(value);
-            }
+        // fetchTerminals(event, index) {
+        //     const value = event.target.value;
+        //     const indexI = this.addCities.indexOf(value);
+        //     if (indexI == -1) {
+        //         this.addCities.push(value);
+        //     }
+        // },
+        updateRow(event, index) {
+            this.addCities[index] = parseInt(event.target.value);
+        },  
+        updateEditRow(event, index) {
+            this.dataEdit.cityIds[index] = parseInt(event.target.value);
+        },  
+
+        addEditRow(index) {
+            this.dataEdit.cityIds.splice(index+1, 0, 0);
         },
+        
+        removeEditRow(index) {
+            this.dataEdit.cityIds.splice(index, 1);
+        },
+
         async fetchCities() {
             const cityRes = await this.callApi("post", "routes/list");
             if (cityRes.status === 200) {

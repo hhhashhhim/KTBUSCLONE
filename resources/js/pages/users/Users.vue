@@ -109,7 +109,7 @@
                                                                title="Delete User"
                                                                class="btn btn-danger text-light"
                                                             >
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="far fas fa-trash"></i>
                                                             </a>
                                                             <!--                                                            href="#delete-modal"-->
                                                             <!--                                                            data-toggle="modal"-->

@@ -132,7 +132,7 @@
                                                                     :data-target="'#' + hideFormID" @click="delId = schedule.id" data-toggle="modal"
                                                                     class="btn btn-danger btn-sm mr-1"
                                                             >
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="far fas fa-trash"></i>
                                                             </button>
                                                         </td>
                                                     </tr>

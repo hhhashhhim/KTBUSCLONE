@@ -47,7 +47,7 @@
                                                             <button title="Delete City" v-if="checkForSubmenuButtons('delete-city')"
                                                                     class=" text-light btn btn-danger" :data-target="'#' + hideFormID" @click="delId = city.id"
                                                                     data-toggle="modal">
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="far fas fa-trash"></i>
                                                             </button>
                                                             <!--                                                            :data-target="'#'+ deleteFormID" data-toggle="modal"-->
                                                             <!--                                                            @click="deleteModal(city,i)"-->

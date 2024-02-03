@@ -90,7 +90,7 @@
                                                             <button v-if="checkForSubmenuButtons('delete-bus-class')"
                                                                     :data-target="'#' + hideFormID" @click="delId = busClass.id" data-toggle="modal"
                                                                     class="btn btn-danger">
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="far fas fa-trash"></i>
                                                             </button>
                                                         </td>
                                                     </tr>

@@ -117,7 +117,7 @@
                                                                     class="btn btn-danger mx-2"
                                                                     v-if="checkForSubmenuButtons('delete-employee')"
                                                             >
-                                                                <i class="far fa-eye-slash"></i>
+                                                                <i class="far fas fa-trash"></i>
                                                             </button>                                                        
                                                         </td>
                                                     </tr>

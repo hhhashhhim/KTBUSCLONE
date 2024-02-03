@@ -27308,7 +27308,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               setTimeout(function () {
-                $("#routeIds").select2();
+                $("#routeIds").select2({
+                  closeOnSelect: false
+                });
               }, 300);
 
             case 5:
@@ -46953,6 +46955,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/Add.vue */ "./resources/js/components/Add.vue");
 /* harmony import */ var _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Edit.vue */ "./resources/js/components/Edit.vue");
 /* harmony import */ var _components_Hide_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Hide.vue */ "./resources/js/components/Hide.vue");
+/* harmony import */ var vue_jquery_mask__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-jquery-mask */ "./node_modules/vue-jquery-mask/dist/vue-jquery-mask.min.js");
+/* harmony import */ var vue_jquery_mask__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vue_jquery_mask__WEBPACK_IMPORTED_MODULE_3__);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
@@ -46965,12 +46969,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "RoutePage",
   components: {
     Add: _components_Add_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     Edit: _components_Edit_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Hide: _components_Hide_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    Hide: _components_Hide_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    vueMask: (vue_jquery_mask__WEBPACK_IMPORTED_MODULE_3___default())
   },
   data: function data() {
     return {
@@ -46981,7 +46987,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       cities: [],
       validationErrors: [],
       city: 0,
-      addCities: [],
+      addCities: [0],
       companies: [],
       terminals: [],
       subroutes: [],
@@ -47020,11 +47026,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $(".modal").click();
     },
     clearForm: function clearForm() {
-      route;
       this.data = {};
       this.reverseRoute = 1;
       this.loop = 1;
-      this.addCities = [];
+      this.addCities = [0];
       $("select#selectCities").prop('selectedIndex', 0);
     },
     fareClassValue: function fareClassValue(data, className) {
@@ -47039,36 +47044,64 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return new_name ? new_name + ' PKR' : 'N/A';
     },
     edit: function edit(route) {
-      this.dataEdit = {
-        id: route.id,
-        routeStartName: route.name.split('-')[0],
-        routeEndName: route.name.split('-')[1],
-        routeVia: route.via
-      };
-    },
-    editVisibility: function editVisibility(id) {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var routeVisibilities, data, i;
+        var routeData;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _this.subroutes = [];
-                _context.next = 3;
-                return _this.callApi("post", "routes/visibilities", {
+                _context.next = 2;
+                return _this.callApi("post", "routes/edit", {
+                  id: route.id
+                });
+
+              case 2:
+                routeData = _context.sent;
+
+                if (routeData.status === 200) {
+                  _this.dataEdit = {
+                    id: routeData.data.route.id,
+                    routeStartName: routeData.data.route.name.split('-')[0],
+                    routeEndName: routeData.data.route.name.split('-')[1],
+                    routeVia: routeData.data.route.via,
+                    cityIds: routeData.data.cityIds,
+                    online_seat_choices: routeData.data.route.online_seat_choices
+                  };
+                }
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    editVisibility: function editVisibility(id) {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var routeVisibilities, data, i;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _this2.subroutes = [];
+                _context2.next = 3;
+                return _this2.callApi("post", "routes/visibilities", {
                   id: id
                 });
 
               case 3:
-                routeVisibilities = _context.sent;
+                routeVisibilities = _context2.sent;
 
                 if (routeVisibilities.status === 200) {
                   data = routeVisibilities.data.visibilities;
 
                   for (i = 0; i < data.length; i++) {
-                    _this.subroutes.push({
+                    _this2.subroutes.push({
                       subroute_id: data[i].id,
                       departure_name: data[i].departure.name,
                       destination_name: data[i].destination.name,
@@ -47079,33 +47112,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee);
+        }, _callee2);
       }))();
     },
     updateVisibility: function updateVisibility() {
-      var _this2 = this;
+      var _this3 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _this2.visibleLoading = true;
-                _context2.next = 3;
-                return _this2.callApi("post", "routes/visibilities/update", {
-                  subroutes: _this2.subroutes
+                _this3.visibleLoading = true;
+                _context3.next = 3;
+                return _this3.callApi("post", "routes/visibilities/update", {
+                  subroutes: _this3.subroutes
                 });
 
               case 3:
-                res = _context2.sent;
+                res = _context3.sent;
 
                 if (res.status == 200) {
                   $(".modal").click();
-                  _this2.visibleLoading = false;
+                  _this3.visibleLoading = false;
                   swal({
                     title: "Success",
                     text: "Visibility Updated Successfully",
@@ -47113,7 +47146,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
                 } else {
-                  _this2.visibleLoading = false;
+                  _this3.visibleLoading = false;
 
                   if (res.status == 422) {
                     (function () {
@@ -47140,133 +47173,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }))();
-    },
-    addRoute: function addRoute() {
-      var _this3 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var data, res;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                if (!(_this3.routeStartName == '' || typeof _this3.routeStartName == 'undefined')) {
-                  _context3.next = 2;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
-                  title: "Required!!",
-                  text: "Route Start Name is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this3.routeEndName == '' || typeof _this3.routeEndName == 'undefined')) {
-                  _context3.next = 4;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
-                  title: "Required!!",
-                  text: "Route End Name is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                data = {
-                  routeStart: _this3.routeStartName,
-                  routeEnd: _this3.routeEndName,
-                  routeVia: _this3.routeVia,
-                  cities: _this3.addCities,
-                  revereRoute: _this3.reverseRoute,
-                  terminals: _this3.addTerminalsOnClick
-                };
-                _this3.loading = true;
-                _context3.next = 8;
-                return _this3.callApi("post", "routes/store", data);
-
-              case 8:
-                res = _context3.sent;
-
-                if (!(res.status === 200)) {
-                  _context3.next = 25;
-                  break;
-                }
-
-                $(".modal").click();
-                _this3.loading = false;
-                swal({
-                  title: "Success",
-                  text: "Route Created Successfully",
-                  icon: "success",
-                  timer: 2000
-                });
-                $('#route_table').DataTable().destroy();
-                _this3.routeStartName = "";
-                _this3.routeEndName = "";
-                _this3.routeVia = "";
-                _this3.loop = 1;
-                _this3.addCities = 0;
-                _this3.cities = 0;
-                _this3.routeDetails = [];
-                _context3.next = 23;
-                return _this3.fetchCities();
-
-              case 23:
-                _context3.next = 27;
-                break;
-
-              case 25:
-                _this3.loading = false;
-
-                if (res.status == 422) {
-                  (function () {
-                    var errorContent = "";
-                    var count = 0;
-
-                    for (var key in res.data.errors) {
-                      res.data.errors[key].forEach(function (element) {
-                        errorContent += ++count + " - " + //creating serial no.
-                        element + // main error
-                        "\n" // creating new line
-                        ;
-                      });
-                      swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                      });
-                    }
-                  })();
-                }
-
-              case 27:
-              case "end":
                 return _context3.stop();
             }
           }
         }, _callee3);
       }))();
     },
-    updateRoute: function updateRoute() {
+    addRoute: function addRoute() {
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res;
+        var obj, valuesArray, checkDuplicate, data, res;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(_this4.dataEdit.routeStartName == '' || typeof _this4.dataEdit.routeStartName == 'undefined')) {
+                if (!(_this4.routeStartName == '' || typeof _this4.routeStartName == 'undefined')) {
                   _context4.next = 2;
                   break;
                 }
@@ -47279,7 +47201,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                if (!(_this4.dataEdit.routeEndName == '' || typeof _this4.dataEdit.routeEndName == 'undefined')) {
+                if (!(_this4.routeEndName == '' || typeof _this4.routeEndName == 'undefined')) {
                   _context4.next = 4;
                   break;
                 }
@@ -47292,36 +47214,95 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 4:
-                _this4.editLoading = true;
-                _context4.next = 7;
-                return _this4.callApi("post", "routes/update", _this4.dataEdit);
+                // check duplication
+                obj = _this4.addCities;
+                valuesArray = Object.values(obj);
+                checkDuplicate = new Set(valuesArray).size !== valuesArray.length;
 
-              case 7:
+                if (!checkDuplicate) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Same city not allowed",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!Object.values(_this4.addCities).includes(0)) {
+                  _context4.next = 11;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Please select all dropdown",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 11:
+                if (!(_this4.addCities.length <= 1)) {
+                  _context4.next = 13;
+                  break;
+                }
+
+                return _context4.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Please select minimum two city",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 13:
+                data = {
+                  routeStart: _this4.routeStartName,
+                  routeEnd: _this4.routeEndName,
+                  routeVia: _this4.routeVia,
+                  cities: _this4.addCities,
+                  revereRoute: _this4.reverseRoute,
+                  terminals: _this4.addTerminalsOnClick
+                };
+                _this4.loading = true;
+                _context4.next = 17;
+                return _this4.callApi("post", "routes/store", data);
+
+              case 17:
                 res = _context4.sent;
 
-                if (!(res.status == 200)) {
-                  _context4.next = 17;
+                if (!(res.status === 200)) {
+                  _context4.next = 34;
                   break;
                 }
 
                 $(".modal").click();
-                _this4.editLoading = false;
-                $('#route_table').DataTable().destroy();
+                _this4.loading = false;
                 swal({
                   title: "Success",
-                  text: "Route Name Updated Successfully",
+                  text: "Route Created Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _context4.next = 15;
+                $('#route_table').DataTable().destroy();
+                _this4.routeStartName = "";
+                _this4.routeEndName = "";
+                _this4.routeVia = "";
+                _this4.loop = 1;
+                _this4.addCities = 0;
+                _this4.cities = 0;
+                _this4.routeDetails = [];
+                _context4.next = 32;
                 return _this4.fetchCities();
 
-              case 15:
-                _context4.next = 19;
+              case 32:
+                _context4.next = 36;
                 break;
 
-              case 17:
-                _this4.editLoading = false;
+              case 34:
+                _this4.loading = false;
 
                 if (res.status == 422) {
                   (function () {
@@ -47345,12 +47326,152 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 19:
+              case 36:
               case "end":
                 return _context4.stop();
             }
           }
         }, _callee4);
+      }))();
+    },
+    updateRoute: function updateRoute() {
+      var _this5 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var obj, valuesArray, checkDuplicate, res;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                if (!(_this5.dataEdit.routeStartName == '' || typeof _this5.dataEdit.routeStartName == 'undefined')) {
+                  _context5.next = 2;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Route Start Name is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                if (!(_this5.dataEdit.routeEndName == '' || typeof _this5.dataEdit.routeEndName == 'undefined')) {
+                  _context5.next = 4;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Route End Name is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 4:
+                // check duplication
+                obj = _this5.dataEdit.cityIds;
+                valuesArray = Object.values(obj);
+                checkDuplicate = new Set(valuesArray).size !== valuesArray.length;
+
+                if (!checkDuplicate) {
+                  _context5.next = 9;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Same city not allowed",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!Object.values(_this5.dataEdit.cityIds).includes(0)) {
+                  _context5.next = 11;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Please select all dropdown",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 11:
+                if (!(_this5.dataEdit.cityIds.length <= 1)) {
+                  _context5.next = 13;
+                  break;
+                }
+
+                return _context5.abrupt("return", swal({
+                  title: "Required!!",
+                  text: "Please select minimum two city",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 13:
+                _this5.editLoading = true;
+                _context5.next = 16;
+                return _this5.callApi("post", "routes/update", _this5.dataEdit);
+
+              case 16:
+                res = _context5.sent;
+
+                if (!(res.status == 200)) {
+                  _context5.next = 26;
+                  break;
+                }
+
+                $(".modal").click();
+                _this5.editLoading = false;
+                $('#route_table').DataTable().destroy();
+                swal({
+                  title: "Success",
+                  text: "Route Updated Successfully",
+                  icon: "success",
+                  timer: 2000
+                });
+                _context5.next = 24;
+                return _this5.fetchCities();
+
+              case 24:
+                _context5.next = 28;
+                break;
+
+              case 26:
+                _this5.editLoading = false;
+
+                if (res.status == 422) {
+                  (function () {
+                    var errorContent = "";
+                    var count = 0;
+
+                    for (var key in res.data.errors) {
+                      res.data.errors[key].forEach(function (element) {
+                        errorContent += ++count + " - " + //creating serial no.
+                        element + // main error
+                        "\n" // creating new line
+                        ;
+                      });
+                      swal({
+                        title: "Error",
+                        text: errorContent,
+                        icon: "error",
+                        timer: 2000
+                      });
+                    }
+                  })();
+                }
+
+              case 28:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
       }))();
     },
     checkBox: function checkBox(e) {
@@ -47360,11 +47481,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.reverseRoute = 0;
       }
     },
-    addRow: function addRow() {
-      this.loop++;
+    addRow: function addRow(index) {
+      this.addCities.splice(index + 1, 0, 0);
     },
-    removeRow: function removeRow() {
-      this.loop--;
+    removeRow: function removeRow(index) {
+      this.addCities.splice(index, 1);
     },
     addTerminal: function addTerminal(event) {
       var value = event.target.value;
@@ -47381,29 +47502,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.addTerminalsOnClick.splice(_index, 1);
       }
     },
-    fetchTerminals: function fetchTerminals(event, index) {
-      var _this5 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var value, indexI;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                value = event.target.value;
-                indexI = _this5.addCities.indexOf(value);
-
-                if (indexI == -1) {
-                  _this5.addCities.push(value);
-                }
-
-              case 3:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5);
-      }))();
+    // fetchTerminals(event, index) {
+    //     const value = event.target.value;
+    //     const indexI = this.addCities.indexOf(value);
+    //     if (indexI == -1) {
+    //         this.addCities.push(value);
+    //     }
+    // },
+    updateRow: function updateRow(event, index) {
+      this.addCities[index] = parseInt(event.target.value);
+    },
+    updateEditRow: function updateEditRow(event, index) {
+      this.dataEdit.cityIds[index] = parseInt(event.target.value);
+    },
+    addEditRow: function addEditRow(index) {
+      this.dataEdit.cityIds.splice(index + 1, 0, 0);
+    },
+    removeEditRow: function removeEditRow(index) {
+      this.dataEdit.cityIds.splice(index, 1);
     },
     fetchCities: function fetchCities() {
       var _this6 = this;
@@ -63447,7 +63563,7 @@ var _hoisted_34 = ["data-target", "onClick"];
 
 var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-eye-slash"
+    "class": "far fas fa-trash"
   }, null, -1
   /* HOISTED */
   );
@@ -65301,7 +65417,7 @@ var _hoisted_24 = [_hoisted_23];
 var _hoisted_25 = ["data-target", "onClick"];
 
 var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye-slash"
+  "class": "far fas fa-trash"
 }, null, -1
 /* HOISTED */
 );
@@ -70238,7 +70354,7 @@ var _hoisted_33 = [_hoisted_32];
 var _hoisted_34 = ["data-target", "onClick"];
 
 var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye-slash"
+  "class": "far fas fa-trash"
 }, null, -1
 /* HOISTED */
 );
@@ -79324,7 +79440,7 @@ var _hoisted_35 = ["data-target", "onClick"];
 
 var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "far fa-eye-slash"
+    "class": "fas fa-trash"
   }, null, -1
   /* HOISTED */
   );
@@ -79425,7 +79541,7 @@ var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_55 = ["onChange"];
+var _hoisted_55 = ["onUpdate:modelValue", "onChange"];
 
 var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
@@ -79437,8 +79553,10 @@ var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_57 = ["value"];
-var _hoisted_58 = ["disabled"];
-var _hoisted_59 = {
+var _hoisted_58 = ["onClick"];
+var _hoisted_59 = ["onClick"];
+var _hoisted_60 = ["disabled"];
+var _hoisted_61 = {
   "class": "modal fade",
   id: "showDetails",
   tabindex: "-1",
@@ -79446,18 +79564,18 @@ var _hoisted_59 = {
   "aria-labelledby": "exampleModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_60 = {
+var _hoisted_62 = {
   "class": "modal-dialog modal-xl",
   role: "document"
 };
-var _hoisted_61 = {
+var _hoisted_63 = {
   "class": "modal-content"
 };
-var _hoisted_62 = {
+var _hoisted_64 = {
   "class": "modal-header"
 };
 
-var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_65 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: "exampleModalLabel"
@@ -79466,7 +79584,7 @@ var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -79474,30 +79592,30 @@ var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_65 = [_hoisted_64];
-var _hoisted_66 = {
+var _hoisted_67 = [_hoisted_66];
+var _hoisted_68 = {
   "class": "modal-body"
 };
-var _hoisted_67 = {
+var _hoisted_69 = {
   "class": "table table-striped"
 };
 
-var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City From", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_69 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_71 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City To", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_70 = {
+var _hoisted_72 = {
   "class": "modal-footer"
 };
-var _hoisted_71 = {
+var _hoisted_73 = {
   "class": "modal fade",
   id: "terminalVisibility",
   tabindex: "-1",
@@ -79505,18 +79623,18 @@ var _hoisted_71 = {
   "aria-labelledby": "exampleModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_72 = {
+var _hoisted_74 = {
   "class": "modal-dialog modal-xl",
   role: "document"
 };
-var _hoisted_73 = {
+var _hoisted_75 = {
   "class": "modal-content"
 };
-var _hoisted_74 = {
+var _hoisted_76 = {
   "class": "modal-header"
 };
 
-var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: "exampleModalLabel"
@@ -79525,7 +79643,7 @@ var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_78 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -79533,52 +79651,38 @@ var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_77 = [_hoisted_76];
-var _hoisted_78 = {
+var _hoisted_79 = [_hoisted_78];
+var _hoisted_80 = {
   "class": "modal-body"
 };
 
-var _hoisted_79 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row\" data-v-66b5e4b9><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Departure City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Destination City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" class=\"d-block\" data-v-66b5e4b9>Hide Subroute</label></div></div>", 1);
+var _hoisted_81 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row\" data-v-66b5e4b9><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Departure City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" data-v-66b5e4b9>Destination City</label></div><div class=\"form-group col-md-4\" data-v-66b5e4b9><label for=\"name\" class=\"d-block\" data-v-66b5e4b9>Hide Subroute</label></div></div>", 1);
 
-var _hoisted_80 = {
+var _hoisted_82 = {
   "class": "form-group col-md-4"
 };
-var _hoisted_81 = {
-  "class": "form-control"
-};
-var _hoisted_82 = ["value"];
 var _hoisted_83 = {
-  "class": "form-group col-md-4"
-};
-var _hoisted_84 = {
   "class": "form-control"
 };
-var _hoisted_85 = ["value"];
-var _hoisted_86 = {
+var _hoisted_84 = ["value"];
+var _hoisted_85 = {
   "class": "form-group col-md-4"
 };
-var _hoisted_87 = ["onUpdate:modelValue"];
+var _hoisted_86 = {
+  "class": "form-control"
+};
+var _hoisted_87 = ["value"];
 var _hoisted_88 = {
+  "class": "form-group col-md-4"
+};
+var _hoisted_89 = ["onUpdate:modelValue"];
+var _hoisted_90 = {
   "class": "modal-footer"
 };
-var _hoisted_89 = ["disabled"];
-var _hoisted_90 = {
+var _hoisted_91 = ["disabled"];
+var _hoisted_92 = {
   "class": "row"
 };
-var _hoisted_91 = {
-  "class": "form-group col-md-4"
-};
-
-var _hoisted_92 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "name"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route Start Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "text-danger ml-1"
-  }, "*")], -1
-  /* HOISTED */
-  );
-});
-
 var _hoisted_93 = {
   "class": "form-group col-md-4"
 };
@@ -79586,7 +79690,7 @@ var _hoisted_93 = {
 var _hoisted_94 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route End Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route Start Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-danger ml-1"
   }, "*")], -1
   /* HOISTED */
@@ -79600,20 +79704,75 @@ var _hoisted_95 = {
 var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Route End Point Name "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-danger ml-1"
+  }, "*")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_97 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_98 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "name"
   }, "Via", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_97 = ["disabled"];
-var _hoisted_98 = ["action"];
-var _hoisted_99 = ["value"];
-var _hoisted_100 = ["value"];
-var _hoisted_101 = ["disabled"];
+var _hoisted_99 = {
+  "class": "form-group col-md-12"
+};
+
+var _hoisted_100 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "available_seats"
+  }, "Allowed Seats", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_101 = {
+  "class": "form-group col-md-12 d-flex align-items-center"
+};
+var _hoisted_102 = {
+  "class": "table table-striped"
+};
+
+var _hoisted_103 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "City From"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_104 = ["onUpdate:modelValue", "onChange"];
+
+var _hoisted_105 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "0",
+    selected: ""
+  }, "Select City", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_106 = ["value"];
+var _hoisted_107 = ["onClick"];
+var _hoisted_108 = ["onClick"];
+var _hoisted_109 = ["disabled"];
+var _hoisted_110 = ["action"];
+var _hoisted_111 = ["value"];
+var _hoisted_112 = ["value"];
+var _hoisted_113 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
+
+  var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
   var _component_Edit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Edit");
 
@@ -79717,13 +79876,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[8] || (_cache[8] = function () {
+        onClick: _cache[6] || (_cache[6] = function () {
           return $options.addRoute && $options.addRoute.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save Route'), 9
       /* TEXT, PROPS */
-      , _hoisted_58)];
+      , _hoisted_60)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -79761,14 +79920,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, null, 40
       /* PROPS, HYDRATE_EVENTS */
-      , _hoisted_50), _hoisted_51])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (index) {
+      , _hoisted_50), _hoisted_51])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.addCities, function (value, index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: index
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
           "class": "form-control rounded-0",
           id: "selectCities",
+          "onUpdate:modelValue": function onUpdateModelValue($event) {
+            return $data.addCities[index] = $event;
+          },
           onChange: function onChange($event) {
-            return $options.fetchTerminals($event, index);
+            return $options.updateRow($event, index);
           }
         }, [_hoisted_56, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (city, i) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -79781,17 +79943,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* KEYED_FRAGMENT */
         ))], 40
         /* PROPS, HYDRATE_EVENTS */
-        , _hoisted_55)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        , _hoisted_55), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addCities[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-primary mx-2",
-          onClick: _cache[6] || (_cache[6] = function () {
-            return $options.addRow && $options.addRow.apply($options, arguments);
-          })
-        }, "Add"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          onClick: function onClick($event) {
+            return $options.addRow(index);
+          }
+        }, "Add", 8
+        /* PROPS */
+        , _hoisted_58), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           "class": "btn btn-outline-danger",
-          onClick: _cache[7] || (_cache[7] = function () {
-            return $options.removeRow && $options.removeRow.apply($options, arguments);
-          })
-        }, "Remove")])]);
+          onClick: function onClick($event) {
+            return $options.removeRow(index);
+          }
+        }, "Remove", 8
+        /* PROPS */
+        , _hoisted_59)])]);
       }), 128
       /* KEYED_FRAGMENT */
       ))])])])])];
@@ -79801,15 +79967,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("            Details Model"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [_hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
     "aria-label": "Close",
-    onClick: _cache[9] || (_cache[9] = function ($event) {
+    onClick: _cache[7] || (_cache[7] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_65)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_68, _hoisted_69, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.th, function (heading, i) {
+  }, _hoisted_67)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_70, _hoisted_71, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.th, function (heading, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(heading.name), 1
@@ -79843,67 +80009,67 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     );
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
     "data-dismiss": "modal",
-    onClick: _cache[10] || (_cache[10] = function ($event) {
+    onClick: _cache[8] || (_cache[8] = function ($event) {
       return $options.printPrice();
     })
   }, "Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     "data-dismiss": "modal",
-    onClick: _cache[11] || (_cache[11] = function ($event) {
+    onClick: _cache[9] || (_cache[9] = function ($event) {
       return $options.closeModal();
     })
-  }, "Close")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [_hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Close")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_75, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_76, [_hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
     "aria-label": "Close",
-    onClick: _cache[12] || (_cache[12] = function ($event) {
+    onClick: _cache[10] || (_cache[10] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_77)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [_hoisted_79, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.subroutes, function (subroute, i) {
+  }, _hoisted_79)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [_hoisted_81, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.subroutes, function (subroute, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       "class": "row",
       key: i
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: subroute.departure_id,
       selected: ""
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(subroute.departure_name), 9
     /* TEXT, PROPS */
-    , _hoisted_82)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    , _hoisted_84)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: subroute.destination_id,
       selected: ""
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(subroute.destination_name), 9
     /* TEXT, PROPS */
-    , _hoisted_85)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_87)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "checkbox",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.subroutes[i].visibility = $event;
       }
     }, null, 8
     /* PROPS */
-    , _hoisted_87), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.subroutes[i].visibility]])])]);
+    , _hoisted_89), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.subroutes[i].visibility]])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
     "data-dismiss": "modal",
     disabled: $data.visibleLoading,
-    onClick: _cache[13] || (_cache[13] = function ($event) {
+    onClick: _cache[11] || (_cache[11] = function ($event) {
       return $options.updateVisibility();
     })
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.visibleLoading ? 'Loading...' : 'Update Visiblility'), 9
   /* TEXT, PROPS */
-  , _hoisted_89), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_91), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     "data-dismiss": "modal",
-    onClick: _cache[14] || (_cache[14] = function ($event) {
+    onClick: _cache[12] || (_cache[12] = function ($event) {
       return $options.closeModal();
     })
   }, "Close")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
@@ -79917,39 +80083,90 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-primary",
         disabled: $data.editLoading,
-        onClick: _cache[18] || (_cache[18] = function ($event) {
+        onClick: _cache[17] || (_cache[17] = function ($event) {
           return $options.updateRoute();
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.editLoading ? 'Loading...' : 'Update Route'), 9
       /* TEXT, PROPS */
-      , _hoisted_97)];
+      , _hoisted_109)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.dataEdit.routeStartName = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeStartName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
           return $data.dataEdit.routeEndName = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeEndName]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [_hoisted_98, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
           return $data.dataEdit.routeVia = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeVia]])])])];
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.routeVia]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+        "class": "form-control",
+        modelValue: $data.dataEdit.online_seat_choices,
+        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+          return $data.dataEdit.online_seat_choices = $event;
+        }),
+        mask: "00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,",
+        raw: false,
+        options: _ctx.optionComma
+      }, null, 8
+      /* PROPS */
+      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_102, [_hoisted_103, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.dataEdit.cityIds, function (value, index) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+          key: index
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+          "class": "form-control rounded-0",
+          id: "",
+          "onUpdate:modelValue": function onUpdateModelValue($event) {
+            return $data.dataEdit.cityIds[index] = $event;
+          },
+          onChange: function onChange($event) {
+            return $options.updateEditRow($event, index);
+          }
+        }, [_hoisted_105, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cities, function (city, i) {
+          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+            value: city.id,
+            key: i
+          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(city.name), 9
+          /* TEXT, PROPS */
+          , _hoisted_106);
+        }), 128
+        /* KEYED_FRAGMENT */
+        ))], 40
+        /* PROPS, HYDRATE_EVENTS */
+        , _hoisted_104), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.cityIds[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          "class": "btn btn-outline-primary mx-2",
+          onClick: function onClick($event) {
+            return $options.addEditRow(index);
+          }
+        }, "Add", 8
+        /* PROPS */
+        , _hoisted_107), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          "class": "btn btn-outline-danger",
+          onClick: function onClick($event) {
+            return $options.removeEditRow(index);
+          }
+        }, "Remove", 8
+        /* PROPS */
+        , _hoisted_108)])]);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))])])])])];
     }),
     _: 1
     /* STABLE */
@@ -79967,15 +80184,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_99), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_111), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "route_id",
     value: this.route_id
   }, null, 8
   /* PROPS */
-  , _hoisted_100)], 8
+  , _hoisted_112)], 8
   /* PROPS */
-  , _hoisted_98), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Hide, {
+  , _hoisted_110), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Hide, {
     hideForm: $data.hideFormID,
     confirmationMessage: "Are You Sure You want To Delete This City ???"
   }, {
@@ -79984,12 +80201,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-danger btn-block",
         disabled: $data.loading,
-        onClick: _cache[19] || (_cache[19] = function () {
+        onClick: _cache[18] || (_cache[18] = function () {
           return $options.hideRoute && $options.hideRoute.apply($options, arguments);
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Yes, I want to Delete'), 9
       /* TEXT, PROPS */
-      , _hoisted_101)];
+      , _hoisted_113)];
     }),
     _: 1
     /* STABLE */
@@ -81255,7 +81472,7 @@ var _hoisted_45 = [_hoisted_44];
 var _hoisted_46 = ["data-target", "onClick"];
 
 var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye-slash"
+  "class": "far fas fa-trash"
 }, null, -1
 /* HOISTED */
 );
@@ -84705,7 +84922,7 @@ var _hoisted_168 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElemen
 var _hoisted_169 = ["data-target", "onClick"];
 
 var _hoisted_170 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye-slash"
+  "class": "far fas fa-trash"
 }, null, -1
 /* HOISTED */
 );
@@ -86430,7 +86647,7 @@ var _hoisted_41 = [_hoisted_40];
 var _hoisted_42 = ["data-target", "onClick"];
 
 var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-eye-slash"
+  "class": "far fas fa-trash"
 }, null, -1
 /* HOISTED */
 );
