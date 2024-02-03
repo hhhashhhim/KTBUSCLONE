@@ -297,7 +297,7 @@ class BookingApiController extends Controller
                 $schedule = Schedule::where('id', $request->schedule_id)
                     ->where('company_id', $companyId)
                     ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
-                    ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+                    ->with('bus_class:id,seat_map', 'route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                     ->first();
                 $scheduleDiscount = Discount::where('id', $schedule->discount_id)->where('is_active', 1)->first();
                 $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
@@ -318,7 +318,7 @@ class BookingApiController extends Controller
                 }
         //        //Apply terminal discount
                 $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $schedule->route_id])->first();
-        
+                $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
                 $seatMap = $schedule->bus_class->seat_map;
                 foreach ($seatMap as $i => &$iValue) {
@@ -351,7 +351,7 @@ class BookingApiController extends Controller
                                 }
                             }
                             
-                            // allow seat manage
+                            // allow seat manage terminal wise
                             if(isset($seats) && !in_array($column['seatNo'], $seats))
                             {
                                 $column['terminal_allow'] = false;
@@ -360,6 +360,23 @@ class BookingApiController extends Controller
                             {
                                 $column['terminal_allow'] = true;
                             }
+                            
+                            // allow seat manage route wise
+                            if($seatChoices)
+                            {
+                                if(in_array($column['seatNo'], $seatChoices) &&  $column['terminal_allow'] == true)
+                                {
+                                    $column['terminal_allow'] = true;
+                                }
+                                else
+                                {
+                                    $column['terminal_allow'] = false;
+                                }
+                            }
+
+
+
+
 
                         }
                         $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;

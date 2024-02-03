@@ -8,6 +8,8 @@ use App\Models\FareTable;
 use App\Models\Terminal\TerminalVisibility;
 use App\Models\ActivityLog;
 use App\Models\Route\Route;
+use App\Models\Schedule\Schedule;
+use App\Models\Schedule\ScheduleDetail;
 use App\Models\Route\RouteFare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -165,6 +167,19 @@ class RouteController extends Controller
         }
     }
 
+    public function edit(Request $request)
+    {
+        $route = Route::find($request->id);
+
+        $lastFare = $route->fares->last();
+        $allCityRoute = $route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+        array_push($allCityRoute, $lastFare->destination_city_id);
+
+        return [
+            "route" => $route,
+            "cityIds" => $allCityRoute,
+        ];
+    }
     public function update(Request $request)
     {
         try {
@@ -179,7 +194,95 @@ class RouteController extends Controller
                 ])->update([
                     'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
                     'via' => $request['routeVia'],
+                    'online_seat_choices' => $request['online_seat_choices'],
                 ]);
+                // now we will delete all route detail and will insert new one
+                RouteFare::where("route_id",$request->id)->delete();
+
+                $used_cities = [];//key can't be same
+                foreach ($request->cityIds as $index => $city) {
+                    $used_cities[] = $city;
+                    foreach ($request->cityIds as $innerIndex => $innerCity) {
+                        if (in_array($innerCity, $used_cities)) {
+                            continue;
+                        } else {
+                            $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
+
+                            if ($fare->count() > 0) {
+                                foreach ($fare as $detail) {
+                                    RouteFare::create([
+                                        'route_id' => $request->id,
+                                        'fare_id' => $detail->id,
+                                        'fare_class_id' => $detail->fare_class,
+                                        'departure_city_id' => $used_cities[$index],
+                                        'destination_city_id' => $innerCity,
+                                        'company_id' => Auth::user()->company_id,
+                                        'added_by' => auth()->user()->id
+                                    ]);
+                                }
+                            }
+                            
+                            TerminalVisibility::where("route_id",$request->id)->delete();
+
+                            TerminalVisibility::create([
+                                'route_id' => $request->id,
+                                'departure_city_id' => $used_cities[$index],
+                                'destination_city_id' => $innerCity,
+                                'company_id' => Auth::user()->company_id,
+                                'added_by' => auth()->user()->id
+                            ]);
+
+                        }
+                    }
+                }
+
+                // and after addition route detail we will update schedule detail also so that it will implent all schedules
+                $schedules = Schedule::where(["company_id"=>Auth::user()->company_id,"route_id"=>$request->id])->get();
+                
+    
+                foreach($schedules as $schedule)
+                {
+                    $start_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id","ASC")->first();
+                    $end_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id",'DESC')->first();
+                    if($start_date && $end_date)
+                    {
+                        ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", '>=' , date("Y-m-d"))->delete();
+                        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
+                        $days = $this->getDays($start_date->schedule_date, $end_date->schedule_date);
+      
+        
+                        for ($i = 0; $i <= $days; $i++) {
+                            $lastDepId = $routeDetails[0]->departure_city_id;
+                            $totalTime = strtotime(date("$start_date->schedule_date $start_date->departure_time")) + ($i * 86400);
+                            $scheduleStartDate = date("Y-m-d", $totalTime);
+                            
+                            
+                            foreach ($routeDetails as $detail) {
+                                if ($lastDepId == $detail->departure_city_id) {
+                                    $departureTime = date("Y-m-d H:i", $totalTime);
+                                } else {
+                                    $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
+                                    $timeDiff = explode(':', $fareTableTime);
+                                    $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
+                                    $departureTime = date("Y-m-d H:i", $totalTime);
+                                    $lastDepId = $detail->departure_city_id;
+                                }
+                              
+                                ScheduleDetail::create([
+                                    'company_id' => Auth::user()->company_id,
+                                    'added_by' => Auth::user()->id,
+                                    'schedule_id' => $schedule->id,
+                                    'departure_id' => $detail->departure_city_id,
+                                    'destination_id' => $detail->destination_city_id,
+                                    'departure_time' => date('H:i', strtotime($departureTime)),
+                                    'departure_date' => date('Y-m-d', strtotime($departureTime)),
+                                    'schedule_date' => $scheduleStartDate, // schedule departure date
+                                ]);
+                            }
+                        }
+                    }
+                }
+             
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated route (".$request['routeStartName'] . '-' . $request['routeEndName'].")",
@@ -262,5 +365,9 @@ class RouteController extends Controller
             'data' => $data,
             'th' => FareClass::where('company_id', Auth::user()->company_id)->orderBY('name', 'ASC')->get(),
         ];
+    }
+    public function getDays($start, $end)
+    {
+        return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
 }

@@ -273,7 +273,7 @@ class TicketingApiController extends Controller
                 }
         //        //Apply terminal discount
                 $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $schedule->route_id])->first();
-        
+                $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
                 $seatMap = $schedule->bus_class->seat_map;
                 foreach ($seatMap as $i => $iValue) {
@@ -318,6 +318,19 @@ class TicketingApiController extends Controller
                             else
                             {
                                 $seatMap[$i][$j]['terminal_allow'] = true;
+                            }
+
+                            // allow seat manage route wise
+                            if($seatChoices)
+                            {
+                                if(in_array($column['seatNo'], $seatChoices) &&  $column['terminal_allow'] == true)
+                                {
+                                    $column['terminal_allow'] = true;
+                                }
+                                else
+                                {
+                                    $column['terminal_allow'] = false;
+                                }
                             }
                         }
                         $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;

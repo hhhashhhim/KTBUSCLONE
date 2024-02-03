@@ -17,17 +17,17 @@ class AdvanceSalesReportController extends Controller
 {
     public function getUserNames()
     {
-        return User::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return User::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function getTerminals()
     {
-        return Terminal::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return Terminal::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function getRoutes()
     {
-        return Route::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function filterData(Request $request)
@@ -50,7 +50,6 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('updated_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
                 return $query->whereIn('route_id', $request->route);
             })
             ->orderBy('date', 'desc')
@@ -111,7 +110,7 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('added_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                return $query->where('route_id', $request->route);
+                return $query->whereIn('route_id', $request->route);
             })
             ->when($request->fromDateTime, function ($query) use ($request) {
                 return $query->where('schedule_time', '>=', $request->fromDateTime);
@@ -152,8 +151,8 @@ class AdvanceSalesReportController extends Controller
             
             return [
                 'record' => $sortData,
-            'refund' => $refundTickets,
-            'counterExpenses' => $counterexpenses ?? [],
+                'refund' => $refundTickets,
+                'counterExpenses' => $counterexpenses ?? [],
         ];
 
     }
@@ -179,9 +178,9 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('updated_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                // $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->whereIn('route_id', $request->route);
+                return $query->whereIn('route_id',  explode(",",$request->route));
             })
+            ->orderBy('date', 'desc')
             ->get();
 
         $tickets->transform(function ($single) {
@@ -239,15 +238,18 @@ class AdvanceSalesReportController extends Controller
                 return $query->where('added_by', $request->user);
             })
             ->when($request->route, function ($query) use ($request) {
-                $scheduleIds = Schedule::where('route_id', $request->route)->pluck('id');
-                return $query->whereIn('schedule_id', $scheduleIds);
+                return $query->whereIn('route_id',  explode(",",$request->route));
             })
-            ->get();
+            ->when($request->fromDateTime, function ($query) use ($request) {
+                return $query->where('schedule_time', '>=', $request->fromDateTime);
+            })->when($request->toDateTime, function ($query) use ($request) {
+                return $query->where('schedule_time', '<=', $request->toDateTime);
+            })->get();
         $refundTickets->map(function ($q) {
             $q->cancel_percentage = $q->cancel_ticket->percentage;
-            $q->refund_by = User::find($q->cancel_ticket->added_by)->name;
+            $user = User::find($q->cancel_ticket->added_by);
+            $q->refund_by = $user ? $user->name : '-';
             $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->bus_NO = BusClass::find($q->bus_class_id)->name;
             $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
             $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
@@ -256,28 +258,23 @@ class AdvanceSalesReportController extends Controller
             $q->cancelation_charges = round($final);
             unset($q->cancel_ticket, $q->schedule);
         });
-        $refundTickets = $refundTickets->when($request->fromDateTime, function ($query) use ($request) {
-            return $query->where('bus_time', '>=', $request->fromDateTime);
-        })->when($request->toDateTime, function ($query) use ($request) {
-            return $query->where('bus_time', '<=', $request->toDateTime);
-        });
         // Counter expenses data
         if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
-            $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
-                ->when($request->terminal, function ($query) use ($request) {
-                    return $query->where('terminal_id', $request->terminal);
-                })
-                ->when($request->user, function ($query) use ($request) {
-                    return $query->where('added_by', $request->user);
-                })
-                ->when($request->fromDateTime, function ($query) use ($request) {
-                    return $query->where('time', '>=', $request->fromDateTime);
-                })
-                ->when($request->toDateTime, function ($query) use ($request) {
-                    return $query->where('time', '<=', $request->toDateTime);
-                })
-                ->get();
-            }
+        $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
+            ->when($request->terminal, function ($query) use ($request) {
+                return $query->where('terminal_id', $request->terminal);
+            })
+            ->when($request->user, function ($query) use ($request) {
+                return $query->where('added_by', $request->user);
+            })
+            ->when($request->fromDateTime, function ($query) use ($request) {
+                return $query->where('time', '>=', $request->fromDateTime);
+            })
+            ->when($request->toDateTime, function ($query) use ($request) {
+                return $query->where('time', '<=', $request->toDateTime);
+            })
+            ->get();
+        }
         $filterData = (object)[];
         $filterData->terminal = Terminal::find($request->terminal)->name??"All";
         $filterData->user = User::find($request->terminal)->name??"All";
