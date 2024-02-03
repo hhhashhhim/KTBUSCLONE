@@ -1400,7 +1400,7 @@ class BookingController extends Controller
         }
 
         // return $ids;
-        $tickets = Ticket::with('customer', 'schedule_detail_data:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+        return $tickets = Ticket::with('customer', 'schedule_detail_data:id,departure_time', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
             $checkTerminal = ScheduleTerminalSequence::where(['company_id' => $item->company_id, 'city_id' => $item->departure_city_id, 'schedule_id' => $item->schedule_id])->orderBy('id', 'DESC')->get();
             $subTime = 0; // how many times difference will affect to departure time according to terminal time difference
