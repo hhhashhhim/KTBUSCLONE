@@ -79730,7 +79730,7 @@ var _hoisted_99 = {
 var _hoisted_100 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "available_seats"
-  }, "Allowed Seats", -1
+  }, "Online Allowed Seats", -1
   /* HOISTED */
   );
 });

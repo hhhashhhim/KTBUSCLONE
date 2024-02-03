@@ -295,7 +295,7 @@
                         <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
                     </div>
                     <div class="form-group col-md-12">
-                        <label for="available_seats">Allowed Seats</label>
+                        <label for="available_seats">Online Allowed Seats</label>
                         <vue-mask
                             class="form-control"
                             v-model="dataEdit.online_seat_choices"
