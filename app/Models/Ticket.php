@@ -74,6 +74,11 @@ class Ticket extends Model
     {
         return $this->hasOne(ScheduleDetail::class, 'id', 'schedule_details_id');
     }
+    
+    public function schedule_detail_data()
+    {
+        return $this->hasOne(ScheduleDetail::class, 'id', 'schedule_details_id');
+    }
 
     public function terminal()
     {
