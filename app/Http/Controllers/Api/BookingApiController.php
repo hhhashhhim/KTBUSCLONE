@@ -115,7 +115,7 @@ class BookingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
                 // Data
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","variation_time"]);
                 
                 
                 $data->map(function($single,$key) use ($data,$companyId,$terminalId){
@@ -288,6 +288,7 @@ class BookingApiController extends Controller
                     'departure_date' => $request->date,
                     'departure_id' => $request->departure_city_id,
                     'destination_id' => $request->destination_city_id,
+                    // 'variation_time' => $request->variation_time,
                 ])->first(['schedule_date']);
                 // Getting Already Booked Tickets
                 $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
