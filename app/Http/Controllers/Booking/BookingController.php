@@ -734,7 +734,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'variation_time' => $request->variation_time,
+            // 'variation_time' => $request->variation_time,
         ])->first(['schedule_date']);
         // Getting Already Booked Tickets
         $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
