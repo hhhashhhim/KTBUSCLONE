@@ -31102,7 +31102,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this25 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
-        var resTicket, bookType;
+        var resTicket, bookType, variationTime;
         return _regeneratorRuntime().wrap(function _callee24$(_context24) {
           while (1) {
             switch (_context24.prev = _context24.next) {
@@ -31255,6 +31255,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     hideAfter: 1000
                   });
                   bookType = _this25.addForm.type;
+                  variationTime = _this25.addForm.variation_time;
                   _this25.addForm = {
                     totalAmount: 0,
                     discount: '',
@@ -31274,6 +31275,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this25.addForm.terminalId = resTicket.data.authTerminalId;
                   _this25.addForm.gender = 1;
                   _this25.addForm.type = bookType;
+                  _this25.addForm.variation_time = variationTime;
                   _this25.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                   _this25.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                   _this25.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);

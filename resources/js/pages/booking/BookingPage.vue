@@ -3180,6 +3180,7 @@ export default {
                     hideAfter: 1000
                 });
                 const bookType = this.addForm.type;
+                const variationTime = this.addForm.variation_time;
                 this.addForm = {
                     totalAmount: 0,
                     discount: '',
@@ -3200,6 +3201,7 @@ export default {
                 this.addForm.terminalId = resTicket.data.authTerminalId;
                 this.addForm.gender = 1;
                 this.addForm.type = bookType;
+                this.addForm.variation_time = variationTime;
                 this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
