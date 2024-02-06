@@ -316,6 +316,17 @@ class BookingController extends Controller
                     'schedule_id' => $item['rescheduleSchedule'],
                 ])->first();
                 $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                
+                $invoice = Invoice::create([
+                    "schedule_id" => $schedule->id,
+                    "route_id" => $schedule->route_id,
+                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                    "schedule_date" => $scheduleDetail->schedule_date,
+                    "schedule_time" => $scheduleDetail->departure_time,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
+                ]);
+                
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                 $isPartial = 0;
@@ -351,6 +362,7 @@ class BookingController extends Controller
                     'destination_city_id' => $item['dataDestination'],
                     'seat_no' => $item['selected_seatNo'],
                     'terminal_id' => $ticket['terminal_id'],
+                    'invoice_id' => $invoice->id,
                     'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                     'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                     'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
@@ -712,26 +724,24 @@ class BookingController extends Controller
     public
     function selected(Request $request)
     {
-        $id = explode("_",$request->id)[0];
-        $variation_time = explode("_",$request->id)[1];
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
         }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
-            'schedule_id' => $id,
+            'schedule_id' => $request->id,
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'variation_time' => $variation_time,
+            // 'variation_time' => $request->variation_time,
         ])->first(['schedule_date']);
         // Getting Already Booked Tickets
         $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
-            ->where('company_id', Auth::user()->company_id)->where('schedule_id', $id)
+            ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
-        $schedule = Schedule::where('id', $id)
+        $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
             ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
