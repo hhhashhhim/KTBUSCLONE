@@ -28920,7 +28920,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         type: "booked",
         gender: "1",
         customerCNIC: "",
+        id: 0,
         schedule: 0,
+        variation_time: 0,
         totalFare: 0,
         destinationCity: 0,
         departureCity: 0,
@@ -28939,6 +28941,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       rescheduleData: {
         rescheduleSchedule: 0,
         rescheduleDate: '',
+        id: 0,
+        variation_time: 0,
         rescheduleDestinationCity: 0,
         dataDepartureCity: 0
       },
@@ -28947,6 +28951,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         type: "booked",
         gender: "1",
         customerCNIC: "",
+        id: 0,
         schedule: 0,
         totalFare: 0,
         destinationCity: 0,
@@ -29024,6 +29029,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var scheduleName = $('#scheduleName');
       scheduleName.on('change', function (e) {
         _this2.addForm.schedule = e.target.value;
+
+        _this2.setScheduleValue(e);
 
         _this2.fetchScheduleData();
 
@@ -29386,6 +29393,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (month < 10) month = '0' + month.toString();
       if (day < 10) day = '0' + day.toString();
       return year + '-' + month + '-' + day;
+    },
+    setScheduleValue: function setScheduleValue(event) {
+      this.addForm.variation_time = this.allSchedules[event.target.selectedIndex - 1].variation_time;
+      this.addForm.schedule = this.allSchedules[event.target.selectedIndex - 1].schedule_id;
+    },
+    setRescheduleValue: function setRescheduleValue(event) {
+      this.rescheduleData.variation_time = this.allReSchedules[event.target.selectedIndex - 1].variation_time;
+      this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     getDestinationCity: function getDestinationCity() {
       var _this7 = this;
@@ -30327,7 +30342,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   date: _this19.addForm.date,
                   departureCity: _this19.addForm.departureCity,
                   destinationCity: _this19.addForm.destinationCity,
-                  dropTerminal: _this19.addForm.terminalId
+                  dropTerminal: _this19.addForm.terminalId,
+                  variation_time: _this19.addForm.variation_time
                 });
 
               case 20:
@@ -30706,7 +30722,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   date: _this22.rescheduleData.rescheduleDate,
                   departureCity: parseInt(_this22.rescheduleData.dataDepartureCity),
                   destinationCity: _this22.rescheduleData.rescheduleDestinationCity,
-                  dropTerminal: _this22.addForm.terminalId
+                  dropTerminal: _this22.addForm.terminalId,
+                  variation_time: _this22.rescheduleData.variation_time
                 });
 
               case 14:
@@ -61259,24 +61276,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "form-control",
     id: "scheduleName",
     onChange: _cache[6] || (_cache[6] = function ($event) {
+      $options.setScheduleValue();
       $options.fetchScheduleData();
       $options.busDropCheck();
     }),
     "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
-      return $data.addForm.schedule = $event;
+      return $data.addForm.id = $event;
     })
   }, [_hoisted_32, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allSchedules, function (schedule, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      value: schedule.schedule_id,
+      value: schedule.id,
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scheduleDropdown(schedule)), 9
     /* TEXT, PROPS */
     , _hoisted_33);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                            :disabled=\"disabledOptions.includes(schedule)\"")], 544
+  ))], 544
   /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.schedule]])])])])]), _hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("CNIC "), this.addForm.type != 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_38, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.id]])])])])]), _hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("CNIC "), this.addForm.type != 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_38, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
     onBlur: _cache[8] || (_cache[8] = function ($event) {
       return $options.getCustomer('addFormCNIC'), $options.getPoints('addFormCNIC');
     }),
@@ -61348,7 +61366,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "form-control",
     id: "Terminals",
     onChange: _cache[15] || (_cache[15] = function ($event) {
-      return $options.fetchScheduleData();
+      $options.fetchScheduleData();
     }),
     "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
       return $data.addForm.terminalId = $event;
@@ -61863,14 +61881,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "form-control",
     id: "reScheduleName",
     onChange: _cache[61] || (_cache[61] = function ($event) {
-      return $options.fetchReScheduleData();
+      $options.setRescheduleValue($event);
+      $options.fetchReScheduleData();
     }),
     "onUpdate:modelValue": _cache[62] || (_cache[62] = function ($event) {
-      return $data.rescheduleData.rescheduleSchedule = $event;
+      return $data.rescheduleData.id = $event;
     })
   }, [_hoisted_282, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allReSchedules, function (schedule, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      value: schedule.schedule_id,
+      value: schedule.id,
       key: i
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scheduleDropdown(schedule)), 9
     /* TEXT, PROPS */
@@ -61879,7 +61898,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* KEYED_FRAGMENT */
   ))], 544
   /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.rescheduleData.rescheduleSchedule]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                :disabled=\"disabledOptionsReschedule.includes(schedule)\"")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_284, [_hoisted_285, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.rescheduleData.id]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                :disabled=\"disabledOptionsReschedule.includes(schedule)\"")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_284, [_hoisted_285, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "rescheduleReason",
     "class": "form-control",
     "onUpdate:modelValue": _cache[63] || (_cache[63] = function ($event) {

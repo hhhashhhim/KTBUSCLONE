@@ -61,16 +61,16 @@
                                                         <label for="scheduleName" class="mb-0">Departure Time <span
                                                             class="text-danger">*</span></label>
                                                         <select class="form-control" id="scheduleName"
-                                                                @change="fetchScheduleData(); busDropCheck()"
-                                                                v-model="addForm.schedule">
+                                                                @change="setScheduleValue(); fetchScheduleData(); busDropCheck();"
+                                                                v-model="addForm.id">
                                                             <option value="0">Select Departure Time</option>
                                                             <option v-for="(schedule, i) in allSchedules"
-                                                                    :value="schedule.schedule_id"
+                                                                    :value="schedule.id"
 
                                                                     :key="i">
                                                                 {{ scheduleDropdown(schedule) }}
                                                             </option>
-                                                            <!--                                                            :disabled="disabledOptions.includes(schedule)"-->
+                                                            
                                                         </select>
                                                     </div>
                                                 </div>
@@ -171,7 +171,7 @@
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
-                                                            @change="fetchScheduleData()"
+                                                            @change="fetchScheduleData();"
                                                             v-model="addForm.terminalId">
                                                         <option value="0">Select Terminal</option>
                                                         <option
@@ -868,12 +868,12 @@
                             <div class="col-md-3 class">
                                 <label for="scheduleName" class="mb-0">Departure Time <span
                                     class="text-danger">*</span></label>
-                                <select class="form-control" id="reScheduleName" @change="fetchReScheduleData()"
-                                        v-model="rescheduleData.rescheduleSchedule">
+                                <select class="form-control" id="reScheduleName" @change="setRescheduleValue($event); fetchReScheduleData()"
+                                        v-model="rescheduleData.id">
                                     <option value="0" selected>Select Schedule</option>
                                     <option v-for="(schedule, i) in allReSchedules"
 
-                                            :value="schedule.schedule_id" :key="i">{{ scheduleDropdown(schedule) }}
+                                            :value="schedule.id" :key="i">{{ scheduleDropdown(schedule) }}
                                     </option>
                                 </select>
                                 <!--                                :disabled="disabledOptionsReschedule.includes(schedule)"-->
@@ -1601,7 +1601,9 @@ export default {
                 type: "booked",
                 gender: "1",
                 customerCNIC: "",
+                id: 0,
                 schedule: 0,
+                variation_time: 0,
                 totalFare: 0,
                 destinationCity: 0,
                 departureCity: 0,
@@ -1620,6 +1622,8 @@ export default {
             rescheduleData: {
                 rescheduleSchedule: 0,
                 rescheduleDate: '',
+                id: 0,
+                variation_time: 0,
                 rescheduleDestinationCity: 0,
                 dataDepartureCity: 0,
             },
@@ -1629,6 +1633,7 @@ export default {
                 type: "booked",
                 gender: "1",
                 customerCNIC: "",
+                id: 0,
                 schedule: 0,
                 totalFare: 0,
                 destinationCity: 0,
@@ -1686,6 +1691,7 @@ export default {
             const scheduleName = $('#scheduleName');
             scheduleName.on('change', (e) => {
                 this.addForm.schedule = e.target.value;
+                this.setScheduleValue(e);
                 this.fetchScheduleData();
                 this.busDropCheck();
             });
@@ -1946,6 +1952,16 @@ export default {
             if (day < 10)
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
+        },
+        
+        setScheduleValue(event) {
+            this.addForm.variation_time = this.allSchedules[event.target.selectedIndex-1].variation_time;
+            this.addForm.schedule = this.allSchedules[event.target.selectedIndex-1].schedule_id;
+        },
+        
+        setRescheduleValue(event) {
+            this.rescheduleData.variation_time = this.allReSchedules[event.target.selectedIndex-1].variation_time;
+            this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex-1].schedule_id;
         },
 
         async getDestinationCity() {
@@ -2469,7 +2485,6 @@ export default {
                     timer: 2000
                 });
             }
-            
             this.resetArrays();
             this.schedule = [];
             this.addForm.customerCNIC = "";
@@ -2492,6 +2507,7 @@ export default {
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                     dropTerminal: this.addForm.terminalId,
+                    variation_time: this.addForm.variation_time,
                 });
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
@@ -2763,6 +2779,7 @@ export default {
                 departureCity: parseInt(this.rescheduleData.dataDepartureCity),
                 destinationCity: this.rescheduleData.rescheduleDestinationCity,
                 dropTerminal: this.addForm.terminalId,
+                variation_time: this.rescheduleData.variation_time,
             });
             if (res.status == 200) {
                 this.seatMapReschedule = true;
