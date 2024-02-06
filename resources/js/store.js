@@ -13,7 +13,7 @@ const store = createStore({
             token:localStorage.getItem("token"),
             main_url:process.env.MIX_MAIN_URL,
             api_url:process.env.MIX_API_URL,
-            permissions: JSON.parse(localStorage.getItem("user")) ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
+            permissions: JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).role ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
             companyModules:false,
         }
     },
