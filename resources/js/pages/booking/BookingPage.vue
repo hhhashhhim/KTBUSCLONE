@@ -2229,15 +2229,15 @@ export default {
 
         async fetchAllSchedules() {
             this.depLoading = true;
-            const resBooking = await this.callApi("post", "booking");
-            const resClass = await this.callApi("post", "booking/fare_class");
+            // const resBooking = await this.callApi("post", "booking");
             const resCity = await this.callApi("post", "booking/cities");
             const resTerminals = await this.callApi("post", "booking/terminals");
-            if (resBooking.status == 200 && resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
-                this.allBookings = resBooking.data;
-                this.allSeatClasses = resClass.data;
+            const resClass = await this.callApi("post", "booking/fare_class");
+            if (resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
+                // this.allBookings = resBooking.data;
                 this.cities = resCity.data;
                 this.terminals = resTerminals.data.terminals;
+                this.allSeatClasses = resClass.data;
                 this.addForm.terminalId = resTerminals.data.authTerminalId;
                 this.depLoading = false;
                 $('#departureCity').select2();
@@ -2509,6 +2509,29 @@ export default {
                     dropTerminal: this.addForm.terminalId,
                     variation_time: this.addForm.variation_time,
                 });
+                if (resSelected.status == 200) {
+                    this.loading = false
+                    this.showBookingDiv = true;
+                    this.schedule = resSelected.data;
+                    this.totalSeats = 0;
+                    this.totalSeatsBooked = 0;
+                    this.totalSeatsIssued = 0;
+                    this.totalSeatsAvailable = 0;
+                    for (let i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
+                        for (let j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
+                            if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
+                                this.totalSeats++;
+                            }
+                            if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {
+                                this.totalSeatsBooked++;
+                            }
+                            if (resSelected.data.bus_class.seat_map[i][j].type == 'advance booking') {
+                                this.totalSeatsIssued++;
+                            }
+                        }
+                    }
+                    this.totalSeatsAvailable = this.totalSeats - (this.totalSeatsBooked + this.totalSeatsIssued);
+                }
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
                 });
@@ -2566,29 +2589,7 @@ export default {
                     this.allowedSeats = 0;
                 }
 
-                if (resSelected.status == 200) {
-                    this.loading = false
-                    this.showBookingDiv = true;
-                    this.schedule = resSelected.data;
-                    this.totalSeats = 0;
-                    this.totalSeatsBooked = 0;
-                    this.totalSeatsIssued = 0;
-                    this.totalSeatsAvailable = 0;
-                    for (let i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
-                        for (let j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
-                            if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
-                                this.totalSeats++;
-                            }
-                            if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {
-                                this.totalSeatsBooked++;
-                            }
-                            if (resSelected.data.bus_class.seat_map[i][j].type == 'advance booking') {
-                                this.totalSeatsIssued++;
-                            }
-                        }
-                    }
-                    this.totalSeatsAvailable = this.totalSeats - (this.totalSeatsBooked + this.totalSeatsIssued);
-                }
+                
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
                     this.loading = true
