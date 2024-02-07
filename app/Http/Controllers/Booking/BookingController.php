@@ -50,7 +50,6 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        return $tickets = Ticket::where(["type"=>"advance booking","online_terminal"=>1])->where("created_at",'<',Carbon::now()->subHours(2))->get()->count();
         $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', Auth::user()->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
