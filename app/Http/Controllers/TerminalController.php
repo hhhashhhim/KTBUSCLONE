@@ -36,7 +36,7 @@ class TerminalController extends Controller
     public function allTerminals()
     {
         return [
-            'terminals' => Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']),
+            'terminals' => Terminal::with('city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name', 'city_id']),
             'authTerminalId' => Auth::user()->terminal_id,
         ];
     }

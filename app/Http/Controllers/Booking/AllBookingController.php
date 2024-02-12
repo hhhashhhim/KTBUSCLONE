@@ -51,8 +51,8 @@ class AllBookingController extends Controller
                 if ($request->fromDateFilter) {
                     $q->where("date",'>=', $request->fromDateFilter);
                 }
-                if ($request->fromDateFilter) {
-                    $q->where("date",'<=', $request->fromDateFilter);
+                if ($request->toDateFilter) {
+                    $q->where("date",'<=', $request->toDateFilter);
                 }
                 if ($request->routeFilter) {
                     $q->where("route_id", $request->routeFilter);
