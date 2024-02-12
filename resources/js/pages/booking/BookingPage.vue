@@ -2485,6 +2485,7 @@ export default {
                     timer: 2000
                 });
             }
+            
             this.resetArrays();
             this.schedule = [];
             this.addForm.customerCNIC = "";
@@ -2494,6 +2495,13 @@ export default {
             this.addForm.alreadyBookedId = [];
             this.addForm.remarks = "";
             this.addForm.totalFare = 0;
+            this.selectedSeats = [];
+            this.selectedSeatsFare = [];
+            this.selectedSeatsClass = [];
+            this.selectedOverIssueSeats = [];
+            this.addForm.selectedSeats = [];
+            this.addForm.selectedSeatsFare = [];
+            this.addForm.selectedSeatsClass = [];
             this.addForm.totalAmount = 0;
             this.addForm.discount = '';
             this.advanceSeat = [];
@@ -2532,6 +2540,22 @@ export default {
                     }
                     this.totalSeatsAvailable = this.totalSeats - (this.totalSeatsBooked + this.totalSeatsIssued);
                 }
+                this.addForm.customerCNIC = "";
+                this.addForm.customerName = "";
+                this.addForm.contact = "";
+                this.addForm.flag = 0;
+                this.addForm.alreadyBookedId = [];
+                this.addForm.remarks = "";
+                this.addForm.totalFare = 0;
+                this.selectedSeats = [];
+                this.selectedSeatsFare = [];
+                this.selectedSeatsClass = [];
+                this.addForm.selectedSeatsFare = [];
+                this.selectedBookedSeats = [];
+                this.selectedOverIssueSeats = [];
+                this.addForm.selectedSeatsClass = [];
+                this.addForm.totalAmount = 0;
+                this.addForm.discount = '';
                 const terminalSeats = await this.callApi("post", "booking/terminal/seats", {
                     terminal_id: this.$store.state.user.terminal_id,
                 });
@@ -2811,6 +2835,7 @@ export default {
 
         async selectSeat(row, col, seatNo, fare, colClass) {
             this.validationErrors = [];
+            console.log(this.selectedOverIssueSeats);
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
                     title: "Ops",
@@ -2819,9 +2844,11 @@ export default {
                     timer: 2000
                 });
             }
+            console.log(this.schedule.bus_class.seat_map);
             if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
+                    console.log("1");
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedBookedSeats.splice(index, 1);
                     this.bookedSeats = this.bookedSeats.filter((seat) => {
@@ -2831,6 +2858,7 @@ export default {
                     });
                     this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                 } else {
+                    console.log("2");
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
@@ -2839,9 +2867,10 @@ export default {
                 this.addForm.totalAmount = this.addForm.totalFare;
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
             } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
-
+                
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
+                    console.log("3");
 
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedSeats.splice(index, 1);
@@ -2849,19 +2878,20 @@ export default {
                     this.selectedSeatsClass.splice(index, 1);
                     this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                 } else {
-
+                    
+                    console.log("4");
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedSeats.push(seatNo);
                     this.selectedSeatsFare.push(fare);
                     this.selectedSeatsClass.push(colClass);
                     this.addForm.totalFare += this.schedule.bus_class.seat_map[row][col].fare;
-
                 }
                 this.addForm.totalAmount = this.addForm.totalFare;
                 this.addForm.selectedSeats = this.selectedSeats;
                 this.addForm.selectedSeatsFare = this.selectedSeatsFare;
                 this.addForm.selectedSeatsClass = this.selectedSeatsClass;
             } else {
+                console.log("5");
                 this.fetchScheduleData();
                 this.resetArrays();
                 return swal({
@@ -2872,7 +2902,7 @@ export default {
                 });
             }
 
-
+           
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
@@ -2911,6 +2941,7 @@ export default {
                     timer: 2000
                 });
             }
+            console.log(this.selectedOverIssueSeats);
         },
 
         // update Form After  advanced Booked seat
@@ -3088,6 +3119,7 @@ export default {
         ,
 
         async add() {
+            
             if (this.addForm.departureCity == 0) {
                 return swal({
                     title: "Required!",
