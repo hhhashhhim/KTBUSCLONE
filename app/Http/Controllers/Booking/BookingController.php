@@ -1275,7 +1275,8 @@ class BookingController extends Controller
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $uniqueDate,
             'type' => "booked",
-        ])->get();
+        ])
+        ->get();
 
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
         $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id, "route_id" => $routeId])->first();
@@ -1290,7 +1291,14 @@ class BookingController extends Controller
         foreach ($passengerData as $passenger) {
             $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
         }
-
+        $passengerData = $passengerData->sortBy(function ($item) {
+            // Extract the integer part of the 'age' values using a regular expression
+            preg_match('/\d+/', $item['seat_no'], $matches);
+            
+            // Use the extracted integer part for sorting
+            return $matches[0] ?? 0;
+        })->values();
+        
         $refunds = Ticket::with('cancel_ticket:ticket_id,percentage')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
@@ -1303,8 +1311,8 @@ class BookingController extends Controller
             $final = $percentageValue / 100;
             $refundData += $final;
         }
+        ;
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
-        // $format = TicketsTemplate::with('terminal')->where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
         $terminal = Terminal::find(Auth::user()->terminal_id);
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal]);
     }
@@ -1509,6 +1517,13 @@ class BookingController extends Controller
         $scheduleName = Schedule::where('id', $request->schedule_id)->first()->name;
         $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
         $remainData = ['passengerCount' => $countPassenger, 'actualDepart' => $actualDeparture, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'scheduleName' => $scheduleName, 'busNo' => $busNo];
+        $passengerData = $passengerData->sortBy(function ($item) {
+            // Extract the integer part of the 'age' values using a regular expression
+            preg_match('/\d+/', $item['seat_no'], $matches);
+            
+            // Use the extracted integer part for sorting
+            return $matches[0] ?? 0;
+        });
         return view('pdf/passengerList', ['data' => $passengerData, 'format' => $format, 'terminalData' => $terminalGroup, 'departureData' => $departureGroup, 'destinationData' => $destinationGroup, 'remain' => $remainData]);
     }
 
