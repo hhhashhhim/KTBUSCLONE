@@ -107,7 +107,7 @@ class BookingController extends Controller
                 $allTicket = updateAdvancedSeat($request, $invoice);
             } else {
                 if (count($request->selectedSeats) == 0) {
-                    return response()->json(["errors" => ["Error" => ["One of Your Selected Seat is Already Booked ! Please Select Any other seat / combination"]]], 422);
+                    return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
                 }
                 // check seat duplication 
                 $lastFare = $schedule->route->fares->last();
@@ -374,6 +374,7 @@ class BookingController extends Controller
                     'date' => $item['rescheduleDate'],
                     'schedule_details_id' => $scheduleDetail->id,
                     'customer_id' => $item['dataCustomer'],
+                    'online_terminal' => Terminal::find($ticket['terminal_id'])->is_online_terminal,
                     'schedule_id' => $item['newDepartureTime'],
                     'route_id' => $schedule->route_id,
                     'remarks' => $item['reason']??"",
@@ -464,7 +465,8 @@ class BookingController extends Controller
         // return $allSchedules;
         if(checkPermissionButtons("time-lock"))
         {
-            return $allSchedules->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) - 7200));
+            $filteredSchedules = $allSchedules->where("departure_date_time", '>', date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s")) - 7200));
+            return array_values($filteredSchedules->toArray());
         }
         return $allSchedules;
     }
