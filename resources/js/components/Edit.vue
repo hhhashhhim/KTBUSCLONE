@@ -45,6 +45,7 @@ export default {
     methods:{
         close(){
             $(`#${this.editForm}`).click();
+            $(`#${this.editForm}`).modal('hide');
         }
     },
     watch:{

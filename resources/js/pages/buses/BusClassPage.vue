@@ -200,7 +200,7 @@
                             >
                                 <img
                                     @click="changeStatus(rowIndex, colIndex)"
-                                    :src=" $store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
+                                    :src=" $store.state.api_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
                             </td>
                         </tr>
                     </div>
@@ -224,7 +224,7 @@
                                     :class="col.selected ? 'selected' : ''"
                                     :style=" col.class ? checkClass(col.class) : '' "
                                     @click="selectSeat(rowIndex, colIndex)"
-                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
+                                    :src=" $store.state.api_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
                                 <span v-else></span>
                             </td>
                         </tr>
@@ -513,7 +513,7 @@
                             >
                                 <img
                                     @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src=" $store.state.app_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
+                                    :src=" $store.state.api_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
                             </td>
                         </tr>
                     </div>
@@ -536,7 +536,7 @@
                                     @click="getSeatDetails(rowIndex, colIndex)"
                                     :style=" col.class ? checkClass(col.class) : '' "
                                     v-if="col.reserved"
-                                    :src=" $store.state.app_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
+                                    :src=" $store.state.api_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
                                 <span v-else></span>
                             </td>
                         </tr>
