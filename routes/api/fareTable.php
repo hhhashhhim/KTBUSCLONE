@@ -12,7 +12,10 @@ Route::group(['prefix' => 'web/v1/fare-table','middleware' => ['auth:sanctum']],
     Route::post('/check', [FareTableController::class, 'check']);
     Route::post('/fare/update', [FareTableController::class, 'fareUpdate']);
     Route::post('/schedules/times/update', [FareTableController::class, 'updateScheduleTimes']);
-    Route::post('/fare/print', [FareTableController::class, 'farePrint']);
     
     Route::post('/schedules/times/update/progress', [FareTableController::class, 'updateScheduleTimesProgress']);
+});
+
+Route::group(['prefix' => 'web/v1/fare-table','middleware' =>  ['custom.sanctum.token.verify']], function () {
+    Route::post('/fare/print', [FareTableController::class, 'farePrint']);
 });
