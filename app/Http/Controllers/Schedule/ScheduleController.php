@@ -344,14 +344,12 @@ class ScheduleController extends Controller
                 DB::beginTransaction();
                 $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
                 $lastEndDate = date("Y-m-d", strtotime($schedule->end_date) + 86400);
-                $schedule->update([
-                    'end_date' => date("Y-m-d", strtotime(date("Y-m-d", strtotime($schedule->end_date)) . "+" . (int)$request->extended_days . "days")),
-                    'extended_days' => (int)$request->extended_days,
-                ]);
+                
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-                $days = $this->getDays($lastEndDate, $schedule->end_date);
+                
+                // $days = $this->getDays($lastEndDate, $schedule->end_date);
                 $end_date = $schedule->end_date;
-                for ($i = 0; $i <= $days; $i++) {
+                for ($i = 0; $i < $request->extended_days; $i++) {
                     $lastDepId = $routeDetails[0]->departure_city_id;
                     $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
                     $scheduleStartDate = date("Y-m-d", $totalTime);
@@ -378,12 +376,15 @@ class ScheduleController extends Controller
                             'departure_date' => date('Y-m-d', strtotime($departureTime)),
                             'schedule_date' => $scheduleStartDate, // schedule departure date
                         ]);
-                        $end_date = date('Y-m-d', strtotime($departureTime));
+                        $end_date = $scheduleStartDate;
+                        
                     }
                 };
+               
                 $schedule->update([
                     "end_date" => $end_date,
                 ]);
+
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",
