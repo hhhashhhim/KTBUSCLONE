@@ -39,7 +39,7 @@ class BusController extends Controller
     {
 
 
-        $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-19","schedule_id"=>240])->get();
+        $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-21","schedule_id"=>240])->get();
         
         foreach($data as $single)
         {
@@ -51,7 +51,7 @@ class BusController extends Controller
                 'destination_id' => $single->destination_id,
                 'departure_time' => date('H:i', strtotime($single->departure_time)),
                 'departure_date' => date('Y-m-d', strtotime($single->departure_date) + 86400),
-                'schedule_date' => "2024-02-20", // schedule departure date
+                'schedule_date' => "2024-02-22", // schedule departure date
             ]);
         }
         return 'helo';
