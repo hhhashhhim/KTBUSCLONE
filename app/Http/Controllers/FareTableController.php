@@ -15,46 +15,69 @@ use Illuminate\Support\Facades\Log;
 
 class FareTableController extends Controller
 {
-    public function store(Request $request)
-    {
-        try {
-                DB::beginTransaction();
-                $request->validate([
-                    'fare' => 'required',
-                    'fare_class' => 'required',
-                ]);
+    // public function store(Request $request)
+    // {
+    //     try {
+    //             DB::beginTransaction();
+    //             $request->validate([
+    //                 'fare' => 'required',
+    //                 'fare_class' => 'required',
+    //             ]);
 
-                $company_id = auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id;
-                if ($request->created == 1) {
-                    updateFare($request, $company_id);
-                } else {
-                    storeFare($request, $company_id);
-                }
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated fare table ($request->from $request->to $request->fare_class)",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $this->getFarePrices($request->fare_class);
+    //             $company_id = auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id;
+    //             if ($request->created == 1) {
+    //                 updateFare($request, $company_id);
+    //             } else {
+    //                 storeFare($request, $company_id);
+    //             }
+    //             ActivityLog::create([
+    //                 "activity_by" => Auth::user()->id,
+    //                 "message" => Auth::user()->name." | updated fare table ($request->from $request->to $request->fare_class)",
+    //                 "requested_host" => $request->ip(),
+    //                 "company_id" => Auth::user()->company_id
+    //             ]);
+    //             DB::commit();
+    //             return $this->getFarePrices($request->fare_class);
 
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+    //         } catch (\Exception $e) {
+    //             DB::rollBack();
+    //             Log::error('Database transaction error: ' . $e->getMessage());
+    //             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+    //         }
 
-    }
+    // }
 
     public function record(Request $request)
     {
-        return $this->getFarePrices($request->fare_class);
+        $fareTable = FareTable::
+            with("city_from:id,name","city_to:id,name","class:id,name")->where(["company_id"=>Auth::user()->company_id])
+            ->when($request->class,function($q) use ($request){
+                $q->where("fare_class",$request->class);
+            })
+            ->when($request->fromCity,function($q) use ($request){
+                $q->where("from_city_id",$request->fromCity);
+            })
+            ->when($request->toCity,function($q) use ($request){
+                $q->where("to_city_id",$request->toCity);
+            })
+            ->where("hide",$request->hide)
+            ->get()
+            ->makeHidden(["added_by","created_at","time","updated_by","updated_at","deleted_at","is_active"]);
+
+        return [
+            "fareTable" => $fareTable
+        ];
+        
     }
 
-    public function getUpdateCities()
+    public function getCitiesClasses()
     {
-        return City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        $cities = City::where(['company_id' => Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+        $classes = FareClass::where(['company_id' => Auth::user()->company_id])->get(['id', 'name']);
+        return [
+            "cities" => $cities,
+            "classes" => $classes
+        ];
     }
 
     public function getFarePrices($fare_class)
@@ -130,26 +153,59 @@ class FareTableController extends Controller
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
     }
-
-    public function updateScheduleTimes(Request $request)
+    
+    public function fareUpdateMultiple(Request $request)
     {
         try {
-                DB::beginTransaction();
-                $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
-                $id = $this->dispatch($job);
-                // DB::table("jobs")->where("queue","default")->update([
-                //     "progress" => 3233
-                // ]);
+            DB::beginTransaction();
 
-                // return UpdateSchedulesTime::dispatch(Auth::user());
+            foreach ($request->mydata as $single) {
+                FareTable::where("id", $single['id'])->update([
+                    'fare' => $single['fare'],
+                    'time_difference' => $single['time_difference'],
+                    'distance_in_km' => $single['distance_in_km'],
+                    'hide' => $single['hide'],
+                    'updated_by' => Auth::user()->id,
+                ]);
+            }
+                
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | updated fare table multiple ",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
                 DB::commit();
-                return $id;
+                return response()->json([
+                    'message' => 'Updated Successfully',
+                ], 200);
+
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
     }
+
+    // public function updateScheduleTimes(Request $request)
+    // {
+    //     try {
+    //             DB::beginTransaction();
+    //             $job = (new UpdateSchedulesTime(Auth::user()))->onQueue("UpdateSchedulesTime");
+    //             $id = $this->dispatch($job);
+    //             // DB::table("jobs")->where("queue","default")->update([
+    //             //     "progress" => 3233
+    //             // ]);
+
+    //             // return UpdateSchedulesTime::dispatch(Auth::user());
+    //             DB::commit();
+    //             return $id;
+    //         } catch (\Exception $e) {
+    //             DB::rollBack();
+    //             Log::error('Database transaction error: ' . $e->getMessage());
+    //             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+    //         }
+    // }
 
     public function farePrint(Request $request)
     {
@@ -177,14 +233,14 @@ class FareTableController extends Controller
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
     }
 
-    public function updateScheduleTimesProgress()
-    {
-        $data = DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
-        if ($data) {
-            return $data;
-        } else {
-            return 0;
-        }
-    }
+    // public function updateScheduleTimesProgress()
+    // {
+    //     $data = DB::table("jobs")->where("queue", "UpdateSchedulesTime")->latest()->first();
+    //     if ($data) {
+    //         return $data;
+    //     } else {
+    //         return 0;
+    //     }
+    // }
 
 }
