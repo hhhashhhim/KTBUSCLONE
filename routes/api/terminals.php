@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\TerminalController;
 use App\Http\Middleware\CustomMiddleware;
+use App\Http\Controllers\Report\AdvanceSalesReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], function () {
@@ -14,6 +15,7 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
     Route::post('update', [TerminalController::class, 'update']);
     Route::post('hide', [TerminalController::class, 'hideTerminal']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
+    Route::post('/sales/fetchFilterData', [TerminalController::class, 'filterData']);
 
     Route::post('/routes', [TerminalController::class, 'getRoutes']);
 
