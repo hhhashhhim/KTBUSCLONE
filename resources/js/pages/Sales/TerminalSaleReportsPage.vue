@@ -120,9 +120,9 @@
                                                                 <td>{{ data.comsn }}</td>
                                                             </tr>
                                                             <tr v-if="filters.record.length > 0">
-                                                                <th colspan="3"></th>
-                                                                <th>{{ filters.record.length }}</th>
                                                                 <th colspan="6"></th>
+                                                                <th>{{ filters.record.length }}</th>
+                                                                <th colspan="3"></th>
                                                                 <th>{{ totalSeatFare() }}</th>
                                                                 <th>{{ totalCommission() }}</th>
                                                             </tr>

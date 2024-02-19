@@ -29424,7 +29424,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 if (!(_this4.selectedBookedSeats.length != 0 || _this4.selectedBookedOverIssueSeats.length != 0)) {
-                  _context3.next = 15;
+                  _context3.next = 16;
                   break;
                 }
 
@@ -29435,10 +29435,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   departureCity: _this4.addForm.departureCity,
                   destinationCity: _this4.addForm.destinationCity
                 };
-                _context3.next = 10;
+                _this4.selectedSeatDataBackEnd = [];
+                _context3.next = 11;
                 return _this4.callApi("post", "booking/advance", dataSeats);
 
-              case 10:
+              case 11:
                 resSeatData = _context3.sent;
 
                 if (resSeatData.status == 200) {
@@ -29505,10 +29506,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-                _context3.next = 16;
+                _context3.next = 17;
                 break;
 
-              case 15:
+              case 16:
                 return _context3.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Select Already Booked Seat",
@@ -29516,7 +29517,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 16:
+              case 17:
               case "end":
                 return _context3.stop();
             }
@@ -57742,7 +57743,7 @@ var _hoisted_37 = {
 
 var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "3"
+    colspan: "6"
   }, null, -1
   /* HOISTED */
   );
@@ -57750,7 +57751,7 @@ var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
 
 var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "6"
+    colspan: "3"
   }, null, -1
   /* HOISTED */
   );

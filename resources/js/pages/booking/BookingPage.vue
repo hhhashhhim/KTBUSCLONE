@@ -1825,6 +1825,7 @@ export default {
                     destinationCity: this.addForm.destinationCity,
 
                 }
+                this.selectedSeatDataBackEnd = [];
                 const resSeatData = await this.callApi("post", "booking/advance", dataSeats);
                 if (resSeatData.status == 200) {
                     this.selectedSeatDataBackEnd = resSeatData.data.tickets;
