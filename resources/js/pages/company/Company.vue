@@ -435,6 +435,13 @@ export default {
                             ],
                         },
                         {
+                            name: "terminal-sale",
+                            allow: true,
+                            buttons: [
+                                {name: "terminal-filter", allow: true},
+                            ],
+                        },
+                        {
                             name: "schedule-drop",
                             allow: true,
                         },

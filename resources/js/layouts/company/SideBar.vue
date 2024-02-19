@@ -85,6 +85,11 @@
                                 <i class="fa fa-landmark"></i> Advance Sales Report
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminal-sale')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'terminal-sale-report' }">
+                                <i class="fa fa-landmark"></i> Terminal Sales Report
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('schedule-drop')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'schedule-drop-report' }">
                                 <i class="fa fa-landmark"></i> Schedule Drop Report

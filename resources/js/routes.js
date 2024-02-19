@@ -50,6 +50,7 @@ import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
 import HeaderLinkPage from "./pages/ReportsHeader/HeaderLinkPage.vue";
 import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPage.vue";
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
+import TerminalSaleReportsPage from "./pages/Sales/TerminalSaleReportsPage.vue";
 import ScheduleDropReportPage from "./pages/ScheduleDrop/ScheduleDropReportPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
@@ -319,6 +320,11 @@ const routes = [
         path: url + "reports/advance/sale",
         component: AdvanceSaleReportsPage,
         name: "advance-sale-report"
+    },
+    {
+        path: url + "reports/terminal/sale",
+        component: TerminalSaleReportsPage,
+        name: "terminal-sale-report"
     },
     {
         path: url + "reports/schedules/drop",
