@@ -1622,7 +1622,7 @@ export default {
             rescheduleData: {
                 rescheduleSchedule: 0,
                 rescheduleDate: '',
-                id: 0,
+                id: "0",
                 variation_time: 0,
                 rescheduleDestinationCity: 0,
                 dataDepartureCity: 0,
@@ -3744,6 +3744,7 @@ export default {
                 single.selected_seatFare = this.alreadyBookedSeatFare[index];
                 single.reason = this.rescheduleData.reason;
                 single.rescheduleDate = this.rescheduleData.rescheduleDate;
+                single.rescheduleSchedule = this.rescheduleData.rescheduleSchedule;
                 single.rescheduleType = this.rescheduleSeatType;
                 single.overIssueReschedule = this.overIssueScheduleCheckBox;
                 single.newDepartureTime = this.rescheduleData.rescheduleSchedule;

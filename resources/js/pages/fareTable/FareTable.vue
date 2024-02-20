@@ -108,6 +108,7 @@
                                                         <th>Fare</th>
                                                         <th>Time Difference ( e.g HH:MM )</th>
                                                         <th>Distance (km)</th>
+                                                        <th>Reverse</th>
                                                         <th>Show</th>
                                                         <th>
                                                             Action
@@ -115,6 +116,11 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr v-if="fareTable.length > 0">
+                                                            <td colspan="7"></td>
+                                                            <td><input type="checkbox" @change="allReverseSelect($event)" /></td>
+                                                            <td><input type="checkbox"  @change="allHideSelect($event)" :checked="entry.hide == 0" /></td>
+                                                        </tr>
                                                         <tr v-for="(item, i) in fareTable" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td><input type="text" disabled v-model="fareTable[i].class.name"></td>
@@ -130,14 +136,15 @@
                                                                 </vue-mask>
                                                             </td>
                                                             <td><input type="text" v-model="fareTable[i].distance_in_km" @keypress="isNumber($event)" maxlength="4"></td>
+                                                            <td><input type="checkbox" v-model="fareTable[i].reverse" :true-value="1" :false-value="0"/></td>
                                                             <td><input type="checkbox" v-model="fareTable[i].hide" :true-value="0" :false-value="1"/></td>
                                                             <td>
                                                                 <button class="btn btn-primary btn-sm mr-1" @click="updateFareTable(fareTable[i])" title="update Fare">Save
                                                                 </button>
                                                             </td>
                                                         </tr>
-                                                        <tr>
-                                                            <td>
+                                                        <tr v-if="fareTable.length > 0">
+                                                            <td colspan="3">
                                                                 <button class="btn btn-primary btn-sm mr-1" @click="updateFareTable(fareTable)" title="update Fare">Save All
                                                                 </button>
                                                             </td>
@@ -374,13 +381,31 @@ export default {
             } 
             
         },
-
-        CheckBox: function (e) {
+        
+        allReverseSelect: function (e) {
             if (e.target.checked) {
-                this.addForm.reverse = 1;
+                this.fareTable.forEach((single) => {
+                    single.reverse = 1;
+                });
             } else {
-                this.addForm.reverse = 0;
+                this.fareTable.forEach((single) => {
+                    single.reverse = 0;
+                });
             }
+           
+        },
+        
+        allHideSelect: function (e) {
+            if (e.target.checked) {
+                this.fareTable.forEach((single) => {
+                    single.hide = 0;
+                });
+            } else {
+                this.fareTable.forEach((single) => {
+                    single.hide = 1;
+                });
+            }
+           
         },
         
         async updateFare() {

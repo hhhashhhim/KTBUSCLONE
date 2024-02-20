@@ -29177,7 +29177,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       rescheduleData: {
         rescheduleSchedule: 0,
         rescheduleDate: '',
-        id: 0,
+        id: "0",
         variation_time: 0,
         rescheduleDestinationCity: 0,
         dataDepartureCity: 0
@@ -32297,6 +32297,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   single.selected_seatFare = _this35.alreadyBookedSeatFare[index];
                   single.reason = _this35.rescheduleData.reason;
                   single.rescheduleDate = _this35.rescheduleData.rescheduleDate;
+                  single.rescheduleSchedule = _this35.rescheduleData.rescheduleSchedule;
                   single.rescheduleType = _this35.rescheduleSeatType;
                   single.overIssueReschedule = _this35.overIssueScheduleCheckBox;
                   single.newDepartureTime = _this35.rescheduleData.rescheduleSchedule;
@@ -39113,11 +39114,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    CheckBox: function CheckBox(e) {
+    allReverseSelect: function allReverseSelect(e) {
       if (e.target.checked) {
-        this.addForm.reverse = 1;
+        this.fareTable.forEach(function (single) {
+          single.reverse = 1;
+        });
       } else {
-        this.addForm.reverse = 0;
+        this.fareTable.forEach(function (single) {
+          single.reverse = 0;
+        });
+      }
+    },
+    allHideSelect: function allHideSelect(e) {
+      if (e.target.checked) {
+        this.fareTable.forEach(function (single) {
+          single.hide = 0;
+        });
+      } else {
+        this.fareTable.forEach(function (single) {
+          single.hide = 1;
+        });
       }
     },
     updateFare: function updateFare() {
@@ -69452,26 +69468,46 @@ var _hoisted_30 = {
 };
 
 var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "From City"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "To City"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference ( e.g HH:MM )"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Distance (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Show"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, " Action ")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "From City"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "To City"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference ( e.g HH:MM )"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Distance (km)"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reverse"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Show"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, " Action ")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_32 = ["onUpdate:modelValue"];
-var _hoisted_33 = ["onUpdate:modelValue"];
-var _hoisted_34 = ["onUpdate:modelValue"];
+var _hoisted_32 = {
+  key: 0
+};
+
+var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    colspan: "7"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_34 = ["checked"];
 var _hoisted_35 = ["onUpdate:modelValue"];
 var _hoisted_36 = ["onUpdate:modelValue"];
 var _hoisted_37 = ["onUpdate:modelValue"];
-var _hoisted_38 = ["onClick"];
-var _hoisted_39 = {
+var _hoisted_38 = ["onUpdate:modelValue"];
+var _hoisted_39 = ["onUpdate:modelValue"];
+var _hoisted_40 = ["onUpdate:modelValue"];
+var _hoisted_41 = ["onUpdate:modelValue"];
+var _hoisted_42 = ["onClick"];
+var _hoisted_43 = {
+  key: 1
+};
+var _hoisted_44 = {
+  colspan: "3"
+};
+var _hoisted_45 = {
   "class": "row"
 };
-var _hoisted_40 = {
+var _hoisted_46 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "fare"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Fare "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -69481,11 +69517,11 @@ var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_42 = {
+var _hoisted_48 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "time_difference"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Travel Time ( e.g HH:MM ) "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -69495,11 +69531,11 @@ var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_44 = {
+var _hoisted_50 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "distance_in_km"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Distance In KM "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -69509,11 +69545,11 @@ var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_46 = {
+var _hoisted_52 = {
   "class": "input-group mb-3"
 };
 
-var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "input-group-append"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -69523,7 +69559,7 @@ var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_48 = ["disabled"];
+var _hoisted_54 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -69601,7 +69637,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 544
   /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.entry.hide]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [$data.tableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, _hoisted_29)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fareTable, function (item, i) {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.entry.hide]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [$data.tableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, _hoisted_29)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.fareTable.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    onChange: _cache[8] || (_cache[8] = function ($event) {
+      return $options.allReverseSelect($event);
+    })
+  }, null, 32
+  /* HYDRATE_EVENTS */
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    onChange: _cache[9] || (_cache[9] = function ($event) {
+      return $options.allHideSelect($event);
+    }),
+    checked: $data.entry.hide == 0
+  }, null, 40
+  /* PROPS, HYDRATE_EVENTS */
+  , _hoisted_34)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fareTable, function (item, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
@@ -69614,7 +69665,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, null, 8
     /* PROPS */
-    , _hoisted_32), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i]["class"].name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i]["class"].name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       disabled: "",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -69622,7 +69673,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, null, 8
     /* PROPS */
-    , _hoisted_33), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].city_from.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].city_from.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       disabled: "",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -69630,17 +69681,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, null, 8
     /* PROPS */
-    , _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].city_to.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].city_to.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.fareTable[i].fare = $event;
       },
-      onKeypress: _cache[8] || (_cache[8] = function ($event) {
+      onKeypress: _cache[10] || (_cache[10] = function ($event) {
         return $options.isNumber($event);
       })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
-    , _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].fare]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+    , _hoisted_38), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].fare]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
       modelValue: $data.fareTable[i].time_difference,
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.fareTable[i].time_difference = $event;
@@ -69655,13 +69706,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.fareTable[i].distance_in_km = $event;
       },
-      onKeypress: _cache[9] || (_cache[9] = function ($event) {
+      onKeypress: _cache[11] || (_cache[11] = function ($event) {
         return $options.isNumber($event);
       }),
       maxlength: "4"
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
-    , _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].distance_in_km]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_39), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.fareTable[i].distance_in_km]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "checkbox",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.fareTable[i].reverse = $event;
+      },
+      "true-value": 1,
+      "false-value": 0
+    }, null, 8
+    /* PROPS */
+    , _hoisted_40), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.fareTable[i].reverse]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "checkbox",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.fareTable[i].hide = $event;
@@ -69670,7 +69730,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "false-value": 1
     }, null, 8
     /* PROPS */
-    , _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.fareTable[i].hide]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_41), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.fareTable[i].hide]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-primary btn-sm mr-1",
       onClick: function onClick($event) {
         return $options.updateFareTable($data.fareTable[i]);
@@ -69678,16 +69738,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       title: "update Fare"
     }, "Save ", 8
     /* PROPS */
-    , _hoisted_38)])]);
+    , _hoisted_42)])]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )), $data.fareTable.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary btn-sm mr-1",
-    onClick: _cache[10] || (_cache[10] = function ($event) {
+    onClick: _cache[12] || (_cache[12] = function ($event) {
       return $options.updateFareTable($data.fareTable);
     }),
     title: "update Fare"
-  }, "Save All ")])])])]))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
+  }, "Save All ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
     heading: _ctx.from + $data.icon + _ctx.to,
     errors: this.validationErrors,
     success: $data.success,
@@ -69697,30 +69757,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[16] || (_cache[16] = function () {
+        onClick: _cache[18] || (_cache[18] = function () {
           return $options.add && $options.add.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading... ' : 'Save Fare Details'), 9
       /* TEXT, PROPS */
-      , _hoisted_48)];
+      , _hoisted_54)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.data.fare = $event;
         }),
-        onKeypress: _cache[12] || (_cache[12] = function ($event) {
+        onKeypress: _cache[14] || (_cache[14] = function ($event) {
           return $options.isNumber($event);
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.fare]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.fare]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
         "class": "form-control",
         modelValue: $data.data.time_difference,
-        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
           return $data.data.time_difference = $event;
         }),
         mask: "00:00",
@@ -69728,19 +69788,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.options
       }, null, 8
       /* PROPS */
-      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
-        onKeypress: _cache[14] || (_cache[14] = function ($event) {
+        onKeypress: _cache[16] || (_cache[16] = function ($event) {
           return $options.isNumber($event);
         }),
         maxlength: "4",
-        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
           return $data.data.distance_in_km = $event;
         })
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.distance_in_km]]), _hoisted_47])])])];
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.distance_in_km]]), _hoisted_53])])])];
     }),
     _: 1
     /* STABLE */
