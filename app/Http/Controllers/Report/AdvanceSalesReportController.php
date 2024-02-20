@@ -70,66 +70,66 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'updated_by']); 
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']); 
 
         $sortData = [];
-        foreach ($tickets as $outer) {
-            foreach ($outer as $inner) {
+        foreach ($tickets as $time) {
+            foreach ($time as $route) {
+                foreach ($route as $inner) {
                 
-                $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
-                $single['bus_class'] = $inner[0]->busClass->name;
-                $single['seats'] = $inner->count();
-                $single['terminal'] = $inner[0]->terminal->name;
-                $single['user'] = $inner[0]->updated_name->name??'N/A';
-                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-                $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
-                $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
-                $eltSum = 0;
-                foreach ($inner as $tkt) {
-                    if ($tkt->ticketElt) {
-                        $eltSum += $tkt->ticketElt->elt_price;
-                    } else {
-                        $eltSum += 0;
-                    }
+                    $single = [];
+                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
+                    $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['seats'] = $inner->count();
+                    $single['terminal'] = $inner[0]->terminal->name;
+                    $single['user'] = $inner[0]->updated_name->name??'N/A';
+                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
+                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $eltSum = 0;
+                    foreach ($inner as $tkt) {
+                        if ($tkt->ticketElt) {
+                            $eltSum += $tkt->ticketElt->elt_price;
+                        } else {
+                            $eltSum += 0;
+                        }
 
+                    }
+                    $single['elt'] = $eltSum;
+                    array_push($sortData, $single);
                 }
-                $single['elt'] = $eltSum;
-                array_push($sortData, $single);
             }
         }
 
 //        Refund Data Details
 
-        $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
-            ->where('type', 'canceled')->withTrashed()
-            ->when($request->terminal, function ($query) use ($request) {
-                return $query->where('terminal_id', $request->terminal);
-            })
-            ->when($request->user, function ($query) use ($request) {
-                return $query->where('added_by', $request->user);
-            })
-            ->when($request->route, function ($query) use ($request) {
-                return $query->whereIn('route_id', $request->route);
-            })
-            ->when($request->fromDateTime, function ($query) use ($request) {
-                return $query->where('schedule_time', '>=', $request->fromDateTime);
-            })->when($request->toDateTime, function ($query) use ($request) {
-                return $query->where('schedule_time', '<=', $request->toDateTime);
-            })->get();
-        $refundTickets->map(function ($q) {
-            $q->cancel_percentage = $q->cancel_ticket->percentage;
-            $user = User::find($q->cancel_ticket->added_by);
-            $q->refund_by = $user ? $user->name : '-';
-            $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_NO = BusClass::find($q->bus_class_id)->name;
-            $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
-            $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
-            $final = $percentageValue / 100;
-            $q->amount_refund = round((int)$q->seat_fare - $final);
-            $q->cancelation_charges = round($final);
-            unset($q->cancel_ticket, $q->schedule);
-        });
+        // $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
+        //     ->where('type', 'canceled')->withTrashed()
+        //     ->when($request->terminal, function ($query) use ($request) {
+        //         return $query->where('terminal_id', $request->terminal);
+        //     })
+        //     ->when($request->user, function ($query) use ($request) {
+        //         return $query->where('added_by', $request->user);
+        //     })
+        //     ->when($request->route, function ($query) use ($request) {
+        //         return $query->whereIn('route_id', $request->route);
+        //     })
+        //     ->get();
+        // $refundTickets->map(function ($q) {
+        //     $q->cancel_percentage = $q->cancel_ticket->percentage;
+        //     $user = User::find($q->cancel_ticket->added_by);
+        //     $q->refund_by = $user ? $user->name : '-';
+        //     $q->cancel_date = $q->cancel_ticket->time;
+        //     $q->bus_NO = BusClass::find($q->bus_class_id)->name;
+        //     $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+        //     $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+        //     $final = $percentageValue / 100;
+        //     $q->amount_refund = round((int)$q->seat_fare - $final);
+        //     $q->cancelation_charges = round($final);
+        //     unset($q->cancel_ticket, $q->schedule);
+        // });
+        
+        
         // Counter expenses data
         if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
             $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
@@ -151,7 +151,7 @@ class AdvanceSalesReportController extends Controller
             
             return [
                 'record' => $sortData,
-                'refund' => $refundTickets,
+                'refund' => [],
                 'counterExpenses' => $counterexpenses ?? [],
         ];
 
@@ -198,66 +198,68 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'updated_by']); 
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']); 
 
         $sortData = [];
-        foreach ($tickets as $outer) {
-            foreach ($outer as $inner) {
+        foreach ($tickets as $time) {
+            foreach ($time as $route) {
+                foreach ($route as $inner) {
                 
-                $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
-                $single['bus_class'] = $inner[0]->busClass->name;
-                $single['seats'] = $inner->count();
-                $single['terminal'] = $inner[0]->terminal->name;
-                $single['user'] = $inner[0]->updated_name->name??'N/A';
-                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-                $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
-                $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
-                $eltSum = 0;
-                foreach ($inner as $tkt) {
-                    if ($tkt->ticketElt) {
-                        $eltSum += $tkt->ticketElt->elt_price;
-                    } else {
-                        $eltSum += 0;
-                    }
+                    $single = [];
+                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
+                    $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['seats'] = $inner->count();
+                    $single['terminal'] = $inner[0]->terminal->name;
+                    $single['user'] = $inner[0]->updated_name->name??'N/A';
+                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
+                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $eltSum = 0;
+                    foreach ($inner as $tkt) {
+                        if ($tkt->ticketElt) {
+                            $eltSum += $tkt->ticketElt->elt_price;
+                        } else {
+                            $eltSum += 0;
+                        }
 
+                    }
+                    $single['elt'] = $eltSum;
+                    array_push($sortData, $single);
                 }
-                $single['elt'] = $eltSum;
-                array_push($sortData, $single);
             }
         }
 
 //        Refund Data Details
 
-        $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
-            ->where('type', 'canceled')->withTrashed()
-            ->when($request->terminal, function ($query) use ($request) {
-                return $query->where('terminal_id', $request->terminal);
-            })
-            ->when($request->user, function ($query) use ($request) {
-                return $query->where('added_by', $request->user);
-            })
-            ->when($request->route, function ($query) use ($request) {
-                return $query->whereIn('route_id',  explode(",",$request->route));
-            })
-            ->when($request->fromDateTime, function ($query) use ($request) {
-                return $query->where('schedule_time', '>=', $request->fromDateTime);
-            })->when($request->toDateTime, function ($query) use ($request) {
-                return $query->where('schedule_time', '<=', $request->toDateTime);
-            })->get();
-        $refundTickets->map(function ($q) {
-            $q->cancel_percentage = $q->cancel_ticket->percentage;
-            $user = User::find($q->cancel_ticket->added_by);
-            $q->refund_by = $user ? $user->name : '-';
-            $q->cancel_date = $q->cancel_ticket->time;
-            $q->bus_NO = BusClass::find($q->bus_class_id)->name;
-            $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
-            $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
-            $final = $percentageValue / 100;
-            $q->amount_refund = round((int)$q->seat_fare - $final);
-            $q->cancelation_charges = round($final);
-            unset($q->cancel_ticket, $q->schedule);
-        });
+        // $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
+        //     ->where('type', 'canceled')->withTrashed()
+        //     ->when($request->terminal, function ($query) use ($request) {
+        //         return $query->where('terminal_id', $request->terminal);
+        //     })
+        //     ->when($request->user, function ($query) use ($request) {
+        //         return $query->where('added_by', $request->user);
+        //     })
+        //     ->when($request->route, function ($query) use ($request) {
+        //         return $query->whereIn('route_id',  explode(",",$request->route));
+        //     })
+        //     ->when($request->fromDateTime, function ($query) use ($request) {
+        //         return $query->where('schedule_time', '>=', $request->fromDateTime);
+        //     })->when($request->toDateTime, function ($query) use ($request) {
+        //         return $query->where('schedule_time', '<=', $request->toDateTime);
+        //     })->get();
+        // $refundTickets->map(function ($q) {
+        //     $q->cancel_percentage = $q->cancel_ticket->percentage;
+        //     $user = User::find($q->cancel_ticket->added_by);
+        //     $q->refund_by = $user ? $user->name : '-';
+        //     $q->cancel_date = $q->cancel_ticket->time;
+        //     $q->bus_NO = BusClass::find($q->bus_class_id)->name;
+        //     $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+        //     $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+        //     $final = $percentageValue / 100;
+        //     $q->amount_refund = round((int)$q->seat_fare - $final);
+        //     $q->cancelation_charges = round($final);
+        //     unset($q->cancel_ticket, $q->schedule);
+        // });
         // Counter expenses data
         if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
         $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
@@ -282,11 +284,11 @@ class AdvanceSalesReportController extends Controller
         $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
         $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
        
-        
+    
     // return $counterexpenses;
         return view('reports.advanceSaleReport', [
             'record' => $sortData,
-            'refund' => $refundTickets,
+            'refund' =>[],
             'counterExpenses' => $counterexpenses ?? [],
             'filterData' => $filterData,
         ]);
