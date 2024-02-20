@@ -67,12 +67,12 @@
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-end" v-if="filters.record != null">
+                                            <!-- <div class="d-flex justify-content-end" v-if="filters.record != null">
                                                 <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
                                                         :disabled="loadingTable">
                                                     {{ loadingTable ? 'Loading...' : 'Print Record' }}
                                                 </button>
-                                            </div>
+                                            </div> -->
                                             <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                 target="_blank">
                                                 <input type="hidden" name="token" :value="this.$store.state.token">
