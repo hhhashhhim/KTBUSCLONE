@@ -124,6 +124,7 @@ class FareTableController extends Controller
 
     public function fareUpdate(Request $request)
     {
+        
         try {
                 DB::beginTransaction();
                 FareTable::where(['from_city_id' => $request->fromCity, 'to_city_id' => $request->toCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
@@ -156,17 +157,27 @@ class FareTableController extends Controller
     
     public function fareUpdateMultiple(Request $request)
     {
+        
         try {
             DB::beginTransaction();
 
             foreach ($request->mydata as $single) {
-                FareTable::where("id", $single['id'])->update([
+                FareTable::where(['from_city_id' => $single['from_city_id'], 'to_city_id' => $single['to_city_id'], 'fare_class' => $single['fare_class'], 'company_id' => Auth::user()->company_id])->update([
                     'fare' => $single['fare'],
                     'time_difference' => $single['time_difference'],
                     'distance_in_km' => $single['distance_in_km'],
                     'hide' => $single['hide'],
                     'updated_by' => Auth::user()->id,
                 ]);
+                if (isset($single['reverse']) && $single['reverse'] == true) {
+                    FareTable::where(['from_city_id' => $single['to_city_id'], 'to_city_id' => $single['from_city_id'], 'fare_class' => $single['fare_class'], 'company_id' => Auth::user()->company_id])->update([
+                        'fare' => $single['fare'],
+                        'time_difference' => $single['time_difference'],
+                        'distance_in_km' => $single['distance_in_km'],
+                        'hide' => $single['hide'],
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
             }
                 
                 ActivityLog::create([

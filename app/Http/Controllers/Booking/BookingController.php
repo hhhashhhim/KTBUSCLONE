@@ -307,6 +307,7 @@ class BookingController extends Controller
                     $bookingNo = Ticket::where('date', $item['rescheduleDate'])->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
+                
                 $scheduleDetail = ScheduleDetail::where([
                     'company_id' => Auth::user()->company_id,
                     'departure_date' => $item['rescheduleDate'],
