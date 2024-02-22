@@ -2911,6 +2911,10 @@ export default {
                 });
             }
 
+            console.log(this.selectedSeats);
+            console.log(this.selectedBookedSeats);
+            console.log(this.advanceSeat);
+            console.log(this.addForm.alreadyBookedId);
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);

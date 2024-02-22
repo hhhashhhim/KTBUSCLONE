@@ -31132,8 +31132,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 26:
+                console.log(_this23.selectedSeats);
+                console.log(_this23.selectedBookedSeats);
+                console.log(_this23.advanceSeat);
+                console.log(_this23.addForm.alreadyBookedId);
+                /*Over Issue Seats*/
+
                 if (!(_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedOverIssueSeats.length == 0)) {
-                  _context22.next = 32;
+                  _context22.next = 36;
                   break;
                 }
 
@@ -31158,12 +31164,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedBookedOverIssueSeats = _this23.selectedBookedOverIssueSeats;
-                _context22.next = 41;
+                _context22.next = 45;
                 break;
 
-              case 32:
+              case 36:
                 if (!(!_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedBookedOverIssueSeats.length == 0)) {
-                  _context22.next = 38;
+                  _context22.next = 42;
                   break;
                 }
 
@@ -31180,10 +31186,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedOverIssueSeats = _this23.selectedOverIssueSeats;
-                _context22.next = 41;
+                _context22.next = 45;
                 break;
 
-              case 38:
+              case 42:
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
@@ -31197,7 +31203,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 41:
+              case 45:
               case "end":
                 return _context22.stop();
             }
