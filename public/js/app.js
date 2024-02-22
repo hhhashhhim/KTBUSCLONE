@@ -31117,9 +31117,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
-                setTimeout(function () {
-                  _this23.resetArrays();
-                }, 1000);
+                _this23.resetArrays();
+
                 return _context22.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",

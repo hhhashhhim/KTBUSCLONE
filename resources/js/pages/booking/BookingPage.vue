@@ -2895,9 +2895,9 @@ export default {
              
                 this.fetchScheduleData();
                 //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-                setTimeout(() => {
-                    this.resetArrays();
-                }, 1000);
+            
+                this.resetArrays();
+                
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
